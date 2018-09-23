@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      
+>
+    <ui:composition template="templates/dialogTemplate.xhtml">
+<ui:define name="title">
+    Player PlayedRounds View
+</ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_dialogPlayedRounds.xhtml"/>
+</ui:define>
+<ui:define name="content">    
+<h:form id="view_played_rounds"
+        style="border:solid 3px" 
+        enctype="application/x-www-form-urlencoded" >
+
+<p:outputPanel id="playedroundsDetail"
+               style="text-align:center;">
+ <p:panelGrid  columns="2"
+               columnClasses="label,value">
+    <f:facet name="header">
+                    this is the header facet
+    </f:facet>
+
+                <h:outputText value="Date Round:" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundDate}"
+                              >
+                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                </h:outputText>
+             
+ 
+                <h:outputText value="Competition :" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundCompetition}" />
+ 
+                <h:outputText value="Game :" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundGame}" 
+                              style="color:silver" />
+ 
+                <h:outputText value="idround" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.idround}" />
+                
+                <h:outputText value="idclub" />
+                <h:outputText value="#{courseC.selectedPlayedRound.club.idclub}" />
+                
+                <h:outputText value="idcourse" />
+                <h:outputText value="#{courseC.selectedPlayedRound.course.idcourse}" />
+                
+                <h:outputText value="Starting Hole" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundStart}" />
+                
+                <h:outputText value="Holes" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundHoles}" />
+                
+
+<f:facet name="footer">
+This is the footer facet of DialogPlayedRounds
+</f:facet>
+
+</p:panelGrid>
+</p:outputPanel>
+</h:form>
+</ui:define> <!--  end of "content" -->
+</ui:composition>
+</html>

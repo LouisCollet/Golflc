@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+       xmlns:p="http://primefaces.org/ui"
+>
+<h:body>
+    <ui:composition>
+
+    <h:outputText id="fmd_help" escape="false" value="#{courseC.mdate}"></h:outputText>
+
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fr">
+<br/>
+#{view.viewId}
+<br/>        
+
+<p:sidebar widgetVar="sidebar2"
+           position="right" 
+           baseZIndex="10000">
+    <h1 style="font-weight:normal">Right Sidebar for Help LC</h1>
+    <p:commandButton value="Cancel"
+                     oncomplete="PF('sidebar2').hide()"/>
+</p:sidebar>
+
+
+
+        <p:commandButton icon="fa fa-arrow-left"
+                         oncomplete="PF('sidebar2').show()" />
+<br/>
+La langue des écrans correspond à la langue que vous avez choisie lors de votre enregistrement.
+<br/>
+Choisissez une action dans le menu à gauche :
+    <br/>
+CREATE
+    <br/>
+PLAYER info
+    <br/>
+PLAY a round
+    <br/>
+STATS
+    <br/>
+RESTART
+    <br/>
+HELP
+    <br/>
+
+ 
+    </h:outputText>
+</ui:composition>
+</h:body>
+</html>

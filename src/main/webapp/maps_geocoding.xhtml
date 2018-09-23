@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+            
+      >
+<ui:composition template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Travel modes in directions</ui:define>
+<ui:define name="head"></ui:define>
+<ui:define name="content">
+  <h:head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+   
+    <title>Geocoding service</title>
+    <style type="text/css">
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #panel {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+
+      /*
+      Provide the following styles for both ID and class,
+      where ID represents an actual existing "panel" with
+      JS bound to its name, and the class is just non-map
+      content that may already have a different ID with
+      JS bound to its name.
+      */
+
+      #panel, .panel {
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      #panel select, #panel input, .panel select, .panel input {
+        font-size: 15px;
+      }
+
+      #panel select, .panel select {
+        width: 100%;
+      }
+
+      #panel i, .panel i {
+        font-size: 12px;
+      }
+
+    </style>
+    
+    <!--  & is a special/functional char in HTML/XML but you want to use it as a normal char.
+    So you have to encode it correctly: Write &amp; instead of &
+    si HTML alors & fonctionne !! 
+    https://maps.googleapis.com/maps/api/js?v=3.exp&amp;key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc"
+    -->
+    
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc"/>
+    <script type="text/javascript" >
+var geocoder;
+var map;
+var google; // fake
+function initialize() {
+  geocoder = new google.maps.Geocoder();
+  var latlng = new google.maps.LatLng(-34.397, 150.644);
+  var mapOptions = {
+    zoom: 8,
+    center: latlng
+  };
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+}
+
+function codeAddress() {
+  var address = document.getElementById('address').value;
+  geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status === google.maps.GeocoderStatus.OK) {
+      map.setCenter(results[0].geometry.location);
+      var marker = new google.maps.Marker({
+          map: map,
+          position: results[0].geometry.location
+      });
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </h:head>
+  <h:body>
+    <div id="panel">
+      <input id="address" type="text" value="Sydney, NSW"/>
+      <input type="button" value="Geocode" onclick="codeAddress()"/>
+    </div>
+    <div id="map-canvas"></div>
+    
+    <p:panelGrid
+    id="panelgrid1"
+    styleClass="alignmentLeft"
+    columnClasses="col1,col2,col3,col4"
+    columns="4" >
+
+<f:facet name="header">
+    <h1>#{msg['title.score.results']}</h1>
+</f:facet>
+    <h:outputText value="#{msg['round.competition']} :" />
+    </p:panelGrid>
+    
+    
+    
+  </h:body>
+    
+    </ui:define> <!-- content -->
+</ui:composition>
+</html>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      template="/templates/masterTemplate.xhtml"
+>
+   <!-- following snippet shows a view parameter which only
+   accepts non null Strings that are at least 3 characters long
+   There's nothing really fancy going on here. When a GET request
+   like localhost:8080/mypage?fooId=1 is processed,
+   setFooId() is called,
+   and when the page is rendered getFooId() is called
+  
+    -->
+  
+    
+
+<ui:define name="title">Club Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_club.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<h:graphicImage library="images"
+                name="golf_club.jpg"
+                alt="image missing :golf_club.jpg"
+                style="float: left;">
+</h:graphicImage>
+<h:graphicImage library="images"
+                name="golf_club.jpg"
+                alt="image missing :golf_club.jpg"
+                style="float: right;">
+</h:graphicImage>
+
+
+     
+<h:form id="testForm">
+    
+    <p:log id="log" />
+    
+    <h:panelGrid columns="5" cellpadding="5">
+        <h:outputLabel id="nameoutput"
+                       for="firstnameTxt"
+                       value="Name:" 
+                       style="font-weight:bold"/>
+        <p:inputText id="firstnameTxt"
+                     value="#{courseC.player.playerFirstName}" />
+        <p:inputText id="lastnameTxt"
+                     value="#{courseC.player.playerLastName}" />
+        <br/>
+        <h:outputLabel id="output12"
+                       for="introductionTxt"
+                       value="Introduction:"
+                       style="font-weight:bold"/>
+        <p:inputText id="introductionTxt"
+                     value="#{courseC.introductionTxt}" />
+
+        <p:commandButton value="Submit" 
+                         update="firstname,lastname"
+                         partialSubmit="true" 
+                         process="firstnameTxt,lastnameTxt"/>
+
+        <h:outputText value="#{courseC.player.playerFirstName}"
+                      id="firstname" />
+        <h:outputText value="#{courseC.player.playerLastName}"
+                      id="lastname" />
+          <br/>  
+    </h:panelGrid>     
+    
+<h:outputLabel for="name1"
+               value="Name:" 
+               style="font-weight:bold" />
+<p:inputText id="name1" />
+<p:commandButton value="Partial Submit (False)" 
+                partialSubmit="false" 
+                process="name1" />
+<p:commandButton value="Partial Submit (True)" 
+                partialSubmit="true" 
+                process="name1" />
+<br/>
+<p:inputText id="id01"/> <p:inputText id="id02"/> <p:inputText id="id03" />
+<p:inputText id="id04"/> <p:inputText id="id05"/> <p:inputText id="id06"/><br/>
+<p:inputText id="id07"/> <p:inputText id="id08"/> <p:inputText id="id09"/><br/>
+
+</h:form>
+</ui:define>
+</ui:composition>

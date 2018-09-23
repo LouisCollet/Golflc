@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facelet-taglib version="2.2"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+	http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd">
+    
+    <namespace>http://utils/ELfunctions</namespace>
+    <!-- le fichier ELFunctions.java est dans Source Packages/utils -->
+<!--
+    <function>
+        <function-name>contains</function-name>
+        <function-class>utils.Functions</function-class>
+        <function-signature>boolean contains(java.util.Collection, java.lang.Object)</function-signature>
+    </function>
+
+    In the function-signature, be sure to use fully qualified names !!!!!.
+-->
+    <function>
+        <function-name>display</function-name>
+        <function-class>
+            utils.ELFunctions
+        </function-class>
+        <function-signature>
+            java.lang.String display(java.lang.String)
+        </function-signature>
+    </function>
+
+<!-- function FileModificationDate -->
+    <function>
+        <function-name>mdate</function-name>
+        <function-class>
+            utils.ELFunctions
+        </function-class>
+        <function-signature>
+            java.lang.String mdate(java.lang.String)
+        </function-signature>
+    </function>
+
+</facelet-taglib>

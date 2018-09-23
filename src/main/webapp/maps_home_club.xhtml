@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+            
+      >
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Travel domicile vers Club</ui:define>
+<ui:define name="head"></ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_club.xhtml"/>
+</ui:define>
+<ui:define name="content">
+    
+<h:head>
+    <title>Calculate Distance</title>
+<script  async="async"
+         defer="defer"
+         type="text/javascript"
+         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc&amp;language=#{languageC.locale}"
+>        
+  //  setTimeout(GetRoute, 1000); // 1 sec utile ?
+</script>
+    <h:outputScript library="js" name="maps_home_club.js"/>    
+</h:head>
+
+<h:form id="calculate_distance"
+        enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>     
+      
+ <!--      style="border:solid 5px" 
+<h:form id="calculate_distance">
+-->
+  <p:panelGrid id="panelgrid1" 
+              columns="2"
+              style="width:100px" 
+              styleClass="alignmentLeft"
+               > 
+      <!-- columnClasses="forty-percent top-alignment, sixty-percent top-alignment"
+      https://stackoverflow.com/questions/16776631/how-can-i-change-column-width-of-panel-grid-in-primefaces  -->
+
+        <h:outputText value="Départ" 
+                      style="width: 100px;"/>
+        <h:inputText id="txtSource" value="#{courseC.player.playerCity}" size="40"/>
+
+        <h:outputText value="Destination" 
+                      style="width: 100px;"/>
+        <h:inputText id="txtDestination" value="#{courseC.club.clubAddress},#{courseC.club.clubCity},#{courseC.club.clubCountry}" size="60"/>
+
+        <h:outputText value="#{msg['club.latitude']} :"   />
+        <p:inputText   id="ClubLatitude"
+                       value="#{courseC.club.clubLatitude}"/>
+    
+        <h:outputText value="#{msg['club.longitude']} :"   />
+        <p:inputText   id="ClubLongitude"
+                       value="#{courseC.club.clubLatitude}"/>
+ <!--       
+        getRoute se trouve dans un fichier.js externe 
+        <h:button value="Back to selectCourse" outcome="selectCourse.xhtml"/
+      -->
+ <f:facet name="footer">       
+        <p:commandButton value="GetRoute"
+                         id="buttonCreate"
+                         type="submit"
+                         icon="ui-icon-disk"
+                         style="float:left;"
+                         onclick="GetRoute()"
+              />
+ </f:facet>     
+  </p:panelGrid>
+
+<p:panelGrid id="panelgrid2" 
+              columns="2"
+              styleClass="alignmentLeft"
+              style="width:300px"
+               > 
+    <h:outputText value="#{msg['google.distance']} :"
+                              id="distance01"/>
+    <h:inputText  id="distance02"/>
+    <h:outputText value="#{msg['google.duration']} :"
+                              id="duration01"/>
+    <h:inputText id="duration02"/>
+    
+    
+</p:panelGrid>
+    
+
+<div id="dvMap" style="width: 1000px; height: 1000px;float: left;border:solid 2px;border-style:double;"/>
+<div id="dvPanel" style="width: 500px; height: 100%;float: right;border:solid 1px;background-color: lightblue;"/>
+<!--
+    <table style="border:solid 3px" 
+           cellpadding="0" 
+           cellspacing="3">
+        <tr> 
+            <td>
+                <div id="dvMap" style="width: 1000px; height: 1000px;float: left;border:solid 2px;border-style:double;"/>
+            </td>
+            <td>
+                <div id="dvPanel" style="width: 500px; height: 100%;float: right;border:solid 1px;background-color: lightblue;"/>
+            </td>
+        </tr>
+    </table>
+  <br />
+-->
+</h:form>
+</ui:define> <!-- content -->
+</ui:composition>
+</html>

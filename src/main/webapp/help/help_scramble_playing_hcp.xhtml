@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fr">
+        
+  <br/>
+#{view.viewId}
+ <b>Help Scramble Playing Handicap </b>
+
+ <b>Simulation</b>
+Scramble : chaque camp est constitué par deux, trois ou quatre joueurs. 
+Chaque joueur jour une balle sur chaque coup.
+Après chaque coup, le camp choisit sa meilleure balle et tous les joueurs du camp
+jouent le coup suivant depuis la position de cette balle.
+ <br/>
+Compléter les rubriques non utilisées par 0.00 !!!
+ <br/>
+  <b>Stableford Scramble à 2</b>
+25% de la somme des Playing Handicaps des 2 joueurs (Pl. Hcp A + Pl. Hcp B) X 25%
+ <br/>
+  <b>Stableford Scramble à 3</b>
+25% de la somme des Playing Handicaps des 3 joueurs (Pl. Hcp A + Pl. Hcp B + Pl. Hcp C) X 20%
+ <br/>
+  <b>Stableford Scramble à 4</b>
+25% de la somme des Playing Handicaps des 4 joueurs (Pl. Hcp A + Pl. Hcp B + Pl. Hcp C + Pl. Hcp D) X 10%
+ <br/>
+
+    </h:outputText>
+
+    
+</ui:composition>
+</h:body>
+</html>

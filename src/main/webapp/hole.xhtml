@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Hole Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_hole.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<h:graphicImage 
+                name="images/hole#{courseC.hole.holeNumber}.png"
+                alt="image missing :golf_hole.png"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/hole#{courseC.hole.holeNumber}.jpg"
+                alt="image missing :golf_hole.jpg"
+                style="float: right;">
+</h:graphicImage>
+    
+<h:form id="hole" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<!--
+<p:focus for="dist" /> ultérieurement
+-->
+<p:panelGrid
+    id="panel1"
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h1>#{msg['hole.data']}</h1>
+</f:facet>
+    
+
+       <h:outputText value="#{msg['hole.number']} :"   />
+       <p:inputMask
+                   label="hole num"
+                        id="holenumb"
+                        value="#{courseC.hole.holeNumber}"
+                        title="#{msg['tooltip.hole.holenumber']}"
+                        size="3"
+                        mask="?99"
+                        />
+
+       <h:outputText value="#{msg['hole.par']} :"   />
+       <p:selectOneButton id="par"
+                         value="#{courseC.hole.holePar}"
+               >
+            <f:selectItem itemLabel="Par 3"  itemValue="3" />
+            <f:selectItem itemLabel="Par 4"  itemValue="4" />
+            <f:selectItem itemLabel="Par 5"  itemValue="5" />
+       </p:selectOneButton>
+       
+       <h:outputText  value="#{msg['hole.index']} :"
+                      title="#{msg['tooltip.hole.holeindex']}"
+                      style="font-weight:bold"  />
+           <p:selectOneMenu id="index" value="#{courseC.hole.holeStrokeIndex}">
+               <f:selectItem itemLabel="??"
+                             itemValue="#{null}" />
+                <f:selectItems value="#{courseC.indexNumbers(18)}"/>
+           </p:selectOneMenu>
+       <h:outputText
+                       id="distance"
+                       value="#{msg['hole.distance']} :"
+                      />
+
+      <h:panelGroup id="panelgroup1">
+                <p:inputMask
+                       id="holeDistance"
+                       value="#{courseC.hole.holeDistance}"
+                       title="#{msg['tooltip.hole.holedistance']}"
+                       size="4"
+                       mask="?999"
+                       />
+       &nbsp;   <p:commandButton
+                         value="#{msg['button.hole.convert']}"
+                         id="commandButtonDistance"
+                         update="holeDistance"
+                         ajax="false"
+                         immediate="false"
+                         icon="ui-icon-transferthick-e-w"
+                         action="#{courseC.convertYtoM}">
+                 </p:commandButton>
+     </h:panelGroup>
+       
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.hole.create']}"
+                         id="commandButton2"
+                         ajax="false"
+                        
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.createHole}"/>
+<!--  rendered="#{not courseC.nextStep}" 
+        -->
+</f:facet>
+
+</p:panelGrid>
+	<p:contextMenu>
+		<p:menuitem value="Save" update="messages"
+			actionListener="#{utilsC.save}"
+                        icon="ui-icon-disk"/>
+		<p:menuitem value="Update" update="messages"
+			actionListener="#{utilsC.update}"
+                        icon="ui-icon-arrowrefresh-1-w"/>
+		<p:menuitem value="Delete" icon="ui-icon-close"
+			actionListener="#{utilsC.delete}"
+                        ajax="false"/>
+		<p:menuitem value="Homepage" url="http://www.primefaces.org"
+                        icon="ui-icon-extlink"/>
+	</p:contextMenu>
+
+<!--<pe:tooltip global="true" myPosition="left center" atPosition="right center"/>-->
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

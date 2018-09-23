@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+ <ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam
+            required="true"
+            name="cmd"
+            value="#{courseC.inputcmdParticipants}"
+            requiredMessage="You did not specify a cmd. (The cmd parameter is missing)"
+            converterMessage="Invalid cmd. (The cmd parameter is not a number)"
+            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
+            <f:validateLength minimum="3" />
+        </f:viewParam>
+ <!--   </f:metadata>
+        <f:metadata> -->
+        <f:viewParam
+            required="false"
+            name="operation"
+            value="#{courseC.inputClubOperation}"
+            requiredMessage="You did not specify a operation. (The id parameter is missing)"
+            converterMessage="Invalid operation. (The id parameter is not a number)"
+            validatorMessage="Invalid operation. (The operation parameter is not a positive number, minimum 6 length)">
+            <f:validateLength minimum="6" />
+        </f:viewParam>
+    </f:metadata>
+</ui:define>
+       
+    
+    
+<ui:define name="title">Participants Rounds Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_show_participants.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:form id="participants_rounds">
+<ui:include src="include/include_messages.xhtml"/>
+
+<p:dataTable id="played_rounds_table1"
+             value="#{courseC.getListmatchplay()}"
+             var="c" >
+<f:facet name="header">
+    <h1>Round Description</h1>
+</f:facet>
+    
+<p:column headerText="#{msg['round.date']}" style="width:100px" >
+   <h:outputText value="#{c.roundDate}"
+                 
+                 >
+    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+
+   </h:outputText>
+</p:column>    
+    <p:column headerText="#{msg['round.competition']}" style="width:100px" >
+   #{c.roundCompetition}
+</p:column>
+    
+<p:column headerText="#{msg['round.game']}" style="width:100px" >
+   #{c.roundGame}
+</p:column>
+    
+<p:column headerText="#{msg['course.name']}" style="width:100px" >
+   #{c.courseName}
+</p:column>
+    
+    
+</p:dataTable>
+                                                           
+<p:dataTable id="played_rounds_table2"
+             value="#{courseC.getListmatchplay()}"
+             var="c" >
+<f:facet name="header">
+     <h1>#{msg['round.players']}</h1>
+</f:facet>
+<!-- 
+
+<p:column headerText="#{msg['player.id']}"
+          footerText="#{msg['player.id']}"
+          style="width:100px" >
+   #{c.idplayer}
+</p:column>
+-->
+<p:column headerText="#{msg['player.first']}"
+          footerText="#{msg['player.first']}"
+          style="width:100px" >
+   #{c.playerFirstName} -  #{c.playerLastName} ( #{c.idplayer})
+</p:column>
+
+
+    <p:column headerText="#{msg['playerhasround.team']}"
+              footerText="#{msg['playerhasround.team']}"
+              style="width:100px" >
+   #{c.inscriptionTeam}
+</p:column>
+
+<ui:include src="include/include_thumbnails.xhtml"/>    
+
+
+<f:facet name="footer">
+
+        <p:commandButton id="button01"
+                         value="#{msg['button.score.create']} #{courseC.inputcmdParticipants} Matchplay"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         rendered="#{courseC.inputcmdParticipants eq 'MP_'}" 
+                         icon="ui-icon-disk"
+                         action="score_matchplay.xhtml"/>
+
+        <p:commandButton id="button02"
+                         value="#{msg['button.score.create']} #{courseC.inputcmdParticipants} Scramble"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         rendered="#{courseC.inputcmdParticipants eq 'SCR'}" 
+                         icon="ui-icon-disk"
+                         action="score_scramble.xhtml"/>
+
+</f:facet>
+</p:dataTable>
+
+
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

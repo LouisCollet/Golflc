@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--  xmlns:h="http://xmlns.jcp.org/jsf/html"  -->
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="head" />    
+<ui:define name="title">Player Page </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_subscription.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:graphicImage 
+                name="images/subscribe1.jpg"
+                alt="image missing :subscribe1.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/subscribe2.jpg"
+                alt="image missing :subscribe2.jpg"
+                style="float: right;">
+</h:graphicImage>
+    <f:event type="preRenderView" 
+             listener="#{facesContext.externalContext.response.setHeader('Cache-Control', 'no-cache, no-store')}" />
+<h:form id="subscription" enctype="application/x-www-form-urlencoded" >
+    
+
+<p:panelGrid 
+    id="panel1" 
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header" >
+    <h1>#{msg['subscription.titre']}</h1>
+</f:facet>
+
+                <h:outputText value="#{msg['player.id']}" />
+                <h:outputText id ="id1"
+                       	value="#{courseC.player.idplayer}" />
+                <h:outputText value="#{msg['player.first']}" />
+		<h:outputText  
+			      value="#{courseC.player.playerFirstName}" />
+
+		<h:outputText value="#{msg['player.last']}"   />
+		<h:outputText  
+			      value="#{courseC.player.playerLastName}" />
+
+		<h:outputText value="#{msg['player.city']}" />
+		<h:outputText  
+                              value="#{courseC.player.playerCity}" />
+
+                <h:outputText value="#{msg['player.country']}" />
+                <h:outputText value="#{courseC.player.playerCountry}" />
+ 
+                
+                <h:outputText value="#{msg['subscription.trial']}" />
+                <h:outputText value="#{courseC.subscription.trialCount}" />
+               
+                <h:outputText value="#{msg['subscription.enddate']}" />
+                <h:outputText id = "sub_endDate"
+                              value="#{courseC.subscription.endDate}"
+                             
+                              >
+                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                 </h:outputText>
+           
+                <h:outputText value="#{msg['subscription.new']}" />
+                <p:selectOneButton id="subscr"
+                                   value="#{courseC.subscription.subCode}"
+                                  >
+                    <f:selectItem itemLabel="#{msg['subscription.trial']}"  itemValue="T"> </f:selectItem>
+                    <f:selectItem itemLabel="#{msg['subscription.month']}"  itemValue="M"> </f:selectItem>
+                    <f:selectItem itemLabel="#{msg['subscription.year']}"   itemValue="Y"> </f:selectItem>
+                </p:selectOneButton>
+   <!--    rendered="#{courseC.player.playerPhotoLocation != null or not empty courseC.player.playerPhotoLocation}"   -->
+                
+                
+<f:facet name="footer">
+        <p:commandButton
+                         value="#{msg['button.subscription.create']}"
+                         id="button01"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.modifySubscription()}"/>
+ 
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+<!--                      -->
+
+</ui:define>
+</ui:composition>
+</html>

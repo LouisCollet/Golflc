@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      lang="#{languageC.locale}"
+>
+<ui:debug hotkey="x"
+          rendered="#{initParam['javax.faces.FACELETS_DEVELOPMENT']}"
+          />
+
+<f:view id="view_login"
+        contentType="text/html"
+        locale="#{languageC.locale}"
+        >
+    <h:head>
+              <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+              <meta http-equiv="Content-Language" content="#{languageC.locale}" /> 
+              <title><ui:insert name="title"> Default title </ui:insert></title>
+              <link rel="shortcut icon"
+                    type="image/x-icon"
+                    href="#{request.contextPath}/resources/images/loginicon.jpg" />
+    </h:head>
+ 
+<h:body id="body_login_template">
+<h:outputStylesheet library="css" name="primefacesLC.css"/>
+<ui:insert name="metadata" />
+<!-- new 21/07/2015 -->
+ <ui:insert name="body"></ui:insert>
+ 
+<p:layout id="layout_login" 
+          fullPage="true">
+        <p:layoutUnit
+                    id="lu_north"
+                    position="north"
+                    size="100"
+                    header ="#{msg['login.welcome']}"
+                    resizable="true"
+                    closable="false"
+                    collapsible="true">
+        <h:outputText value="Top unit content." />
+         <ui:insert name="header"></ui:insert>
+        <ui:include src="/header.xhtml"/>
+       
+        </p:layoutUnit>
+
+        <p:layoutUnit
+                    id="lu_south"
+                    position="south"
+                    size="100"
+                    header="Bottom"
+                    closable="true"
+                    collapsible="true">
+<!-- text here  "/" added 01/01/2015 car directory pour templates = /templates/xx!!
+le "/" epositionne sur le dirctory standard -->
+        <ui:include src="/footer.xhtml"/>
+        </p:layoutUnit>
+
+        <p:layoutUnit
+              id="lu_west"
+              position="west"
+              size="175"
+              header="Welcome loginTemplate"
+              collapsible="true">
+            <h:outputText value="#{msg['menu.title']}" />
+            <h:graphicImage 
+                name="images/golf man drive.jpg"
+                alt="image missing :golf man drive.jpg"
+                >
+            </h:graphicImage>
+        </p:layoutUnit>
+
+<ui:remove> </ui:remove>
+
+        <p:layoutUnit
+              id="lu_east"
+              position="east"
+              size="175"
+              header="Help"
+              collapsible="true"
+        >
+        <h:graphicImage 
+                name="images/golf_help.jpg"
+                alt="image missing :golf_help.jpg"
+                >
+        </h:graphicImage>
+        <ui:insert name="help"></ui:insert>
+        </p:layoutUnit>
+
+        <p:layoutUnit
+            id="lu_center"
+            position="center"
+
+            >
+            <ui:include src="/include/include_messages.xhtml"/>  <!-- new   -->
+                <ui:insert name="content"></ui:insert>
+        </p:layoutUnit>
+
+</p:layout>
+</h:body>
+</f:view>
+</html>

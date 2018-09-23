@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Job Execution</ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_register.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<h:graphicImage library="images"
+                name="file.png"
+                alt="image missing :file.png"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage library="images"
+                name="detail.png"
+                alt="image missing :text file.png"
+                style="float: right;">
+</h:graphicImage>
+
+<h:form id="jobexecution" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_messages.xhtml"/>
+
+<p:panelGrid
+    id="panel"
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h1>Batch Job Execution</h1>
+</f:facet>
+
+<h:outputText value="Last Batch ID" />
+<h:outputText value="#{batchC.execID}" />
+
+<h:outputText value="Last Batch Status"/>
+<h:outputText value="#{batchC.jobStatus}" />
+
+<!-- récupère le execID dans la ListeBatch gérée par l'application et l'utilise pour appeler la method -->
+<c:forEach items="#{batchC.listeBatch}" var="c" varStatus="loop">
+   <h:outputText value="Job Execution Details" />
+   <h:outputText value="#{batchC.getJobExecutionDetails(c.execID)} / #{loop.index+1}" />
+</c:forEach>
+
+<f:facet name="footer">
+        <p:commandButton value="Back to Job Submission" 
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="fa fa-arrow-circle-left"
+                         action="jobSubmitter.xhtml" />
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

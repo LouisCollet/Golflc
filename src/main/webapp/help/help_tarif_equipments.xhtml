@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fake">
+        
+<br/>
+Tarif Equipements
+#{view.viewId}
+<br/>
+Fairway : si le tee shot a atteint le fairway, ou pas (1 ou 0).
+Doit être 0 s'il s'agit d'un Par 3
+<br/>
+Green : nombre de coups pour atteindre le green.
+(GIR : Green In Regulation)
+<br/>
+Putts : nombre de puts pour terminer le trou.
+Attention : il faut être sur le green (n'est donc PAS le nombre de strokes avec le putter !)
+<br/>
+Sand : nombre de coups pour sortir d'un bunker.
+    <br/>
+     
+    </h:outputText>
+
+</ui:composition>
+</h:body>
+</html>

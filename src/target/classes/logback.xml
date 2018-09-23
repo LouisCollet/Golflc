@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+
+<!--   <property name="MY_HOME" value="/home/my" />
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${MY_HOME}/logs/mylog.log</File>
+     By default, the configuration file will be scanned for changes once every minute.
+\(%class{25}:%line\)
+-->
+<configuration debug="true">
+     
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{ISO8601} %-4r %-5p %C %M %F - %m%n</pattern>
+    </encoder>
+  </appender>
+  
+  <property name="MY_HOME" value="C:/log/" />
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+         <!--<pattern>%d{ISO8601} %-4r %-5p %x %l = %X{remoteAddress} - %m %n</pattern> -->
+    <Append>true</Append>
+    <File>${MY_HOME}golflc_logback.log</File>
+<encoder>
+      <!--   <pattern>[%thread] %highlight(%-5level) %cyan(%logger{15}) - %msg %n</pattern> -->
+       <pattern>%d{ISO8601} %-4r %-5p %C %M %F %m %n</pattern> 
+</encoder>
+
+  </appender>
+  
+  <root level="ALL">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>

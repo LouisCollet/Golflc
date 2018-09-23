@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fr">
+  <br/>
+#{view.viewId}
+<br/>
+ <b>Nom du parcours : </b>
+Le nom du club commence par une majuscule
+ <br/>
+ 
+ <b>Nombre de trous : </b>
+Possibilités : 9 ou 18
+ <br/>
+ 
+  <b>Par : </b>
+Indiquer le PAR du parcours.
+IMPORTANT : total des par des 18 trous !
+ <br/>
+ 
+    </h:outputText>
+
+            <h:outputText
+        escape="false"
+        id="helptextnl"
+        rendered="#{languageC.locale eq 'nl'}" 
+        value="nl">
+            NL Versie 
+            Ceci est la page HELP de Create Course
+            version spéciale JSF sous primefaces
+            (à compléter)
+            <br/>
+        
+    </h:outputText>
+</ui:composition>
+</h:body>
+</html>

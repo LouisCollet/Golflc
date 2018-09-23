@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      template="templates/masterTemplate.xhtml"
+>
+
+<ui:define name="title">Tarif Page </ui:define>
+<!--
+<ui:define name="help">
+    <ui:include src="/help/help_score_statistics.xhtml"/>
+</ui:define>
+-->
+<ui:define name="content">
+    <!-- 
+        <h:outputScript library="js" name="forms.js" target="head"/>
+<h:graphicImage 
+                name="images/tarif1.jpg"
+                alt="image missing :tarif1.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/tarif2.jpg"
+                alt="image missing :tarif2.jpg"
+                style="float: right;">
+</h:graphicImage>
+-->
+    <p:tabView>
+        <p:tab title="Tarif Part I">
+            <h:panelGrid columns="3" >
+                <ui:include src="tarif_seasons.xhtml"/>
+            </h:panelGrid>
+        </p:tab>
+        <p:tab title="Tarif Part II">
+            <h:panelGrid columns="2" cellpadding="10">
+               texte
+               
+            </h:panelGrid>
+        </p:tab>
+        <p:tab title="Tarif Part III">
+            <h:panelGrid columns="1" cellpadding="10">
+                <h:outputText value="After a break of more than 15 years, director Francis Ford Coppola and writer Mario Puzo returned to the well for this third and final story of the fictional Corleone crime family. 
+                    Two decades have passed, and crime kingpin Michael Corleone, now divorced from his wife Kay has nearly succeeded in keeping his promise that his family would one day be completely legitimate." />
+            </h:panelGrid>
+        </p:tab>
+    </p:tabView>
+
+<!--
+<p:panelMenu id="panel_menu">
+    <p:submenu label="Input Data Tarif" 
+               icon="ui-icon-wrench">
+         <p:menuitem value ="Seasons"
+                     outcome="tarif_seasons.xhtml"
+                     icon="fa fa-calendar-o" />
+         <p:menuitem value ="Hours"
+                     outcome="tarif_hours.xhtml"
+                     icon="fa fa-clock-o" />
+         <p:menuitem value="Equipments"
+                     icon="fa fa-sun-o"
+                     outcome="tarif_equipments.xhtml" />
+         <p:menuitem value="Days"
+                     icon="fa fa-sun-o"
+                     outcome="tarif_days.xhtml" />
+    </p:submenu>
+    <p:separator/>
+    <p:submenu label="Create Tarif "
+               icon="ui-icon-wrench">
+          <p:menuitem value="All tarifs in one shot" 
+                     icon="fa fa-database"
+                     action="#{courseC.createTarif}"/>
+    </p:submenu>
+</p:panelMenu>
+-->
+
+</ui:define>
+</ui:composition>

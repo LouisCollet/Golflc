@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Descriptor : jboss-web.xml
+location: WEB-INF
+Description :  JBoss Web deployment descriptor. This can be use to override settings from web.xml,
+               and to set WildFly specific options
+ https://docs.jboss.org/jbossweb/7.0.x/appdev/jbossweb.html              
+-->  
+<!DOCTYPE jboss-web PUBLIC "http://www.jboss.org/j2ee/dtd" "http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd">
+<jboss-web>
+<!--<context-root>test</context-root> context-root 
+Root context of the web-app. It defaults to the filename of the deployememt without the .war suffix
+ -->
+</jboss-web>

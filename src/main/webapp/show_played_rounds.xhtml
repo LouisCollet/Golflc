@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      template="templates/masterTemplate.xhtml"
+>
+    <!--
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam
+            required="true"
+            name="cmd"
+            value="#{courseC.inputPlayedRounds}"xxx
+    
+            requiredMessage="You did not specify a inputPlayedRounds. (The cmd parameter is missing)"
+            converterMessage="Invalid cmd. (The id parameter is not a number)"
+            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
+            <f:validateLength minimum="3" />
+        </f:viewParam>
+    </f:metadata>
+</ui:define>
+-->
+<ui:define name="title">Played Rounds Page </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_show_playedrounds.xhtml"/>
+</ui:define>
+
+<ui:define name="content">
+
+<h:form id="played_rounds">
+  <ui:include src="include/include_messages.xhtml"/>
+       
+<!--  screen with DIALOG , il faut :
+    - filtered
+    - selection
+    - rowKey (attention pas de valeur null, sinon msg erreur non compréhensible
+    - une colonne avec selectionMode="single"
+-->
+<p:dataTable id="played_rounds_table"
+            value="#{courseC.listPlayedRounds('LCformula')}"
+            filteredValue="#{courseC.filteredPlayedRounds}"
+            var="c"
+            selection="#{courseC.selectedPlayedRound}"
+            rowKey="#{c.round.idround}"
+            resizableColumns="true"
+            liveResize="true"
+            rowIndexVar="row"
+     >
+    <p:ajax event="colResize"
+            update=":played_rounds:growl-msg"
+            listener="#{utilsC.onResize}" />
+
+
+<f:facet name="header">
+            <p:commandButton 
+                actionListener="#{dialogC.viewRound()}" 
+                icon="ui-icon-extlink"
+                value="View Detail"
+                style="float:left">
+                    <p:ajax event="dialogReturn"
+                            update=":played_rounds:growl-msg"
+                            listener="#{dialogC.onDialogReturn()}"/>
+            </p:commandButton>
+            <p:commandButton 
+                actionListener="#{courseC.viewChartPlayedRound}" 
+                icon="ui-icon-extlink"
+                value="View Chart"
+                style="float:right">
+            </p:commandButton>
+    
+     <h1>
+         #{msg['round.played']} #{courseC.player.playerFirstName} ,
+                 #{courseC.player.playerLastName} (#{courseC.player.idplayer})
+     </h1>
+</f:facet>    
+<!--    
+
+    <f:facet name="right">
+            second facet
+    </f:facet>
+ -->
+<p:column 
+          id="rowSingle"
+          selectionMode="single"
+          style="width:3%;text-align:center"
+          headerText="View"
+          footerText="View"
+          />
+
+<p:column
+     id="rowColumn"
+     headerText="#"
+     footerText="#"
+     style="width:2%;text-align:center"
+     >
+             #{row+1}
+</p:column>
+
+<p:column id="RoundDateColumn"
+          headerText="#{msg['round.date']}"
+          footerText="#{msg['round.date']}"
+          filterBy="#{c.round.roundDate}"
+          filterMatchMode="exact"
+          filterOptions="#{courseC.seasonOptions}"
+          style="width:10%" >
+   <h:outputText value="#{c.round.roundDate}"
+          >
+        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
+   </h:outputText>
+</p:column>
+<!--   <f:convertDateTime pattern="dd-MM-yyyy HH:mm" /> 
+  filterOptions="#{courseC.seasonOptions}"
+
+ -->
+ <f:facet name="filter">
+    <p:calendar  pattern="dd/MM/yyyy">
+        <p:ajax event="dateSelect"
+                oncomplete="PF('played_rounds_table').filter()"/>
+    </p:calendar>
+</f:facet>
+ 
+<p:column id="RoundCompetitionColumn"
+          sortBy="#{c.round.roundCompetition}"
+          filterMatchMode="contains"
+          filterBy="#{c.round.roundCompetition}"
+          headerText="#{msg['round.competition']}"
+          footerText="#{msg['round.competition']}"
+          style="width:100px" >
+   #{c.round.roundCompetition}
+</p:column>
+
+<p:column headerText="#{msg['round.game']}"
+          footerText="#{msg['round.game']}"
+          style="width:90px;text-align:right;margin-left:10px;margin-right:50px;"
+          id="GameColumn"
+          filterBy="#{c.round.roundGame}"
+          filterMatchMode="exact"
+          filterOptions="#{courseC.gameOptions}"
+                  >
+              #{c.round.roundGame}
+        </p:column>
+<!--
+<p:column id="colClubName1"
+          sortBy="#{c.clubName}"
+          headerText="#{msg['club.name']}"
+          footerText="#{msg['club.name']}"
+          style="width:100px" >
+   #{c.clubName}
+</p:column>
+ -->
+ 	<p:column   id="colClubName2"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                     sortBy="#{c.club.clubName}"
+                  >
+            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
+	</p:column>
+ 
+ <p:column id="colCourseName"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  style="width:20%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  >
+            <h:outputText value="#{c.course.courseName} (#{c.course.idcourse})" />
+	</p:column>
+ 
+ 
+ 
+ 
+<!--
+-->
+<p:column headerText="#{msg['round.result.stableford']}"
+          footerText="#{msg['round.result.stableford']}"
+          id="FinalResultColumn"
+          sortBy="#{c.inscription.playerhasroundFinalResult}"
+          style="white-space:pre-line;width:50px" >
+   #{c.inscription.playerhasroundFinalResult}  
+<!--        <h:outputText
+            value="(#{c.courseHoles})"
+            rendered="#{c.courseHoles != 18}"
+            >
+        </h:outputText>
+-->
+</p:column>
+
+<p:column id="colQualifying"
+          headerText="#{msg['round.qualifying']}"
+          footerText="#{msg['round.qualifying']}"
+          style="white-space:pre-line;width:40px;text-align:right" >
+   #{c.round.roundQualifying}
+</p:column>
+<!-- new 30/03/2016 -->
+<p:column  id="scorecard"
+                  headerText="#{msg['scorecard.header']}"
+                  footerText="#{msg['scorecard.header']}"
+                  style="width:9%" >
+            <p:commandButton
+                id="selectScorecard"
+                action="#{courseC.scorecard(c)}"
+                value="Scorecard"
+                icon="fa fa-map-o"
+                >
+             </p:commandButton>
+</p:column>
+<!-- new 30/03/2016 -->
+<p:column  id="chart"
+                  headerText="#{msg['course.chart']}"
+                  footerText="#{msg['course.chart']}"
+                  style="width:9%" >
+            <p:commandButton
+                id="selectChart"
+                action="#{courseC.selectChart(c, 'played rounds')}"
+                value="ViewChart"
+                icon="fa fa-line-chart"
+                >
+             </p:commandButton>
+</p:column>
+
+</p:dataTable>
+<!--
+    <p:commandButton id="btn"
+                     value="#{msg['button.print']}"
+                     type="button"
+                     icon="ui-icon-print"
+                     >
+        <p:printer target="played_rounds" />
+    </p:commandButton>
+ -->          
+
+</h:form>
+</ui:define>
+</ui:composition>

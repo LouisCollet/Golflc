@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+>
+
+<ui:composition template="templates/loginTemplate.xhtml">
+<ui:define name="title">Register </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_login.xhtml"/>
+</ui:define>
+<ui:define name="content">
+    
+<h:link title="#{msg['login.user.belgian']}"
+        outcome="register_eID_player.xhtml"
+        style="float:left;"
+        >
+    <h:graphicImage 
+                    rendered="true"
+                    name="images/eIDcard.jpg"
+                    alt="image missing : eIDcard.jpg"
+                    style="float:left;">
+    </h:graphicImage>
+</h:link>
+
+<h:link title="#{msg['login.user.nonbelgian']}"
+        outcome="player.xhtml"
+        style="float:right;"
+        >    
+<h:graphicImage 
+                rendered="true"
+                name="images/registration.jpg"
+                alt="image missing :registration.jpg"
+                style="float:right;">
+</h:graphicImage>
+    
+    <!--  outcome="#{courseC.to_player_xhtml('non_belgian')}"  -->
+</h:link>
+    
+<h:form id="register" enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>
+
+    <!-- -->
+<p:panelGrid id="panel"
+             columns="2"
+             
+             >
+<f:facet name="header">
+        <h1>#{msg['login.welcome']}</h1>
+</f:facet>
+
+     <h:outputText value="eID card holder" />
+     <h:outputText value="Manual registration" />
+     <h:link title="#{msg['login.user.belgian']}"
+             outcome="register_eID_player.xhtml"
+             style="float:left;"
+        >
+        <h:graphicImage name="images/arrow-left-3D.jpg" style="float:left;"/>
+     </h:link>
+     <h:link title="#{msg['login.user.nonbelgian']}"
+             outcome="player.xhtml}"
+             style="float:right;"
+        >
+     <h:graphicImage name="images/arrow-right-3D.jpg" style="float:right;"/>
+   </h:link>
+     <!--  outcome="#{courseC.to_player_xhtml('non_belgian')}"   -->
+ </p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

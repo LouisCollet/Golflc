@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+    <ui:composition template="templates/masterTemplate.xhtml">
+<!--
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam
+            required="true"
+            name="game"
+            value="#{courseC.inputScore}"
+            requiredMessage="You did not specify a cmd. (The id parameter is missing)"
+            converterMessage="Invalid cmd. (The id parameter is not a number)"
+            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
+            <f:validateLength minimum="3" />
+        </f:viewParam>
+    </f:metadata>
+</ui:define>
+-->
+<ui:define name="title">Select Played Stableford Round Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_select_playedrounds.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:form id="form_select_played_round">
+<ui:include src="include/include_messages.xhtml"/>
+
+    <!--	<h1>Played Round list : select for score registration</h1>
+    avant il y avait 'sta'
+-->
+<p:dataTable id="player_has_played_round"
+             rowIndexVar="row"
+             value="#{courseC.listStablefordPlayedRounds()}"
+             var="c"
+             filteredValue="#{courseC.filteredCars}"
+             >
+
+<f:facet name="header">
+            <h1>#{msg['message.selectround']} #{msg['message.for.score']}</h1>
+</f:facet>
+
+<ui:remove>
+  texte à supprimer
+</ui:remove>
+
+	<p:column headerText="#"
+                  style="width:40px"
+                  id="rowColumn">
+             #{row+1}
+	</p:column>
+<!-- c is ClubCourseRound  -->
+        <p:column headerText="#{msg['round.selected']}" style="width:100px" >
+            <p:commandButton
+                id="selectButtonColumn"
+                action="#{courseC.scoreStableford(c)}"
+                value="#{c.round.idround} - #{msg['button.select']}"
+                icon="ui-icon-pencil">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['round.date']}"
+                  style="width:100px"
+                  id="dateColumn">
+                  <h:outputText value="#{c.round.roundDate}"
+                  
+                                > 
+                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                  </h:outputText>
+	</p:column>
+<!-- attention : casse de la classe :min et MAF <f:convertDateTime pattern="dd-MM-yyyy" />-->
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    style="width:100px"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName} "
+                  >
+            #{c.club.clubName} (#{c.club.idclub})
+	</p:column>
+
+	<p:column id="coursenameColumn"
+                  headerText="#{msg['course.name']}"
+                  style="width:100px"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  >
+		#{c.course.courseName} (#{c.course.idcourse})(#{c.course.courseBegin} - #{c.course.courseEnd})
+	</p:column>
+
+        <p:column headerText="#{msg['round.competition']}"
+                  style="width:100px"
+                  id="competitionColumn"
+                  >
+                        #{c.round.roundCompetition}
+        </p:column>
+
+        <p:column headerText="#{msg['round.game']}"
+                  style="width:100px"
+                  id="gameColumn"
+                  >
+                        #{c.round.roundGame}
+        </p:column>
+
+        <p:column headerText="#{msg['round.result.stableford']}"
+                  style="width:10px"
+                  id="FinalResultColumn"
+                  >
+                        #{c.inscription.playerhasroundFinalResult}
+        </p:column>
+
+        <p:column headerText="#{msg['round.result.zwanzeurs']}"
+                  style="width:10px"
+                  id="ZwanzeursResultColumn"
+                  >
+                        #{c.inscription.playerhasroundZwanzeursResult}
+        </p:column>
+
+       <f:facet name="footer">
+           In total there are #{fn:length(courseC.listStablefordPlayedRounds())} rounds.
+       </f:facet>
+
+</p:dataTable>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

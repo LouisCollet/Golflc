@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+<ui:composition template="templates/dialogTemplate.xhtml">
+<ui:define name="title">Select Flight Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_dialogHandicap.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:form id="form_select_flight">
+<ui:include src="include/include_messages.xhtml"/>
+<p:outputPanel id="handicapDetail"
+               deferred="true"
+               style="text-align:center;">
+<p:dataTable id="flights"
+             value="#{courseC.listFlights()}"
+             var="var_flight"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredFlights}"
+             widgetVar="flightsTable"
+             paginator="true"
+             paginatorPosition="top"
+             rows="10"
+             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink}
+                    {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+             rowsPerPageTemplate="5,10,15"
+             >
+<!--  stickyHeader="true"  rowHover="true" -->
+<f:facet name="header">
+    <h1>#{msg['message.selectflight']} </h1>
+</f:facet>
+
+<p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="colRow">
+             #{row+1}
+</p:column>
+
+	<p:column id="colFlightPeriod"
+                  headerText="#{msg['flight.period']}"
+                  footerText="#{msg['flight.period']}"
+                  style="width:20%"
+                  filterMatchMode="equals"
+                  filterBy="#{var_flight.flightPeriod}"
+                  >
+            <f:facet name="filter">
+                <p:selectOneButton onchange="PF('flightsTable').filter()">
+                    <f:selectItem itemLabel="#{msg['flight.period.morning']}"   itemValue="A" />
+                    <f:selectItem itemLabel="#{msg['flight.period.midday']}"    itemValue="B" />
+                    <f:selectItem itemLabel="#{msg['flight.period.afternoon']}" itemValue="C" />
+                </p:selectOneButton>
+            </f:facet>
+            <h:outputText value="#{var_flight.flightPeriod}" />
+	</p:column>
+
+	<p:column headerText="#{msg['flight.selected']}"
+                  footerText="#{msg['flight.selected']}"
+                  style="width:20%"
+                  id="colFlightSelected" 
+         >
+            <c:set var="s0"
+                   value="#{var_flight.flightStart}">
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+            </c:set>
+   <!--                converter="localDateTimeConverter" -->
+               
+            <p:commandButton
+                id="selectButton"
+                actionListener="#{courseC.selectFlightFromDialog(var_flight)}"
+                value="#{s0}"
+          
+                icon="ui-icon-pencil"
+                >
+             </p:commandButton>
+ 	</p:column>            
+
+	<p:column   id="colFlightStart"
+                    headerText="#{msg['round.players']}"
+                    footerText="#{msg['round.players']}"
+                    style="width:20%"
+                  >
+            <h:outputText value="#{var_flight.flightStart}" 
+                          >
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+            </h:outputText>
+	</p:column>
+
+</p:dataTable>
+</p:outputPanel>
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

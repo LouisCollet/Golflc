@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender class="org.apache.log4j.RollingFileAppender" name="FILE">
+        <param value="true" name="Append"/>
+        <param value="C:/log/golflc.log" name="File"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d{ISO8601} %-4r %-5p %x %l = %X{remoteAddress} - %m %n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <!-- remotreAddrees et remotehost : voir UserIdentificationFilter.java   -->
+    
+    <appender class="org.apache.log4j.ConsoleAppender" name="stdout">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-4r %-5p %C %M %F - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <root>
+        <level value="all"/>
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</log4j:configuration>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      >
+ 
+<ui:composition>
+    	<p:column 
+                id="thumbnail"
+                headerText="Thumbnail"
+                footerText="Thumbnail"
+                style="width:10%;text-align:center" >
+	<c:set var="th_photo" value="#{c.playerPhotoLocation}"/>
+<!--             &nbsp;  photoLocation =  #{th_photo} -->
+            <h:graphicImage 
+                id="image_thumbnail"
+                name="images/thumbnails/thumbnail.#{th_photo}"
+                rendered="#{th_photo ne 'nophoto.jpeg'}"
+                alt="Photo missing for : #{c.playerLastName}"/>
+            <h:graphicImage 
+                id="image_thumbnail_unknown"
+                title="this is the title !!"
+                name="images/thumbnails/thumbnail.unknown.jpg"
+                rendered="#{th_photo eq 'nophoto.jpeg'}"
+                alt="image missing for : #{c.playerLastName}"/>
+	</p:column>
+</ui:composition>
+
+</html>

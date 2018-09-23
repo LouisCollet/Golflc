@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+        <h:outputText
+        escape="false"
+        id="helptexten"
+        rendered="#{languageC.locale eq 'en'}" 
+        value="en">
+<br/>
+view = #{view.viewId}
+<br/>
+EN Version - language not yet known
+    Welcome to the application GolfLC !
+If you are coming back, choose 'Registered player'.
+ <br/>
+ If you are new to this application, click on the down arrow left to 'First Utilisation' 
+ and choose between 'Belgian player' and 'Non Belgian player';
+ <br/>
+Pour des écrans en français, cliquez sur le bouton 'Français' en haut de l'écran.
+Om nederlands schermen te bekomen, click op 'Nederlands' bovenop up. en druk F5.
+
+file = #{request.requestURI}
+
+
+
+        ">
+    </h:outputText>
+        <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fr">
+ <br/>
+    Bienvenue dans l'application GolfLC !
+Si vous êtez déjà enregistré, cliquez sur 'Utilisateur Enregistré'.
+ <br/>
+ S'il d'agit de votre première utilisation, cliquez sur la flèche à gauche de 'Première Utilisation' 
+ et choisissez entre 'Joueur Belge(avec  eID)' et 'Joueur non Belge';
+ <br/>
+Pour des écrans en français, cliquez sur le bouton 'Français' en haut de l'écran, puis enfoncez F5.
+Om nederlands schermen te bekomen, click op 'Nederlands' bovenop up en druk F5.
+
+file = #{request.requestURI}
+
+view = #{view.viewId}
+
+        
+    </h:outputText>
+</ui:composition>
+</h:body>
+</html>

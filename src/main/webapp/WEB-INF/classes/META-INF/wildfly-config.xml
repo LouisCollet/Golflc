@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+https://developer.jboss.org/people/fjuma/blog/2017/09/08/getting-started-with-ejbs-and-elytron-part-1
+-->
+
+
+    <configuration>  
+        <authentication-client xmlns="urn:elytron:1.0">  
+            <authentication-rules>  
+                <rule use-configuration="default"/>  
+            </authentication-rules>  
+            <authentication-configurations>  
+                <configuration name="default">  
+                    <set-user-name name="bob"/>  
+                    <credentials>  
+                        <clear-password password="secret"/>  
+                    </credentials>  
+                </configuration>  
+            </authentication-configurations>  
+        </authentication-client>  
+        <jboss-ejb-client xmlns="urn:jboss:wildfly-client-ejb:3.0">  
+            <connections>  
+                <connection uri="remote+http://10.20.30.40:8080" />  
+            </connections>  
+        </jboss-ejb-client>  
+    </configuration>  

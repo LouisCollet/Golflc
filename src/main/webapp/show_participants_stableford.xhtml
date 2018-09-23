@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Participants Stableford Round Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_show_participants.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:form id="participants_rounds">
+<ui:include src="include/include_messages.xhtml"/>
+<!--
+<ui:include src="include/include_summary.xhtml"/>
+-->
+<p:dataTable id="played_rounds_table1"
+             value="#{courseC.listStableford1()}"
+             var="c" >
+<f:facet name="header">
+    <h1>Round Description</h1>
+</f:facet>
+    
+<p:column headerText="#{msg['round.date']}" style="width:100px" >
+   <h:outputText value="#{c.round.roundDate}"
+                 
+                 >
+             <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+   </h:outputText>
+</p:column>    
+    <p:column headerText="#{msg['round.competition']}"
+              style="width:100px"
+             
+              >
+   #{c.round.roundCompetition}  (#{c.round.idround})
+</p:column>
+    
+<p:column headerText="#{msg['round.game']}" style="width:100px" >
+    
+   #{c.round.roundGame}
+</p:column>
+    
+<p:column headerText="#{msg['course.name']}" style="width:100px" >
+    
+   #{c.course.courseName}
+</p:column>
+    
+</p:dataTable>
+                                                           
+<p:dataTable id="played_rounds_table2"
+             value="#{courseC.listStableford()}"
+             rowIndexVar="rowIndex"
+             var="c" >
+<f:facet name="header">
+     <h1>#{msg['inscription.players']}</h1>
+</f:facet>
+<!-- -->
+<p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%;text-align:center"
+     id="rrow">
+             #{rowIndex+1}
+</p:column>
+<p:column headerText="#{msg['player.id']}"
+          footerText="#{msg['player.id']}"
+          style="width:10%" >
+   #{c.player.idplayer}
+</p:column>
+
+<p:column headerText="#{msg['player.first']}"
+          footerText="#{msg['player.first']}"
+          style="width:20%" >
+    <h:outputText
+         value = "#{c.player.playerFirstName} - #{c.player.playerLastName}"
+         >
+    </h:outputText>
+</p:column>
+
+        <p:column headerText="#{msg['inscription.canceled']}"
+                  footerText="#{msg['inscription.canceled']}"
+                  style="width:20%" >
+            <p:commandButton
+                id="cancelButton"
+                rendered="#{c.classment.totalPoints eq 0}"
+                action="#{courseC.cancelInscription(c)}"
+                value="#{msg['button.delete']} - #{c.idplayer} - #{c.idround}"
+                icon="fa fa-trash-o fa-lg">
+                
+                <p:confirm header="#{msg['message.confirm']}"
+                     message="#{msg['message.cancel']}" 
+                     icon="fa fa-exclamation-triangle"
+                     severity="alert"/>
+            </p:commandButton>
+
+             <h:outputText value="No delete possible : score already registered"
+                rendered="#{c.classment.totalPoints gt 0}"
+                style="font-weight:bold;color:red" />
+            
+	</p:column>
+
+<!--  #{c.inscription.playerhasroundFinalResult gt 0}
+<p:column headerText="#{msg['round.team']}"
+              footerText="#{msg['round.team']}"
+              style="width:10%" >
+   #{c.round.roundTeam}
+</p:column>
+ -->
+<p:column headerText="#{msg['score.extra']}"
+          footerText="#{msg['score.extra']}"
+          style="width:5%" >
+   #{c.classment.totalExtraStrokes} 
+</p:column>
+
+<p:column headerText="#{msg['playerhasround.result']}"
+          footerText="#{msg['playerhasround.result']}"
+          style="width:10%" >
+    #{c.classment.totalPoints} #{c.classment.last9}
+   #{c.classment.last6} #{c.classment.last3} #{c.classment.last1}
+</p:column>
+
+<ui:include src="include/include_thumbnails_ecourselist.xhtml"/>    
+
+<!--
+<f:facet name="footer"> #{c.inscription.playerhasroundFinalResult}
+        <p:commandButton id="button01"
+                         value="#{msg['button.score.create']} matchplay"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="ui-icon-disk"
+                         action="score_matchplay.xhtml"/>
+
+        <p:commandButton id="button02"
+                         value="#{msg['button.score.create']} scramble"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="ui-icon-disk"
+                         action="score_scramble.xhtml"/>
+
+</f:facet>
+-->
+</p:dataTable>
+<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check-square-o" />
+        <p:commandButton value="No"  type="button" styleClass="ui-confirmdialog-no"  icon="fa fa-close" />
+</p:confirmDialog>
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

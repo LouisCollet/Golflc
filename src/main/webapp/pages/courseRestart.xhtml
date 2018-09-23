@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:o="http://omnifaces.org/ui"
+>
+    <ui:composition template="/templates/masterTemplate.xhtml">
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam
+            required="false"
+            name="cmd"
+            value="#{courseC.inputCourse}"
+            requiredMessage="You did not specify a cmd. (The id parameter is missing)"
+            converterMessage="Invalid cmd. (The id parameter is not a number)"
+            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
+            <f:validateLength minimum="3" />
+        </f:viewParam>
+    </f:metadata>      
+    <f:metadata>
+        <f:viewParam
+            required="false"
+            name="operation"
+            value="#{courseC.inputCourseOperation}"
+            requiredMessage="You did not specify a operation. (The id parameter is missing)"
+            converterMessage="Invalid operation. (The id parameter is not a number)"
+            validatorMessage="Invalid operation. (The operation parameter is not a positive number, minimum 6 length)">
+            <f:validateLength minimum="6" />
+        </f:viewParam>
+    </f:metadata>
+        
+</ui:define>
+    
+    
+ <script type="text/javascript">
+ function startupSubmit()
+ {
+  document.getElementById('course:startupBtn').click();
+ }
+ </script>
+    
+<ui:define name="title">Course restart Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_course.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<h:graphicImage 
+                name="images/golf_course.jpg"
+                alt="image missing : golf_course.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/golf_course.jpg"
+                alt="image missing : golf_course.jpg"
+                style="float: right;">
+</h:graphicImage>
+    <h:body onload="startupSubmit();">
+        
+<h:head>
+    <script src="http://maps.google.com/maps/api/js"
+        type="text/javascript" >
+    </script>
+</h:head>
+    <!-- -->
+<h:form 
+    id="course"
+        enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>
+<p:focus for="coursename" />
+<p:panelGrid id="panel"
+             columns="2"
+             styleClass="alignmentLeft"
+             columnClasses="className">
+
+<f:facet name="header">
+    <p:steps activeIndex="1"
+             style="border-style:dotted; border-color:red; border-width:2px " >
+        <p:menuitem value="#{msg['club.club'] } (#{courseC.club.createModify})#{courseC.club.idclub} " />
+        <p:menuitem value="#{msg['course.course']}" />
+        <p:menuitem value="#{msg['tee.tee']}" />
+        <p:menuitem value="#{msg['hole.hole']}" />
+    </p:steps>
+    <h1>#{msg['course.data']}    </h1>
+    &nbsp;  idclub =  #{courseC.club.idclub}
+    &nbsp;  , cmd =   #{param.cmd}
+    &nbsp;  , operation = #{param.operation}
+    &nbsp;  , inputClubOperation = #{courseC.inputClubOperation}
+    &nbsp;  , inputCourseOperation = #{courseC.inputCourseOperation}
+    &nbsp;  , nextTee = #{courseC.tee.nextTee}
+
+</f:facet>
+
+<!-- mod 17/7/2013 cas restart : field idclub must be accessible rendered="#{param.operation eq 'restart'}" -->
+     <h:outputText
+         value="#{msg['club.id']} :"
+      />
+ <!--
+     <h:outputText
+       
+        value="#{courseC.club.idclub}"
+      />
+     ne met pas à jour courseC.club.idclub qui reste null 
+  rendered="#{param.operation eq 'restart'}"
+ -->
+     <p:inputText
+        id="idclub"
+        label="idclub"
+       
+        value="#{courseC.club.idclub}"
+        size="4"
+      />
+                <h:outputText value="#{msg['course.name']} :"   />
+                <p:inputText  label="coursename"
+                       id="coursename"
+                       value="#{courseC.course.courseName}"
+                       size="45"
+                />
+
+                <h:outputText value="#{msg['course.holes']} :"  />
+                <p:selectOneButton id="OneRadioHoles"
+                                  value="#{courseC.course.courseHoles}"
+                                  styleClass="selectOneRadioColumn"
+                                  style="border-style: none !important;">
+                    <f:selectItem itemLabel="18"  itemValue="18" />
+                    <f:selectItem itemLabel="9" itemValue="9" />
+                </p:selectOneButton>
+
+                <h:outputText value="#{msg['course.par']} :"   />
+                <p:selectOneMenu
+                    id="OneMenuPar"
+                    value="#{courseC.course.coursePar}">
+                    <f:selectItems value="#{of:createIntegerArray(73, 63)}" />
+                </p:selectOneMenu>
+<!--
+                <h:outputText value="#{msg['course.gender']} :"
+                              style="font-weight:bold"  />
+                <p:selectOneButton id="gender"
+                                  
+                                   style="border-style: none !important;">
+                    <f:selectItem itemLabel="#{msg['player.gent']}"   itemValue="M" />
+                    <f:selectItem itemLabel="#{msg['player.lady']}"   itemValue="L" />
+                </p:selectOneButton>
+-->
+        <h:outputText value="#{msg['club.web']} :"  />
+        <p:lightBox iframe="true"
+                    width ="800px"
+                    height="600px">
+             <h:outputLink value="http://#{courseC.club.clubWebsite}/"
+                          title="Club HomePage">
+                <h:outputText value="#{courseC.club.clubWebsite}"/>
+            </h:outputLink>
+        </p:lightBox>
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.course.create']}"
+                         id="buttonCreate"
+                         ajax="false"
+                         rendered="#{(not courseC.tee.nextTee)}"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         style="float:left;"
+                         action="#{courseC.createCourse()}"
+              />
+<!--  and (courseC.inputClubOperation eq 'create')  -->
+         <p:commandButton value="#{msg['button.course.modify']}"
+                         id="buttonModify"
+                         ajax="false"
+                         rendered="#{(not courseC.tee.nextTee) and (param.operation eq 'modify') }"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         style="float:left;"
+                         action="#{courseC.modifyCourse()}"
+              />
+        <p:commandButton value="#{msg['course.next']}"
+                         id="buttonNext"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         rendered="#{courseC.tee.nextTee}"
+                         icon="ui-icon-circle-arrow-e"
+                         style="float:right;"
+                         action="tee.xhtml"/>
+</f:facet>
+</p:panelGrid>
+
+<br/>
+<!--   50.622616,4.295123    center="#{utilsC.mapCenter}"   zoom="#{utilsC.mapZoom}" 
+
+modifié 26/08/2014 voir dans UtilsController-->
+<p:gmap center="#{courseC.club.clubLatitude},#{courseC.club.clubLongitude}"
+        id="circlemap"
+        zoom="15"
+        type="HYBRID"
+        style="width:800px;
+               height:400px;"
+
+        model="#{courseC.mapModel}"
+        streetView="true">
+</p:gmap>  
+</h:form>
+ </h:body>
+</ui:define>
+</ui:composition>
+</html>

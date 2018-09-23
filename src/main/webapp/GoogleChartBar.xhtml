@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<!--
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadParArray()}"/>
+    </f:metadata>
+</ui:define>
+-->
+
+<ui:define name="title">Score Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_score.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:graphicImage 
+                name="images/golfcard.png"
+                alt="image missing :golf_round.jpg"
+                style="float: right;">
+</h:graphicImage>
+<h:form>
+  <h:head>
+    <script type="text/javascript" 
+            src="https://www.gstatic.com/charts/loader.js">
+    </script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales', 'Expenses', 'Profit'],
+          ['2014', 1000, 400, 200],
+          ['2015', 1170, 460, 250],
+          ['2016', 660, 1120, 300],
+          ['2017', 1030, 540, 350]
+        ]);
+
+        var options = {
+          chart: {
+            title: 'Company Performance',
+            subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+  </h:head>
+  <h:body>
+    <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
+  </h:body>
+</h:form>
+</ui:define>
+</ui:composition>
+</html>    
+    
+   

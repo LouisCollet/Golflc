@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+	<title>JCG conversation 3</title>
+</h:head>
+<h:body>
+	<h:outputText value="Ending conversation"></h:outputText>
+	<br />
+	<br />
+	<h:outputText value="#{cDIConversationScopedBean.message}"></h:outputText>
+	<br />
+	<br />
+	<h:form>
+		<h:commandLink action="#{cDIConversationScopedBean.endConversation}"
+			value="End conversation" />
+	</h:form>
+</h:body>
+</html>

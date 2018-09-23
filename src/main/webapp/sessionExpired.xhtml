@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+
+<ui:composition template="templates/loginTemplate.xhtml">
+<ui:define name="title">Session Expired </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_login.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<h:graphicImage 
+                name="images/expired.jpg"
+                alt="image missing :expired.jpg"
+                style="float:left;">
+</h:graphicImage>
+<h:link value="New Connection : clic on Login Image !"
+        outcome="login.xhtml"
+        style="float:right;"
+        >
+    <h:graphicImage 
+                name="images/golf_login.jpg"
+                alt="image golf_login.jpg"
+                style="float:right;">
+    </h:graphicImage>
+</h:link>
+    
+<h:form id="login" enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>
+
+    <!-- -->
+<p:panelGrid id="panel"
+             columns="3"
+             styleClass="alignmentLeft"
+             columnClasses="className"
+             >
+<f:facet name="header">
+    <h1>Session Expired !! <br/>
+         #{msg['login.welcome.back']}
+    </h1>
+
+</f:facet>
+
+<f:facet name="footer">
+    <p:commandButton value="#{msg['login.user.old']}"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="ui-icon-person"
+                         action="selectPlayer.xhtml"/>
+
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

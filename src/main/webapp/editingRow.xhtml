@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+
+>
+   <!-- following snippet shows a view parameter which only
+   accepts non null Strings that are at least 3 characters long
+   There's nothing really fancy going on here. When a GET request
+   like localhost:8080/mypage?fooId=1 is processed,
+   setFooId() is called,
+   and when the page is rendered getFooId() is called
+   
+    -->
+    <ui:composition template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Editing Row Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_club.xhtml"/>
+</ui:define>
+<ui:define name="content">
+    <!--<p:growl id="msgs" showDetail="true"/>
+    value="#{editView.cars1}"-->
+<h:form id="form">
+ <ui:include src="include/include_messages.xhtml"/>  <!-- growl-msg vient d'ici -->
+   <p:dataTable id="cars1"
+                var="c"
+                value="#{courseC.listCars()}"
+                
+                editable="true"
+                style="margin-bottom:20px">
+       <f:facet name="header">
+           Row Editing
+       </f:facet>
+ 
+       <p:ajax event="rowEdit"       listener="#{editView.onRowEdit}"      update=":form:growl-msg" />
+       <p:ajax event="rowEditCancel" listener="#{editView.onRowCancel}"    update=":form:growl-msg" />
+       <p:ajax event="rowEditInit"   listener="#{editView.onRowEditInit}"  update=":form:growl-msg" />
+ <!--
+       <p:column headerText="1.Id">
+           <p:cellEditor>
+               <f:facet name="output">
+                   <h:outputText id="idOutput" value="#{c.idcar}" />
+               </f:facet>
+               <f:facet name="input">
+                   <p:inputText  id="idInput" value="#{c.idcar}" style="width:50%"/>
+               </f:facet>
+           </p:cellEditor>
+       </p:column>
+ -->
+        <p:column headerText="1.Id">
+                   <h:outputText  id="idInputA" value="#{c.id}" style="width:20%"/>
+       </p:column>
+       
+       <p:column headerText="2.Year">
+           <p:cellEditor>
+               <f:facet name="output">
+                   <h:outputText  id="yearOutput" value="#{c.year}" />
+               </f:facet>
+               <f:facet name="input">
+                   <p:inputText   id="yearInput" value="#{c.year}" style="width:50%" label="Year"/>
+               </f:facet>
+           </p:cellEditor>
+       </p:column>
+ 
+       <p:column headerText="3.Brand">
+           <p:cellEditor>
+               <f:facet name="output">
+                   <h:outputText id="brandOutput" value="#{c.brand}" />
+               </f:facet>
+               <f:facet name="input">
+                   <p:selectOneMenu id="brandInput" value="#{c.brand}" style="width:50%">
+                       <f:selectItems value="#{editView.brands}" var="man" itemLabel="#{man}" itemValue="#{man}" />
+                   </p:selectOneMenu>
+               </f:facet>
+           </p:cellEditor>
+       </p:column>
+ 
+       <p:column headerText="4.Color">
+           <p:cellEditor>
+               <f:facet name="output">
+                   <h:outputText id="colorOutput" value="#{c.color}" />
+               </f:facet>
+               <f:facet name="input">
+                   <p:selectOneMenu id="colorInput" value="#{c.color}" style="width:50%">
+                       <f:selectItems value="#{editView.colors}" var="color" itemLabel="#{color}" itemValue="#{color}" />
+                   </p:selectOneMenu>
+               </f:facet>
+           </p:cellEditor>
+       </p:column>
+ 
+       <p:column style="width:32px">
+           <p:rowEditor />
+          
+  
+     <!--  old           </p:rowEditor>  <p:rowEditor />       <p:ajaxStatus oncomplete="#{editView.yourMethod(probablyYourTableItem)}"></p:ajaxStatus> -->
+       </p:column>
+   </p:dataTable>
+ 
+   <p:contextMenu for="cars2" widgetVar="cMenu">
+       <p:menuitem value="Edit Cell" icon="ui-icon-search" onclick="PF('cellCars').showCellEditor();return false;"/>  
+       <p:menuitem value="Hide Menu" icon="ui-icon-close"  onclick="PF('cMenu').hide()"/>  
+   </p:contextMenu> 
+ 
+ <!--   value="#{editView.cars2}"   -->
+ 
+   <p:dataTable id="cars2"
+                value="#{dndCarsView.cars}"
+              
+                var="c"
+                
+                editable="true"
+                editMode="cell"
+                widgetVar="cellCars">
+       <f:facet name="header">
+           Cell Editing with DoubleClick and RightClick
+       </f:facet>
+ 
+       <p:ajax event="cellEdit" 
+               listener="#{editView.onCellEdit}"
+               update=":form:growl-msg" />
+ 
+       <p:column headerText="Id">
+              <p:cellEditor>
+                  <f:facet name="output"><h:outputText value="#{c.id}" /></f:facet>
+                  <f:facet name="input"><p:inputText id="idInput2" value="#{c.id}" style="width:100%"/></f:facet>
+              </p:cellEditor>
+          </p:column>
+ 
+          <p:column headerText="Year">
+           <p:cellEditor>
+               <f:facet name="output"><h:outputText value="#{c.year}" /></f:facet>
+               <f:facet name="input"><p:inputText id="yearInput2" value="#{c.year}" style="width:96%" label="Year"/></f:facet>
+           </p:cellEditor>
+       </p:column>
+ 
+       <p:column headerText="Brand">
+           <p:cellEditor>
+               <f:facet name="output"><h:outputText value="#{c.brand}" /></f:facet>
+               <f:facet name="input">
+                   <p:selectOneMenu id="brand2" value="#{c.brand}" style="width:50%">
+                       <f:selectItems value="#{editView.brands}" var="brand" itemLabel="#{brand}" itemValue="#{brand}" />
+                   </p:selectOneMenu>
+               </f:facet>
+           </p:cellEditor>
+       </p:column>
+ 
+       <p:column headerText="Color">
+           <p:cellEditor>
+               <f:facet name="output"><h:outputText value="#{c.color}" /></f:facet>
+               <f:facet name="input">
+                   <p:selectOneMenu id="color2" value="#{c.color}" style="width:50%">
+                       <f:selectItems value="#{editView.colors}" var="color" itemLabel="#{color}" itemValue="#{color}" />
+                   </p:selectOneMenu>
+               </f:facet>
+           </p:cellEditor>
+       </p:column>
+   </p:dataTable>
+</h:form>
+
+</ui:define>
+</ui:composition>
+
+</html>

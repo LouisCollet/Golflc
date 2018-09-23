@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+     
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Tarif Page </ui:define>
+
+<ui:define name="help">
+     <ui:include src="/help/help_tarif_equipments.xhtml"/>
+</ui:define>
+
+<ui:define name="content">
+    <!-- 
+        <h:outputScript library="js" name="forms.js" target="head"/>-->
+<h:graphicImage 
+                name="images/tarif1.jpg"
+                alt="image missing :tarif1.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/tarif2.jpg"
+                alt="image missing :tarif2.jpg"
+                style="float: right;">
+</h:graphicImage>
+<h:form id="tarif_menu" enctype="application/x-www-form-urlencoded" >
+<!--
+<ui:include src="include/include_messages.xhtml"/>
+-->
+<ui:include src="include/include_summary_club.xhtml"/>
+
+<p:panelMenu id="panel_menu"
+             style="font-size:12em;">
+    <p:submenu label="Input Data Tarif" 
+               icon="ui-icon-wrench"
+               >
+         <p:menuitem value ="Seasons"
+                     outcome="tarif_seasons.xhtml"
+                     icon="fa fa-calendar-o" />
+         <p:menuitem value ="Hours"
+                     outcome="tarif_hours.xhtml"
+                     icon="fa fa-clock-o" />
+         <p:menuitem value="Equipments"
+                     icon="fa fa-sun-o"
+                     outcome="tarif_equipments.xhtml" />
+         <p:menuitem value="Days of Week"
+                     icon="fa fa-sun-o"
+                     outcome="tarif_days.xhtml" />
+    </p:submenu>
+    <p:separator/>
+    <p:submenu label="Create Tarif "
+               icon="ui-icon-wrench"
+                >
+         <p:menuitem  value="#{msg['tarif.print']}"
+                     icon="fa fa-list"
+                     action="#{courseC.printTarif}"/>
+        <p:menuitem value="All tarifs in one shot" 
+                     icon="fa fa-database"
+                     action="#{courseC.createTarif}"/>
+    </p:submenu>
+</p:panelMenu>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>
+    

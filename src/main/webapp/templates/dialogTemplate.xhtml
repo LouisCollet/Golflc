@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      lang="#{languageC.locale}"
+>
+
+<ui:debug hotkey="x" rendered="#{initParam['javax.faces.FACELETS_DEVELOPMENT']}" />
+
+<f:view id="view_dialog"
+        contentType="text/html"
+        locale="#{languageC.locale}">
+
+<h:head>
+   <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+   <meta http-equiv="Content-Language" content="#{languageC.locale}" /> 
+   <meta name="sessionTimeout"
+         http-equiv="refresh" 
+         content="#{session.maxInactiveInterval};url=#{request.contextPath}/sessionExpired.xhtml?cmd=time-out"/>
+     <!-- de rediriger le visiteur vers une autre page au bout de N secondes grâce 
+au mot clé refresh et à la précision URL=chemin-vers-ma-page.-->
+    <title><ui:insert name="title"> Default title </ui:insert></title>
+    <h:outputScript library="primefaces" name="jquery/jquery.js" target="head"  /> <!-- new 27/07/2014 -->
+    <h:outputScript library="js" name="forms.js" target="head"/>
+   
+</h:head>
+
+<h:body id="body_master_template"> <!-- new 13/07/2014-->
+<!-- Just put them in a .css file which you include
+by <h:outputStylesheet> inside the beginning of the <h:body>
+JSF will automatically relocate the stylesheet
+to the end of the generated HTML <head> and this
+will thus ensure that the stylesheet is loaded after the PrimeFaces' default styles.
+-->
+
+<ui:insert name="metadata" />
+<h:outputStylesheet library="css" name="primefacesLC.css"/>
+
+<p:layout id="layout_master"
+          fullPage="true">
+
+
+<p:layoutUnit 
+              id="lu_east"
+              position="east"
+              size="100"
+              header="Help"
+              collapsible="true"
+              closable="true"
+        >
+        <h:graphicImage library="images"
+                name="golf_help.jpg"
+                alt="image missing :help.jpg"
+                >
+        </h:graphicImage>
+        <ui:insert name="help"></ui:insert>
+</p:layoutUnit>
+
+<p:layoutUnit
+            id="lu_center"
+            position="center"
+            resizable="true"
+            collapsible="false"
+            closable="true"
+            >
+    <!--             header="Detailed DialogFramework"  -->
+                <ui:insert name="content"></ui:insert>
+</p:layoutUnit>
+ <p:layoutUnit
+                    id="lu_south"
+                    position="south"
+                    size="50"
+                    closable="true"
+                    resizable="true"
+                    collapsible="true">
+        <b>View : </b> #{view.viewId}
+</p:layoutUnit>   
+    <!--       header="Bottom"  -->
+</p:layout>
+</h:body>
+</f:view>
+
+</html>

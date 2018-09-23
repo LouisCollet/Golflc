@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+
+
+<f:view contentType="text/html">
+<h:head>
+
+</h:head>
+<h:body>
+<h:form id="upform" enctype="multipart/form-data">
+<p:growl id="msg"
+         life="10000"
+         showDetail="false"/>
+
+            <p:fileUpload
+                fileUploadListener="#{fileUploadController.upload}"
+                allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+                sizeLimit="100000"
+                label="Choose File to Upload"
+                                update="msg"
+                />
+</h:form>
+
+<h:form>
+    <br></br>
+    Download this file, 
+     <a href="file-downloads/testplans.pdf" > Louis, !! </a>
+
+<p:commandButton value="Download Button" ajax="false">
+    <p:fileDownload value="#{fileDownloadController.file}" />
+</p:commandButton>
+    <br></br>
+<p:commandLink ajax="false" title="Download">
+    <p:fileDownload value="#{fileDownloadController.file}" />
+</p:commandLink>
+</h:form>
+
+</h:body>
+</f:view>
+</html>

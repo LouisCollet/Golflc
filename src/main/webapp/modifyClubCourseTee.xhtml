@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Modify Club,Course,Tee,Holes Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_select_course.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:form id="form__club_restart">
+<ui:include src="/include/include_messages.xhtml"/>
+
+<!--<h1>Create round : select a Course</h1> -->
+
+<p:dataTable id="rounds"
+             value="#{courseC.listClubsCoursesTees()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredCourses}"
+             rowHover="true"
+             >
+     
+<!-- filteredValue="#{courseC.filteredCars}"
+filteredCars est utilisé dans tous les cas (copié du manuel PF)
+Migration Guide Primefaces 3.3 to 3.4 : Component Changes¶
+•DataTable filtering requires filteredValue reference in backing bean,
+for backwards compatibility if this reference is not defined,
+filtering will work using view state
+however this is a fallback and will be removed in future releases. 
+see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
+-->
+<f:facet name="header">
+    <h1>#{msg['message.selectclub.modify']}</h1>
+</f:facet>
+
+<p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="rrow">
+             #{row+1}
+</p:column>
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                  >
+            #{c.club.clubName}  (#{c.club.idclub})
+	</p:column>
+
+
+	<p:column headerText="#{msg['club.modify']}"
+                  footerText="#{msg['club.modify']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="loadClub"
+                action="#{courseC.loadClub(c)}"
+                value="#{c.club.idclub}"
+                icon="ui-icon-refresh">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['course.add']}"
+                  footerText="#{msg['course.add']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="addCourse"
+                action="#{courseC.addCourse(c)}"
+                value="#{c.club.idclub}"
+                icon="ui-icon-refresh">
+             </p:commandButton>
+	</p:column>
+
+<p:column id="colcoursename"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  style="width:20%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  >
+		#{c.course.courseName} (#{c.course.idcourse})
+	</p:column>
+
+	<p:column headerText="#{msg['course.modify']}"
+                  footerText="#{msg['course.modify']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="loadCourse"
+                action="#{courseC.loadCourse(c)}"
+                value="#{c.course.idcourse}"
+                icon="ui-icon-arrowreturnthick-1-w">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['tee.add']}"
+                  footerText="#{msg['tee.add']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="addTee"
+                action="#{courseC.addTee(c)}"
+                value="#{c.course.idcourse}"
+                icon="ui-icon-refresh">
+             </p:commandButton>
+	</p:column>
+
+
+
+
+	<p:column id="colteestart"
+                  headerText="#{msg['tee.start']}"
+                  footerText="#{msg['tee.start']}"
+                  style="width:10%"
+                  >
+		#{c.tee.teeStart}
+	</p:column>
+
+	<p:column headerText="#{msg['tee.modify']}"
+                  footerText="#{msg['tee.modify']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="loadTee"
+                action="#{courseC.loadTee(c)}"
+                value="#{c.tee.idtee}"
+                icon="ui-icon-arrowreturnthick-1-w">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['hole.modify']}"
+                  footerText="#{msg['hole.modify']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="loadHole"
+                action="#{courseC.loadHoles(c)}"
+                value="#{c.tee.idtee}"
+                icon="ui-icon-arrowreturnthick-1-w">
+             </p:commandButton>
+	</p:column>
+
+<!-- loadHole = 1 hole, loadHoles = multiple holes -->
+
+
+<f:facet name="footer">
+          Enjoy the Game
+</f:facet>
+
+</p:dataTable>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

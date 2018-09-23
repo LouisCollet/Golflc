@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      template="templates/masterTemplate.xhtml"
+>
+    <!--
+<h:outputScript>this.plot.destroy();</h:outputScript> -->
+<ui:define name="title">Stat Chart Handicap Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_statcourse.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+    <!-- -->
+<h:form id="statHcp" enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>
+
+<h:panelGrid id="p1" columns="1">
+    <p:chart type="line"
+         id="hcp"
+         model="#{courseC.HandicapModel()}" 
+         style="height:400px; width:1250px; margin-top:20px"
+       
+         />
+</h:panelGrid>
+
+
+
+</h:form>
+</ui:define>
+</ui:composition>

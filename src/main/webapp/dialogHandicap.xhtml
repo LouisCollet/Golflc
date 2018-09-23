@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      
+>
+    <ui:composition template="templates/dialogTemplate.xhtml">
+<ui:define name="title">
+    DialogFramework View Detailed Handicap
+</ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_dialogHandicap.xhtml"/>
+</ui:define>
+<ui:define name="content"> 
+
+<h:form id="view_handicap"
+        style="border:solid 3px" 
+        enctype="application/x-www-form-urlencoded" >
+
+<p:outputPanel id="handicapDetail"
+               deferred="true"
+               style="text-align:center;">
+   <p:panelGrid  columns="2"
+                          columnClasses="label,value">
+                <f:facet name="header">
+                    this is the header facet
+                </f:facet>
+ <!--  rendered="#{not empty courseC.selectedHandicap}"   -->
+                <h:outputText id="date_handicap" value="#{msg['handicap.start']}" />
+                <h:outputText id="dathcp2" value="#{courseC.selectedHandicap.handicap.handicapStart}" />
+ 
+                <h:outputText id="competition" value="#{msg['round.competition']}" />
+                <h:outputText id="compet2" value="#{courseC.selectedHandicap.round.roundCompetition}" />
+ 
+                <h:outputText id="game" value="#{msg['round.game']}" />
+                <h:outputText id="game2" value="#{courseC.selectedHandicap.round.roundGame}" 
+                              style="color:silver" />
+ 
+                <h:outputText id="idround" value="#{msg['round.id']}" />
+                <h:outputText id="idround2" value="#{courseC.selectedHandicap.round.idround}" 
+                              style="color:red"/>
+<!--    
+                
+        <f:facet name="footer">
+               <p:commandButton value ="Close Dialog"
+                         id="buttonClose"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="ui-icon-circle-arrow-e"
+                         style="float:right;"
+                         action="#{dialogC.closeDialog('dialogHandicap.xhtml')}"
+                         />
+        </f:facet>
+-->
+   </p:panelGrid>
+</p:outputPanel>
+</h:form>
+</ui:define> <!--  end of "content" -->
+</ui:composition>
+</html>

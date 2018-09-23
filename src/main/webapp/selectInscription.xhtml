@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Select Recent Rounds Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_select_inscriptionrounds.xhtml"/>
+</ui:define>
+<ui:define name="content">
+    <!--
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam
+            required="true"
+            name="cmd"
+            value="#{courseC.inputInscription}"
+            requiredMessage="You did not specify a cmd. (The id parameter is missing)"
+            converterMessage="Invalid cmd. (The id parameter is not a number)"
+            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
+            <f:validateLength minimum="3" />
+        </f:viewParam>
+    </f:metadata>
+</ui:define>
+    -->
+<h:form id="select_inscription_round">
+<ui:include src="include/include_messages.xhtml"/>
+
+<p:dataTable id="recent_round"
+             value="#{courseC.listInscriptions()}"
+             rowIndexVar="row"
+             resizableColumns="true"
+             var="c"
+             filteredValue="#{courseC.filteredInscriptions}"
+             style="border:solid 5px" 
+             >
+
+<p:ajax event="rowToggle" 
+        listener="#{courseC.onRowToggle}"
+        update=":select_inscription_round:growl-msg" />
+
+<f:facet name="header">
+    <h1>#{msg['message.selectround']} #{msg['message.for.inscription']}</h1>
+</f:facet>
+
+<p:column
+     headerText="#"      footerText="#"      style="width:2%"      id="rrow">
+             #{row+1}
+</p:column>
+
+<p:column
+    headerText="T"     footerText="T"     style="width:2%">
+    <p:rowToggler />
+</p:column>
+
+    	<p:column headerText="#{msg['round.selected']}"
+                  footerText="#{msg['round.selected']}"
+                  style="width:20%" >
+            <p:commandButton
+                id="selectButton"
+                action="#{courseC.selectRecentInscription(c)}"
+                value="#{c.round.idround} - #{msg['button.select']}"
+                icon="ui-icon-pencil">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['round.date']}"
+                  footerText="#{msg['round.date']}"
+                  style="width:15%"
+                  id="rdate">
+                  <h:outputText value="#{c.round.roundDate}"
+                                
+                                > 
+                      <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                  </h:outputText>
+            
+	</p:column>
+
+    	<p:column headerText="#{msg['round.tarif']}"
+                  footerText="#{msg['round.tarif']}"
+                  style="width:20%" >
+            <p:commandButton
+                id="selectButtonTarif"
+                action="#{courseC.findTarif(c)}"
+                value="#{c.course.idcourse} - #{msg['button.select']}"
+                icon="fa fa-dollar fa-lg">
+             </p:commandButton>
+	</p:column>
+
+<!-- new 13/11/2017-->
+        <p:column headerText="#{msg['round.canceled']}"
+                  footerText="#{msg['round.canceled']}"
+                  style="width:15%"
+                  id="cancelround">
+            <p:commandButton
+                id="cancelButton"
+                action="#{courseC.cancelRound(c)}"
+                value="#{msg['button.delete']} - #{c.round.idround}"
+                icon="fa fa-trash-o fa-lg"
+                >
+                <p:confirm header="#{msg['message.confirm']}"
+                           message="#{msg['message.cancel']}" 
+                           icon="fa fa-exclamation-triangle"
+                           severity="alert"/>
+           </p:commandButton>
+	</p:column>
+
+        <p:column headerText="#{msg['round.players']}"
+                  footerText="#{msg['round.players']}"
+                  style="width:10%"
+                  id="teestart"
+                  >
+                        #{c.round.roundPlayers}
+        </p:column>
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:25%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                  >
+            #{c.club.clubName}
+	</p:column>
+
+	<p:column id="colcoursename"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  style="width:25%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  >
+		#{c.course.courseName}
+	</p:column>
+<!--
+        <p:column headerText="#{msg['round.competition']}"
+                  footerText="#{msg['round.competition']}"
+                  style="width:20%"
+                  id="compet"
+                  >
+                        #{c.round.roundCompetition}
+        </p:column>
+-->
+        <p:column headerText="#{msg['round.game']}"
+                  footerText="#{msg['round.game']}"
+                  style="width:10%"
+                  id="game"
+                  >
+                        #{c.round.roundGame}
+        </p:column>
+<!--
+<f:facet name="footer">
+           
+</f:facet>
+
+                        cellpadding="4"
+                         style="width:300px;"
+                         styleClass="ui-widget-content grid"
+-->
+
+
+
+
+<p:rowExpansion>
+            <h:panelGrid id="display"
+                         columns="2"
+ >
+
+                <f:facet name="header">
+                    #{msg['inscription.detail']}
+                </f:facet>
+
+                <h:outputText value="Round:"
+                              />
+                <h:outputText
+                      id="reround"
+                      style="font-style:italic"
+                      value="#{c.round.idround}" />
+
+                <h:outputText value="Game:"
+                              style="font-weight:bold"/>
+                <h:outputText
+                      id="regame"
+                      style="font-style:italic"
+                      value="#{c.round.roundGame}" />
+
+                <h:outputText value="Holes:"
+                              style="font-weight:bold"/>
+                <h:outputText
+                      id="reholes"
+                      style="font-style:italic"
+                      value="#{c.round.roundHoles}" />
+
+                <h:outputText value="Start:"
+                              style="font-weight:bold" />
+                <h:outputText
+                      id="restart"
+                      style="font-style:italic"
+                      value="#{c.round.roundStart}" />
+                
+                <h:outputText value="Competition:"
+                              style="font-weight:bold" />
+                <h:outputText
+                      id="recompetition"
+                      style="font-style:italic"
+                      value="#{c.round.roundCompetition}" />
+            </h:panelGrid>
+  </p:rowExpansion>
+
+</p:dataTable>
+<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check-square-o" />
+        <p:commandButton value="No"  type="button" styleClass="ui-confirmdialog-no"  icon="fa fa-close" />
+</p:confirmDialog>
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

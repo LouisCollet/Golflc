@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fr">
+        
+  <br/>
+  #{view.viewId}
+  <br/>
+ <b>Numéro du trou : </b>
+Le numéro du trou est géré par l'application
+ <br/>
+ 
+ <b>Par du trou : </b>
+Score normal fixé pour le trou : de 3 à 5 (score moyen d'un joueur professionnel).
+  <br/>
+Par 3 : de 91 à 224 mètres.
+ <br/>
+Par 4 : de 225 à 434 mètres.
+ <br/>
+Par 5 : de 435 à 630 mètres.
+ <br/>
+
+  <b>Stroke index : </b>
+Le Stroke index établit un classement des trous en fonction de leur difficulté :
+18 est le plus facile, 1 le plus difficile.
+<br/>
+Est utilisé pour répartir le nombre de coups reçus en Stableford.
+<br/>
+Le Stroke index utilisé disparaît de la liste déroulante.
+    <br/>
+
+<b>Distance : </b>
+Les distances sont enregistrées en mètres.
+    <br/>
+Pour convertir des yards en mètres, introduisez la valeur en yards et cliquez sur 'Yards vers mètres'
+    <br/>
+
+ </h:outputText>
+
+ <h:outputText
+        escape="false"
+        id="helptextnl"
+        rendered="#{languageC.locale eq 'nl'}" 
+        value="nl">
+            NL Versie 
+            Ceci est la page HELP de Create Hole
+            version spéciale JSF sous primefaces
+            (à compléter)
+            <br/>
+      
+    </h:outputText>
+    
+</ui:composition>
+</h:body>
+</html>

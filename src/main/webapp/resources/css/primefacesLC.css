@@ -1,0 +1,469 @@
+@charset "UTF-8";
+/*
+http://stackoverflow.com/questions/8768317/how-do-i-override-those-classes-defined-in-primefaces-css?lq=1
+You need to ensure that your CSS is loaded after the PrimeFaces one.
+You can achieve this by placing the <h:outputStylesheet> referencing
+your CSS file inside <h:body> instead of <h:head>:
+JSF will automatically relocate the stylesheet to the end of the generated HTML <head>
+and this will thus ensure that the stylesheet is loaded after the PrimeFaces' default styles.
+This way the selectors in your CSS file which are exactly the same as in PrimeFaces CSS file
+will get precedence over the PrimeFaces one.
+
+
+
+Set Font Size With Em
+
+To avoid the resizing problem with Internet Explorer, many developers use em instead of pixels.
+ The em size unit is recommended by the W3C.
+ 1em is equal to the current font size. The default text size in browsers is 16px.
+So, the defauljt size of 1em is 16px.
+ The size can be calculated from pixels to em using this formula: pixels/16=em
+
+-----------------------------------------------------
+
+Use a Combination of Percent and Em
+
+The solution that works in all browsers, is to set a default font-size in percent for the body element:
+
+Example
+
+body {font-size:100%;}
+ h1 {font-size:2.5em;}
+ h2 {font-size:1.875em;}
+ p {font-size:0.875em;}
+
+*/
+.errorMessage
+{
+  font-size: 1.5em;
+  font-weight: bold;
+  color:red;
+}
+h1
+{
+    font-size: 2.0em;   /* 40px/16=2.5em */
+    color: green;
+    font-weight: bold;
+}
+h2
+{
+    font-size: 1.5em;   /* 40px/16=2.5em */
+    color: blue;
+    font-weight: bold;
+}
+h3
+{
+    font-size: 1.0em;   /* 40px/16=2.5em */
+    color: red;
+    font-weight: bold;
+}
+h4
+{
+    font-size: 0.5em;   /* 40px/16=2.5em */
+    color: yellow;
+    font-weight: bold;
+}
+
+
+table      /* center the table */
+{
+margin-left: auto;
+margin-right: auto;
+border-collapse:collapse;
+border: 1px;
+background-color :#66ff00;
+}
+
+form.styleGreen
+{
+    background-color: #009900;
+    font-family: Arial,Helvetica,sans-serif;
+}
+
+td.red
+{
+    background-color: red;
+}
+/*
+.golfLCcss td
+{
+    border: none;
+}
+
+.golfLCcss tr
+{
+    border: none;
+}
+*/
+.ui-panelgrid tr, .ui-panelgrid td
+{
+    border: none;
+}
+/*How can I change the background color of hovered/highlighted item of <p:selectOneMenu>?*/
+.ui-selectonemenu-item.ui-selectonemenu-list-item.ui-state-highlight
+{
+    background: #a9c6c9;
+    color: red;
+    font-size: 11pt;
+}
+/* used with selectoneradio
+.oneradio td
+{
+    color: red;
+    font-size: 7pt;
+}*/
+
+li.ui-selectonemenu-item
+{
+    font-size:18px;
+}
+
+/*  next 2 : used by <o:highlight styleClass="error" /> de omnifaces dans masterTemplate.xhtml */
+ label.error
+ {
+   color: #f00;
+   font-size: 12pt;
+ }
+ input.error, select.error, textarea.error
+ {
+   background-color: #fee;
+ }
+ 
+.alignmentLeft
+{
+ text-align : left;
+ border: 1px solid black;
+ background-color: aquamarine;
+}
+
+/* s'applique d'office à tous les panelgrid */
+.ui-panelgrid td
+{
+    background-color:yellow !important;
+    font-weight: bold;
+}
+/*   new 05/04/2013 
+.ui-panelgrid th
+{
+    background-color:blue !important;
+    font-weight: bold;
+}
+*/ 
+
+/*v  utilisé pour colonne 1 = standard (voir ci-dessus panelGrid : bold
+colonne 2 : enlève le bold par defaut, ajoute italic 
+exemple : participants.xhtml
+<p:panelGrid id="panel"
+             columns="2"
+             styleClass="alignmentLeft"
+             columnClasses="col1,col2">
+*/
+.col1
+{
+   
+}
+.col2
+{
+    font-weight: normal !important;
+    font-style: italic;
+}
+.col3
+{
+   
+}
+.col4
+{
+    font-weight: normal !important;
+    font-style: italic;
+}
+
+/* used in statCourse.xhtml voir également forms.js   */
+    table.jqplot-table-legend 
+    {
+        font-size: 1.0em  !important;
+        line-height: 1em;
+        margin: 0px 0px 10px 15px;
+        border-collapse: collapse;
+    }
+/*  I would like to change the color of the 2 facet headers which contains the 2 last comboboxes.
+Datatable would be rendered as HTML table. So the column header would be th
+You can achieve this from below CSS
+Specify styleClass for the required p:column 
+<p:column styleClass = "customHeader ">
+...
+</p:column>
+
+  */
+
+.customHeader th {
+    background-color: yellowgreen;
+}
+/*https://dzone.com/articles/how-customize-growl-primefaces
+ message positionné à gauche (default = droite)*/
+.ui-growl {
+    left: 20px;
+}
+.ui-growl-title {
+    font: 20px "Lucida Console", Monaco, monospace;
+    text-align: center;
+}
+.ui-growl-message p {
+    font: 15px "Lucida Console", Monaco, monospace;
+    letter-spacing: -1px;
+}
+/*https://searchcode.com/codesearch/view/2686073/*/
+.ui-messages-info-summary, .ui-messages-warn-summary, .ui-messages-error-summary, .ui-messages-fatal-summary,
+.ui-message-info-summary, .ui-message-warn-summary, .ui-message-error-summary, .ui-message-fatal-summary{
+    font-family: Verdana;
+    font-size: 15px;
+    font-weight: 400;
+    margin: 0;
+    padding: 0;
+}
+.ui-messages-info, .ui-messages-warn, .ui-messages-error, .ui-messages-fatal {
+    margin: 1px;
+    padding: 5px 0px 5px 0px;
+}
+/* ajouté 19/04/2015 - steps de workflow   used in club, course,                             */ 
+.ui-steps .ui-steps-item {
+    width: 24%;    /* was 25 24 */
+}
+ 
+.ui-state-highlight {
+    text-shadow: none !important;
+}
+ 
+.ui-steps.custom {
+    margin-bottom: 30px;
+}
+ 
+.ui-steps.custom .ui-steps-item .ui-menuitem-link {
+    height: 10px;
+    padding: 0 1em;
+}
+ 
+.ui-steps.custom .ui-steps-item .ui-steps-number {
+    background-color: #0081c2;
+    color: #FFFFFF;
+    display: inline-block;
+    width: 30px;
+    border-radius: 10px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+
+
+.ui-button.ui-state-default {
+	background-color: red !important;
+}
+.ui-button.ui-state-hover {
+	background-color: green !important;
+}
+.ui-button.ui-state-active {
+	background-color: blue !important;
+}
+/* fonctionne pas*/
+.ui-layout-north
+{
+}
+
+.ui-state-disabled{
+    opacity: 0.85 !important;
+}
+.selectOneRadioColumn td {
+ border: none !important;
+/* border-style: none !important;*/
+}
+
+.classYellow{
+    color:yellow;
+    font-weight:bold;
+    font-style:italic;
+    text-shadow: 0px 2px 3px #666;
+}
+.classBlue{
+    color:blue;
+    font-weight:bold;
+    font-style:italic;
+    text-shadow: 0px 2px 3px #666;
+}
+
+
+
+/* https://line25.com/articles/using-css-text-shadow-to-create-cool-text-effects Inset text effect */
+.classFire{
+text-shadow: 0 0 20px #fefcc9,
+    10px -10px 30px #feec85,
+    -20px -20px 40px #ffae34,
+    20px -40px 50px #ec760c,
+    -20px -60px 60px #cd4606,
+    0 -80px 70px #973716,
+    10px -90px 80px #451b0e;
+}
+/*  new 30/06/2017 */
+
+.ui-picklist .ui-picklist-list {
+    width: auto;
+    min-width: 200px;
+    height:auto;
+    min-height: 300px;
+}
+/* 14/07/2017 https://stackoverflow.com/questions/14204797/change-selectonemenu-stylesheet-primefaces  */
+.menu .ui-selectonemenu-label { 
+    background: pink;
+}
+.panel .ui-selectonemenu-list { 
+    background: red;
+}
+
+.ui-selectonemenu-item .ui-selectonemenu-list-item .ui-state-highlight {
+    background: blueviolet;
+}
+/* https://stackoverflow.com/questions/16776631/how-can-i-change-column-width-of-panel-grid-in-primefaces  
+used in maps_home_club.xhtml */
+.forty-percent {
+     width: 40%;
+}
+
+.sixty-percent {
+     width: 60%;
+}
+
+.top-alignment {
+     vertical-align: top;
+}
+
+#dvMap {
+  width: 50%;
+  height: 200px;
+  float: left;
+}
+
+.ui-datatable tbody td.columnborder{
+        border-right-width:5px;
+        border-left-width:5px;
+    }
+    .ui-datatable thead th.columnborder1{
+        font-weight: bold;
+        background: yellow;
+        font-size: 1.5em;
+        border-right-width:5px;
+        border-left-width:5px;
+        border: 3px solid #fff;
+    }
+    .ui-datatable thead th.columnborder2{
+        font-weight: bold;
+        background: green;
+        font-size: 1.5em;
+        border-right-width:5px;
+        border-left-width:5px;
+    }
+    /*   used in deleteClubCourseTee.xhtml   */
+    .colorDelete1{
+        color: red
+    }
+    .colorDelete2{
+        color: blue
+    }
+    
+.smallButton .ui-button-text {
+   font-size:15px;
+}
+/* dans tarifperiod.xhtml etc 21/01/2018  */
+.ui-steps .ui-steps-item {
+    width: 33%;
+}
+ 
+.ui-state-highlight {
+    text-shadow: none !important;
+}
+ 
+.ui-steps.custom {
+    margin-bottom: 30px;
+}
+ 
+.ui-steps.custom .ui-steps-item .ui-menuitem-link {
+    height: 10px;
+    padding: 0 1em;
+}
+ 
+.ui-steps.custom .ui-steps-item .ui-steps-number {
+    background-color: green; /* #0081c2 */
+    color: #FFFFFF;
+    display: inline-block;
+    width: 30px;
+    border-radius: 10px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+ 
+.ui-steps.custom .ui-steps-item.ui-state-highlight .ui-steps-title {
+    color: blueviolet; /* #555 */
+}
+.myLayoutStyleClass .ui-layout-unit-content{
+   background: #a8549b;
+}
+   /*  https://github.com/qTip2/qTip2/wiki/Style-Guide   done 10-03-2018 //   used in formTemplate.xhtml   */
+.myQtip2Style .qtip-content{
+	font-size: 16px;
+}
+
+.myQtip2Style{
+	
+	height: 200px;
+        
+}
+
+
+/*      .myCustomClass .qtip-content{
+	font-size: 12px;
+}    !important;
+.ui-selectonemenu input.ui-selectonemenu-label{ background: yellow; }
+
+ background: blue;
+override the style of each component - see skinning in the documentation
+ fonctionne pas
+.ui-datatable-header {
+  background: red;
+  background-color: #0081c2 !important;
+}*/
+
+/* new 23/06/2015
+.ui-datatable tr.ui-datatable-even:hover,
+.ui-datatable tr.ui-datatable-odd:hover
+{
+    background: #78BCFF;
+}
+
+.myTableClass>tbody>tr { 
+    background: pink;
+}
+
+.myTableClass>tbody>tr:hover { 
+    background: purple; 
+}
+*/
+
+/*
+ http://java.dzone.com/articles/how-customize-growl-primefaces 
+27/01/2015
+attention: c'est de la merde : les input fields étaient inaccessibles !!!'
+ .ui-growl-title {
+    font: 28px "Lucida Console", Monaco, monospace;
+    text-align: center;
+}
+.ui-growl-message p {
+    font: 20px "Lucida Console", Monaco, monospace;
+    letter-spacing: -1px;
+}
+
+    <style type="text/css">
+        .ui-growl {
+            position:absolute;
+            top:20px;
+            left:20px;
+            width:301px;
+            z-index:9999;
+        }
+    </style>
+*/

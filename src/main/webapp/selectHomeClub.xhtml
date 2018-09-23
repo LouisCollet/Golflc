@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Select Club Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_select_course.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:form id="form_select_club">
+<ui:include src="include/include_messages.xhtml"/>
+
+<!--<h1>Create round : select a Course</h1> -->
+
+<p:dataTable id="rounds"
+             value="#{courseC.listCourses()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredCars}"
+             >
+<!--
+filteredCars est utilisé dans tous les cas (copié du manuel PF)
+Migration Guide Primefaces 3.3 to 3.4 : Component Changes¶
+•DataTable filtering requires filteredValue reference in backing bean,
+for backwards compatibility if this reference is not defined,
+filtering will work using view state
+however this is a fallback and will be removed in future releases. 
+see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
+-->
+<f:facet name="header">
+    <h1>#{msg['message.selectclub']} #{msg['message.for.home']}</h1>
+</f:facet>
+
+<p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="rrow">
+             #{row+1}
+</p:column>
+
+	<p:column headerText="#{msg['club.selected']}"
+                  footerText="#{msg['club.selected']}"
+                  style="width:100px" >
+            <p:commandButton
+                id="selectButton"
+                action="#{courseC.selectHomeClub(c)}"
+                value="#{c.club.idclub} - #{msg['button.select']}"
+                icon="ui-icon-arrowreturnthick-1-w">
+             </p:commandButton>
+	</p:column>
+
+<!-- attention : casse de la classe :min et MAJ -->
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:100px"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                  >
+            #{c.club.clubName}  (#{c.club.idclub})
+	</p:column>
+
+        <p:column headerText="#{msg['club.city']}"
+                  footerText="#{msg['club.city']}"
+                  style="width:100px" >
+            #{c.club.clubCity}
+        </p:column>
+
+        <p:column headerText="#{msg['club.country']}"
+                  footerText="#{msg['club.country']}"
+                  style="width:100px" >
+            #{c.club.clubCountry}
+        </p:column>
+
+<f:facet name="footer">
+           In total there are #{fn:length(courseC.list)} clubs.
+</f:facet>
+
+</p:dataTable>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee           http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <!-- attention ! ne pas utiliser xlmns.jcp.org BUG BUG !! Config here. -->
+    <display-name>Display_name_from web.xml=GolfWfly by LC</display-name>
+    <!--  ServletContext.getServletContextName()
+        Returns the name of this web application corresponding to this ServletContext 
+        as specified in the deployment descriptor for this web application by the display-name element.
+  -->
+    <!--   new 01/05/2015 WARNING: JSF1091: No mime type could be found for file images/thumbnails/thumbnail.
+https://www.sitepoint.com/web-foundations/mime-types-complete-list
+    -->
+    <!--  added 17-07-2018 https://javabeat.net/jsf-custom-error-pages/ 
+   see servlet mapping 
+http://flask.pocoo.org/docs/0.12/patterns/errorpages/
+    -->
+    <!--
+<error-page>
+	<error-code>404</error-code>
+	<location>faces/error.xhtml</location>
+</error-page>
+<error-page>
+	<error-code>500</error-code>
+	<location>/errors/error.xhtml</location>
+</error-page>
+<error-page>
+	<exception-type>java.lang.Exception</exception-type>
+	<location>/errors/error.xhtml</location>
+</error-page>
+<error-page>
+    <exception-type>java.io.FileNotFoundException</exception-type>
+    <location>/errors/error.xhtml</location>
+</error-page>
+<error-page>
+    <exception-type>javax.servlet.ServletException</exception-type>
+    <location>/errors/error.xhtml</location>
+</error-page>
+-->
+    <mime-mapping>
+        <extension>jpeg</extension>
+        <mime-type>image/jpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>jpeg</extension>
+        <mime-type>image/pjpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>jpg</extension>
+        <mime-type>image/jpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>jpg</extension>
+        <mime-type>image/pjpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff</extension>
+        <mime-type>application/font-woff</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff2</extension>
+        <mime-type>application/font-woff</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>eot</extension>
+        <mime-type>application/font-eot</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ttf</extension>
+        <mime-type>application/font-ttf</mime-type>
+    </mime-mapping>
+    <!--  http://www.journaldev.com/3229/primefaces-fileupload-component-example-tutorial -->
+    <context-param>
+        <description>State saving method: 'client' or 'server' (=default)</description>
+        <param-name>primefaces.UPLOADER</param-name>
+        <param-value>commons</param-value>
+        <!-- native|auto|commons  was commons -->
+    </context-param>
+    <context-param>
+        <description>Parameter??</description>
+        <param-name>com.sun.faces.disableUnicodeEscaping</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <!-- Change to "Production" when you are ready to deploy -->
+    <context-param>
+        <description>Parameter ??</description>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+    <!-- Use Documents Saved as *.xhtml
+ NOTE: Strictly speaking, JSF pages are not XHTML files—they only aim to
+produce such files. If you want to use a .jsf extension for JSF page files,
+then add the following entry to the web.xml file: was .xhtml
+ -->
+    <context-param>
+        <description>Parameter ??</description>
+        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+        <param-value>.xhtml</param-value>
+    </context-param>
+    <!-- new 15/8/2012 -->
+    <context-param>
+        <description>Parameter ??</description>
+        <param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <!-- new 21/8/2012 mod 8/12/2014
+https://myfaces.apache.org/core12/myfaces-impl/webconfig.html
+    -->
+    <context-param>
+        <description>Parameter State Saving Method : server or client</description>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+        <!-- mod 8/12/204 was client -->
+    </context-param>
+    <!-- new 21/8/2012 SOLVED : cannot create a session after the response has been committed 
+    http://stackoverflow.com/questions/8072311/illegalstateexception-cannot-create-a-session-after-the-response-has-been commited 
+    <context-param>
+        <description>Parameter ??</description>
+        <param-name>com.sun.faces.writeStateAtFormEnd </param-name>
+        <param-value>false</param-value>
+    </context-param>
+</web-app>-->
+    <!-- new 04/09/2012 -->
+    <context-param>
+        <description>Parameter ??</description>
+        <param-name>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <description>Parameter required by Mojarra</description>
+        <param-name>com.sun.faces.allowTextChildren</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <description>Parameter ??</description>
+        <param-name>javax.faces.FACELETS_DEVELOPMENT</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <description>Parameter ??</description>
+        <param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <!--Bluesky theme for PrimeFaces + dependency in pom.xml -->
+    <context-param>
+        <description>Primefaces Themes</description>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>bluesky</param-value>
+    </context-param>
+    <context-param>
+        <!-- new 02-04-2017 -->
+        <description>is disabled by default</description>
+        <param-name>primefaces.SUBMIT</param-name>
+        <param-value>partial</param-value>
+    </context-param>
+    <!-- new 30/12/2012 -->
+    <context-param>
+        <description>Registering Custom EL Function</description>
+        <param-name>javax.faces.FACELETS_LIBRARIES</param-name>
+        <param-value>/WEB-INF/functions.taglib.xml</param-value>
+    </context-param>
+    <!-- new 01/03/2015 -->
+    <context-param>
+        <param-name>primefaces.PUBLIC_CAPTCHA_KEY</param-name>
+        <param-value>6LcM2AITAAAAAPtW0gG83lxR13CmoOwSReffr8uo</param-value>
+    </context-param>
+    <context-param>
+        <param-name>BootsFaces_USETHEME</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>primefaces.PRIVATE_CAPTCHA_KEY</param-name>
+        <param-value>6LcM2AITAAAAAPPAV2vpS5flQYuPIrxPvgo2S0Yz</param-value>
+    </context-param>
+    <context-param>
+        <param-name>primefaces.FONT_AWESOME</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <!--  Move above the fold scripts to the bottom (end of body). This is a huge improvement of the visible rendering and removes flickering between navigations (since 6.2):
+http://tandraschko.blogspot.be/ -->
+    <context-param>
+        <param-name>primefaces.MOVE_SCRIPTS_TO_BOTTOM</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <!-- enlevé 15/12/2012 -->
+    <resource-ref>
+        <description>MySQL DB Connection</description>
+        <res-ref-name>java:/MySqlDS</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+        <res-sharing-scope>Shareable</res-sharing-scope>
+    </resource-ref>
+    <!-- Welcome page -->
+    <welcome-file-list>
+        <welcome-file>/login.xhtml</welcome-file>
+    </welcome-file-list>
+    <!-- JSF mapping -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <!-- Map these files with JSF   
+    <servlet>
+        <servlet-name>BatchJobStartServlet</servlet-name>
+        <servlet-class>batch.BatchJobStartServlet.java</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>BatchJobStartServlet</servlet-name>
+        <url-pattern>/BatchJobStartServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BatchJobStartServlet</servlet-name>
+        <url-pattern>/BatchJobStartServlet</url-pattern>
+    </servlet-mapping>
+  -->
+    <!--  new 17-07-2018 for error page  -->
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+    <!-- Map these files with JSF - added 12/08/2012 
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.jsf</url-pattern>
+    </servlet-mapping>-->
+    <!-- Configuration part for the Primefaces 16/6/2012
+<servlet>
+    <servlet-name>Resource Servlet</servlet-name>
+    <servlet-class>
+    org.primefaces.resource.ResourceServlet
+    </servlet-class>
+    <load-on-startup>2</load-on-startup>
+</servlet>
+<servlet-mapping>
+    <servlet-name>Resource Servlet</servlet-name>
+    <url-pattern>/primefaces_resource/*</url-pattern>
+</servlet-mapping>
+ End of the configuration part for the Primefaces-->
+    <!-- fileupload 4/7/2012 new new new new
+    - thresholdSize specifies the maximum file size in bytes to keep uploaded files in memory.
+        If it exceeds this limit, it’ll be temporarily written to disk.
+    - uploadDirectory is the folder where to keep temporary files that exceed thresholdSize.
+    <filter-mapping>
+   <filter-name>PrimeFaces FileUpload Filter</filter-name>
+   <servlet-name>Faces Servlet</servlet-name>
+</filter-mapping>
+E:\FileUpload
+C:\Users\collet\Documents\NetBeansProjects\GolfWfly\FileUpload
+-->
+    <filter>
+        <filter-name>PrimeFaces FileUpload Filter</filter-name>
+        <filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
+        <init-param>
+            <param-name>thresholdSize</param-name>
+            <param-value>51200</param-value>
+        </init-param>
+        <init-param>
+            <description>This is just a Temporary for temporary files</description>
+            <param-name>uploadDirectory</param-name>
+            <param-value>C:\Users\collet\Documents\NetBeansProjects\GolfWfly\FileUpload\</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>PrimeFaces FileUpload Filter</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+    </filter-mapping>
+    <!-- new 20/04/2013 marche pas ...
+<filter>
+    <filter-name>SecurityFilter</filter-name>
+    <filter-class>utils.SecurityFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>SecurityFilter</filter-name>
+    <url-pattern>/*</url-pattern> 
+  </filter-mapping>
+  <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.jsf</url-pattern>
+  </servlet-mapping>
+ -->
+    <!-- new 26/04/2013 fonctionne, mais on utilise @WebFilter 
+ <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>utils.UserIdentificationFilter</filter-class>
+</filter>
+<filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+</filter-mapping>
+-->
+<!--   06-09-2018 pour security API 
+    <security-constraint>
+        <display-name>Constraint1</display-name>
+        <web-resource-collection>
+            <web-resource-name>wrcoll</web-resource-name>
+            <description/>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>TutorialUser</description>
+            <role-name>TutorialUser</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>file</realm-name>
+        <form-login-config>
+            <form-login-page>/login_securityAPI.xhtml</form-login-page>
+            <form-error-page>/login.xhtml</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <security-role>
+        <description>TutorialUser</description>
+        <role-name>TutorialUser</role-name>
+    </security-role>
+    -->
+
+<!--
+    <security-constraint>
+        <display-name>Administrator</display-name>
+        <web-resource-collection>
+            <web-resource-name>Admin Area</web-resource-name>
+            <description/>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Administrator</description>
+            <role-name>Administrator</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <display-name>Manager</display-name>
+        <web-resource-collection>
+            <web-resource-name>Manager Area</web-resource-name>
+            <description/>
+            <url-pattern>/manager/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Manager</description>
+            <role-name>Manager</role-name>
+            <role-name>Administrator</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <display-name>User</display-name>
+        <web-resource-collection>
+            <web-resource-name>User Operations</web-resource-name>
+            <description/>
+            <url-pattern>/user/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>User</description>
+            <role-name>Manager</role-name>
+            <role-name>Administrator</role-name>
+            <role-name>User</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>SimpleCRUD_Realm</realm-name>
+        <form-login-config>
+            <form-login-page>/login.xhtml</form-login-page>
+            <form-error-page>/error.xhtml</form-error-page>
+        </form-login-config>
+    </login-config>
+    <security-role>
+        <role-name>Administrator</role-name>
+    </security-role>
+    <security-role>
+        <role-name>Manager</role-name>
+    </security-role>
+    <security-role>
+        <role-name>User</role-name>
+    </security-role>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/ErrorAccessDenied.xhtml</location>
+    </error-page>
+    -->
+    
+    <session-config>
+        <session-timeout>20</session-timeout>  <!-- Session idle timeout in MINUTES new 8/12/2014 -->
+    </session-config>
+    <!-- new 8/12/2014 -->
+    <error-page>
+        <exception-type>javax.faces.application.ViewExpiredException</exception-type>
+        <location>/sessionExpired.xhtml</location>
+    </error-page>
+    <context-param> <!-- new 8/12/2014 -->
+        <param-name>javax.faces.FACELETS_BUFFER_SIZE</param-name>
+        <param-value>65535</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.writeStateAtFormEnd</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <listener>
+        <listener-class>com.sun.faces.config.ConfigureListener</listener-class>
+    </listener>
+    <!-- new 27-08-2018 Listeners 
+    <listener>
+        <listener-class>listeners.MySessionCounter</listener-class>
+    </listener>
+    -->
+    <!-- enlevé car mis @Named @ApplicationScoped @WebListener
+    <listener>
+        <listener-class>listeners.StartStopAppListener</listener-class>
+    </listener>
+    -->
+    <!--  new apache shiro 24-12-2017
+ <listener>
+    <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+</listener>
+
+<filter>
+    <filter-name>ShiroFilter</filter-name>
+    <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+</filter>
+
+<filter-mapping>
+    <filter-name>ShiroFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>ERROR</dispatcher>
+</filter-mapping>
+ -->
+</web-app>

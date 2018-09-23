@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--  xmlns:h="http://xmlns.jcp.org/jsf/html"  -->
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+     
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:jsf="http://xmlns.jcp.org/jsf/"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="head" />    
+<ui:define name="title">Player Page </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_player.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<!--
+<h:graphicImage 
+                name="images/WOODS_Tiger.jpg"
+                alt="image missing :golf_club.jpg"
+                style="float: left;">
+</h:graphicImage>
+-->
+<h:graphicImage 
+                name="images/jack_nicklaus.png"
+                alt="image missing :golf_club.jpg"
+                style="float: right;">
+</h:graphicImage>
+    
+<h:form id="player" enctype="application/x-www-form-urlencoded" >
+    
+
+<p:focus for="idplayer" />
+
+<p:panelGrid 
+    id="panel1" 
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header" >
+    <h1>#{msg['player.create.data']}</h1>
+</f:facet>
+
+                <h:outputText value="#{msg['player.id']}" />
+                <p:inputMask
+                        label="Player Identification"
+                        id="idplayer"
+			value="#{courseC.player.idplayer}"
+                        title="#{msg['tooltip.player.id']}"
+                        size="7"
+                        mask="?999999" />
+<!-- The Java EE 7 version of JSF (2.2) enables the definition of any arbitrary attributes,
+which are not going to be processed by the JSF runtime and directly passed to the browser. 
+The first one is the new attribute placeholder used to define a text 
+that is displayed if the input is empty.
+http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
+-->
+                <h:outputText value="#{msg['player.first']}" />
+		<p:inputText  label="Firstname"
+                              id="firstName"
+                              pt:placeholder="this is a HTML5 placeholder"
+                              title="#{msg['tooltip.player.firstname']}"
+                              size="45"
+                              styleClass="noprocess"
+			      value="#{courseC.player.playerFirstName}" />
+
+		<h:outputText value="#{msg['player.last']}"   />
+		<p:inputText  label="Lastname"
+                              id="lastName"
+                              size="45"
+                              title="#{msg['tooltip.player.lastname']}"
+			      value="#{courseC.player.playerLastName}" 
+                              />
+                
+                <h:outputText value="#{msg['player.gender']}" style="font-weight:bold"  />
+                <p:selectOneButton id="gender"
+                                  value="#{courseC.player.playerGender}"
+                                  >
+                    <f:selectItem itemLabel="#{msg['player.gent']}" itemValue="M"/>
+                    <f:selectItem itemLabel="#{msg['player.lady']}" itemValue="L" />
+                </p:selectOneButton> 
+                     
+                <h:outputText value="#{msg['player.birth']}"  />
+                <p:calendar
+                    immediate="true"
+                    value="#{courseC.player.playerBirthDate}"
+                    id="birthDate"
+                    locale="en"
+                    mode="popup"
+                    showOn="both"
+                    required="true"
+                    showButtonPanel="true"
+                    pattern="dd/MM/yyyy"
+                    navigator="true"
+                    readonlyInput="false">
+                
+                </p:calendar>
+                
+                     
+                
+   <!--  yearRange="c-50:"  <f:convertDateTime pattern="dd/MM/yyyy" /> -->             
+                 <h:outputText value="#{msg['player.email']}" />
+		<p:inputText  label="email"
+                              id="email"
+                              size="45"
+                              title="#{msg['tooltip.player.email']}"
+			      value="#{courseC.player.playerEmail}" />
+
+                
+      <h:outputText value="#{msg['player.handicap']}" />
+      <h:panelGroup id="panelG1" layout="block" >
+                <p:inputMask  label="Handicap"
+                       id="hcp"
+                       value="#{courseC.handicap.handicapPlayer}"
+                       size="4"
+                       title="#{msg['tooltip.player.handicap']}"
+                       mask="?99.9"
+                       />
+                <h:outputText value="#{msg['player.datehandicap']}"
+                       style="padding-left : 30px;
+                              padding-right: 15px;"
+                                  
+                        />
+                <p:calendar value="#{courseC.handicap.handicapStart}"
+                        id="dhcp"
+                        locale="#{languageC.locale}"
+                        mode="popup"
+                        showOn="both"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd/MM/yyyy"
+                        navigator="true"
+                        yearRange="c-5:c-0"
+                        readonlyInput="true"
+                 />
+      </h:panelGroup>
+
+       <p:commandButton
+                         value="#{msg['button.player.identify']}"
+                         id="buttonPlayerIdentify"
+                         ajax="false"
+                
+                         update="growl-msg"
+                         immediate="false"
+                         icon="fa fa-male"
+                         action="#{courseC.validatePlayer}"/>
+        <h:outputText value=" " />
+        
+        <!--  rendered="#{not courseC.connected}"   <p:keyFilter for="email" mask="email" />  -->
+</p:panelGrid>
+
+
+<p:panelGrid 
+    id="panel2" 
+    columns="2"
+    rendered="#{courseC.nextPanelPlayer}"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+        
+                <h:outputText value="#{msg['player.country']}" />
+                <p:selectOneMenu
+                    id="country"
+                    name="country"
+                    immediate="true"
+                    valueChangeListener="#{courseC.playerCountryListener}"
+                    value="#{courseC.player.playerCountry}"
+                    >
+                    <f:selectItem
+                         itemLabel="??"
+                         itemValue="#{null}" />
+                    <f:selectItems
+                         value="#{listCtry.getCountriesMap()}" />
+                </p:selectOneMenu>  
+                
+		<h:outputText value="#{msg['player.city']}" />
+		<p:inputText  
+                              name="city"
+                              id="city"
+                              size="45"
+                              immediate="true"
+                              valueChangeListener="#{courseC.playerCityListener}"
+                              value="#{courseC.player.playerCity}" />
+
+                <h:outputText value="#{msg['player.language']}" />
+                <p:selectOneMenu id="lang"
+                                 value="#{courseC.player.playerLanguage}"
+                                 immediate="true"
+                                 required="true"
+                                 valueChangeListener="#{courseC.playerLanguageListener}"
+                                 >
+                    <f:selectItem 
+                                  itemLabel="?? Select"
+                                  noSelectionOption="true"
+                                  itemDisabled="true"
+                                  itemValue="#{null}" />
+                    <f:selectItems value="#{courseC.languages}" />
+                </p:selectOneMenu>
+      
+         <h:outputText value="#{msg['player.homeclub']}" />
+            <h:panelGroup layout="block" id="container2">
+                <p:inputMask
+                       label="HomeClub"
+                       styleClass="mystyle"
+                       id="homeClub"
+                       value="#{courseC.player.playerHomeClub}"
+                       size="5"
+                       style="margin-right: 10px;"
+                       mask="?9999"
+                    />
+                <!--  24-03-2017 with immediate = true on peut l'utiliser sans provoquer d'erreurs de validation ! -->
+                <p:commandButton 
+                         value="#{msg['button.player.homeclub']}"
+                         id="ButtonHomeClub"
+                         update="homeClub"
+                         ajax="false"
+                         immediate="true"
+                         style="margin-right: 10px;"
+                         icon="ui-icon-search"
+                         action="#{courseC.findHomeClub()}"
+                        
+                  />
+
+                <h:outputText value=" #{courseC.club.clubName}" 
+                              style="font-style:italic"/>  
+            </h:panelGroup>
+ 
+    <h:outputText value="#{msg['player.zoneid']}" />    
+   <h:panelGroup layout="block" id="container3">
+	<h:outputText label="ZoneId"
+                      id="zone"
+                      style="margin-right: 20px;"
+                      value="#{courseC.player.playerTimeZone.timeZoneId}" />
+        <h:outputText label="ZoneName"
+                      id="zonename"
+                      value="#{courseC.player.playerTimeZone.timeZoneName}" />
+   </h:panelGroup>
+
+ 
+        <h:outputText value="#{msg['player.latlng']}" />
+	<h:outputText label="latlng"
+                      id="latlng"
+                      value="#{courseC.player.playerStringLatLng}" />
+
+<f:facet name="footer">
+        <p:commandButton
+                         value="#{msg['button.player.create']}"
+                         id="createPlayer"
+                         ajax="false"
+                         style="font-weight:normal "
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.createPlayer}"/>
+        <!--  rendered="#{not courseC.connected}"    -->
+        <p:commandButton
+                         value="#{msg['button.player.image']}"
+                         id="button02"
+                         ajax="false"
+                         rendered="#{courseC.nextPlayer}"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="ui-icon-circle-arrow-e"
+                         style="float: right;"
+                         action="player_file.xhtml"/>
+
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+<!--       <p:keyFilter for="email" mask="email" />               -->
+                <!--  24-03-2017 
+                 action="selectHomeClub.xhtml"
+                
+                   <p:commandButton 
+                         value="AJAX - #{msg['button.player.homeclub']}"
+                         id="ButtonHomeClubAjax"
+                         update="@(.mystyle)"
+                   process="@(form :not(.noprocess))"
+                         partialSubmit="true"
+                         event="click"
+                         immediate="true"
+                         ajax="true"
+                         style="margin-right: 10px;"
+                         icon="ui-icon-search"
+                         action="selectHomeClub.xhtml"
+                  />
+               -->
+                <!-- 
+                update=homeClub fonctionne aussi sur le id
+                mais on utilise pour le fun PFS (PrimeFaces Selectors) -->
+
+</ui:define>
+</ui:composition>
+</html>

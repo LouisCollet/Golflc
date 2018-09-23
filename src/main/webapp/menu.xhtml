@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+
+>
+
+    <h:head>
+              <title>IGNORED</title>
+    </h:head>
+    <h:body>
+<ui:composition>
+<h:form id="menu"      enctype="application/x-www-form-urlencoded" >
+<p:panelMenu id="panel_menu">
+    <p:submenu label="HOME LC" icon="ui-icon-wrench">
+         <p:menuitem value ="Reset   "
+                     action="#{courseC.reset('from menu : Home')}"
+                     icon="fa fa-home" />
+    </p:submenu>
+
+    <p:submenu label="CREATE" >
+             <p:menuitem value ="Club,Course,Tee,Holes"
+                        action="#{courseC.to_club_xhtml('create club')}"
+                         />
+   <!--          <p:menuitem value ="Course" 
+                         action="#{courseC.to_course_xhtml('create course')}"
+                         icon="fa fa-flag-checkered" />
+             <p:menuitem value ="Tee Box" 
+                         action="#{courseC.to_tee_xhtml('create tee')}"
+                         icon="fa fa-flag-o" />
+             <p:menuitem value ="Hole" 
+                         url="hole.xhtml?cmd=ini&amp;operation=create"     icon="ui-icon-flag" />
+    -->         
+             <p:menuitem value ="Create Round"
+                         action="#{courseC.to_selectCourse_xhtml('CreateRound')}"
+                         icon="fa fa-list" />
+             <p:menuitem value ="Create Tarif"
+                         action="#{courseC.to_selectCourse_xhtml('CreateTarif')}"
+                         icon="fa fa-dollar" />
+ <!-- https://www.w3schools.com/icons/fontawesome_icons_intro.asp -->            
+    </p:submenu>
+    <p:submenu label="MODIFY">
+            <p:menuitem value ="Club,Course,Tee"
+                        action="#{courseC.to_clubModify_xhtml('modify club')}"
+                        icon="ui-icon-flag" />
+    </p:submenu>
+    <p:submenu label="PLAYER info"  >
+         <p:menuitem value ="Show Handicap"
+                     icon="fa fa-trophy" 
+                     action="#{courseC.to_show_handicap_xhtml('Handicap')}"
+          />
+         <p:menuitem value ="Played Rounds"
+                     action="#{courseC.to_show_played_rounds_xhtml('stableford')}"
+                     icon="fa fa-list-alt" />
+    </p:submenu>
+<!-- url="show_played_rounds.xhtml?cmd=ini" 
+url="show_played_rounds.xhtml?cmd=ini"
+-->
+    <p:submenu label="INSCRIPTION"  >
+         <p:menuitem value ="Inscription STB/SCR"
+                     action="#{courseC.to_select_inscription_xhtml('STABLEFORD')}"
+                     icon="ui-icon-check" />
+  <!--       <p:menuitem value ="Inscription Scramble"
+                     action="#{courseC.to_select_inscription_xhtml('SCRAMBLE')}"
+                     icon="ui-icon-check" />
+  -->
+        <p:menuitem value ="Inscription Matchplay "
+                     action="#{courseC.to_select_inscription_xhtml('mp_')}"
+                     icon="ui-icon-check" />
+        <p:menuitem value ="Classment Participants Round"
+               action="#{courseC.to_selectParticipantsRound_xhtml('ini')}"
+               icon="ui-icon-calendar" />
+    </p:submenu>
+
+<p:submenu label="REGISTER SCORE"  >
+    <p:menuitem value ="Register Score STB/SCR"
+                action="#{courseC.to_selectStablefordRounds_xhtml('STABLEFORD')}"
+                icon="ui-icon-check" />
+<!--  url="selectPlayedRound.xhtml?cmd=ini&amp;game=stableford" 
+<p:menuitem value ="Register Score MPL" url="selectMatchplayRounds.xhtml?game=matchplay"          icon="ui-icon-check" />
+   url="selectCourse.xhtml?cmd=Rnd"
+-->
+    <p:menuitem value ="Register Score MPL"
+                action="#{courseC.to_selectMatchplayRounds_xhtml('matchplay')}"
+                icon="ui-icon-check" />
+ <!--   
+    <p:menuitem value ="Register Score SCR"
+                action="#{courseC.to_selectScrambleRounds_xhtml('SCRAMBLE')}"
+                icon="ui-icon-check" />
+ -->   
+</p:submenu>
+<p:submenu label="PLAY A ROUND">
+   
+   <p:menuitem value ="Score Card"
+               action="#{courseC.to_selectRegisteredRounds_xhtml('ini')}"
+               icon="ui-icon-check" />
+
+<!-- url="selectRegisteredRound.xhtml?cmd=ini" url="selectParticipantsRound.xhtml?cmd=ini"
+-->
+</p:submenu>
+
+<p:submenu label="PLAYING Hcp"  >
+   <p:menuitem value ="Stableford Playing Hcp"  url="stableford_playing_hcp.xhtml?cmd=ini" icon="ui-icon-calculator" />
+   <p:menuitem value ="Scramble Playing Hcp"    url="scramble_playing_hcp.xhtml?cmd=ini" icon="ui-icon-document" />
+   <p:menuitem value ="Other Games Playing Hcp" url="othergames_playing_hcp.xhtml?cmd=ini" icon="ui-icon-document" />
+</p:submenu>
+
+<p:submenu label="SUBSCRIPTION" >
+   <p:menuitem value ="Subscription = #{courseC.subscription.endDate}" url="subscription.xhtml" icon="ui-icon-calculator" />
+
+</p:submenu>
+    <p:submenu label="UPLOAD" >
+         <p:menuitem value ="Upload Photo"
+                     outcome="player_file.xhtml?cmd=Det"
+                     icon="fa fa-upload" />
+         <p:menuitem value ="Thumbnails"
+                     action="#{thumbnailsC.thumbs('from menu')}"
+                     icon="ui-icon-star" />
+    </p:submenu>
+<!--    <p:menuitem value="Go" id="page1LinkID" action="#{navBean.goNav}">     
+                    <f:param id="page1ParamID" name="pageViewID" value="Page1"/>
+                </p:menuitem> -->
+    <p:submenu label="STATS">
+         <p:menuitem value ="Stats Round"     url="selectCourse.xhtml?cmd=ChartRound"    icon="ui-icon-image" />
+         <p:menuitem value ="Stats Course   "
+                url="selectCourse.xhtml?cmd=ChartCourse"
+                action="#{courseC.to_selectcourse_xhtml('ChartCourse')}" 
+                icon="ui-icon-pencil" />
+    </p:submenu>
+    <!--   <p:menuitem value ="direct      "     url="statCourseAvg.xhtml"           icon="fa fa-bar-chart" />      
+    url="selectCourse.xhtml?cmd=Avg"
+    url="selectCourseStatAvg.xhtml?cmd=avg"  -->
+    
+
+    <!--   url="modifyClubCourseTee.xhtml?cmd=ini&amp;operation=restart" -->
+    <p:submenu label="DELETE">
+            <p:menuitem value ="Delete Club, Course, Tee"
+                        action="#{courseC.to_clubDelete_xhtml('modify club')}"
+                        icon="ui-icon-flag" />
+    </p:submenu>
+    <p:submenu label="RESTART">
+         <p:menuitem value ="matchplay 221     " 
+                     action="#{courseC.participantsMatchplay()}"
+                     icon="ui-icon-check" />
+             <p:menuitem value ="Cell and Row editor"  url="editingRow.xhtml?cmd=ini&amp;operation=restart"   icon="ui-icon-flag" />
+         
+      <!--       <p:menuitem value ="Restart Course"  url="courseRestart.xhtml?cmd=ini&amp;operation=restart" icon="ui-icon-flag" />
+            
+             <p:menuitem value ="Restart Tee"     url="teeRestart.xhtml?cmd=ini&amp;operation=restart"    icon="ui-icon-flag" />
+             <p:menuitem value ="Restart Hole"    url="holeRestart.xhtml?cmd=ini&amp;operation=restart"   icon="ui-icon-flag" />
+              -->
+             <p:menuitem value ="essaiCell and "  outcome="/essai/editingRow.xhtml"   icon="ui-icon-flag" />
+    </p:submenu>
+    <p:submenu label="HELP">
+         <p:menuitem value ="Application Help" url="result.xhtml" icon="ui-icon-star" />
+         <p:menuitem value ="About"            url="result.xhtml" icon="ui-icon-star" />
+         <p:menuitem value ="Technical info"   url="technical_info.xhtml" icon="ui-icon-star" />
+    </p:submenu>
+    <p:submenu label="BATCH">
+         <p:menuitem value ="Batch concat images" url="batch.xhtml" icon="ui-icon-star" />
+         <p:menuitem value ="LC Import Players"
+                     action="#{importPlayers.main('from menu : louis')}"
+                     icon="ui-icon-star" />
+         <p:menuitem value ="Batch JEE7 Imports"
+                     url="jobSubmitter.xhtml"
+                     icon="ui-icon-star" />
+    </p:submenu>
+    <p:submenu label="TOOLS/TESTS" >
+<!-- If you are not using "url" but want to go with "action" then remember that you are doing a POST request.
+In this case you should either
+1.Add ?faces-redirect=true to your returning String, like "test.xhtml?faces-redirect=true"
+2.Set ajax=false in your menuitems,  
+  -->
+         <p:menuitem value ="test match play   "
+                     action="#{lists.MatchplayList.main()}"
+                     icon="ui-icon-wrench" />
+                 
+         <p:menuitem value ="test Junit 5   "
+                 
+                     action="#{salaryP.testBasicSalaryWithValidSalary('from menu TOOLS - test Junit 5')}"
+                     icon="ui-icon-wrench" />
+     <!--  -->                
+         <p:menuitem value ="Check Mail"
+                     action="#{courseC.checkMail('from menu : checkMail')}"
+                     icon="fa-envelope-o" />
+         
+          <p:menuitem value ="Check Subscription Reneval"
+                     action="#{courseC.listSubscriptionRenewal('from menu : checkSubscription')}"
+                     icon="fa-envelope-o" />
+          
+          <p:menuitem value ="GeoApiController"
+                     action="#{geoapiC.checkGeoApi()}"
+                     icon="fa-envelope-o" />
+          
+
+          <p:menuitem value ="Picklist     " url="picklist.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Media Flash  " url="media_flash.xhtml" icon="ui-icon-wrench" />
+          
+          <p:menuitem value ="Text directions" url="maps_text_directions.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Travel modes" url="maps_travel_modes.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Geocoding" url="maps_geocoding.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Distance" url="maps_distance_matrix.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Autocomplete" url="autocomplete.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Search Golf Courses" url="search_golf.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Autocomplete Address" url="autocomplete_address.xhtml" icon="ui-icon-wrench" />
+          <p:menuitem value ="Player Autocomplete" url="player_autocomplete.xhtml" icon="ui-icon-wrench" />
+    </p:submenu>
+    <!--   a faire : n'afficher que si 324713  -->
+    <p:submenu label="ADMINISTRATEUR" 
+               rendered="#{courseC.player.idplayer eq '324713'}">
+        <p:menuitem value ="Delete (test) Player" 
+                    action="#{courseC.to_delete_player_xhtml('222222')}"
+                    icon="ui-icon-calculator" />
+        <p:menuitem value ="Delete (test) Club"
+                    action="#{courseC.to_show_handicap_xhtml('Handicap')}"
+                    icon="ui-icon-document" />
+        <p:menuitem value ="Other Games Playing Hcp"
+                    url="othergames_playing_hcp.xhtml?cmd=ini"
+                    icon="ui-icon-document" />
+    </p:submenu>
+    
+    
+    <p:submenu label="Resources">
+           <p:menuitem value ="Download "    url="download.xhtml"/>
+           <p:menuitem value="Demo"     url="http://www.primefaces.org/showcase-labs/ui/home.jsf" icon="ui-icon-extlink" />
+           <p:menuitem value="Documentation" url="http://www.primefaces.org/documentation.html" icon="ui-icon-extlink" />
+           <p:menuitem value="Forum"    url="http://forum.primefaces.org/" icon="ui-icon-folder-collapsed" />
+           <p:menuitem value="Themes"   url="http://www.primefaces.org/themes.html" icon="ui-icon-extlink" />
+           <p:menuitem value="ckEditor" url="http://docs.cksource.com/CKEditor_3.x/Users_Guide" icon="ui-icon-extlink" />
+           
+    </p:submenu>
+
+</p:panelMenu>
+
+
+<!-- ______________________________________________ -->
+</h:form>
+ </ui:composition>   
+</h:body>
+
+</html>

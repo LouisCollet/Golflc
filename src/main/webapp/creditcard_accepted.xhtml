@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+   <!-- 
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadTarif()}"/>
+    </f:metadata>
+</ui:define>
+    
+    Use the <f:viewAction> when you want to execute a method before the HTML is been rendered.
+ici c'est pour générer des data pour tester !  -->  
+    
+<ui:define name="title">Payment</ui:define>
+
+<ui:define name="content">
+    <h:outputScript library="js" name="totalprice.js" target="head"/>
+
+<h:graphicImage 
+                name="images/addtocart.jpg"
+                alt="image missing :tarif1.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/online2.png"
+                alt="image missing :tarif2.jpg"
+                style="float: right;">
+</h:graphicImage>
+
+<h:form id="creditcard_accepted" enctype="application/x-www-form-urlencoded">
+        
+<ui:include src="include/include_summary.xhtml"/>
+
+<p:panelGrid
+    id="panelGrid1"
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h1>#{msg['title.payment.round']}</h1>
+</f:facet>
+    <h:outputText  id="Total"
+                value="#{msg['payment.amounttobepaid']} :"
+                />
+     <h:outputText  id="TotalPrice"
+                value="#{courseC.creditcard.totalPrice}"
+                style="font-size: 3em;"
+                />
+    
+    <h:outputText value="#{msg['creditcard.communication']} :" />
+    <h:outputText  label="com"
+                  id="Communication"
+                  value="#{courseC.creditcard.communication}"
+                  title="#{msg['tooltip.club.clubaddress']}"
+                  size="45" 
+                  />
+    
+    <h:outputText value="Holder :" />
+    <h:outputText  label="holder"
+                              id="Holder"
+                              value="#{courseC.creditcard.creditCardHolder}"
+                              
+                         />
+    
+    <h:outputText  value="#{msg['creditcard.number']} :"/>
+    <h:outputText
+                        label="creditcard"
+                        id="creditcardNumber"
+                        value="#{courseC.creditcard.creditCardNumber} / #{courseC.creditcard.creditCardVerificationCode}"
+                        >
+      </h:outputText>
+    
+    <h:outputText value="#{msg['creditcard.type']} :"   />
+    <h:outputText  id="TypeCreditcard"
+                   value="#{courseC.creditcard.creditCardType}"
+               >
+     </h:outputText>
+    
+    <h:outputText value="Expiration Date :" />
+    <h:outputText 
+            id="Expiration"
+            value="#{courseC.creditcard.creditCardExpirationDate}"
+            >
+         <f:convertDateTime type="date" pattern="MM/yyyy" />
+        </h:outputText> 
+    
+    <h:outputText value="Major Industry Identifier :" />
+    <h:outputText 
+            id="Industry"
+            value="#{courseC.creditcard.creditCardMajorIndustryIdentifier}"
+            />
+
+    <h:outputText value="Issuer calculated from cardnumber :" />
+    <h:outputText 
+            id="Issuer"
+            value="#{courseC.creditcard.creditCardIssuer}"
+            />
+  <!--
+    <h:panelGroup id="panelGreenfee"
+                  layout="block"
+                  rendered="#{not empty courseC.tarif.priceItem[0]}"
+                  >
+       <h:outputText  value="#{msg['tarif.greenfee']} :"/>
+       <h:outputText  label="Greenfee3"
+                       id="Greenfee3"
+                       value="#{courseC.tarif.priceItem[0]}"
+                       >
+            <f:convertNumber type="currency"/>
+       </h:outputText>
+    </h:panelGroup>
+        
+-->
+<!-- do not change the id !! see totalprice.js  -->
+
+<p:commandButton value="I accept this payment !"
+                         id="commandButtonPay"
+                         actionListener="#{courseC.startTask}"
+                         rendered="#{courseC.creditcard.paymentOK eq false}"
+                         onclick="jsStartTask()"
+                         update="taskResult"
+                         widgetVar="taskButton"/>
+    <h:outputText value=" "/>
+    
+    <p:progressBar  widgetVar="progressBar"
+                    id="progressBar1"
+                    ajax="true"
+                        interval="500"
+                        value="#{courseC.progress}"
+                        labelTemplate="{value}%"
+                        global="false"
+                        style="width: 500px;font-size: 2em;">
+            <p:ajax event="complete"
+                    update="taskResult"
+                    oncomplete="jsOnComplete();"
+                    />
+    </p:progressBar>
+    
+    <!--  PF('commandButtonPay').disable();
+                    PF('commandButtonMail').enable();  -->
+        <h:outputText id="taskResult"
+                      value="#{courseC.resultCreditCard}"/>
+
+<f:facet name="footer">
+         <p:commandButton value="#{msg['inscription.back']}"
+                         id="commandButtonBack"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-rotate-left"
+                         action="inscription.xhtml"
+                         />
+         <p:commandButton value="Mail de confirmation"
+                         id="commandButtonMail"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-envelope"
+                         
+                         action="#{courseC.creditCardMail}"
+                         />
+         <!--  rendered="#{courseC.creditcard.paymentOK eq true}" -->
+          <p:commandButton id="btn"
+                         value="#{msg['button.print']}"
+                         type="button"
+                         icon="fa fa-print"
+                         >
+                <p:printer target="creditcard_accepted" />
+          </p:commandButton>
+         
+</f:facet>
+
+</p:panelGrid>
+
+   <!--  transfer data fromm js to bean
+   https://stackoverflow.com/questions/7221495/pass-parameter-to-premotecommand-from-javascript/18510102#18510102
+   https://stackoverflow.com/questions/26849704/pass-variable-from-jsf-javascript-to-bean
+   SetMystrings se trouve dans totalprice.js (c'est une fonction JS
+   -->
+   <p:remoteCommand name="SetMyStrings"
+                    actionListener="#{courseC.creditcard.setMyStrings}" />
+   
+</h:form>
+    <script type="text/javascript">
+    function jsOnComplete() {
+        PF('taskButton').enable();
+        console.info("before buttonplay");
+   //     document.getElementById("creditcard_accepted:commandButtonPay").disabled = true;
+
+    //    document.getElementById("creditcard_accepted:").disabled = true; 
+    //    document.getElementById("commandButtonPay").disabled = true;
+
+    //    document.getElementById('creditcard_accepted:commandButtonMail'").enabled = true;
+   //     console.info("after buttonplay : ne fonctionne pas !!");
+    }
+    function jsStartTask() {
+      PF('taskButton').disable();
+      PF('progressBar').cancel();
+      PF('progressBar').setValue(0);
+      PF('progressBar').start();
+  //    setTimeout("document.getElementById(\'' + this.id + '\').disabled=true;", 50);
+    }
+ </script>
+</ui:define>
+</ui:composition>
+</html>

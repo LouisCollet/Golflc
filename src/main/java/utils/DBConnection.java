@@ -1,0 +1,441 @@
+
+package utils;
+//import com.mysql.cj.jdbc.Driver; // mod 05-10-2017 pour connector /J 8
+// Notice, do not import com.mysql.cj.jdbc.* or you will have problems!
+import java.io.InputStream;
+import java.sql.*;
+import java.util.Properties;
+import javax.naming.*;
+import javax.sql.DataSource;
+
+/**
+ *
+ * @author collet
+ * DataSource dataSource;
+            try {
+                dataSource = (DataSource) new InitialContext().lookup(url);
+            } catch (NamingException e) {
+                throw new DAOConfigurationException(
+                    "DataSource '" + url + "' is missing in JNDI.", e);
+ */
+public class DBConnection implements interfaces.GolfInterface, interfaces.Log
+{
+static private Connection conn = null;
+
+public Connection getConnection() throws SQLException, Exception   // was static
+{
+/* Load Driver pas nécessaire !! enlevé le 02-09-2018 car le driver est dans le path
+    https://stackoverflow.com/questions/5484227/jdbc-class-forname-vs-drivermanager-registerdriver
+    excellent article !!
+*/
+    String db_connection = null;
+    Properties p = null;
+    
+try{
+       ClassLoader clo = Thread.currentThread().getContextClassLoader();
+     // Netbeans Files en haut à gauche /src/main/resources
+       InputStream is = clo.getResourceAsStream("jdbc.properties");
+       p = new Properties();
+       p.load(is);
+/*       p.list(System.out); 
+      // print the properties list
+       Enumeration keys = p.keys();
+       while (keys.hasMoreElements()) {
+         String key = (String)keys.nextElement();
+         String value = (String)p.get(key);
+            LOG.debug("jdbc.properties = " + key + ": " + value);
+      }
+            LOG.info("element username = " + p.getProperty("jdbc.username"));
+            */
+            
+// load from the xml that we saved earlier
+  //      props.loadFromXML(fis);http://www.drdobbs.com/jvm/readwrite-properties-files-in-java/231000005
+
+  //      static final String DB_CONNECTION_V8_0 =  
+  //        "jdbc:mysql://" + DB_HOST_80 +" /" + DB_NAME
+  //              + "?AllowMultiQueries=true"
+ //               + "&AllowUserVariables=true"
+ //               + "&useSSL=false"
+ //               + "&nullNamePatternMatchesAll=true"; // 
+         db_connection = p.getProperty("jdbc.mysql")
+                       + p.getProperty("jdbc.host")
+                       + p.getProperty("jdbc.dbname")
+                       + p.getProperty("jdbc.params");
+         
+  //       LOG.info("db_connection = " + db_connection);
+ //   LOG.info("old connection = " + DB_CONNECTION_V8_0);
+  //  conn = DriverManager.getConnection(DB_CONNECTION_V8_0,
+        conn = DriverManager.getConnection(db_connection,
+                p.getProperty("jdbc.username"), 
+                p.getProperty("jdbc.password"));
+	return conn;
+}catch (SQLException e){
+	LOG.error("SQLException in Opening Connection : " + db_connection + " Errorcode = " + e);
+        return null;//conn = null;
+        //throw e;
+}catch (Exception e){
+	LOG.error(NEW_LINE + "/"
+                + NEW_LINE + "/"
+                + NEW_LINE + "/"
+                + NEW_LINE + "NO DATABASE FOUND !!!!!!!!!!!!!!!: " + p.getProperty("jdbc.dbname")
+                + NEW_LINE + " Errorcode = " + e
+                + NEW_LINE + "/");
+        e.printStackTrace();
+        return null;//conn = null;
+        //throw e;        
+ }finally{  
+  //  LOG.info("conn = " + conn.toString());
+    String c = conn.toString();
+        LOG.info("Connection returned : {} on database = {}", c.substring(c.lastIndexOf("@"),c.length()), conn.getCatalog() );
+}
+} // end method
+
+/////////////////////////////////////////
+public static void closeQuietly(Connection connection, Statement statement,
+  // enlevé static      public static void closeQuietly(Connection connection, Statement statement,
+        ResultSet resultSet,PreparedStatement preparedStatement ) throws SQLException
+{
+    // https://openclassrooms.com/fr/courses/626954-creez-votre-application-web-avec-java-ee/624392-communiquez-avec-votre-bdd
+ if (resultSet != null){
+    try { resultSet.close();
+        String r = resultSet.toString();
+ //           LOG.info("resultSet closed : " + r.substring(r.lastIndexOf("@"),r.length() ));
+        }
+        catch (SQLException e)
+        {LOG.error("DBConnection : SQL error closing resultset : " + e);
+        }
+    }
+
+if (preparedStatement != null && !preparedStatement.isClosed() ){
+ try{
+            String p = preparedStatement.toString();
+          //      LOG.debug("preparedStatement closed : "
+          //              + p.substring(p.lastIndexOf("@"), p.lastIndexOf(":") ));
+            preparedStatement.close();
+  }catch(SQLException e){
+            LOG.error("SQL error closing preparedStatement : " + e);
+            if(e.getSuppressed() != null)
+            {
+                for(Throwable t : e.getSuppressed())
+                { 
+                    LOG.error("Suppressed errors = " + t.getMessage() + " Class: " + t.getClass().getSimpleName()); 
+                } 
+            }
+        }
+} //end if
+if (connection != null && !connection.isClosed() )
+    {
+        try { connection.close();
+        String c = connection.toString();
+        LOG.info("connection closed : " + c.substring(c.lastIndexOf("@"),c.length() ) );
+        }
+        catch (SQLException e)
+        {LOG.error("SQL error closing connection : " + e);
+        }
+    }
+
+if (statement != null){
+        try { statement.close();
+        String s = statement.toString();
+            LOG.info("-- statement closed quietly : " + s);
+        LOG.info("statement closed : " + s.substring(s.lastIndexOf("@"),statement.toString().length() ));
+        }
+        catch (SQLException e)
+        {LOG.error("SQL error closing Statement : " + e);
+        }
+    }
+
+} // end method closeQuietly
+
+  private static Connection getJNDIConnection()
+  {
+      javax.sql.DataSource ds = null;
+      Context context = null;
+      Connection conn = null;
+  //    https://developer.jboss.org/thread/228231
+  //    conn = null;
+// https://stackoverflow.com/questions/36441217/wflynam0027-classnotfoundexception-org-jboss-naming-remote-client-initialcont
+  try{
+      
+        // create an InitialContext  
+Properties properties = new Properties();  
+properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");  
+ context = new InitialContext(properties);  
+      
+      
+      
+      
+      
+     //     Properties properties = new Properties();
+     //     ClassLoader clo = Thread.currentThread().getContextClassLoader();
+        //  clo.
+    //      properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
+    //             env.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");
+    //      context = new InitialContext(properties);
+         
+          
+      //    InitialContext ctx = new InitialContext();
+      LOG.info("jndi enumeration for 'java'");
+    NamingEnumeration<NameClassPair> list = context.list("java:jboss/datasources/golflc");
+        while (list.hasMore()) {
+        LOG.info("jndi el" + list.next().getName());
+    }
+          
+          
+       //   NamingEnumeration<NameClassPair> list = context.list("java:comp/env/jdbc");java:jboss/datasources/golflc
+          NamingEnumeration<NameClassPair> list2 = context.list("java:jboss/datasources/golflc");
+          
+          while (list2.hasMore()) {
+            LOG.info("JNDI element = " + list2.next().getName());
+          }
+          
+          //DataSource ds = (DataSource)ctx.lookup("jdbc/billingDB");
+
+          
+     //     ds = (DataSource) context.lookup("java:/MySqlDS"); // voir wildfly standalone-full.xml
+          ds = (DataSource) context.lookup("java:/golflc"); // voir wildfly standalone-full.xml
+      //    ds = (DataSource) context.lookup("java:/MySqlDS"); // voir wildfly standalone-full.xml
+          return conn = ds.getConnection();
+   }catch (NamingException e) {
+               LOG.error(" naming exception in getJNDIConnection = " + e);
+   }catch (Exception ex){
+          LOG.info("exception in jndi" + ex);
+   }finally{
+      return conn;
+   }
+  }  // end method
+
+  //// new 15/12/2012
+public static Connection getConnection2() throws Exception  // new 24/11/2011
+    {
+          return getPooledConnection();
+    }
+
+private static Connection getPooledConnection() throws Exception
+{   DataSource ds = null;
+    Context ctx = null;
+    conn = null;
+try
+    {   LOG.info("starting Pooled Connection" );
+
+   // Properties properties = new Properties();
+   //     properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
+   //     properties.put(Context.URL_PKG_PREFIXES, "org.apache.naming");
+       //   ctx = new InitialContext();
+          Properties properties = new Properties();  
+properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");  
+ ctx = new InitialContext(properties);  
+          
+            LOG.info("step 1 ctx = " + ctx);
+          if(ctx == null)
+          {
+              throw new Exception("getPooledConnection -- Exception = No Context");
+          }
+            LOG.info("step 2" );
+          //ds = (DataSource)ctx.lookup("java:app/jdbc/MySQLDataSource");
+            ds = (DataSource)ctx.lookup("java:/MySqlDS");
+            //ds = (DataSource)ctx.lookup("java:comp/env/jdbc/MySQLDataSource");
+           // ds = (DataSource)ctx.lookup("jdbc/fastCoffeeDB");//
+          LOG.info("-- Using Connection Pool JNDI : java:comp/env/jdbc/MySQLDataSource " + ds);
+          if (ds != null)
+          {
+             conn = ds.getConnection();
+ //// voir jdbc.properties            conn.setCatalog(DB_NAME); // from webGolfInterface mod 4/12/2011
+                LOG.info("-- getPooledConnection Database opened = " + conn.getCatalog() );
+             conn.setAutoCommit(true); //
+             return conn;
+          }else{
+             LOG.info("-- getPooledConnection NOT established = null" );
+             //throw new Exception("getPooledConnection -- Exception = No Context");
+             return null;
+          }
+} catch(final NoInitialContextException e) {
+        LOG.info("-- NoInitialContext Exception = " + e.getMessage() );
+        return null;
+}catch(final Exception e){
+        LOG.info("-- getPooledConnection Exception = " + e.getMessage() );
+        return null;
+}finally{
+        LOG.info("-- getPooledConnection finally" );
+    }
+
+} // getPooledConnection
+
+    public static Connection getConn() {
+        return conn;
+    }
+
+    public static void setConn(Connection conn) {
+        DBConnection.conn = conn;
+    }
+
+
+
+@Override
+public String toString()
+{ return 
+        ("from DBConnection = "
+               + " ,conn : "   + this.getConn()
+          //     + " ,club Name : " + this.getClubName()
+          //     + " ,club City : " + this.getClubCity()
+        );
+}   
+//public static void printDataSourceStats(DataSource ds) throws
+//SQLException {
+//         javax.sql.BasicDataSource bds = (BasicDataSource) ds;
+//         LOG.info("NumActive: " + bds.getNumActive());
+//         LOG.info("NumIdle: " + bds.getNumIdle());
+//     }
+
+public static void main(String[] args) throws SQLException, Exception // testing purposes
+{
+
+    DBConnection dbc = new DBConnection();
+    conn = dbc.getConnection();
+    LOG.info(" -- connection success = " + conn);
+    DBConnection.closeQuietly(conn, null, null, null);
+
+//conn = DBConnection.getPooledConnection();
+//LOG.info(" -- connection pool obtained  = " + conn);
+//DBConnection.closeQuietly(conn, null, null, null);
+
+conn = DBConnection.getJNDIConnection();
+LOG.info(" -- JNDI obtained  = " + conn);
+DBConnection.closeQuietly(conn, null, null, null);
+
+}// end main
+
+} // end class
+
+
+
+
+/**
+ * Opens database MySQL.
+ */
+
+
+
+// ------------------------------------------------
+
+/*
+public static Connection getConnection() throws Exception  // new 24/11/2011
+    {
+       return getPooledConnection(); //mod 5/8/2012
+//    conn = dataSource.getConnection();
+//             LOG.info("-- getPooledConnection established = " + dataSource.getConnection().toString());
+//     conn.setCatalog(DataBaseName); // from GolfInterface mod 4/12/2011
+//             LOG.info("-- getPooledConnection Database opened = " + dataSource.getConnection().getCatalog() );
+//        return dataSource.getConnection();
+    }
+*/
+/*
+private static DataSource dataSource; // new 5/8/2012
+static
+    {   String name = "java:comp/env/jdbc/MySQLDataSource";
+      //String name = "java:comp/env/jdbc/MySQLDataSource";
+        try
+        {
+            dataSource = (DataSource) new InitialContext().lookup(name);
+        }
+        catch (NamingException e)
+        {
+            LOG.info("-- ExceptionInInitializerError, name = " + name + " / "+ e.toString() );
+            throw new ExceptionInInitializerError(e);
+            //I throw here ExceptionInInitializerError so that the application
+            //will immediately stop so that you don't need to face "unexplainable"
+            //NullPointerException when trying to obtain a connection.
+        }
+    }
+*/
+/*
+private static Connection getPooledConnection() throws Exception // not used from 5/8/2012
+{
+    DataSource ds = null;
+    try
+    {   //LOG.info("Context  = " + getServletContext().getInitParameter("Administrator =") );
+          ctx = new InitialContext();
+          if(ctx == null )
+            {throw new Exception("getPooledConnection -- Exception in ctx = No Context");}
+          ds = (javax.sql.DataSource)ctx.lookup("java:comp/env/jdbc/MySQLDataSource");
+             LOG.info("-- Connection Pool Used = java:comp/env/jdbc/MySQLDataSource = " + ds.toString());
+
+          if (ds != null)
+          {
+             conn = ds.getConnection();
+             LOG.info("-- getPooledConnection established = " + conn.toString());
+             // mod 25/11/2011
+             //stm = conn.createStatement();
+             //rs = stm.executeQuery("use golflc");
+             //String db = context .getServletContext().getInitParameter("name");
+             //getServletContext().getInitParameter("DataBaseName");
+             //LOG.info("-- getPooledConnection Database InitParameter = " + db );
+             //conn.setCatalog("golflc"); // mod 25/11/2011
+             conn.setCatalog(DataBaseName); // from GolfInterface mod 4/12/2011
+                LOG.info("-- getPooledConnection Database opened = " + conn.getCatalog() );
+             conn.setAutoCommit(true); //
+             return conn;
+          }else{
+             LOG.info("-- getPooledConnection NOT established = null" );
+             //throw new Exception("getPooledConnection -- Exception = No Context");
+             return null;
+          }
+    } //end try
+    catch(final Exception e)
+    {
+        LOG.info("-- getPooledConnection Exception = " + e.getMessage() );
+   //     e.printStackTrace();
+        throw e;
+    }
+    finally
+    {
+
+    }
+
+} // getPooledConnection
+*/
+
+//public static void printDataSourceStats(DataSource ds) throws
+//SQLException {
+//         javax.sql.BasicDataSource bds = (BasicDataSource) ds;
+//         LOG.info("NumActive: " + bds.getNumActive());
+//         LOG.info("NumIdle: " + bds.getNumIdle());
+//     }
+/*
+public static void closeQuietly(Connection connection, Statement statement,
+        ResultSet resultSet,PreparedStatement preparedStatement ) throws SQLException
+{
+    if (connection != null && !connection.isClosed() ) // mod 18/12/2011
+    {
+        try { connection.close();
+        String c = connection.toString();
+        LOG.info("-- connection closed quietly : " + connection);
+        LOG.info("-- connection closed quietly : " + c.substring(c.lastIndexOf("@"),c.length() ) );
+        }
+        catch (SQLException logOrIgnore) {LOG.info("bizarre bizarre");}
+    }
+    if (statement != null)
+    {
+        try { statement.close();
+        String s = connection.toString();
+        LOG.info("-- statement closed quietly : " + statement);
+        LOG.info("-- statement closed quietly : " + s.substring(s.lastIndexOf("@"),s.length() ));
+        }
+        catch (SQLException logOrIgnore) {}
+    }
+    if (resultSet != null)
+    {
+        try { resultSet.close();
+        LOG.info("-- resultset closed quietly : " + resultSet);
+        }
+        catch (SQLException logOrIgnore) {}
+    }
+    if (preparedStatement != null)
+    {
+        try { preparedStatement.close();
+        LOG.info("-- preparedStatement closed quietly : " + preparedStatement);
+        }
+        catch (SQLException logOrIgnore) {}
+    }
+} // end
+*/

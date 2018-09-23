@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Score Statistics Page </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_score_statistics.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:graphicImage 
+                name="images/stroke_stats.jpg"
+                alt="image missing :stroke_stats.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/stroke_stats.jpg"
+                alt="image missing :stroke_stats.jpg"
+                style="float: right;">
+</h:graphicImage>
+<h:form id="score_statistics" enctype="application/x-www-form-urlencoded" >
+
+
+<ui:include src="include/include_summary.xhtml"/>
+
+
+<p:panelGrid id="panelgrid01-09"
+             columns="6"
+             styleClass="alignmentLeft"
+             style="text-align:center;"
+             columnClasses="className"
+             rendered="#{courseC.round.roundHoles eq 18 or courseC.round.roundStart eq 1}"
+             >
+<f:facet name="header">
+    <h1>#{msg['title.score.statistics']}</h1>
+    
+</f:facet>
+    
+    
+    <h:outputText value="&nbsp;&nbsp;#{msg['score.aller']}"
+              style="font-weight:bold;background-color: lightskyblue;"
+              />            
+    <h:outputText value="#{msg['score.fairway']}"   />
+    <h:outputText value="#{msg['score.green']}"   />
+    <h:outputText value="#{msg['score.putts']}"   />
+    <h:outputText value="#{msg['score.bunker']}"  /> <!-- scorebunker -->
+    <h:outputText value="#{msg['score.penalty']}"  /> <!-- scorepenalty -->
+
+    <c:forEach var="i" begin="01" end="09" step="1">
+       <ui:include src="include/include_statistics.xhtml" />
+    </c:forEach>
+</p:panelGrid>
+
+<p:separator id="separator2"/>
+
+<p:panelGrid id="panelgrid10-18"
+             columns="6"
+             styleClass="alignmentLeft"
+             style="text-align:center;"
+             columnClasses="className"
+             rendered="#{courseC.round.roundHoles eq 18 or courseC.round.roundStart eq 10}"
+             >
+    <h:outputText value="&nbsp;&nbsp;#{msg['score.return']}"
+              style="font-weight:bold;background-color: lightskyblue;"
+              />            
+    <h:outputText value="#{msg['score.fairway']}"   />
+    <h:outputText value="#{msg['score.green']}"   />
+    <h:outputText value="#{msg['score.putts']}"   />
+    <h:outputText value="#{msg['score.bunker']}"  />
+    <h:outputText value="#{msg['score.penalty']}"  />
+
+    <c:forEach var="i" begin="10" end="18" step="1">
+      <ui:include src="include/include_statistics.xhtml" />
+    </c:forEach>
+</p:panelGrid>
+
+<p:panelGrid 
+    id="panelgrid4" 
+    columnClasses="className"
+    columns="2">
+<f:facet name="footer">
+        <p:commandButton 
+                         id="button01"
+                         value="#{msg['button.score.statistics']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.createStatistics}"/>
+
+        
+</f:facet>
+
+    <!--  rendered="#{not courseC.nextScorecard}"
+                          rendered="#{courseC.nextScorecard}"   --> 
+    
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

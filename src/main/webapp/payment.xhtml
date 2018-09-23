@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+    
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadTarif()}"/>
+    </f:metadata>
+</ui:define>
+    
+  <!--  Use the <f:viewAction> when you want to execute a method before the HTML is been rendered.
+ici c'est pour générer des data pour tester !  -->  
+    
+<ui:define name="title">Payment</ui:define>
+
+<ui:define name="content">
+    <h:outputScript library="js" name="totalprice.js" target="head"/>
+
+<h:graphicImage 
+                name="images/addtocart.jpg"
+                alt="image missing :tarif1.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/online2.png"
+                alt="image missing :tarif2.jpg"
+                style="float: right;">
+</h:graphicImage>
+
+<h:form id="form_payment" enctype="application/x-www-form-urlencoded"
+        
+ onkeypress="if(event.which === 13){event.which=0;}">
+
+<script type="text/javascript">
+function my_code(){
+alert(" Alert inside my_code function");
+}
+window.onload=my_code();
+</script>
+<!--
+onkeypress="return event.keyCode !== 13"<script type="text/javascript">
+        $(window).load(function() {
+            startProgress();
+        });
+>
+  onkeypress="if (event.keyCode === 13) { return false; }"> 
+
+<ui:include src="include/include_messages.xhtml"/>-->
+<ui:include src="include/include_summary.xhtml"/>
+
+<p:panelGrid
+    id="panelGrid1"
+    columns="4"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h1>#{msg['title.payment.round']}</h1>
+</f:facet>
+    
+    <h:outputText  value="#{msg['payment.item']}"/>
+    <h:outputText  value="#{msg['payment.unit']}"/>
+    <h:outputText  value="#{msg['payment.quantity']}"/>
+    <h:outputText  value="#{msg['payment.amount']}"/>
+    
+    <c:forEach var="i" begin="01" end="04" step="1">
+      <p:column value="" />
+   </c:forEach>
+    
+       <h:outputText  value="#{msg['tarif.greenfee']} :"/>
+       <h:outputText  label="Greenfee"
+                       id="Greenfee1"
+                       value="#{courseC.tarif.priceGreenfee}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+       </h:outputText>
+       <p:inputMask
+                        label="greenfee2"
+                        id="Greenfee2"
+                        onkeyup="totalprice(1, this.form, event);"
+                        value="#{courseC.tarif.quantity[0]}"
+                        size="2"
+                        mask="?9">
+               <o:converter converterId="omnifaces.ImplicitNumberConverter"
+                            type="currency"
+                            currencySymbol="$" />
+       </p:inputMask>
+ <!-- onkeyup  onkeypress="KeyCode(event);"     onkeypress='return isNumberKey(event)'              -->      
+        <h:outputText  label="Greenfee3"
+                       id="Greenfee3"
+                       value="#{courseC.tarif.priceItem[0]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+            <f:convertNumber type="currency"/>
+       </h:outputText>
+        
+                
+       <h:outputText  value="#{msg['tarif.equipments.buggy']} :"/>
+       <h:outputText  label="Buggy1"
+                       id="Buggy1"
+                       value="#{courseC.tarif.priceEquipments[0]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+       </h:outputText>
+              <p:inputMask
+                   label="buggy2"
+                        id="Buggy2"
+                        onkeyup="totalprice(2, this.form, event);"
+                        value="#{courseC.tarif.quantity[1]}"
+                        size="2"
+                        mask="?9"
+                        />
+              <h:outputText  label="Buggy1"
+                       id="Buggy3"
+                       value="#{courseC.tarif.priceItem[1]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+       </h:outputText>
+       
+           
+       <h:outputText  value="#{msg['tarif.equipments.handtrolley']} :"/>
+       <h:outputText  label="HTrolley"
+                       id="HTrolley1"
+                       value="#{courseC.tarif.priceEquipments[1]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+        </h:outputText>
+              <p:inputMask
+                   label="hole num"
+                        id="HTrolley2"
+                        onkeyup="totalprice(3, this.form,event);"
+                        value="#{courseC.tarif.quantity[2]}"
+                        size="2"
+                        mask="?9"
+                        />
+         <h:outputText  label="HTrolley1"
+                       id="HTrolley3"
+                       value="#{courseC.tarif.priceItem[2]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+        </h:outputText>
+       
+              
+       <h:outputText  value="#{msg['tarif.equipments.electrictrolley']} :"/>
+       <h:outputText  label="MediumSeason"
+                       id="ETrolley1"
+                       value="#{courseC.tarif.priceEquipments[2]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+       </h:outputText>
+              <p:inputMask
+                   label="hole num"
+                        id="ETrolley2"
+                        onkeyup="totalprice(4, this.form,event);"
+                        value="#{courseC.tarif.quantity[3]}"
+                        size="2"
+                        mask="?9"
+                        />
+              <h:outputText  label="MediumSeason"
+                       id="ETrolley3"
+                       value="#{courseC.tarif.priceItem[3]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+       </h:outputText>
+       
+       
+       
+       <h:outputText  value="#{msg['tarif.equipments.clubs']} :"/>
+       <h:outputText  label="Clubs1"
+                       id="Clubs1"
+                       value="#{courseC.tarif.priceEquipments[3]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+        </h:outputText>
+              <p:inputMask
+                   label="hole num"
+                        id="Clubs2"
+                        onkeyup="totalprice(5, this.form,event);"
+                        value="#{courseC.tarif.quantity[4]}"
+                        size="2"
+                        mask="?9"
+                        />
+              <h:outputText  label="Clubs1"
+                       id="Clubs3"
+                       value="#{courseC.tarif.priceItem[4]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+        </h:outputText>
+              
+       <h:outputText  value="#{msg['tarif.equipments.practice']} :"/>
+       <h:outputText  label="Practice"
+                       id="Practice1"
+                       value="#{courseC.tarif.priceEquipments[4]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+       </h:outputText>
+              <p:inputMask
+                   label="hole num"
+                        id="Practice2"
+                        onkeyup="totalprice(6, this.form, event);"
+                        value="#{courseC.tarif.quantity[5]}"
+                        size="2"
+                        mask="?9"
+                        />
+              <h:outputText  label="Practice"
+                       id="Practice3"
+                       value="#{courseC.tarif.priceItem[5]}"
+                       title="#{msg['title.tee.teerating']}"
+                       >
+       </h:outputText>
+
+   <c:forEach var="i" begin="01" end="02" step="1">
+      <p:column value="" />
+   </c:forEach>
+              
+  <h:outputText id="Total"
+                value="#{msg['payment.amounttobepaid']} :"
+                />
+  <h:outputText  id="TotalPrice"
+                 value="#{courseC.creditcard.totalPrice}"
+                 style="font-size: 3em;"
+                />
+<!-- do not change the id !! see totalprice.js  -->
+<f:facet name="footer">
+         <p:commandButton value="#{msg['inscription.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-rotate-left"
+                         action="inscription.xhtml"
+                         />
+         <p:commandButton value="#{msg['payment.creditcard']}"
+                         id="commandButtonPayment"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-credit-card"
+                         action="creditcard.xhtml?cmd=tarif"
+                         />
+          <p:commandButton id="btn"
+                         value="#{msg['button.print']}"
+                         type="button"
+                         icon="fa fa-print"
+                         >
+                <p:printer target="panelGrid1" />
+          </p:commandButton>
+         
+          <p:commandButton value="Reset"
+                         id="commandButtonReset"
+                         ajax="false"
+                         update="messages"
+                         immediate="false"
+                         icon="fa fa-refresh"
+                         onclick="this.form.reset();"
+                         />
+
+</f:facet>
+
+</p:panelGrid>
+
+   <!--  transfer data fromm js to bean
+   https://stackoverflow.com/questions/7221495/pass-parameter-to-premotecommand-from-javascript/18510102#18510102
+   https://stackoverflow.com/questions/26849704/pass-variable-from-jsf-javascript-to-bean
+   SetMystrings se trouve dans totalprice.js (c'est une fonction JS
+   -->
+   <p:remoteCommand name="SetMyStrings"
+                    actionListener="#{courseC.creditcard.setMyStrings}" />
+   
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

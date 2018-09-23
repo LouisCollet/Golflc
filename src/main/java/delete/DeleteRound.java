@@ -1,0 +1,64 @@
+package delete;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import utils.DBConnection;
+import utils.LCUtil;
+
+public class DeleteRound implements interfaces.Log, interfaces.GolfInterface
+{
+    public String deleteRound(final int idround, final Connection conn) throws Exception
+    {
+    PreparedStatement ps = null;
+try
+{       LOG.info("starting Delete Round ... = " );
+        LOG.info("Delete round for idround "  + idround);
+    String query = 
+       " DELETE from round" +
+       " WHERE round.idround = ?" 
+        ;
+    ps = conn.prepareStatement(query);
+    ps.setInt(1, idround);
+    LCUtil.logps(ps); 
+    int row_delete = ps.executeUpdate();
+        LOG.info("deleted Round = " + row_delete);
+    String msg = "<br/> <h1>Round deleted = " + idround;
+        LOG.info(msg);
+        LCUtil.showMessageInfo(msg);
+        return "Round deleted ! ";
+}catch (SQLException e){
+    String msg = "SQL Exception in DeleteRond = " + e.toString() + ", SQLState = " + e.getSQLState()
+            + ", ErrorCode = " + e.getErrorCode();
+    LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+}catch (Exception ex){
+    String msg = "Exception in DeleteRound() " + ex;
+    LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+}finally{
+        utils.DBConnection.closeQuietly(null, null, null, ps);
+}
+} //end method
+   
+ public static void main(String[] args) throws SQLException, Exception 
+ {
+     DBConnection dbc = new DBConnection();
+     Connection conn = dbc.getConnection();
+ try{
+       LOG.info("Input main = ");
+    int idround = 339;
+ //  Date date =SDF.parse("01/01/2000");
+    DeleteRound dr = new DeleteRound();
+    dr.deleteRound(idround, conn);
+ } catch (Exception e) {
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+      //      LCUtil.showMessageFatal(msg);
+   }finally{
+       DBConnection.closeQuietly(conn, null, null, null); 
+          }
+} // end method main
+} //end class

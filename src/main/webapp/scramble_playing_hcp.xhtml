@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Scramble Playing Handicap Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_scramble_playing_hcp.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<h:graphicImage 
+                name="images/golf_tee.jpg"
+                alt="image missing :golf_tee.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/golf_tee.jpg"
+                alt="image missing :golf_tee.jpg"
+                style="float: right;">
+</h:graphicImage>
+    <!-- -->
+    
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.initInputPlayingHcp(0)}"/>
+    </f:metadata>
+</ui:define>
+    
+    
+<h:form id="scramble_playing_hcp" enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>
+<!--
+<p:focus for="slope" />
+-->
+<p:panelGrid
+    id="panelG1"
+    columns="2"
+    style="text-align:center;"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h1>#{msg['playinghcp.scramble.title']}</h1>
+</f:facet>
+    
+    <c:forEach var="i" begin="1" end="2" step="1">
+      <h:outputText value="Hcp #{msg['player.message']} #{i}" />
+   </c:forEach>
+        
+    <!-- value="#{courseC.playingHcp.hcpScr[i-1]}"  -->
+    
+    <c:forEach var="i" begin="1" end="2" step="1">
+      <p:inputMask  id="LCcpScr1${i}"
+                    label="Hcp"
+                    value="#{courseC.playingHcp.hcpScr[i-1]}"
+                    size="4"
+                    slotChar="_"
+                    mask="99.9"
+                    required="true"
+                    validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
+                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="36" />
+      </p:inputMask>
+    </c:forEach>
+<!--  required="true"   -->
+    <c:forEach var="i" begin="3" end="4" step="1">
+      <h:outputText value="Hcp #{msg['player.message']} #{i}" />
+   </c:forEach>
+        
+    <c:forEach var="i" begin="3" end="4" step="1">
+      <p:inputMask  id="LCcpScr2${i}"
+                    label="Hcp"
+                    value="#{courseC.playingHcp.hcpScr[i-1]}"
+                    size="4"
+                    slotChar="_"
+                    mask="99.9"
+                   
+                    validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
+                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="36" />
+      </p:inputMask>
+    </c:forEach>
+    
+<!--  required="true"   -->
+    <h:outputText value="#{msg['handicap.playing']}" />
+    <h:outputText value="#{courseC.playingHcp.playingHandicap}"
+                  style="font-size: 3em;"
+                       />
+
+<f:facet name="footer">
+         <p:commandButton 
+                         id="button01"
+                         value="#{msg['button.hcp.calculate']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.calculateHcpScramble()}"/>
+
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

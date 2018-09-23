@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fr">
+<br/>
+view = #{view.viewId}
+<br/>
+<br/>
+
+<b>Numéro d'identification : </b>
+Introduisez votre numério d'identification à la fédération belge de golf (6 positions).
+ <br/>
+ 
+ <b>Prénom : </b>
+Introduisez votre prénom.
+ <br/>
+ 
+  <b>Nom : </b>
+Introduisez votre nom.
+ <br/>
+ 
+ <b>Ville : </b>
+Introduisez la ville de votre domicile, précédée du code postal et d'un tiret.
+ <br/>
+ 
+  <b>Pays : </b>
+Sélectionnez un pays
+ <br/>
+ 
+<b>Date de naissance : </b>
+Introduisez votre date de naissance à l'aide du calendrier.
+ <br/>
+ 
+<b>Sexe: </b>
+Sexe : Masculin ou féminin.
+ <br/>
+ 
+ <b>Handicap : </b>
+Introduisez votre handicap, avec une décimale.
+ <br/> 
+
+ <b>Date Handicap : </b>
+Introduisez la date de votre handicap (index) actuel à l'aide du calendrier.
+ <br/> 
+ Maximum : 45.
+Il sera introduit au lendemain ???
+ <br/> 
+ 
+  <b>Langue : </b>
+Introduisez votre langue.  Elle sera utilisés pour l'affichage des écrans.
+ <br/> 
+ 
+   <b>Adresse email : </b>
+Introduisez votre adresse de messagerie électronique.
+ATTENTION ! un mail sera envoyé à cette adresse et vous devrez
+suivre les instructions qui s'y trouventpour compléter votre enregistrement !!!
+ <br/> 
+ 
+<b>Home club : </b>
+Introduisez votre home club : il doit exister dans l'application.
+ <br/> 
+Vous introduisez le code si vous le connaissez, sinon vous cliquez sur 'Liste des clubs'.
+ <br/> 
+Si le club n'existe pas, faites-en la demande par email à ???.
+ <br/> 
+
+<br/>
+
+    </h:outputText>
+</ui:composition>
+</h:body>
+</html>

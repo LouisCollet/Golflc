@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript">
+    var url = "https://maps.googleapis.com/maps/api/timezone/json?location=37.3711, -122.0375&timestamp="; + (Math.round((new Date().getTime()) / 1000)).toString() + "&sensor=false";
+var lat=23.8103771;
+var long=90.41245449999997;
+$.ajax({
+		 url:"https://maps.googleapis.com/maps/api/timezone/json?location=" + lat + "," + long + "&timestamp="+(Math.round((new Date().getTime())/1000)).toString()+"&sensor=false;",
+			}).done(function(response){
+				 if(response.timeZoneId != null){
+                   var hour=(response.rawOffset)/60
+                   //alert(hour)
+					 
+                   $('#timezone option[value="'+hour+'"]').prop('selected', true)
+                   
+				 }
+		});
+</head>
+<body>
+  <p>
+</body>
+</html>

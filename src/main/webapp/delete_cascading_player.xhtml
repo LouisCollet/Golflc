@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+>
+
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Cascading Delete Player</ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_login.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+        <h:graphicImage 
+                    rendered="true"
+                    name="images/Danger.jpg"
+                    alt="image missing : login.jpg"
+                    style="float:left;">
+        </h:graphicImage>
+
+        <h:graphicImage 
+                rendered="true"
+                name="images/RIP.jpg"
+                alt="image missing :golf_register.jpg"
+                style="float:right;">
+        </h:graphicImage>
+
+<h:form id="delete_cascading" enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>
+
+    <!-- -->
+<p:panelGrid id="panel"
+             columns="2"
+             
+             >
+<f:facet name="header">
+        <h1>#{msg['login.welcome']} delete a player</h1>
+</f:facet>
+
+<f:facet name="footer">
+    <p:commandButton value="Delete Cascading Player"
+                     action="#{courseC.deleteCascadingPlayer()}" update="messages">
+        <p:confirm 
+            header="Cascading delete of a player"
+            message="Are you sure you want to delete this player = #{courseC.deletePlayer}"
+            icon="ui-icon-alert">
+        </p:confirm>
+    </p:commandButton>
+    <p:commandButton value="Save Your Profile"
+                     action="#{confirmDialog.save}" update="messages">
+        <p:confirm
+            header="Confirmation"
+            message="Are you sure you want to save your profile?"
+            icon="ui-icon-alert">
+        </p:confirm>
+    </p:commandButton>
+ 
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
+        <p:commandButton 
+            value="Oui"
+            type="button"
+            styleClass="ui-confirmdialog-yes"
+            icon="ui-icon-check"/>
+        <p:commandButton
+            value="Non"
+            type="button"
+            styleClass="ui-confirmdialog-no"
+            icon="ui-icon-close"/>
+    </p:confirmDialog>
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

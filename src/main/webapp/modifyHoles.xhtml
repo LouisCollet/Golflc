@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<!--http://www.oracle.com/technetwork/articles/java/jsf22-1377252.html
+http://docs.oracle.com/javaee/7/javaserver-faces-2-2/vdldocs-facelets/f/viewAction.html
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadParArray()}"/>
+    </f:metadata>
+</ui:define>
+-->
+
+<ui:define name="title">Modify Holes Page </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_score.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:graphicImage 
+                name="images/golfcard.png"
+                alt="image missing :golf_round.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/golfcard.png"
+                alt="image missing :golf_round.jpg"
+                style="float: right;">
+</h:graphicImage>
+<h:form id="score_stableford" enctype="application/x-www-form-urlencoded" >
+
+
+<p:panelGrid
+    id="panelgrid1"
+    styleClass="alignmentLeft"
+    columnClasses="col1,col2"
+    columns="2" >
+
+<f:facet name="header">
+    <h1>#{msg['title.holes.modify']}</h1>
+    
+</f:facet>
+
+      <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText
+            id="clubn" 
+            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+
+      <h:outputText value="#{msg['course.name']} :" />
+      <h:outputText
+            id="idcourse" 
+            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
+
+       <h:outputText value="#{msg['tee.id']} :" />
+       <h:outputText
+                        id="idtee"
+                        style="font-style:italic"
+                        value="(#{courseC.tee.idtee})- #{courseC.tee.teeGender} - #{courseC.tee.teeStart}"
+                        title="#{msg['title.hole.holenumber']}"
+                        />
+
+</p:panelGrid>
+<!--
+<p:separator id="separator1"/>
+
+<p:separator id="customSeparator" style="width:500px;height:20px" />
+-->
+
+<p/>
+<p/><p/>
+<p/>
+<p:panelGrid id="panelgrid2"
+             columns="19"
+             styleClass="alignmentLeft"
+             style="text-align:center;"
+             columnClasses="className"
+           >
+<!--  complète 1ere ligne avec numéros de trou -->
+<h:outputText value="#{msg['hole.number']}"   />
+    <c:forEach var="i" begin="01" end="18" step="1">
+             <h:outputText  id="holenumber${i}"
+                    label="holenumber"
+                    value="#{courseC.holesGlobal.dataHoles[i-1][0]}"
+                    size="2"
+                    />
+    </c:forEach>
+ 
+<!--  complète 2e ligne avec par -->
+ <h:outputText value="#{msg['hole.par']}"   />
+     <c:forEach var="i" begin="01" end="18" step="1">
+             <h:inputText  id="par${i}"
+                    label="holenumber"
+                    
+                    value="#{courseC.holesGlobal.dataHoles[i-1][1]}"
+                    size="2"
+                    required="true"
+                  
+                    requiredMessage="#{msg['hole.par.notnull']} : #{i}"
+                    validatorMessage="#{msg['hole.par.minMAX']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="5" />
+      </h:inputText> 
+    </c:forEach>
+ 
+ <!--  complète 2e ligne avec strokeindex -->
+  <h:outputText value="#{msg['hole.index']}"   />
+      <c:forEach var="i" begin="01" end="18" step="1">
+       <h:inputText  id="holeindex${i}"
+                    label="index"
+                    value="#{courseC.holesGlobal.dataHoles[i-1][2]}"
+                    size="2"
+                    required="true"
+                 
+                    requiredMessage="#{msg['hole.strokeindex.notnull']} : #{i}"
+                    validatorMessage="#{msg['hole.strokeindex.minMAX']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="18" />
+      </h:inputText>
+    </c:forEach>
+  
+   <!--  complète 3e ligne avec distance -->
+  <h:outputText value="#{msg['hole.distance']}"   />
+     <c:forEach var="i" begin="01" end="18" step="1">
+       <h:inputText  id="distance${i}"
+                    label="index"
+                    value="#{courseC.holesGlobal.dataHoles[i-1][3]}"
+                    size="3"
+                    required="true"
+                    requiredMessage="#{msg['hole.distance.notnull']} : #{i}"
+                    validatorMessage="#{msg['hole.distance.minMAX']} : #{i}"
+                    >
+            <f:validateLongRange minimum="90" maximum="550" />
+      </h:inputText>
+    </c:forEach>
+  
+</p:panelGrid >
+
+
+<p:panelGrid 
+    id="panelgrid4" 
+    columnClasses="className"
+    columns="2">
+<f:facet name="footer">
+        <p:commandButton 
+                         id="buttonModify"
+                         value="#{msg['button.holes.modify']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.modifyHolesGlobal}"
+           />
+        <p:commandButton 
+                         id="buttonCreate"
+                         value="#{msg['button.holes.create']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.createHolesGlobal}"
+           />
+</f:facet>
+    
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

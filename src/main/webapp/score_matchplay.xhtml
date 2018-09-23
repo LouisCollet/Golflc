@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+>
+ <!--  http://www.rydercup.com/europe/scoring/scorecards/22792 -->
+<ui:composition template="templates/masterTemplate.xhtml">
+    <!--
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadParArray()}"/>
+    </f:metadata>
+</ui:define> 
+  -->  
+<ui:define name="title">Register Score Matchplay</ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_score_matchplay.xhtml"/>
+</ui:define>
+<ui:define name="content">
+ <h:outputScript library="js" name="matchplay.js" target="head"/>
+    <!--
+<script type ="text/javascript">
+    window.onload = "init();"
+ $(document).ready(function() {
+    alert("document ready in jQuery");
+ //   init = 0;
+ //   console.info("Jquery ready : variable 'init' = " + init);
+   alert("init =");
+});
+ $(window).load(function() {
+    alert("document load in jQuery");
+  //  init = 0;
+    console.info("Jquery load : variable 'init' = " );
+});
+ 
+
+//  window.onload=mp_start();
+</script> 
+    -->
+    <script type="text/javascript" charset="UTF-8">
+  window.addEventListener("DOMContentLoaded", function(event) {
+    console.log("DOM fully loaded and parsed");
+  });
+</script>
+    
+<h:form id="score_matchplay" enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_messages.xhtml"/>
+
+<p:panelGrid
+    id="panelgrid1"
+    styleClass="alignmentLeft"
+    columnClasses="col1,col2,col3,col4"
+    columns="4" >
+
+<f:facet name="header">
+    <h1>#{msg['title.score.results']}</h1>
+</f:facet>
+    <h:outputText value="#{msg['round.competition']} :" />
+    <h:outputText
+             id="idround" 
+             value="#{courseC.round.roundCompetition} (#{courseC.round.idround})"
+             title="This tooltip is displayed when input gets the focus" />
+
+     <h:outputText value="#{msg['club.name']} :"   />
+     <h:outputText
+             id="clubn" 
+             value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+
+     <h:outputText value="#{msg['course.name']} :" />
+     <h:outputText
+             id="idcourse" 
+             value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
+
+     <h:outputText value="#{msg['round.date']} :" />
+     <h:outputText
+             id="rounddate" 
+             value="#{courseC.round.roundDate}"
+            
+             >
+           <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+      </h:outputText>
+     
+     <h:outputText value="Résultat :" />
+     <h:outputText
+             id="roundResult" 
+             value="#{courseC.scoreMatchplay.matchplayResult}" />
+
+     <h:outputText value="#{msg['round.game']} :" />
+     <h:outputText
+             id="game" 
+             value="#{courseC.round.roundGame}(#{fn:length(courseC.getListmatchplay() )})" />
+
+</p:panelGrid>
+<p:separator id="separator1"/>
+<!--
+<p:separator id="customSeparator" style="width:500px;height:20px" />
+-->
+<p:panelGrid id="panelgrid2"
+             columns="21"
+             styleClass="alignmentLeft"
+             style="text-align:center;"
+             columnClasses="className"
+             rendered="#{courseC.round.roundHoles eq 18 or courseC.round.roundStart eq 1}"
+             >
+ <!-- first line : team, player, holes -->                                       
+ <h:outputText value="#{msg['player.team']}"    style="font-weight:bold;" />
+ <h:outputText value="#{msg['player.last']}"    style="font-weight:bold;" />   
+<h:outputText value="#{msg['score.aller']}"     style="font-weight:bold;background-color: lightskyblue;"  />
+        <!-- generate hole numbers -->
+   <c:forEach var="i" begin="01" end="18" step="1">
+      <h:outputText value="#{i}" />
+   </c:forEach>
+
+ <!-- second line : rien, rien, par <h:outputText id="Competitors" value="#{fn:length(courseC.getListmatchplay() )}" /> -->   
+     <h:inputHidden id="hiddenParArray" value="#{courseC.parArrayString}"  />
+     <h:inputHidden id="hiddenResult" value="#{courseC.scoreMatchplay.matchplayResult}"  />
+     
+     <h:outputText value="ID Player // #{msg['par.par']} ->" />
+        <c:forEach var="i" begin="01" end="18" step="1">
+            <h:outputText 
+                     id="scorePar#{i}"
+                     value="#{courseC.parArray[i-1]}"
+                     style="font-style:italic;width:2%" />
+        </c:forEach>
+<!--    style="width:2%" ________________________________________ --> 
+<!--_ __ ____ ___ _____ ___ ___ _____ ______  -->
+<c:forEach   
+           items="#{courseC.getListmatchplay()}"
+           var="v"
+           varStatus="j"> 
+    <c:set var="s0" value="#{v.inscriptionTeam}"/>
+              <c:set var="s1" value="#{fn:substring(s0,0,3)}" />
+              <c:set var="s2" value="#{fn:substring(s0,2,1)}" />  
+              <h:outputText 
+                  id="teamPlay#{j.index}"
+                  value="#{s1} #{s2}"
+                  rendered="#{j.even}"
+                  style="width:5%;" /> 
+              <h:outputText value="#{s2}" rendered="#{j.odd}"  style="width:5%;" /> 
+              <c:set var="s3" value="#{v.playerFirstName}"/>
+              <c:set var="s4" value="#{fn:substring(s3,0,1)}"/>
+              <h:outputText value="#{s4}. #{v.playerLastName}"   style="width:5%;"/>        
+              <h:outputText value="#{v.idplayer}"         style="width:5%;"/>                 
+ 
+     <c:forEach var="i" begin="01" end="18" step="1">
+         <!-- astuce ! on utilise j.index valeur de j définie dans le foreach parent 
+         ne pas modifier field name , car utilisée dans javascript !!!
+                          validator="#{courseC.validateMP4}" enlevé 21/11/2014
+                          requiredMessage="#{msg['score.hole.notnull']} : #{j.index} - #{i}"
+                          validatorMessage="#{msg['score.hole.minMAX']} : #{j.index} - #{i}"
+                          required="true"
+         et puis, sÃ©parÃ© :
+           <f:validateLongRange minimum="0" maximum="12" />
+         -->
+        <h:inputText   id="scorePlay#{j.index}-#{i}"
+                    label="ScorePlayer#{j.index}#{i}"
+                    value="#{courseC.scoreMatchplay.scoreMP4[j.index][i-1]}"
+                    size="1"
+                    onchange="mp_main(this);"
+                    onfocus="focusFunction(this)"
+                    onblur="blurFunction(this)"
+                    onkeydown="keydownFunction(this)"
+                    onkeyup="keyupFunction(this)"
+
+                    >
+        </h:inputText>
+     </c:forEach> 
+           
+</c:forEach>
+
+    <!--  lines 7-8 : match progress team gagné hole, 1UP ...-->                   
+<c:forEach var="j" begin="05" end="06" step="1">
+       <!-- new 11/07/2014 link between Bean and Javascript  <h:outputText value=""  /> 
+       rendered="false"
+     <h:outputText value="" />-->
+     <h:inputHidden id="hiddenGame"   value="#{courseC.round.roundGame}"  />
+     <h:inputHidden id="hiddenString" value="#{courseC.scoreMatchplay.scoreString}"  />
+
+     <!-- modifier ligne suivante
+     <h:outputText value=""
+                   id="MatchProgress#{j}"
+                   style="white-space:pre-line;width:5%;"/>
+     -->
+     <h:outputText value="Leading Team"   rendered="#{j == 5}" />
+     <h:outputText value="Score"          rendered="#{j == 6}" />
+     <c:forEach var="i" begin="01" end="18" step="1">
+        <h:outputText   id="scoreTeam#{j}-#{i}"
+                        value="#{courseC.scoreMatchplay.scoreMP4[j-1][i-1]}"
+                        style="text-align:center" />
+     </c:forEach> 
+</c:forEach>
+
+</p:panelGrid >
+     <p:remoteCommand name="remoteChangeCommand" process="hiddenString"/>
+<p/>
+<p:panelGrid 
+    id="panelgrid4" 
+    columnClasses="className"
+    columns="2">
+<f:facet name="footer">
+    <h:panelGrid columns="1">
+        <p:commandButton 
+                         id="buttonValidate"
+                         value="validate"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="ui-icon-pencil"
+                         style="float: left;"
+                         action="#{courseC.validateScoreHoleMatchplay2()}"
+                         />
+         <p:commandButton 
+                         id="buttonRegister"
+                         value="#{msg['button.score.create']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.createScoreMatchplay}"
+                         onclick="mp_loadResult();"
+                         style="float: right;"   
+                         />
+         <!--  onclick="efface_formulaire();"   -->
+                  <p:commandButton 
+                         id="buttonReset"
+                         value="Reset"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         onclick="clear_form('#score_matchplay');"
+                         />
+                  <h:outputText value="one line"/>
+                      <p:commandButton id="print"
+                     value="#{msg['button.print']}"
+                     type="button"
+                     icon="ui-icon-print"
+                     >
+        <p:printer target="score_matchplay" />
+    </p:commandButton>
+                  
+                  
+    </h:panelGrid>
+</f:facet>
+
+    <!-- 
+     rendered="#{courseC.showButtonCreateStatistics}"
+    rendered="#{not courseC.nextScorecard}"
+                          rendered="#{courseC.nextScorecard}"   --> 
+    
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

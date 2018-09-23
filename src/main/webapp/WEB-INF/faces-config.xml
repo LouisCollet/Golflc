@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  mod 05-09-2018, replaced bu version 2.3
+<faces-config version="2.2"
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlnx.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
+>
+    -->
+<faces-config
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd"
+    version="2.3"
+>
+
+<application>
+     <locale-config>
+         <default-locale>fr</default-locale>
+         <supported-locale>en</supported-locale>
+         <supported-locale>nl</supported-locale>
+         <supported-locale>us</supported-locale>
+     </locale-config>
+<!-- new 13/10/2012  -->
+    <managed-bean>
+        <managed-bean-name>currentDate</managed-bean-name>
+        <managed-bean-class>java.util.Date</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+
+<!-- new 05 09 2012 -->
+<message-bundle>messages</message-bundle>
+<!-- mod 13/10/2012-->
+<resource-bundle>
+    <base-name>/messages</base-name>
+    <var>msg</var>
+</resource-bundle>
+
+<!-- new 09/05/2013 used in CourseController, init(), config in faces-config.xml-->
+<resource-bundle>
+    <base-name>/golflc_settings</base-name>
+    <var>settings</var>
+</resource-bundle>
+
+<resource-bundle>
+               <base-name>/Bundle</base-name>
+               <var>bundle</var>
+</resource-bundle>
+<!-- new 23/10/2015 http://www.mkyong.com/jsf2/jsf-2-0-and-resource-bundles-example/ -->
+	  <resource-bundle>
+		<base-name>version_components</base-name>
+		<var>ver</var>
+	   </resource-bundle>
+
+<!-- new 19/04/2015 http://www.bootsfaces.net/integration/OmniFaces.jsf -->
+<resource-handler>
+    org.omnifaces.resourcehandler.CombinedResourceHandler
+</resource-handler>
+
+<!--  added 12/08/2012  
+<navigation-rule>
+    <from-view-id>/login.xhtml</from-view-id>
+    <navigation-case>
+      <from-outcome>home</from-outcome>
+      <to-view-id>/home.xhtml</to-view-id>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>login</from-outcome>
+      <to-view-id>/login.xhtml</to-view-id>
+    </navigation-case>
+  </navigation-rule>
+  mod 01/01/2014-->
+<navigation-rule>
+        <display-name>login.xhtml</display-name>
+        <from-view-id>/login.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>failure</from-outcome>
+            <to-view-id>/login.xhtml</to-view-id>
+            <redirect />
+        </navigation-case>
+    </navigation-rule>
+
+
+<!-- reactivated 02/08/2018 Application Startup replaced by @WebListener annotation on 03/05/2014 -->
+      <system-event-listener>
+         <system-event-listener-class>listeners.CustomSystemEventListener</system-event-listener-class>
+         <system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>
+      </system-event-listener>-->
+      <!-- Before Application is to shut down  -->
+      <system-event-listener>
+         <system-event-listener-class>listeners.CustomSystemEventListener</system-event-listener-class>
+         <system-event-class>javax.faces.event.PreDestroyApplicationEvent</system-event-class>
+      </system-event-listener>
+ <!--    
+<lifecycle>
+    <phase-listener>listeners.CustomSystemEventListener</phase-listener>
+</lifecycle> 
+      
+<lifecycle>
+    <phase-listener>listeners.LifeCycleListener</phase-listener>
+</lifecycle>   -->   
+
+      <!-- 
+      <system-event-listener>
+            <system-event-listener-class>listeners.PreRenderViewListener</system-event-listener-class>
+            <system-event-class>javax.faces.event.PreRenderViewEvent</system-event-class>
+      </system-event-listener>-->
+     
+<!--  added 27/11/2013  used by primefaces dialog framework
+http://www.javacodegeeks.com/2015/01/primefaces-opening-external-pages-in-dynamically-generated-dialog.html
+      -->
+<action-listener>org.primefaces.application.DialogActionListener</action-listener>
+<navigation-handler>org.primefaces.application.DialogNavigationHandler</navigation-handler>
+<view-handler>org.primefaces.application.DialogViewHandler</view-handler>
+ 
+</application>
+</faces-config>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Player Match Play List</ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_select_player.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+    
+<h:form id="selectPlayers">
+<ui:include src="include/include_messages.xhtml"/>
+
+<p:dataTable id="table_players"
+             value="#{courseC.listPlayers()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredPlayers}"
+             selection="#{courseC.player.selectedOtherPlayers}"
+       
+             rowKey="#{c.idplayer}">
+
+
+<f:facet name="header">
+            <p:commandButton
+                id="cmd01Button"
+                action="#{courseC.pickListPlayers()}"
+                icon="ui-icon-extlink"
+                value="#{msg['button.selectotherplayers']}"
+               
+                style="float:left">
+            </p:commandButton>
+    <!--   disabled="#{empty courseC.selectedPlayersMatchPlay}" -->
+    
+    
+        <p:commandButton id="toggler" 
+                     type="button"
+                     value="Columns"
+                     style="float:right"
+                     icon="ui-icon-calculator" />
+        <p:columnToggler id="colToggler"
+                     datasource="table_players"
+                     trigger="toggler" />
+       <h1>#{msg["message.playerslist"]}</h1>
+  <!--  -->
+</f:facet>
+
+<p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="rrow">
+             #{row+1}
+</p:column>
+<p:column 
+     id="rowMultiple"
+     toggleable="false"
+     selectionMode="multiple"
+     style="width:3%;text-align:center"
+     headerText="Select"
+     footerText="Select"
+          />
+  <p:ajax event="rowSelectCheckbox" 
+             listener="#{courseC.rowPlayerSelect()}"
+             update=":selectPlayers:table_players"
+       />
+
+
+
+<!--  gestion disabled Button 
+<p:ajax partialSubmit="true" update="cmd01Button" event="toggleSelect"/> 
+<p:ajax update="cmd01Button" event="rowSelectCheckbox"/>
+<p:ajax update="cmd01Button" event="rowUnselectCheckbox"/>
+-->
+	<p:column id="colPlayerSelected"
+                  toggleable="false"
+                  headerText="#{msg['player.selected']}"
+                  footerText="#{msg['player.selected']}"
+                  style="width:5%" >
+            <h:outputText value="#{c.idplayer}" />
+         </p:column>
+ <!--          
+            <p:commandButton
+                ajax="true"
+                id="selectButton"
+                action="#{courseC.selectPlayer(c)}"
+                value="#{msg['button.select']} - "
+                icon="ui-icon-pencil">
+             </p:commandButton>
+            
+	
+-->
+	<p:column toggleable="false"
+            headerText="#{msg['player.first']}"
+            footerText="#{msg['player.first']}"
+            style="width:15%" >
+                    <h:outputText value="#{c.playerFirstName}" />
+	</p:column>
+
+	<p:column toggleable="false"
+            headerText="#{msg['player.last']}"
+            footerText="#{msg['player.last']}"
+            style="width:15%"
+            filterMatchMode="contains"
+            filterBy="#{c.playerLastName}"
+            >
+                  <h:outputText value="#{c.playerLastName}" />
+	</p:column>
+
+	<p:column headerText="#{msg['player.city']}"
+                  footerText="#{msg['player.city']}"
+                  style="width:15%" >
+		<h:outputText value="#{c.playerCity}" />
+	</p:column>
+
+	<p:column headerText="#{msg['player.country']}"
+                  footerText="#{msg['player.country']}"
+                  style="width:15%" >
+            <h:outputText value="#{c.playerCity}" />   <!-- à corriger -->
+	</p:column>
+
+        <p:column headerText="#{msg['message.modification']}"
+                  footerText="#{msg['message.modification']}"
+                  style="width:10%" >
+                        <h:outputText value="#{c.playerModificationDate}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+        </p:column>
+
+<f:facet name="footer">
+facet
+</f:facet>
+</p:dataTable>
+
+<p:dialog header="Selected Players"
+          widgetVar="multiPlayerDialog"
+          modal="true"
+          showEffect="fade"
+          hideEffect="fade"
+          resizable="false"
+          width="200">
+        <p:outputPanel id="multiPlayerDetail" style="text-align:center;">
+            <h:outputText value="welcome louis" style="display:block"/>
+            <ui:repeat value="#{courseC.selectedPlayersMatchPlay}" var="pl">
+                <h:outputText value="#{pl.idplayer} - #{pl.playerFirstName} / #{pl.playerLastName} " style="display:block"/>
+            </ui:repeat>
+        </p:outputPanel>
+    </p:dialog>
+
+
+</h:form>
+
+
+</ui:define>
+</ui:composition>
+</html>

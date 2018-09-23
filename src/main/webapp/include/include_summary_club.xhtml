@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      
+>
+<h:body>
+<ui:composition>
+
+<p:panelGrid
+    id="panelgridSummary"
+    styleClass="alignmentLeft"
+    columnClasses="col1,col2"
+    columns="2" >
+
+<f:facet name="header">
+    <h1>#{msg['title.summary.club']}</h1>
+</f:facet>
+      
+
+      <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText
+            id="clubsummary" 
+            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+
+      <h:outputText value="#{msg['course.name']} :" />
+      <h:outputText
+            id="coursesummary" 
+            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
+      
+      <h:outputText value="#{msg['tee.id']} :" 
+                    rendered="#{courseC.tee.idtee != null}"/>
+      <h:outputText
+            id="teesummary"
+            value="(#{courseC.tee.idtee})- #{courseC.tee.teeGender} - #{courseC.tee.teeStart}"
+            title="#{msg['title.hole.holenumber']}"
+            rendered="#{courseC.tee.idtee != null}"/>
+                     
+</p:panelGrid>
+<p:separator id="separatorsummary"/>
+
+
+</ui:composition>
+</h:body>
+</html>

@@ -1,0 +1,14 @@
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema">
+  <datasource jndi-name="java:jboss/datasources/MySqlDB" pool-name="MySQLPool">
+      <connection-url>jdbc:mysql://localhost:3307/golflc</connection-url>
+      <driver>mysql-connector-java-5.1.18-bin.jar</driver>
+      <pool>
+          <min-pool-size>3</min-pool-size>
+          <max-pool-size>30</max-pool-size>
+      </pool>
+      <security>
+          <user-name>LouisCollet</user-name>
+          <password>lc1lc2</password>
+      </security>
+  </datasource>
+</datasources>

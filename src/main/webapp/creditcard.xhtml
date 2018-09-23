@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Credit Card</ui:define>
+
+<ui:define name="content">
+
+<h:graphicImage 
+                name="images/credit-card-1.jpg"
+                alt="image missing :tarif1.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/credit-card-2.png"
+                alt="image missing :tarif2.jpg"
+                style="float: right;">
+</h:graphicImage>
+<h:form id="creditcard" enctype="application/x-www-form-urlencoded">
+    <div>
+        <a href=" https://openweathermap.org/img/w/10d.png">Login page</a>
+       
+    </div>
+    
+<ui:include src="include/include_summary.xhtml"/>
+
+<p:panelGrid
+    id="panelGrid1"
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h1>#{msg['title.payment.round']}</h1>
+</f:facet>
+    <h:outputText  id="Total"
+                value="#{msg['payment.amounttobepaid']} :"
+                />
+     <h:outputText  id="TotalPrice"
+                value="#{courseC.creditcard.totalPrice}"
+                style="font-size: 3em;"
+                >
+     </h:outputText>
+    
+    <h:outputText value="#{msg['creditcard.communication']} :" />
+    <h:outputText  label="com"
+                  id="Communication"
+                  value="#{courseC.creditcard.communication}"
+                  title="#{msg['tooltip.club.clubaddress']}"
+                  size="45" 
+                         />
+    
+    <h:outputText value="Credit Card Holder :" />
+    <p:inputText  label="holder"
+                              id="Holder"
+                              value="#{courseC.creditcard.creditCardHolder}"
+                              title="#{msg['tooltip.club.clubaddress']}"
+                              converter="omnifaces.ToUpperCaseConverter"
+                              size="45" 
+                         />
+    
+    <h:outputText  value="#{msg['creditcard.number']} :"/>
+      <p:inputMask
+                        label="creditcard"
+                        id="creditcardNumber"
+                        value="#{courseC.creditcard.creditCardNumber}"
+                        valueChangeListener="#{courseC.creditCardNumberListener}"
+                        size="21"
+                        slotChar="_"
+                        mask="9999 9999 9999 9999">
+      </p:inputMask>
+    
+    <h:outputText value="Verification Code :" />
+    <p:inputMask  label="holder"
+                       id="Verification"
+                       value="#{courseC.creditcard.creditCardVerificationCode}"
+                       title="#{msg['tooltip.club.clubaddress']}"
+                       size="3" 
+                       mask="999"
+                         />
+        
+  <!--    <h:outputText value="#{msg['creditcard.type']} :"   />
+    
+     valueChangeListener="#{courseC.tarifCreditCardNumberListener}"    -->
+        <!--
+    <h:selectOneMenu  id="TypeCreditcard0"
+                          required="true"
+                          valueChangeListener="#{courseC.creditCardTypeListener}"
+                          value="#{courseC.creditcard.creditCardType}"
+               >
+            <f:selectItem itemLabel="Visa"  itemValue="VISA" />
+            <f:selectItem itemLabel="Maestro"  itemValue="Maestro" />
+            <f:selectItem itemLabel="Mastercard"  itemValue="MASTERCARD" />
+            <f:selectItem itemLabel="JCB"  itemValue="JCB" />
+            <f:selectItem itemLabel="UPI"  itemValue="U" />
+            <f:selectItem itemLabel="Diners Club"  itemValue="DINERS_CLUB" />
+            <f:selectItem itemLabel="American Express"  itemValue="AMERICAN_EXPRESS" />
+            <f:selectItem itemLabel="Discover"  itemValue="DISCOVER" />
+            <f:selectItem itemLabel="China Union Pay"  itemValue="CHINA_UNION_PAY" />
+       </h:selectOneMenu>
+    -->
+    
+     <h:outputText value="#{msg['creditcard.type']} :"   />
+     <h:selectOneMenu id="TypeCreditcard"
+                          required="true"
+                          valueChangeListener="#{courseC.creditCardTypeListener}"
+                          value="#{courseC.creditcard.creditCardType}" >
+                <f:selectItems value="#{courseC.creditcard.cards}"/>
+                <f:ajax event="change" render="@form"/>
+            </h:selectOneMenu>
+
+    <h:outputText value="Credit Card Expiration Date :" />
+    <p:calendar 
+            id="Expiration"
+            immediate="true"
+            value="#{courseC.creditcard.creditCardExpirationDate}"
+            mode="popup"
+            pattern="MM/yyyy"
+            showOn="both"
+            locale="#{languageC.locale}"
+            navigator="true"
+            yearRange="#{of:formatDate(now, 'yyyy')}:c+2"
+            title="#{msg['title.round.rounddate']}"
+            readonlyInput="true"
+            showButtonPanel="true"
+            size="8"
+            >
+         
+        </p:calendar> 
+    <!-- <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />  -->
+<f:facet name="footer">
+         <p:commandButton value="#{msg['inscription.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-rotate-left"
+                         action="inscription.xhtml"
+                         />
+         <p:commandButton value="#{msg['payment.creditcard']}"
+                         id="commandButtonPayment"
+                         ajax="false"
+                         update="messages"
+                         immediate="false"
+                         icon="fa fa-cc-visa"
+                         action="creditcard_accepted.xhtml"
+                         />
+</f:facet>
+
+</p:panelGrid>
+
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

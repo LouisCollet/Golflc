@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+
+http://stackoverflow.com/questions/21846329/override-logging-in-wildfly
+added by LC on 25/7/2016
+pour utiliser Log4j2 dans l'application (Wildfly utilise son propre système de logging)
+-->
+
+<jboss-deployment-structure>
+  <deployment>
+     <!-- exclude-subsystem prevents a subsystems deployment unit processors running on a deployment -->
+     <!-- which gives basically the same effect as removing the subsystem, but it only affects single deployment -->
+     <exclude-subsystems>
+        <subsystem name="logging" />
+    </exclude-subsystems>
+  </deployment>
+<dependencies>  
+    <module name="com.lmax.disruptor"/>
+    <module name="org.apache.log4j2.core">
+            <imports>  
+                    <include path="META-INF"/>  
+            </imports>  
+    </module> 
+
+    <module name="org.apache.log4j2"/>
+</dependencies>  
+
+</jboss-deployment-structure>

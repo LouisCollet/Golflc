@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+            
+      >
+<ui:composition template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Travel modes in directions</ui:define>
+<ui:define name="head"></ui:define>
+<ui:define name="content">
+
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+   
+    <title>Displaying text directions with setPanel()</title>
+    <style type="text/css">
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #panel {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+
+      /*
+      Provide the following styles for both ID and class,
+      where ID represents an actual existing "panel" with
+      JS bound to its name, and the class is just non-map
+      content that may already have a different ID with
+      JS bound to its name.
+      */
+
+      #panel, .panel {
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      #panel select, #panel input, .panel select, .panel input {
+        font-size: 15px;
+      }
+
+      #panel select, .panel select {
+        width: 100%;
+      }
+
+      #panel i, .panel i {
+        font-size: 12px;
+      }
+
+
+       
+      #directions-panel {
+        height: 100%;
+        float: right;
+        width: 390px;
+        overflow: auto;
+      }
+
+      #map-canvas {
+        margin-right: 400px;
+      }
+
+      #control {
+        background: #fff;
+        padding: 5px;
+        font-size: 14px;
+        font-family: Arial;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 2px rgba(33, 33, 33, 0.4);
+        display: none;
+      }
+
+      media print {
+        #map-canvas {
+          height: 500px;
+          margin: 0;
+        }
+
+        #directions-panel {
+          float: none;
+          width: auto;
+        }
+      }
+     </style>
+     
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc"
+>        
+    </script>    
+    
+<script type="text/javascript">
+var directionsDisplay;
+var google; // fake
+var directionsService = new google.maps.DirectionsService();
+
+function initialize() {
+  directionsDisplay = new google.maps.DirectionsRenderer();
+  var mapOptions = {
+    zoom: 7,
+    center: new google.maps.LatLng(41.850033, -87.6500523)
+  };
+  var map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+  directionsDisplay.setMap(map);
+  directionsDisplay.setPanel(document.getElementById('directions-panel'));
+
+  var control = document.getElementById('control');
+  control.style.display = 'block';
+  map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
+}   //end initialize
+
+function calcRoute() {
+  var start = document.getElementById('start').value;
+  var end = document.getElementById('end').value;
+  var request = {
+    origin: start,
+    destination: end,
+    travelMode: google.maps.TravelMode.DRIVING
+  };
+  directionsService.route(request, function(response, status) {
+    if (status === google.maps.DirectionsStatus.OK) {
+      directionsDisplay.setDirections(response);
+    }
+  });
+} //end calcroute
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+    
+</head>
+    
+  <body>
+    <div id="control" class="panel">
+      <strong>Start:</strong>
+      <select id="start" onchange="calcRoute();">
+        <option value="chicago, il">Chicago</option>
+        <option value="st louis, mo">St Louis</option>
+        <option value="joplin, mo">Joplin, MO</option>
+        <option value="oklahoma city, ok">Oklahoma City</option>
+        <option value="amarillo, tx">Amarillo</option>
+        <option value="gallup, nm">Gallup, NM</option>
+        <option value="flagstaff, az">Flagstaff, AZ</option>
+        <option value="winona, az">Winona</option>
+        <option value="kingman, az">Kingman</option>
+        <option value="barstow, ca">Barstow</option>
+        <option value="san bernardino, ca">San Bernardino</option>
+        <option value="los angeles, ca">Los Angeles</option>
+      </select>
+      <strong>End:</strong>
+      <select id="end" onchange="calcRoute();">
+        <option value="chicago, il">Chicago</option>
+        <option value="st louis, mo">St Louis</option>
+        <option value="joplin, mo">Joplin, MO</option>
+        <option value="oklahoma city, ok">Oklahoma City</option>
+        <option value="amarillo, tx">Amarillo</option>
+        <option value="gallup, nm">Gallup, NM</option>
+        <option value="flagstaff, az">Flagstaff, AZ</option>
+        <option value="winona, az">Winona</option>
+        <option value="kingman, az">Kingman</option>
+        <option value="barstow, ca">Barstow</option>
+        <option value="san bernardino, ca">San Bernardino</option>
+        <option value="los angeles, ca">Los Angeles</option>
+      </select>
+    </div>
+    <div id="directions-panel" class="panel"></div>
+    <div id="map-canvas"></div>
+  </body>
+    
+</ui:define> <!-- content -->
+</ui:composition>
+    
+</html>

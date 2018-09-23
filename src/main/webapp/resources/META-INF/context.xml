@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+https://www.codejava.net/servers/tomcat/configuring-jndi-datasource-for-database-connection-pooling-in-tomcat
+28-08-2018 testing java EE api
+-->
+
+
+<root>
+    <Context>
+    <Resource
+        name="jdbc/UsersDB"
+        auth="Container"
+        type="javax.sql.DataSource"
+        maxActive="100"
+        maxIdle="30"
+        maxWait="10000"
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/usersDB"
+        username="root"
+        password="secret"
+    />
+    </Context>
+</root>

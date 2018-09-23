@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      lang="#{languageC.locale}"
+>
+
+<!--
+ xml:lang="#{languageC.language}"
+To improve SEO of your internationalized pages (otherwise it would be marked as duplicate content),
+bind language to <html> as well.
+SEO (Search Engine Optimization)
+#{LanguageController.language}
+rendered="#{initParam['javax.faces.FACELETS_DEVELOPMENT']}"
+        encoding="#{encodingBean.encoding}"
+
+<ui:debug hotkey="w"  />
+-->
+<f:view id="view_master"
+        locale="#{languageC.locale}"
+        contentType="text/html;charset=utf-8">
+
+<h:head>
+  
+   <meta name="description" content="GolfLC Application"/> 
+   <meta name="author" content="Louis Collet"/> 
+   <meta charset="utf-8"/>
+   <meta http-equiv="Content-Type" content="text/html"/>
+   <meta http-equiv="Content-Language" content="#{languageC.locale}" /> 
+   <meta name="sessionTimeout"
+         http-equiv="refresh" 
+         content="#{session.maxInactiveInterval};url=#{request.contextPath}/sessionExpired.xhtml?cmd=time-out"/>
+     <!-- maxInactiveInterval positionné dans ??
+     de rediriger le visiteur vers une autre page au bout de N secondes grâce 
+au mot clé refresh et à la précision URL=chemin-vers-ma-page.-->
+    <title><ui:insert name="title"> Default title </ui:insert></title>
+
+    <link rel="shortcut icon"
+                    type="image/x-icon"
+                    href="#{request.contextPath}/resources/images/golficon.jpg" />
+<!--
+    <h:outputScript library="primefaces" name="jquery/jquery.js" target="head"  />
+-->
+    <h:outputScript library="js" name="forms.js" target="head"/>
+      <!-- changer la langue du calendar from player.xhtml et round.xhtml -->
+    <h:outputScript library="js" name="CalendarLocales.js"/>
+    <ui:insert name="head"> </ui:insert>
+</h:head>
+
+<h:body id="body_master_template"> <!-- new 13/07/2014-->
+<!-- Just put them in a .css file which you include
+by <h:outputStylesheet> inside the beginning of the <h:body> JSF will automatically relocate the stylesheet
+to the end of the generated HTML <head> and thiswill thus ensure that the stylesheet is loaded after the PrimeFaces' default styles.
+new next lines 12/8/2016 
+<p:growl id="LCmessages"
+         showDetail="true"
+         sticky="true"
+         escape="false" />-->
+
+<ui:include src="/include/include_messages.xhtml"/>
+<p:idleMonitor timeout="500000">
+    <p:ajax event="idle"   listener="#{utilsC.onIdle()}"   update="growl-msg" />
+    <p:ajax event="active" listener="#{utilsC.onActive()}" update="growl-msg" />
+</p:idleMonitor>
+
+<ui:insert name="metadata" />
+<h:outputStylesheet library="css" name="primefacesLC.css"/>
+
+<h:panelGroup id="layoutsContainer"
+              layout="block">
+<pe:layout id="layout_master"
+          fullPage="true"
+          >
+<pe:layoutPane
+                    id="lu_north"
+                    position="north"
+                    size="100"
+                    header ="#{msg['login.welcome']}"
+                    resizable="true"
+                    closable="false"
+                    collapsible="true"
+                    styleClass="myLayoutStyleClass">
+                    >
+         <ui:include src="/header.xhtml"/>
+</pe:layoutPane>
+
+<pe:layoutPane
+                    id="lu_south"
+                    position="south"
+                    size="75"
+                    header="Bottom"
+                    closable="true"
+                    resizable="true"
+                    collapsible="true"
+                    styleClass="myLayoutStyleClass">
+        <ui:include src="/footer.xhtml"/>
+</pe:layoutPane>
+
+    <pe:layoutPane 
+              id="lu_east"
+              position="east"
+              size="175"
+              header="Help"
+              collapsible="true"
+        >
+        <h:graphicImage library="images"
+                name="golf_help.jpg"
+                alt="image missing :help.jpg"
+                >
+        </h:graphicImage>
+        <ui:insert name="help"></ui:insert>
+</pe:layoutPane>
+
+
+    
+<pe:layoutPane
+              id="lu_west"
+              position="west"
+              size="175"
+              header="Menu"
+              collapsible="true">
+        <ui:include src="/menu.xhtml"/>
+</pe:layoutPane>
+    
+    
+    <pe:layoutPane
+            id="lu_center"
+            position="center"
+            header="Center"
+            >
+                <ui:insert name="center"> center</ui:insert>
+    </pe:layoutPane>
+    
+    
+</pe:layout>
+<!--
+<ui:insert name="bodyContent"> Default title </ui:insert>
+-->
+</h:panelGroup>
+</h:body>
+</f:view>
+
+</html>

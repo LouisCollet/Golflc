@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="WARN"
+               name="XMLConfigLC"
+          > 
+ <Properties>
+      <Property name="logfileName">C:/log/golflc.log</Property>
+ </Properties>
+ <Appenders> <!--  was true -->
+   <File name="LogFile"
+         fileName="${logfileName}"
+         append="false" 
+         bufferedIO="true"
+         immediateFlush="true"
+        >
+ <PatternLayout
+     charset="UTF-8"
+     pattern="%sequenceNumber  %date{ISO8601}  %-6relative  %level{length=6}  %location = %X{remoteAddress} = %X{ipAddress} -- %message %n ">
+ </PatternLayout>
+               <!-- charset="UTF-8" remotreAddress et remotehost : voir UserIdentificationFilter
+               http://logging.apache.org/log4j/2.x/manual/layouts.html
+                pattern="%d{ISO8601} %-4r %-5p %x %l = %X{remoteAddress} - %m %n"           -->
+   </File>
+   <Console name="STDOUT"
+                 target="SYSTEM_OUT"
+        >
+            <PatternLayout pattern="%d{ISO8601} %-4r %level{length=5} %C %M %F - %m%n"/>
+   </Console>
+
+   </Appenders>
+   <Loggers>
+        <Logger name="org.apache.logging.log4j.xml"
+                level="debug">
+        </Logger>
+  <!--                                 /> -->
+        <Root level="debug">
+            <AppenderRef ref="LogFile" level="debug" /> 
+            <AppenderRef ref="STDOUT"  level="debug"/>
+        </Root>
+   </Loggers>
+</Configuration>

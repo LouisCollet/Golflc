@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Picklist Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_club.xhtml"/>
+</ui:define>
+<ui:define name="content">
+    
+<h:graphicImage library="images"
+                name="golf_club.jpg"
+                alt="image missing :golf_club.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage library="images"
+                name="golf_club.jpg"
+                alt="image missing :golf_club.jpg"
+                style="float: right;">
+</h:graphicImage>
+ <h:form id="picklist" enctype="application/x-www-form-urlencoded">
+<ui:include src="include/include_messages.xhtml"/>
+
+<h3> Players Picklist </h3>
+<p:pickList id="picklistPlayers"
+                value="#{courseC.dlPlayers}"
+                var="pl"
+                itemValue="#{pl}" 
+                itemLabel="#{pl.idplayer} / #{pl.playerLastName} / #{pl.playerFirstName} / #{pl.playerGender}"
+                showCheckbox="true"
+                showSourceControls="true"
+                onTransfer="handleTranfer(e)"
+                filterMatchMode="startsWith"
+                
+                style="border:solid 5px" 
+            >
+ <!--  onTransfer="handleTransfer(e)                showSourceFilter="true"" 
+        <f:facet name="sourceCaption">Available Players</f:facet>
+        <f:facet name="targetCaption">Ordered Players</f:facet> 
+-->
+        <f:facet name="sourceCaption"> #{msg['button.availableplayers']} </f:facet>
+        <f:facet name="targetCaption"> #{msg['button.orderedplayers']}   </f:facet> 
+     <o:converter converterId="omnifaces.ListConverter" 
+                  list="#{courseC.fullList}" />   
+    </p:pickList>  
+
+    <p:commandButton id="button01"
+                     immediate="false"
+                     ajax="false" 
+                     value="Create Other Players"
+                     
+                     style="margin-top:5px"
+                     action="#{courseC.createOtherPlayers()}"
+                     />
+
+<script type="text/javascript">
+function handleTransfer(e)
+{   alert("hi, Louis");
+    item = e.item;
+    alert(item.text());
+
+    fromList = e.from;
+    toList = e.to;
+    type = e.type; //type of transfer; command, dblclick or dragdrop)
+}
+</script>
+
+
+<!-- 
+    <p:dialog modal="true"
+              showEffect="fade"
+              hideEffect="fade"
+              widgetVar="cityDialog">
+        
+        <h:panelGrid 
+            id="displayCities"
+            styleClass="alignmentLeft"
+            columnClasses="className"
+            columns="2">
+            <h:outputText value="Source: " style="font-weight:bold"/>
+                <ui:repeat value="#{pickList.cities.source}" var="item">
+                    <h:outputText value="#{item}" style="margin-right:5px" />
+                </ui:repeat>
+
+            <h:outputText value="Target: " style="font-weight:bold"/>
+                <ui:repeat value="#{pickList.cities.target}" var="item">
+                    <h:outputText value="#{item}" style="margin-right:5px" />
+                </ui:repeat>
+        </h:panelGrid>
+    </p:dialog>
+
+    <p:dialog modal="true"
+              showEffect="fade"
+              hideEffect="fade"
+              widgetVar="playerDialog">
+        <h:panelGrid id="displayPlayers" columns="2">
+            <h:outputText value="Source: " style="font-weight:bold"/>
+            <ui:repeat value="#{pickListBean.players.source}" var="player">
+                <h:outputText value="#{player.name}" style="margin-right:5px" />
+            </ui:repeat>
+
+            <h:outputText value="Target: " style="font-weight:bold"/>
+            <ui:repeat value="#{pickListBean.players.target}" var="player">
+                <h:outputText value="#{player.name}" style="margin-right:5px" />
+            </ui:repeat>
+        </h:panelGrid>
+    </p:dialog>
+-->
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

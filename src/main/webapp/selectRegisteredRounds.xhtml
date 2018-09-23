@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+    
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewParam
+            required="true"
+            name="cmd"
+            value="#{courseC.inputScorecard}"
+            requiredMessage="You did not specify a cmd. (The id parameter is missing)"
+            converterMessage="Invalid cmd. (The id parameter is not a number)"
+            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
+            <f:validateLength minimum="3" />
+        </f:viewParam>
+    </f:metadata>
+</ui:define>
+    
+<ui:define name="title">Select Participants Round Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_select_registeredround.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:form id="form_select_participants">
+<ui:include src="include/include_messages.xhtml"/>
+
+    <!--	<h1>Score Card for Registered Round list</h1> -->
+
+<p:dataTable id="player_has_played_round"
+             value="#{courseC.listRounds()}"
+             var="c"
+             filteredValue="#{courseC.filteredCars}"
+             >
+
+<f:facet name="header">
+     <h1>#{msg['message.selectround']} #{msg['message.for.scorecard']}</h1>
+</f:facet>
+
+        <p:column headerText="#{msg['round.selected']}" style="width:100px" >
+            <p:commandButton
+                id="selectButton"
+                action="#{courseC.scorecard(c)}"
+                value="#{c.round.idround} - #{msg['button.select']}"
+                icon="fa fa-map-o">
+            </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['round.date']}"
+                  style="width:70px"
+                  id="rdate">
+                  <h:outputText value="#{c.round.roundDate}"
+                                
+                                > 
+                 <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                  </h:outputText>
+	</p:column>
+    
+        <p:column headerText="#{msg['tee.start']}"
+                  footerText="#{msg['tee.start']}"
+                  style="width:10%"
+                  id="teestart"
+                  >
+                        #{c.tee.teeStart}
+        </p:column>
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    style="width:100px"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                  >
+                        #{c.club.clubName}
+	</p:column>
+
+	<p:column id="colcoursename"
+                  headerText="#{msg['course.name']}"
+                  style="width:100px"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  >
+                        #{c.course.courseName}
+	</p:column>
+<!-- width:50% : prend 50% de largeur écran
+ style="width:40%; background-color: blue;"
+-->
+        <p:column headerText="#{msg['round.competition']}"
+                  style="width:100px"
+                  styleClass="red"
+                  id="compet"
+                  >
+                        #{c.round.roundCompetition}
+        </p:column>
+
+<!-- style="width:50px;text-align:right"   -->
+        <p:column headerText="#{msg['round.game']}"
+                  style="width:50px;text-align:right"
+                  id="game"
+                  >
+                        #{c.round.roundGame}
+        </p:column>
+
+<f:facet name="footer">
+     There are #{fn:length(courseC.listRounds())} rounds. 
+</f:facet>
+
+</p:dataTable>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fr" >
+  <br/>
+
+ <b>Sexe des joueurs du tee : </b>
+Masculin ou féminin
+ <br/>
+
+ <b>Départ (tee) : </b>
+Faites votre choix
+ <br/>
+
+  <b>Slope : </b>
+Le Slope Rating est la difficulté relative d'un parcours de golf 
+pour un 'golfeur bogey' (index 18 à 22) par rapport à un 'joueur scratch' (index à 0,0).
+ <br/>
+Complète le CR qui existait dans les années 1980.
+Le SR a été ajouté pour tenir compte de la différence
+croissante entre les scores des joueurs de niveau différents.
+ <br/>
+
+<b>Rating : </b>
+Le Golf Course Rating (CR) est l'évaluation du dergré de difficulté d'un terrain pour un joueur 'scratch',
+dans des conditions de jeu et météo normales.
+<br/>
+C'est un chiffre à une décimale qui indique le score moyen qu'un golfeur scratch jouerait :
+75,3 signifie que le terrain est relativement difficile    
+ <br/>    
+ <b>Handicap 54 : </b>   
+    </h:outputText>
+
+            <h:outputText
+        escape="false"
+        id="helptextnl"
+        rendered="#{languageC.locale eq 'nl'}" 
+        value="nl">
+            NL Versie 
+            Ceci est la page HELP de Create Tee
+            version spéciale JSF sous primefaces
+            (à compléter)
+            <br/>
+        
+    </h:outputText>
+    
+</ui:composition>
+</h:body>
+</html>

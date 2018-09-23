@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      
+   >
+<ui:composition template="templates/masterTemplate.xhtml">
+ <!--  next lines : afficher les tee possibles en fonction gender voir TeeStart  -->   
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadTeeStart()}"/>
+    </f:metadata>
+</ui:define>
+    
+    
+<ui:define name="title">Inscription Page </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_inscription.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:head>
+    <!--
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc&amp;language=#{languageC.locale}"
+        type="text/javascript" >
+    </script>
+    -->
+</h:head>
+
+    
+<h:graphicImage 
+                name="images/OK.png"
+                alt="image missing :golf_round.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/OK.png"
+                alt="image missing :golf_round.jpg"
+                style="float: right;">
+</h:graphicImage>
+    
+<h:form id="inscription" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary.xhtml"/>
+
+<p:panelGrid id="panel"
+             columns="2"
+             styleClass="alignmentLeft"
+             columnClasses="col1,col2">
+    
+    <!-- columnClasses="className" -->
+<f:facet name="header">
+    <h1>#{msg['inscription.data']}</h1>
+</f:facet>
+
+        <h:outputText value="#{msg['round.players']} :" />
+        <h:outputText
+                      id="rcomp" 
+                      value="#{courseC.round.roundPlayers} = #{courseC.round.playersString}" />
+
+        <h:outputText value="#{msg['inscription.team']} :"   />
+        <h:outputText id="competition" 
+                      value="#{courseC.round.roundTeam}" />
+<!--
+  <h:panelGroup id="panelG1" layout="block" >
+        <h:outputText value="#{msg['tee.gender']} :"  />
+          <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-inputgroup">
+                    <span class="ui-inputgroup-addon"><i class="fa fa-male"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-female"></i></span>
+                </div>
+            </div>
+        </div>
+   </h:panelGroup>
+        <h:outputText id="teegender" 
+                      value="#{courseC.player.playerGender}" />
+https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling -->
+
+   <h:panelGroup id="panelG2" layout="block" >
+        <h:outputText value="#{msg['tee.gender']} :"  />
+                    <span class="ui-inputgroup-addon"><i class="fa fa-male"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-female"></i></span>
+   </h:panelGroup>
+
+        <h:outputText id="teegender2" 
+                      value="#{courseC.player.playerGender}" />
+        
+        <h:outputText value="#{msg['tee.start']} :"  />
+        <p:selectOneMenu id="teestart"
+                         value="#{courseC.inscription.inscriptionTeeStart}"
+                           >
+                    <f:selectItems value="#{courseC.teeStartListe}" />
+        </p:selectOneMenu>
+        
+        <h:outputText value="#{msg['club.web']} :"  />
+        <p:lightBox iframe="true"
+                    width ="800px"
+                    height="600px">
+             <h:outputLink value="http://#{courseC.club.clubWebsite}/"
+                           title="Club WebPage">
+                <h:outputText value="#{courseC.club.clubWebsite}"/>
+            </h:outputLink>
+        </p:lightBox>
+
+<f:facet name="footer">
+<p:commandButton 
+                         id="buttonCreate"
+                         value="#{msg['button.inscription.create']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="fa fa-pencil"
+                         disabled="#{courseC.inscription.inscriptionOK}"
+                         action="#{courseC.createInscription}"
+         />
+
+<!--   -->
+<p:commandButton 
+                         id="buttonWeather"
+                         value="#{msg['button.weather']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="fa fa-umbrella"
+                         action="#{courseC.findWeather()}"
+         />
+
+<p:commandButton 
+                         id="buttonTarif"
+                         value="#{msg['button.inscription.findtarif']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="fa fa-eur"
+                         action="#{courseC.findTarif()}"
+         />
+
+        <!-- disabled="#{courseC.playerhasround.inscriptionOK}" -->
+<p:commandButton 
+                         id="OtherPlayers"
+                         value="#{msg['button.inscription.otherplayers']} / #{courseC.round.roundPlayers}"
+                         update="growl-msg"
+                         ajax="false"
+                         disabled="#{(!courseC.inscription.inscriptionOK) or (courseC.round.roundPlayers gt 3)}"
+                         immediate="false"
+                         icon="fa fa-list-alt"
+                         action="selectOtherPlayers.xhtml"
+         />
+</f:facet>
+
+</p:panelGrid>
+<br/>
+<!--   50.622616,4.295123 
+
+fn:length(courseC.lp)
+
+<p:gmap center="#{courseC.club.clubLatitude},#{courseC.club.clubLongitude}"
+        zoom="15"
+        type="HYBRID"
+        style="width:600px;
+               height:400px;
+               margin-left:25em;
+               max-width:60em;"
+        streetView="true"/>
+-->
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

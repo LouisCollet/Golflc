@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this is the JOB SPECIFICATION LANGUAGE (JSL)-->
+<job id="GolfRoundsJob"
+     xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     version="1.0">
+    <step id="myStep">
+        <properties>
+            <property name="input_file" value="C:/Users/collet/Documents/NetBeansProjects/GolfNew/ryder cup rounds.txt"
+                      />
+        </properties>
+        <chunk item-count="1">
+            <reader    ref="ItemReaderRound"> </reader>
+            <processor ref="ItemProcessorRound"> </processor>
+            <writer    ref="ItemWriterRound"> </writer>
+        </chunk>
+    </step>
+</job>
+<!-- value="C:/Users/collet/Documents/NetBeansProjects/GolfNew/importPlayers.txt"  -->

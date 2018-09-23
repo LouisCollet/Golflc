@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:h="http://xmlns.jcp.org/jsf/html"
+       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      >
+    <ui:composition template="templates/timeTemplate.xhtml">
+<ui:define name="title">Travel modes in directions</ui:define>
+<ui:define name="head"></ui:define>
+<ui:define name="content">
+
+<h:outputScript library="js" name="timezone-api-sample.js"/>
+    <h:head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>Google-timezone-API-Sample</title>
+        <style type="text/css">
+            html, body, #map-canvas {
+                margin: 0;
+                padding: 0;
+                height: 50%;
+            }
+            #map-canvas {
+                height: 50%;
+                width: 50%;
+            }
+        </style>
+collet
+        
+    </h:head>
+before form
+<h:form id="timezone-api-sample">
+        <h:panelGrid columns="2" > 
+                <h:outputText value="#{msg['player.id']}" />
+                <h:outputText id ="id1"
+                       	value="#{courseC.player.idplayer}" />
+                
+                <h:outputText value="#{msg['player.first']}" />
+		<h:outputText  
+			      value="#{courseC.player.playerFirstName}" />
+
+		<h:outputText value="#{msg['player.last']}"   />
+		<h:outputText  
+			      value="#{courseC.player.playerLastName}" />
+
+		<h:outputText value="#{msg['player.city']}" />
+		<h:outputText  
+                              value="#{courseC.player.playerCity}" />
+
+                <h:outputText value="#{msg['player.country']}" />
+                <h:outputText value="#{courseC.player.playerCountry}" />
+       
+        </h:panelGrid>
+    </h:form>
+    <h:body>
+        <div id="map-canvas"></div>
+    </h:body>
+</ui:define> <!-- content -->
+</ui:composition>
+</html>

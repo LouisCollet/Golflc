@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:jsf="http://xmlns.jcp.org/jsf/"
+      template="templates/masterTemplate.xhtml"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+> 
+<!--  donne une erreur ! <ui:define name="head">Player Page </ui:define> < template="templates/masterTemplate.xhtml"> -->
+    
+   
+<ui:define name="title">Round Page </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_round.xhtml"/>
+</ui:define>
+<ui:define name="content">
+    <!--Target Attribute
+In addition, you can use �target� attribute to control where to output the js file.
+1.target="head" � Display within the top of HTML head tag.
+2.target="body" � Display at the end of the body tag.
+3.no target � Display at where the tag is placed.
+
+<h:head> </h:head>
+    -->
+    
+<h:graphicImage 
+                name="images/golf_round.png"
+                alt="image missing :golf_round.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/golf_round.png"
+                alt="image missing :golf_round.jpg"
+                style="float: right;">
+</h:graphicImage>
+    <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;"/>
+<h:form id="form_round" enctype="application/x-www-form-urlencoded" >
+    
+<ui:include src="include/include_summary_club.xhtml"/>
+
+<p:panelGrid
+    id="panelGrid1" 
+    styleClass="alignmentLeft"
+    columnClasses="col1,col2"
+    columns="2"
+    >
+
+<f:facet name="header">
+    <h1>#{msg['round.data']}</h1>
+</f:facet>
+    <!--
+        <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText
+            id="clubname" 
+            value="#{courseC.club.clubName} (#{courseC.club.idclub})"
+            />
+
+        <h:outputText value="#{msg['course.name']} :"  />
+        <h:outputText
+            id="coursename" 
+            value="#{courseC.course.courseName} (#{courseC.course.idcourse})"
+            />
+-->
+        
+        <h:outputText value="#{msg['round.competition']} *"   />
+	<p:inputText  label="Competition"
+            id="compet"
+            size="45"
+            title="#{msg['title.round.roundcompetition']}"
+	    value="#{courseC.round.roundCompetition}" />
+        
+        <h:outputText value="#{msg['round.date']} *"/>
+        <p:calendar 
+            immediate="true"
+            valueChangeListener="#{courseC.roundWorkDate}"
+            value="#{courseC.round.workDate}"
+            id="rdate"
+            mode="popup"
+            pattern="dd/MM/yyyy"
+            showOn="both"
+            locale="#{languageC.locale}"
+            navigator="true"
+            yearRange="c-1:c+1"
+            title="#{msg['title.round.rounddate']}"
+            readonlyInput="true"
+            minHour="08"
+            maxHour="18"
+            stepMinute="2"
+            showButtonPanel="true"
+            >
+        </p:calendar> 
+<!--           converter="localDateTimeConverter"       pattern="dd/MM/yyyy HH:mm"             -->
+      <h:outputText value="#{msg['round.hour']}" />
+      <h:panelGroup id="panelG1" layout="block" >
+
+          <p:commandButton 
+                        id="flightButton"
+                        actionListener="#{dialogC.viewFlight()}"
+                        icon="ui-icon-extlink"
+                        value="Choose Flight Hour"
+                 
+                        style="float:left"
+                        >
+                <p:ajax event="dialogReturn"
+                        update=":form_round:idworkhour"
+                        listener="#{dialogC.onFlightChosen('louis')}"/>
+   
+            </p:commandButton>
+          <h:outputText id="idworkhour" 
+                        value="#{courseC.round.workHour}"
+            />
+      </h:panelGroup>
+
+<!-- http://stackoverflow.com/questions/32456951/primefaces-dialog-framework-dialog-not-opening  -->
+
+
+ </p:panelGrid>       
+        
+
+<p:panelGrid
+    id="panelGrid2" 
+    styleClass="alignmentLeft"
+    columnClasses="col1,col2"
+    columns="2"
+    >
+
+        <h:outputText value="#{msg['round.game']} * " />
+        <p:selectOneMenu id="game"
+                         value="#{courseC.round.roundGame}">
+            <f:selectItems value="#{courseC.games}" />
+        </p:selectOneMenu>
+        
+
+        
+        <h:outputText value="#{msg['round.qualifying']}"   />
+        <p:selectOneButton id="qualifying"
+            value="#{courseC.round.roundQualifying}"
+            styleClass="oneradio" >
+               <f:selectItem itemLabel="Non Qualifying"  itemValue="N" />
+               <f:selectItem itemLabel="Qualifying"      itemValue="Y" />
+               <f:selectItem itemLabel="Counting"        itemValue="C" />
+        </p:selectOneButton>
+        <h:outputText value="#{msg['round.cba']}" />
+        <p:selectOneButton id="cba"
+                                  value="#{courseC.round.roundCBA}"
+                                  styleClass="oneradio"
+                                  >
+               <f:selectItem itemLabel="+1"  itemValue="+1" />
+               <f:selectItem itemLabel="0"   itemValue="0" />
+               <f:selectItem itemLabel="-1"  itemValue="-1" />
+               <f:selectItem itemLabel="-2"  itemValue="-2" />
+               <f:selectItem itemLabel="-3"  itemValue="-3" />
+               <f:selectItem itemLabel="-4R/O"  itemValue="-4" />
+        </p:selectOneButton>
+        <h:outputText value="#{msg['round.holes']} *"   />
+        <p:selectOneButton id="holes"
+                value="#{courseC.round.roundHoles}"
+                styleClass="oneradio"
+                >
+                <f:selectItem itemLabel="Holes 9 " itemValue="9" />
+                <f:selectItem itemLabel="Holes 18" itemValue="18" />
+        </p:selectOneButton>
+
+        <h:outputText value="#{msg['round.start']} *"   />
+        <p:selectOneButton id="start"
+                value="#{courseC.round.roundStart}"
+                styleClass="oneradio"
+                >
+                <f:selectItem itemLabel="Start 1 " itemValue="1" />
+                <f:selectItem itemLabel="Start 10" itemValue="10" />
+        </p:selectOneButton>
+
+ <!-- -->
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.round.create']}"
+                         id="cb1"
+                         update="growl-msg"
+                         ajax="false"
+                         rendered="#{not courseC.nextInscription}"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.createRound}"/>
+
+        <p:commandButton value="#{msg['button.inscription']}"
+                         id="cb2"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         rendered="#{courseC.nextInscription}"
+                         icon="ui-icon-circle-arrow-e"
+                         style="float: right;"
+                         action="inscription.xhtml"/>
+
+</f:facet>
+</p:panelGrid>
+<pe:tooltip global="true" myPosition="left center" atPosition="right center"/>
+</h:form>
+</ui:define>
+</ui:composition> 

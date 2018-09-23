@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      lang="#{languageC.locale}"
+>
+    
+ <f:view id="view_form"
+        locale="#{languageC.locale}"
+        contentType="text/html;charset=utf-8">
+
+<h:head>
+   <meta name="description" content="GolfLC Application"/> 
+   <meta name="author" content="Louis Collet"/> 
+   <meta charset="utf-8"/>
+   <meta http-equiv="Content-Type" content="text/html"/>
+   <meta http-equiv="Content-Language" content="#{languageC.locale}" /> 
+   <meta name="sessionTimeout"
+         http-equiv="refresh" 
+         content="#{session.maxInactiveInterval};url=#{request.contextPath}/sessionExpired.xhtml?cmd=time-out"/>
+   <title><ui:insert name="title"> Default title </ui:insert></title>
+   <link rel="shortcut icon"
+         type="image/x-icon"
+         href="#{request.contextPath}/resources/images/golficon.jpg" />
+    <h:outputScript library="js" name="forms.js" target="head"/>
+ 
+    <ui:insert name="head"> </ui:insert>
+</h:head>
+    
+<h:body id="body_form_template">
+    <ui:insert name="metadata" />
+  <h:outputStylesheet library="css" name="primefacesLC.css"/>  
+ <ui:include src="/include/include_messages.xhtml"/>
+ <ui:include src="/header.xhtml"/>
+ <ui:insert name="content"></ui:insert>
+ <!--<ui:insert name="metadata" />-->
+ <ui:include src="/footer.xhtml"/>
+ <pe:tooltip global="true"
+            myPosition="left center"
+            atPosition="right center"
+            showEvent="focus"
+            hideEvent="blur"
+            header="GolfLC Application"
+            styleClass="qtip qtip-green qtip-rounded qtip-shadow myQtip2Style"
+            />
+</h:body>
+
+</f:view>
+</ui:composition>
+
+
+<!--
+
+
+
+http://qtip2.com/options se style.classes 
+/* CSS2 styles */
+qtip{ } /* This one is applied by default (formally the "cream" style) */
+qtip-plain{ }
+qtip-light{ }
+qtip-dark{ }
+qtip-red{ }
+qtip-green{ }
+qtip-blue{ }
+
+/* CSS3+ styles */
+qtip-shadow{ } /* Adds a shadows to your tooltips */
+qtip-rounded{ } /* Adds a rounded corner to your tooltips */
+qtip-bootstrap{ } /* Bootstrap style */
+qtip-tipsy{ } /* Tipsy style */
+qtip-youtube{ } /* Youtube style */
+qtip-jtools{ } /* jTools tooltip style */
+qtip-cluetip{ } /* ClueTip style */
+qtip-tipped{ } /* Tipped style */
+-->
