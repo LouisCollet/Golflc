@@ -26,6 +26,7 @@
 <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> <!-- new 11/05/2014 -->
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
         <mysql.connectorJ.version>8.0.12</mysql.connectorJ.version> <!-- mod 05-08-2018 was 8.0.11 -->
@@ -39,16 +40,16 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <javaee.version>8.0</javaee.version> <!-- was 7.0 mod 26-04-2014 -->
         <java.mail.version>1.6.1</java.mail.version> <!-- was 7.0 mod 26-04-2014 -->
+        <javax.activation.version>1.2.0</javax.activation.version>
         <log4j2.version>2.11.1</log4j2.version> <!-- new 08/08/2018  was 2.11.0 -->
         <!--<glassfish.version>4.1.1</glassfish.version>  was 4.1 on 17/10/2015 -->
         <!--<wildfly.version>Wildfly-10.1.0.Final</wildfly.version> not used meme plus pour via MyPOM properties -->
         <hibernate.version>3.5.3.Final</hibernate.version> <!-- only used via MyPOM properties -->
         <maven.version>3.5.2</maven.version> <!-- only used via MyPOM properties -->
   <!--  Maven plugins -->       
-        <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version><!-- was 3.6.2 mod 12/11/2017 -->
-        
+        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version><!-- was 3.7.0 mod 25-09-2018 -->
         <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version> <!-- was 3.0.0 mod 14/07/2018 -->
-        <maven.clean.plugin.version>  </maven.clean.plugin.version>
+        <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
         <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
         <maven.war.plugin.version>3.2.2</maven.war.plugin.version> <!-- new 14/07/2018  was 3.2.1 -->
         <maven.install.plugin.version> </maven.install.plugin.version>
@@ -58,7 +59,7 @@
         
         <netbeans.compile.on.save>all</netbeans.compile.on.save> <!-- new 27/11/2013 -->
         <!--<mojarra.version>2.2.13.SP4</mojarra.version>  not used only used via MyPOM properties 2.2.13.SP4-->
-        <netbeans.version>9</netbeans.version> <!-- only used via MyPOM properties 
+        <netbeans.version>8.2</netbeans.version> <!-- only used via MyPOM properties 
 voir plus bas <artifactId>properties-maven-plugin</artifactId>-->
         
         <timestamp>${maven.build.timestamp}</timestamp> <!-- see https://dzone.com/articles/stamping-version-number-and -->
@@ -202,9 +203,9 @@ http://logging.apache.org/log4j/2.x/maven-artifacts.html -->
             </dependency>
 <!--   mod 29-12-2017 was 1.5.5 <scope>provided</scope>mod 21/07/2016 was 1.5.4 mais utilise 1.5.5 de wildfly !! -->
 <dependency>
-    <groupId>com.sun.activation</groupId>
-    <artifactId>javax.activation</artifactId>
-    <version>1.2.0</version>
+    <groupId>javax.activation</groupId>
+    <artifactId>javax.activation-api</artifactId>
+    <version>${javax.activation.version}</version>
 </dependency>
 
 <!--   new 08/03/2017
@@ -255,13 +256,13 @@ Dependencies, right clic on jEidlib-1.1.jar > Manually install artifact > browse
  <dependency>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-clean-plugin</artifactId>
-    <version>3.1.0</version> <!-- mod 29/05/2018 was 2.6.1 -->
+    <version>${maven.clean.plugin.version}</version> <!-- mod 25/09/2018 was fixed value -->
 </dependency> 
                     
 <dependency>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-resources-plugin</artifactId>
-    <version>2.7</version> <!-- mod 29/052/2018 was 2.6.1 -->
+    <version>${maven.resources.plugin.version}</version> <!-- mod 25-09-2018 was fixed value -->
 </dependency>
 <!--
 <dependency>

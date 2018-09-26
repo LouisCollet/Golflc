@@ -63,7 +63,6 @@ public class PlayerCSV implements Serializable, interfaces.Log, interfaces.GolfI
 @Pattern(regexp = "([^.@]+)(\\.[^.@]+)*@([^.@]+\\.)+([^.@]+)", message="{player.email.format}")
     private String playerEmail;
 
-//@NotNull(message="{handicap.start.notnull}")
 @Past(message="{handicap.start.past}")
     private Date handicapStart;
 

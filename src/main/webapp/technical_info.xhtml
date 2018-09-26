@@ -60,9 +60,6 @@
     <h:outputText value="Copyright" />
         <b>&copy;2012-#{of:formatDate(now, 'yyyy')} </b> Application GolfLC by Louis Collet v1.0
 
-   <h:outputText value="Java Version" />
-        #{utilsC.javaVersion}
-
     <h:outputText value="IPv4 Address" />
         #{request.getRemoteAddr()}
 
@@ -118,11 +115,11 @@
             #{utilsC.mojarraVersion}
 
 <h:graphicImage 
-                name="images/java.jpg"
+                name="images/jdk 11.jpg"
                 alt="image missing :java.jpg"
                 >
 </h:graphicImage>
-            8 (HC)
+             #{utilsC.javaVersion}
 
  <!--<h:graphicImage 
                 name="images/glassfish.png"

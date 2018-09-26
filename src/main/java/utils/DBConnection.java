@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.Properties;
 import javax.naming.*;
 import javax.sql.DataSource;
-
+//import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 /**
  *
  * @author collet
@@ -18,9 +18,12 @@ import javax.sql.DataSource;
                 throw new DAOConfigurationException(
                     "DataSource '" + url + "' is missing in JNDI.", e);
  */
+// @TransactionManagement(value=TransactionManagementType.BEAN)
 public class DBConnection implements interfaces.GolfInterface, interfaces.Log
 {
 static private Connection conn = null;
+static private Connection connPool = null;
+
 
 public Connection getConnection() throws SQLException, Exception   // was static
 {
@@ -61,7 +64,7 @@ try{
                        + p.getProperty("jdbc.host")
                        + p.getProperty("jdbc.dbname")
                        + p.getProperty("jdbc.params");
-         
+         // adapter également les params dans standalone-full.xml, pour le datasource !!!!!
   //       LOG.info("db_connection = " + db_connection);
  //   LOG.info("old connection = " + DB_CONNECTION_V8_0);
   //  conn = DriverManager.getConnection(DB_CONNECTION_V8_0,
@@ -206,48 +209,63 @@ properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildF
   }  // end method
 
   //// new 15/12/2012
-public static Connection getConnection2() throws Exception  // new 24/11/2011
+  
+public static Connection getConnection2() throws Exception  // pour minimum d'adaptation
     {
-          return getPooledConnection();
+        LOG.info("entering getConnection2 - going to getPooledConnection");
+        return getPooledConnection();
     }
 
-private static Connection getPooledConnection() throws Exception
-{   DataSource ds = null;
-    Context ctx = null;
-    conn = null;
-try
-    {   LOG.info("starting Pooled Connection" );
 
-   // Properties properties = new Properties();
-   //     properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
-   //     properties.put(Context.URL_PKG_PREFIXES, "org.apache.naming");
-       //   ctx = new InitialContext();
-          Properties properties = new Properties();  
-properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");  
- ctx = new InitialContext(properties);  
-          
-            LOG.info("step 1 ctx = " + ctx);
-          if(ctx == null)
-          {
-              throw new Exception("getPooledConnection -- Exception = No Context");
+public static Connection getPooledConnection() throws Exception
+{ //Connection conn2;
+  //  Context ctx = null;
+    connPool = null;
+try
+    {        LOG.info("starting Pooled Connection" );
+    
+    ClassLoader clo = Thread.currentThread().getContextClassLoader();
+     // Netbeans Files en haut à gauche /src/main/resources
+    InputStream is = clo.getResourceAsStream("jdbc.properties");
+          Properties p = new Properties(); 
+          p.load(is);
+          p.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildFlyInitialContextFactory");  
+          Context ctx = new InitialContext(p);  
+             LOG.info("step 1 ctx = " + ctx);
+          if(ctx == null){
+              throw new Exception("getPooledConnection -- Exception = No Context: is nul");
           }
-            LOG.info("step 2" );
-          //ds = (DataSource)ctx.lookup("java:app/jdbc/MySQLDataSource");
-            ds = (DataSource)ctx.lookup("java:/MySqlDS");
-            //ds = (DataSource)ctx.lookup("java:comp/env/jdbc/MySQLDataSource");
-           // ds = (DataSource)ctx.lookup("jdbc/fastCoffeeDB");//
-          LOG.info("-- Using Connection Pool JNDI : java:comp/env/jdbc/MySQLDataSource " + ds);
-          if (ds != null)
-          {
-             conn = ds.getConnection();
+             LOG.info("step 2" );
+      //    String s = "java:jboss/datasources/golflc";
+          String s = p.getProperty("jdbc.datasource");
+          /* commentaires ici !!
+          // copier le driver sous Wildfly...\standalone\deployments
+          // ou sous : lib au même niveau que WEB-INF ? à verifier
+          // adapter standlone-full.xml
+          //<datasource jta="true" jndi-name="java:jboss/datasources/golflc" pool-name="MySqlDS" enabled="true" use-java-context="true" use-ccm="true">
+                    <connection-url>jdbc:mysql://localhost:3307/golflc</connection-url>
+                    <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
+                    <driver>mysql-connector-java-8.0.12.jar</driver>
+          */
+             LOG.info("-- Using datasource : " + s);
+          DataSource ds = (DataSource)ctx.lookup(s);
+             LOG.info("-- found datasource : " + ds);
+             
+       //      Method method = ds.getClass().getMethod("getJNDINames");
+       //     String[] jndi = (String[])method.invoke(ds);
+      //          LOG.info("jndi name = " + jndi[0]);
+       //      LOG.info("line01");
+             
+          if (ds != null){
+             connPool = ds.getConnection(p.getProperty("jdbc.username"),p.getProperty("jdbc.password"));
  //// voir jdbc.properties            conn.setCatalog(DB_NAME); // from webGolfInterface mod 4/12/2011
-                LOG.info("-- getPooledConnection Database opened = " + conn.getCatalog() );
-             conn.setAutoCommit(true); //
+            LOG.info("-- getPooledConnection Database opened = " + connPool.getCatalog() );
+     //        conn.setAutoCommit(true); //
              return conn;
           }else{
              LOG.info("-- getPooledConnection NOT established = null" );
-             //throw new Exception("getPooledConnection -- Exception = No Context");
-             return null;
+                throw new Exception("getPooledConnection NOT established-- ");
+         //    return null;
           }
 } catch(final NoInitialContextException e) {
         LOG.info("-- NoInitialContext Exception = " + e.getMessage() );
@@ -256,10 +274,9 @@ properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildF
         LOG.info("-- getPooledConnection Exception = " + e.getMessage() );
         return null;
 }finally{
-        LOG.info("-- getPooledConnection finally" );
+    //    LOG.info("-- getPooledConnection finally" );
     }
-
-} // getPooledConnection
+} // end getPooledConnection
 
     public static Connection getConn() {
         return conn;
@@ -268,6 +285,16 @@ properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildF
     public static void setConn(Connection conn) {
         DBConnection.conn = conn;
     }
+
+    public static Connection getConnPool() {
+        return connPool;
+    }
+
+    public static void setConnPool(Connection connPool) {
+        DBConnection.connPool = connPool;
+    }
+
+    
 
 
 
@@ -290,17 +317,18 @@ public String toString()
 public static void main(String[] args) throws SQLException, Exception // testing purposes
 {
 
-    DBConnection dbc = new DBConnection();
-    conn = dbc.getConnection();
-    LOG.info(" -- connection success = " + conn);
-    DBConnection.closeQuietly(conn, null, null, null);
+ //   DBConnection dbc = new DBConnection();
+ //   conn = dbc.getConnection();
+ //   LOG.info(" -- connection success = " + conn);
+  //  DBConnection.closeQuietly(conn, null, null, null);
 
-//conn = DBConnection.getPooledConnection();
-//LOG.info(" -- connection pool obtained  = " + conn);
-//DBConnection.closeQuietly(conn, null, null, null);
+// pooled connection
+conn = DBConnection.getConnection2(); //.getPooledConnection();
+LOG.info(" -- pooled connection  obtained  = " + conn);
+DBConnection.closeQuietly(conn, null, null, null);
 
 conn = DBConnection.getJNDIConnection();
-LOG.info(" -- JNDI obtained  = " + conn);
+LOG.info(" -- connextion JNDI obtained  = " + conn);
 DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main

@@ -21,8 +21,11 @@ public class FindSubscriptionStatus {
      {
      try{
          LOG.info("entering subcriptionStatus");
+     //    LOG.info("entering subcriptionStatus with conn :" + conn);
+     //    conn = utils.DBConnection.getConnection2(); 
+         LOG.info("entering subcriptionStatus with conn restarted :" + conn);
          find.FindSubscription fs = new find.FindSubscription();
-        subscr = fs.subscriptionDetail(player, conn);
+         subscr = fs.subscriptionDetail(player, conn);
     //        LOG.info("subdcription = " + subscr..toPrint());
         if(subscr == null)  // player non trouvé ??
             {  String msg = "££ pas de subscription record for player = " + player.getIdplayer();

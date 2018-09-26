@@ -24,10 +24,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
+//import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
+//import java.util.concurrent.Executors;
+//import java.util.concurrent.ThreadLocalRandom;
+//import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
@@ -58,14 +59,15 @@ import org.primefaces.event.FlowEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.model.DualListModel;
-import org.primefaces.model.chart.BarChartModel;
-import org.primefaces.model.chart.CartesianChartModel;
-import org.primefaces.model.chart.LineChartModel;
-import org.primefaces.model.map.Circle;
-import org.primefaces.model.map.DefaultMapModel;
-import org.primefaces.model.map.MapModel;
-import org.primefaces.model.map.Marker;
-import org.primefaces.model.map.Overlay;
+import org.primefaces.model.*;
+//import org.primefaces.model.chart.BarChartModel;
+//mport org.primefaces.model.chart.CartesianChartModel;
+//import org.primefaces.model.chart.LineChartModel;
+//import org.primefaces.model.map.Circle;
+//import org.primefaces.model.map.DefaultMapModel;
+//import org.primefaces.model.map.MapModel;
+//import org.primefaces.model.map.Marker;
+//import org.primefaces.model.map.Overlay;
 import utils.*;
 @Named("courseC") // this qualifier  makes a bean EL-injectable (Expression Language)
 @SessionScoped
@@ -210,18 +212,18 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
         this.setSunRiseSet(null);
     }
 
-    @PostConstruct
-     public void init() // attention !! ne peut absolument pas avoir : throws SQLException
+ @PostConstruct
+ public void init() // attention !! ne peut absolument pas avoir : throws SQLException
     {
-   //     BasicConfigurator.configure();  pour log4j ÃƒÆ’Ã‚Â  ne faire qu'une fois ??
-        //    String msg = " Basic Configurator starting PostConstruct init ()    = ";
-        //    LOG.info(msg);
-    try
-        {
+    try{
     //        LOG.info("new");
-            conn = lc.golfnew.PostStartupBean.getConn();
+           conn = lc.golfnew.PostStartupBean.getConn();
            LOG.info("cette connection database sera utilisée pendant toute la session = "+ conn);
             
+  //         conn = lc.golfnew.PostStartupBean.getConn2();
+  //         LOG.info("cette connection database sera utilisée pendant toute la session = "+ conn);
+           
+           
   //    LOG.info("connection from poststartupbean = " + conn);
        LOG.info("** Webbrowser url = " + utils.LCUtil.firstPartUrl());
           
@@ -4206,12 +4208,6 @@ try{
         LOG.info(msg);
         
      // new 27-08-2018 https://stackoverflow.com/questions/7644968/httpsession-how-to-get-the-session-setattribute
-        
-    //    FacesContext context = FacesContext.getCurrentInstance();
-//        HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-    //    session.setAttribute("playerid", player.getIdplayer());
-    //    session.setAttribute("playerlastname", player.getPlayerLastName());
-  //  session.
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerid", player.getIdplayer());
         FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerlastname", player.getPlayerLastName());
    // mod 07-08-2018     
@@ -4222,26 +4218,24 @@ try{
         }
        
         LOG.info("going to subscriptionStatus ");
-        //    LCUtil.startAuditLogin(Integer.toString(player.getIdplayer() ) );
-
-// switch for logout
         setConnected(true); // affiche le bouton Logout dans header.xhtml
     // charger sun rise and sunset pour le joueur
     
-        if(getSunRiseSet() == null)
-        {   LOG.info("Calling findSun from selectPlayer");
+ ////       if(getSunRiseSet() == null)
+ ////       {   LOG.info("Calling findSun from selectPlayer");
         
         /// à modifier ultérieurement
 ////            String s = findSun();
 ////            LOG.info("String s = " + s);
 ////            setSunRiseSet(s);
-        }else{
-            LOG.info("getSunRiseSet = " + getSunRiseSet());
-        }
+ ////       }else{
+  ////          LOG.info("getSunRiseSet = " + getSunRiseSet());
+ ////       }
 // pour vérifier si subscription OK !!! et si pas OK afficher subscription.xhtml        
     //    return subscriptionStatus ( player); //, subscription);
-    find.FindSubscriptionStatus fss = new find.FindSubscriptionStatus();
-         return fss.subscriptionStatus(subscription, player, conn); //, subscription);
+        LOG.info("going to subscription status");
+         find.FindSubscriptionStatus fss = new find.FindSubscriptionStatus();
+     return fss.subscriptionStatus(subscription, player, conn); //, subscription);
 
   } catch (Exception e) {
             String msg = "££ Exception selectPlayer = " + e.getMessage() + " for player = " + player.getPlayerLastName();

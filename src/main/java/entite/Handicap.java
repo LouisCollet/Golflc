@@ -15,7 +15,7 @@ public class Handicap implements Serializable, interfaces.Log, interfaces.GolfIn
 {
     private static final long serialVersionUID = 1L;
     
-@NotNull(message="{handicap.start.notnull}")
+//@NotNull(message="{handicap.start.notnull}")
 @Past(message="{handicap.start.past}")
     private Date handicapStart;
 
