@@ -1,26 +1,27 @@
-package custom_validations;
+package validator;
 
-import static java.lang.annotation.ElementType.*; 
-
+import static interfaces.Log.LOG;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.*;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-//import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Documented
-@Constraint(validatedBy = FirstUpperValidator.class)
+@Constraint(validatedBy = CreditCardValidator.class)
 @Target( { ElementType.METHOD, ElementType.FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 
 // used by Club.Java poour vérifier si la première lettre du club est une majuscule
-public @interface FirstUpper
+public @interface CreditCardV
 {
-    String message() default "{club.name.uppercase}";
+//    LOG.info("we are now in CreditCardV");
+    String message() default "{creditcard.invalidnumber}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-    public int max() default 5; // added 1/11/2016
+    public int max() default 16; // added 1/11/2016
+
 }

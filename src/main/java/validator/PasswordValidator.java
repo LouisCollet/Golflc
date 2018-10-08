@@ -4,7 +4,7 @@
  * and open the template in the editor.
 https://www.mkyong.com/jsf2/multi-components-validator-in-jsf-2-0/
  */
-package custom_validations;
+package validator;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
@@ -23,10 +23,8 @@ public class PasswordValidator implements Validator {
 
 	  String password = value.toString();
 
-	  UIInput uiInputConfirmPassword = (UIInput) component.getAttributes()
-		.get("confirmPassword");
-	  String confirmPassword = uiInputConfirmPassword.getSubmittedValue()
-		.toString();
+	  UIInput uiInputConfirmPassword = (UIInput) component.getAttributes().get("confirmPassword");
+	  String confirmPassword = uiInputConfirmPassword.getSubmittedValue().toString();
 
 	  // Let required="true" do its job.
 	  if (password == null || password.isEmpty() || confirmPassword == null
@@ -36,7 +34,7 @@ public class PasswordValidator implements Validator {
 
 	  if (!password.equals(confirmPassword)) {
 		uiInputConfirmPassword.setValid(false);
-                String msg =  LCUtil.prepareMessageBean("password.notmatch");
+                String msg =  LCUtil.prepareMessageBean("password.confirmation.notmatch");
                     throw new ValidatorException(new FacesMessage(msg));
 	  }
 

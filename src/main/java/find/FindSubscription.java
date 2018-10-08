@@ -24,12 +24,13 @@ public class FindSubscription implements interfaces.Log
    private static List<Subscription> liste = null;
    final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
    
-public List<Subscription> subscriptionDetail (final Player player ,final Connection conn) throws SQLException
+public List<Subscription> subscriptionDetail (final Player player , Connection conn) throws SQLException, Exception
 {   
 ///if(liste == null)
-///{    LOG.debug("starting find subscription ...for player  = "  + player.getIdplayer());
+   LOG.debug("starting subscriptionDetail.for player  = "  + player.getIdplayer());
     PreparedStatement ps = null;
     ResultSet rs = null;
+ //   conn = DBConnection.getPooledConnection();
 try
 {   
     String query =
@@ -40,10 +41,10 @@ try
      ps = conn.prepareStatement(query);
      ps.setInt(1, player.getIdplayer()); 
          utils.LCUtil.logps(ps); 
-    rs =  ps.executeQuery();
-    rs.last(); //on récupère le numéro de la ligne
+     rs =  ps.executeQuery();
+     rs.last(); //on récupère le numéro de la ligne
         LOG.info("ResultSet FindSubscription has " + rs.getRow() + " lines.");
-    if(rs.getRow() == 0)
+     if(rs.getRow() == 0)
       {   String msg = "££ Empty Result Table in " + ClassName + " for player = " + player.getIdplayer();
       //String msg = "NullPointerException in " + npe;
         LOG.error(msg);

@@ -24,11 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-//import java.util.concurrent.ExecutorService;
 import java.util.concurrent.*;
-//import java.util.concurrent.Executors;
-//import java.util.concurrent.ThreadLocalRandom;
-//import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
@@ -47,7 +44,6 @@ import javax.faces.validator.ValidatorException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.MessagingException;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -59,15 +55,14 @@ import org.primefaces.event.FlowEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.model.DualListModel;
-import org.primefaces.model.*;
-//import org.primefaces.model.chart.BarChartModel;
-//mport org.primefaces.model.chart.CartesianChartModel;
-//import org.primefaces.model.chart.LineChartModel;
-//import org.primefaces.model.map.Circle;
-//import org.primefaces.model.map.DefaultMapModel;
-//import org.primefaces.model.map.MapModel;
-//import org.primefaces.model.map.Marker;
-//import org.primefaces.model.map.Overlay;
+import org.primefaces.model.chart.BarChartModel;
+import org.primefaces.model.chart.CartesianChartModel;
+import org.primefaces.model.chart.LineChartModel;
+import org.primefaces.model.map.Circle;
+import org.primefaces.model.map.DefaultMapModel;
+import org.primefaces.model.map.MapModel;
+import org.primefaces.model.map.Marker;
+import org.primefaces.model.map.Overlay;
 import utils.*;
 @Named("courseC") // this qualifier  makes a bean EL-injectable (Expression Language)
 @SessionScoped
@@ -95,7 +90,7 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
      @Inject private Flight flight;
      @Inject private Tarif tarif;
      @Inject private Creditcard creditcard;
-     
+     @Inject private Login login;
 
     private ClubCourseRound clubcourseround = new ClubCourseRound();
     private final static List<Integer> STROKEINDEX = new ArrayList<>();
@@ -197,6 +192,7 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
     private List<Player> lp = null;
 //private static BeID eID = null;
     private Connection conn = null;
+    private Connection connPool = null;
     private String radioButtonJSF;
     private String createModifyPlayer = "C";  // utilisé pour choisir player.xhtml ou player_modify.xhtml
     private String SunRiseSet; // = null; 
@@ -218,12 +214,14 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
     try{
     //        LOG.info("new");
            conn = lc.golfnew.PostStartupBean.getConn();
-           LOG.info("cette connection database sera utilisée pendant toute la session = "+ conn);
+             LOG.info("cette connection database sera utilisée pendant toute la session = "+ conn);
             
-  //         conn = lc.golfnew.PostStartupBean.getConn2();
-  //         LOG.info("cette connection database sera utilisée pendant toute la session = "+ conn);
+           connPool = utils.DBConnection.getPooledConnection();
+             LOG.info("cette connection pooled database sera réutilisée = "+ connPool);
            
-           
+             conn = connPool;
+             
+             
   //    LOG.info("connection from poststartupbean = " + conn);
        LOG.info("** Webbrowser url = " + utils.LCUtil.firstPartUrl());
           
@@ -435,26 +433,30 @@ if(currentUser.isPermitted("articles:publish")) {
   LOG.info("Primefaces version from myPOM.properties: " + version); 
   
   FacesContext facesContext = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-        Enumeration e = session.getAttributeNames();
+  HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+  Enumeration e = session.getAttributeNames();
     while (e.hasMoreElements())
     {
      String attr = (String)e.nextElement();
-        if(attr.equals("facelets.ui.DebugOutput")) continue;  // print view !!
-     
-        LOG.info("   session   attr  = "+ attr);
-        Object value2 = session.getAttribute(attr);
-        LOG.info("   session   value = "+ value2);
+        if(!attr.equals("facelets.ui.DebugOutput")){// continue;  // print view !!
+            LOG.info("   session   attr  = "+ attr);
+            Object value2 = session.getAttribute(attr);
+            LOG.info("   session   value = "+ value2);
+        }
     }
-  ServletRequest req = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+ ///        utils.LCUtil.logMap(session);
+  HttpServletRequest req = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
   HttpServletResponse res = (HttpServletResponse)FacesContext.getCurrentInstance().getExternalContext().getResponse();
-  
+  //utils.SessionSnoop ssno = new utils.SessionSnoop();
+  //ssno.doGet(req, res);
     LOG.info("we start a reset for all the working fields of the new session ");
   reset("from init in CourseController");
  //  LOG.info("leaving " + this.getClass().getSimpleName() + " Postconstruct init()");
    LOG.info("NEW session just started !! " + NEW_LINE);
  //  utils.MySessionCounter msc = new utils.MySessionCounter();
  //  LOG.info("The are activeSessions = : " + msc.getActiveSessions()); 
+// HttpServletRequest req = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+// HttpServletResponse res = (HttpServletResponse)FacesContext.getCurrentInstance().getExternalContext().getResponse();
 
  } catch (Exception e){
             String msg = "££ Exception in creating Connection or init in courseC = " + e.getMessage();
@@ -466,6 +468,14 @@ if(currentUser.isPermitted("articles:publish")) {
     @PreDestroy
     public void exit() {
         LOG.info(" ------------------ from CourseController PreDestroy exit ()...");
+    }
+
+    public Login getLogin() {
+        return login;
+    }
+
+    public void setLogin(Login login) {
+        this.login = login;
     }
 
     public String getEmoji() {
@@ -1708,15 +1718,12 @@ public void roundWorkDate(ValueChangeEvent valueChangeEvent) throws ParseExcepti
         }
     return null;
     } // end class selectcourse
-    
+
 public String selectTravel(ECourseList CCR) // mod 28/07/2017
     { 
     try {
         LOG.info(" entering select Travel ...");
             LOG.info(" select Travel with clubcourseround = " + CCR.toString());
-     ////    this.clubcourseround = CCR;
-  //          LOG.info("selectCourse, inputStat  = " + getInputStat());
- //           LOG.info("selectCourse, inputRound = " + getInputRound());
         club.setIdclub(CCR.Eclub.getIdclub());
             LOG.info("setted idClub = " + club.getIdclub());
         club.setClubName(CCR.Eclub.getClubName());
@@ -1747,18 +1754,14 @@ public String selectTravel(ECourseList CCR) // mod 28/07/2017
           LOG.info("getInputSelectCourse = " + getInputSelectCourse() ); // à vérifer
 //        if (getInputSelectCourse().equals("ChartCourse")) {
             return "maps_home_club.xhtml?faces-redirect=true"; //?cmd=Rnd"; // mod 30/07/2014
-//        } else {
-//            String s = "statChartRound.xhtml?faces-redirect=true";
-//            LOG.info("return = " + s);
-//            return s;
-//        }
+
     } catch (Exception e) {
             String msg = "££ Exception in selectTravel = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return null;
     }
-    } // end class selectTravel
+ } // end class selectTravel
  
   public String selectChart(ClubCourseRound CCR, String cmd)
   { try {
@@ -1917,6 +1920,7 @@ public String reset(String ini) // new 14/08/2014, called from menu
     tarif = new Tarif(); // new 18/03/2018
     creditcard = new Creditcard();
     holesGlobal = new HolesGlobal();
+    login = new Login();
  //      LOG.info("ending initialize entites , param = " + ini);
     return "reset OK "; // on retourne d'où on vient
      }catch (Exception ex){
@@ -3411,6 +3415,7 @@ public List<Player> listPlayers() throws SQLException {
 //            LOG.info("... entering listPlayers with conn = " + conn);
    try {
        lists.PlayersList pl = new lists.PlayersList();
+       // using pooled connections
        return pl.getListAllPlayers(conn);
    } catch (Exception ex) {
             String msg = "Exception in CourseController.listPlayers() " + ex;
@@ -4188,38 +4193,35 @@ public void modifyPlayer() throws SQLException, Exception
     return "selectInscription.xhtml?faces-redirect=true";  // refresh view without message !
   }
     
-public String selectPlayer(Player in_player) throws SQLException
-{
+public String selectPlayer(Player in_player) throws SQLException{
 try{
     LOG.info(" starting selectPlayer ");
  //   LOG.info(" starting selectPlayer = " + player.getIdplayer().toString());
         this.player =  in_player;
         // change language according to the user database language 
         LanguageController.setLanguage(player.getPlayerLanguage());
-        LOG.info("Language Player = " + player.getPlayerLanguage());
-  //      String msg = "Select Player Successful " + player.toString()
-  //              + " <br/> idplayer   = " + player.getIdplayer()
-  //              + " <br/> First name = " + player.getPlayerFirstName()
-  //              + " <br/> last name = " + player.getPlayerLastName()
-  //              + " <br/> country = " + player.getPlayerCountry()
-  //              + " <br/> city = " + player.getPlayerCity();
-  //      LOG.info(msg);
+            LOG.info("Language Player = " + player.getPlayerLanguage());
         String msg="selected Player = " + player.toString();
-        LOG.info(msg);
-        
-     // new 27-08-2018 https://stackoverflow.com/questions/7644968/httpsession-how-to-get-the-session-setattribute
-        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerid", player.getIdplayer());
-        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerlastname", player.getPlayerLastName());
-   // mod 07-08-2018     
+            LOG.info(msg);
+  // mod 07-08-2018     
         LOG.info("player password = " + player.getPlayerPassword());
+        
+        LOG.info("1. verifying if there is a password");
         if(player.getPlayerPassword() == null){
-            LOG.info("Yhe player has no password yet !! "); // + player.getPlayerPassword());
+            LOG.info("The player has no password yet !! ");
             return "password_create.xhtml?faces-redirect=true";
         }
-       
-        LOG.info("going to subscriptionStatus ");
-        setConnected(true); // affiche le bouton Logout dans header.xhtml
-    // charger sun rise and sunset pour le joueur
+          // new 27-08-2018 https://stackoverflow.com/questions/7644968/httpsession-how-to-get-the-session-setattribute
+       FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerid", player.getIdplayer());
+       FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerid", player.getIdplayer());
+   //     sessionMap.put("playerlastname", player.getPlayerLastName());
+  //          .filter(item -> (item.length() == 4))/
+       Map<String, Object> sessionMap = FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
+       utils.LCUtil.logMap(sessionMap);
+       setConnected(true); // affiche le bouton Logout dans header.xhtml
+        
+        
+    // charger sun rise and sunset pour le joueur ???
     
  ////       if(getSunRiseSet() == null)
  ////       {   LOG.info("Calling findSun from selectPlayer");
@@ -4233,9 +4235,13 @@ try{
  ////       }
 // pour vérifier si subscription OK !!! et si pas OK afficher subscription.xhtml        
     //    return subscriptionStatus ( player); //, subscription);
-        LOG.info("going to subscription status");
+        LOG.info("2. verifying if there is a subscription");
+        
          find.FindSubscriptionStatus fss = new find.FindSubscriptionStatus();
-     return fss.subscriptionStatus(subscription, player, conn); //, subscription);
+      
+         String view = fss.subscriptionStatus(subscription, player, conn);
+         LOG.info("after subscription verification, goint to : " + view);
+        return view;
 
   } catch (Exception e) {
             String msg = "££ Exception selectPlayer = " + e.getMessage() + " for player = " + player.getPlayerLastName();
@@ -4437,6 +4443,13 @@ public void rowPlayerSelect(SelectEvent event) {
     //        return;
         }
     }
+
+public void loginAPI(){
+    
+LOG.info("entering loginAPI coming from login_securityAPI.xhtml");
+LOG.info("username = " + login.getUsername());
+LOG.info("password = " + login.getPassword());
+        }
 
 public String login() throws IOException, SQLException {
         LOG.info("entering login coming from login.xhtml");

@@ -44,7 +44,7 @@
             <p:commandButton 
                         id="handicapButton"
                         actionListener="#{dialogC.viewHandicap()}"
-                        icon="ui-icon-extlink"
+                        icon="fa fa-binocular"
                         value="View Detail Hcp"
                         style="float:left"
                         onmouseover="this.style.cursor='default';this.style.backgroundColor='#F1F1F1';" 
@@ -195,12 +195,13 @@
                      >
         <p:printer target="form_handicap" />
     </p:commandButton>
-
+<!--
 <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
         <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check-square-o" />
         <p:commandButton value="No"  type="button" styleClass="ui-confirmdialog-no"  icon="fa fa-close" />
 </p:confirmDialog>
-
+-->
+<ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
 </ui:define>
 </ui:composition>

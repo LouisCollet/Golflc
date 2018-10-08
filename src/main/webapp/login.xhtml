@@ -60,11 +60,8 @@
 <o:onloadScript>alert('Welcome user - omnifaces msg!');</o:onloadScript>
 -->
 <h:form id="login" enctype="application/x-www-form-urlencoded" >
-
-    <!-- -->
 <p:panelGrid id="panel"
              columns="2"
-             
              >
 <f:facet name="header">
         <h1>#{msg['login.welcome']}</h1>
@@ -95,37 +92,6 @@
     </h:link>  
      
     
- <!--   
-<f:facet name="footer">
-    <p:commandButton value="#{msg['login.user.old']}"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         icon="ui-icon-person"
-                         action="selectPlayer.xhtml"/>
-
-   <p:splitButton value="#{msg['login.user.new']}"
-                  icon="ui-icon-circle-arrow-s"
-                  style="float:right;"
-                  >
-        <p:menuitem value="#{msg['login.user.belgian']}"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         icon="ui-icon-person"
-                         style="float:right;"
-                         action="register_eID_player.xhtml"/>
-        <p:menuitem value="#{msg['login.user.nonbelgian']}"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         icon="ui-icon-person"
-                         style="float: right;"
-                         action="player.xhtml"/>
-    </p:splitButton>
-
-</f:facet>
- -->
  
 <!--                         <p> 
                              Create a dummy array of size 5: 

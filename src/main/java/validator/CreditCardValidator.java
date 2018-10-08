@@ -1,4 +1,4 @@
-package custom_validations;
+package validator;
 
 import java.util.Scanner;
 import javax.validation.ConstraintValidator;

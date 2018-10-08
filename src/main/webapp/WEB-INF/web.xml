@@ -180,14 +180,14 @@ http://tandraschko.blogspot.be/ -->
         <param-name>primefaces.MOVE_SCRIPTS_TO_BOTTOM</param-name>
         <param-value>true</param-value>
     </context-param>
-    <!-- enlevé 15/12/2012 -->
+    <!-- enlevé 15/12/2012
     <resource-ref>
         <description>MySQL DB Connection</description>
         <res-ref-name>java:/MySqlDS</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
         <res-sharing-scope>Shareable</res-sharing-scope>
-    </resource-ref>
+    </resource-ref> -->
     <!-- Welcome page -->
     <welcome-file-list>
         <welcome-file>/login.xhtml</welcome-file>

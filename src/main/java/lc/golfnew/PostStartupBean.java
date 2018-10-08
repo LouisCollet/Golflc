@@ -3,16 +3,19 @@ package lc.golfnew;
 
 import static interfaces.Log.LOG;
 import java.sql.Connection;
+import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import utils.DBConnection;
 @Startup
 @Singleton
 @DependsOn("StartupBean")
+//@ApplicationScoped
 public class PostStartupBean {
    private static Connection conn = null;
-   private static Connection conn2 = null;
+   private static Connection connPool = null;
   @PostConstruct
   public void init(){
    try{
@@ -22,9 +25,19 @@ public class PostStartupBean {
     utils.DBConnection dbc = new utils.DBConnection();
     conn = dbc.getConnection();
         LOG.info("classic connection 1 = " + conn);
+   // configure UNE fois la datasource    !!!!!
+   utils.DBConnection.setDataSource();
+   connPool = DBConnection.getPooledConnection();
+        LOG.info("pooled connection 2 = " + connPool);
+   /// LOG.info("line 02");
+   TimeZone.setDefault(TimeZone.getTimeZone("Europe/Brussels"));
+   utils.LCUtil.ListAllSystemProperties();
+  // 
+   utils.DBMeta.listMetaData(connPool);
+//   security.CustomIdentityStore.;
    
-    conn2 = utils.DBConnection.getPooledConnection(); // pooled
-        LOG.info("pooled connection 2 = " + conn2);
+   
+    LOG.info("exiting PostStartupBean");
   }catch (Exception e){
 	LOG.error("Fatal Exception in PostStartupBean : "  + e);
 }
@@ -33,9 +46,7 @@ public class PostStartupBean {
     public static Connection getConn() {
         return conn;
     }
-    public static Connection getConn2() {
-        return conn2;
+    public static Connection getConnPool() {
+        return connPool;
     }
-    
-    
 } //end class

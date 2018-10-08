@@ -113,9 +113,22 @@
             <f:selectItem itemLabel="Discover"  itemValue="DISCOVER" />
             <f:selectItem itemLabel="China Union Pay"  itemValue="CHINA_UNION_PAY" />
        </h:selectOneMenu>
-    -->
+    
     
      <h:outputText value="#{msg['creditcard.type']} :"   />
+     -->
+   <h:panelGroup id="panelG2" layout="block" >
+        <h:outputText value="#{msg['creditcard.type']} :"  />
+                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-amex"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-diners-club"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-discover"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-jcb"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-mastercard"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-paypal"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-visa"></i></span>
+   </h:panelGroup>
+     
+     
      <h:selectOneMenu id="TypeCreditcard"
                           required="true"
                           valueChangeListener="#{courseC.creditCardTypeListener}"

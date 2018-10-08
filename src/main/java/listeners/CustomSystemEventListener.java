@@ -20,7 +20,7 @@ public class CustomSystemEventListener
      //   extends EventListener implements 
         implements Serializable, SystemEventListener, interfaces.GolfInterface, interfaces.Log , ServletContextListener
 {
-    private String Admin = null;
+  //  private String Admin = null;
     
     @Override
     public void processEvent(final SystemEvent event) throws AbortProcessingException
@@ -43,24 +43,7 @@ public class CustomSystemEventListener
     {
           //1. PostConstructApplicationEvent – Perform a custom post-configuration after application has started.
         LOG.info("Application Started : performBootstrap occurred! " + event);
-        utils.LCUtil.LCstartup();
-         
-        //    Application application = event.getApplication();
-  //         LOG.info("Application = " + application);
-  //     ProjectStage stage = application.getProjectStage();
-  //        LOG.info("Stage = " + stage);
-  //   if (ProjectStage.Development == stage)
-   //     {
-  //          LifecycleFactory lcFactory = (LifecycleFactory) FactoryFinder.getFactory(FactoryFinder.LIFECYCLE_FACTORY);
-  //         Lifecycle lc = lcFactory.getLifecycle(LifecycleFactory.DEFAULT_LIFECYCLE);
-    //       lc.addPhaseListener(new PhaseListener());
-
-  //  }
     }
-        // do other stuff related to bootstrapping:
-        // 1) check for availablity of web services
-        // 2) init ressources
-        // ...
  private void performTearDown(final PreDestroyApplicationEvent event)
  {
         LOG.info("Application Destroyed : performTearDown occurred! " + event);
@@ -142,7 +125,7 @@ if(event instanceof PreDestroyApplicationEvent)
          LOG.info("PreDestroyApplicationEvent occurred : Application is stopping." + NEW_PAGE);
       }
 }
-*/
+
     public String getAdmin() {
         return Admin;
     }
@@ -150,7 +133,7 @@ if(event instanceof PreDestroyApplicationEvent)
     public void setAdmin(String Admin) {
         this.Admin = Admin;
     }
-
+*/
  //   @Override
 //    public void contextInitialized(ServletContextEvent sce) {
  //       throw new UnsupportedOperationException("contextInitialized is Not supported yet."); //To change body of generated methods, choose Tools | Templates.

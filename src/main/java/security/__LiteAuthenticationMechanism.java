@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @ApplicationScoped
 
-public class LiteAuthenticationMechanism implements HttpAuthenticationMechanism {
+public class __LiteAuthenticationMechanism implements HttpAuthenticationMechanism {
    @Inject
    private IdentityStoreHandler idStoreHandler;
    @Override

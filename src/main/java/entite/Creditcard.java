@@ -1,6 +1,6 @@
 package entite;
 
-import custom_validations.CreditCardV;
+import validator.CreditCardV;
 import static interfaces.GolfInterface.SDF;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;

@@ -36,8 +36,8 @@
         <omnifaces.version>3.2</omnifaces.version> <!-- 07/09/2018 was 3.1 -->
         <junit.version>5.0.0-ALPHA</junit.version> <!-- was 4.7 mod 4/6/2016 -->
         <java.version>1.8</java.version> <!-- only used via MyPOM properties -->
-        <maven.compiler.source>1.8</maven.compiler.source> <!-- was 1.8 mod 08-08-2018 -->
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source> <!-- was 1.8 mod 26-09-2018 -->
+        <maven.compiler.target>1.8</maven.compiler.target><!-- was 1.8 mod 26-09-2018 -->
         <javaee.version>8.0</javaee.version> <!-- was 7.0 mod 26-04-2014 -->
         <java.mail.version>1.6.1</java.mail.version> <!-- was 7.0 mod 26-04-2014 -->
         <javax.activation.version>1.2.0</javax.activation.version>
@@ -45,7 +45,7 @@
         <!--<glassfish.version>4.1.1</glassfish.version>  was 4.1 on 17/10/2015 -->
         <!--<wildfly.version>Wildfly-10.1.0.Final</wildfly.version> not used meme plus pour via MyPOM properties -->
         <hibernate.version>3.5.3.Final</hibernate.version> <!-- only used via MyPOM properties -->
-        <maven.version>3.5.2</maven.version> <!-- only used via MyPOM properties -->
+        <maven.version>3.5.4</maven.version> <!-- only used via MyPOM properties -->
   <!--  Maven plugins -->       
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version><!-- was 3.7.0 mod 25-09-2018 -->
         <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version> <!-- was 3.0.0 mod 14/07/2018 -->
@@ -526,22 +526,23 @@ https://mvnrepository.com/artifact/javax.faces/javax.faces-api
     <artifactId>passay</artifactId>
     <version>1.3.1</version>
 </dependency>
-<!-- add 09-009-2018  -->
-<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-ejb-client-bom -->
+<!-- add 09-09-2018  -->
+<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-ejb-client-bom 
 <dependency>
     <groupId>org.wildfly</groupId>
     <artifactId>wildfly-ejb-client-bom</artifactId>
     <version>14.0.0.Final</version>
     <type>pom</type>
 </dependency>
-<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-jms-client-bom -->
+-->
+<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-jms-client-bom 
 <dependency>
     <groupId>org.wildfly</groupId>
     <artifactId>wildfly-jms-client-bom</artifactId>
     <version>14.0.0.Final</version>
     <type>pom</type>
 </dependency>
-
+-->
 <!-- https://github.com/vdurmont/emoji-java  
 <dependency>
   <groupId>com.vdurmont</groupId>

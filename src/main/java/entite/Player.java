@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
@@ -121,7 +122,10 @@ public Player()    // constructor
     droppedPlayers = new ArrayList<>();
     wrkpassword = "";
 }
-
+@PostConstruct
+    public void init(){
+    //    user = new User("Elder Moraes", "elder@eldermoraes.com");
+}
 // getter and setters
 
     public Integer getIdplayer()

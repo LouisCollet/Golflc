@@ -15,11 +15,13 @@ public class Subscription implements Serializable, interfaces.Log, interfaces.Go
     private LocalDate startDate;
     private LocalDate endDate; // mod 30/01/2017
     private String subCode;
-    @Max(value=5,message="{club.latitude.max}")
+    @Max(value=5,message="{subscription.trial.max}")
     private Integer trialCount;
 
 public Subscription()    // constructor
-{ }
+{ 
+// empty
+}
 
 // getter and setters
 

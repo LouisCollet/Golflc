@@ -24,25 +24,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import utils.LCUtil;
 //https://github.com/rdebusscher/soteria-customform-ldap-example/blob/master/src/main/java/be/c4j/security/soteria/test/LoginBean.java 
 
 @CustomFormAuthenticationMechanismDefinition(
         loginToContinue = @LoginToContinue(
-                loginPage="/login_securityAPI.xhtml",
+                loginPage="login_securityAPI.xhtml",
                 errorPage="error_securityAPI.xhtml" // DRAFT API - must be set to empty for now
         )
 )
-/*
-@LdapIdentityStoreDefinition(
-        url = "ldap://www.zflexldap.com/",
-        baseDn = "cn=ro_admin,ou=sysadmins,dc=zflexsoftware,dc=com",
-        password = "zflexpass",
-        searchBase = "ou=developers,dc=zflexsoftware,dc=com",
-        searchExpression = "(&(uid=%s)(objectClass=person))",
-        groupBaseDn = "ou=groups,ou=developers,dc=zflexsoftware,dc=com"
-)
-*/
-@Named
+
+@Named("loginBean")
 @RequestScoped
 public class LoginBean {
 
@@ -50,19 +42,60 @@ public class LoginBean {
     private SecurityContext securityContext;
 
     @NotNull
-    @Size(min = 3, max = 15, message = "Username must be between 3 and 15 characters")
+    @Size(min = 3, max = 15, message = "Username must be between {min} and {max} characters")
     private String username;
 
-    @NotNull
-    @Size(min = 5, max = 50, message = "Password must be between 5 and 50 characters")
+    @NotNull(message="{password.notnull}")
+    @Size(min = 5, max = 50, message = "Password must be between {min} and {max} characters")
     private String password;
 
-    public void login() {
+    /*
+    public void submit() throws IOException {
+
+        // credential that want to be validate was UsernamePasswordCredential
+        Credential credential = new UsernamePasswordCredential(username, new Password(password));
+
+        // this will call our security configuration to authorize the user
+        AuthenticationStatus status = this.securityContext.authenticate(
+                getRequest(),
+                getResponse(),
+                withParams()
+                        .credential(credential)
+                        .newAuthentication(!loginToContinue)
+                        .rememberMe(remember)
+        );
+
+        if (status.equals(SUCCESS)) {
+
+            redirect("index.xhtml");
+
+        } else if (status.equals(SEND_FAILURE)) {
+
+            addGlobalError("auth.message.error.failure");
+            validationFailed();
+
+        }
+}
+    */
+    public void start(){
+        LOG.info("starting LoginBean ");
+    }
+    
+    public void login(){
+        try{
             LOG.info("starting login of LoginBean");
         FacesContext context = FacesContext.getCurrentInstance();
+     //   securityContext.
         LOG.debug("line 01");
+        LOG.info("username = " + getUsername());
+        LOG.info("password = " + getPassword());
+   //     LOG.info("securitycontext = " + securityContext.getCallerPrincipal().getName());
+    //    Credential credential = new UsernamePasswordCredential(username, new Password(password));
+     //   Credential credential = new UsernamePasswordCredential(username,password);
         Credential credential = new UsernamePasswordCredential(username, new Password(password));
-LOG.debug("line 02 credential = " + credential);
+   //     Credential cr = new UsernamePasswordCredential();
+        
+        LOG.debug("line 02 credential = " + credential);
         // Request for authentication
         AuthenticationStatus status = securityContext.authenticate(
                 getRequest(context),
@@ -77,7 +110,11 @@ LOG.debug("line 02 credential = " + credential);
             // TODO: only 1 status should be returned. Change to enum or fix source.
             addError(context, "Authentication failed");
         }
-
+ } catch (Exception e){
+            String msg = "££ Exception in login = " + e.getMessage();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+     }
     }
 
     public void logout() {
@@ -112,17 +149,17 @@ LOG.debug("line 02 credential = " + credential);
     }
 
     public String getUsername() {
-          LOG.info("getUsername");
+          LOG.info("getUsername = " + username);
         return username;
     }
 
     public void setUsername(String username) {
-        LOG.info("setUsername");
+        LOG.info("setUsername = " + username);
         this.username = username;
     }
 
     public String getPassword() {
-         LOG.info("getPassword");
+         LOG.info("getPassword = " + password);
         return password;
     }
 

@@ -61,18 +61,9 @@
         </p:confirm>
     </p:commandButton>
  
-    <p:confirmDialog global="true" showEffect="fade" hideEffect="explode">
-        <p:commandButton 
-            value="Oui"
-            type="button"
-            styleClass="ui-confirmdialog-yes"
-            icon="ui-icon-check"/>
-        <p:commandButton
-            value="Non"
-            type="button"
-            styleClass="ui-confirmdialog-no"
-            icon="ui-icon-close"/>
-    </p:confirmDialog>
+    
+    <ui:include src="include/include_confirmDialog.xhtml"/>
+ 
 </f:facet>
 
 </p:panelGrid>

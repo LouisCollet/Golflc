@@ -15,12 +15,11 @@ public class StartupBean // implements interfaces.GolfInterface
    
     @PostConstruct
     public void initialize() {
-        state = States.BEFORESTARTED;
-        LOG.info("Wildfly - We just created an EJB Startup Service with state = " + state);
+     //   state = States.BEFORESTARTED;
+    //    LOG.info("Wildfly - We just created an EJB Startup Service with state = " + state);
    //     LOG.info("intitialize - is this the moment to open the database ??"); // Perform intialization open database ?
-       
         state = States.STARTED;
-        LOG.info("Wildfly - StartupBean initialized - state " + state);
+        LOG.info("Wildfly - StartupBean initialized - state " + States.STARTED);
     }
     
     @PreDestroy
@@ -28,14 +27,12 @@ public class StartupBean // implements interfaces.GolfInterface
     {
         state = States.SHUTTINGDOWN;
         // Perform termination
-        LOG.info("Wildfly - terminate - Shut down in progress, state =  " + state);
+        LOG.info("Wildfly - terminate - Shut down in progress, state =  " + States.SHUTTINGDOWN);
     }
-    public States getState()
-    {
+    public States getState(){
         return state;
     }
-    public void setState(States state)
-    {
+    public void setState(States state){
         this.state = state;
     }
 } //end class

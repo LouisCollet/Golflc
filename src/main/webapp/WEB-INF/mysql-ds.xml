@@ -1,6 +1,14 @@
 <datasources xmlns="http://www.jboss.org/ironjacamar/schema">
     <!--  définition de la datasource, indépendante de la version wildfly et donc de standalone-full.xml
 à recopier de la version standalone-full !!
+se trouve sous GolfWfly > Web Pages > WEB-INF
+
+http://middlewaremagic.com/jboss/?p=1050
+            <logger category="org.jboss.jca">
+                <level name="TRACE"/>
+            </logger>
+à ajouter à standalone-full.xml pour un loggin très détaillé
+
     -->
   <datasource jndi-name="java:jboss/datasources/MySqlDB" pool-name="MySQLPool">
       <connection-url>jdbc:mysql://localhost:3307/golflc</connection-url>
@@ -14,4 +22,50 @@
           <password>lc1lc2</password>
       </security>
   </datasource>
+  <!-- utilisée dans golflc attention &amp; !!!!! -->
+  <datasource jta="true"
+              jndi-name="java:jboss/datasources/golflc" 
+              pool-name="MySqlDS" 
+              enabled="true" 
+              use-java-context="true"
+              spy="true"
+              use-ccm="true">
+                    <connection-url>jdbc:mysql://localhost:3307/golflc?AllowMultiQueries=true&amp;AllowUserVariables=true&amp;useSSL=false&amp;nullNamePatternMatchesAll=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>
+                    <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
+                    <driver>mysql-connector-java-8.0.12.jar</driver>
+                    <pool>
+                        <min-pool-size>10</min-pool-size>
+                        <max-pool-size>20</max-pool-size>
+                    </pool>
+                    <security>
+                        <user-name>LouisCollet</user-name>
+                        <password>lc1lc2</password>
+                    </security>
+  </datasource>
+  
 </datasources>
+
+<!-- à tester
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
+                        <check-valid-connection-sql>select 1</check-valid-connection-sql>
+                        <background-validation>true</background-validation>
+                        <background-validation-millis>2000</background-validation-millis>
+                        <stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.spi.StaleConnection"/>
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
+                    </validation>
+                       <timeout>
+                        <set-tx-query-timeout>true</set-tx-query-timeout>
+                        <blocking-timeout-millis>20000</blocking-timeout-millis>
+                        <idle-timeout-minutes>15</idle-timeout-minutes>
+                        <query-timeout>120</query-timeout>
+                        <use-try-lock>100</use-try-lock>
+                        <allocation-retry>2</allocation-retry>
+                        <allocation-retry-wait-millis>3000</allocation-retry-wait-millis>
+                    </timeout>
+                    <statement>
+                        <track-statements>nowarn</track-statements>
+                        <prepared-statement-cache-size>30</prepared-statement-cache-size>
+                        <share-prepared-statements>true</share-prepared-statements>
+                    </statement>
+-->

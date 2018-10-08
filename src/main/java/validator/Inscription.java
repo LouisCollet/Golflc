@@ -1,4 +1,4 @@
-package custom_validations;
+package validator;
 
 import static java.lang.annotation.ElementType.*; //ANNOTATION_TYPE;
 //import static java.lang.annotation.ElementType.CONSTRUCTOR;

@@ -1,4 +1,4 @@
-package custom_validations;
+package validator;
 
 //import entite.ScoreMatchplay;
 import java.util.Arrays;

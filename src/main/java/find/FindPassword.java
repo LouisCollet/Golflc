@@ -46,10 +46,12 @@ try
         return true;
       }    
     if(rs.getRow() == 0)
-      {   String msg = "££ Password does not match " + ClassName +  " for player = " + player.getIdplayer()
-              +  " for password = " + player.getWrkpassword();
-        LOG.error(msg);
+      {   String msg =  LCUtil.prepareMessageBean("password.notmatch");
+        //  String msg = "££ Password does not match " 
+         //     +  " for password = " + ;
+       
         LCUtil.showMessageFatal(msg);
+            LOG.error(msg + " for player = " + player.getIdplayer() + " // " + player.getWrkpassword());
         return false;
         
      //     throw new LCCustomException(msg);

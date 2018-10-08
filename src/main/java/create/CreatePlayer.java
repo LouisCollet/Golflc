@@ -140,21 +140,4 @@ catch (SQLException sqle) {
         }
 //         return false;
     } //end createplayer
-/*
-    @Override
-    public boolean modifyPlayer(Player player, Connection conn) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public String deletePlayerAndChilds(int idplayer, Connection conn) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<Player> getListAllPlayers(Connection conn) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-*/
 } //end Class

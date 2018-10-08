@@ -35,6 +35,11 @@ if(liste == null)
 try
 {
             ps = conn.prepareStatement(query);
+            
+                LOG.info("line03");
+             utils.LCUtil.logps(ps);
+                LOG.info("line04");
+            
             rs = ps.executeQuery();
             while (rs.next())
             {

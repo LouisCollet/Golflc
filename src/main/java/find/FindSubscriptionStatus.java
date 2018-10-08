@@ -1,7 +1,6 @@
 
 package find;
 
-import create.CreateSubscription;
 import entite.Player;
 import entite.Subscription;
 import static interfaces.Log.LOG;
@@ -23,17 +22,18 @@ public class FindSubscriptionStatus {
          LOG.info("entering subcriptionStatus");
      //    LOG.info("entering subcriptionStatus with conn :" + conn);
      //    conn = utils.DBConnection.getConnection2(); 
-         LOG.info("entering subcriptionStatus with conn restarted :" + conn);
+   //  conn = DBConnection.getPooledConnection();
+  //       LOG.info("entering subcriptionStatus with new conn :" + conn);
          find.FindSubscription fs = new find.FindSubscription();
          subscr = fs.subscriptionDetail(player, conn);
-    //        LOG.info("subdcription = " + subscr..toPrint());
+            LOG.info("subscription detail found = " + subscr.toArray().toString());
         if(subscr == null)  // player non trouvé ??
             {  String msg = "££ pas de subscription record for player = " + player.getIdplayer();
-                CreateSubscription cs = new CreateSubscription();
-                cs.createSubscription(player, conn);
+              //  CreateSubscription cs = new CreateSubscription();
+              //  cs.createSubscription(player, conn);
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
-                
+                return "subscription.xhtml?faces-redirect=true";
             }
     //    LOG.info("after call findssubcription");
         LOG.info("subscription playerid " + subscr.get(0).getIdplayer());
@@ -43,7 +43,7 @@ public class FindSubscriptionStatus {
         LOG.info("subscription endDate " + subscription.getEndDate());
         LOG.info("subscription Trial Count " + subscription.getTrialCount());
        
-      if(subscription.getTrialCount() > 5)
+     if(subscription.getTrialCount() > 5)
           {LOG.info("subscription Trial > 5 - Subscription Month of Year !!!");
             String msg = "Trial exceeded "
                   + " player = " + player.getIdplayer()

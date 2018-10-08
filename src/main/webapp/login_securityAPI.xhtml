@@ -13,13 +13,13 @@
 >
 
 <ui:composition template="templates/loginTemplate.xhtml">
-    <!--  new 27-08-2018  -->
+    <!--  new 27-08-2018  
 <ui:define name="metadata">
     <f:metadata>
-        <f:viewAction action="#{courseC.login()}"/>
+        <f:viewAction action="#{courseC.login.start()}"/>
     </f:metadata>
 </ui:define>
-
+-->
 <ui:define name="title">
     Login
 </ui:define>
@@ -56,18 +56,23 @@
 
 <h:form id="login_security" enctype="application/x-www-form-urlencoded">
             <p:panelGrid columns="2">
-                <h:outputText for="userName" value="Username"/>
-                <p:inputText id="userName" value="#{loginBean.username}" required="true"/>
+                <h:outputText value="Username"/>
+                <p:inputText id="userName"
+                             value="#{courseC.login.username}"
+                             />
 
-                <h:outputText for="password" value="Password"/>
-                <h:inputSecret id="password" value="#{loginBean.password}" required="true"/>
+                <h:outputText value="Password"/>
+                <h:inputSecret id="password"
+                               value="#{courseC.login.password}"
+                               />
             </p:panelGrid>
     <p:commandButton value="#{msg['login.user.old']}"
                          update="growl-msg"
                          immediate="true"
                          ajax="false"
-                         icon="ui-icon-person"
-                         action="#{loginBean.login}"/>
+                         icon="fa fa-key"
+                         action="#{courseC.loginAPI}"
+                         />
 
  </h:form>
 </ui:define>

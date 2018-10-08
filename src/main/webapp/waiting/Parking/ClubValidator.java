@@ -1,5 +1,6 @@
 package custom_validations;
 
+import validator.ClubValidation;
 import entite.Club;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -110,7 +110,7 @@
         </h:graphicImage>
     <f:param name="idplayer" value="#{courseC.player.idplayer}" />
     <f:param name="playerFirstName" value="#{courseC.player.playerFirstName}" />
-    <f:param name="playerLastName" value="#{courseC.player.playerLastName}" />
+    <f:param name="playerLastName"  value="#{courseC.player.playerLastName}" />
 </h:link>
 
 <f:facet name="footer">
@@ -120,9 +120,9 @@
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         icon="ui-icon-circle-arrow-e"
+                         icon="fa fa-question-circle"
                          style="float: left;"
-                        action="#{courseC.forgetPassword}"
+                         action="#{courseC.forgetPassword}"
                          />
         <p:commandButton
                          value="#{msg['button.password.modify']}"
@@ -130,7 +130,7 @@
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         icon="ui-icon-circle-arrow-e"
+                         icon="fa fa-key"
                          style="float: right;"
                          action="password_modify.xhtml"/>
 

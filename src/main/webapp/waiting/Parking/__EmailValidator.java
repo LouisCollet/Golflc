@@ -26,7 +26,7 @@ import org.primefaces.validate.ClientValidator;
  
  */
  
-@FacesValidator("custom.emailValidator")
+@FacesValidator("emailValidator")
  
 public class __EmailValidator implements Validator, ClientValidator {
   private Pattern pattern;

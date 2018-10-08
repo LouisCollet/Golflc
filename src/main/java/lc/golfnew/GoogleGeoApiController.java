@@ -136,21 +136,25 @@ public class GoogleGeoApiController
       //https://maps.googleapis.com/maps/api/timezone/json?location=39.6034810,-119.6822510&timestamp=1331161200&key=YOUR1331161200
         LOG.info("welcome to findTimeZone with LatLng latlng =  " + latlng + " with locale = " + locale);
         if (latlng == null)
-       { LOG.info("latlng = null - nothing in findLatLng");
-        return null;} 
-        
+            { LOG.info("latlng = null - nothing in findLatLng");
+              return null;
+            } 
  //     long t = System.currentTimeMillis() / 1000;
  //       LOG.info("long timestamp in seconds = " + t);
  //     String ts = String.valueOf(t);
  //       LOG.info("String timestamp in seconds = " + ts);
    //   String lang = "es";
+      java.time.Clock clock = java.time.Clock.systemDefaultZone();
       String string_url = "https://maps.googleapis.com/maps/api/timezone/json"
               + "?location="  + latlng
               + "&key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc"  // new 09-08-2018
-              + "&timestamp=" + String.valueOf(System.currentTimeMillis()/1000) // google api demande des secondes 
+        //      + "&timestamp=" + String.valueOf(System.currentTimeMillis()/1000) // google api demande des secondes 
+              + "&timestamp=" + String.valueOf(clock.millis()/1000) // google api demande des secondes 
               + "&language="  + locale // paramètre supplémentaire
       ;
- //     LOG.info("String_url = " + string_url);
+ //  
+// long millis = clock.millis();
+// LOG.info("String_url = " + string_url);
  // attention ssl est nécessaire si on utilise la key
 ///  URL url = new URL(URL_TZ + "?location=" + URLEncoder.encode(latlng, "UTF-8") + "&timestamp=133116120" ); //location=50.8262271%2C4.3571382
 //URL url = new URL("https://maps.googleapis.com/maps/api/timezone/json?location=50.8262271,4.3571382&timestamp=1331161200&language=es");

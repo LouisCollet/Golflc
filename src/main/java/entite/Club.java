@@ -1,8 +1,8 @@
 package entite;
 
 import com.google.maps.model.LatLng;
-import custom_validations.ClubValidation;
-import custom_validations.FirstUpper;
+import validator.ClubValidation;
+import validator.FirstUpper;
 import googlemaps.GoogleTimeZone;
 import static interfaces.GolfInterface.NEWLINE;
 import java.io.Serializable;

@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.faces.application.FacesMessage;
@@ -36,10 +38,9 @@ import javax.imageio.ImageIO;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletContext;
-import lc.golfnew.PostStartupBean;
 import org.primefaces.PrimeFaces;
 import org.primefaces.context.RequestContext;
-
+//import org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8;
 /**
  *
  * @author Louis Collet
@@ -445,7 +446,9 @@ public static void printArray3DInt(int [][][] t)
 public static void startExecutionTimer()
   {
       reset();
-      startTime = System.currentTimeMillis();
+   //   startTime = System.currentTimeMillis();
+      Clock clock = Clock.systemDefaultZone();
+      startTime = clock.millis();
   }
 
 /**
@@ -453,7 +456,9 @@ public static void startExecutionTimer()
  */
 public static void stopExecutionTimer()
   {
-    stopTime = System.currentTimeMillis();
+      Clock clock = Clock.systemDefaultZone();
+  //  stopTime = System.currentTimeMillis();
+      stopTime = clock.millis();
   }
 
 /**
@@ -1008,11 +1013,57 @@ for (File file : files)
 } // end for
 } // end method
 
-public static void logps(PreparedStatement ps)
-{
-           String p = ps.toString();
-        LOG.debug("Prepared Statement = " + p.substring(p.indexOf(":"), p.length() ));
 
+public static void logps(PreparedStatement ps) 
+{
+  try{
+        LOG.info("entering logps");     
+        //avec connection pool p = org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8@10b61e60
+//        org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8.
+        //connection classique p = com.mysql.cj.jdbc.ClientPreparedStatement: SELECT idplayer, PlayerFirstName, PlayerLastName, PlayerCity, Play
+    String p = ps.toString();
+    LOG.info("p toString = " + p);
+    if(p.contains("WrappedPreparedStatement")){
+        LOG.info("pooled connection");
+    }else{
+      //  LOG.info("p 0 = " + p.substring(0));
+        LOG.debug("Prepared Statement after bind variables set= " + p.substring(p.indexOf(":"), p.length() ));
+    }
+   }catch (Exception e){
+        LOG.error("logpMap Exception " + e);
+      }
+}
+
+public static void logMap(Map<String, Object> map){
+  try{
+        LOG.info("entering logMap");     
+
+     /*   // 4. Java 8 - using Stream.forEach()
+		map.entrySet()
+			.stream()
+                        .filter(x -> !x.getKey().equals("facelets.ui.DebugOutput"))
+			.forEach(System.out::println);
+        */
+        
+       Map<String, Object> collect = map.entrySet()
+                .stream()
+		.filter(x -> !x.getKey().equals("facelets.ui.DebugOutput"))  // avoid printing .xhtml files
+	//	.collect(Collectors.toMap(x -> x.getKey(), x -> x.getValue()));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+       collect.forEach((String key, Object value) -> {
+            LOG.info("SessionMap Key : " + key  +" // " + "SessionMap Value : " + value);
+            });
+    /*   
+       map.entrySet().stream()
+            .map(e -> e.getKey() + ": " + e.getValue())
+            .filter(!getKey().equals("facelets.ui.DebugOutput"))  // avoid printing .xhtml files   
+            .forEach(e -> LOG.info("SessionMap one shot " + e));
+       
+       
+       */
+   }catch (Exception e){
+        LOG.error("logps Exception " + e);
+      }
 }
 public static void LCstartup() throws Exception //throws SQLException //throws SQLException
 {
@@ -1037,7 +1088,8 @@ try{
       }
     
    // DBMeta.listMetaData(conn);
-   DBMeta.listMetaData(PostStartupBean.getConn());
+   // DBMeta.listMetaData(PostStartupBean.getConn());
+   DBConnection.getPooledConnection();
    ListAllSystemProperties();
    
  //  DBConnection.closeQuietly(conn, null, null, null);
@@ -1317,7 +1369,9 @@ return ld;
 }
   
   public static void ListAllSystemProperties() {
-
+try{
+    /*
+      LOG.info("entering listallsystemproperties");
         Properties systemProperties = System.getProperties();
         Enumeration enuProp = systemProperties.propertyNames();
         while (enuProp.hasMoreElements()) {
@@ -1325,10 +1379,23 @@ return ld;
             String propertyValue = systemProperties.getProperty(propertyName);
             LOG.debug("System property Name = " + propertyName + " Value = " + propertyValue);
         }
-   // }
+ */
+   System.getenv().forEach((k, v) -> {
+    LOG.info("getenv() = "+ k + ":" + v);
+    });
+ 
+   System.getProperties().entrySet().stream()
+            .map(e -> e.getKey() + ": " + e.getValue())
+            .forEach(e -> LOG.info("System Property " + e));
+// liste.forEach(item -> LOG.info("Flight list " + item));  // java 8 lambda
 
+}catch (Exception e){
+    String msg = "error listallasystemproperties = " + e ;
+        LOG.error("error = " + msg );
+        }
 }
   
+
 public static void main(String[] args) // throws IOException,Exception
 {
 } //end class main
