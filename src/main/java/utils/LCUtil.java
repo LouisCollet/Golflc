@@ -1,6 +1,5 @@
 package utils;
 
-import entite.Player;
 import entite.ScoreMatchplay;
 import static interfaces.Log.LOG;
 import java.awt.*;
@@ -38,6 +37,7 @@ import javax.imageio.ImageIO;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletContext;
+import static org.apache.commons.lang3.StringUtils.repeat;
 import org.primefaces.PrimeFaces;
 import org.primefaces.context.RequestContext;
 //import org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8;
@@ -160,13 +160,11 @@ public static void delayLC() {// throws InterruptedException, ExecutionException
     */
     
 }
-public static LocalDateTime DatetoLocalDateTime(java.util.Date date)
-{
+public static LocalDateTime DatetoLocalDateTime(java.util.Date date){
   return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 }
 
-public static LocalDate DatetoLocalDate(java.util.Date date)
-{
+public static LocalDate DatetoLocalDate(java.util.Date date){
   return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 }
 /**
@@ -193,6 +191,7 @@ public static LocalDate DatetoLocalDate(java.util.Date date)
         if (date instanceof LocalDate)
             return java.util.Date.from(((LocalDate) date).atStartOfDay(zone).toInstant());
         if (date instanceof LocalDateTime)
+               //    java.util.Date.from(date.atZone(zone).toInstant());
             return java.util.Date.from(((LocalDateTime) date).atZone(zone).toInstant());
         if (date instanceof ZonedDateTime)
             return java.util.Date.from(((ZonedDateTime) date).toInstant());
@@ -246,9 +245,9 @@ public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat) // java.sql
 
 
 public static String secondsToString(int time){
-   int seconds = (int)(time % 60);
-   int minutes = (int)((time/60) % 60);
-   int hours   = (int)((time/60*60) % 24);
+   int seconds = (time % 60);
+   int minutes = ((time/60) % 60);
+   int hours   = ((time/60*60) % 24);
    //int days    = (int)((time/60*60*24) % 8);
    String secondsStr = (seconds<10 ? "0" : "")+ seconds;
    String minutesStr = (minutes<10 ? "0" : "")+ minutes;
@@ -335,10 +334,9 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
    * @param monTableau
    * @return
    */
-  public static int getArrayDimension(Object monTableau )
-{
+  public static int getArrayDimension(Object monTableau ){
         int dim=0;
-        Class cls = monTableau.getClass();
+        Class<?> cls = monTableau.getClass();
         while( cls.isArray() )
         {
                 cls = cls.getComponentType();
@@ -482,7 +480,7 @@ public static void reset() {
    */
   public static void javaSpecs()
 {
-   final java.util.Enumeration liste = System.getProperties().propertyNames();
+   final java.util.Enumeration<?> liste = System.getProperties().propertyNames();
     String cle;
     while( liste.hasMoreElements() )
     {
@@ -560,7 +558,7 @@ static public String dumpJavaProperties()
       e.printStackTrace();
       return "";
     }
-    final java.util.Enumeration en = p.propertyNames();
+    final java.util.Enumeration<?> en = p.propertyNames();
     while (en.hasMoreElements())
     {
       final String s = (String) en.nextElement();
@@ -717,15 +715,21 @@ try{
         }     
 } // end method
 
-public static void showMessageFatal(String summary)
-{            
+//@Inject
+//private Flash flash;
+public static void showMessageFatal(String summary){
     try{
  ////       LOG.info("entering showMessageFatal " + FacesContext.getCurrentInstance() );
         if(RequestContext.getCurrentInstance() == null){
             LOG.info("RequestContext.getCurrentInstance() == null");   
     //        RequestContext.getCurrentInstance().execute("{alert('Welcome user - showMessageFatal error!')}");
         }
-  
+  // 2.2
+//Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
+// 2.3  
+
+   //     flash.setKeepMessages(true); ne fonctionne pas avec static context !!!
+
        FacesContext fc = FacesContext.getCurrentInstance();
        fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
 //        LOG.info("face context batch" + FacesContext.getCurrentInstance().getApplication());
@@ -753,7 +757,8 @@ catch (Exception cv)
 
 public static void showMessageInfo(String summary)
 {
-   // FacesContext as an object is tied directly to the JSF request processing lifecycle
+   // https://stackoverflow.com/questions/13685633/how-to-show-faces-message-in-the-redirected-page
+    //FacesContext as an object is tied directly to the JSF request processing lifecycle
     //and as a result is only available during a standard JSF (user-driven) request-response process
     // donc pas disponible dans Batch Processing jsr-352 !!
         
@@ -829,14 +834,14 @@ public static PreparedStatement prepareStatement(Connection connection, String s
 }
 */
 
-public static void getTimeStampDiff(String in_player) throws SQLException
+public static void getAuditTimeStampDiff(String in_player) throws SQLException
 {   // à modifier !!!
     PreparedStatement ps = null;
     ResultSet rs = null;
 try
 {
      String q = "select AuditStartDate, AuditEndDate,"
-             + " TIMESTAMPDIFF (SECOND, AuditStartDate, AuditEndDate) as stamp from audit_in_out"
+             + " TIMESTAMPDIFF (SECOND, AuditStartDate, AuditEndDate) as stamp from audit"
               + " where AuditPlayerId = ?";
               //+ " order by AuditStartDate desc limit 1 ";
          LOG.info(" -- TIMESTAMPDIFF - query = " + q);
@@ -879,48 +884,6 @@ finally
 }
 } //end method
 
-public static Timestamp getLastAuditLogin(Player player, Connection conn) throws SQLException
-{
-    LOG.info("starting getLastAuditLogin - player = " + player.getIdplayer());
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    java.sql.Timestamp dbSqlTimestamp = null;
-try
-{
-     String query = "SELECT AuditStartDate, AuditPlayerId from audit_in_out"
-              + " where AuditPlayerId = ?"
-              + " order by AuditStartDate desc limit 1 ";
-      ps = conn.prepareStatement(query);
-      ps.setInt(1, player.getIdplayer());      // Assign value to input parameter
-      rs = ps.executeQuery();       // Get the result table from the query  3
-         //    String p = ps.toString();
-         utils.LCUtil.logps(ps);
-        if(rs.first())
-            {LOG.info("this is a returning connection for : " + player.getIdplayer());
-            dbSqlTimestamp = rs.getTimestamp("AuditStartDate");
-         //   String s = ;
-            LOG.info("last connection string = " + SDF.format(dbSqlTimestamp));
-            
-        }else{
-             LOG.info("this is the first connection for : " + player.getIdplayer());
-       //        String text = ;
-       //     dbSqlTimestamp = null;   
-            dbSqlTimestamp = Timestamp.valueOf("2000-01-01 00:00:00.123456");  // fake date
-        }
-    return dbSqlTimestamp;
-}catch (Exception ex){
-    String msg = "Exception in getLastAuditLogin() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}
-finally
-{
-       // DBConnection.closeQuietly(conn, null, rs, ps);
-        DBConnection.closeQuietly(null, null, rs, ps);
-}
-
-} // end method 
 
 
 
@@ -1395,10 +1358,32 @@ try{
         }
 }
   
-
+public static String[] intArraytoStringArray(int[] int01){
+  try{  
+    String[] str01 = new String[int01.length];
+    for(int i=0;i<int01.length;i++){
+           str01[i] = String.valueOf(int01[i]);
+       }    
+    return str01;
+}catch (Exception e){
+    String msg = "error listallasystemproperties = " + e ;
+        LOG.error("error = " + msg );
+        return null;
+        }
+}
+  
+  
 public static void main(String[] args) // throws IOException,Exception
 {
 } //end class main
-
+ public static String creditcardSecret(String creditcardNumber) {
+ try{
+    return repeat("*", 12) + creditcardNumber.substring(creditcardNumber.length()-4);
+    }catch (Exception e){
+    String msg = "error creditcardSecret = " + e ;
+        LOG.error("error = " + msg );
+        return null;
+    }
+}
 
 } // end Class ApexUtil

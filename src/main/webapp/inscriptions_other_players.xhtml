@@ -27,19 +27,18 @@
 </h:graphicImage>
 
 <h:graphicImage 
-                name="images/draganddrop.jpg"
+                name="images/drop zone.png"
                 alt="image missing : draganddrop.jpg"
                 style="float: right;">
 </h:graphicImage>
-    
 
-<h:form id="carForm" enctype="application/x-www-form-urlencoded">
+<h:form id="otherPlayers" enctype="application/x-www-form-urlencoded">
 
+    <ui:include src="include/include_summary.xhtml"/>
     
-    
-    <p:fieldset id="availableCarsField"
+    <p:fieldset id="availablePlayers"
                 legend="#{msg['player.available']}">
-    <p:dataTable id="availableCars"
+    <p:dataTable id="availablePlayersTable"
                      value="#{courseC.player.selectedOtherPlayers}"
                      var="c"
                      emptyMessage="#{msg['message.table.empty']}"
@@ -78,7 +77,7 @@
                 legend="#{msg['player.selected']}"
                 style="margin-top:20px">
         <p:outputPanel id="dropArea">
-            <h:outputText value="!!!Drop here!!!" 
+            <h:outputText value="This is the Drop Zone !!!" 
                           rendered="#{empty courseC.player.droppedPlayers}"
                           style="font-size:24px;" />
             <p:dataTable id="selectedCarsTable"
@@ -111,6 +110,23 @@
                         <f:selectItems value="#{courseC.teeStartListe}" />
                     </p:selectOneMenu>
                 </p:column>
+                
+                <p:column headerText="#{msg['button.inscription.delete']}"
+            
+                  style="width:20%" >
+                    <p:commandButton
+                          id="selectButtonRemove"
+                          action="#{courseC.player.PlayerRemove(c)}"
+                          value="#{c.idplayer}"
+                          icon="fa fa-trash-o fa-lg colorDelete1">
+                        <p:confirm header="#{msg['message.confirm']}"
+                           message="#{msg['message.cancel']}" 
+                           icon="fa fa-exclamation-triangle"
+                           />   
+            </p:commandButton>
+	</p:column>
+                
+                
             </p:dataTable>
             
         <p:commandButton value="#{msg['button.inscription.create']}"
@@ -130,12 +146,12 @@
                  scope="player"
                  activeStyleClass="ui-state-highlight"
                  hoverStyleClass="ui-state-hover"
-                 datasource="availableCars"
+                 datasource="availablePlayersTable"
                  onDrop="handleDrop">
         <p:ajax listener="#{courseC.player.onPlayerDrop}"
-                update="dropArea availableCars" />
+                update="dropArea availablePlayersTable" />
     </p:droppable>
- 
+ <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
 </ui:define>
 </ui:composition>

@@ -63,7 +63,7 @@ public class ActivationMail {
             String sujet = "Activate Your Account for GolfLC";
             String to = "louis.collet@skynet.be";
             utils.SendEmail sm = new utils.SendEmail();
-            boolean b = sm.sendHtmlMail(sujet,msg,to);
+            boolean b = sm.sendHtmlMail(sujet,msg,to,"ACTIVATION");
                 LOG.info("HTML Mail status = " + b);
 return b;
 }

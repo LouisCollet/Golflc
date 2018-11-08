@@ -64,7 +64,13 @@
                   </h:outputText>
 	</p:column>
 <!-- attention : casse de la classe :min et MAF -->
-
+        <p:column headerText="#{msg['round.players']}"
+                  footerText="#{msg['round.players']}"
+                  style="width:10%"
+                  id="teestart"
+                  >
+                        #{c.round.roundPlayers}
+        </p:column>
 	<p:column   id="colclubname"
                     headerText="#{msg['club.name']}"
                     style="width:100px"

@@ -12,33 +12,17 @@ import lc.golfnew.Constants;
 
 public class SendEmail implements interfaces.Log{
     
+    
   //  final private String subject; //= msgSubject;
     private String text; // = msgText;
  //   private static String password;
     private static String fromEmail;
     private File attachment;
-/*
-public SendEmail(String subject, String text, File attachment) // constructor #1 with attachment
-{
-        LOG.info(" SendEmail with Attachment");
-    this.subject = subject;
-    this.text = text;
-    this.attachment = attachment;
-    if (attachment == null)
-     LOG.info(" error !! Attachment = null");
-}
 
-public SendEmail(String subject, String text) // constructor #2 without attachment
-{
-        LOG.info(" SendEmail Text Only");
-    this.subject = subject;
- ///   this.text = text;
-    //this.attachment = attachment;
-}
-*/
-public boolean sendHtmlMail(final String sujet, String texte, final String  to) throws UnsupportedDataTypeException, MessagingException, Exception
+public boolean sendHtmlMail(final String sujet, String texte, final String to, String type) throws UnsupportedDataTypeException, MessagingException, Exception
 {
         LOG.info(" starting SendEmail sendHtmlMail ");
+        LOG.info("entering SendEmail with type = " + type);
     final String mailserver = "relay.proximus.be";
     // https://blogs.oracle.com/apanicker/entry/java_code_for_smtp_server
    
@@ -126,6 +110,17 @@ try
   // (not as an attachment)
     imagePart.setDisposition(MimeBodyPart.INLINE);
     multipart.addBodyPart(imagePart);
+    
+  //  File attachment
+  if (type.equals("INSCRIPTION")){    // attachment .ics file
+         MimeBodyPart attachmentPart = new MimeBodyPart();
+         String filename = "c:\\aa (LC Data)\\GolfCalendar.ics";
+         DataSource source = new FileDataSource(filename);
+         attachmentPart.setDataHandler(new DataHandler(source));
+     //    htmlPart.setFileName(filename);
+         attachmentPart.setFileName("from GolfLc = " + filename);      // si omis , alors "part 1.2"
+         multipart.addBodyPart(attachmentPart);
+  }
 
     msg.setContent(multipart);
     msg.setHeader("MIME-Version" ,"1.0");
@@ -157,82 +152,6 @@ try
 }
 } // end method
 
-// new 26/12/2016
-//private static class SMTPAuthenticator extends javax.mail.Authenticator
-//{
-//public PasswordAuthentication getPasswordAuthentication()
-//{
-//    return new PasswordAuthentication(fromEmail, password);
-//}
-//}
-
-/*
-public void sendOneMail() throws UnsupportedDataTypeException, MessagingException
-{
-    final Properties p = new Properties();
-    //String host = "relay.skynet.be";
-    p.put("mail.smtp.host", "relay.skynet.be");
-    p.put("mail.smtp.port", "25");
-    p.put("mail.mime.charset", "ISO-8859-1");
-
-try
-{
-    final Session ses = Session.getDefaultInstance(p, null);
-    ses.setDebug(false);
-// create a message
-    final MimeMessage msg = new MimeMessage(ses);
-    String from = "louis.collet@skynet.be";
-    msg.setFrom(new InternetAddress(from));
-    String to = "louis.collet@skynet.be";
-    msg.setRecipients(Message.RecipientType.TO, to);
-    msg.setSubject(subject);
-// create and fill the first message part
-    final Multipart mp = new MimeMultipart();
-    BodyPart mbp1 = new MimeBodyPart();
-    mbp1.setText(text);  // Contenu du message
-    //Ajout de la première partie du message dans un objet Multipart
-
-    // Attach the part to the multipart
-    mp.addBodyPart(mbp1);
-
-    if (attachment != null)         // create the second message part
-    {
-        BodyPart mbp2 = new MimeBodyPart();
-        final DataSource ds = new FileDataSource(attachment);
-        mbp2.setDataHandler(new DataHandler(ds));
-        mbp2.setFileName("from GolfLc = " + attachment.toString());      // si omis , alors "part 1.2"
-        //Attach the part to the multipart
-        mp.addBodyPart(mbp2);
-    }
-    // Add the Multipart to the message
-	    // create the Multipart and add its parts to it
-
-    //msg.setContent(mp);
-    msg.setContent(mp,"text/html"); //mod 10/02/2013
-
-// send the message
-    Transport.send(msg);
-    LOG.info(" -- mail sent ! ");
-} // end try
-//catch (UnsupportedDataTypeException dte)
-//    {LOG.info(" -- UnsupportedDataTypeException by LC");
-//        dte.printStackTrace();
-//        throw dte;
-//    } // end catch
-catch (MessagingException me)
-    {LOG.info(" -- MessagingException by LC");
-        throw me;
-    } // end catch
-finally
-    {
-        LOG.info(" -- finally by LC");
-    }    // cleanUp();}
-    //catch (IOException e)
-    //{
-    //    e.printStackTrace();
-    //} // end catch
-  } // end class SendOneMail
-*/
 
 public static void main(String[] args) throws Exception // for testing purposes
 {
@@ -249,7 +168,10 @@ public static void main(String[] args) throws Exception // for testing purposes
    String sujet = "Ceci est le sujet du mail, louis";
    String to = "louis.collet@skynet.be";
    utils.SendEmail sm = new utils.SendEmail();
-   boolean b = sm.sendHtmlMail(sujet,text,to);
+ //  SendEmail.createvCard cvc = new SendEmail.createvCard();
+//   sm.createvCard(sujet,text,to);
+   
+ //  boolean b = sm.sendHtmlMail(sujet,text,to);
 //LOG.info("msg sent = " + b);
 } // end main
 

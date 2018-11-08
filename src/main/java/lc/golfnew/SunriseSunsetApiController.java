@@ -138,7 +138,7 @@ and day_length will be expressed in seconds. Optional.
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);// to prevent exception when encountering unknown property:
     // on utilise le package googlemaps pour ne pas en créer un autre ...
  //   LOG.info("line 01");
-    responseSS = (SunriseSunsetResponse)mapper.readValue(iStream, SunriseSunsetResponse.class);
+    responseSS = mapper.readValue(iStream, SunriseSunsetResponse.class);
 //        LOG.info("line 02");
     mapper.configure(SerializationFeature.INDENT_OUTPUT, true); // equivalent Pretty Print
         LOG.info("mapper avec indent\n" + mapper.writeValueAsString(responseSS));

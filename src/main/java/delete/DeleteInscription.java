@@ -1,7 +1,7 @@
 
 package delete;
 
-import entite.ClubCourseRound;
+import entite.ECourseList;
 import entite.Player;
 import entite.Round;
 import static interfaces.Log.LOG;
@@ -13,9 +13,9 @@ import utils.LCUtil;
 
 public class DeleteInscription implements interfaces.Log, interfaces.GolfInterface
 {
-    public int deleteInscription(final Player player, final Round round, final ClubCourseRound ccr,Connection conn) throws Exception
-    {
-    PreparedStatement ps = null;     // a modifier pour tenir compte du round, sinon delete de tous les round !
+  //  public int deleteInscription(final Player player, final Round round, final ClubCourseRound ccr,Connection conn) throws Exception {
+public int deleteInscription(final Player player, final Round round, final ECourseList ecl,Connection conn) throws Exception {
+        PreparedStatement ps = null;     // a modifier pour tenir compte du round, sinon delete de tous les round !
                 // il faut aussi modifier le nombre de joueurs inscrits dans RoundPlayers !!!
 try
 {   //encore Ã  faire : delete du record activation s'il existe ...
@@ -72,9 +72,9 @@ if (rows == 0) // no delete !!
                 + " <br/>" + SDF_TIME.format(new java.util.Date() )
                 + " <br/> Round Game   = " + round.getRoundGame()
                 + " <br/> Round Date   = " + round.getRoundDate().format(ZDF_TIME_HHmm)
-                + " <br/> Course Name  = " + ccr.getCourseName()
-                + " <br/> Club Name    = " + ccr.getClubName()
-                + " <br/> Club City    = " + ccr.getClubCity()
+                + " <br/> Course Name  = " + ecl.Ecourse.getCourseName()
+                + " <br/> Club Name    = " + ecl.Eclub.getClubName()
+                + " <br/> Club City    = " + ecl.Eclub.getClubCity()
                 + " <br/><b>ID         = </b>" + player.getIdplayer()
                 + " <br/><b>First Name = </b>" + player.getPlayerFirstName()
                 + " <br/><b>Last Name  = </b>" + player.getPlayerLastName()
@@ -87,7 +87,7 @@ if (rows == 0) // no delete !!
         
     String to = "louis.collet@skynet.be";
     utils.SendEmail sm = new utils.SendEmail();
-    boolean b = sm.sendHtmlMail(sujet,mail,to);
+    boolean b = sm.sendHtmlMail(sujet,mail,to,"DELETE INSCRIPTION");
        LOG.info("HTML Mail status = " + b);
         
     return rows;
@@ -158,11 +158,11 @@ if (rows == 0) // no delete !!
     Connection conn = dbc.getConnection();
     Player player = new Player();
     Round round =new Round(); 
-    ClubCourseRound ccr = new ClubCourseRound();
+    ECourseList ecl = new ECourseList();
     player.setIdplayer(324733);
     round.setIdround(323);
     DeleteInscription di  = new DeleteInscription();
-    di.deleteInscription(player,round, ccr, conn);
+    di.deleteInscription(player,round, ecl, conn);
     DBConnection.closeQuietly(conn, null, null, null);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();

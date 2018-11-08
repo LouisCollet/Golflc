@@ -20,7 +20,7 @@
     
 <h:form id="selectPlayers">
 <ui:include src="include/include_messages.xhtml"/>
-
+<ui:include src="include/include_summary.xhtml"/>
 <p:dataTable id="table_players"
              value="#{courseC.listPlayers()}"
              var="c"
@@ -160,8 +160,6 @@ facet
 
 
 </h:form>
-
-
 </ui:define>
 </ui:composition>
 </html>

@@ -34,9 +34,11 @@ public int [][] LoadStrokesArray(Connection conn, int [][] points, final Player 
 try
 {
      LOG.info("starting getHoleStrokes = " + " player = " + player.getIdplayer() + " round = " + round.getIdround());
-     
+     String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
-          "SELECT scorehole, scorepar, scorestrokeindex, scorestroke,idround, scorepoints, scoreextrastroke "
+          "SELECT " 
+          + sc + "," + "round.idround"
+      //    scorehole, scorepar, scorestrokeindex, scorestroke,, scorepoints, scoreextrastroke "
           + "		from score, round"
           + "		where score.player_has_round_player_idplayer = ?"
           + "		and round.idround = ?"
@@ -48,7 +50,6 @@ try
      ps.setInt(1, player.getIdplayer());
      ps.setInt(2, round.getIdround());
      //ps.setInt(3, in_holenumber);
-         //    String p = ps.toString();
          utils.LCUtil.logps(ps);
 		//get round data from database
     rs =  ps.executeQuery();

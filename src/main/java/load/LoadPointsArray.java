@@ -30,8 +30,13 @@ public int [][] LoadPointsArray(Connection conn, int [][] points, final Player p
 try
 {
      LOG.info("starting getPointsArray with player = " + player.getIdplayer() + " , round = " + round.getIdround() );
+     String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
+     
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
-          "SELECT HoleNumber, HolePar ,HoleStrokeIndex, idtee, idround, player_has_round.InscriptionTeeStart"
+          "SELECT "
+          + ho + ","
+          //HoleNumber, HolePar ,HoleStrokeIndex,"
+          + " idtee, idround, player_has_round.InscriptionTeeStart"
           + "    FROM course"
           + "    JOIN player"
           + "       ON player.idplayer = ?"

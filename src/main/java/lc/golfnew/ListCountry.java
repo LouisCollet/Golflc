@@ -50,12 +50,13 @@ public void getListOfCountries(Locale locale) {
     }
 public static String getExtendedCountry(String S2)
 {  // from "HU" finding "Hungary"
-    LOG.info("getExtendedCountry - searching for =" + S2);
+  try{
+      LOG.info("getExtendedCountry - searching for = " + S2);
+  
       String ret = null;
          for (Map.Entry<String,String> entry : countriesMap.entrySet()){
    //         LOG.info("entry.getKey = " + entry.getKey());
    //         LOG.info("entry.getValue = " + entry.getValue());
-        
             if (entry.getValue().equals(S2)){
                 ret = entry.getKey();
                 LOG.info("value founded = " + entry.getValue());
@@ -64,6 +65,12 @@ public static String getExtendedCountry(String S2)
         } // end for
          LOG.info("return extendedCountry = " +  ret);
     return ret;
+  } catch (Exception e) {
+            String msg = "Â£ Exception in gestExendedCountry = " + e.getMessage();
+            LOG.error(msg);
+        //    LCUtil.showMessageFatal(msg);
+            return null;
+        }  
 };
 
 

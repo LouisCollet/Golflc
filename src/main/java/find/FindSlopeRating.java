@@ -7,12 +7,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 /**
  *
@@ -95,11 +94,10 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
          //           sr.setRoundDate(rs.getTimestamp("roundDate")); // mod 02/08/2015 avec minutes
                     
                     java.util.Date d = rs.getTimestamp("roundDate");
-                    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                    sr.setRoundDate(date);
-                    
-                    
-                    sr.setRoundStart(rs.getShort("roundstart"));
+               //     LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                //    LocalDateTime date = DatetoLocalDateTime(d); //.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                    sr.setRoundDate(DatetoLocalDateTime(d));
+//                    sr.setRoundStart(rs.getShort("roundstart"));
                     sr.setRoundCompetition(rs.getString("roundcompetition"));
                     sr.setRoundGame(rs.getString("roundgame"));
                     sr.setIdclub(rs.getInt("idclub"));

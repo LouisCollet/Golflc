@@ -19,8 +19,7 @@
         <f:viewAction action="#{courseC.LoadTeeStart()}"/>
     </f:metadata>
 </ui:define>
-    
-    
+
 <ui:define name="title">Inscription Page </ui:define>
 
 <ui:define name="help">
@@ -37,13 +36,11 @@
     -->
 </h:head>
 
-    
 <h:graphicImage 
                 name="images/OK.png"
                 alt="image missing :golf_round.jpg"
                 style="float: left;">
 </h:graphicImage>
-
 <h:graphicImage 
                 name="images/OK.png"
                 alt="image missing :golf_round.jpg"
@@ -59,33 +56,19 @@
              styleClass="alignmentLeft"
              columnClasses="col1,col2">
     
-    <!-- columnClasses="className" -->
 <f:facet name="header">
     <h1>#{msg['inscription.data']}</h1>
 </f:facet>
-
+<!-- déplacé vers include_summary
         <h:outputText value="#{msg['round.players']} :" />
         <h:outputText
                       id="rcomp" 
                       value="#{courseC.round.roundPlayers} = #{courseC.round.playersString}" />
-
+-->
         <h:outputText value="#{msg['inscription.team']} :"   />
         <h:outputText id="competition" 
                       value="#{courseC.round.roundTeam}" />
 <!--
-  <h:panelGroup id="panelG1" layout="block" >
-        <h:outputText value="#{msg['tee.gender']} :"  />
-          <div class="ui-g">
-            <div class="ui-g-12">
-                <div class="ui-inputgroup">
-                    <span class="ui-inputgroup-addon"><i class="fa fa-male"></i></span>
-                    <span class="ui-inputgroup-addon"><i class="fa fa-female"></i></span>
-                </div>
-            </div>
-        </div>
-   </h:panelGroup>
-        <h:outputText id="teegender" 
-                      value="#{courseC.player.playerGender}" />
 https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling -->
 
    <h:panelGroup id="panelG2" layout="block" >
@@ -125,8 +108,6 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          disabled="#{courseC.inscription.inscriptionOK}"
                          action="#{courseC.createInscription}"
          />
-
-<!--   -->
 <p:commandButton 
                          id="buttonWeather"
                          value="#{msg['button.weather']}"
@@ -136,7 +117,6 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          icon="fa fa-umbrella"
                          action="#{courseC.findWeather()}"
          />
-
 <p:commandButton 
                          id="buttonTarif"
                          value="#{msg['button.inscription.findtarif']}"
@@ -146,8 +126,6 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          icon="fa fa-eur"
                          action="#{courseC.findTarif()}"
          />
-
-        <!-- disabled="#{courseC.playerhasround.inscriptionOK}" -->
 <p:commandButton 
                          id="OtherPlayers"
                          value="#{msg['button.inscription.otherplayers']} / #{courseC.round.roundPlayers}"
@@ -162,19 +140,7 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
 
 </p:panelGrid>
 <br/>
-<!--   50.622616,4.295123 
 
-fn:length(courseC.lp)
-
-<p:gmap center="#{courseC.club.clubLatitude},#{courseC.club.clubLongitude}"
-        zoom="15"
-        type="HYBRID"
-        style="width:600px;
-               height:400px;
-               margin-left:25em;
-               max-width:60em;"
-        streetView="true"/>
--->
 </h:form>
 </ui:define>
 </ui:composition>

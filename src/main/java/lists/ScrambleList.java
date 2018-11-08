@@ -5,13 +5,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 public class ScrambleList implements interfaces.Log
 {
@@ -61,8 +60,8 @@ try
      
 //           mp.setRoundDate(rs.getTimestamp("roundDate") ); // mod 01/06/2017
            java.util.Date d = rs.getTimestamp("roundDate");
-           LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-          mp.setRoundDate(date);
+       //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+          mp.setRoundDate(DatetoLocalDateTime(d));
            
            
    //        mp.setIdplayer(rs.getInt("idplayer") );

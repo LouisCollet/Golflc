@@ -11,15 +11,15 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class ScramblePlayersList implements interfaces.Log
+public class RoundPlayersList implements interfaces.Log
 {  //en réalité vaut pour tous games !
     private static List<Player> liste = null;
     
 public List<Player> listAllParticipants(final Round round ,final Connection conn) throws SQLException 
 {   
 if(liste == null)
-{    LOG.debug("starting ScramblePlayersList "  );
-     LOG.debug("starting ScramblePlayersList for round =  " + round.toString()  );
+{    LOG.debug("starting RoundPlayersList "  );
+     LOG.debug("starting RoundPlayersList for round =  " + round.toString()  );
     PreparedStatement ps = null;
     ResultSet rs = null;
 try
@@ -40,9 +40,9 @@ try
     rs =  ps.executeQuery();
 
     rs.last(); //on récupère le numéro de la ligne
-        LOG.info("ResultSet ScramblePlayersList has " + rs.getRow() + " lines.");
+        LOG.info("ResultSet RoundPlayersList has " + rs.getRow() + " lines.");
          if(rs.getRow() == 0)
-         { String msg = "no players for ScramblePlayersList";
+         { String msg = "no players for RoundPlayersList";
             LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
       //          return null;
@@ -75,17 +75,17 @@ try
   //  LCUtil.showMessageFatal(msg);
 //    return null;    
 }catch (NullPointerException npe){
-    String msg = "NullPointerException in ScramblePlayersList() " + npe;
+    String msg = "NullPointerException in RoundPlayersList() " + npe;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;
 }catch (SQLException e){
-    String msg = "SQL Exception in ScramblePlayersList : " + e;
+    String msg = "SQL Exception in RoundPlayersList : " + e;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
 }catch (Exception ex){
-    String msg = "Exception in ScramblePlayersList() " + ex;
+    String msg = "Exception in RoundPlayersList() " + ex;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;
@@ -104,6 +104,6 @@ try
     }
 
     public static void setListe(List<Player> liste) {
-        ScramblePlayersList.liste = liste;
+        RoundPlayersList.liste = liste;
     }
 } //end class

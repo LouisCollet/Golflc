@@ -47,7 +47,7 @@ public class ChartsLineModel implements interfaces.Log
 
  LOG.info(" ... entering CreateLineModel new API for player = " + player.getIdplayer() +
              " course  = " + course.getIdcourse() + " round = " + round.getIdround() );
-        try {
+  try {
             lineModel = new LineChartModel();
    
             lineModel.setTitle("#{msg['message.stat.parcours']} #{courseC.course.courseName}");
@@ -96,27 +96,31 @@ public class ChartsLineModel implements interfaces.Log
                 lineModel.addSeries(series1);
                 LOG.info("No Round Found for this Course = ");
             } //end else
-
+ return lineModel;
         } catch (ArrayIndexOutOfBoundsException cv) {
             String msg = "£££ index out of bounds = if from <0 or from > original.length() " + cv.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         } catch (IllegalArgumentException cv) {
             String msg = "£££ illegal argument = if from > to " + cv.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         } catch (NullPointerException cv) {
             String msg = "£££ nullPointerException in createLinearModel : " + cv.getMessage(); // null
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         } catch (Exception cv) {
             String msg = "£££ other exception = " + cv.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         }
         finally
         {   
-        return lineModel;
+    //    return lineModel;
             }
    //     }
     } // end method

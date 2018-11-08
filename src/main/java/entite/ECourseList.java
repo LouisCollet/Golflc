@@ -6,7 +6,7 @@ import static interfaces.Log.LOG;
 import javax.inject.Named;
 
 @Named
-public class ECourseList // implements Serializable //, interfaces.Log
+public class ECourseList // implements Comparable<ECourseList> 
 {
     public Club Eclub; 
     public Course Ecourse;
@@ -14,6 +14,7 @@ public class ECourseList // implements Serializable //, interfaces.Log
     public Round Eround;  // new 20/01/2018
     public Handicap Ehandicap;
     public PlayerHasRound Eplayerhasround;
+    public Inscription EinscriptionNew;
     public Player Eplayer;
     public Classment Eclassment;
     
@@ -29,6 +30,7 @@ public class ECourseList // implements Serializable //, interfaces.Log
         Eround = new Round();
         Ehandicap = new Handicap();
         Eplayerhasround = new PlayerHasRound();
+        EinscriptionNew = new Inscription();
         Eplayer = new Player();
         Eclassment = new Classment();
     }
@@ -94,7 +96,15 @@ public class ECourseList // implements Serializable //, interfaces.Log
         this.Eplayer = Eplayer;
     }
 
-    
+    public Inscription getEinscriptionNew() {
+        return EinscriptionNew;
+    }
+
+    public void setEinscriptionNew(Inscription EinscriptionNew) {
+        this.EinscriptionNew = EinscriptionNew;
+    }
+
+
 
  //   public int getTotalExtraStrokes() {
  //       return totalExtraStrokes;
@@ -116,7 +126,7 @@ public String toString()
        +  Etee.toString()
        +  Eround.toString()
    //   +  Eplayer.toString()
- //      +  EClassment.toString()
+       +  Eclassment.toString()
         );
 }   
 

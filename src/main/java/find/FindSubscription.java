@@ -3,17 +3,15 @@ package find;
 
 import entite.Player;
 import entite.Subscription;
-import exceptions.LCCustomException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDate;
 
 /**
  *
@@ -48,8 +46,11 @@ try
       {   String msg = "££ Empty Result Table in " + ClassName + " for player = " + player.getIdplayer();
       //String msg = "NullPointerException in " + npe;
         LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-          throw new LCCustomException(msg);
+    //    LCUtil.showMessageFatal(msg);
+  ////      create.CreateSubscription cs = new create.CreateSubscription();
+  ////      cs.createSubscription(player,conn);
+        return null;        
+       //   throw new LCCustomException(msg);
       }     
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
@@ -62,12 +63,13 @@ try
                   //     rs.getTimestamp
                     //    cc.setEndDate(rs.getTimestamp("SubscriptionEndDate"));
                         java.util.Date d = rs.getTimestamp("SubscriptionStartDate");
-                        LocalDate date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        cc.setStartDate(date);
+                   //     LocalDate date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        
+                        cc.setStartDate(DatetoLocalDate(d));
                     
                         d = rs.getTimestamp("SubscriptionEndDate");
-                        date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        cc.setEndDate(date);
+                     //   date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        cc.setEndDate(DatetoLocalDate(d));
                      //   cc.setEndDate(rs.getDate("SubscriptionEndDate"));
                         cc.setTrialCount(rs.getInt("SubscriptionTrialCount"));
 			liste.add(cc);
@@ -75,11 +77,11 @@ try
 //LOG.debug(" -- query 5= listcc = " + listcc.toString() );
     return liste;
 
-}catch (LCCustomException e){
+//}catch (LCCustomException e){
   //  String msg = " SQL Exception in getScoreCardList1() " + e;
   //  LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
-    return null;    
+//    return null;    
 }catch (NullPointerException npe){
     String msg = "NullPointerException in " + ClassName + npe;
     LOG.error(msg);

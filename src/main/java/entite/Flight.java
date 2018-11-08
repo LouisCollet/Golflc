@@ -1,5 +1,7 @@
 package entite;
 
+
+import static interfaces.GolfInterface.ZDF_HOURS;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import javax.inject.Named;
@@ -35,9 +37,13 @@ public class Flight implements Serializable, interfaces.Log
     }
 
     public LocalDateTime getFlightStart() {
-        return flightStart;
+            return flightStart;
     }
-
+    public String getFlightHourStart() {
+        //this.getRoundDate().format(ZDF_TIME_HHmm)
+        return flightStart.format(ZDF_HOURS);
+    }
+    
     public void setFlightStart(LocalDateTime flightDepart) {
         this.flightStart = flightDepart;
     }
@@ -61,7 +67,7 @@ public class Flight implements Serializable, interfaces.Log
      @Override
 public String toString()
 { return 
-        ("from entite : " + this.getClass().getSimpleName()
+        (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName()
                + " ,idflight : "   + this.getIdflight()
                + " ,FlightStart : " + this.getFlightStart()
                + " ,course_idcourse : " + this.getCourse_idcourse()

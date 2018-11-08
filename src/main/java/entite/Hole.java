@@ -1,12 +1,16 @@
 
 package entite;
 
+import static interfaces.Log.LOG;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import javax.inject.Named;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import utils.LCUtil;
 //import javax.validation.constraints.Size;
 //import javax.xml.bind.annotation.XmlRootElement;
 
@@ -143,10 +147,29 @@ private boolean CreateModify = true; // 12/08/2017
  @Override
 public String toString()
 { return 
-        ("from entite = "+ this.getClass().getSimpleName()
+        (NEW_LINE + "FROM ENTITE = "+ this.getClass().getSimpleName().toUpperCase()+ NEW_LINE
                + " ,idhole : "   + this.getIdhole()
                + " ,Hole StrokeIndex : " + this.getHoleStrokeIndex()
                + " ,Hole Par : " + this.getHolePar()
         );
 }
+
+  public static Hole mapHole(ResultSet rs) throws SQLException{
+      String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Hole h = new Hole();
+        h.setHoleNumber(rs.getShort("HoleNumber") );
+        h.setHolePar(rs.getShort("HolePar") );
+        h.setHoleDistance(rs.getShort("HoleDistance") );
+        h.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
+        return h;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method map
+
+
 } // end class

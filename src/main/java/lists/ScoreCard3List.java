@@ -18,8 +18,7 @@ public class ScoreCard3List implements interfaces.Log
     private static List<ScoreCard> liste = null; 
     
 public List<ScoreCard> getScoreCardList3(final Player player, final Round round ,
-         final PlayerHasRound phr, final Connection conn) throws SQLException
-{   
+         final PlayerHasRound phr, final Connection conn) throws SQLException{ 
 if(liste == null)
 {    
     LOG.debug("starting getScoreCardList3... = ");
@@ -31,12 +30,21 @@ if(liste == null)
     ResultSet rs = null;
 try
 {
-
+    String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
+    String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
+    String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
+  // String cl = utils.DBMeta.listMetaColumnsLoad(conn, "Club");
+  //   String co = utils.DBMeta.listMetaColumnsLoad(conn, "Course");
+    String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+  
     String query =
-          "SELECT ScoreHole, ScorePar ,HoleStrokeIndex, ScoreExtraStroke, HoleDistance,"
-        + "  ScoreStroke, ScorePoints, ScoreFairway, ScoreGreen, ScorePutts, ScoreBunker, ScorePenalty,"
-        + " idround, RoundCSA, RoundHoles, RoundCompetition, RoundGame,RoundQualifying, "
-        + " Player_has_roundZwanzeursResult, Player_has_roundZwanzeursGreenshirt"
+         "SELECT"
+         + sc + "," + ho + "," + ro + "," + ph
+    //      " ScoreHole, ScorePar ,HoleStrokeIndex, ScoreExtraStroke, HoleDistance,"
+   //     + "  ScoreStroke, ScorePoints, ScoreFairway, ScoreGreen, ScorePutts, ScoreBunker, ScorePenalty,"
+   //     + " idround, RoundCSA, RoundHoles, RoundCompetition, RoundGame,RoundQualifying, "
+ //   + " Player_has_roundZwanzeursResult, Player_has_roundZwanzeursGreenshirt"
+
         + " FROM course"
         + " JOIN player"
         + "     ON player.idplayer = ?"
@@ -62,7 +70,6 @@ try
         + " ORDER by hole.HoleNumber"
          ;
      ps = conn.prepareStatement(query);
-     
      ps.setInt(1, player.getIdplayer());
      ps.setInt(2, round.getIdround());
      ps.setString(3, phr.getInscriptionTeeStart() );
@@ -89,14 +96,16 @@ while(rs.next())
 {
             cc = new ScoreCard(); // est réi, donc total = 0
 		//cc.setIdclub(rs.getInt("idclub") ); // was idscoreCard : not case sensitive ??
-            cc.setIdround(rs.getInt("idround"));
+
             // LOG.debug("idround = " + cc.getIdround());
        //     cc.setIdclub(rs.getInt("idclub"));
+            
+            cc.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
+            cc.setHoleDistance(rs.getShort("HoleDistance") );
+            
             cc.setScoreHole(rs.getShort("ScoreHole") );
             cc.setScorePar(rs.getShort("ScorePar") );
-            cc.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
             cc.setScoreExtraStroke(rs.getShort("ScoreExtraStroke") );
-            cc.setHoleDistance(rs.getShort("HoleDistance") );
             cc.setScoreStroke(rs.getShort("ScoreStroke") );
             cc.setScorePoints(rs.getShort("ScorePoints") );
             cc.setScoreFairway(rs.getShort("ScoreFairway") );
@@ -104,15 +113,18 @@ while(rs.next())
             cc.setScorePutts(rs.getShort("ScorePutts") );
             cc.setScoreBunker(rs.getShort("ScoreBunker") );
             cc.setScorePenalty(rs.getShort("ScorePenalty") );
+            
+            cc.setIdround(rs.getInt("idround"));
             cc.setRoundCBA(rs.getShort("RoundCSA") );
             cc.setRoundHoles(rs.getShort("RoundHoles") );
             cc.setRoundCompetition(rs.getString("RoundCompetition") );
             cc.setRoundGame(rs.getString("RoundGame") );
             cc.setRoundQualifying(rs.getString("RoundQualifying") );
+            
             cc.setPlayerhasroundZwanzeursResult(rs.getShort("Player_has_roundZwanzeursResult") );
             cc.setPlayerhasroundZwanzeursGreenshirt(rs.getShort("Player_has_roundZwanzeursGreenshirt") );
 
-            liste.add(cc);			//store all data into a List
+            liste.add(cc);//store all data into a List
             //    LOG.info("just after add to listsc3");
 } //end while
       LOG.info("listsc3 after while = " + liste.toString() );

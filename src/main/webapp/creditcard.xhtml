@@ -31,14 +31,23 @@
                 alt="image missing :tarif2.jpg"
                 style="float: right;">
 </h:graphicImage>
+ <!--  cmd = #{param.cmd}
+    typePayment=#{courseC.creditcard.typePayment} -->
+ 
 <h:form id="creditcard" enctype="application/x-www-form-urlencoded">
-    <div>
-        <a href=" https://openweathermap.org/img/w/10d.png">Login page</a>
+ <!--   <div>
+        <a href=" https://openweathermap.org/img/w/10d.png">openweathermap</a>
        
     </div>
+-->
+    <c:if test="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}">
+         <ui:include src="include/include_summary.xhtml"/>
+    </c:if>
     
-<ui:include src="include/include_summary.xhtml"/>
-
+    <c:if test="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}">
+         <ui:include src="include/include_subscription.xhtml"/>
+    </c:if>
+    
 <p:panelGrid
     id="panelGrid1"
     columns="2"
@@ -46,23 +55,34 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.payment.round']}</h1>
+ <h1>
+    <h:outputText
+            id="subscription"
+            rendered="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
+            value="#{msg['title.payment.subscription']}">
+    </h:outputText>
+    <h:outputText
+            id="inscription"
+            rendered="#{coursC.creditcard.typePayment eq 'INSCRIPTION'}" 
+            value="#{msg['title.payment.round']}">
+    </h:outputText>
+ </h1>
 </f:facet>
     <h:outputText  id="Total"
                 value="#{msg['payment.amounttobepaid']} :"
                 />
-     <h:outputText  id="TotalPrice"
+    <h:outputText  id="TotalPrice"
                 value="#{courseC.creditcard.totalPrice}"
                 style="font-size: 3em;"
                 >
      </h:outputText>
     
     <h:outputText value="#{msg['creditcard.communication']} :" />
-    <h:outputText  label="com"
+    <h:outputText 
                   id="Communication"
                   value="#{courseC.creditcard.communication}"
                   title="#{msg['tooltip.club.clubaddress']}"
-                  size="45" 
+                 
                          />
     
     <h:outputText value="Credit Card Holder :" />
@@ -70,8 +90,8 @@
                               id="Holder"
                               value="#{courseC.creditcard.creditCardHolder}"
                               title="#{msg['tooltip.club.clubaddress']}"
-                              converter="omnifaces.ToUpperCaseConverter"
                               size="45" 
+                              converter="omnifaces.ToUpperCaseConverter"
                          />
     
     <h:outputText  value="#{msg['creditcard.number']} :"/>
@@ -82,8 +102,12 @@
                         valueChangeListener="#{courseC.creditCardNumberListener}"
                         size="21"
                         slotChar="_"
+                       
                         mask="9999 9999 9999 9999">
       </p:inputMask>
+    
+    <!--   converter="creditcardConverter"  -->
+    
     
     <h:outputText value="Verification Code :" />
     <p:inputMask  label="holder"
@@ -173,11 +197,9 @@
                          icon="fa fa-cc-visa"
                          action="creditcard_accepted.xhtml"
                          />
+
 </f:facet>
-
 </p:panelGrid>
-
-
 </h:form>
 </ui:define>
 </ui:composition>

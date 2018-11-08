@@ -1,8 +1,11 @@
 
 package entite;
 
+import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import javax.inject.Named;
 import javax.validation.constraints.DecimalMax;
@@ -11,6 +14,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import utils.LCUtil;
 
 
 @Named
@@ -141,7 +145,7 @@ private boolean CreateModify = true; // 12/08/2017
 @Override
 public String toString()
 { return 
-        ( NEW_LINE  + "from entite : " + getClass().getSimpleName() + NEW_LINE
+        ( NEW_LINE  + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase() + NEW_LINE
                + " idtee : "   + this.getIdtee()
                + " ,TeeStart : " + this.getTeeStart()
                + " ,Tee Slope : " + this.getTeeSlope()
@@ -149,4 +153,26 @@ public String toString()
                + " ,idcourse : " + this.getCourse_idcourse()
         );
 }   
+
+  public static Tee mapTee(ResultSet rs) throws SQLException{
+      String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Tee t = new Tee();
+        t.setIdtee(rs.getInt("idtee"));
+        t.setTeeGender(rs.getString("TeeGender"));
+        t.setTeeStart(rs.getString("TeeStart"));
+        t.setTeeSlope(rs.getShort("teeslope"));
+        t.setTeeRating(rs.getBigDecimal("teerating"));
+        t.setTeeClubHandicap(rs.getInt("TeeClubHandicap"));
+        t.setCourse_idcourse(rs.getInt("tee.course_idcourse"));
+        
+   return t;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method map
+
 } // end class

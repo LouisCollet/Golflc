@@ -1,18 +1,15 @@
-
 package lists;
 
 import entite.Club;
 import entite.Course;
 import entite.ECourseList;
+import entite.Inscription;
 import entite.Player;
-import entite.PlayerHasRound;
 import entite.Round;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
@@ -36,12 +33,22 @@ if (liste == null)
 try
 {
      LOG.info("starting getPlayedList.. = " );
+     
+     String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+     String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
+     
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
-     "SELECT idplayer, RoundDate, idround, player_has_round.InscriptionFinalResult,"
-   + " player_has_round.Player_has_roundZwanzeursResult, player_has_round.Player_has_roundZwanzeursGreenshirt,"
-   + " RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundStart,"
-   + " idcourse, CourseName, CourseBegin, CourseEnd, "
-   + " idclub, ClubName, ClubCity, ClubWebsite, ClubLatitude, ClubLongitude, round.RoundQualifying"
+     "SELECT "
+           + cl + "," + co + "," + ro + "," + pl + "," + ph
+  //        + "idplayer, RoundDate, idround, player_has_round.InscriptionFinalResult,"
+ //  + " player_has_round.Player_has_roundZwanzeursResult, player_has_round.Player_has_roundZwanzeursGreenshirt,"
+ //  + " RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundStart,"
+ //  + " idcourse, CourseName, CourseBegin, CourseEnd, "
+//   + " idclub, ClubName, ClubCity, ClubWebsite, ClubLatitude, ClubLongitude, round.RoundQualifying"
+          
    + "   FROM tee" 
    + "   JOIN player"
    + "      ON player.idplayer = ?"
@@ -59,7 +66,7 @@ try
    + "   GROUP by round.idround"
    + "   ORDER by date(RoundDate) desc"
      ;
-        LOG.info("player = " + player) ;
+ //       LOG.info("player = " + player.toString()) ;
     ps = conn.prepareStatement(query);
        ps.setInt(1, player.getIdplayer());
          utils.LCUtil.logps(ps);
@@ -70,48 +77,47 @@ try
         rs.beforeFirst(); //on replace le curseur avant la première ligne
         liste = new ArrayList<>();
           //LOG.info("just before while ! ");
-		while(rs.next())
-                {
-			//LOG.info("just after while ! ");
-
-                        ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
+	while(rs.next())
+        {
+          ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
           Club c = new Club();
-          	c.setIdclub(rs.getInt("idclub") );
+          c = entite.Club.mapClub(rs);
+  /*        	c.setIdclub(rs.getInt("idclub") );
                 c.setClubName(rs.getString("clubName") );
                 c.setClubWebsite(rs.getString("clubWebsite") );
                 c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
                 c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
-                c.setClubCity(rs.getString("clubcity"));
+                c.setClubCity(rs.getString("clubcity"));*/
           ecl.setClub(c);
           
           Course o = new Course();
-            o.setIdcourse(rs.getInt("idcourse"));
+          o = entite.Course.mapCourse(rs);
+      /*      o.setIdcourse(rs.getInt("idcourse"));
             o.setCourseName(rs.getString("CourseName") );
             o.setCourseBegin(rs.getDate("courseBegin")); // new 13/06/2015
-            o.setCourseEnd(rs.getDate("courseEnd")); // new 13/06/2015
+            o.setCourseEnd(rs.getDate("courseEnd")); // new 13/06/2015*/
           ecl.setCourse(o);
           
           Round r = new Round();
-            r.setIdround(rs.getInt("idround") );
+          r = entite.Round.mapRound(rs);
+     /*       r.setIdround(rs.getInt("idround") );
                 java.util.Date d = rs.getTimestamp("roundDate");
-                LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            r.setRoundDate(date);
+          //      LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            r.setRoundDate(DatetoLocalDateTime(d));
             r.setRoundGame(rs.getString("roundgame") );
             r.setRoundCompetition(rs.getString("RoundCompetition") );
             r.setRoundHoles(rs.getShort("RoundHoles") );
             r.setRoundQualifying(rs.getString("RoundQualifying") );
      //       r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-            r.setRoundStart(rs.getShort("RoundStart") );
+            r.setRoundStart(rs.getShort("RoundStart") );*/
           ecl.setRound(r);
 
-            PlayerHasRound phr = new PlayerHasRound();             
-               phr.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
-            ecl.setInscription(phr);
-
-                        //LOG.info("inside while : " + ccr.toString());
-			//store all data into a List
-			liste.add(ecl);
-		}
+          Inscription i = new Inscription();
+          i = entite.Inscription.mapInscription(rs);  
+       //        phr.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
+          ecl.setEinscriptionNew(i);//.setInscriptionNew(i);
+	liste.add(ecl);
+	}
     return liste;
 }catch (SQLException e){
     String msg = "SQL Exception in getPlayedList() = " + e.toString() + ", SQLState = " + e.getSQLState()
@@ -119,11 +125,6 @@ try
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    String msg = "NullPointerException in getPlayedList() " + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
     LCUtil.showMessageFatal("Exception getPlayedList= " + ex.toString() );
@@ -146,4 +147,24 @@ try
     public static void setListe(List<ECourseList> liste) {
         PlayedList.liste = liste;
     }
+    
+    public static void main(String[] args) throws SQLException, Exception 
+     {
+         DBConnection dbc = new DBConnection();
+     Connection conn = dbc.getConnection();
+  try{
+    Player player = new Player();
+    player.setIdplayer(324713);
+    PlayedList pl = new PlayedList();
+    List<ECourseList> lp = pl.getPlayedList(player, conn);
+        LOG.info("from main, after lp = " + lp);
+ } catch (Exception e) {
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
+    
+    
 } //end Class

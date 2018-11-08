@@ -18,6 +18,7 @@ and open the template in the editor.
         <h:form>
     <p:fileUpload fileUploadListener="#{fileUploadC.uploadListener(event)}"
         mode="advanced" 
+        dragDropSupport="true"
         update="messages"
         sizeLimit="100000" 
         allowTypes="/(\.|\/)(gif|jpe?g|png)$/"

@@ -24,29 +24,35 @@
 </ui:define>
     
   <!--  Use the <f:viewAction> when you want to execute a method before the HTML is been rendered.
-ici c'est pour générer des data pour tester !  -->  
+ici c'est pour générer des data pour tester ! outcome="selectPlayer.xhtml" -->  
     
 <ui:define name="title">Payment</ui:define>
 
 <ui:define name="content">
     <h:outputScript library="js" name="totalprice.js" target="head"/>
-
+<h:link id="link01"
+        title="#{msg['login.user.old']}"
+        
+        action="#{courseC.printTarif}"
+        style="float:left;"
+        >
 <h:graphicImage 
                 name="images/addtocart.jpg"
                 alt="image missing :tarif1.jpg"
                 style="float: left;">
 </h:graphicImage>
-
+</h:link>
 <h:graphicImage 
                 name="images/online2.png"
                 alt="image missing :tarif2.jpg"
                 style="float: right;">
 </h:graphicImage>
 
-<h:form id="form_payment" enctype="application/x-www-form-urlencoded"
-        
+ <h:form id="form_payment" enctype="application/x-www-form-urlencoded">
+ 
+ <!--       
  onkeypress="if(event.which === 13){event.which=0;}">
-
+-->
 <script type="text/javascript">
 function my_code(){
 alert(" Alert inside my_code function");
@@ -65,15 +71,16 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
 <ui:include src="include/include_summary.xhtml"/>
 
 <p:panelGrid
-    id="panelGrid1"
+    id="panelGridMain"
     columns="4"
     styleClass="alignmentLeft"
-    columnClasses="className">
+    columnClasses="className"
+    >
 
 <f:facet name="header">
     <h1>#{msg['title.payment.round']}</h1>
 </f:facet>
-    
+    <!--
     <h:outputText  value="#{msg['payment.item']}"/>
     <h:outputText  value="#{msg['payment.unit']}"/>
     <h:outputText  value="#{msg['payment.quantity']}"/>
@@ -82,7 +89,13 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
     <c:forEach var="i" begin="01" end="04" step="1">
       <p:column value="" />
    </c:forEach>
-    
+    -->
+
+<p:panelGrid
+    id="panelGridGreenfee"
+    columns="4"
+     columnClasses="className"
+    styleClass="alignmentLeft">
        <h:outputText  value="#{msg['tarif.greenfee']} :"/>
        <h:outputText  label="Greenfee"
                        id="Greenfee1"
@@ -109,8 +122,14 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                        >
             <f:convertNumber type="currency"/>
        </h:outputText>
-        
-                
+</p:panelGrid>
+
+   <p:panelGrid  id="panelGridBuggy"
+                  columns="4"
+                       columnClasses="className"
+    styleClass="alignmentLeft"
+                  rendered="#{courseC.tarif.priceEquipments[0] ne '00.0'}"
+                  >
        <h:outputText  value="#{msg['tarif.equipments.buggy']} :"/>
        <h:outputText  label="Buggy1"
                        id="Buggy1"
@@ -118,7 +137,7 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
-              <p:inputMask
+       <p:inputMask
                    label="buggy2"
                         id="Buggy2"
                         onkeyup="totalprice(2, this.form, event);"
@@ -126,14 +145,21 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                         size="2"
                         mask="?9"
                         />
-              <h:outputText  label="Buggy1"
+        <h:outputText  label="Buggy1"
                        id="Buggy3"
                        value="#{courseC.tarif.priceItem[1]}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
-       
-           
+    </p:panelGrid>
+ 
+ 
+  <h:panelGrid id="panelHTrolley" 
+               columns="4"
+               styleClass="alignmentLeft"
+               columnClasses="className"
+               rendered="#{courseC.tarif.priceEquipments[1] ne '00.0'}"
+                >
        <h:outputText  value="#{msg['tarif.equipments.handtrolley']} :"/>
        <h:outputText  label="HTrolley"
                        id="HTrolley1"
@@ -141,22 +167,28 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                        title="#{msg['title.tee.teerating']}"
                        >
         </h:outputText>
-              <p:inputMask
+        <p:inputMask
                    label="hole num"
                         id="HTrolley2"
                         onkeyup="totalprice(3, this.form,event);"
                         value="#{courseC.tarif.quantity[2]}"
                         size="2"
                         mask="?9"
-                        />
+          />
          <h:outputText  label="HTrolley1"
                        id="HTrolley3"
                        value="#{courseC.tarif.priceItem[2]}"
                        title="#{msg['title.tee.teerating']}"
                        >
         </h:outputText>
-       
+  </h:panelGrid>
               
+  <h:panelGrid id="panelETrolley" 
+                columns="4"
+                 styleClass="alignmentLeft"
+    columnClasses="className"
+                rendered="#{courseC.tarif.priceEquipments[2] ne '00.0'}"
+                >       
        <h:outputText  value="#{msg['tarif.equipments.electrictrolley']} :"/>
        <h:outputText  label="MediumSeason"
                        id="ETrolley1"
@@ -179,8 +211,14 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                        >
        </h:outputText>
        
+  </h:panelGrid>
        
-       
+  <h:panelGrid id="panelClubs" 
+               columns="4"
+                styleClass="alignmentLeft"
+    columnClasses="className"
+               rendered="#{courseC.tarif.priceEquipments[3] ne '00.0'}"
+                >       
        <h:outputText  value="#{msg['tarif.equipments.clubs']} :"/>
        <h:outputText  label="Clubs1"
                        id="Clubs1"
@@ -202,7 +240,14 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                        title="#{msg['title.tee.teerating']}"
                        >
         </h:outputText>
-              
+   </h:panelGrid>
+
+   <h:panelGrid id="panelPractice"
+                columns="4"
+                 styleClass="alignmentLeft"
+    columnClasses="className"
+                rendered="#{courseC.tarif.priceEquipments[4] ne '00.0'}"
+                >               
        <h:outputText  value="#{msg['tarif.equipments.practice']} :"/>
        <h:outputText  label="Practice"
                        id="Practice1"
@@ -224,7 +269,8 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
-
+   </h:panelGrid>
+              
    <c:forEach var="i" begin="01" end="02" step="1">
       <p:column value="" />
    </c:forEach>
@@ -236,7 +282,7 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                  value="#{courseC.creditcard.totalPrice}"
                  style="font-size: 3em;"
                 />
-<!-- do not change the id !! see totalprice.js  -->
+  <!-- do not change the id !! see totalprice.js  -->
 <f:facet name="footer">
          <p:commandButton value="#{msg['inscription.back']}"
                          id="commandButtonback"
@@ -246,20 +292,27 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                          icon="fa fa-rotate-left"
                          action="inscription.xhtml"
                          />
-         <p:commandButton value="#{msg['payment.creditcard']}"
+         <p:commandButton value="#{msg['tarif.print']}"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.printTarif}"/>
+         <p:commandButton value="#{msg['payment.add.cart']}"
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         icon="fa fa-credit-card"
+                         icon="fa fa-cart-plus"
                          action="creditcard.xhtml?cmd=tarif"
                          />
-          <p:commandButton id="btn"
+          <p:commandButton id="commandButtonPrint"
                          value="#{msg['button.print']}"
                          type="button"
                          icon="fa fa-print"
                          >
-                <p:printer target="panelGrid1" />
+                <p:printer target="panelGridMain" />
           </p:commandButton>
          
           <p:commandButton value="Reset"
@@ -272,7 +325,6 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                          />
 
 </f:facet>
-
 </p:panelGrid>
 
    <!--  transfer data fromm js to bean
@@ -281,7 +333,7 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
    SetMystrings se trouve dans totalprice.js (c'est une fonction JS
    -->
    <p:remoteCommand name="SetMyStrings"
-                    actionListener="#{courseC.creditcard.setMyStrings}" />
+                    action="#{courseC.creditcard.setMyStrings}" />
    
 </h:form>
 </ui:define>

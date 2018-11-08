@@ -57,7 +57,7 @@ private String [] quantity;
 public Tarif() // constructor 1
     {
         datesSeason = new String[20][3]; // 20 dates (5 paired début et fin), 3 périodes Low, Medium, High
-            LOG.info("from construtor : dateseason = " + Arrays.deepToString(datesSeason));
+//            LOG.info("from construtor : dateseason = " + Arrays.deepToString(datesSeason));
         teeTimes = new String[10][5];    //
         priceEquipments = new String[10];
         days = new String[5][3];

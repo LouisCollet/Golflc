@@ -3,10 +3,7 @@ package lists;
 
 //import entite.ScoreMatchplay;
 import entite.Classment;
-import entite.Club;
-import entite.Course;
 import entite.ECourseList;
-import entite.Player;
 import entite.Round;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
@@ -14,13 +11,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 /** extrait database les participants (2 ou 4) à un matchplay 
  *
@@ -75,24 +72,31 @@ try
 	while(rs.next())
         {
          ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
-          Club clu = new Club();
-             clu.setIdclub(rs.getInt("idclub") );
-             clu.setClubName(rs.getString("clubName") );
+         
+         ecl.Eclub.setIdclub(rs.getInt("idclub") );
+         ecl.Eclub.setClubName(rs.getString("clubName") );
+  ////        Club clu = new Club();
+  ////           clu.setIdclub(rs.getInt("idclub") );
+  ////           clu.setClubName(rs.getString("clubName") );
        //      c.setClubCity(rs.getString("clubcity"));
        //      c.setClubWebsite(rs.getString("ClubWebsite"));
        //      c.setClubCountry(rs.getString("ClubCountry"));
-          ecl.setClub(clu);
+    //   ecl.setClub(ecl.Eclub);
+   ////       ecl.setClub(clu);
 
-          Course o = new Course();
-            o.setIdcourse(rs.getInt("idcourse"));
-            o.setCourseName(rs.getString("CourseName") );
-          ecl.setCourse(o);
+   ecl.Ecourse.setIdcourse(rs.getInt("idcourse"));
+   ecl.Ecourse.setCourseName(rs.getString("CourseName") );
+////          Course o = new Course();
+////            o.setIdcourse(rs.getInt("idcourse"));
+////            o.setCourseName(rs.getString("CourseName") );
+////          ecl.setCourse(o);
 
           Round r = new Round();
             r.setIdround(rs.getInt("idround") );
                 java.util.Date d = rs.getTimestamp("roundDate");
-                LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            r.setRoundDate(date);
+          //      LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                
+            r.setRoundDate(DatetoLocalDateTime(d));
             r.setRoundGame(rs.getString("roundgame") );
             r.setRoundCompetition(rs.getString("RoundCompetition") );
       //      r.setRoundHoles(rs.getShort("RoundHoles") );
@@ -105,7 +109,7 @@ try
    //        phr.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
    //      ecl.setInscription(phr);
 
-          Player p = new Player();
+   /*       Player p = new Player();
             p.setIdplayer(rs.getInt("idplayer") );
                 LOG.info("current player  = " + p.getIdplayer());
             p.setPlayerFirstName(rs.getString("playerFirstName") );
@@ -113,6 +117,16 @@ try
                LOG.info("playerlastname = " + p.getPlayerLastName());
             p.setPlayerPhotoLocation(rs.getString("playerPhotoLocation") );
           ecl.setPlayer(p);
+      */    
+            ecl.Eplayer.setIdplayer(rs.getInt("idplayer") );
+                LOG.info("current player  = " + ecl.Eplayer.getIdplayer());
+            ecl.Eplayer.setPlayerFirstName(rs.getString("playerFirstName") );
+            ecl.Eplayer.setPlayerLastName(rs.getString("playerLastName") );
+                LOG.info("playerlastname = " + ecl.Eplayer.getPlayerLastName());
+            ecl.Eplayer.setPlayerPhotoLocation(rs.getString("playerPhotoLocation") );
+          
+          
+          
           
           Classment cla = new Classment();
             find.FindClassmentElements fcel = new find.FindClassmentElements();
@@ -124,7 +138,36 @@ try
 	}
     //            boucler sur la liste ??
     LOG.info("ending liste  =  ",  Arrays.deepToString(liste.toArray()) );
-    //    LOG.info(" ending liste" + liste.toString() );
+    
+// https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
+  //LOG.info
+  //liste.forEach(item -> LOG.info("liste before sort " + item));
+  liste.forEach(item -> LOG.info("liste BEFORE sort " + NEW_LINE + item.Eplayer.getPlayerFirstName()+ item.Eclassment));
+/* bug !!
+  liste.sort(Comparator.comparingInt((ECourseList p)->p.Eclassment.getTotalPoints() ).reversed()  // descending
+   //        liste.sort(Comparator.comparingInt((ECourseList p)->p.Eclassment.getLast3() ).reversed()
+               //    .thenComparing((ECourseList p)->p.Eclassment.getTotalPoints() )
+              .thenComparingInt((ECourseList p)->p.Eclassment.getLast9() ).reversed()
+              .thenComparingInt((ECourseList p)->p.Eclassment.getLast6() ).reversed()
+                 .thenComparingInt((ECourseList p)->p.Eclassment.getLast3() ).reversed()
+                .thenComparingInt((ECourseList p)->p.Eclassment.getLast1() ).reversed()
+            );
+  liste.forEach(item -> LOG.info("liste AFTER sort1 " + NEW_LINE + item.Eplayer.getPlayerFirstName()+ item.Eclassment));
+  */
+   // attention au au -p
+   ///https://stackoverflow.com/questions/51565422/java-8-compare-multiple-fields-in-different-order-using-comparator
+   //There is no need to use the method Comparator::reverse. 
+   //Since you want to reverse the comparison based on the integer, just negate the age -p.getAge()
+// and it will be sorted in the descending order:
+    liste.sort(Comparator.comparingInt((ECourseList p)-> -p.Eclassment.getTotalPoints() )  // -p=descending trick !!!
+                     .thenComparingInt((ECourseList p)-> -p.Eclassment.getLast9() )
+                     .thenComparingInt((ECourseList p)-> -p.Eclassment.getLast6() )
+                     .thenComparingInt((ECourseList p)-> -p.Eclassment.getLast3() )
+                     .thenComparingInt((ECourseList p)-> -p.Eclassment.getLast1() )
+            );
+     liste.forEach(item -> LOG.info("liste AFTER sort2 " + NEW_LINE + item.Eplayer.getPlayerFirstName() + " / "
+                                                                    + item.Eplayer.getIdplayer()+ item.Eclassment));
+ 
     return liste;
 }catch (NullPointerException npe){ 
     String msg = "NullPointerException in ParticipantsStableford() " + npe;

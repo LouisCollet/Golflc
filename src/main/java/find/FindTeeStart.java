@@ -20,7 +20,7 @@ public class FindTeeStart implements interfaces.Log
 public List<String> teeStart (final Course course ,final Connection conn) throws SQLException
 {   
 if(liste == null)
-{  //  LOG.debug("starting find subscription ...for player  = "  + player.getIdplayer());
+{ 
     LOG.info("starting FindTeeStart for course = " + course.toString());
     PreparedStatement ps = null;
     ResultSet rs = null;

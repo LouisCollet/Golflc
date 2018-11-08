@@ -15,10 +15,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.Period;
-import java.time.ZoneId;
 import java.util.Arrays;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDate;
 // rester à faire le cas des invités / guests
 // a faire : greenfee 0 pour memebre du club ! via une table member : greenfee 0 pour les membres du club
 public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.Log{
@@ -49,7 +49,8 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
         LOG.info("LocalDate ldround = " + ldround);
      LocalTime tround = round.getRoundDate().toLocalTime();
         LOG.info("LocalTime tround = " + tround);
-     LocalDate lddob = utils.LCUtil.asLocalDate(player.getPlayerBirthDate(), ZoneId.systemDefault());
+   //  LocalDate lddob = utils.LCUtil.asLocalDate(player.getPlayerBirthDate(), ZoneId.systemDefault());
+     LocalDate lddob = DatetoLocalDate(player.getPlayerBirthDate()); //, ZoneId.systemDefault());
         LOG.info("LocalDate lddob = " + lddob);
 //1.    // l'ordre a de l'importance : il faut commencer par Days !!  il utilise les 2 premieres cells de dates Season qui existe donc ! 
      if(tarif.getDays().length > 0){

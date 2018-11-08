@@ -101,9 +101,10 @@
  <p:separator/>
 
     <p:fileUpload
-        language="#{languageC.locale}"
+
         fileUploadListener="#{courseC.uploadListener}"
         mode="advanced"
+        dragDropSupport="true"
         allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
         sizeLimit="61440"
         invalidSizeMessage="GolfLC: Invalid Size : File Size should not exceed 60 MB"

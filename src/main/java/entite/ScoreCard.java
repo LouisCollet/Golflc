@@ -1,11 +1,15 @@
 package entite;
 
 //import static interfaces.GolfInterface.ZDF_TIME;
+import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import javax.inject.Named;
+import utils.LCUtil;
 
 @Named
 public class ScoreCard implements Serializable, interfaces.Log, interfaces.GolfInterface
@@ -446,6 +450,33 @@ public String toString()
         );
 
 } // end method
+
+  public static ScoreCard mapScoreCard(ResultSet rs) throws SQLException{
+      String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        ScoreCard s = new ScoreCard();
+   //         s.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
+   //         s.setHoleDistance(rs.getShort("HoleDistance") );
+            s.setScoreHole(rs.getShort("ScoreHole") );
+            s.setScoreStroke(rs.getShort("ScoreStroke") );
+            s.setScoreExtraStroke(rs.getShort("ScoreExtraStroke") );
+            s.setScorePoints(rs.getShort("ScorePoints") );
+            s.setScorePar(rs.getShort("ScorePar") );
+            s.setHoleStrokeIndex(rs.getShort("ScoreStrokeIndex"));
+            s.setScoreFairway(rs.getShort("ScoreFairway") );
+            s.setScoreGreen(rs.getShort("ScoreGreen") );
+            s.setScorePutts(rs.getShort("ScorePutts") );
+            s.setScoreBunker(rs.getShort("ScoreBunker") );
+            s.setScorePenalty(rs.getShort("ScorePenalty") );
+   return s;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method map
+
 
 //Whenever you print any instance of your class, the default toString implementation
 //of Object class is called, which returns the representation that you are getting.

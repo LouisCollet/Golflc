@@ -9,10 +9,11 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>GolfWfly</name>
+
 <description>
     GolfLC application based on JSF 2.3 and Primefaces 6.2 by lc
 </description>
-<inceptionYear>2015</inceptionYear>
+<inceptionYear>2012</inceptionYear>
     <licenses>
         <license>
             <name>CDDL + GPLv2 with Classpath Exception</name>
@@ -29,15 +30,15 @@
         
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> <!-- new 11/05/2014 -->
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
-        <mysql.connectorJ.version>8.0.12</mysql.connectorJ.version> <!-- mod 05-08-2018 was 8.0.11 -->
+        <mysql.connectorJ.version>8.0.13</mysql.connectorJ.version> <!-- mod 02-11-2018 was 8.0.12 -->
         <primefaces.version>6.2</primefaces.version> <!-- 5/3/2017 : was 6.0 and 6.1 6.2.RC1-->
         <primefaces.extension.version>6.2.8</primefaces.extension.version> <!-- mod 08/09/2017 was 6.2.4 -->
         <primefaces.theme.version>1.0.10</primefaces.theme.version><!-- was 1.0.9 -->
         <omnifaces.version>3.2</omnifaces.version> <!-- 07/09/2018 was 3.1 -->
-        <junit.version>5.0.0-ALPHA</junit.version> <!-- was 4.7 mod 4/6/2016 -->
-        <java.version>1.8</java.version> <!-- only used via MyPOM properties -->
-        <maven.compiler.source>1.8</maven.compiler.source> <!-- was 1.8 mod 26-09-2018 -->
-        <maven.compiler.target>1.8</maven.compiler.target><!-- was 1.8 mod 26-09-2018 -->
+        <junit.version>5.0.0-ALPHA</junit.version> <!-- not used was 4.7 mod 4/6/2016 -->
+        <java.version>11</java.version> <!-- only used via MyPOM properties -->
+        <maven.compiler.source>1.8</maven.compiler.source> <!-- was 1.8 mod 01-11-2018 -->
+        <maven.compiler.target>1.8</maven.compiler.target><!-- was 1.8 mod 01-11-2018 -->
         <javaee.version>8.0</javaee.version> <!-- was 7.0 mod 26-04-2014 -->
         <java.mail.version>1.6.1</java.mail.version> <!-- was 7.0 mod 26-04-2014 -->
         <javax.activation.version>1.2.0</javax.activation.version>
@@ -69,6 +70,7 @@ voir plus bas <artifactId>properties-maven-plugin</artifactId>-->
         <apache.shiro.version>1.3.2</apache.shiro.version> <!-- new 24-12-2017 1.4.0 gives errors -->
         <itext.version>2.1.7</itext.version>
         <verbose>true</verbose>
+         <xnio.version>3.6.5.Final</xnio.version>
 </properties>
 <!-- not used  ne sert à rien, continue à utiliser le 1.2.1
 <dependencyManagement>
@@ -108,21 +110,7 @@ voir plus bas <artifactId>properties-maven-plugin</artifactId>-->
             <version>${javaee.version}</version>
             <scope>provided</scope>
         </dependency>
-<!-- https://mvnrepository.com/artifact/javax/javaee-api 
-<dependency>
-    <groupId>javax</groupId>
-    <artifactId>javaee-api</artifactId>
-    <version>${javaee.version}</version>
-    <scope>provided</scope>
-</dependency>
 
-<dependency>
-    <groupId>org.primefaces.themes</groupId>
-    <artifactId>all-themes</artifactId>   mod 25/12/2012 - was 1.0.6 bluesky 
-    <version>${primefaces.theme.version}</version>  was 1.0.9
-</dependency>
--->
-<!--     PrimeFaces new 1/09/2012 -->
 <dependency>
     <groupId>org.omnifaces</groupId>
     <artifactId>omnifaces</artifactId>
@@ -264,14 +252,7 @@ Dependencies, right clic on jEidlib-1.1.jar > Manually install artifact > browse
     <artifactId>maven-resources-plugin</artifactId>
     <version>${maven.resources.plugin.version}</version> <!-- mod 25-09-2018 was fixed value -->
 </dependency>
-<!--
-<dependency>
-	<groupId>org.codehaus.mojo</groupId>
-	<artifactId>exec-maven-plugin</artifactId>
-	<version>1.6.0</version>   
-        
-</dependency>
--->
+
 <dependency>
 	<groupId>org.ostermiller</groupId>
 	<artifactId>utils</artifactId>
@@ -306,13 +287,7 @@ Dependencies, right clic on jEidlib-1.1.jar > Manually install artifact > browse
     <artifactId>junit-jupiter-api</artifactId>
     <version>5.0.0-M3</version>
 </dependency>
-<!-- new 04/06/2016 
-<dependency>  
-    <groupId>org.primefaces</groupId>  
-    <artifactId>primefaces</artifactId>  
-    <version>5.0</version>  
-</dependency>  -->
-<!-- https://mvnrepository.com/artifact/org.wildfly.plugins/wildfly-maven-plugin -->
+
 <dependency>
     <groupId>org.wildfly.plugins</groupId>
     <artifactId>wildfly-maven-plugin</artifactId>
@@ -387,83 +362,17 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
   <artifactId>SunriseSunsetCalculator</artifactId>
   <version>1.2</version>
 </dependency>
-<!--   new 09/06/2017 -->
-<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-jpa 
-<dependency>
-    <groupId>org.wildfly</groupId>
-    <artifactId>wildfly-jpa</artifactId>
-    <version>10.1.0.Final</version>
-</dependency>
--->
+
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-nop</artifactId>
     <version>1.7.25</version>
 </dependency>
 
-<!--   new 05/09/2017 -->
-<!-- https://mvnrepository.com/artifact/org.jboss.xnio/xnio-api 
-<dependency>
-    <groupId>org.jboss.xnio</groupId>
-    <artifactId>xnio-api</artifactId>
-    <version>3.5.1.Final</version>
-</dependency>
-
-<dependency>
-   <groupId>javax.enterprise</groupId>
-   <artifactId>cdi-api</artifactId>
-   <version>1.2</version>
-   <scope>provided</scope>
-</dependency>
--->
-
-<!-- https://mvnrepository.com/artifact/org.apache.shiro/shiro-web 
-<dependency>
-    <groupId>org.apache.shiro</groupId>
-    <artifactId>shiro-web</artifactId>
-    <version>${apache.shiro.version}</version>
-</dependency>
-
-
-<dependency>
-    <groupId>org.apache.shiro</groupId>
-    <artifactId>shiro-core</artifactId>
-    <version>${apache.shiro.version}</version>
-</dependency>
-
-<dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-ehcache</artifactId>
-            <version>${apache.shiro.version}</version>
-</dependency>
-
--->
-
-<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils 
-<dependency>
-    <groupId>commons-beanutils</groupId>
-    <artifactId>commons-beanutils</artifactId>
-    <version>1.9.3</version>
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils-core
-<dependency>
-    <groupId>commons-beanutils</groupId>
-    <artifactId>commons-beanutils-core</artifactId>
-    <version>1.8.3</version>
-</dependency>
- -->
-<!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils-bean-collections 
-<dependency>
-    <groupId>commons-beanutils</groupId>
-    <artifactId>commons-beanutils-bean-collections</artifactId>
-    <version>1.8.3</version>
-</dependency>
--->
 <dependency>
     <groupId>net.aksingh</groupId>
     <artifactId>owm-japis</artifactId>
-    <version>2.5.2.2</version>
+    <version>2.5.2.3</version>
    
 </dependency>
 
@@ -491,93 +400,72 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
     <version>0.2.7</version>
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/com.google.guava/guava 
-<dependency>
-    <groupId>com.google.guava</groupId>
-    <artifactId>guava</artifactId>
-    <version>25.1-jre</version>
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/javax.enterprise/cdi-api 
-<dependency>
-    <groupId>javax.enterprise</groupId>
-    <artifactId>cdi-api</artifactId>
-    <version>2.0.SP1</version>
-    <scope>provided</scope>
-</dependency>
-https://mvnrepository.com/artifact/org.hibernate/hibernate-validator 
-<dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-validator</artifactId>
-    <version>6.0.11.Final</version>
-</dependency>
-https://mvnrepository.com/artifact/javax.faces/javax.faces-api
-<dependency>
-    <groupId>javax.faces</groupId>
-    <artifactId>javax.faces-api</artifactId>
-    <version>2.3</version>
-    <scope>provided</scope>
-</dependency>
- -->
- 
+
+
  <!-- https://mvnrepository.com/artifact/org.passay/passay -->
 <dependency>
     <groupId>org.passay</groupId>
     <artifactId>passay</artifactId>
     <version>1.3.1</version>
 </dependency>
-<!-- add 09-09-2018  -->
-<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-ejb-client-bom 
+<!-- https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j  new 30-10-2018-->
 <dependency>
-    <groupId>org.wildfly</groupId>
-    <artifactId>wildfly-ejb-client-bom</artifactId>
-    <version>14.0.0.Final</version>
-    <type>pom</type>
+    <groupId>org.mnode.ical4j</groupId>
+    <artifactId>ical4j</artifactId>
+    <version>3.0.1</version>
 </dependency>
--->
-<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-jms-client-bom 
+<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin  new 05-11-2018-->
 <dependency>
-    <groupId>org.wildfly</groupId>
-    <artifactId>wildfly-jms-client-bom</artifactId>
-    <version>14.0.0.Final</version>
-    <type>pom</type>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>exec-maven-plugin</artifactId>
+    <version>1.6.0</version>
 </dependency>
--->
-<!-- https://github.com/vdurmont/emoji-java  
-<dependency>
-  <groupId>com.vdurmont</groupId>
-  <artifactId>emoji-java</artifactId>
-  <version>4.0.0</version>
-</dependency>
--->
-
 
 </dependencies>
 
  <build>
 
+ <!--  new 05-11-2018  
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+-->    
+     
  <plugins>
    <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version> <!-- mod 27/03/2016 was 3.3 est 3.6.1 -->
+                <version>${maven.compiler.plugin.version}</version> 
                 <configuration>
                     <fork>true</fork>
                     <meminitial>128m</meminitial><!-- was 128 -->
                     <maxmem>2048m</maxmem> <!-- was 1024-->
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <compilerArguments>
-                    <!--     <endorseddirs>${endorsed.dir}</endorseddirs>
-                       <verbose /> -->
-                    </compilerArguments>
-                    
-                    <compilerArgument> -Xlint:unchecked </compilerArgument>
+                <!--     <release>${maven.compiler.source}</release> new 01-11-2018 -->
+                    <encoding>${project.build.sourceEncoding}</encoding> <!-- new 01-11-2018
+      https://docs.oracle.com/javase/10/tools/javac.htm#JSWOR627
+https://www.baeldung.com/javac
+Supplies warnings to enable or disable, separated by comma. 
+Precede a key by a hyphen (-) to disable the specified warning.-->
+                    <compilerArgs> <!-- new 01-11-2018 
+                        <arg>-Xmaxwarns 100</arg>
+  <arg>-J-Duser.language=en_us</arg>
+      <arg>-Xlint:-rawtypes,-serial</arg> --> 
+                        <arg>-Xlint:all,-rawtypes,-serial</arg>
+                    </compilerArgs>
+
                     <showDeprecation>true</showDeprecation> <!--  mod 08-02-2018 was true -->
                     <showWarnings>true</showWarnings> <!-- new 20/01/2013 -->
                     <Averbose>true</Averbose> <!-- new 20/01/2013 -->
                     <debug>false</debug>
-                    <optimize>false</optimize> 
+                 
                 </configuration>
             </plugin>
      <plugin>
@@ -603,8 +491,7 @@ https://mvnrepository.com/artifact/javax.faces/javax.faces-api
                             </artifactItems>
                         </configuration>
                     </execution>
-                    
-                    
+
                     <execution>
                         <id>analyze</id>
                         <goals>
@@ -618,9 +505,6 @@ https://mvnrepository.com/artifact/javax.faces/javax.faces-api
                         </configuration>
                  </execution>
                     
-                    
-                    
-                    
                 </executions>
             </plugin>
   <!-- new 27/05/2014 yes yes : c'est pour forcer la version à utiliser ! ! ! ! !-->
@@ -629,22 +513,7 @@ https://mvnrepository.com/artifact/javax.faces/javax.faces-api
      <artifactId>maven-clean-plugin</artifactId>
      <version>3.1.0</version>  <!-- mod 29/05/2018 - was 2.6.1-->
 </plugin>
-<!--
-<plugin>
-	<groupId>org.codehaus.mojo</groupId>
-	<artifactId>exec-maven-plugin</artifactId>
-	<version>1.6.0</version> 
-        <executions>
-    <execution>
-      <id>my-execution</id>
-      <phase>package</phase>
-      <goals>
-        <goal>java</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>
--->
+
 <!-- new 27/05/2014 yes yes : c'est pour forcer la version à utiliser ! ! ! ! !-->                      
 <plugin>
      <groupId>org.apache.maven.plugins</groupId>
@@ -706,18 +575,7 @@ https://mvnrepository.com/artifact/javax.faces/javax.faces-api
 <!-- https://mvnrepository.com/artifact/org.wildfly.plugins/wildfly-maven-plugin
 https://docs.jboss.org/wildfly/plugins/maven/latest/examples/deployment-example.html
 
-<configuration>
-	<hostname>127.0.0.1</hostname>
-	<port>9990</port>
-	<username>mkyong</username>
-	<password>password</password>
-	<name>spring4ajax.war</name>
-</configuration>
-
-
-
 -->
-
 
 <plugin>
                 <groupId>org.wildfly.plugins</groupId>
@@ -742,12 +600,6 @@ https://docs.jboss.org/wildfly/plugins/maven/latest/examples/deployment-example.
                 </executions>
             </plugin>
 
-<!-- added 13/12/2014 testing with JAX-WS<dependency>
-	<groupId>org.jvnet.jax-ws-commons</groupId>
-	<artifactId>jaxws-maven-plugin</artifactId>
-	<version>2.3.1-b20141205.0945</version>
-</dependency>
- -->
 <plugin>
     <groupId>org.jvnet.jax-ws-commons</groupId>
     <artifactId>jaxws-maven-plugin</artifactId>
@@ -781,7 +633,7 @@ http://stackoverflow.com/questions/11500533/in-java-code-how-to-access-maven-pro
             </execution>
         </executions>
     </plugin>
-
+<!-- enlevé 01-11-2018
 <plugin>
 	<artifactId>maven-surefire-plugin</artifactId>
 	<version>2.19.1</version>
@@ -798,7 +650,7 @@ http://stackoverflow.com/questions/11500533/in-java-code-how-to-access-maven-pro
                 </dependency>
 	</dependencies>
 </plugin>
-
+-->
 
 </plugins>
 
@@ -841,58 +693,7 @@ http://stackoverflow.com/questions/11500533/in-java-code-how-to-access-maven-pro
         <layout>default</layout>
 
     </repository>
-<!--
 
-new 14/09/2014
-    <repository>
-        <id>prime-repo</id>
-        <name>Repository for library Library[primefaces]</name>
-        <url>http://repository.primefaces.org</url>
-        <releases>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-        </releases>
-        <snapshots>
-                <enabled>true</enabled> 
-                <updatePolicy>always</updatePolicy>
-        </snapshots>
-    </repository>
--->
-   <!--     new 06/02/2013      
-    <repository>
-            <id>Java EE 7</id>
-            <url>https://maven.java.net/content/groups/promoted/</url>
-    </repository>
-   -->
-    
-<!--
-    <repository>
-        <url>http://repository.primefaces.org/</url>
-        <id>PrimeFaces-maven-lib</id>
-      <layout>default</layout>
-      <name>Repository for library PrimeFaces-maven-lib</name>
-    </repository>
-  
-     <repository>
-        <url>http://repository.primefaces.org/</url>
-        <id>PrimeFaces-maven-lib</id>
-      <layout>default</layout>
-      <name>Repository for library PrimeFaces-maven-lib</name>
-     </repository>
-  -->   
- <!--     new 11/12/2015 
-      eviter The POM for jEidlib:jEidlib:jar:1.1 is missing, no dependency information available       
-
-        <repository>
-        <id>wmc-central</id>
-        <url>http://localhost/users/collet/.m2/repository/jEidlib/jEidlib/</url>
-    </repository> -->
-    <repository>
-        <url>http://repository.primefaces.org/</url>
-        <id>PrimeFaces-maven-lib</id>
-      <layout>default</layout>
-      <name>Repository for library PrimeFaces-maven-lib</name>
-    </repository>
 </repositories>
 
 <pluginRepositories>
@@ -903,17 +704,7 @@ new 14/09/2014
 
       <!--<url>http://search.maven.org/maven2</url>  mod 16/07/2013 -->
     </pluginRepository>
-    <!--
-     <pluginRepository>
-         <id>glassfish-plugin-repository</id>
-         <url>https://maven.java.net/content/repositories/snapshots</url>
-    </pluginRepository>
-    -->
-    <!-- new 28/05/2014 inutile ?? 
-    <pluginRepository>
-      <id>maven-annotation-plugin</id>
-      <url>http://maven-annotation-plugin.googlecode.com/svn/trunk/mavenrepo</url>
-    </pluginRepository>-->
+
 </pluginRepositories>
 <!-- new 25/05/2015   -->
 <reporting>

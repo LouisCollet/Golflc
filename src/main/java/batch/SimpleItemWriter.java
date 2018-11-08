@@ -9,12 +9,11 @@ package batch;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.batch.api.chunk.AbstractItemWriter;
+import javax.inject.Named;
 
 @Named("SimpleItemWriter")
-public class SimpleItemWriter extends AbstractItemWriter implements interfaces.Log
+public abstract class SimpleItemWriter extends AbstractItemWriter implements interfaces.Log
 {
 
     @Override

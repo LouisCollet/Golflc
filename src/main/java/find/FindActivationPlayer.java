@@ -59,8 +59,7 @@ try{
           //      LOG.info("duration modern = " + duration.toMinutes());
      //     LocalDateTime now = LocalDateTime.now();
                 
-    //        System.out.println("ISO-8601: " + duration);
-    //        System.out.println("Minutes: " + duration.toMinutes());
+
  //    Player player = new Player();
         if(differenceInMinutes < 10){   //reliable?
                 player.setIdplayer(rs.getInt("player_idplayer"));

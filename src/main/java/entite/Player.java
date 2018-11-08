@@ -4,6 +4,8 @@ import com.google.maps.model.LatLng;
 import googlemaps.GoogleTimeZone;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -109,7 +111,7 @@ private String wrkpassword;
 // coming from Subscription entite and not from data entry
 private LocalDate endDate; // mod 30/01/2017
 private GoogleTimeZone playerTimeZone;
-
+private String playerRole;
 private List<Player> selectedOtherPlayers = null; // new 11/07/2017
 private List<Player> droppedPlayers = null; // new 11/07/2017
 
@@ -359,25 +361,57 @@ public Date getPlayerModificationDate()
 
     public void onPlayerDrop(DragDropEvent ddEvent) {  // used in inscriptions_other_players.xhtml
             LOG.info("entering onPlayerDrop");
+            LOG.info("DragId = " + ddEvent.getDragId());
+            LOG.info("DropId = " + ddEvent.getDropId());
         Player player = ((Player) ddEvent.getData());
             LOG.info("Player dropped = " + player.toString());
         droppedPlayers.add(player);
-            LOG.info("droppedPlayers = " + droppedPlayers.toString());
-            LOG.info("number of dropped players = " + droppedPlayers.size());
-          if(droppedPlayers.size() == 3){
-            String msg = "Third and last player";
+            LOG.info("After add, droppedPlayers = " + droppedPlayers.toString());
+            LOG.info("After add, number of dropped players = " + droppedPlayers.size());
+        if(droppedPlayers.size() == 3){
+            String msg = "There are 3 dropped players";
+            LOG.info(msg);
             LCUtil.showMessageInfo(msg);
-   };   
+        } 
         /// A FAIRE limiter à 3 inscriptions !
         selectedOtherPlayers.remove(player);
-            LOG.info("selectedOtherPlayers = " + selectedOtherPlayers.toString());
-
+            LOG.info("After remove, selectedOtherPlayers = " + selectedOtherPlayers.toString());
+    }
+public String PlayerRemove(Player player) {  // used in inscriptions_other_players.xhtml
+            LOG.info("entering PlayerRemove");
+            LOG.info("Player to remove from droppedPlayers = " + player.toString());
+     //       LOG.info("DragId = " + ddEvent.getDragId());
+     //       LOG.info("DropId = " + ddEvent.getDropId());
+    //    Player player = ((Player) ddEvent.getData());
+      //      LOG.info("Player removed = " + player.toString());
+        droppedPlayers.remove(player);
+            LOG.info("After remove, droppedPlayers = " + droppedPlayers.toString());
+            LOG.info("After remove, number of dropped players = " + droppedPlayers.size());
+        getDroppedPlayers(); // refrech screen
+        //    if(droppedPlayers.size() == 3){
+     //   String msg = "There are 3 dropped players";
+     //       LOG.info(msg);
+      //      LCUtil.showMessageInfo(msg);
+      //  } 
+        /// A FAIRE limiter à 3 inscriptions !
+   //     selectedOtherPlayers.remove(player);
+   //         LOG.info("After remove, selectedOtherPlayers = " + selectedOtherPlayers.toString());
+   return "inscriptions_other_players.xhtml?faces-redirect=true";
     }
 
+    public String getPlayerRole() {
+        return playerRole;
+    }
+
+    public void setPlayerRole(String playerRole) {
+        this.playerRole = playerRole;
+    }
+    
 @Override
 public String toString()
-{      
+{ 
  try{
+   if(this.getIdplayer() != null){
      LOG.info("idplayer : "   + this.getIdplayer());
      LOG.info("playerFirstName : " + this.getPlayerFirstName());
      LOG.info("playerLastName  : " + this.getPlayerLastName());
@@ -387,13 +421,14 @@ public String toString()
      LOG.info("playerLanguage : " + this.getPlayerLanguage());
      LOG.info("playerBirthDate : " + this.getPlayerBirthDate());
      LOG.info("playerEmail : " + this.getPlayerEmail());
-     
+   }else{
+       LOG.info("idplayer =  null" );
+   }
  //    LOG.info("playerTimeZoneId : " + this.getPlayerTimeZone().getTimeZoneId());
  //    LOG.info("playerLatLng : " + this.getPlayerLatLng());
 
    if(this.getIdplayer() != null){
-     String str = 
-        "from entite : " + this.getClass().getSimpleName() + " // "
+     String str = NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEW_LINE
                + " ,idplayer : "   + this.getIdplayer()
                + " ,playerFirstName : " + this.getPlayerFirstName()
                + " ,playerLastName : " + this.getPlayerLastName()
@@ -418,5 +453,59 @@ public String toString()
 }
  return null;
 } // end method toString
+  public static Player mapPlayer(ResultSet rs) throws SQLException{
+  try{
+        Player p = new Player();
+        p.setIdplayer(rs.getInt("idplayer"));
+ //           LOG.info(" -- map : playerId = " + p.getIdplayer() );
+        p.setPlayerFirstName(rs.getString("playerfirstname"));
+        p.setPlayerLastName(rs.getString("playerlastname"));
+        p.setPlayerCity(rs.getString("playercity"));
+        p.setPlayerLanguage(rs.getString("PlayerLanguage"));
+        p.setPlayerEmail(rs.getString("PlayerEmail"));
 
+      GoogleTimeZone tz = new GoogleTimeZone();
+      tz.setTimeZoneId(rs.getString("PlayerZoneId"));
+      if(tz.getTimeZoneId() == null){
+          tz.setTimeZoneId("Europe/Brussels"); // le même pour tous ! par defaut
+      }
+      p.setPlayerTimeZone(tz);
+  //      LOG.info("playerTimeZoneId = " + p.getPlayerTimeZone().getTimeZoneId());
+  //  String s = rs.getString("PlayerLatLng");
+    String[] latlng = null;
+    if(rs.getString("PlayerLatLng") == null){ 
+          latlng = "50.8262271,4.3571382".split(",");  // le même pour tous ! par defaut
+    }else{
+          latlng = rs.getString("PlayerLatLng").split(",");
+    }
+        double latitude = Double.parseDouble(latlng[0]);
+        double longitude = Double.parseDouble(latlng[1]);
+        LatLng location = new LatLng(latitude, longitude);
+        p.setPlayerLatLng(location);
+  ////       LOG.info("PlayerLatLng = " + p.getPlayerLatLng());
+ //       LOG.info("step 6");
+//  }catch(ClassCastException e){
+//    String msg = "£££ ClassCastException in rs " + e.getMessage()+ " for player = " + p.getPlayerLastName();
+//    LOG.error(msg);
+//    LCUtil.showMessageFatal(msg);
+
+        p.setPlayerCountry(rs.getString("playerCountry"));
+        p.setPlayerBirthDate(rs.getDate("playerbirthdate"));
+        p.setPlayerGender(rs.getString("playergender"));
+        p.setPlayerHomeClub(rs.getInt("playerhomeclub"));
+        p.setPlayerLanguage(rs.getString("playerLanguage"));
+        p.setPlayerEmail(rs.getString("playerEmail"));
+        p.setPlayerPhotoLocation(rs.getString("PlayerPhotoLocation"));
+        p.setPlayerPassword(rs.getString("PlayerPassword"));
+        p.setPlayerRole(rs.getString("PlayerRole"));
+        p.setPlayerModificationDate(rs.getTimestamp("playerModificationDate"));
+    //        LOG.info("map = success !!! " + p.toString());
+   return p;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method
 } // end class

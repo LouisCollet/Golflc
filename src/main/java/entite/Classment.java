@@ -1,5 +1,6 @@
 package entite;
 
+import static interfaces.GolfInterface.NEWLINE;
 import java.io.Serializable;
 import javax.inject.Named;
 
@@ -8,13 +9,14 @@ public class Classment implements Serializable, interfaces.Log
 {
     private static final long serialVersionUID = 1L;
 
-    private Integer totalExtraStrokes;
+   
     private Integer totalPoints;
     private Integer last9;
     private Integer last6;
     private Integer last3;
     private Integer last1;
  
+    private Integer totalExtraStrokes;
     public Classment()
     {
        
@@ -71,7 +73,7 @@ public class Classment implements Serializable, interfaces.Log
  @Override
 public String toString()
 { return 
-        ("from entite : " + this.getClass().getSimpleName()
+        (NEWLINE +"from entite : " + this.getClass().getSimpleName().toUpperCase()+ NEWLINE 
                + " ,TotalExtraStrokes : "   + this.totalExtraStrokes
                + " ,TotalPoints : " + this.totalPoints
                + " ,Last 9 : " + this.last9

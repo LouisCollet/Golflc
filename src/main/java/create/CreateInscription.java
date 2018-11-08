@@ -28,38 +28,23 @@ public boolean createInscription(final Round round, final Player player, Player 
             LOG.info("Player Email  = " + player.getPlayerEmail());
             
   //          LOG.info("Player Gender = " + player.getPlayerGender() ); // new 19/08/2014
-            if(round.getRoundDate() != null)
-            {
-           //   LOG.info("round Date    = " + sdf_timeHHmm.format(round.getRoundDate()) );
+            if(round.getRoundDate() != null){
               LOG.info("Round Date = " + round.getRoundDate().format(ZDF_TIME_HHmm));
               LOG.info("Round Game    = " + round.getRoundGame()); 
             }
             
               LOG.info("Tee Start = " + inscription.getInscriptionTeeStart() );
-////            ccr = find.FindClubCourseFromRound.findClubCourse(round, conn);
- //           LOG.info("ligneLC 01 = ");
- ////           LOG.info("course name = " + ccr.get(0).getCourseName());
- //            LOG.info("ligneLC 021 = ");
-             
-            //    LOG.info(msg);
-// à déplacer en cas d'erreur !!!
-      //      String sujet = "Your Round Inscription for GolfLC";
-      //      String to = "louis.collet@skynet.be";
-      //      boolean b = utils.SendEmail_old.sendHtmlMail(sujet,msg,to);
-      //          LOG.info("HTML Mail status = " + b);
-              
 //validation 1 supprimé 25/06/2017
   //    if(playerhasround.getInscriptionTeam().equals("") && round.getRoundGame().equals(Round.GameType.SCRAMBLE.toString()) )
   //         { String msgerr = "Error inscription : Team must be completed for Scramble !! ";
   //              throw new LCCustomException(msgerr);
   //         }
 //validation 2
-      lists.ScramblePlayersList spl = new lists.ScramblePlayersList();
+      lists.RoundPlayersList spl = new lists.RoundPlayersList();
       listPlayers = spl.listAllParticipants(round, conn);
         LOG.info("there are already {} players for this round ! ", listPlayers.size());
         LOG.info("there are RoundPlayers for this round : " + round.getRoundPlayers());
-      if(listPlayers.size() > 4)  // maximum 4 players par flight !
-      {
+      if(listPlayers.size() > 4){  // maximum 4 players par flight !
           String msgerr =  LCUtil.prepareMessageBean("inscription.too much players"); // + listPlayers.size() ;
           LOG.error(msgerr); 
           LCUtil.showMessageFatal(msgerr);
@@ -90,38 +75,16 @@ public boolean createInscription(final Round round, final Player player, Player 
                 msg = msg
                         + "for round = " + round.getIdround()
                         + " <br/> player = " + player.getIdplayer()
-                        + " <br/> player name = " + player.getPlayerLastName();
+                        + " <br/> player name = " + player.getPlayerLastName()
+                        + " <br/> round date = " + round.getRoundDate().format(ZDF_TIME_HHmm)
+                    ;
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
                 
-                String sujet = "Your Round Inscription via GolfLC";
-                String mail = 
-                  " <br/>Inscription Confirmation - GolfLC!"
-                + " <br/>" + SDF_TIME.format(new java.util.Date() )
-                + " <br/> Round Game   = " + round.getRoundGame()
-                + " <br/> Round Date   = " + round.getRoundDate().format(ZDF_TIME_HHmm)
-                + " <br/> Course Name  = " + course.getCourseName()
-                + " <br/> Club Name    = " + club.getClubName()
-                + " <br/> Club City    = " + club.getClubCity()
-                + " <br/><b>ID         = </b>" + player.getIdplayer()
-                + " <br/><b>First Name = </b>" + player.getPlayerFirstName()
-                + " <br/><b>Last Name  = </b>" + player.getPlayerLastName()
-                + " <br/><b>Language   = </b>" + player.getPlayerLanguage()
-                + " <br/><b>City       = </b>" + player.getPlayerCity()
-                + " <br/><b>Email      = </b>" + player.getPlayerEmail()
-                + " <br/><b>Invited by     = </b>" + invitedBy.getPlayerLastName() + ", " + invitedBy.getPlayerFirstName()
-                + " <br/> Thank you !"
-                + " <br/> The GolfLC team"
-                    ; 
-                
-                String to = "louis.collet@skynet.be";
-                utils.SendEmail sm = new utils.SendEmail();
-                boolean b = sm.sendHtmlMail(sujet,mail,to);
-                    LOG.info("HTML Mail status = " + b);
-                                
-                return true;
-
-            } else {
+                mail.InscriptionMail im = new mail.InscriptionMail();
+                im.sendInscriptionMail(player, invitedBy, round, club, course);
+       return true;
+            }else{
                 String msg = "-- NOT NOT successful Insert in create Inscription !!! " + row;
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);

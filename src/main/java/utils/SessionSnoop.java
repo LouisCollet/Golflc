@@ -44,7 +44,7 @@ public class SessionSnoop extends HttpServlet {
     out.println("<P>");
 
     out.println("<H3>Here is your saved session data:</H3>");
-    Enumeration e = session.getAttributeNames();
+    Enumeration<?> e = session.getAttributeNames();
     while (e.hasMoreElements()) {
       String name = (String) e.nextElement();
       out.println(name + ": " + session.getAttribute(name) + "<BR>");

@@ -38,7 +38,12 @@
              >
 <!--  stickyHeader="true"  rowHover="true" -->
 <f:facet name="header">
-    <h1>#{msg['message.selectflight']} </h1>
+    <h1>#{msg['message.selectflight']} 
+        <h:outputText value="#{courseC.flight.flightStart}">
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+            </h:outputText>
+       
+    </h1>
 </f:facet>
 
 <p:column
@@ -66,34 +71,33 @@
             <h:outputText value="#{var_flight.flightPeriod}" />
 	</p:column>
 
-	<p:column headerText="#{msg['flight.selected']}"
-                  footerText="#{msg['flight.selected']}"
+	<p:column headerText="#{msg['flight.start']}   "
+                  footerText="#{msg['flight.start']}"
                   style="width:20%"
                   id="colFlightSelected" 
          >
+ <!--
             <c:set var="s0"
                    value="#{var_flight.flightStart}">
-                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                   <f:convertDateTime type="localDateTime" pattern="HH:mm" />
             </c:set>
-   <!--                converter="localDateTimeConverter" -->
+  -->
                
             <p:commandButton
                 id="selectButton"
                 actionListener="#{courseC.selectFlightFromDialog(var_flight)}"
-                value="#{s0}"
-          
-                icon="ui-icon-pencil"
+                value="#{var_flight.flightHourStart}"
+                icon="fa fa-flag"
                 >
              </p:commandButton>
  	</p:column>            
 
 	<p:column   id="colFlightStart"
-                    headerText="#{msg['round.players']}"
-                    footerText="#{msg['round.players']}"
+                    headerText="#{msg['flight.selected']}"
+                    footerText="#{msg['flight.selected']}"
                     style="width:20%"
                   >
-            <h:outputText value="#{var_flight.flightStart}" 
-                          >
+            <h:outputText value="#{var_flight.flightStart}">
                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
             </h:outputText>
 	</p:column>

@@ -15,13 +15,14 @@ public class CreateClub implements interfaces.Log
      //   PreparedStatement ps = null;
 //        try (PreparedStatement ps = null;)
 //        {
-            LOG.info("club Name       = " + club.getClubName());
-            LOG.info("club Address    = " + club.getClubAddress());
-            LOG.info("club City       = " + club.getClubCity());
-            LOG.info("club Country    = " + club.getClubCountry());
-            LOG.info("club Latitude   = " + club.getClubLatitude());
-            LOG.info("club Longitude  = " + String.format("%.6f", club.getClubLongitude() ) );
-            LOG.info("club Web site   = " + club.getClubWebsite());
+            LOG.info("club = " + club.toString());
+    //        LOG.info("club Name       = " + club.getClubName());
+    //        LOG.info("club Address    = " + club.getClubAddress());
+    //        LOG.info("club City       = " + club.getClubCity());
+    //        LOG.info("club Country    = " + club.getClubCountry());
+    //        LOG.info("club Latitude   = " + club.getClubLatitude());
+    //        LOG.info("club Longitude  = " + String.format("%.6f", club.getClubLongitude() ) );
+    //        LOG.info("club Web site   = " + club.getClubWebsite());
             LOG.info("club Zone ID   = " + club.getClubTimeZone().getTimeZoneId());
 
             final String query = LCUtil.generateInsertQuery(conn, "club"); // new 15/11/2012

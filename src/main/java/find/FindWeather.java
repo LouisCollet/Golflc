@@ -1,6 +1,8 @@
 package find;
 //import static interfaces.GolfInterface.OWM_KEY_LC;
 import net.aksingh.owmjapis.core.OWM;
+import net.aksingh.owmjapis.core.OWM.Language;
+import net.aksingh.owmjapis.core.OWM.Unit;
 import net.aksingh.owmjapis.model.CurrentUVIndex;
 import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.DailyWeatherForecast;
@@ -37,14 +39,15 @@ public class FindWeather implements interfaces.GolfInterface, interfaces.Log{
     
     if (owm == null) {
 	owm = new OWM(OWM_KEY_LC);
+        LOG.info("owm was null, new created");
     }
 
-        
-        LOG.info("key OK");
+         LOG.info("key OK");
         // getting current weather data 
-        owm.setLanguage(OWM.Language.ENGLISH);
-        owm.setUnit(OWM.Unit.METRIC);
+        owm.setLanguage(Language.ENGLISH);
+        owm.setUnit(Unit.METRIC);
         CWD = owm.currentWeatherByCityName(city, OWM.Country.BELGIUM);
+        
         
   //      ho
 //  LOG.info("line 01");
@@ -59,6 +62,9 @@ StringBuilder sb = new StringBuilder ();
     LOG.info("weather list " + CWD.getWeatherList());
     LOG.info("wind force km/h: " + CWD.getWindData().getSpeed() );
     LOG.info("wind gust/rafales : " + CWD.getWindData().getGust() );
+    LOG.info("Humidity : " + CWD.getMainData().getHumidity());
+    LOG.info("Pressure : " + CWD.getMainData().getPressure());
+   //  LOG.info("Pressure : " + CWD.getMainData().getPressure());
 // https://stackoverflow.com/questions/2131195/cardinal-direction-algorithm-in-java
 //  http://snowfence.umn.edu/Components/winddirectionanddegreeswithouttable3.htm
 

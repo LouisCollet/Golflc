@@ -5,11 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 // ce programme élimine les flights déjà réservés !
 public class FlightList implements interfaces.Log
@@ -47,10 +46,11 @@ try{
                 
          //       fl.setFlightStart(rs.getDate("FlightStart"));
                 java.util.Date d = rs.getTimestamp("FlightStart");
-                LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                fl.setFlightStart(date);
+             //   LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            //    LocalDateTime date = DatetoLocalDateTime(d);
+                fl.setFlightStart(DatetoLocalDateTime(d));
                 
-                fl.setCourse_idcourse(rs.getInt("course_idcourse"));
+                fl.setCourse_idcourse(rs.getInt("flight.course_idcourse"));
                 fl.setFlightPeriod("?");
                 liste.add(fl);
             }

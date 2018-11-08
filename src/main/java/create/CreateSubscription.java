@@ -1,6 +1,5 @@
 package create;
 
-
 import entite.Player;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
@@ -10,15 +9,10 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import utils.DBConnection;
 import utils.LCUtil;
-/**
- *
- * @author collet
- */
 
 // encoe à faire !! danas le futur, l'appeler à partir de create player
 public class CreateSubscription implements interfaces.Log, interfaces.GolfInterface
 {
-   
     public boolean createSubscription(final Player player, final Connection conn) throws SQLException
     {
         PreparedStatement ps = null;
@@ -41,7 +35,8 @@ public class CreateSubscription implements interfaces.Log, interfaces.GolfInterf
             ps.setTimestamp(2, ts);  // start subscription date
             ps.setTimestamp(3, ts);  // end subscription date
             ps.setInt(4, 0);  // trial count
-            ps.setTimestamp(5, LCUtil.getCurrentTimeStamp());
+            ps.setString(5,""); // new 14-10-2018 paymentReference
+            ps.setTimestamp(6, LCUtil.getCurrentTimeStamp());
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
             if (row != 0) 
@@ -57,7 +52,6 @@ public class CreateSubscription implements interfaces.Log, interfaces.GolfInterf
                 return true;
             } else {
                 String msg = "<br/><br/>ERROR insert for subscription : "  + player.getIdplayer();
-                  ;
                 LOG.info(msg);
                 LCUtil.showMessageFatal(msg);
                 return false;

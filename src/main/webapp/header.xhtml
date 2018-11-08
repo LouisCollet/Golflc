@@ -21,7 +21,7 @@
                          value="#{msg['button.logout']}"
                          immediate="true"
                          icon="ui-icon-power"
-                         action="#{courseC.logout()}"
+                         action="#{courseC.logout('from button Logout')}"
                          rendered="#{courseC.connected}"
                          onclick="window.location.reload();"
                          />
@@ -116,9 +116,16 @@ Set this parameter to true if you want to force the browser to get the page from
     <h:outputText value=" /Subscription Trial : " rendered="#{courseC.player.idplayer != null}"/>
     <b> <h:outputText value=" #{courseC.subscription.trialCount}" rendered="#{courseC.player.idplayer != null}"/> </b> 
 
-    <h:outputText value=" /ZoneId Time Zone : " rendered="#{courseC.player.idplayer != null}"/>
-    <b> <h:outputText value=" #{player.getPlayerTimeZone().getTimeZoneId()}" rendered="#{courseC.player.idplayer != null}"/> </b> 
+    
+    
+    
+    <h:outputText value=" /ZoneId Time Zone : " 
+                  rendered="#{courseC.player.idplayer != null}"/>
+    <b> <h:outputText value=" #{courseC.player.getPlayerTimeZone().getTimeZoneId()}"
+                      rendered="#{courseC.player.idplayer != null}"/> </b> 
 
+   
+    
     <h:outputText value=" /Sunset, sunrise : " rendered="#{courseC.player.idplayer != null}"/>
     <b> <h:outputText value=" #{courseC.sunRiseSet}" rendered="#{courseC.player.idplayer != null}"/> </b> 
         

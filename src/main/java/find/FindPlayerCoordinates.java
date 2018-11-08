@@ -3,6 +3,7 @@ package find;
 import com.google.maps.model.LatLng;
 import entite.Player;
 import exceptions.LCCustomException;
+import googlemaps.GoogleResult;
 import googlemaps.GoogleTimeZone;
 import static interfaces.Log.LOG;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
@@ -29,8 +30,11 @@ LOG.info("entering findPlayerLatLngTz " );
         String country_completed = ListCountry.getExtendedCountry(player.getPlayerCountry());
             LOG.info("Player country completed = " + country_completed) ;
     //    String address = player.getPlayerCity() + "," + address_completed;
-///----------        
-        LatLng latlng = GoogleGeoApiController.findLatLng(player.getPlayerCity() + ", " + country_completed);
+        GoogleGeoApiController ggeo = new GoogleGeoApiController();
+       
+        GoogleResult gr = ggeo.findLatLng(player.getPlayerCity() + ", " + country_completed);
+        LatLng latlng = gr.getGeometry().getLocation().getLatlng();// = ggeo.findLatLng(player.getPlayerCity() + ", " + country_completed);
+        ; //
             LOG.info(" returned Google Player latlng = " + latlng);
         if(latlng == null){
             player.setPlayerLatLng(null);
@@ -46,7 +50,8 @@ LOG.info("entering findPlayerLatLngTz " );
         }
             LOG.info("playerLanguage = " + player.getPlayerLanguage()); // a été complété par playerLanguageListener, 
 ///--------------
-            GoogleTimeZone tz = GoogleGeoApiController.findTimeZone(latlng, player.getPlayerLanguage());  // à modifier ultérieurement
+    //        GoogleGeoApiController ggeo = new GoogleGeoApiController();
+            GoogleTimeZone tz = ggeo.findTimeZone(latlng, player.getPlayerLanguage());  // à modifier ultérieurement
             LOG.info(" returned Player Google TimeZone = " + tz);
        
         if(tz == null){
@@ -70,7 +75,7 @@ LOG.info("entering findPlayerLatLngTz " );
         }
             LOG.info("Player ZoneId      = " + player.getPlayerTimeZone().getTimeZoneId());
             LOG.info("Player Zone Name   = " + player.getPlayerTimeZone().getTimeZoneName() );
-       
+            LOG.info("Player Zone Name   = " + player.getPlayerTimeZone().getTimeZoneName() );
    //     return "selectHomeClub.xhtml?faces-redirect=true";
     return player;
 

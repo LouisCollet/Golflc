@@ -66,7 +66,6 @@ public ArrayList<Flight> createTableFlights (ZonedDateTime sunrise, ZonedDateTim
             fl.setFlightStart(ld);
 //                LOG.info("Flight 3 " + i + " = " + fl.getFlightStart());
             LocalTime lt = sunrise.toLocalTime();
-
 //                LOG.info("local time lt = " + lt);
                 if(lt.isBefore(LocalTime.of(12,0) )){
 //                    LOG.info("lt isBefore 12 HH == " + lt);

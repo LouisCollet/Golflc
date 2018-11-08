@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.maps.model.LatLng;
 import googlemaps.GoogleResponse;
+import googlemaps.GoogleResult;
 import googlemaps.GoogleTimeZone;
 import static interfaces.Log.LOG;
 import java.io.IOException;
@@ -48,31 +49,27 @@ public class GoogleGeoApiController
   * "address,city,state,zipcode". Here address means "street number + route"
   * .
   */
- public static LatLng findLatLng(String fullAddress) throws IOException, Exception {
+ //public LatLng findLatLng(String fullAddress) throws IOException, Exception {
+     public GoogleResult findLatLng(String fullAddress) throws IOException, Exception {
   /*
    * Create an java.net.URL object by passing the request URL in constructor.
      Here you can see I am converting the fullAddress String in UTF-8 format.
      You will get Exception if you don't convert your address in UTF-8 format. 
    */
   try{
-      Objects.requireNonNull(fullAddress, "requireNonNull - fullAddress = null - nothing found in findLatLng - Back to sender");
-  //    Objects.requireNonNull(anotherPointer, "anotherPointer cannot be null!");
-
-      if (fullAddress == null)
+       LOG.info("entering findLatLng with fullAddress =  " + fullAddress);
+     if (fullAddress == null)
       { LOG.info("fullAddress = null - nothing found in findLatLng - Back to sender");
         return null;} 
- //     if (country == null)
- //     { LOG.info("Country = null - nothing in findLatLng");
- //       return null;} 
-      
-  //    String fullAddress = city + "," + country;
-       LOG.info("welcome to findLatLng with fullAddress =  " + fullAddress);
+       
+      Objects.requireNonNull(fullAddress, "requireNonNull - fullAddress = null - nothing found in findLatLng - Back to sender");
+  //    Objects.requireNonNull(anotherPointer, "anotherPointer cannot be null!");
 
      URL url = new URL(URL + "&address=" + URLEncoder.encode(fullAddress, "UTF-8") );
         LOG.info("URL = " + url);
   //   url = url + "&key= ???";
     urlConnection = (HttpsURLConnection) url.openConnection(); // Open the Connection
-      LOG.info("URL after connection= " );
+      LOG.info("URL for connection= " );
     // see https://github.com/FasterXML/jackson-databind
     iStream = urlConnection.getInputStream() ;
        LOG.info("after iStream = " );
@@ -81,27 +78,48 @@ public class GoogleGeoApiController
  
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);// to prevent exception when encountering unknown property:
   //      LOG.info("after mapper disable = " );
-    response = (GoogleResponse)mapper.readValue(iStream, GoogleResponse.class);
+    response = mapper.readValue(iStream, GoogleResponse.class);
+ //   response = (GoogleResponse)mapper.readValue(iStream, GoogleResponse.class);
     mapper.configure(SerializationFeature.INDENT_OUTPUT, true); // equivalent Pretty Print
         LOG.info("From Google Api :\n" + mapper.writeValueAsString(response));
-  //     LOG.info("after response status = " + response ); // + response.getStatus());
-    //   LOG.info("response length = " + response.getResults().length);
+        LOG.info("reponse from Google Api, formatted address = " + response.getResults()[0].getFormatted_address());
+        LOG.info("reponse from Google Api, is partial match = " + response.getResults()[0].isPartial_match());
+        
+        // à modifier c'est pas bon si partial match = true !!
+        
+        
+        
+        LOG.info("reponse from Google Api, status = " + response.getStatus());  //doit être "OK"
+        
  //   if(response.getStatus() == null)
  //           LOG.info("response = null");
    //    LOG.info("response LatLng = " + response.getResults()[0].getGeometry()..getLocation().toString());
-   if(!response.getStatus().equals("ZERO_RESULTS"))
-    {     // resultat correct - on prend la première situation ?? que faire si trop de solutions ?
+   
+   if(!response.getStatus().equals("ZERO_RESULTS")
+           || !response.getResults()[0].isPartial_match() 
+           || response.getResults().length > 1)
+    {   // à ajouter si on trouve plus qu'une solution !!
+        
+        // resultat correct - on prend la première situation ?? que faire si trop de solutions ? 1
         // voir la solution de ??
+        String msg = "reponse from Google Api, formatted address = " + response.getResults()[0].getFormatted_address();
             LOG.info("How many results ? = " + response.getResults().length);
-        LatLng latlng = response.getResults()[0].getGeometry().getLocation().getLatlng(); // les 2 en même temps !!!
-            LOG.info("Geoapi LatLng latlng  : " + latlng);
-        return latlng;
+            LOG.info("msg = " + msg);
+        
+        GoogleResult gr = new GoogleResult();
+        gr.setGeometry(response.getResults()[0].getGeometry());
+        LOG.info("line 01");
+        gr.setFormatted_address(response.getResults()[0].getFormatted_address());
+        LOG.info("line 02");
+  //      LatLng latlng = response.getResults()[0].getGeometry().getLocation().getLatlng(); // les 2 en même temps !!!
+      //      LOG.info("Geoapi LatLng latlng  : " + latlng);
+      LCUtil.showMessageInfo(msg);
+        return gr;
+            //return latlng;
     } else {
             String msg =  LCUtil.prepareMessageBean("zero.result"); 
-       //     String msg = "Error_message = ZERO_RESULTS";
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-       //     throw new Exception(msg);
             return null;
         }
   //   return latlng;
@@ -127,7 +145,7 @@ public class GoogleGeoApiController
  } //end method
  
  // développé par lc sur base de l'exemple précédent
- public static GoogleTimeZone findTimeZone(LatLng latlng, String locale) throws IOException {
+ public GoogleTimeZone findTimeZone(LatLng latlng, String locale) throws IOException {
   try{
    // documentation   https://developers.google.com/maps/documentation/timezone/intro
 // location — Paire de valeurs de latitude et longitude séparées par une virgule (location=-33.86,151.20, par exemple), représentant le point géographique à rechercher.
@@ -177,7 +195,8 @@ public class GoogleGeoApiController
     // see https://github.com/FasterXML/jackson-databind
     ObjectMapper mapper = new ObjectMapper();  // create once, reuse
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);// to prevent exception when encountering unknown property:
-    GoogleTimeZone tz = (GoogleTimeZone)mapper.readValue(iStream, GoogleTimeZone.class);
+  //  GoogleTimeZone tz = (GoogleTimeZone)mapper.readValue(iStream, GoogleTimeZone.class);
+     GoogleTimeZone tz = mapper.readValue(iStream, GoogleTimeZone.class);
     mapper.configure(SerializationFeature.INDENT_OUTPUT, true); // equivalent Pretty Print
     LOG.info("mapper avec indent\n" + mapper.writeValueAsString(tz));
  //       LOG.info("Pretty Print tz = \n" + mapper.writerWithDefaultPrettyPrinter().writeValueAsString(tz));
@@ -233,7 +252,8 @@ public class GoogleGeoApiController
         iStream = conn.getInputStream() ;
         ObjectMapper mapper = new ObjectMapper(); 
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);// to prevent exception when encountering unknown property:
-        response = (GoogleResponse)mapper.readValue(iStream, GoogleResponse.class);
+    //    response = (GoogleResponse)mapper.readValue(iStream, GoogleResponse.class);
+        response = mapper.readValue(iStream, GoogleResponse.class);
             LOG.info("response status = " + response.getStatus());
             LOG.info("response length = " + response.getResults().length);
             LOG.info("response print = " + response.getResults()[0].toString());
@@ -253,32 +273,14 @@ public class GoogleGeoApiController
   try{
  // GoogleResponse res = new GoogleGeoApiController().convertToLatLong("Apollo Bunder,Mumbai ,Maharashtra, India");
  // String adr = "Rue de l'Amazone 55, 1060 Brussels, Belgium";
+ /*
   String adr = "Rue de l'Amazone 55, Belgium";
   LatLng latlng = new GoogleGeoApiController().findLatLng(adr);
         LOG.info("LatLng rs = :" );
         LOG.info("LatLng rs = :"  + latlng);
-         /*
-  GoogleResponse res2 = new GoogleGeoApiController().convertFromLatLong("18.92038860,72.83013059999999");
-  if(res2.getStatus().equals("OK"))
-  {
-   for(GoogleResult result : res2.getResults())
-   {
-    LOG.info("address is :"  +result.getFormatted_address());
-   }
-  } else {
-    LOG.info("Fatal error in Status = " + res2.getStatus());
-  }
   
-    String[] latlng = "50.8262271,4.3571382".split(",");
- // String[] latlng =  "-34.8799074,174.7565664";
-    double latitude = Double.parseDouble(latlng[0]);
-    double longitude = Double.parseDouble(latlng[1]);
-    LatLng location = new LatLng(latitude, longitude);
-    
-    
-    */
-  // GoogleTimeZone tz1 = new GoogleGeoApiController().findTimeZone(location);
-  GoogleTimeZone tz1 = GoogleGeoApiController.findTimeZone(latlng,"es");
+  GoogleGeoApiController ggeo = new GoogleGeoApiController();
+  GoogleTimeZone tz1 = ggeo.findTimeZone(latlng,"es");
    //  LOG.info("after GoogleResponse in main = ");
    if(tz1.getStatus().equals("OK"))
   {     //LOG.info("tz1 getstatuts is = OK");
@@ -290,7 +292,7 @@ public class GoogleGeoApiController
    } else {
         LOG.info("Fatal error in Status = " + tz1.getStatus() + " " + tz1.getError_message());
   }
-
+*/
   } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

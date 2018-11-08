@@ -91,7 +91,7 @@ public Boolean checkPassword(String uuid, Connection conn) throws SQLException, 
                      String href = msg + url + "/login.xhtml";
                      String to = "louis.collet@skynet.be";
                      utils.SendEmail sm = new utils.SendEmail();
-                     boolean boo = sm.sendHtmlMail(sujet,href,to);
+                     boolean boo = sm.sendHtmlMail(sujet,href,to,"PASSWORD");
                         LOG.info("HTML Mail status = " + boo);
                   return true;
             } //end else 1

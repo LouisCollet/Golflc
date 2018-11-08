@@ -109,7 +109,7 @@ public class CheckingMails implements interfaces.Log {
             LOG.debug("equals unsubscribe " + subject);
             // envoyer un mail de confirmayion de réception
             utils.SendEmail sm = new utils.SendEmail();
-            boolean b = sm.sendHtmlMail("unsubscribe confirmation : " + from, "mailbody = unsubscribe confirmation", "louis.collet@skynet.be");
+            boolean b = sm.sendHtmlMail("unsubscribe confirmation : " + from, "mailbody = unsubscribe confirmation", "louis.collet@skynet.be","CHECKING");
                LOG.info("HTML Mail status = " + b);
             // delete logique du mail current
             message.setFlag(Flags.Flag.DELETED, true);

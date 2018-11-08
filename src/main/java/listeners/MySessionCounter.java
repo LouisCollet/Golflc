@@ -53,8 +53,8 @@ private List<String> sessions = new ArrayList<>();
   LOG.info("session invalidated = " );//+ activeSessions); 
   }
   public int getActiveSessions() {
-   LOG.info("number of active sessions 1 = " + activeSessions);
-   LOG.info("number of active sessions 2 = " + sessions.size());
+   LOG.info("number of active sessions = " + activeSessions);
+///   LOG.info("number of active sessions 2 = " + sessions.size());
    return activeSessions;
   }
 

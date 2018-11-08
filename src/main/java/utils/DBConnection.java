@@ -61,6 +61,10 @@ try{
         conn = DriverManager.getConnection(db_connection,
                 p.getProperty("jdbc.username"), 
                 p.getProperty("jdbc.password"));
+        DatabaseMetaData meta = null;
+        meta = conn.getMetaData();
+         LOG.info(" -- Meta JDBC Version = " + meta.getJDBCMajorVersion() + '.' + meta.getJDBCMinorVersion());
+         LOG.info(" -- Meta JDBC Connector Version = " + meta.getDriverVersion() );
 	return conn;
 }catch (SQLException e){
 	LOG.error("SQLException in Opening Connection : " + db_connection + " Errorcode = " + e);
@@ -191,10 +195,12 @@ properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildF
           return conn = ds.getConnection();
    }catch (NamingException e) {
                LOG.error(" naming exception in getJNDIConnection = " + e);
+               return null;
    }catch (Exception ex){
           LOG.info("exception in jndi" + ex);
+          return null;
    }finally{
-      return conn;
+  //   return conn;
    }
   }  // end method
 
@@ -282,6 +288,12 @@ try{
             LOG.info("-- getPooledConnection Database opened = " + connPool.getCatalog() );
             LOG.info("-- getPooledConnection isValid ? = " + connPool.isValid(5)); // timeout 5 seconds ;
             LOG.info("-- PooledConnection = " + connPool);
+            
+          DatabaseMetaData meta = null;
+          meta = connPool.getMetaData();
+         LOG.info(" -- Meta JDBC Version = " + meta.getJDBCMajorVersion() + '.' + meta.getJDBCMinorVersion());
+         LOG.info(" -- Meta JDBC Connector Version = " + meta.getDriverVersion() );
+            
      //        conn.setAutoCommit(true); //
              return connPool;
         }else{
@@ -315,7 +327,7 @@ try{
 public String toString()
 { return 
         ("from DBConnection = "
-               + " ,conn : "   + this.getConn()
+               + " ,conn : "   + DBConnection.getConn()
           //     + " ,club Name : " + this.getClubName()
           //     + " ,club City : " + this.getClubCity()
         );

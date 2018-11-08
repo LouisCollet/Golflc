@@ -1,19 +1,77 @@
 package test_instruction;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-//import org.apache.commons.lang3.ArrayUtils;
 
 
-public class test_3 implements interfaces.Log
+public class test_3 // implements interfaces.Log
 {
 
   public static void main(String[] args)
   {
+      
+ // input primitive integer array
+      
+      
+      // input primitive integer array
+		int[] intArray = { 1, 2, 3, 4 ,5 };
+
+		String strArray[] = new String[intArray.length];
+
+		for (int i = 0; i < intArray.length; i++)
+			strArray[i] = String.valueOf(intArray[i]);
+
+		System.out.println("array string =" + Arrays.toString(strArray));
+      
+      
+             //   int[] intArray = {1, 2, 3, 4, 5};
+
+        // 1. Arrays.stream -> IntStream 
+    //    IntStream intStream1 = Arrays.stream(intArray);
+    //    intStream1.forEach(x -> System.out.println(x));
+
+        // 2. Stream.of -> Stream<int[]>
+    //    Stream<int[]> temp = Stream.of(intArray);
+
+        // Cant print Stream<int[]> directly, convert / flat it to IntStream 
+    //    IntStream intStream2 = temp.flatMapToInt(x -> Arrays.stream(x));
+    //    intStream2.forEach(x -> System.out.println(x));
+                
+                
+      
+		int[] intArray2 = { 1, 2, 3, 4, 5 };
+
+//		String strArray2[] = Arrays.stream(intArray2)
+//			.mapToObj(String::valueOf)
+//			.toArray(String[]::new);
+
+		System.out.println(Arrays.toString(strArray));};
+      
+      
+      /*
+      
+      
+      String text = "abcdefghijkl1234"; 
+        LOG.info("text =  " + text); 
+        System.out.println("The size of the String is " + text.length()); 
+      
+      String numbers = text.substring(0, text.length() - 4) + "****"; 
+
+//.subtring("****");
+        System.out.println("numbers =  " + numbers); 
+        
+    //      numbers = "************" + text.substring(text.length()-4, text.length()); 
+    //      System.out.println("numbers =  " + numbers); 
+          
+          numbers = repeat("*", 12) + text.substring(text.length()-4); 
+          System.out.println("numbers =  " + numbers); 
+          
+         
+          
+        int n = 8;
+String s = "Hello, World!";
+ System.out.println("s =  " + s); 
+System.out.println("reducted = " + s.substring(0,n));
+        
       Map<String, Integer> items = new HashMap<>();
 
         items.put("coins", 3);
@@ -88,10 +146,10 @@ System.out.println("The number is: " + number);
    //     }
         
         
-        for(Double speed : unboxed) {
-            LOG.info("Print ad element Double = " + speed);
-        }
-
+//        for(Double speed : unboxed) {
+ //           LOG.info("Print ad element Double = " + speed);
+ //       }
+/*
       List<String> myList = new ArrayList<>();
     myList.add("Black");
     myList.add("White");
@@ -151,6 +209,6 @@ for (String myString:myArray) {
        s2 = s2.trim();} //.replace(" ","0");
       System.out.println( "s2 = /" + s2 + "/");
       
-      
+      */
   }    
-}
+//}

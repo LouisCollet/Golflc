@@ -10,8 +10,7 @@ package utils;
  */
 import java.util.Comparator;
 
-//@SuppressWarnings("rawtypes")
-
+@SuppressWarnings("rawtypes")
 class ColumnComparator implements Comparator
 {
 int columnToSort;

@@ -1,17 +1,22 @@
 
 package entite;
 
+import static interfaces.Log.LOG;
+import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import javax.inject.Named;
 import javax.validation.constraints.*;
+import utils.LCUtil;
 /**
  *
  * @author collet
  */
 @Named
-public class Handicap implements Serializable, interfaces.Log, interfaces.GolfInterface
+public class Handicap implements Serializable, interfaces.GolfInterface
 {
     private static final long serialVersionUID = 1L;
     
@@ -100,11 +105,28 @@ public class Handicap implements Serializable, interfaces.Log, interfaces.GolfIn
  @Override
 public String toString()
 { return 
-        ("from entite = " + this.getClass().getSimpleName()
-             + " ,Handicap Start : "   + this.SDF.format(getHandicapStart() )
+        (NEW_LINE + "FROM ENTITE = " + this.getClass().getSimpleName()
+             + " ,Handicap Start : "   + Handicap.SDF.format(getHandicapStart() )
              + " ,Player Handicap : " + this.getHandicapPlayer() 
      //        + " ,Playing Handicap : " + this.getPlayingHandicap()
              + " ,Handicap End : " + this.getHandicapEnd()
         );
 }
+  public static Handicap mapHandicap(ResultSet rs) throws SQLException{
+      String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Handicap h = new Handicap();
+        h.setHandicapStart(rs.getDate("idhandicap") );
+        h.setHandicapEnd(rs.getDate("HandicapEnd") );
+        h.setHandicapPlayer(rs.getBigDecimal("HandicapPlayer") );
+    
+   return h;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method map
+
 } //end class

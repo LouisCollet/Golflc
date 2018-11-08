@@ -9,15 +9,9 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-/**
- *
- * @author collet
- */
-public class ModifyPlayer implements Serializable, interfaces.Log, interfaces.GolfInterface
-{
+public class ModifyPlayer implements Serializable, interfaces.Log, interfaces.GolfInterface{
 
-public boolean modifyPlayer(final Player player, final Connection conn) throws Exception
-    {
+public boolean modifyPlayer(final Player player, final Connection conn) throws Exception{
         PreparedStatement ps = null;
         int row = 0;
         boolean b = false;
@@ -45,7 +39,6 @@ public boolean modifyPlayer(final Player player, final Connection conn) throws E
         LOG.info("String from listMetaColumns = " + s);
         // encrypted password with SHA2 function of mysql 
  ///   s = s.replace("playerpassword=?" , "playerpassword=sha2(?,256)"); // new 07-08-2018 
-    
         LOG.info("String modified for encryption password sha2 = " + s);
         
     String query = "UPDATE player"
@@ -91,8 +84,7 @@ public boolean modifyPlayer(final Player player, final Connection conn) throws E
                 //    return false; pas compatible avec throw
             }
 return true;
-        } // end try
-catch (SQLException sqle) {
+}catch (SQLException sqle) {
             String msg = "£££ SQLException in Modify Player = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);
@@ -107,7 +99,5 @@ catch (SQLException sqle) {
             DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
         }
 //         return false;
-    } //end createplayer
-
- 
+    } //end modifyPlayer
 } //end Class

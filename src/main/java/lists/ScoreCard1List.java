@@ -24,8 +24,7 @@ public class ScoreCard1List implements interfaces.Log
 //    private static BigDecimal HandicapPlayer;
     
 public List<ScoreCard> getScoreCardList1(final Player player, final Round round,
-        final Connection conn) throws SQLException, NullPointerException, LCCustomException 
-{  
+        final Connection conn) throws SQLException, NullPointerException, LCCustomException{  
   //  LOG.debug("  ... entering ScoreCard1List !!!");
     
 if(liste == null)
@@ -33,11 +32,16 @@ if(liste == null)
      LOG.debug("starting getScoreCardList1 for round : {} with listsc1 = {}", round, liste);
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
+        // String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+  //   String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+     String ha = utils.DBMeta.listMetaColumnsLoad(conn, "Handicap");
 String query =
-          "SELECT"
-        + "   PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer, idround, playergender, PlayerBirthDate"
+        "SELECT"
+        + pl + "," + ha + "," + ro
+  //      + "   PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer, idround, playergender, PlayerBirthDate"
         + " FROM player, handicap, round"
         + " WHERE"
         + "   player.idplayer=?"

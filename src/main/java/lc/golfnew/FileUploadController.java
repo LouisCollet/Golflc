@@ -21,8 +21,7 @@ public class FileUploadController implements Serializable, interfaces.Log, inter
 {
     private static UploadedFile uploadedFile; 
 
-public static void uploadListener(FileUploadEvent event, Player player, Connection conn)
-{
+public static void uploadListener(FileUploadEvent event, Player player, Connection conn){
 try{
         LOG.info("starting uploadListener, player = " + player);
 
@@ -97,7 +96,7 @@ try{
     }
 
     public void setUploadedFile(UploadedFile uploadedFile) {
-        this.uploadedFile = uploadedFile;
+        FileUploadController.uploadedFile = uploadedFile;
     }
 
 //    public Upload getUpload() {

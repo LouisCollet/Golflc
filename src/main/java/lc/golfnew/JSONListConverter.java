@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,7 +15,6 @@ import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.enterprise.context.SessionScoped;
@@ -62,8 +60,8 @@ public class JSONListConverter implements Serializable, interfaces.GolfInterface
 // http://www.baeldung.com/jackson-jsonmappingexception
     	//Define map which will be converted to JSON
         
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+ //       SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+ //       sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
    //  sdf.setTimeZone(zone);
     //   Date [][]datesSeason = new Date[20][3];
        String [][]datesSeason = new String[20][3];

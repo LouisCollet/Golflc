@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+>
+
+<ui:composition template="templates/loginTemplate.xhtml">
+    <!--  new 27-08-2018  
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.login.start()}"/>
+    </f:metadata>
+</ui:define>
+-->
+<ui:define name="title">
+    Login
+</ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_login.xhtml"/>
+</ui:define>
+<ui:define name="content">
+ <a href="login.xhtml"></a>
+<h:link id="link01"
+        title="#{msg['login.user.old']}"
+        outcome="selectPlayer.xhtml"
+        style="float:left;"
+        >
+        <h:graphicImage 
+                    rendered="true"
+                    name="images/login.jpg"
+                    alt="image missing : login.jpg"
+                    style="float:left;">
+        </h:graphicImage>
+</h:link>
+
+<h:link id="link02"
+        title="#{msg['login.user.new']}"
+        outcome="register.xhtml"
+        style="float:right;"
+        > 
+        <h:graphicImage 
+                rendered="true"
+                name="images/register.jpg"
+                alt="image missing :golf_register.jpg"
+                style="float:right;">
+        </h:graphicImage>
+</h:link>
+<!--  https://stackoverflow.com/questions/2206911/performing-user-authentication-in-java-ee-jsf-using-j-security-check/2207147#2207147 -->
+<h:form id="login_balus" enctype="application/x-www-form-urlencoded">
+            <p:panelGrid columns="2">
+                <h:outputText value="Username"/>
+                <p:inputText id="userName"
+                             value="#{courseC.login.username}"
+                             required="true"
+                             />
+
+                <h:outputText value="Password"/>
+                <h:inputSecret id="password"
+                               value="#{courseC.login.password}"
+                               required="true"
+                               />
+            </p:panelGrid>
+    <p:commandButton value="#{msg['login.user.old']}"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="fa fa-key"
+                         action="#{courseC.loginAPI}" 
+                         />
+
+ </h:form>
+</ui:define>
+</ui:composition>
+</html>

@@ -12,14 +12,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Arrays;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.runtime.context.JobContext;
 import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 /**
  *
@@ -138,8 +137,8 @@ public Object readItem() throws Exception     // à valider
        //          round.setRoundDate(SDF_TIME.parse(values2D[count][0]) );
                  
                  java.util.Date d = SDF_TIME.parse(values2D[count][0]);
-                 LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                 round.setRoundDate(date);
+             //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                 round.setRoundDate(DatetoLocalDateTime(d));
          
                  
                  

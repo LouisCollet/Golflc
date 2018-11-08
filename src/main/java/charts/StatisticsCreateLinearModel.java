@@ -75,29 +75,34 @@ public class StatisticsCreateLinearModel implements interfaces.Log
                 linearModel.addSeries(series1);
                 LOG.info("No Round Found for this Course = ");
             } //end else
-
+   return linearModel;
         } // end try
+     
         catch (ArrayIndexOutOfBoundsException cv) {
             String msg = "£££ index out of bounds = if from <0 or from > original.length() " + cv.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         } catch (IllegalArgumentException cv) {
             String msg = "£££ illegal argument = if from > to " + cv.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         } catch (NullPointerException cv) {
             String msg = "£££ nullPointerException in createLinearModel : " + cv.getMessage(); // null
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         } catch (Exception cv)
         {
             String msg = "£££ other exception = " + cv.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
+            return null;
         }
         finally
         {   
-            return linearModel;
+          //  return linearModel;
             }    
    //     }
 

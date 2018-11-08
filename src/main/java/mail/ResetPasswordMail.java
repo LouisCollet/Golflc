@@ -41,7 +41,7 @@ public class ResetPasswordMail {
             String sujet = "Forgot Your Password for GolfLC";
             String to = "louis.collet@skynet.be";
             utils.SendEmail sm = new utils.SendEmail();
-            boolean b = sm.sendHtmlMail(sujet,msg,to);
+            boolean b = sm.sendHtmlMail(sujet,msg,to,"PASSWORD");
             
             msg = "-- We just send you an mail for resetting your Password, please use it within the 10 minutes ... = " ;//+ player.getIdplayer()
             LOG.info(msg);

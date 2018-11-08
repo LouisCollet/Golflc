@@ -4,19 +4,14 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-/**
- *
- * @author collet
- */
 public class CreatePlayer implements java.io.Serializable, interfaces.Log, interfaces.GolfInterface//, interfaces.PlayerDao
-{  // doit être abstract sinon il faut implémentere toutes les méthodes ...
+{  
     // private final static String photoFile = "no photo";
     private static String photo;
      
  //@Override
     public boolean createPlayer(final entite.Player player, final entite.Handicap handicap,
-                final java.sql.Connection conn, final String batch) throws Exception
-    {
+                final java.sql.Connection conn, final String batch) throws Exception{
         java.sql.PreparedStatement ps = null;
         int row = 0;
         boolean b = false;
@@ -41,32 +36,26 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
             ps.setInt(8, player.getPlayerHomeClub());
             // à modifier
      //       String photo = "";
-            if(player.iseID() ) // player with belgian eID
-                {
+            if(player.iseID()){ // player with belgian eID
        //             photo = FilleIDcardPlayer.photoURL(CourseController.eID);
                     photo = player.getPlayerPhotoLocation();
                         LOG.info("photo file for database = " + photo );
-    //                CourseController.eID.disconnect();
-      //                  LOG.info("eID is disconnected");
-                }else{
-                    photo = "no photo";
-                }
+            }else{
+                    photo = "no photo";}
             ps.setString(9, photo);
             ps.setString(10, player.getPlayerLanguage());
             ps.setString(11, player.getPlayerEmail()); // new 15/11/2012
-            if(batch.equals("B"))
-            {
+            if(batch.equals("B")){
                 LOG.info("is batch");
                 ps.setShort(12, Short.parseShort("1"));
             }else{
-                ps.setShort(12, (short) 0); // getPlayerActivation , activÃ© Ã  0 doit Ãªtre 1 !! new 13/04/2013
-            }
-      //      ps.setString(13, player.getPlayerZoneId() ); // new 11/03/2017
+                ps.setShort(12, (short) 0);} // getPlayerActivation , activÃ© Ã  0 doit Ãªtre 1 !! new 13/04/2013
             ps.setString(13, player.getPlayerTimeZone().getTimeZoneId() ); // new 28/03/2017 using GoogleTimeZone
             ps.setString(14, player.getPlayerLatLng().toString()); // new 28/03/2017
             // new 07/08/2018  attention password est null à la création !!
             ps.setString(15, null); 
-            ps.setTimestamp(16, LCUtil.getCurrentTimeStamp()); // was 15
+            ps.setString(16, "PLAYER"); 
+            ps.setTimestamp(17, LCUtil.getCurrentTimeStamp()); // was 15
             utils.LCUtil.logps(ps);
             row = ps.executeUpdate(); // write into database
                 LOG.info("row = " + row);

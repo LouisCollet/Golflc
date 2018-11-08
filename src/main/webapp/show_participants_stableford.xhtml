@@ -15,10 +15,6 @@
 <ui:define name="content">
 
 <h:form id="participants_rounds">
-<ui:include src="include/include_messages.xhtml"/>
-<!--
-<ui:include src="include/include_summary.xhtml"/>
--->
 <p:dataTable id="played_rounds_table1"
              value="#{courseC.listStableford1()}"
              var="c" >
@@ -89,13 +85,14 @@
                 id="cancelButton"
                 rendered="#{c.classment.totalPoints eq 0}"
                 action="#{courseC.cancelInscription(c)}"
-                value="#{msg['button.delete']} - #{c.idplayer} - #{c.idround}"
+                value="#{msg['button.delete']} - #{c.player.idplayer} - #{c.round.idround}"
                 icon="fa fa-trash-o fa-lg">
                 
                 <p:confirm header="#{msg['message.confirm']}"
                      message="#{msg['message.cancel']}" 
                      icon="fa fa-exclamation-triangle"
-                     severity="alert"/>
+                     severity="alert"
+                     />
             </p:commandButton>
 
              <h:outputText value="No delete possible : score already registered"
@@ -104,13 +101,6 @@
             
 	</p:column>
 
-<!--  #{c.inscription.playerhasroundFinalResult gt 0}
-<p:column headerText="#{msg['round.team']}"
-              footerText="#{msg['round.team']}"
-              style="width:10%" >
-   #{c.round.roundTeam}
-</p:column>
- -->
 <p:column headerText="#{msg['score.extra']}"
           footerText="#{msg['score.extra']}"
           style="width:5%" >

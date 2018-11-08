@@ -1,7 +1,10 @@
 
 package entite;
 
+import static interfaces.Log.LOG;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,6 +13,8 @@ import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 @Named
 public class Round implements Serializable, interfaces.Log, interfaces.GolfInterface
@@ -70,6 +75,7 @@ private String RoundScoreString;
     private List<Player> players ; //added 01/04/2013
     private String playersString;
     private Short roundPlayers;
+    
     public Round() // constructor
     {
        this.players = new ArrayList<>();
@@ -161,12 +167,6 @@ private String RoundScoreString;
         this.roundTeam = roundTeam;
     }
 
-
-
-    
-    
-    
-    
     public String getRoundGame() {
         return roundGame;
     }
@@ -250,7 +250,7 @@ public String toString()
     LOG.info("starting toString for Round = " + this.getIdround());
     if(this.getRoundDate() != null || this.getIdround() != null){
        return 
-        (NEW_LINE + "from entite : " + this.getClass().getSimpleName() + NEWLINE 
+        (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
                + " ,idround : "   + this.getIdround()
                + " ,Round Players : "   + this.getRoundPlayers()
                + " ,Round Date: "   + this.getRoundDate().format(ZDF_TIME)
@@ -260,6 +260,10 @@ public String toString()
                + " ,Round Game : " + this.getRoundGame()
                + " ,Round Qualifying : " + this.getRoundQualifying()
                + " ,Team : "   + this.getRoundTeam()
+               + " ,Holes : "   + this.getRoundHoles()
+               + " ,Start : "   + this.getRoundStart()
+               + " ,Nombre Players : "   + this.getPlayers()
+               + " ,Name Players : "   + this.getPlayersString()
         );
    }else{
         return
@@ -267,4 +271,31 @@ public String toString()
           + " idRound = null !!");
     }
 }
+public static Round mapRound(ResultSet rs) throws SQLException{
+      String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Round r = new Round();
+            r.setIdround(rs.getInt("idround") );
+                java.util.Date d = rs.getTimestamp("roundDate");
+            r.setRoundDate(DatetoLocalDateTime(d));
+            r.setRoundGame(rs.getString("roundgame") );
+            r.setRoundCBA(rs.getShort("RoundCSA") );
+            r.setRoundCompetition(rs.getString("RoundCompetition") );
+            r.setRoundQualifying(rs.getString("RoundQualifying") );
+            r.setRoundHoles(rs.getShort("RoundHoles") );
+            r.setRoundStart(rs.getShort("RoundStart") );// start
+            r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
+            r.setRoundTeam(rs.getString("roundTeam"));
+            
+      //      r.setCourse_idcourse(rs.getInt("course_idcourse"));
+           
+   return r;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method map
+
 } //end class

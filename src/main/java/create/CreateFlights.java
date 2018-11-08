@@ -39,7 +39,7 @@ public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
         //    ps.setTimestamp(2, LCUtil.getSqlTimestamp(SDF_TIME.parse(n.getFlightStart())) );
             LocalDateTime d = n.getFlightStart(); //.toLocalDate();
      //           LOG.info("line 2 = ok ");
-            java.sql.Timestamp ts = Timestamp.valueOf(d); //.atStartOfDay());  // error !
+            java.sql.Timestamp ts = Timestamp.valueOf(d); 
      //           LOG.info("line 3 = ok");
       //                  LOG.info("new endDate inserted in DB = " + ts);
             ps.setTimestamp(2, ts);

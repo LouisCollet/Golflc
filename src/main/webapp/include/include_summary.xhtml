@@ -61,11 +61,13 @@
             id="roundgcompetitionummary" 
             value="#{courseC.round.roundCompetition}"
             />
+      
+      <h:outputText value="#{msg['round.players']} :" />
+       <h:outputText
+                      id="roundplayers" 
+                      value="#{courseC.round.roundPlayers} = #{courseC.round.playersString}" />
 </p:panelGrid>
 <p:separator id="separatorsummary"/>
-
-
-
 
 </ui:composition>
 </h:body>

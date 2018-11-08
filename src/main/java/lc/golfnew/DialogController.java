@@ -7,8 +7,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.ViewHandler;
+import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
-import org.omnifaces.util.Faces;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import utils.LCUtil;
@@ -46,7 +49,7 @@ public class DialogController implements Serializable, interfaces.Log
 
   public static void viewFlight()
   {
-       LOG.info("entering viewFlight");
+       LOG.info("entering DialogController viewFlight");
     Map<String,Object> options = new HashMap<>();
     options.put("modal", true);
     options.put("draggable", true);
@@ -63,7 +66,7 @@ public class DialogController implements Serializable, interfaces.Log
  //   options.put("header", "header by LC");
 //   RequestContext.getCurrentInstance().openDialog("dialogFlight.xhtml", options, null); // deprecated changed 08/02/2018
     PrimeFaces.current().dialog().openDynamic("dialogFlight.xhtml", options, null); 
-        LOG.info("exiting viewFlight");
+        LOG.info("exiting DialogController viewFlight");
 }  
 
   
@@ -81,11 +84,10 @@ public class DialogController implements Serializable, interfaces.Log
     PrimeFaces.current().dialog().openDynamic("dialogPlayedRounds.xhtml", options, null); 
 }  
 
-  public void onFlightChosen(SelectEvent event) 
-{ 
+  public void onFlightChosen(SelectEvent event){ 
     //
         LOG.info("entering onFlightChosen() !");
-        LOG.info("entering closeDialog with source = " + event.getSource() );
+        LOG.info("entering onFlightChosen() with source = " + event.getSource() );
     Flight flight = (Flight) event.getObject(); 
         String msg = "Dialog return with flight : " + flight.toString();
         LOG.info("msg");
@@ -103,30 +105,41 @@ public class DialogController implements Serializable, interfaces.Log
          
 
 } 
-/*
-  public static  void closeFlightFromDialog(Flight flight) throws IOException{
-      LOG.info("entering selectflightfromdialog");
-      LOG.info("entering selectflightfromdialog with source = " + flight.toString() );
-  //    CourseController.setFlight(flight);
-     
-  //      LOG.info("after setflight, flight = " + CourseController.getFlight().getFlightStart() );
-  //         LOG.info("after setflight, flight HHMM = " +  dtf_HHmm.format(CourseController.getFlight().getFlightStart()) );
-     
-  //    CourseController.setFlight().
- //     closeDialog("dialogFlight.xhtml");
-      PrimeFaces.current().dialog().closeDynamic("dialogFlight.xhtml"); 
-  }
-*/
-  public static void closeDialog(Object obj) throws IOException
+
+@Inject
+private FacesContext facesContext;
+@Inject
+private UIViewRoot viewRoot;
+
+public void closeDialog(Object obj) throws IOException
     { // if(obj == null
         LOG.info("entering closeDialog with : " + obj.toString() );
 //      RequestContext.getCurrentInstance().closeDialog("LC - closeDialog");  // deprecated 08/02/2018
       // https://github.com/primefaces/primefaces/blob/master/src/main/java/org/primefaces/context/RequestContext.java
       PrimeFaces.current().dialog().closeDynamic(obj); 
       
-      Faces.refresh();
+ //     Faces.refresh();
+ //new 22-10-2018
+  //  FacesContext context = FacesContext.getCurrentInstance();
+  
+    String refreshpage = facesContext.getViewRoot().getViewId();
+    ViewHandler handler = facesContext.getApplication().getViewHandler();
+   // UIViewRoot root = handler.createView(facesContext, refreshpage);
+    viewRoot = handler.createView(facesContext, refreshpage);
+    viewRoot.setViewId(refreshpage);
+    facesContext.setViewRoot(viewRoot);
+      
+      
       String msg = "Dialog closed for = " + obj.toString();
         LOG.info(msg);
   //      LCUtil.showMessageInfo(msg);
     }
+
+public static void closeDialog2(Object obj) throws IOException{ // if(obj == null
+        LOG.info("entering closeDialog with : " + obj.toString() );
+//      RequestContext.getCurrentInstance().closeDialog("LC - closeDialog");  // deprecated 08/02/2018
+      // https://github.com/primefaces/primefaces/blob/master/src/main/java/org/primefaces/context/RequestContext.java
+      PrimeFaces.current().dialog().closeDynamic(obj); 
+}
+
   } //end class

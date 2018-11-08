@@ -1,17 +1,21 @@
 package entite;
 
 import com.google.maps.model.LatLng;
-import validator.ClubValidation;
-import validator.FirstUpper;
 import googlemaps.GoogleTimeZone;
 import static interfaces.GolfInterface.NEWLINE;
+import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import javax.validation.GroupSequence;
 import javax.validation.constraints.*;
+import utils.LCUtil;
+import validator.ClubValidation;
+import validator.FirstUpper;
 /**
  *
  * @author collet
@@ -80,7 +84,7 @@ private GoogleTimeZone clubTimeZone;  // intéressant voir googlemaps.GoogleTime
  ///   private String timeZoneId;
  ///   private String timeZoneName;
 private boolean CreateModify = true; // 12/08/2017
-
+private String clubFormattedAddress;
     public Club()
     {
    
@@ -210,6 +214,14 @@ private boolean CreateModify = true; // 12/08/2017
         this.clubTimeZone = clubTimeZone;
     }
 
+    public String getClubFormattedAddress() {
+        return clubFormattedAddress;
+    }
+
+    public void setClubFormattedAddress(String clubFormattedAddress) {
+        this.clubFormattedAddress = clubFormattedAddress;
+    }
+
  //   public String getClubZoneName() {
  //       return clubZoneName;
  //   }
@@ -240,19 +252,52 @@ private boolean CreateModify = true; // 12/08/2017
  @Override
 public String toString()
 { return 
-        ( NEWLINE + "from entite : " + getClass().getSimpleName() + NEWLINE 
+        ( NEWLINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase() + NEWLINE 
         + " idclub : "   + this.getIdclub()
                + " ,club Name : " + this.getClubName()
                + " ,club Address : " + this.getClubAddress()
                + " ,club City : " + this.getClubCity()
                + " ,club Country : " + this.getClubCountry()
                + " ,club Latitude : " + this.getClubLatitude()
-               + " ,club Longitude : " + this.getClubLongitude()
+  //             + " ,club Longitude : " + this.getClubLongitude()
                + " ,club Website : " + this.getClubWebsite()
-      //         + " ,club ZoneId : " + this.clubTimeZone.getTimeZoneId()  // faut tout sauter !!
+               + ", club Longitude  = " + String.format("%.6f", this.getClubLongitude())
+       //        + "club Zone ID   = " + this.getClubTimeZone().getTimeZoneId()
+      //         + " ,club ZoneId : " + this.clubTimeZone.getTimeZoneId()  // fait tout sauter !!
        //        + " ,club ZoneId : " + this.clubTimeZone.getTimeZoneId()   // fait tout sauter !!!
-        
-        );
+              );
 }   
-
+public static Club mapClub(ResultSet rs) throws SQLException{
+    String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Club c = new Club();
+        c.setIdclub(rs.getInt("idclub") );
+           //                 LOG.debug("idcclub setted = " + c.getIdclub() );
+        c.setClubName(rs.getString("clubName") );
+          //                  LOG.debug("clubname setted = " + c.getClubName() );       
+        c.setClubCity(rs.getString("clubCity") );
+          //                  LOG.debug("clubcity setted = " + c.getClubCity() );    
+        c.setClubCountry(rs.getString("clubCountry") );
+          //                  LOG.debug("clubcountry setted = " + c.getClubCountry() );       
+        c.setClubAddress(rs.getString("clubAddress") );
+          //                  LOG.debug("clubaddress setted from c = " + c.getClubAddress() ); 
+      // new 22-10-2018    
+                        GoogleTimeZone gtz = new GoogleTimeZone();
+                   //     tz.setTimeZoneName(NEW_LINE);
+                        gtz.setTimeZoneId(rs.getString("ClubZoneId"));
+                        if(gtz.getTimeZoneId() == null){
+                              gtz.setTimeZoneId("Europe/Brussels"); // le même pour tous ! par defaut
+                         }
+         c.setClubTimeZone(gtz);
+         c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
+         c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
+         c.setClubWebsite(rs.getString("ClubWebsite"));
+   return c;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method
 } // end class

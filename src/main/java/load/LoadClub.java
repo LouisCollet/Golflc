@@ -1,7 +1,6 @@
 package load;
 
 import entite.Club;
-import googlemaps.GoogleTimeZone;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,11 +34,11 @@ final String query = "SELECT "
      utils.LCUtil.logps(ps); 
      rs =  ps.executeQuery();
      rs.beforeFirst();
-     Club sg = new Club(); 
+     Club c = new Club(); 
      while(rs.next())
                 {
-               
-			sg.setIdclub(rs.getInt("idclub") );
+               c = entite.Club.mapClub(rs);
+		/*	sg.setIdclub(rs.getInt("idclub") );
                         sg.setClubName(rs.getString("clubName") );
                         sg.setClubAddress(rs.getString("clubAddress") );
                         sg.setClubCity(rs.getString("clubCity") );
@@ -54,9 +53,9 @@ final String query = "SELECT "
                         GoogleTimeZone gtz = new GoogleTimeZone();
                           gtz.setTimeZoneId(rs.getString("clubZoneId") );
                         sg.setClubTimeZone(gtz);
-               //         ccr.getClubModificationDate(rs.getDate("clubModificationDate"));
+                      ccr.getClubModificationDate(rs.getDate("clubModificationDate"));*/
 		}  //end while
-    return sg;
+    return c;
 }catch (SQLException e){
     String msg = "SQLException in LoadClub() = " + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();

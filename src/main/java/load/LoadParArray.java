@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -55,7 +56,7 @@ final String query = "SELECT idcourse, course.CourseName , idhole, holenumber, h
         {rowNum = rs.getRow() - 1;
             PAR [rowNum]= rs.getInt("HolePar"); 
         } // end while
- //       LOG.info("finishing LoadParArray with par = " + Arrays.toString(par) );
+        LOG.info("finishing LoadParArray with par = " + Arrays.toString(PAR) );
 return PAR;
 }catch (SQLException e){
     String msg = "SQLException in LoadParArray() = " + e.toString() + ", SQLState = " + e.getSQLState().toString()
@@ -63,10 +64,6 @@ return PAR;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    LOG.error("NullPointerException in LoadParArray() " + npe);
-    LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
     LCUtil.showMessageFatal("Exception in LoadParArray = " + ex.toString() );

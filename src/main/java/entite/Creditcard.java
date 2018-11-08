@@ -1,7 +1,6 @@
 package entite;
 
-import validator.CreditCardV;
-import static interfaces.GolfInterface.SDF;
+import static interfaces.GolfInterface.SDF_MM;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
@@ -11,31 +10,38 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.inject.Named;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import lc.golfnew.CardType;
 import lc.golfnew.MajorIndustryIdentifier;
+import validator.CreditCardV;
 
 @Named
 public class Creditcard implements Serializable{
     private final static List<SelectItem> CARDS = new ArrayList<>();
     private Double totalPrice;
-    @NotNull(message="creditCardHolder ne peut être null")
+    
+  @NotNull(message="{tarif.holder.notnull}")
     private String creditCardHolder;
     
   @NotNull(message="{tarif.number.notnull}")
   @CreditCardV(max=16) // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
     private String creditCardNumber;
-  //@Future(message="expiration date must be in the future")
+  @Future(message="expiration date must be in the future")
     private java.util.Date creditCardExpirationDate;
  //  private LocalDate creditCardExpirationDate;
     private String creditCardType; // input from end user
     private String creditCardIssuer;  // calculated for validtion equality with creditC    ardType
-   @NotNull(message="creditCardVerificationCode ne peut être null")
+    
+   @NotNull(message="{tarif.verification.notnull}")
     private String creditCardVerificationCode; 
    private String creditCardMajorIndustryIdentifier;
    private boolean paymentOK = false; // 23/06/2013
    private String selected; // 15/04/2018
    private String communication;
+   private String typePayment;   // values : SUBSCRIPTION, INSCRIPTION
+   public enum etypePayment{SUBSCRIPTION, INSCRIPTION};
+   
 public Creditcard() // constructor 1
     {
      //   paymentOK = false;
@@ -60,22 +66,34 @@ public List<SelectItem> getCards() {
     return CARDS;
     }
 
+    public String getTypePayment() {
+        return typePayment;
+    }
+
+    public void setTypePayment(String typePayment) {
+        this.typePayment = typePayment;
+    }
+
     public String getCreditCardHolder() {
-        return creditCardHolder;
+        return creditCardHolder; //.toUpperCase();
     }
 
     public void setCreditCardHolder(String creditCardHolder) {
-        this.creditCardHolder = creditCardHolder;
+        if (creditCardHolder == null){
+            this.creditCardHolder = creditCardHolder;
+        }else{
+            this.creditCardHolder = creditCardHolder.toUpperCase();
+        };
     }
 
     public String getCreditCardNumber() {
         LOG.info("getCreditCardNumber = " + creditCardNumber);
-        return creditCardNumber;
+        return utils.LCUtil.creditcardSecret(creditCardNumber);
     }
 
     public void setCreditCardNumber(String creditCardNumber) {
         LOG.info("setCreditCardNumber = " + creditCardNumber);
-        creditCardNumber = creditCardNumber.replaceAll(" ", "");  // enlève les blancs pour la présentation
+        creditCardNumber = creditCardNumber.replaceAll(" ", "");
         LOG.info("setCreditCardNumber spaces removed = " + creditCardNumber);
         this.creditCardNumber = creditCardNumber;
         setCreditCardMajorIndustryIdentifier(MajorIndustryIdentifier.MIIfrom(creditCardNumber).toString()); //from(creditCardNumber);
@@ -165,6 +183,7 @@ public List<SelectItem> getCards() {
 
 public void setMyStrings(){
     //info coming from payment.xhtml et totalprice.js
+    LOG.info("entering setMyStrings");
    Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
    Double totPrice = Double.valueOf(params.get("TotalPrice"));
     LOG.info("TotalPrice in Bean = " + totPrice);
@@ -186,11 +205,15 @@ public String toString()
             + NEW_LINE + "<br>"
             + " , TotalPrice : "   + this.getTotalPrice()
             + NEW_LINE + "<br>"
+            + " ,Holder: "   + this.creditCardHolder
+            + NEW_LINE + "<br>"
+            + " ,Issuer: "   + this.creditCardIssuer
+            + NEW_LINE + "<br>"
             + " ,Number: "   + this.creditCardNumber
             + NEW_LINE + "<br>"
             + " ,Type : "   + this.getCreditCardType()
             + NEW_LINE + "<br>"
-            + " ,Expiration date : "   + SDF.format(this.creditCardExpirationDate)
+            + " ,Expiration date : "   + SDF_MM.format(this.creditCardExpirationDate)
            + NEW_LINE + "<br>"
            + " ,communication : "   + this.getCommunication()
             );

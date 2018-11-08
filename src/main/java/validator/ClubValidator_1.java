@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
  *
  * @author collet
  */
-public class ClubValidator implements ConstraintValidator<ClubValidation, Club>, interfaces.Log
+public class ClubValidator_1 implements ConstraintValidator<ClubValidation, Club>, interfaces.Log
 {
 // ne fonctionne pas !!
 @Override

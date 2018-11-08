@@ -24,8 +24,10 @@ public Handicap LoadHandicap(Player player, Round round, Connection conn) throws
 try{
    //     LOG.info("entering LoadHandicap");
        LOG.info("player =" + player.toString());
-
-       final String query = "SELECT idhandicap, handicapend, handicapplayer" +
+    String ha = utils.DBMeta.listMetaColumnsLoad(conn, "handicap");
+       final String query = "SELECT "
+               + ha +
+             //  + "idhandicap, handicapend, handicapplayer" +
 "   from handicap " +
 "   where handicap.player_idplayer=?" +
 "   and date(?)" +
@@ -44,9 +46,10 @@ try{
      Handicap h = new Handicap(); 
      while(rs.next())
                 {
-		h.setHandicapStart(rs.getDate("idhandicap"));
-                h.setHandicapEnd(rs.getDate("HandicapEnd") );
-                h.setHandicapPlayer(rs.getBigDecimal("handicapPlayer"));
+                   h = entite.Handicap.mapHandicap(rs);
+	//	h.setHandicapStart(rs.getDate("idhandicap"));
+        //        h.setHandicapEnd(rs.getDate("HandicapEnd") );
+         //       h.setHandicapPlayer(rs.getBigDecimal("handicapPlayer"));
 		}  //end while
     return h;
 }catch (SQLException e){

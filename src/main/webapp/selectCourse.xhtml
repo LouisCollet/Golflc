@@ -132,12 +132,21 @@
             <h:outputText value="#{c.course.courseBegin}">
                 <f:convertDateTime pattern="dd-MM-yyyy"/>
             </h:outputText>
-
         </p:column>
 <!-- new 14/08/2015-->
             <h:outputText value=" -> #{c.course.courseEnd}">
                 <f:convertDateTime pattern="dd-MM-yyyy"/>
             </h:outputText>
+
+        <p:column  id="courseTimeZone"
+                  headerText="#{msg['googletime.timezone']}"
+                  footerText="#{msg['googletime.timezone']}"
+                  style="width:15%" >
+            <h:outputText value="#{c.club.getClubTimeZone().getTimeZoneId()}">
+           
+            </h:outputText>
+        </p:column>
+
 
         <p:column  id="travel"
                   headerText="#{msg['course.travel']}"

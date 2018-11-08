@@ -18,15 +18,15 @@ public Tee LoadTee(Connection conn, int idtee) throws SQLException
     ResultSet rs = null;
 try{
         LOG.info("entering LoadTee");
-    String s = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
-        LOG.info("String from listMetaColumns = " + s);
+    String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
+        LOG.info("String from listMetaColumns = " + te);
      //   LOG.info("simple name = " + club.)
 
 final String query = "SELECT "
-        + s
+        + te
         + " FROM Tee "
         + " WHERE idtee = ?" ;
-     //   LOG.info("Club  = " + club.getIdclub() ); 
+
         LOG.info("Tee to be modified = " + idtee); 
      ps = conn.prepareStatement(query);
   //   ps.setInt(1, club.getIdclub());
@@ -36,15 +36,16 @@ final String query = "SELECT "
      rs.beforeFirst();
      Tee t = new Tee(); 
      while(rs.next())
-                {
-		t.setIdtee(rs.getInt("idtee"));
+     {
+                t = entite.Tee.mapTee(rs);
+	/*	t.setIdtee(rs.getInt("idtee"));
                 t.setTeeStart(rs.getString("TeeStart"));
                 t.setTeeGender(rs.getString("TeeGender"));
                 t.setTeeSlope(rs.getShort("teeslope"));
                 t.setTeeRating(rs.getBigDecimal("teerating"));
                 t.setTeeClubHandicap(rs.getInt("TeeClubHandicap"));
-                t.setCourse_idcourse(rs.getInt("course_idcourse"));
-		}  //end while
+                t.setCourse_idcourse(rs.getInt("course_idcourse"));*/
+      }  //end while
     return t;
 }catch (SQLException e){
     String msg = "SQLException in LoadTee() = " + ", SQLState = " + e.getSQLState()

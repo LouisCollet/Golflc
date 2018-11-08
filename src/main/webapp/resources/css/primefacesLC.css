@@ -413,7 +413,8 @@ used in maps_home_club.xhtml */
 	height: 200px;
         
 }
-
+/* 03-11-2018 confirm dialog   */
+ui-confirm-dialog .ui-dialog-content .ui-confirm-dialog-message{color:#72828B !important;}
 
 /*      .myCustomClass .qtip-content{
 	font-size: 12px;

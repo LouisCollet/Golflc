@@ -19,11 +19,13 @@ public HolesGlobal LoadHolesArray(Connection conn, int idtee) throws SQLExceptio
 try
 {    LOG.info("entering LoadHoles ...");
     LOG.info("starting LoadHolesArray with idtee = = " + idtee) ;
-
+  String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
   String query =  
-        "SELECT holenumber, holepar, holestrokeindex, holedistance" +
+        "SELECT "
+          + ho +
+   //       + "holenumber, holepar, holestrokeindex, holedistance" +
         " FROM hole, tee" +
-        " WHERE idtee = ?" +
+        " WHERE tee.idtee = ?" +
             " AND hole.tee_idtee = tee.idtee" +
         " ORDER by holenumber"
 ;

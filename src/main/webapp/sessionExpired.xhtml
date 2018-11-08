@@ -14,6 +14,13 @@
 >
 
 <ui:composition template="templates/loginTemplate.xhtml">
+    
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.logout(param['cmd'])}"/>
+    </f:metadata>
+</ui:define>
+    
 <ui:define name="title">Session Expired </ui:define>
 <ui:define name="help">
     <ui:include src="/help/help_login.xhtml"/>
@@ -36,8 +43,6 @@
 </h:link>
     
 <h:form id="login" enctype="application/x-www-form-urlencoded" >
-<ui:include src="include/include_messages.xhtml"/>
-
     <!-- -->
 <p:panelGrid id="panel"
              columns="3"

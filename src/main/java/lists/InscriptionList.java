@@ -8,8 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
@@ -31,16 +29,24 @@ try
 {
     
      LOG.info("starting getInscriptionList.. = " );
-  String query = 
+     String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+  //   String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+ 
+String query =
+        "SELECT "
+        + cl + "," + co + "," + ro + //"," + // pl + "," +
           // attention faut un espace en fin de ligne avant le " !!!!
-"SELECT  RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundPlayers, RoundStart, " +
-"         idcourse, CourseName, idclub, ClubName, clubcity, clubcountry, ClubWebsite" +
-"		 FROM round" +
-"		   JOIN course	ON round.course_idcourse = course.idcourse" +
-"			 JOIN club 	ON club.idclub = course.club_idclub" +
-"			    WHERE RoundDate > DATE_SUB(current_date(),INTERVAL 03 month)" +
-"				    GROUP BY idround"
-          + "                       ORDER by rounddate desc "
+//" SELECT  RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundPlayers, RoundStart, " +
+//"         idcourse, CourseName, idclub, ClubName, clubcity, clubcountry, ClubWebsite" +
+          
+    "		 FROM round" +
+    "		   JOIN course	ON round.course_idcourse = course.idcourse" +
+    "			 JOIN club 	ON club.idclub = course.club_idclub" +
+    "			    WHERE RoundDate > DATE_SUB(current_date(),INTERVAL 03 month)" +
+    "				    GROUP BY idround" +
+    "                       ORDER by rounddate desc "
 ;
 
        // LOG.info("player = " + player.getIdplayer() ) ;
@@ -58,31 +64,36 @@ try
 	while(rs.next())
        {
 			//LOG.info("just after while ! ");
-          ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
+          ECourseList ecl = new ECourseList(); // liste pour sélectionner un round player = entite.Player.mapPlayer(rs);
           Club c = new Club();
-             c.setIdclub(rs.getInt("idclub") );
-             c.setClubName(rs.getString("clubName") );
-             c.setClubCity(rs.getString("clubcity"));
-             c.setClubWebsite(rs.getString("ClubWebsite"));
-             c.setClubCountry(rs.getString("ClubCountry"));
+          c = entite.Club.mapClub(rs);
+   //          c.setIdclub(rs.getInt("idclub") );
+   //          c.setClubName(rs.getString("clubName") );
+   //          c.setClubCity(rs.getString("clubcity"));
+   //          c.setClubWebsite(rs.getString("ClubWebsite"));
+   //          c.setClubCountry(rs.getString("ClubCountry"));
           ecl.setClub(c);
           
           Course o = new Course();
-            o.setIdcourse(rs.getInt("idcourse"));
-            o.setCourseName(rs.getString("CourseName") );
+          o = entite.Course.mapCourse(rs);
+      //      o.setIdcourse(rs.getInt("idcourse"));
+      //      o.setCourseName(rs.getString("CourseName") );
           ecl.setCourse(o);
           
           Round r = new Round();
-            r.setIdround(rs.getInt("idround") );
+          r = entite.Round.mapRound(rs);
+  /*          r.setIdround(rs.getInt("idround") );
                 java.util.Date d = rs.getTimestamp("roundDate");
-                LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            r.setRoundDate(date);
+            //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+          //  LocalDateTime date = DatetoLocalDateTime(d);
+            r.setRoundDate(DatetoLocalDateTime(d));
             r.setRoundGame(rs.getString("roundgame") );
             r.setRoundCompetition(rs.getString("RoundCompetition") );
             r.setRoundHoles(rs.getShort("RoundHoles") );
             r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-            r.setRoundStart(rs.getShort("RoundStart") );
+            r.setRoundStart(rs.getShort("RoundStart") );*/
           ecl.setRound(r);
+
  			//store all data into a List
 	liste.add(ecl);
 	} //end while

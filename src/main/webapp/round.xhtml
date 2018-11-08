@@ -102,32 +102,34 @@ In addition, you can use �target� attribute to control where to output the j
             >
         </p:calendar> 
 <!--           converter="localDateTimeConverter"       pattern="dd/MM/yyyy HH:mm"             -->
+
+
       <h:outputText value="#{msg['round.hour']}" />
       <h:panelGroup id="panelG1" layout="block" >
-
           <p:commandButton 
                         id="flightButton"
                         actionListener="#{dialogC.viewFlight()}"
                         icon="ui-icon-extlink"
                         value="Choose Flight Hour"
-                 
                         style="float:left"
                         >
                 <p:ajax event="dialogReturn"
                         update=":form_round:idworkhour"
                         listener="#{dialogC.onFlightChosen('louis')}"/>
-   
-            </p:commandButton>
+               </p:commandButton>
+          
           <h:outputText id="idworkhour" 
                         value="#{courseC.round.workHour}"
             />
       </h:panelGroup>
 
+      
+      
 <!-- http://stackoverflow.com/questions/32456951/primefaces-dialog-framework-dialog-not-opening  -->
 
 
  </p:panelGrid>       
-        
+
 
 <p:panelGrid
     id="panelGrid2" 
@@ -135,23 +137,37 @@ In addition, you can use �target� attribute to control where to output the j
     columnClasses="col1,col2"
     columns="2"
     >
-
+<!--
         <h:outputText value="#{msg['round.game']} * " />
         <p:selectOneMenu id="game"
                          value="#{courseC.round.roundGame}">
             <f:selectItems value="#{courseC.games}" />
         </p:selectOneMenu>
         
-
-        
+-->
+        <h:outputText value="#{msg['round.game']} * " />
+        <p:selectOneMenu id="game2"
+                         value="#{courseC.round.roundGame}">
+            <f:selectItems value="#{courseC.gameList}"
+                           var="role" 
+                           itemLabel="#{role}"
+                           itemValue="#{role}" />
+        </p:selectOneMenu>
+ 
         <h:outputText value="#{msg['round.qualifying']}"   />
         <p:selectOneButton id="qualifying"
             value="#{courseC.round.roundQualifying}"
             styleClass="oneradio" >
-               <f:selectItem itemLabel="Non Qualifying"  itemValue="N" />
+               <f:selectItems value="#{courseC.availableQualifying}" />
+        </p:selectOneButton>
+  <!--      
+  
+   <f:selectItem itemLabel="Non Qualifying"  itemValue="N" />
                <f:selectItem itemLabel="Qualifying"      itemValue="Y" />
                <f:selectItem itemLabel="Counting"        itemValue="C" />
-        </p:selectOneButton>
+  
+ 
+  
         <h:outputText value="#{msg['round.cba']}" />
         <p:selectOneButton id="cba"
                                   value="#{courseC.round.roundCBA}"
@@ -164,6 +180,7 @@ In addition, you can use �target� attribute to control where to output the j
                <f:selectItem itemLabel="-3"  itemValue="-3" />
                <f:selectItem itemLabel="-4R/O"  itemValue="-4" />
         </p:selectOneButton>
+  -->      
         <h:outputText value="#{msg['round.holes']} *"   />
         <p:selectOneButton id="holes"
                 value="#{courseC.round.roundHoles}"

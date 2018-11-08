@@ -32,20 +32,20 @@ ici c'est pour générer des data pour tester !  -->
     <h:outputScript library="js" name="totalprice.js" target="head"/>
 
 <h:graphicImage 
-                name="images/addtocart.jpg"
+                name="images/paid1.jpg"
                 alt="image missing :tarif1.jpg"
                 style="float: left;">
 </h:graphicImage>
 
 <h:graphicImage 
-                name="images/online2.png"
+                name="images/paid2.png"
                 alt="image missing :tarif2.jpg"
                 style="float: right;">
 </h:graphicImage>
 
 <h:form id="creditcard_payment_executed" enctype="application/x-www-form-urlencoded">
         
-<ui:include src="include/include_summary.xhtml"/>
+
 
 <p:panelGrid
     id="panelGrid1"
@@ -83,7 +83,7 @@ ici c'est pour générer des data pour tester !  -->
     <h:outputText
                         label="creditcard"
                         id="creditcardNumber"
-                        value="#{courseC.creditcard.creditCardNumber} / #{courseC.creditcard.creditCardVerificationCode}"
+                        value="#{courseC.creditcard.creditCardNumber}"
                         >
       </h:outputText>
     
@@ -92,7 +92,7 @@ ici c'est pour générer des data pour tester !  -->
                    value="#{courseC.creditcard.creditCardType}"
                >
      </h:outputText>
-    
+   <!--
     <h:outputText value="Expiration Date :" />
     <h:outputText 
             id="Expiration"
@@ -112,7 +112,7 @@ ici c'est pour générer des data pour tester !  -->
             id="Issuer"
             value="#{courseC.creditcard.creditCardIssuer}"
             />
-  <!--
+ 
     <h:panelGroup id="panelGreenfee"
                   layout="block"
                   rendered="#{not empty courseC.tarif.priceItem[0]}"
@@ -136,7 +136,7 @@ ici c'est pour générer des data pour tester !  -->
                          onclick="jsStartTask()"
                          update="taskResult"
                          widgetVar="taskButton"/>
-    <h:outputText value=" "/>
+    <h:outputText value="Progress Bar "/>
     
     <p:progressBar  widgetVar="progressBar"
                     id="progressBar1"
@@ -154,8 +154,10 @@ ici c'est pour générer des data pour tester !  -->
     
     <!--  PF('commandButtonPay').disable();
                     PF('commandButtonMail').enable();  -->
+         <h:outputText id="comm"
+                      value="Payment reference : "/>
         <h:outputText id="taskResult"
-                      value="#{courseC.resultCreditCard}"/>
+                      value="#{courseC.getResultCreditCardSubscription()}"/>
 
 <f:facet name="footer">
          <p:commandButton value="#{msg['inscription.back']}"

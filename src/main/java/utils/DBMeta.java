@@ -5,6 +5,7 @@
 package utils;
 import static interfaces.GolfInterface.NEWLINE;
 import static interfaces.Log.LOG;
+import static interfaces.Log.NEW_LINE;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.sql.*;
@@ -458,9 +459,10 @@ StringBuilder sb = new StringBuilder();
 } // end method
 
 public static String listMetaColumnsLoad (Connection conn, String table) throws SQLException
-{  // ne fonctionne plus avec connector j 8.0.8 dmr ? fallait cchangr un option de connection !!
-    ResultSet rs = null;
+{      ResultSet rs = null;
+//https://docs.oracle.com/javase/8/docs/api/java/sql/DatabaseMetaData.html#getColumns-java.lang.String-java.lang.String-java.lang.String-java.lang.String-
 try{
+    LOG.info("starting listMetaColumnsLoad for table = " + table );
     DatabaseMetaData meta = conn.getMetaData();
   //  String   catalog          = null;
   //  String   schemaPattern    = null;
@@ -469,28 +471,21 @@ try{
 //LOG.info("line 01");
 rs = meta.getColumns(null, null, table, null);
 //LOG.info("line 02");
-/*
-while(rs.next())
-{
-       LOG.info("COLUMN_NAME = " + rs.getString(4));
-      LOG.info("DATA_TYPE = " + rs.getInt(5));
-     LOG.info("ORDINAL_POSITION = " + rs.getInt(17));
-     LOG.info("DECIMAL_DIGITS = " + rs.getInt(9));
-      LOG.info("COLUMN_SIZE = " + rs.getInt(7));
-} //end while
-LOG.info("line 03");
-*/
 rs.beforeFirst();
 StringBuilder sb = new StringBuilder();
+sb.append(" "); // space to separate query element
+//LOG.info("line 03");
    while(rs.next())
     {
-        sb.append(rs.getString(4));
+ //    LOG.info("We are now with = " + rs.getString(4));  // column name
+        sb.append(rs.getString("TABLE_NAME")).append(".").append(rs.getString("COLUMN_NAME"));
+     //   sb.append(table + "." + rs.getString(4));  // column name
         sb.append(", ");
  //       LOG.info("inside loop, sb = " + sb);
     }  //end while
   sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
  //   LOG.info("sb capacity = " + sb.capacity());
-        LOG.info("sb = " + sb);
+        LOG.info("Table fields for " + table + " = " + sb);
 return sb.toString();
    
    
@@ -556,8 +551,7 @@ Parameters:
 
 } // end method
 
-public static String listMetaColumnsUpdate (Connection conn, String table) throws SQLException // 10/08/2017
-{
+public static String listMetaColumnsUpdate (Connection conn, String table) throws SQLException{ // 10/08/2017
     ResultSet rs = null;
 try{
     DatabaseMetaData meta = conn.getMetaData();
@@ -573,12 +567,12 @@ rs.first();  // grosse astuce ! ne pas prendre la première field : idplayer, id
 StringBuilder sb = new StringBuilder();
 // les colonnes suivantes ne doivent pas être MAJ en update
 List<String> blacklist = Arrays.asList(
-        "playerphotolocation", "playeractivation", "playermodificationdate",   // TOUT EN MINUSCULES !!!!
-        "clubmodificationdate",
-        "coursemodificationdate","club_idclub",
-        "teemodificationdate", "course_idcourse",
-        "holenumber", "tee_idtee", "tee_course_idcourse", "holemodificationdate",
-        "playerpassword"); // 07-08-208
+        "playerphotolocation", "playeractivation", "playermodificationdate" , "playerpassword", "playerRole",  // TOUT EN MINUSCULES !!!!
+        "clubmodificationdate","club_idclub",
+        "coursemodificationdate","course_idcourse",
+        "teemodificationdate", "tee_idtee", "tee_course_idcourse",
+        "holenumber", "holemodificationdate"
+        ); // 07-08-208
 String s = "";
    while(rs.next())
     {   s = rs.getString(4).toLowerCase(); // 4.COLUMN_NAME String => column name 
@@ -637,13 +631,20 @@ Connection conn = dbc.getConnection();
 
 //String s = setterGenerator(conn, "handicap");
 
-DatabaseMetaData md = conn.getMetaData();
+//DBMeta md = new DBMeta();
+String p = listMetaColumnsLoad(conn,"Player");  // is static 
+LOG.info(" main - player = " + p);
+String p1 = listMetaColumnsLoad(conn,"Round"); 
+LOG.info(" main - round = " + NEW_LINE + p);
+p = p + NEW_LINE + "," + p1;
+LOG.info(" main - player + round = " + p);
+/*
 ResultSet rs = md.getTables(null, null, "%", null);
 while (rs.next()) {
   LOG.info(rs.getString(3));
   String s = setterGenerator(conn, rs.getString(3));
 }
-
+*/
 //listMetaStoredPro(conn, "get_list_points");
 DBConnection.closeQuietly(conn, null, null, null);
 }// end main

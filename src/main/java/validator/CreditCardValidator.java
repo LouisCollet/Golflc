@@ -32,7 +32,7 @@ public boolean isValid(String value, ConstraintValidatorContext context)
 	return false;
 	}
     value = value.replaceAll(" ", "");
-    LOG.info("entering isValid with zero removed = " + value);//return value.substring(0, 1).equals(value.substring(0, 1).toUpperCase());
+    LOG.info("entering isValid with SPACES removed = " + value);//return value.substring(0, 1).equals(value.substring(0, 1).toUpperCase());
     return validateCreditCardNumber(value);
 }
 

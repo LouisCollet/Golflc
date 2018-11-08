@@ -61,7 +61,7 @@ return true;
        return false;
     }finally{
         DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
-        return false;
+      //  return false;
     }
 } //end updateHoles
 

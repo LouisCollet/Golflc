@@ -1,6 +1,5 @@
 package lc.golfnew;
 
-import entite.ClubCourseRound;
 import entite.ScoreCard;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
@@ -8,10 +7,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
-import lists.__RoundList;
 import lists.ScoreCard3List;
-//import utils.LCUtil;
-
 /**
  *
  * @author collet
@@ -23,7 +19,7 @@ public class TotalController implements Serializable, interfaces.Log
 {
     int totalPar = 0;
     private static List<ScoreCard> listsc3 = null; // used in CalculateController !!
-    private static List<ClubCourseRound> listround = null;
+//    private static List<ClubCourseRound> listround = null;
      
  public TotalController()  // constructor
     {
@@ -35,7 +31,7 @@ public void init()
 {
         LOG.info(" starting PostConstruct init ()    = ");
         listsc3 = ScoreCard3List.getListe();
-        listround = __RoundList.getListe();
+  ////      listround = RoundList.getListe();
 }
 public int getTotalPar()
 { int total = 0;
@@ -128,7 +124,7 @@ listsc3 = ScoreCard3List.getListe();
 
 public int getTotalZwanzeurs()
 { int total = 0;
-    listround = lists.__RoundList.getListe();
+/*    listround = lists.__RoundList.getListe();
     if(listround == null)
         {return 0;}
   for (ClubCourseRound golf : listround)
@@ -138,10 +134,12 @@ public int getTotalZwanzeurs()
             total += golf.getPlayerhasroundZwanzeursResult();
         }
     }
+*/
   return total;
 }
 public int getTotalGreenshirt()
 { int total = 0;
+/*
  listround = __RoundList.getListe();
  if(listround == null)
         {return 0;}
@@ -154,6 +152,7 @@ public int getTotalGreenshirt()
             total += golf.getPlayerhasroundZwanzeursGreenshirt();
         }
     }
+*/
   return total;
 }
 

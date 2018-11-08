@@ -116,10 +116,13 @@ function creation(i, item){
   MP4[i-1] = y3; // save in array will be used later in case of modification !
 
  document.getElementById('form_payment:'.concat(item).concat("3")).innerHTML = y3;
+ 
  t = t + y3;
  console.info("TotalPrice = " + t);
  SetMyStrings([{ name: "TotalPrice", value: t}]); // transfert data to bean via xhtml
  document.getElementById('form_payment:TotalPrice').innerHTML = t;
+ document.getElementById('form_payment:hiddenTotalPrice').value = t; // new 08*10-2018
+ 
 console.info("ending function creation " );
 }catch(exception){
     var message = exception.message;
@@ -129,7 +132,7 @@ console.info("ending function creation " );
 } // end function creation
 
 function isNumberKey(evt){
-    var charCode = (evt.which) ? evt.which : evt.keyCode
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57))
         return false;
     return true;

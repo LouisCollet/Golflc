@@ -26,9 +26,9 @@ public class EmailClientValidationConstraint implements ClientValidationConstrai
     public static final String MESSAGE_METADATA = "data-p-email-msg";
  
     @Override
-    public Map<String, Object> getMetadata(ConstraintDescriptor constraintDescriptor) {
+    public Map<String,Object> getMetadata(ConstraintDescriptor constraintDescriptor) {
         Map<String,Object> metadata = new HashMap<>();
-        Map attrs = constraintDescriptor.getAttributes();
+        Map<?,?> attrs = constraintDescriptor.getAttributes();
         Object message = attrs.get("message");    
         if(message != null) {
             metadata.put(MESSAGE_METADATA, message);

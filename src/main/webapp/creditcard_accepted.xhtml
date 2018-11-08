@@ -43,9 +43,17 @@ ici c'est pour générer des data pour tester !  -->
                 style="float: right;">
 </h:graphicImage>
 
+    cmd = #{param.cmd}
+    typePayment=#{courseC.creditcard.typePayment}
 <h:form id="creditcard_accepted" enctype="application/x-www-form-urlencoded">
         
-<ui:include src="include/include_summary.xhtml"/>
+    <c:if test="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}">
+         <ui:include src="include/include_summary.xhtml"/>
+    </c:if>
+    
+    <c:if test="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}">
+         <ui:include src="include/include_subscription.xhtml"/>
+    </c:if>
 
 <p:panelGrid
     id="panelGrid1"
@@ -54,7 +62,18 @@ ici c'est pour générer des data pour tester !  -->
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.payment.round']}</h1>
+ <h1>
+    <h:outputText
+            id="subscription"
+            rendered="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
+            value="#{msg['title.payment.subscription']}">
+    </h:outputText>
+    <h:outputText
+            id="inscription"
+            rendered="#{coursC.creditcard.typePayment eq 'INSCRIPTION'}" 
+            value="#{msg['title.payment.round']}">
+    </h:outputText>
+ </h1>
 </f:facet>
     <h:outputText  id="Total"
                 value="#{msg['payment.amounttobepaid']} :"
@@ -83,7 +102,7 @@ ici c'est pour générer des data pour tester !  -->
     <h:outputText
                         label="creditcard"
                         id="creditcardNumber"
-                        value="#{courseC.creditcard.creditCardNumber} / #{courseC.creditcard.creditCardVerificationCode}"
+                        value="#{courseC.creditcard.creditCardNumber}"
                         >
       </h:outputText>
     
@@ -155,7 +174,7 @@ ici c'est pour générer des data pour tester !  -->
     <!--  PF('commandButtonPay').disable();
                     PF('commandButtonMail').enable();  -->
         <h:outputText id="taskResult"
-                      value="#{courseC.resultCreditCard}"/>
+                      value="#{courseC.getResultCreditCardSubscription()}"/>
 
 <f:facet name="footer">
          <p:commandButton value="#{msg['inscription.back']}"
@@ -172,7 +191,6 @@ ici c'est pour générer des data pour tester !  -->
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-envelope"
-                         
                          action="#{courseC.creditCardMail}"
                          />
          <!--  rendered="#{courseC.creditcard.paymentOK eq true}" -->
@@ -183,6 +201,14 @@ ici c'est pour générer des data pour tester !  -->
                          >
                 <p:printer target="creditcard_accepted" />
           </p:commandButton>
+          <p:commandButton value="#{msg['login.welcome']}"
+                         id="commandButtonWelcome"
+                         ajax="false"
+                         update="messages"
+                         immediate="false"
+                         icon="fa fa-home"
+                         action="welcome.xhtml"
+                  />
          
 </f:facet>
 

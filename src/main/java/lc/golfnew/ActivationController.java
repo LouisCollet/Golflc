@@ -86,7 +86,7 @@ public String checkActivation() throws SQLException, Exception, Throwable
  // à mofifier             //       <a href=" + href + ">"
                      String to = "louis.collet@skynet.be";
                      utils.SendEmail sm = new utils.SendEmail();
-                     b = sm.sendHtmlMail(sujet,href,to);
+                     b = sm.sendHtmlMail(sujet,href,to,"ACTIVATION");
                         LOG.info("HTML Mail status = " + b);
             }
         }

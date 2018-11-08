@@ -1,10 +1,14 @@
 package entite;
 
 import static interfaces.GolfInterface.NEWLINE;
+import static interfaces.Log.LOG;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import javax.inject.Named;
 import javax.validation.constraints.*;
+import utils.LCUtil;
 //import javax.validation.constraints.Pattern;
 //import javax.validation.constraints.Size;
 /**
@@ -150,12 +154,31 @@ public class Course implements Serializable, interfaces.Log
  @Override
 public String toString()
 { return 
-        ( NEWLINE + "from entite : " + this.getClass().getSimpleName() + NEWLINE 
+        ( NEWLINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
         + " idcourse : "   + this.getIdcourse()
                + " ,course Name : " + this.getCourseName()
                + " ,course Par : " + this.getCoursePar()
                + " ,course Holes : " + this.getCourseHoles()
         );
 }
-    
+  public static Course mapCourse(ResultSet rs) throws SQLException{
+      String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Course c = new Course();
+		c.setIdcourse(rs.getInt("idcourse"));
+                c.setCourseName(rs.getString("coursename") );
+                c.setCourseHoles(rs.getShort("CourseHoles"));
+                c.setCoursePar(rs.getShort("coursepar"));
+                c.setClub_idclub(rs.getInt("course.club_idclub"));
+                c.setCourseBegin(rs.getDate("courseBegin"));
+                c.setCourseEnd(rs.getDate("courseEnd"));
+        
+   return c;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method map
 } // end class

@@ -224,8 +224,8 @@ System.out.println("collect 2: " + collect);
       }
       return min;
    }
-	
-   private static int getSum(List numbers) {
+/*	
+   private static int getSum(List<?> numbers) {
       int sum = (int)(numbers.get(0));
 		
       for(int i = 1;i < numbers.size();i++) {
@@ -236,5 +236,6 @@ System.out.println("collect 2: " + collect);
 	
    private static int getAverage(List<Integer> numbers) {
       return getSum(numbers) / numbers.size();
-   }
+   }*/
+   
 } // end class

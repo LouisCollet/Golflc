@@ -3,9 +3,7 @@ package lc.golfnew;
 
 import calc.CalcHandicap;
 import calc.CalcScramblePlayingHandicap;
-import calc.CalcStablefordPlayingHandicap;
 import create.CreateHandicap;
-import create.CreateResult;
 import create.CreateScoreSqueleton;
 import entite.Course;
 import entite.Handicap;
@@ -91,19 +89,22 @@ try
 LOG.info("game = " + round.getRoundGame()); 
 int handicap_strokes = 0;
 if("STABLEFORD".equals(round.getRoundGame()) )
-    {   LOG.info("gameType is STABLEFORD");
-        CalcStablefordPlayingHandicap csph = new CalcStablefordPlayingHandicap();
+    {       LOG.info("gameType is STABLEFORD");
+        calc.CalcStablefordPlayingHandicap csph = new calc.CalcStablefordPlayingHandicap();
+            LOG.info("before getPlayingHcp player = " + player.toString());
+            LOG.info("before getPlayingHcp round = " + round.toString());
         list = csph.getPlayingHcp(conn, player, round);
             LOG.info(" -- Result PlayingHandicap = " + Arrays.deepToString(list) );
         handicap_strokes = parseInt(list[1]);
             LOG.info(" -- PlayingHandicap Stableford = " + handicap_strokes );
     }
-if("SCRAMBLE".equals(round.getRoundGame()) )
+if(Round.GameType.SCRAMBLE.toString().equals(round.getRoundGame()))
+// old if("SCRAMBLE".equals(round.getRoundGame()) )
 {   LOG.info("gameType is SCRAMBLE");
          LOG.info("on cherche le nombre de joueurs déjà inscrits"); 
-         lists.ScramblePlayersList spl = new lists.ScramblePlayersList();
+         lists.RoundPlayersList spl = new lists.RoundPlayersList();
      listPlayers = spl.listAllParticipants(round, conn);
-        LOG.info("after lists.ScramblePlayersList, lp =  "); // + Arrays.deepToString(lp));
+        LOG.info("after lists.RoundPlayersList, lp =  "); // + Arrays.deepToString(lp));
   if(listPlayers != null)
   {
         LOG.info("nombre de players stableford = lp size = " + listPlayers.size());
@@ -260,11 +261,11 @@ if(operation_card.equals("complete") && (round.getRoundGame().equals("ZWANZEURS"
 
 //call # 11     insert result in table=Round, only for complete card
 if(operation_card.equals("complete") )
-{
-    CreateResult cr = new CreateResult();
+{       LOG.info("before setStoredResult");
+    create.CreateResult cr = new create.CreateResult();
     list = cr.setStoredResult (conn, player.getIdplayer(),round.getIdround(), round_result_stableford,
             round_result_zwanzeurs, round_result_greenshirt );
-    
+            LOG.info("list setStoreResult = " + Arrays.toString(list));
     
     if(list[0].equals("ERROR") )
         {  LOG.error(" -- Error inserting Round result : " + Arrays.deepToString(list) );
@@ -360,13 +361,14 @@ LocalDate ldRoundDate = round.getRoundDate().toLocalDate();
         LCUtil.showMessageInfo(msg);
     }
  // end calls 16 and 17
-//return list;
+return list;
 
  // end try
 }catch(SQLException e){
     String msg = "-- SQLException in calculate Controller !!! " + e.toString();
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
+    return null;
 }catch(Exception e){
          String msg = "-- Exception in calculate Controller !!! " + e.toString();
          LOG.error(msg + NEWLINE + NEWLINE);
@@ -376,7 +378,7 @@ LocalDate ldRoundDate = round.getRoundDate().toLocalDate();
 }finally{
       //  LOG.info("-- calculate controller finally = !!! ");
     DBConnection.closeQuietly(null, null, null, null); // new 10/12/2011
-    return list;
+  //  return list;
 }
 } // end of method
 } // end of class

@@ -236,8 +236,14 @@ Anything listed AFTER '?' within the mask is considered optional user input
         <h:outputText value="#{msg['player.latlng']}" />
 	<h:outputText label="LatLng"
                       id="ClubLatLng"
-                      value="#{courseC.club.clubLatLng}" />          
+                      value="#{courseC.club.clubLatLng}" />
 
+         <h:outputText value="#{msg['player.formatted']}" />
+	<h:outputText label="fadr"
+                      id="formattedAddress"
+                      value="#{courseC.club.clubFormattedAddress}" />
+        
+        
 <f:facet name="footer">
         <p:commandButton value="#{msg['club.create']}"
                          id="cb1"

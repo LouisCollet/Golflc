@@ -18,12 +18,12 @@ public Course LoadCourse(Connection conn, int idcourse) throws SQLException
     ResultSet rs = null;
 try{
         LOG.info("entering LoadCourse");
-    String s = utils.DBMeta.listMetaColumnsLoad(conn, "course");
-        LOG.info("String from listMetaColumns = " + s);
+    String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     /////   LOG.info("String from listMetaColumns = " + co);
      //   LOG.info("simple name = " + club.)
-
+ // String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
 final String query = "SELECT "
-        + s
+        + co
         + " FROM Course "
         + " WHERE idcourse = ?" ;
      //   LOG.info("Club  = " + club.getIdclub() ); 
@@ -37,13 +37,15 @@ final String query = "SELECT "
      Course c = new Course(); 
      while(rs.next())
                 {
+                   c = entite.Course.mapCourse(rs);
+                      /*
 		c.setIdcourse(rs.getInt("idcourse"));
                 c.setCourseName(rs.getString("coursename") );
                 c.setCourseHoles(rs.getShort("CourseHoles"));
                 c.setCoursePar(rs.getShort("coursepar"));
                 c.setCourseBegin(rs.getDate("courseBegin"));
                 c.setCourseEnd(rs.getDate("courseEnd"));
-                c.setClub_idclub(rs.getInt("club_idclub"));
+                c.setClub_idclub(rs.getInt("club_idclub"));  */
 		}  //end while
     return c;
 }catch (SQLException e){

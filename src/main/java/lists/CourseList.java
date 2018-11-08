@@ -4,6 +4,7 @@ import entite.Club;
 import entite.Course;
 import entite.ECourseList;
 import entite.Tee;
+import googlemaps.GoogleTimeZone;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,19 +21,22 @@ public class CourseList implements interfaces.Log
     private static List<ECourseList> liste = null;
 
 public List<ECourseList> getCourseList(final @NotNull Connection conn) throws SQLException
-{  
+{    String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 if(liste == null)
 {
         LOG.info(" ... entering CourseList !! ");
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
      //LOG.debug("starting getScoreCardList... = " );
+     String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
 String query =
-        "SELECT idclub, clubname, clubcity, clubcountry, clubAddress, "
-            +  " clubLatitude, clubLongitude ,"
-            + " idcourse, courseholes, coursepar, coursename, courseBegin, courseEnd ,"
+        "SELECT "
+        + cl + "," + co + ","
+  //      + " idclub, clubname, clubcity, clubcountry, clubAddress,"
+  //          +  " clubLatitude, clubLongitude, ClubZoneId,"
+  //          + " idcourse, courseholes, coursepar, coursename, courseBegin, courseEnd,"
         + "tee.idtee, tee.TeeStart"
             + "        FROM club, course, tee "
             + "        WHERE club.idclub = course.club_idclub"
@@ -71,6 +75,15 @@ String query =
           //                  LOG.debug("clubcountry setted = " + c.getClubCountry() );       
                         c.setClubAddress(rs.getString("clubAddress") );
           //                  LOG.debug("clubaddress setted from c = " + c.getClubAddress() ); 
+      // new 22-10-2018    
+                        GoogleTimeZone gtz = new GoogleTimeZone();
+                   //     tz.setTimeZoneName(NEW_LINE);
+                        gtz.setTimeZoneId(rs.getString("ClubZoneId"));
+                        if(gtz.getTimeZoneId() == null){
+                              gtz.setTimeZoneId("Europe/Brussels"); // le même pour tous ! par defaut
+                         }
+                        c.setClubTimeZone(gtz);
+                        
                         c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
                         c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
                 ecl.setClub(c);

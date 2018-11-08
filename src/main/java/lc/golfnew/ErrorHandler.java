@@ -48,7 +48,7 @@ try{
 } //end method
         } // 
 	public String getException(){
-		String val =  (String)((Exception)FacesContext.getCurrentInstance().getExternalContext().
+		String val = ((Exception)FacesContext.getCurrentInstance().getExternalContext().
 			getRequestMap().get("javax.servlet.error.exception")).toString();
 		return val;
 	}
@@ -66,7 +66,7 @@ try{
 public String getStackTrace() {
  // à implémenter !!
     FacesContext context = FacesContext.getCurrentInstance();
-    Map requestMap = context.getExternalContext().getRequestMap();
+    Map<?,?> requestMap = context.getExternalContext().getRequestMap();
     Throwable ex = (Throwable) requestMap.get("javax.servlet.error.exception");
      StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);

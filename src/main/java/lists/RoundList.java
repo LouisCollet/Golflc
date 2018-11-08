@@ -7,15 +7,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 
-public class __RoundList implements interfaces.Log
+public class RoundList implements interfaces.Log
 {
     private static List<ClubCourseRound> liste = null;
     
@@ -29,11 +28,19 @@ if (liste == null)
     ResultSet rs = null;
 try
 {   
+     String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+  //   String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
 String query =
-        "SELECT idplayer, playerFirstName, playerLastName, round_idround,"
-        + " idclub, idcourse, idround, "
-        + " RoundDate, RoundCompetition, RoundQualifying, RoundGame,"
-        + " RoundCSA, CourseName, ClubName, InscriptionFinalResult,"
+        "SELECT "
+        + cl + "," + co + "," + ro + "," + pl + ","
+   //     + "idplayer, playerFirstName, playerLastName, round_idround,"
+    //    + " idclub, idcourse, idround, "
+    //    + " RoundDate, RoundCompetition, RoundQualifying, RoundGame,"
+    //    + " RoundCSA, CourseName, ClubName, "
+        + " InscriptionFinalResult,"
         + " Player_has_roundZwanzeursResult, Player_has_roundZwanzeursGreenshirt"
         + " FROM player"
         + " JOIN player_has_round"
@@ -75,14 +82,15 @@ String query =
                         
                         cc.setIdclub(rs.getInt("idclub") );
                         cc.setIdcourse(rs.getInt("idcourse"));
-                        cc.setIdround(rs.getInt("idround") );
+                       
                     //    cc.setRoundDate(rs.getDate("RoundDate") );
                   //      cc.setRoundDate(rs.getTimestamp("roundDate") ); // mod 02/08/2015 avec minutes 
                         
                         java.util.Date d = rs.getTimestamp("roundDate");
-                        LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                        cc.setRoundDate(date);
-                         
+                    //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                        cc.setRoundDate(DatetoLocalDateTime(d));
+                        cc.setIdround(rs.getInt("idround") );
+                        cc.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
                         cc.setRoundCompetition(rs.getString("RoundCompetition") );
                         cc.setRoundQualifying(rs.getString("RoundQualifying") );
                         cc.setRoundCBA(rs.getShort("RoundCSA") );
@@ -123,7 +131,7 @@ String query =
     }
 
     public static void setListe(List<ClubCourseRound> liste) {
-        __RoundList.liste = liste;
+        RoundList.liste = liste;
     }
 
  

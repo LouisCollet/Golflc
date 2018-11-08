@@ -9,15 +9,9 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-/**
- *
- * @author collet
- */
-public class ModifyPassword implements Serializable, interfaces.Log, interfaces.GolfInterface
-{
+public class ModifyPassword implements Serializable, interfaces.Log, interfaces.GolfInterface{
 
-public boolean modifypassword(final Player player, final Connection conn) throws Exception
-    {
+public boolean modifypassword(final Player player, final Connection conn) throws Exception{
         PreparedStatement ps = null;
         int row = 0;
         boolean b = false;
@@ -52,7 +46,7 @@ public boolean modifypassword(final Player player, final Connection conn) throws
             row = ps.executeUpdate(); // write into database
                 LOG.info("row = " + row);
             if (row == 1) 
-            {   LOG.info("PlayerPassword modified");
+            {   LOG.info("PlayerPassword created or modified");
       //          String msg =  LCUtil.prepareMessageBean("player.modify")
                  String msg = "<h1> successful modify Password : "
                             + " <br/>ID = " + player.getIdplayer()

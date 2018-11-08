@@ -64,6 +64,7 @@ try
      } // end for
  //array_return_error[0]= "NO ERROR";
  //array_return_error[1]= array_return_error[2]= "";
+ return array_return_error;
 } catch(SQLException sqle) {
        LOG.error(" -- SQL Exception by LC = " + sqle.getMessage());
        LOG.error(" -- ErrorCode = " +  sqle.getErrorCode() );
@@ -79,7 +80,7 @@ try
         ps.close();
         LOG.info("end of setScore with : ");
         LOG.info(NEWLINE + Arrays.deepToString(points) );
-        return array_return_error;
+   //     return array_return_error;
     }
 } //end setScore
 

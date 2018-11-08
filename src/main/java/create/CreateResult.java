@@ -23,7 +23,7 @@ try
     LOG.info(" -- Start with : " + stored_name);
     cs = conn.prepareCall("{CALL " + stored_name + "}");
     String p = cs.toString();
-        LOG.debug("Callable statement " + p.substring(p.indexOf(":"), p.length() ));
+ ////       LOG.debug("Callable statement " + p.substring(p.indexOf(":"), p.length() ));
     //Bind IN parameter first : player and round date
       cs.setInt(1, in_player);
         LOG.info("Param1 - Player = " + in_player);

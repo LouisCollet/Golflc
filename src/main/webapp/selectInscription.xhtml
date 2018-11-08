@@ -31,7 +31,6 @@
 </ui:define>
     -->
 <h:form id="select_inscription_round">
-<ui:include src="include/include_messages.xhtml"/>
 
 <p:dataTable id="recent_round"
              value="#{courseC.listInscriptions()}"
@@ -44,8 +43,9 @@
 
 <p:ajax event="rowToggle" 
         listener="#{courseC.onRowToggle}"
-        update=":select_inscription_round:growl-msg" />
-
+        
+        />
+<!-- update=":select_inscription_round:growl-msg"  -->
 <f:facet name="header">
     <h1>#{msg['message.selectround']} #{msg['message.for.inscription']}</h1>
 </f:facet>
@@ -78,7 +78,7 @@
                   <h:outputText value="#{c.round.roundDate}"
                                 
                                 > 
-                      <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                      <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
                   </h:outputText>
             
 	</p:column>
@@ -91,7 +91,7 @@
                 action="#{courseC.findTarif(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="fa fa-dollar fa-lg">
-             </p:commandButton>
+            </p:commandButton>
 	</p:column>
 
 <!-- new 13/11/2017-->
@@ -105,10 +105,10 @@
                 value="#{msg['button.delete']} - #{c.round.idround}"
                 icon="fa fa-trash-o fa-lg"
                 >
-                <p:confirm header="#{msg['message.confirm']}"
+                <p:confirm  header="#{msg['message.confirm']}"
                            message="#{msg['message.cancel']}" 
                            icon="fa fa-exclamation-triangle"
-                           severity="alert"/>
+                           />
            </p:commandButton>
 	</p:column>
 

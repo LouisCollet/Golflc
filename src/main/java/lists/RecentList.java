@@ -9,11 +9,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
 public class RecentList implements interfaces.Log, interfaces.GolfInterface
 {
@@ -28,9 +28,16 @@ if(liste == null)
     ResultSet rs = null;
 try
 {
+     String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+  //   String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
-    "SELECT idplayer, RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles,"
-          + "          idcourse, CourseName, idclub, ClubName, ClubCity, ClubWebsite, ClubLatitude, ClubLongitude"
+    "SELECT "
+          + cl + "," + co + "," + ro + "," + pl // + "," + ph
+  //        + "idplayer, RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles,"
+  //        + "          idcourse, CourseName, idclub, ClubName, ClubCity, ClubWebsite, ClubLatitude, ClubLongitude"
           + "  FROM player"
           + "  JOIN player_has_round"
           + "    	ON player_has_round.player_idplayer = player.idplayer"
@@ -77,9 +84,9 @@ try
               Round r = new Round();
                     r.setIdround(rs.getInt("idround") );
                         java.util.Date d = rs.getTimestamp("roundDate");
-                        LocalDateTime date = utils.LCUtil.DatetoLocalDateTime(d);
+                  //      LocalDateTime date = utils.LCUtil.DatetoLocalDateTime(d);
             //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                    r.setRoundDate(date);
+                    r.setRoundDate(DatetoLocalDateTime(d));
                     r.setRoundGame(rs.getString("roundgame") );
                     r.setRoundCompetition(rs.getString("RoundCompetition") );
                     r.setRoundHoles(rs.getShort("RoundHoles") );

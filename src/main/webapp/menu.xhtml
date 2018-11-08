@@ -124,6 +124,13 @@ url="show_played_rounds.xhtml?cmd=ini"
 <!--    <p:menuitem value="Go" id="page1LinkID" action="#{navBean.goNav}">     
                     <f:param id="page1ParamID" name="pageViewID" value="Page1"/>
                 </p:menuitem> -->
+
+    <p:submenu label="GitHub">
+           <p:menuitem value="GitHub"
+                       url="https://github.com/LouisCollet/Golflc.git"
+                       icon="fa fa-git" />
+    </p:submenu>
+
     <p:submenu label="STATS">
          <p:menuitem value ="Stats Round"     url="selectCourse.xhtml?cmd=ChartRound"    icon="ui-icon-image" />
          <p:menuitem value ="Stats Course   "
@@ -169,6 +176,21 @@ url="show_played_rounds.xhtml?cmd=ini"
                      url="jobSubmitter.xhtml"
                      icon="ui-icon-star" />
     </p:submenu>
+    
+    <p:submenu label="Resources">
+           <p:menuitem value ="Download "    url="download.xhtml"/>
+           <p:menuitem value="Demo"     url="http://www.primefaces.org/showcase-labs/ui/home.jsf" icon="ui-icon-extlink" />
+           <p:menuitem value="Documentation" url="http://www.primefaces.org/documentation.html" icon="ui-icon-extlink" />
+           <p:menuitem value="Forum"    url="http://forum.primefaces.org/" icon="ui-icon-folder-collapsed" />
+           <p:menuitem value="Themes"   url="http://www.primefaces.org/themes.html" icon="ui-icon-extlink" />
+           <p:menuitem value="ckEditor" url="http://docs.cksource.com/CKEditor_3.x/Users_Guide" icon="ui-icon-extlink" />
+           
+    </p:submenu>
+
+    
+    
+    
+    
     <p:submenu label="TOOLS/TESTS" >
 <!-- If you are not using "url" but want to go with "action" then remember that you are doing a POST request.
 In this case you should either

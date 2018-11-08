@@ -7,9 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 /**
  *
  * @author collet
@@ -23,34 +23,34 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface
             LOG.info(" ... starting createRound()");
             LOG.info("round competition = " + round.getRoundCompetition());
       //      LOG.info("round Date  = " + SDF_TIME.format(round.getRoundDate()) );
-            LOG.info("Work Date 1 = " + round.getWorkDate());
-            LOG.info("RoundDate  = " + round.getRoundDate());
-            LOG.info("Work Date 2 = " + SDF_TIME.format(round.getWorkDate()));
-            
-         java.util.Date d1 = round.getWorkDate();
-            LOG.info("java.util.dl = " + d1);
+   //         LOG.info("Work Date 1 = " + round.getWorkDate());
+   //         LOG.info("RoundDate  = " + round.getRoundDate());
+   //         LOG.info("Work Date 2 = " + SDF_TIME.format(round.getWorkDate()));
+   //      java.util.Date d1 = round.getWorkDate();
+    //        LOG.info("java.util.dl = " + d1);
    // remise- 08/08/2017 3 lignes, enlevé 14/08/2017
     //    LocalDateTime ldt = d1.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     //       LOG.info("LocalDateTime ldt = " + ldt);
     //     round.setRoundDate(ldt);
-    
-    
     // enlevé 08/08/2017 2 lignes remis 14/08/2017
-           LOG.info("get RoundDate 1 = " + round.getRoundDate());
-          LOG.info("get RoundDate 2 format = " + round.getRoundDate().format(ZDF_TIME_HHmm));
+    LOG.info("entite round = " + round.toString());
+            LOG.info("RoundDate = " + round.getRoundDate());
+            LOG.info("RoundDate formated = " + round.getRoundDate().format(ZDF_TIME_HHmm));
             LOG.info("round Game  = " + round.getRoundGame());
             LOG.info("round CBA   = " + round.getRoundCBA());
             LOG.info("round qual  = " + round.getRoundQualifying());
             LOG.info("round holes = " + round.getRoundHoles());
             LOG.info("round # of players = " + round.getPlayers());
             LOG.info("round start = " + round.getRoundStart());
+    LOG.info("entite course = " + course.toString());          
             LOG.info("idcourse    = " + course.getIdcourse());
             LOG.info("Begin course = " + course.getCourseBegin() );
             LOG.info("End course = " + course.getCourseEnd());
     // à faire : utiliser RoundValidation
     //    if(round.getRoundDate().before(course.getCourseBegin()) )
  //       LOG.info("line 000");
-         LocalDateTime cb = course.getCourseBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+      //   LocalDateTime cb = course.getCourseBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+         LocalDateTime cb = DatetoLocalDateTime(course.getCourseBegin());
  //        LOG.info("line 01");
            LOG.info("LocalDateTime courseBegin = " + cb);
          if(round.getRoundDate().isBefore(cb) )
@@ -61,7 +61,9 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface
                 return false;
            }
     //    if(round.getRoundDate().after(course.getCourseEnd()) )
-         LocalDateTime ce = course.getCourseEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    
+      ///   LocalDateTime ce = course.getCourseEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+         LocalDateTime ce = DatetoLocalDateTime(course.getCourseEnd());
            LOG.info("LocalDateTime courseEnd = " + ce);
          if(round.getRoundDate().isAfter(ce) )
            { // String msg = "Error date : creating Round on closed Course";

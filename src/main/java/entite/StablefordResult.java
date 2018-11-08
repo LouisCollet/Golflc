@@ -287,7 +287,7 @@ public class StablefordResult implements Serializable, interfaces.Log, interface
 @Override
 public String toString()
 { return 
-        ("from entite " + this.getClass().getSimpleName()
+        (NEW_LINE + "FRROM ENTITE " + this.getClass().getSimpleName().toUpperCase() + NEW_LINE
                + " = slope : "   + this.getTeeSlope()
                + " , rating : " + this.getTeeRating()
                + " , coursepar : " + this.getCoursePar()

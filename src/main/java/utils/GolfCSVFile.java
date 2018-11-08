@@ -223,9 +223,9 @@ conn.commit();
 	}finally{
           // empty
         conn.setAutoCommit(true);  //reset to normal state !!!!!
-              return array_return;
+   //           return array_return;
 	  }
-	//return array_return;
+	return array_return;
 
 }   // end method setExtract
 

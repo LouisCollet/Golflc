@@ -14,38 +14,54 @@ public class CalcStablefordPlayingHandicap implements interfaces.Log
 {
 //private static int round; modifié 15-0-8-2018 supprimé variables de classe inutiles
 
+    int handicap_strokes;
+  //  double par;
+  //  int csa;
+  //  int holes;
+    
  public String [] getPlayingHcp(final Connection conn, final Player player, final Round round) throws SQLException, Exception
 {
-    int handicap_strokes;
-    double par;
-    int csa;
-    int holes;
-    int starthole;
-    String qualifying;
-    Short teeClubHandicap;
-    List<StablefordResult> stb;
-  //  List<StablefordResult> listeStb;
-    String[] array_return_error = new String [3];    
-try
-{       LOG.info("game " + round.getRoundGame() );
+     LOG.info("very first entering getPlayingHcp !");
+    
+  //  int starthole;
+  //  String qualifying = "";
+   // Short teeClubHandicap = 0;
+  //  List<StablefordResult> stb = null;
+    String[] array_return_error = new String [3];  
+try{   //  List<StablefordResult> listeStb;
+   
+    LOG.info("entering getPlayingHcp !");
+    LOG.info("player = " + player.toString());
+    LOG.info("round = " + round.toString());
+ 
+    LOG.info("game " + round.getRoundGame() );
     find.FindSlopeRating fsr = new find.FindSlopeRating();
-     stb = fsr.getSlopeRating(player, round, conn);
-        LOG.info("stb = " + Arrays.toString(stb.toArray() ) );
+    List<StablefordResult> stb = fsr.getSlopeRating(player, round, conn);
+        LOG.info("List StablefordResult = " + Arrays.toString(stb.toArray() ) );
  //    listeStb = stb.subList(0, 1);
      
     FindHandicap fh = new FindHandicap (); // mod 14-08-2018
     double player_hcp = fh.findPlayerHandicap(player, round, conn);
  //   double player_hcp = find.FindHandicap.findPlayerHandicap(player, round, conn);
-    
+        LOG.info("OKOK player_hcp = " + player_hcp);
     double slope = stb.get(0).getTeeSlope(); // new
+        LOG.info("OKOK slope = " + slope);
     BigDecimal bd_rating = stb.get(0).getTeeRating(); //new
     double rating = bd_rating.doubleValue(); //turn the BigDecimal object into a double
-    par = stb.get(0).getCoursePar();
-    csa = stb.get(0).getRoundCBA();
-    holes = stb.get(0).getRoundHoles();
-    qualifying = stb.get(0).getRoundQualifying();
-    starthole = stb.get(0).getRoundStart();    // hole de départ : 1 ou 10 (pour les parcours 9 trous)
-    teeClubHandicap = stb.get(0).getTeeClubHandicap();
+        LOG.info("OKOK rating = " + rating);
+    double par = stb.get(0).getCoursePar();
+        LOG.info("OKOK par = " + par);
+    int csa = stb.get(0).getRoundCBA();
+        LOG.info("OKOK csa = " + csa);
+    int holes = stb.get(0).getRoundHoles();
+        LOG.info("OKOK holes = " + holes);
+    String qualifying = stb.get(0).getRoundQualifying();
+        LOG.info("OKOK qualifying = " + qualifying);
+        /// bug !!
+    Short starthole = stb.get(0).getRoundStart();    // hole de départ : 1 ou 10 (pour les parcours 9 trous)
+        LOG.info("OKOK starthole = " + starthole);
+        
+    Short teeClubHandicap = stb.get(0).getTeeClubHandicap();
         LOG.info("teeClubHandicap = " +  teeClubHandicap);
 
     
@@ -72,10 +88,8 @@ try
     array_return_error[1]= Integer.toString(handicap_strokes);
     array_return_error[2]= "";
     return array_return_error;
-} // end try
-
-catch(final SQLException sqle)
-{
+    
+} catch(final SQLException sqle){
        LOG.error(" -- SQL Exception by LC mod = " + sqle.getMessage());
        LOG.error(" -- ErrorCode = " + sqle.getErrorCode() );
        LOG.error(" -- SQLSTATE =  " + sqle.getSQLState());

@@ -9,8 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
@@ -32,11 +30,18 @@ if(liste == null)
     ResultSet rs = null;
 try
 {
- 
+    // String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+     String ha = utils.DBMeta.listMetaColumnsLoad(conn, "Handicap");
 String query =
-        "SELECT idhandicap, HandicapPlayer, PlayerFirstName, PlayerLastName, idplayer,"
-        + " RoundDate, RoundCompetition, RoundGame, idround, "
+        "SELECT "
+        +  co + "," + ro + "," + pl + "," + ha
+   ////     + "idhandicap, HandicapPlayer, PlayerFirstName, PlayerLastName, idplayer,"
+   //     + " RoundDate, RoundCompetition, RoundGame, idround, "
         + "  CourseName, HandicapModificationDate"
+        
         + " FROM handicap, round, course, player"
         + " WHERE handicap.round_idround = round.idround"
         + "     and round.course_idcourse = course.idcourse"
@@ -63,40 +68,35 @@ String query =
       //LOG.debug(" -- query 4= " );
 		while(rs.next())
                 {
-			ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
-                        Handicap h= new Handicap();
-//			ccr.setPlayerFirstName(rs.getString("PlayerFirstName") );
+		ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
+                Handicap h = new Handicap();
+                h = entite.Handicap.mapHandicap(rs);
+/*			ccr.setPlayerFirstName(rs.getString("PlayerFirstName") );
 //                        ccr.setPlayerLastName(rs.getString("PlayerLastName") );
 //                        ccr.setIdplayer(rs.getInt("idplayer") );
                         h.setHandicapPlayer(rs.getBigDecimal("HandicapPlayer") );
-                        h.setHandicapStart(rs.getDate("idhandicap") );
-                        ecl.setHandicap(h);
-                    //    ccr.setRoundDate(rs.getDate("RoundDate") );
-                //        ccr.setRoundDate(rs.getTimestamp("roundDate") ); // mod 02/08/2015 avec minutes
+                        h.setHandicapStart(rs.getDate("idhandicap") );*/
+                ecl.setHandicap(h);
+                
                 Round r = new Round();
-                    r.setIdround(rs.getInt("idround") );
+                r = entite.Round.mapRound(rs);
+    /*                r.setIdround(rs.getInt("idround") );
                     java.util.Date d = rs.getTimestamp("roundDate");
-                    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                    r.setRoundDate(date);
+              //      LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+               //     LocalDateTime date = DatetoLocalDateTime(d);
+                    r.setRoundDate(DatetoLocalDateTime(d));
                     r.setRoundGame(rs.getString("roundgame") );
                     r.setRoundCompetition(rs.getString("RoundCompetition") );
              //       r.setRoundHoles(rs.getShort("RoundHoles") );
              //       r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-              //      r.setRoundStart(rs.getShort("RoundStart") );
+              //      r.setRoundStart(rs.getShort("RoundStart") );*/
                 ecl.setRound(r);
                 
                 Course o = new Course();
-     //       o.setIdcourse(rs.getInt("idcourse"));
-                    o.setCourseName(rs.getString("CourseName") );
+                o = entite.Course.mapCourse(rs);
                 ecl.setCourse(o);
-                
-                     
-       //                 ccr.setIdplayer(rs.getInt("idplayer"));
-        //                ccr.setPlayerLastName(rs.getString("PlayerLastName"));
-
-			//store all data into a List
-			liste.add(ecl);
-		}
+	liste.add(ecl);
+}
 //LOG.debug(" -- query 5= listcc = " + listcc.toString() );
     return liste;
 }catch (SQLException e){
