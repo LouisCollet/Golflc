@@ -1,29 +1,28 @@
 package entite;
 
-
 import static interfaces.GolfInterface.ZDF_HOURS;
+import static interfaces.Log.LOG;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import javax.inject.Named;
-//import javax.validation.constraints.*;
-//import javax.validation.constraints.Pattern;
-//import javax.validation.constraints.Size;
-/**
- *
- * @author collet
- */
+import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
+
 @Named
 public class Flight implements Serializable, interfaces.Log
 {
     private static final long serialVersionUID = 1L;
-
     private Integer idflight;
     private LocalDateTime flightStart;
     private Integer course_idcourse;
     private String flightPeriod;
-
- 
-    public Flight()
+    private ZonedDateTime sunrise;
+    private ZonedDateTime sunset;
+    
+ public Flight()
     {
        
     }
@@ -64,6 +63,22 @@ public class Flight implements Serializable, interfaces.Log
         this.course_idcourse = course_idcourse;
     }
 
+    public ZonedDateTime getSunrise() {
+        return sunrise;
+    }
+
+    public void setSunrise(ZonedDateTime sunrise) {
+        this.sunrise = sunrise;
+    }
+
+    public ZonedDateTime getSunset() {
+        return sunset;
+    }
+
+    public void setSunset(ZonedDateTime sunset) {
+        this.sunset = sunset;
+    }
+
      @Override
 public String toString()
 { return 
@@ -74,5 +89,21 @@ public String toString()
                + " ,period : " + this.getFlightPeriod()
         );
 }
-
+public static Flight mapFlight(ResultSet rs) throws SQLException{
+    String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Flight f = new Flight();
+          f.setIdflight(rs.getInt("idflight") );
+          java.util.Date d = rs.getTimestamp("FlightStart");
+          f.setFlightStart(DatetoLocalDateTime(d));
+          f.setCourse_idcourse(rs.getInt("flight.course_idcourse"));
+          f.setFlightPeriod(rs.getString("FlightPeriod"));
+   return f;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method
 } // end class

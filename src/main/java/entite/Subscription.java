@@ -1,10 +1,15 @@
 package entite;
 
+import static interfaces.Log.LOG;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import javax.inject.Named;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDate;
 
 @Named
 public class Subscription implements Serializable, interfaces.Log, interfaces.GolfInterface
@@ -91,5 +96,26 @@ public String toString()
                + " ,reference payment : "  + this.getPaymentReference()
         );
 }
+
+public static Subscription mapSubscription(ResultSet rs) throws SQLException{
+    String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Subscription s = new Subscription();
+        s.setIdplayer(rs.getInt("subscription_player_id") );
+            java.util.Date d = rs.getTimestamp("SubscriptionStartDate");
+        s.setStartDate(DatetoLocalDate(d));
+        d = rs.getTimestamp("SubscriptionEndDate");
+        s.setEndDate(DatetoLocalDate(d));
+        s.setTrialCount(rs.getInt("SubscriptionTrialCount"));
+        s.setPaymentReference(rs.getString("SubscriptionPaymentReference"));
+   return s;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method
+
 
 } // end class

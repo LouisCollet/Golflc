@@ -425,17 +425,28 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 
  <build>
 
- <!--  new 05-11-2018  
+ <!--  new 16-11-2018 
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
           <version>1.6.0</version>
+          <executions>
+             <execution>
+                <id>myLC-execution</id>
+                <goals>
+                   <goal>exec</goal>
+                </goals>
+             </execution>
+          </executions>
+          
+          
+          
         </plugin>
       </plugins>
     </pluginManagement>
--->    
+   -->  
      
  <plugins>
    <plugin>
@@ -454,18 +465,14 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 https://www.baeldung.com/javac
 Supplies warnings to enable or disable, separated by comma. 
 Precede a key by a hyphen (-) to disable the specified warning.-->
-                    <compilerArgs> <!-- new 01-11-2018 
-                        <arg>-Xmaxwarns 100</arg>
-  <arg>-J-Duser.language=en_us</arg>
-      <arg>-Xlint:-rawtypes,-serial</arg> --> 
+                    <compilerArgs> <!-- new 01-11-2018  --> 
                         <arg>-Xlint:all,-rawtypes,-serial</arg>
                     </compilerArgs>
-
                     <showDeprecation>true</showDeprecation> <!--  mod 08-02-2018 was true -->
                     <showWarnings>true</showWarnings> <!-- new 20/01/2013 -->
-                    <Averbose>true</Averbose> <!-- new 20/01/2013 -->
-                    <debug>false</debug>
-                 
+                    <verbose>false</verbose>   <!--new 20/01/2013 'true' donne liste de toutes les sources -->
+                    <debug>true</debug>
+                  <!--  <debuglevel>lines,vars,source</debuglevel> new 17/11/2018 -->
                 </configuration>
             </plugin>
      <plugin>

@@ -10,10 +10,7 @@ import java.time.LocalDateTime;
 import utils.DBConnection;
 import utils.LCUtil;
 import static utils.LCUtil.DatetoLocalDateTime;
-/**
- *
- * @author collet
- */
+
 public class CreateRound implements interfaces.Log, interfaces.GolfInterface
 {
     public boolean createRound(final Round round, final Course course, final Connection conn) throws SQLException {
@@ -21,59 +18,36 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface
         PreparedStatement ps = null;
         try {
             LOG.info(" ... starting createRound()");
-            LOG.info("round competition = " + round.getRoundCompetition());
-      //      LOG.info("round Date  = " + SDF_TIME.format(round.getRoundDate()) );
-   //         LOG.info("Work Date 1 = " + round.getWorkDate());
-   //         LOG.info("RoundDate  = " + round.getRoundDate());
-   //         LOG.info("Work Date 2 = " + SDF_TIME.format(round.getWorkDate()));
-   //      java.util.Date d1 = round.getWorkDate();
-    //        LOG.info("java.util.dl = " + d1);
-   // remise- 08/08/2017 3 lignes, enlevé 14/08/2017
-    //    LocalDateTime ldt = d1.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-    //       LOG.info("LocalDateTime ldt = " + ldt);
-    //     round.setRoundDate(ldt);
-    // enlevé 08/08/2017 2 lignes remis 14/08/2017
-    LOG.info("entite round = " + round.toString());
-            LOG.info("RoundDate = " + round.getRoundDate());
-            LOG.info("RoundDate formated = " + round.getRoundDate().format(ZDF_TIME_HHmm));
-            LOG.info("round Game  = " + round.getRoundGame());
-            LOG.info("round CBA   = " + round.getRoundCBA());
-            LOG.info("round qual  = " + round.getRoundQualifying());
-            LOG.info("round holes = " + round.getRoundHoles());
-            LOG.info("round # of players = " + round.getPlayers());
-            LOG.info("round start = " + round.getRoundStart());
-    LOG.info("entite course = " + course.toString());          
-            LOG.info("idcourse    = " + course.getIdcourse());
-            LOG.info("Begin course = " + course.getCourseBegin() );
-            LOG.info("End course = " + course.getCourseEnd());
+       //     LOG.info("round competition = " + round.getRoundCompetition());
+            LOG.info("round to be created = = " + round.toString());
+            LOG.info("entite course = " + course.toString());          
+      //      LOG.info("idcourse    = " + course.getIdcourse());
+      //     LOG.info("Begin course = " + course.getCourseBegin() );
+      //     LOG.info("End course = " + course.getCourseEnd());
     // à faire : utiliser RoundValidation
     //    if(round.getRoundDate().before(course.getCourseBegin()) )
  //       LOG.info("line 000");
       //   LocalDateTime cb = course.getCourseBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-         LocalDateTime cb = DatetoLocalDateTime(course.getCourseBegin());
- //        LOG.info("line 01");
-           LOG.info("LocalDateTime courseBegin = " + cb);
-         if(round.getRoundDate().isBefore(cb) )
-           { //String msg = "Error date : creating Round on not yet opened Course !! ";
+     //      LOG.info("line 00");
+       LocalDateTime cb = DatetoLocalDateTime(course.getCourseBegin());
+          LOG.info("LocalDateTime courseBegin = " + cb);
+         if(round.getRoundDate().isBefore(cb) ){ 
                 String msgerr =  LCUtil.prepareMessageBean("round.notopened");
                 LOG.error(msgerr); 
                 LCUtil.showMessageFatal(msgerr);
                 return false;
            }
     //    if(round.getRoundDate().after(course.getCourseEnd()) )
-    
-      ///   LocalDateTime ce = course.getCourseEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+   //      LOG.info("line 02");
          LocalDateTime ce = DatetoLocalDateTime(course.getCourseEnd());
            LOG.info("LocalDateTime courseEnd = " + ce);
-         if(round.getRoundDate().isAfter(ce) )
-           { // String msg = "Error date : creating Round on closed Course";
+         if(round.getRoundDate().isAfter(ce) ){ 
                 String msgerr =  LCUtil.prepareMessageBean("round.closed");
                 LOG.error(msgerr); 
                 LCUtil.showMessageFatal(msgerr);
                 return false;
            }
-         
-  //       LOG.info("line 02");
+  //     LOG.info("line 03");
             final String query = LCUtil.generateInsertQuery(conn, "round"); // new 15/11/2012
             ps = conn.prepareStatement(query);
             ps.setNull(1, java.sql.Types.INTEGER);

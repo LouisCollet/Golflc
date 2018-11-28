@@ -26,18 +26,19 @@ public boolean modifyCourse(final Course course, final Connection conn) throws E
             LOG.info("course Holes  = " + course.getCourseHoles());
             LOG.info("course Par  = " + course.getCoursePar());
             
-    String s = utils.DBMeta.listMetaColumnsUpdate(conn, "course");
-        LOG.info("String from listMetaColumns = " + s);
+    String co = utils.DBMeta.listMetaColumnsUpdate(conn, "course");
+        LOG.info("String from listMetaColumns = " + co);
     String query = "UPDATE course SET "
-                   + s
+                   + co
                    + "  WHERE course.idcourse=?";
         
              ps = conn.prepareStatement(query);
             // insérer dans l'ordre de la database : 1 = first db field
        //     ps.setNull(1, java.sql.Types.INTEGER);
             ps.setString(1, course.getCourseName());
-            ps.setShort(2, course.getCourseHoles());
-            ps.setShort(3, course.getCoursePar());
+      //      ps.setShort(2, course.getCourseHoles());
+            ps.setShort(2, (short) 18);// mod 12-11-2018 toujour 18 holes  enlevé dans blaclist de columns update
+            ps.setShort(3, course.getCoursePar()); 
 ///            ps.setInt(6, club.getIdclub());
             ps.setDate(4, LCUtil.getSqlDate(course.getCourseBegin()));
             ps.setDate(5, LCUtil.getSqlDate(course.getCourseEnd()));

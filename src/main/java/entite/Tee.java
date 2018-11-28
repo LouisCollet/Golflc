@@ -43,7 +43,7 @@ public class Tee implements Serializable, interfaces.Log
 @DecimalMax(value="75.0",message="{tee.rating.max}")
 private BigDecimal teeRating;
 
-// @NotNull(message="{tee.clubhandicap.notnull}")
+@NotNull(message="{tee.clubhandicap.notnull}")
 @Min(value=00,message="{tee.clubhandicap.min}")
 @Max(value=10,message="{tee.clubhandicap.max}")
     private Integer teeClubHandicap; // was Short
@@ -58,6 +58,7 @@ private boolean CreateModify = true; // 12/08/2017
     {
         teeGender="M"; // default for radio button
         teeStart="YELLOW";
+        teeClubHandicap = 0;
     }
 
     public Integer getIdtee() {

@@ -462,7 +462,7 @@ public static String listMetaColumnsLoad (Connection conn, String table) throws 
 {      ResultSet rs = null;
 //https://docs.oracle.com/javase/8/docs/api/java/sql/DatabaseMetaData.html#getColumns-java.lang.String-java.lang.String-java.lang.String-java.lang.String-
 try{
-    LOG.info("starting listMetaColumnsLoad for table = " + table );
+///    LOG.info("starting listMetaColumnsLoad for table = " + table );
     DatabaseMetaData meta = conn.getMetaData();
   //  String   catalog          = null;
   //  String   schemaPattern    = null;
@@ -484,10 +484,9 @@ sb.append(" "); // space to separate query element
  //       LOG.info("inside loop, sb = " + sb);
     }  //end while
   sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
- //   LOG.info("sb capacity = " + sb.capacity());
-        LOG.info("Table fields for " + table + " = " + sb);
+
+ ///       LOG.info("Table fields for " + table + " = " + sb);
 return sb.toString();
-   
    
 /*http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html
  * The ResultSet returned by the getColumns() method contains a list of columns
@@ -569,7 +568,7 @@ StringBuilder sb = new StringBuilder();
 List<String> blacklist = Arrays.asList(
         "playerphotolocation", "playeractivation", "playermodificationdate" , "playerpassword", "playerRole",  // TOUT EN MINUSCULES !!!!
         "clubmodificationdate","club_idclub",
-        "coursemodificationdate","course_idcourse",
+        "coursemodificationdate","course_idcourse",// "courseholes",
         "teemodificationdate", "tee_idtee", "tee_course_idcourse",
         "holenumber", "holemodificationdate"
         ); // 07-08-208

@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -161,11 +162,31 @@ public static void delayLC() {// throws InterruptedException, ExecutionException
     
 }
 public static LocalDateTime DatetoLocalDateTime(java.util.Date date){
-  return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+try{
+ //       LOG.info("entering DatetoLocalDateTime with Date = " + date);
+        return date.toInstant()
+                   .atZone(ZoneId.systemDefault())
+                   .toLocalDateTime();
+ }catch(Exception e){
+   String msg = "£££ Exception in DatetoLocalDateTime = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
 }
 
 public static LocalDate DatetoLocalDate(java.util.Date date){
-  return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+  try{
+  //     LOG.info("entering DatetoLocalDate with Date = " + date);
+        return date.toInstant()
+                   .atZone(ZoneId.systemDefault())
+                   .toLocalDate();
+   }catch(Exception e){
+   String msg = "£££ Exception in DatetoLocalDate = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+    LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
 }
 /**
      * Creates {@link LocalDate} from {@code java.util.Date} or it's subclasses. Null-safe.
@@ -733,7 +754,17 @@ public static void showMessageFatal(String summary){
        FacesContext fc = FacesContext.getCurrentInstance();
        fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
 //        LOG.info("face context batch" + FacesContext.getCurrentInstance().getApplication());
-       RequestContext rc = RequestContext.getCurrentInstance();
+////    RequestContext rc = RequestContext.getCurrentInstance();
+     
+     
+       PrimeFaces pf = PrimeFaces.current();
+       if (pf.isAjaxRequest()) {
+         // pf.ajax().update("...");
+         LOG.info("this is an AjaxRequest !!");
+        }
+       
+       
+       
        if(fc != null) //JSF session, fc is null for  BATCH sessions
        {
             fc.getExternalContext().getFlash().setKeepMessages(true);
@@ -980,12 +1011,12 @@ for (File file : files)
 public static void logps(PreparedStatement ps) 
 {
   try{
-        LOG.info("entering logps");     
+ ///       LOG.info("entering logps");     
         //avec connection pool p = org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8@10b61e60
 //        org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8.
         //connection classique p = com.mysql.cj.jdbc.ClientPreparedStatement: SELECT idplayer, PlayerFirstName, PlayerLastName, PlayerCity, Play
     String p = ps.toString();
-    LOG.info("p toString = " + p);
+ ///   LOG.info("p toString = " + p);
     if(p.contains("WrappedPreparedStatement")){
         LOG.info("pooled connection");
     }else{
@@ -1358,6 +1389,28 @@ try{
         }
 }
   
+public static String findProperties(String cat, String subcat) throws IOException {
+try{
+    LOG.info("cat : " + cat);
+    LOG.info("subcat : " + subcat);
+    ClassLoader clo = Thread.currentThread().getContextClassLoader(); // new 25-11-2018
+     // Netbeans Files en haut à gauche /src/main/resources
+     //InputStream is = clo.getResourceAsStream("subscription.properties");
+       InputStream is = clo.getResourceAsStream(cat + ".properties");
+       Properties p = new Properties();
+       p.load(is);
+       String r = p.getProperty(cat + "." + subcat);
+    //     price = p.getProperty("subscription.month");
+        //     price = p.getProperty("subscription.month"); //subscripton.month
+       LOG.info("Property cat + e = " + r);
+    return r;
+    
+  }catch (Exception e){
+    String msg = "error findProperties = " + e ;
+    LOG.error(msg);
+    return null;
+        }
+}
 public static String[] intArraytoStringArray(int[] int01){
   try{  
     String[] str01 = new String[int01.length];

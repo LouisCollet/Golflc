@@ -1,8 +1,8 @@
 package calc;
 
+import entite.ECourseList;
 import entite.Player;
 import entite.Round;
-import entite.StablefordResult;
 import find.FindHandicap;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -36,7 +36,7 @@ try{   //  List<StablefordResult> listeStb;
  
     LOG.info("game " + round.getRoundGame() );
     find.FindSlopeRating fsr = new find.FindSlopeRating();
-    List<StablefordResult> stb = fsr.getSlopeRating(player, round, conn);
+    List<ECourseList> stb = fsr.getSlopeRating(player, round, conn);
         LOG.info("List StablefordResult = " + Arrays.toString(stb.toArray() ) );
  //    listeStb = stb.subList(0, 1);
      
@@ -44,24 +44,25 @@ try{   //  List<StablefordResult> listeStb;
     double player_hcp = fh.findPlayerHandicap(player, round, conn);
  //   double player_hcp = find.FindHandicap.findPlayerHandicap(player, round, conn);
         LOG.info("OKOK player_hcp = " + player_hcp);
-    double slope = stb.get(0).getTeeSlope(); // new
+    double slope = stb.get(0).Etee.getTeeSlope(); // new
         LOG.info("OKOK slope = " + slope);
-    BigDecimal bd_rating = stb.get(0).getTeeRating(); //new
+    BigDecimal bd_rating = stb.get(0).Etee.getTeeRating(); //new
     double rating = bd_rating.doubleValue(); //turn the BigDecimal object into a double
         LOG.info("OKOK rating = " + rating);
-    double par = stb.get(0).getCoursePar();
+    double par = stb.get(0).Ecourse.getCoursePar();
         LOG.info("OKOK par = " + par);
-    int csa = stb.get(0).getRoundCBA();
+    int csa = stb.get(0).Eround.getRoundCBA();
         LOG.info("OKOK csa = " + csa);
-    int holes = stb.get(0).getRoundHoles();
+    int holes = stb.get(0).Eround.getRoundHoles();
         LOG.info("OKOK holes = " + holes);
-    String qualifying = stb.get(0).getRoundQualifying();
+    String qualifying = stb.get(0).Eround.getRoundQualifying();
         LOG.info("OKOK qualifying = " + qualifying);
         /// bug !!
-    Short starthole = stb.get(0).getRoundStart();    // hole de départ : 1 ou 10 (pour les parcours 9 trous)
+    Short starthole = stb.get(0).Eround.getRoundStart();    // hole de départ : 1 ou 10 (pour les parcours 9 trous)
         LOG.info("OKOK starthole = " + starthole);
-        
-    Short teeClubHandicap = stb.get(0).getTeeClubHandicap();
+ 
+ //   Short teeClubHandicap = stb.get(0).Etee.getTeeClubHandicap();     
+    int teeClubHandicap = stb.get(0).Etee.getTeeClubHandicap();
         LOG.info("teeClubHandicap = " +  teeClubHandicap);
 
     
@@ -119,7 +120,8 @@ finally
 }
 } //end getPlayingHandicap
     
-public int calculatePlayingHcp (double exact_hcp, double slope, double rating, double par, short clubhandicap)
+//public int calculatePlayingHcp (double exact_hcp, double slope, double rating, double par, short clubhandicap)
+        public int calculatePlayingHcp (double exact_hcp, double slope, double rating, double par, int clubhandicap)
 {
     int addhcp = 0;
      if(exact_hcp == 54) //new 05/07/2016

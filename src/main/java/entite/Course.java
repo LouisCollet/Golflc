@@ -30,28 +30,27 @@ public class Course implements Serializable, interfaces.Log
     private String courseName;
 
 @NotNull(message="{course.holes.notnull}")
+@Size(min=1,max=2,message="Bean validation : the Round Game is min 3, max 20 characters")
+@Min(value=9,message="{tee.slope.min}")
+@Max(value=18,message="{tee.slope.max}")
     private short courseHoles;
 
 @NotNull(message="{course.par.notnull}")
-    private short coursePar;
-
-//@NotNull(message="Bean validation : the Gender must be completed")
-//    @Size(max = 1,message="Bean validation : the Gender is maximum 1 character")
-//    private String CourseGender;
+@Min(value=69,message="{tee.slope.min}")
+@Max(value=73,message="{tee.slope.max}")
+    private Short coursePar;
 
     private Integer club_idclub;
-
     private Date courseBegin;
     private Date courseEnd;
     private Date courseModificationDate;
-
     private boolean NextCourse; // 23/06/2013
     private boolean CreateModify = true; // 12/08/2017
     private String inputSelectCourse; // new 27/08/2018  
     public Course()
     {
        courseHoles = 18; //set default value to 18 in radiobutton
-       coursePar=72;
+       coursePar = (short)72;
     }
 
     public Integer getIdcourse() {
@@ -78,21 +77,15 @@ public class Course implements Serializable, interfaces.Log
         this.courseHoles = courseHoles;
     }
 
-    public short getCoursePar() {
+    public Short getCoursePar() {
+   //      LOG.info("getCoursepar = " + coursePar);
         return coursePar;
     }
 
-    public void setCoursePar(short coursePar) {
+    public void setCoursePar(Short coursePar) {
         this.coursePar = coursePar;
+ //       LOG.info("setCoursepar to " + this.coursePar);
     }
-
- //   public String getCourseGender() {
- //       return CourseGender;
- //   }
-
- //   public void setCourseGender(String CourseGender) {
- //       this.CourseGender = CourseGender;
- //   }
 
     public Integer getClub_idclub() {
         return club_idclub;
@@ -150,7 +143,6 @@ public class Course implements Serializable, interfaces.Log
         this.inputSelectCourse = inputSelectCourse;
     }
 
-
  @Override
 public String toString()
 { return 
@@ -159,6 +151,9 @@ public String toString()
                + " ,course Name : " + this.getCourseName()
                + " ,course Par : " + this.getCoursePar()
                + " ,course Holes : " + this.getCourseHoles()
+               + " ,Begin course = " + this.getCourseBegin()
+               + " ,End course = " + this.getCourseEnd()
+               + " ,inputSelectCourse = " + this.getInputSelectCourse()
         );
 }
   public static Course mapCourse(ResultSet rs) throws SQLException{
@@ -170,9 +165,9 @@ public String toString()
                 c.setCourseHoles(rs.getShort("CourseHoles"));
                 c.setCoursePar(rs.getShort("coursepar"));
                 c.setClub_idclub(rs.getInt("course.club_idclub"));
-                c.setCourseBegin(rs.getDate("courseBegin"));
-                c.setCourseEnd(rs.getDate("courseEnd"));
-        
+                c.setCourseBegin(rs.getTimestamp("courseBegin")); // format 'DATE' in database
+                c.setCourseEnd(rs.getTimestamp("courseend")); // format 'DATE' in database
+                
    return c;
   }catch(Exception e){
    String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();

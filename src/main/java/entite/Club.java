@@ -32,13 +32,13 @@ public class Club implements Serializable, interfaces.Log
 @NotNull(message="Bean validation : the Club ID must be completed")
   private Integer idclub;
 
-@Pattern(regexp="[a-zA-Z0-9éèàê' ç-]*",message="{club.name.characters}")
+@Pattern(regexp="[a-zA-Z0-9éèàê'!â& ç-]*",message="{club.name.characters}")
 @NotNull(message="{club.name.notnull}")
 @Size(max=45,message="{club.name.size}")
 @FirstUpper(max=7) // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
     private String clubName;
 //---------------------
-@Pattern(regexp="[a-zA-Z0-9'éèàê' ç-]*",message="{club.address.characters}")
+@Pattern(regexp="[a-zA-Z0-9'éèàê'&â!, ç-]*",message="{club.address.characters}")
 @NotNull(message="{club.address.notnull}")
 @Size(max=45,message="{club.address.size}")
     private String clubAddress;

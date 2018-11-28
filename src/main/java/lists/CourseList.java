@@ -4,7 +4,6 @@ import entite.Club;
 import entite.Course;
 import entite.ECourseList;
 import entite.Tee;
-import googlemaps.GoogleTimeZone;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,13 +30,14 @@ try{
      //LOG.debug("starting getScoreCardList... = " );
      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
      String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
 String query =
         "SELECT "
-        + cl + "," + co + ","
+        + cl + "," + co + "," + te
   //      + " idclub, clubname, clubcity, clubcountry, clubAddress,"
   //          +  " clubLatitude, clubLongitude, ClubZoneId,"
   //          + " idcourse, courseholes, coursepar, coursename, courseBegin, courseEnd,"
-        + "tee.idtee, tee.TeeStart"
+    //    + "tee.idtee, tee.TeeStart"
             + "        FROM club, course, tee "
             + "        WHERE club.idclub = course.club_idclub"
                 + "    AND course.CourseEnd >=  MAKEDATE(year(now()),1)"   // new 28/07/2017 >= 01/01 année en cours
@@ -65,7 +65,8 @@ String query =
         {
 		ECourseList ecl = new ECourseList();
                 Club c = new Club();
-                        c.setIdclub(rs.getInt("idclub") );
+                c = entite.Club.mapClub(rs);
+                  /*      c.setIdclub(rs.getInt("idclub") );
            //                 LOG.debug("idcclub setted = " + c.getIdclub() );
                         c.setClubName(rs.getString("clubName") );
           //                  LOG.debug("clubname setted = " + c.getClubName() );       
@@ -85,33 +86,33 @@ String query =
                         c.setClubTimeZone(gtz);
                         
                         c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
-                        c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
+                        c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );*/
                 ecl.setClub(c);
-           //             LOG.debug("clubaddress setted from ecl = " + ecl.Eclub.getClubAddress() );
+
                 Course o = new Course();
-                        o.setIdcourse(rs.getInt("idcourse"));
+                o = entite.Course.mapCourse(rs);
+                    /*     o.setIdcourse(rs.getInt("idcourse"));
            //                LOG.debug("idcourse setted = " + o.getIdcourse() );
 			o.setCourseName(rs.getString("coursename") );
             //                LOG.debug("course name setted = " + o.getCourseName() );    
                         o.setCourseBegin(rs.getTimestamp("courseBegin")); // mod 01/05/2017 was getDate
              //               LOG.debug("begin date setted = " + o.getCourseBegin() );
                         o.setCourseEnd(rs.getTimestamp("courseend")); // mod 01/05/2017 was getDate
-             //               LOG.debug("begin date setted = " + o.getCourseBegin() );
+             //               LOG.debug("begin date setted = " + o.getCourseBegin() );*/
+         //           o.setInputSelectCourse(o.getInputSelectCourse()); // new 24-11-2018
                 ecl.setCourse(o);
           //               LOG.debug("begin date setted from ecl = " + ecl.Ecourse.getCourseBegin() );
                 Tee t = new Tee();
-                        t.setIdtee(rs.getInt("idtee"));
+                t = entite.Tee.mapTee(rs);
+              //          t.setIdtee(rs.getInt("idtee"));
             //               LOG.debug("idtee setted = " + t.getIdtee() );
-			t.setTeeStart(rs.getString("teestart") );
+		//	t.setTeeStart(rs.getString("teestart") );
             //                LOG.debug("teestart name setted = " + t.getTeeStart() );    
                 ecl.setTee(t);
-           //         LOG.debug("teestart name setted from ecl = " + ecl.Etee.getTeeStart() );    
-     //                   LOG.debug("ECourseList = " + ecl.toString());
-			//store all data into a List
-		liste.add(ecl);
+	liste.add(ecl);
 	} // end while
   //     LOG.debug(" -- before forEach " );
-       liste.forEach(item -> LOG.info("Course list " + item + "/"));  // java 8 lambda                   
+ //      liste.forEach(item -> LOG.info("Course list " + item + "/"));  // java 8 lambda                   
 
     return liste;
 }catch (SQLException e){ 

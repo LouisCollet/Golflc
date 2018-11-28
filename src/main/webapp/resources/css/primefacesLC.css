@@ -406,12 +406,13 @@ used in maps_home_club.xhtml */
    /*  https://github.com/qTip2/qTip2/wiki/Style-Guide   done 10-03-2018 //   used in formTemplate.xhtml   */
 .myQtip2Style .qtip-content{
 	font-size: 16px;
+        
 }
 
 .myQtip2Style{
-	
-	height: 200px;
-        
+	height: 60px;
+        border-color: rgb(0,190,0);
+        background-color: #ddd;
 }
 /* 03-11-2018 confirm dialog   */
 ui-confirm-dialog .ui-dialog-content .ui-confirm-dialog-message{color:#72828B !important;}

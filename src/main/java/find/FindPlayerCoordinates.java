@@ -116,7 +116,7 @@ public static void main(String[] args) throws Exception , Exception{
     // fille in the fields
   //  FindTarifData ftd = new FindTarifData();
     player = new FindPlayerCoordinates().findPlayerLatLngTz(player); 
-     LOG.info("Plyer is now = "  +player.toString());
+     LOG.info("Player is now = " + player.toString());
 //findPlayerHandicap(player,round, conn);
 //for (int x: par )
 //        LOG.info(x + ",");

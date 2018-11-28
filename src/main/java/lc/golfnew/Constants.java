@@ -34,6 +34,6 @@ public class Constants
     
   //  static final String GOOGLE_API_KEY = "AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc";
     static final String GOOGLE_API_KEY = "AIzaSyB8N9pZyPmYCSr0d3sTf9n8HHlvHlTRYLI";
-    static final DateTimeFormatter dtf_HHmm = DateTimeFormatter.ofPattern("HH:mm");
+ //   static final DateTimeFormatter dtf_HHmm = DateTimeFormatter.ofPattern("HH:mm");
     static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 }

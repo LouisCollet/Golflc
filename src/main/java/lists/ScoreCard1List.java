@@ -1,9 +1,10 @@
 
 package lists;
 
+import entite.ECourseList;
+import entite.Handicap;
 import entite.Player;
 import entite.Round;
-import entite.ScoreCard;
 import exceptions.LCCustomException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,10 +21,10 @@ import utils.LCUtil;
  */
 public class ScoreCard1List implements interfaces.Log
 {
-    private static List<ScoreCard> liste = null;
+    private static List<ECourseList> liste = null;
 //    private static BigDecimal HandicapPlayer;
     
-public List<ScoreCard> getScoreCardList1(final Player player, final Round round,
+public List<ECourseList> getScoreCardList1(final Player player, final Round round,
         final Connection conn) throws SQLException, NullPointerException, LCCustomException{  
   //  LOG.debug("  ... entering ScoreCard1List !!!");
     
@@ -62,12 +63,27 @@ String query =
             }    
      rs.beforeFirst(); //on replace le curseur avant la premiÃ¨re ligne
      liste = new ArrayList<>();
-     ScoreCard cc = new ScoreCard();
+  //   ECourseList cc = new ECourseList();
       //LOG.debug(" -- query 4= " );
 	while(rs.next())
         {
-        	cc = new ScoreCard(); // liste pour sÃ©lectionner un scoreCard
+             ECourseList ecl = new ECourseList();
+     //   	cc = new ECourseList(); // liste pour sÃ©lectionner un scoreCard
 		//cc.setIdclub(rs.getInt("idclub") ); // was idscoreCard : not case sensitive ??
+                
+          Player p = new Player();
+          p = entite.Player.mapPlayer(rs);
+          ecl.setPlayer(p);
+
+          Round r = new Round();
+          r = entite.Round.mapRound(rs);
+          ecl.setRound(r);
+          
+          Handicap h = new Handicap();
+          h = entite.Handicap.mapHandicap(rs);  
+          ecl.setHandicap(h);
+                
+      /*          
                 cc.setIdplayer(player.getIdplayer() ); // new 09/05/2013 ou chercher dans requÃªte ?
                 cc.setPlayerFirstName(rs.getString("PlayerFirstName") );
                 cc.setPlayerLastName(rs.getString("PlayerLastName") );
@@ -78,10 +94,11 @@ String query =
                 cc.setIdround(rs.getInt("idround"));
                     LOG.debug("cc = " + cc);
 			//store all data into a List
-	liste.add(cc);
+*/
+	liste.add(ecl);
 	} //end while
         
-    LOG.info("exiting ScoreCard1List with " + liste.toString());
+ ///   LOG.info("exiting ScoreCard1List with " + liste.toString());
     return liste;
     
     
@@ -116,11 +133,11 @@ String query =
 }
 } //end method
 
-    public static List<ScoreCard> getListe() {
+    public static List<ECourseList> getListe() {
         return liste;
     }
 
-    public static void setListe(List<ScoreCard> liste) {
+    public static void setListe(List<ECourseList> liste) {
         ScoreCard1List.liste = liste;
     }
     

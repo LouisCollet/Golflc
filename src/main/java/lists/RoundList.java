@@ -32,16 +32,17 @@ try
      String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
      String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
      String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
-  //   String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");   
 String query =
         "SELECT "
-        + cl + "," + co + "," + ro + "," + pl + ","
+        + cl + "," + co + "," + ro + "," + pl + "," + ph
    //     + "idplayer, playerFirstName, playerLastName, round_idround,"
     //    + " idclub, idcourse, idround, "
     //    + " RoundDate, RoundCompetition, RoundQualifying, RoundGame,"
     //    + " RoundCSA, CourseName, ClubName, "
-        + " InscriptionFinalResult,"
-        + " Player_has_roundZwanzeursResult, Player_has_roundZwanzeursGreenshirt"
+   //     + " InscriptionFinalResult,"
+  //      + " Player_has_roundZwanzeursResult, Player_has_roundZwanzeursGreenshirt"
+        
         + " FROM player"
         + " JOIN player_has_round"
         + "     ON player_has_round.player_idplayer = player.idplayer"

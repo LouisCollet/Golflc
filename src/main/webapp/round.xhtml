@@ -45,7 +45,7 @@ In addition, you can use �target� attribute to control where to output the j
                 alt="image missing :golf_round.jpg"
                 style="float: right;">
 </h:graphicImage>
-    <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;"/>
+  <!--  <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;"/>-->
 <h:form id="form_round" enctype="application/x-www-form-urlencoded" >
     
 <ui:include src="include/include_summary_club.xhtml"/>
@@ -104,7 +104,8 @@ In addition, you can use �target� attribute to control where to output the j
 <!--           converter="localDateTimeConverter"       pattern="dd/MM/yyyy HH:mm"             -->
 
 
-      <h:outputText value="#{msg['round.hour']}" />
+      <h:outputText id="outputHour"
+                    value="#{msg['round.hour']}" />
       <h:panelGroup id="panelG1" layout="block" >
           <p:commandButton 
                         id="flightButton"
@@ -113,18 +114,20 @@ In addition, you can use �target� attribute to control where to output the j
                         value="Choose Flight Hour"
                         style="float:left"
                         >
-                <p:ajax event="dialogReturn"
-                        update=":form_round:idworkhour"
-                        listener="#{dialogC.onFlightChosen('louis')}"/>
+                 <p:ajax event="dialogReturn"
+                         update=":form_round:idworkhour" 
+                        />
                </p:commandButton>
           
+ <!--    <p:ajax event="click"
+                        update="idworkhour"
+                        listener="#{dialogC.onFlightChosen()}"/>-->
           <h:outputText id="idworkhour" 
+                        style="font-weight:bold;font-size: 2em;font-style:normal;color: red"
                         value="#{courseC.round.workHour}"
             />
       </h:panelGroup>
 
-      
-      
 <!-- http://stackoverflow.com/questions/32456951/primefaces-dialog-framework-dialog-not-opening  -->
 
 

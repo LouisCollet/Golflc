@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -23,23 +22,22 @@ private static ResultSet rs = null;
 private static ArrayList<Flight> liste = null;
 
 public ArrayList<Flight> createTableFlights (ZonedDateTime sunrise, ZonedDateTime sunset,
-                                                        String tz, int courseid, Connection conn) throws ParseException         
-            
-    {  LOG.info("entering createTableFlights ");
-        //    LOG.info+ liste.toString());
-   if(liste == null)
-   { 
-       LOG.info("liste == null");
-        try{
+                                             String tz, int courseid, Connection conn) throws ParseException{         
+//   LOG.info("entering createTableFlights ");
+ if(liste == null)
+ { 
+       LOG.info("liste == null then we do something ");
+       LOG.info("with courseid = " + courseid);
+   try{
         // test en partant d'une heure de départ en en arrêtant à une heure de fin, créer des départs Golf
             LOG.info("String date sunrise = " + sunrise);
  ////       ZonedDateTime sunrise = ZonedDateTime.parse(date_sunrise, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
  //           LOG.info("ZonedDateTime with iso-offset_date_time: " + sunrise);
  // ZonedDateTime dateTime = ZonedDateTime.parse("2007-12-03T10:15:30+01:00[Europe/Paris]");
 
-        Instant instant = sunrise.toInstant();
+   ///     Instant instant = sunrise.toInstant();
 //            LOG.info("instant = " + instant);
-        sunrise = instant.atZone(ZoneId.of(tz));
+        sunrise = sunrise.toInstant().atZone(ZoneId.of(tz));
 //        LOG.info("tz = " + tz);
 //            LOG.info ("formatted tz sunrise = " + dtf_HHmm.format(sunrise));
 //           LOG.info("String date sunset = " + date_sunset);
@@ -81,20 +79,19 @@ public ArrayList<Flight> createTableFlights (ZonedDateTime sunrise, ZonedDateTim
             liste.add(fl); // mod 17/04/2017
 //            LOG.info("Flight 4 " + i + " = " + liste.toString() );
         }
-////        LOG.info("Arraylist = " + flight.toString()); //Arrays.toString(list));
-//        LOG.info("get12 : " + flight.get(12));  //exemple
-           //       flight.forEach(System.out::println);
-           // let us print all the elements available in list
-           liste.forEach((n) -> {
-               LOG.info("Flight = " + n);
-           }); // initialisation et recréation de la table flight
-         CreateFlights cf = new CreateFlights();
-         boolean OK = cf.createFlight(liste, courseid, conn);  // fake = courseid
-            LOG.info("boolean result create.CreateFlights = " + OK);
+
+    //       liste.forEach((n) -> {LOG.info("end of createTableFlights, Flight = " + n);
+    //       }); 
+
+// initialisation et recréation de la table flight
+           
+ ///        CreateFlights cf = new CreateFlights();
+ ///        boolean OK = cf.createFlight(liste, courseid, conn);  // fake = courseid
+///            LOG.info("boolean result create.CreateFlights = " + OK);
   // elimination des flights déjà réservés  ////////////        
-        lists.FlightList fl = new lists.FlightList();
-        fl.listAllFlights(conn);
-            LOG.info("boolean result lists.FlightList =  = " + OK);
+///        lists.FlightList fl = new lists.FlightList();
+///        fl.listAllFlights(conn);
+///            LOG.info("boolean result lists.FlightList =  = " + OK);
    return liste;  // à modifier, pas nécessaire !
    } catch (Exception e) {
             String msg = "£££ Exception in Insert flight = " + e.getMessage();

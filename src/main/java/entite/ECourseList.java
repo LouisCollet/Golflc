@@ -17,7 +17,9 @@ public class ECourseList // implements Comparable<ECourseList>
     public Inscription EinscriptionNew;
     public Player Eplayer;
     public Classment Eclassment;
-    
+    public ScoreStableford EscoreStableford;
+    public Hole Ehole;
+    public Subscription Esubscription;
  //   private int totalExtraStrokes;
   //  private Short playerhasroundFinalResult;
 
@@ -33,6 +35,9 @@ public class ECourseList // implements Comparable<ECourseList>
         EinscriptionNew = new Inscription();
         Eplayer = new Player();
         Eclassment = new Classment();
+        EscoreStableford = new ScoreStableford();
+        Ehole = new Hole();
+        Esubscription = new Subscription();
     }
  
     public Club getClub() {   // permet d'utiliser #{vc.round.idround} par ex dans selectInscription.xhtml
@@ -44,58 +49,84 @@ public class ECourseList // implements Comparable<ECourseList>
     public Classment getClassment() {
         return Eclassment;
     }
-
     public void setClassment(Classment classment) {
         this.Eclassment = classment;
     }
+
+    public Subscription getSubscription() {
+        return Esubscription;
+    }
+    public void setSubscription(Subscription subscription) {
+        this.Esubscription = subscription;
+    }
+    
+    
+    
+    
     public Course getCourse() {
         return Ecourse;
     }
 
-    public void setCourse(Course Ecourse) {
-        this.Ecourse = Ecourse;
+    public void setCourse(Course course) {
+        this.Ecourse = course;
     }
 
     public Tee getTee() {
         return Etee;
     }
 
-    public void setTee(Tee Etee) {
-        this.Etee = Etee;
+    public void setTee(Tee tee) {
+        this.Etee = tee;
     }
 
     public Round getRound() {
         return Eround;
     }
 
-    public void setRound(Round Eround) {
-        this.Eround = Eround;
+    public void setRound(Round round) {
+        this.Eround = round;
     }
 
     public Handicap getHandicap() {
         return Ehandicap;
     }
 
-    public void setHandicap(Handicap Ehandicap) {
-        this.Ehandicap = Ehandicap;
+    public void setHandicap(Handicap handicap) {
+        this.Ehandicap = handicap;
     }
 
     public PlayerHasRound getInscription() {
         return Eplayerhasround;
     }
 
-    public void setInscription(PlayerHasRound Eplayerhasround) {
-        this.Eplayerhasround = Eplayerhasround;
+    public void setInscription(PlayerHasRound inscription) {
+        this.Eplayerhasround = inscription;
     }
 
     public Player getPlayer() {
         return Eplayer;
     }
 
-    public void setPlayer(Player Eplayer) {
-        this.Eplayer = Eplayer;
+    public void setPlayer(Player player) {
+        this.Eplayer = player;
     }
 
+   public Hole getHole() {
+        return Ehole;
+    }
+
+    public void setScoreStableford(ScoreStableford score) {
+        this.EscoreStableford = score;
+    }
+    
+    public ScoreStableford getScoreStableford() {
+        return EscoreStableford;
+    }
+
+    public void setHole(Hole hole) {
+        this.Ehole = hole;
+    }
+    
     public Inscription getEinscriptionNew() {
         return EinscriptionNew;
     }
@@ -103,16 +134,6 @@ public class ECourseList // implements Comparable<ECourseList>
     public void setEinscriptionNew(Inscription EinscriptionNew) {
         this.EinscriptionNew = EinscriptionNew;
     }
-
-
-
- //   public int getTotalExtraStrokes() {
- //       return totalExtraStrokes;
- //   }
-
- //   public void setTotalExtraStrokes(int totalExtraStrokes) {
- //       this.totalExtraStrokes = totalExtraStrokes;
- //   }
 
 @Override
 public String toString()
@@ -127,7 +148,9 @@ public String toString()
        +  Eround.toString()
    //   +  Eplayer.toString()
        +  Eclassment.toString()
+       +  EscoreStableford.toString()
+       +  Ehole.toString()
+       + Esubscription.toString()
         );
 }   
-
 } // end class

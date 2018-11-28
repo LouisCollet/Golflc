@@ -15,6 +15,7 @@
 <ui:define name="content">
 
 <h:form id="participants_rounds">
+    <ui:include src="include/include_summary.xhtml"/>
 <p:dataTable id="played_rounds_table1"
              value="#{courseC.listStableford1()}"
              var="c" >

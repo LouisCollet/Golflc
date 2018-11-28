@@ -1,10 +1,15 @@
 
 package entite;
 
+import static interfaces.GolfInterface.NEWLINE;
+import static interfaces.Log.LOG;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import javax.inject.Named;
+import utils.LCUtil;
 
 @Named
 public class ScoreStableford implements Serializable, interfaces.Log
@@ -17,6 +22,15 @@ public class ScoreStableford implements Serializable, interfaces.Log
     private Short scorePoints;
     private Short scorePar;
     private Short scoreStrokeIndex;
+//    private Short scoreNet;
+    private Short scoreFairway;
+    private Short scoreGreen;
+    private Short scorePutts;
+    private Short scoreBunker;
+    private Short scorePenalty;
+    
+    
+    
     private Integer player_has_round_player_idplayer;
     private Integer player_has_round_round_idround;
     private Date scoreModificationDate;
@@ -94,6 +108,46 @@ public ScoreStableford() // constructor
         return scoreStrokeIndex;
     }
 
+    public Short getScoreFairway() {
+        return scoreFairway;
+    }
+
+    public void setScoreFairway(Short scoreFairway) {
+        this.scoreFairway = scoreFairway;
+    }
+
+    public Short getScoreGreen() {
+        return scoreGreen;
+    }
+
+    public void setScoreGreen(Short scoreGreen) {
+        this.scoreGreen = scoreGreen;
+    }
+
+    public Short getScorePutts() {
+        return scorePutts;
+    }
+
+    public void setScorePutts(Short scorePutts) {
+        this.scorePutts = scorePutts;
+    }
+
+    public Short getScoreBunker() {
+        return scoreBunker;
+    }
+
+    public void setScoreBunker(Short scoreBunker) {
+        this.scoreBunker = scoreBunker;
+    }
+
+    public Short getScorePenalty() {
+        return scorePenalty;
+    }
+
+    public void setScorePenalty(Short scorePenalty) {
+        this.scorePenalty = scorePenalty;
+    }
+
     public void setScoreStrokeIndex(Short scoreStrokeIndex) {
         this.scoreStrokeIndex = scoreStrokeIndex;
     }
@@ -156,7 +210,7 @@ public ScoreStableford() // constructor
     @Override
     public String toString()
 { return 
-        ("from entite : " + this.getClass().getSimpleName()
+        (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
                + " ,scoreHole : "   + this.getScoreHole()
            //    + " ,Round Date: "   + Round.SDF.format(getRoundDate() )
                + " ,scoreStroke : "   + this.getScoreStroke()
@@ -175,5 +229,28 @@ public ScoreStableford() // constructor
 //    public void setScramblePlayers(Integer[] scramblePlayers) {
   //      this.scramblePlayers = scramblePlayers;
     //}
-
+ public static ScoreStableford mapScoreStableford(ResultSet rs) throws SQLException{
+      String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        ScoreStableford s = new ScoreStableford();
+            s.setScoreHole(rs.getShort("ScoreHole") );
+            s.setScoreStroke(rs.getShort("ScoreStroke") );
+            s.setScoreExtraStroke(rs.getShort("ScoreExtraStroke") );
+            s.setScorePoints(rs.getShort("ScorePoints") );
+            s.setScorePar(rs.getShort("ScorePar") );
+            s.setScoreStrokeIndex(rs.getShort("ScoreStrokeIndex"));
+            s.setScoreFairway(rs.getShort("ScoreFairway") );
+            s.setScoreGreen(rs.getShort("ScoreGreen") );
+            s.setScorePutts(rs.getShort("ScorePutts") );
+            s.setScoreBunker(rs.getShort("ScoreBunker") );
+            s.setScorePenalty(rs.getShort("ScorePenalty") );
+                
+   return s;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method map
 } // end class

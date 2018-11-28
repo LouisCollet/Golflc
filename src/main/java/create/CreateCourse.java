@@ -30,7 +30,9 @@ public class CreateCourse implements interfaces.Log, interfaces.GolfInterface
             // insérer dans l'ordre de la database : 1 = first db field
             ps.setNull(1, java.sql.Types.INTEGER);
             ps.setString(2, course.getCourseName());
-            ps.setShort(3, course.getCourseHoles());
+                    //    ps.setShort(3, course.getCourseHoles());
+            ps.setShort(3, (short)18); // mod 12-11-2018 toujours 18 holes for a course
+
             ps.setShort(4, course.getCoursePar());
     //        ps.setString(5, "M");   // nto clean up : gender is now a tee attribute
             ps.setInt(5, club.getIdclub());

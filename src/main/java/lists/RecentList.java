@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
-import static utils.LCUtil.DatetoLocalDateTime;
 
 public class RecentList implements interfaces.Log, interfaces.GolfInterface
 {
@@ -67,33 +66,21 @@ try
         {
 		//LOG.info("just after while ! ");
            ECourseList ecl = new ECourseList();
-                   Club c = new Club();
-                        c.setIdclub(rs.getInt("idclub") );
-                        c.setClubName(rs.getString("clubName") );
-                        c.setClubWebsite(rs.getString("clubWebsite") );
-                        c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
-                        c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
-                        c.setClubCity(rs.getString("clubcity"));
-                ecl.setClub(c);
+          Club c = new Club();
+          c = entite.Club.mapClub(rs);
+          ecl.setClub(c);
 
-                 Course o = new Course();
-                        o.setIdcourse(rs.getInt("idcourse"));
-                        o.setCourseName(rs.getString("CourseName") );
-                ecl.setCourse(o);
+          Course o = new Course();
+          o = entite.Course.mapCourse(rs);
+          ecl.setCourse(o);
 
-              Round r = new Round();
-                    r.setIdround(rs.getInt("idround") );
-                        java.util.Date d = rs.getTimestamp("roundDate");
-                  //      LocalDateTime date = utils.LCUtil.DatetoLocalDateTime(d);
-            //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                    r.setRoundDate(DatetoLocalDateTime(d));
-                    r.setRoundGame(rs.getString("roundgame") );
-                    r.setRoundCompetition(rs.getString("RoundCompetition") );
-                    r.setRoundHoles(rs.getShort("RoundHoles") );
-           //         r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-            //        r.setRoundStart(rs.getShort("RoundStart") );
-                    r.setRoundQualifying(rs.getString("RoundQualifying") ); // new 14/06/2016
-              ecl.setRound(r);
+          Round r = new Round();
+          r = entite.Round.mapRound(rs);
+          ecl.setRound(r);
+          
+          Player p = new Player();
+          p = entite.Player.mapPlayer(rs);  
+          ecl.setPlayer(p);
 	liste.add(ecl);
 	} // end while
     return liste;

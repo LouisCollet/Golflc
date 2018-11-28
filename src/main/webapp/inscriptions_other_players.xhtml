@@ -117,7 +117,7 @@
                     <p:commandButton
                           id="selectButtonRemove"
                           action="#{courseC.player.PlayerRemove(c)}"
-                          value="#{c.idplayer}"
+                          value="#{c.playerLastName}}"
                           icon="fa fa-trash-o fa-lg colorDelete1">
                         <p:confirm header="#{msg['message.confirm']}"
                            message="#{msg['message.cancel']}" 

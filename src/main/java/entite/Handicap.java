@@ -11,10 +11,7 @@ import java.util.Date;
 import javax.inject.Named;
 import javax.validation.constraints.*;
 import utils.LCUtil;
-/**
- *
- * @author collet
- */
+
 @Named
 public class Handicap implements Serializable, interfaces.GolfInterface
 {
@@ -116,8 +113,11 @@ public String toString()
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Handicap h = new Handicap();
-        h.setHandicapStart(rs.getDate("idhandicap") );
-        h.setHandicapEnd(rs.getDate("HandicapEnd") );
+      //  h.setHandicapStart(rs.getDate("idhandicap") );
+         h.setHandicapStart(rs.getTimestamp("idhandicap")) ;
+         h.setHandicapEnd(rs.getTimestamp("HandicapEnd") );
+  //      c.setCourseBegin(rs.getTimestamp("courseBegin")); // format 'DATE' in database
+  //      c.setCourseEnd(rs.getTimestamp("courseend")); // format 'DATE' in database
         h.setHandicapPlayer(rs.getBigDecimal("HandicapPlayer") );
     
    return h;

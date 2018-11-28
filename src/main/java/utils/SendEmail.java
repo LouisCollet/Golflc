@@ -35,8 +35,7 @@ public boolean sendHtmlMail(final String sujet, String texte, final String to, S
     final String displayName = "GolfLC";
     final String password = "9tygru4m";
   //  String password = "lc1lc2lc"; // mod 26/12/2016 was "d"
-try
-{
+try{
     Properties props = System.getProperties();
     props.put("mail.smtp.host", mailserver);
     props.put("mail.smtp.from", fromEmail);
@@ -95,7 +94,7 @@ try
     htmlPart.setHeader("MIME-Version","1.0" ); 
  //       LOG.info(" SendEmail sendHtmlMail texte 1 = " + texte);
     texte = texte + "<html><div>And <b>here</b>'s an image: <img src=\"cid:" + cid + "\"></div></html>";
-        LOG.info(" SendEmail sendHtmlMail texte = " + texte);
+ ///       LOG.info(" SendEmail sendHtmlMail texte = " + texte);
     htmlPart.setContent(texte,"text/html; charset=utf-8");
     multipart.addBodyPart(htmlPart);
     // Image part - new 25/12/2016

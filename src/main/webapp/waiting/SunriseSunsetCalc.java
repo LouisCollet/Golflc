@@ -3,6 +3,7 @@ package lc.golfnew;
 
 
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator; 
+import static interfaces.GolfInterface.ZDF_HOURS;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -19,7 +20,7 @@ public class SunriseSunsetCalc implements interfaces.Log{
 //    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 //    private static final DateTimeFormatter dtf_utc = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss Z");
     //                                                                            2017-04-09T04:59:02+00:00
-    private static final DateTimeFormatter dtf_HHmm = DateTimeFormatter.ofPattern("HH:mm");
+    
 
     public ArrayList<String> sunCalc (String date_sunrise, String date_sunset, String tz) throws ParseException 
     {
@@ -32,7 +33,7 @@ public class SunriseSunsetCalc implements interfaces.Log{
             LOG.info("instant = " + instant);
         sunrise = instant.atZone(ZoneId.of(tz));
         LOG.info("tz = " + tz);
-            LOG.info ("formatted tz sunrise = " + dtf_HHmm.format(sunrise));
+            LOG.info ("formatted tz sunrise = " + ZDF_HOURS.format(sunrise));
    //         LOG.info ("offset = " + sunrise.getOffset());
   //      sunrise = sunrise.plusMinutes(12);
     //    LOG.info("Later 12 = " + sunrise.plusMinutes(12) );
@@ -47,16 +48,16 @@ public class SunriseSunsetCalc implements interfaces.Log{
       //     instant = sunset.toInstant();
       //     sunset = instant.atZone(ZoneId.of("Europe/Brussels"));
            sunset = sunset.toInstant().atZone(ZoneId.of(tz));
-           LOG.info ("formatted tz sunset = " + dtf_HHmm.format(sunset));
+           LOG.info ("formatted tz sunset = " + ZDF_HOURS.format(sunset));
         ArrayList<String> flight = new ArrayList<>();
         int i = 0;
         while(sunrise.isBefore(sunset.minusHours(2).minusMinutes(30))) // dernier départ 2 heures 30 avant sunset
         {
             i++;
             sunrise = sunrise.plusMinutes(12); // un départ toutes les 12 minutes
-            LOG.info("Flight " + i + " = " + dtf_HHmm.format(sunrise));
+            LOG.info("Flight " + i + " = " + ZDF_HOURS.format(sunrise));
             // Adding items to arrayList
-	    flight.add(dtf_HHmm.format(sunrise) + "/available");
+	    flight.add(ZDF_HOURS.format(sunrise) + "/available");
         }
         LOG.info("Arraylist = " + flight.toString()); //Arrays.toString(list));
         LOG.info("get12 : " + flight.get(12));

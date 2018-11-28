@@ -1,9 +1,11 @@
-
 package lists;
 
-//import entite.ScoreMatchplay;
 import entite.Classment;
+import entite.Club;
+import entite.Course;
 import entite.ECourseList;
+import entite.Inscription;
+import entite.Player;
 import entite.Round;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
@@ -17,7 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
-import static utils.LCUtil.DatetoLocalDateTime;
 
 /** extrait database les participants (2 ou 4) à un matchplay 
  *
@@ -35,13 +36,21 @@ if(liste == null)
     PreparedStatement ps = null;
     ResultSet rs = null;
 try
-{   
-     LOG.debug("starting getParticipantsStableford ...for round  = "  + round.getIdround() );
+{        LOG.debug("starting getParticipantsStableford ...for round  = "  + round.getIdround() );
+     String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+   //  String ha = utils.DBMeta.listMetaColumnsLoad(conn, "Handicap");
+     String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
     String query =
-          "SELECT idround, idplayer, round.RoundGame, playerLastName, playerFirstName, playerPhotoLocation, " +
-"		  RoundDate, round.RoundCompetition, round.RoundGame, round.roundTeam, " +
-"		  InscriptionFinalResult, course.CourseName, course.idcourse, club.ClubName, club.idclub ," + 
-"         RoundCompetition, round.RoundMatchplayResult, uncompress(round.RoundScoreStringCompressed) " +
+          "SELECT "
+               + cl + "," + co + "," + ro + "," + pl + "," + ph +
+    //        + "idround, idplayer, round.RoundGame, playerLastName, playerFirstName, playerPhotoLocation, " +
+//   "		  RoundDate, round.RoundCompetition, round.RoundGame, round.roundTeam, " +
+//   "		  InscriptionFinalResult, course.CourseName, course.idcourse, club.ClubName, club.idclub ," + 
+//  "        RoundCompetition, round.RoundMatchplayResult, uncompress(round.RoundScoreStringCompressed) " +
+            
 "       FROM player " +
 "       JOIN round " +
 "           ON round.idround = ? " +
@@ -67,71 +76,34 @@ try
         LOG.info("ParticipantsStableford has {} players ", rs.getRow() );
        rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
-    int rowNum = 0; //The method getRow lets you check the number of the row
+ //   int rowNum = 0; //The method getRow lets you check the number of the row
         //              rowNum = rs.getRow() - 1;
 	while(rs.next())
         {
          ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
-         
-         ecl.Eclub.setIdclub(rs.getInt("idclub") );
-         ecl.Eclub.setClubName(rs.getString("clubName") );
-  ////        Club clu = new Club();
-  ////           clu.setIdclub(rs.getInt("idclub") );
-  ////           clu.setClubName(rs.getString("clubName") );
-       //      c.setClubCity(rs.getString("clubcity"));
-       //      c.setClubWebsite(rs.getString("ClubWebsite"));
-       //      c.setClubCountry(rs.getString("ClubCountry"));
-    //   ecl.setClub(ecl.Eclub);
-   ////       ecl.setClub(clu);
+          Club c = new Club();
+          c = entite.Club.mapClub(rs);
+          ecl.setClub(c);
 
-   ecl.Ecourse.setIdcourse(rs.getInt("idcourse"));
-   ecl.Ecourse.setCourseName(rs.getString("CourseName") );
-////          Course o = new Course();
-////            o.setIdcourse(rs.getInt("idcourse"));
-////            o.setCourseName(rs.getString("CourseName") );
-////          ecl.setCourse(o);
+          Course o = new Course();
+          o = entite.Course.mapCourse(rs);
+          ecl.setCourse(o);
 
           Round r = new Round();
-            r.setIdround(rs.getInt("idround") );
-                java.util.Date d = rs.getTimestamp("roundDate");
-          //      LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                
-            r.setRoundDate(DatetoLocalDateTime(d));
-            r.setRoundGame(rs.getString("roundgame") );
-            r.setRoundCompetition(rs.getString("RoundCompetition") );
-      //      r.setRoundHoles(rs.getShort("RoundHoles") );
-       //     r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-       //     r.setRoundStart(rs.getShort("RoundStart") );
-            r.setRoundTeam(rs.getString("roundTeam"));
+          r = entite.Round.mapRound(rs);
           ecl.setRound(r);
+          
+          Inscription i = new Inscription();
+          i = entite.Inscription.mapInscription(rs);  
+          ecl.setEinscriptionNew(i);//.setInscriptionNew(i);
 
-   //      PlayerHasRound phr = new PlayerHasRound();
-   //        phr.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
-   //      ecl.setInscription(phr);
-
-   /*       Player p = new Player();
-            p.setIdplayer(rs.getInt("idplayer") );
-                LOG.info("current player  = " + p.getIdplayer());
-            p.setPlayerFirstName(rs.getString("playerFirstName") );
-            p.setPlayerLastName(rs.getString("playerLastName") );
-               LOG.info("playerlastname = " + p.getPlayerLastName());
-            p.setPlayerPhotoLocation(rs.getString("playerPhotoLocation") );
+          Player p = new Player();
+          p = entite.Player.mapPlayer(rs);  
           ecl.setPlayer(p);
-      */    
-            ecl.Eplayer.setIdplayer(rs.getInt("idplayer") );
-                LOG.info("current player  = " + ecl.Eplayer.getIdplayer());
-            ecl.Eplayer.setPlayerFirstName(rs.getString("playerFirstName") );
-            ecl.Eplayer.setPlayerLastName(rs.getString("playerLastName") );
-                LOG.info("playerlastname = " + ecl.Eplayer.getPlayerLastName());
-            ecl.Eplayer.setPlayerPhotoLocation(rs.getString("playerPhotoLocation") );
-          
-          
-          
           
           Classment cla = new Classment();
-            find.FindClassmentElements fcel = new find.FindClassmentElements();
-            cla = fcel.findClassment(ecl.Eplayer.getIdplayer(), ecl.Eround.getIdround(), conn);
-            LOG.info("");
+          find.FindClassmentElements fcel = new find.FindClassmentElements();
+          cla = fcel.findClassment(ecl.Eplayer.getIdplayer(), ecl.Eround.getIdround(), conn);
           ecl.setClassment(cla);
 			//store all data into a List
 	liste.add(ecl);

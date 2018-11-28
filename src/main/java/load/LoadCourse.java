@@ -18,11 +18,9 @@ public Course LoadCourse(Connection conn, int idcourse) throws SQLException
     ResultSet rs = null;
 try{
         LOG.info("entering LoadCourse");
-    String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
-     /////   LOG.info("String from listMetaColumns = " + co);
-     //   LOG.info("simple name = " + club.)
- // String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
-final String query = "SELECT "
+    final String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+
+    final String query = "SELECT "
         + co
         + " FROM Course "
         + " WHERE idcourse = ?" ;

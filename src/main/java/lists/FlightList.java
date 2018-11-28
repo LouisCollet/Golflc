@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import utils.DBConnection;
 import utils.LCUtil;
-import static utils.LCUtil.DatetoLocalDateTime;
 
 // ce programme élimine les flights déjà réservés !
 public class FlightList implements interfaces.Log
@@ -16,46 +15,48 @@ public class FlightList implements interfaces.Log
     private static ArrayList<Flight> liste = null;
   //  private static final Connection CONN = null;
     
-public ArrayList<Flight> listAllFlights(final Connection CONN) throws Exception
-{
+public ArrayList<Flight> listAllFlights(final Connection conn) throws Exception{
 if(liste == null)
 {    
-    LOG.debug("starting listAllFlights()," );
+    LOG.debug("liste == null; then starting listAllFlights()," );
         PreparedStatement ps = null;
         ResultSet rs = null;
         liste = new ArrayList<>();
+        String fl = utils.DBMeta.listMetaColumnsLoad(conn, "flight");
         final String query =
-            "SELECT  flight.idflight, flight.FlightStart, flight.course_idcourse" +
-            " FROM    flight" +
+            "SELECT "
+                + fl +
+       //         + " flight.idflight, flight.FlightStart, flight.course_idcourse" +
+            " FROM flight" +
             " WHERE   DATE_FORMAT(flight.FlightStart, '%Y-%m-%d %k:%i')" +   // élimine les secondes
-        "	      NOT IN" +
-    "        (" +
-    "        SELECT DATE_FORMAT(reservation.ReservationStartFlight, '%Y-%m-%d %k:%i')" +
-    "        FROM  reservation" +
-    "        WHERE reservation.course_idcourse = flight.course_idcourse" +
-    "        )" +
-    "       ORDER BY flight.FlightStart";
+            "     NOT IN" +
+            "     (" +
+            "     SELECT DATE_FORMAT(round.RoundDate, '%Y-%m-%d %k:%i')" +
+            "     FROM round" +
+            "     WHERE round.course_idcourse = flight.course_idcourse" +
+            "     )" +
+            " ORDER BY flight.FlightStart";
 try{
-            ps = CONN.prepareStatement(query);
+            ps = conn.prepareStatement(query);
             rs = ps.executeQuery();
             liste = new ArrayList<>();
             while (rs.next())
             { //  
-                Flight fl = new Flight(); 
-                fl.setIdflight(rs.getInt("idflight") );
-                
+                Flight f = new Flight(); 
+                f= entite.Flight.mapFlight(rs);
+          /*      f.setIdflight(rs.getInt("idflight") );
          //       fl.setFlightStart(rs.getDate("FlightStart"));
                 java.util.Date d = rs.getTimestamp("FlightStart");
              //   LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             //    LocalDateTime date = DatetoLocalDateTime(d);
-                fl.setFlightStart(DatetoLocalDateTime(d));
+                f.setFlightStart(DatetoLocalDateTime(d));
                 
-                fl.setCourse_idcourse(rs.getInt("flight.course_idcourse"));
-                fl.setFlightPeriod("?");
-                liste.add(fl);
-            }
-  //  LOG.debug("closing listAllPlayers() with players = " + Arrays.deepToString(liste.toArray()) );
-  liste.forEach(item -> LOG.info("Flight list " + item));  // java 8 lambda
+                f.setCourse_idcourse(rs.getInt("flight.course_idcourse"));
+                f.setFlightPeriod("?");*/
+               liste.add(f);
+            } // end while
+
+//  liste.forEach(item -> LOG.info("Flight list " + item));  // java 8 lambda
 return liste;
 
 } catch(SQLException sqle){
@@ -75,13 +76,9 @@ return liste;
 }else{
      LOG.debug("escaped to listAllFlights repetition thanks to lazy loading");
      return liste;  //plusieurs fois ??
-   //then you should introduce lazy loading inside the getter method. I.e. if the property is null,
-    //then load and assign it to the property, else return it.
 }
-    //end if
 
 } //end method
-    
 
     public static ArrayList<Flight> getListe() {
         return liste;
@@ -90,11 +87,10 @@ return liste;
     public static void setListe(ArrayList<Flight> liste) {
         FlightList.liste = liste;
     }
-   public static void main(String[] args) throws SQLException // for testing purposes !
- {
+ public static void main(String[] args) throws SQLException {
        Connection conn1 = null;
-       try{
-           DBConnection dbc = new DBConnection();
+ try{
+        DBConnection dbc = new DBConnection();
         conn1 = dbc.getConnection();
         FlightList fl = new FlightList();
         fl.listAllFlights(conn1);

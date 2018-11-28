@@ -58,10 +58,6 @@ try{
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-     LOG.error("NullPointerException in LoadHandicap() " + npe);
-     LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
   //  LCUtil.showMessageFatal("Exception in LoadClub = " + ex.toString() );
@@ -76,7 +72,7 @@ finally
 public static void main(String[] args) throws SQLException, Exception // testing purposes
 {
     DBConnection dbc = new DBConnection();
-Connection conn = dbc.getConnection();
+    Connection conn = dbc.getConnection();
     Player player = new Player();
     player.setIdplayer(324713);
     LOG.info("line 010");

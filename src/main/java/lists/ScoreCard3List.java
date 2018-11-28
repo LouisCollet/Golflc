@@ -1,9 +1,11 @@
 package lists;
 
+import entite.ECourseList;
+import entite.Hole;
+import entite.Inscription;
 import entite.Player;
-import entite.PlayerHasRound;
 import entite.Round;
-import entite.ScoreCard;
+import entite.ScoreStableford;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,10 +17,11 @@ import utils.LCUtil;
 
 public class ScoreCard3List implements interfaces.Log
 {
-    private static List<ScoreCard> liste = null; 
+    private static List<ECourseList> liste = null; 
     
-public List<ScoreCard> getScoreCardList3(final Player player, final Round round ,
-         final PlayerHasRound phr, final Connection conn) throws SQLException{ 
+public List<ECourseList> getScoreCardList3(final Player player, final Round round ,
+     //    final PlayerHasRound phr, final Connection conn) throws SQLException{ 
+     final Inscription phr, final Connection conn) throws SQLException{ 
 if(liste == null)
 {    
     LOG.debug("starting getScoreCardList3... = ");
@@ -28,8 +31,7 @@ if(liste == null)
     
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
     String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
     String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
     String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
@@ -87,19 +89,28 @@ try
     }   
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>(); // new 02/06/2013
-   //int TotalDistance = 0;
-   //int TotalPar = 0;
-
-    ScoreCard cc = new ScoreCard();
+  //  ECourseList cc = new ECourseList(); mod
 
 while(rs.next())
 {
-            cc = new ScoreCard(); // est réi, donc total = 0
-		//cc.setIdclub(rs.getInt("idclub") ); // was idscoreCard : not case sensitive ??
+          ECourseList ecl = new ECourseList(); // est réi, donc total = 0
 
-            // LOG.debug("idround = " + cc.getIdround());
-       //     cc.setIdclub(rs.getInt("idclub"));
-            
+          Hole h = new Hole();
+          h = entite.Hole.mapHole(rs);
+          ecl.setHole(h);
+
+          Round r = new Round();
+          r = entite.Round.mapRound(rs);
+          ecl.setRound(r);
+          
+          Inscription i = new Inscription();
+          i = entite.Inscription.mapInscription(rs);  
+          ecl.setEinscriptionNew(i);
+
+          ScoreStableford s = new ScoreStableford();
+          s = entite.ScoreStableford.mapScoreStableford(rs);  
+          ecl.setScoreStableford(s);
+/*
             cc.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
             cc.setHoleDistance(rs.getShort("HoleDistance") );
             
@@ -123,28 +134,18 @@ while(rs.next())
             
             cc.setPlayerhasroundZwanzeursResult(rs.getShort("Player_has_roundZwanzeursResult") );
             cc.setPlayerhasroundZwanzeursGreenshirt(rs.getShort("Player_has_roundZwanzeursGreenshirt") );
-
-            liste.add(cc);//store all data into a List
+*/
+            liste.add(ecl );//store all data into a List
             //    LOG.info("just after add to listsc3");
 } //end while
-      LOG.info("listsc3 after while = " + liste.toString() );
-      // ici classement zawanzeurs
-  //    LOG.info("classement zwanzeurs roundholes = " + cc.getRoundHoles() );
-//      LOG.info("classement zwanzeurs totalstroke = " + getTotalStroke() );
-   //   LOG.info("classement zwanzeurs totalPar = " + getTotalPar() );
-      
-  //    LOG.info("classement zwanzeurs handicap = " + HandicapPlayer );  // positionné dans getScoreCardList1
-        // aller le chercher dans scorecard1list !!!
 
+ ///  LOG.info("exiting ScoreCard3List with " + liste.toString());
     return liste;
-}catch (SQLException e){       String msg = "SQL Exception in getScoreCardList3 " + e;
+}catch (SQLException e){
+        String msg = "SQL Exception in getScoreCardList3 " + e;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){   String msg = "NullPointerException in getScoreCardList3() " + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
 }catch (Exception ex){
     String msg = "Exception in getScoreCardList3() " + ex;
     LOG.error(msg);
@@ -155,17 +156,16 @@ while(rs.next())
     DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 }else{
-         //    LOG.debug("escaped to ScoreCard3 repetition thanks to lazy loading");
-return liste;  //plusieurs fois ??
+        LOG.debug("escaped to ScoreCard3 repetition thanks to lazy loading");
+return liste;
 }
-
 } //end method
 
-    public static List<ScoreCard> getListe() {
+    public static List<ECourseList> getListe() {
         return liste;
     }
 
-    public static void setListe(List<ScoreCard> liste) {
+    public static void setListe(List<ECourseList> liste) {
         ScoreCard3List.liste = liste;
     }
 

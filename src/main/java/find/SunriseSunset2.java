@@ -1,15 +1,15 @@
-package lc.golfnew;
+package find;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import create.CreateAllFlights;
 import entite.Flight;
 import googlemaps.SunriseSunsetResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.time.Instant;
@@ -17,20 +17,15 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 import javax.inject.Named;
 import javax.net.ssl.HttpsURLConnection;
 import javax.validation.constraints.NotNull;
 import utils.DBConnection;
-/*** 
- * 
- * @author 
- */
+
 @Named("sunrisesunsetapiC")
-public class SunriseSunsetApiController implements interfaces.Log, interfaces.GolfInterface
-{
+public class SunriseSunset2 implements interfaces.Log, interfaces.GolfInterface{
  /*
   * Geocode request URL. Here see we are passing "json" it means we will get
   * the output in JSON format. You can also pass "xml" instead of "json" for
@@ -42,18 +37,24 @@ public class SunriseSunsetApiController implements interfaces.Log, interfaces.Go
  private static InputStream iStream; 
  private static HttpsURLConnection urlConnection;
  private static SunriseSunsetResponse responseSS;
- private static ArrayList<Flight> liste = null;
+// private static ArrayList<Flight> liste = null;
+ private static Flight liste = null;
 
 // https://sunrise-sunset.org/api
-    public SunriseSunsetApiController() {  // constructor
-        SunriseSunsetApiController.iStream = null;
-        SunriseSunsetApiController.urlConnection = null;
-        SunriseSunsetApiController.responseSS = null;
+    public SunriseSunset2() {  // constructor
+        SunriseSunset2.iStream = null;
+        SunriseSunset2.urlConnection = null;
+        SunriseSunset2.responseSS = null;
     } 
 
-  public static ArrayList<Flight> findSunriseSunset(@NotNull Date date_in, String in_lat, String in_lng, @NotNull String tz, Connection conn) throws IOException {
-   if(liste == null)
-   { 
+// public ArrayList<Flight> findSunriseSunset(@NotNull Date date_in, String in_lat, String in_lng,
+ //// public Flight findSunriseSunset(@NotNull Date date_in, String in_lat, String in_lng,        
+ ////         @NotNull String tz, Course course, Connection conn) throws IOException {
+ 
+   public Flight findSunriseSunset(@NotNull Date date_in, BigDecimal in_lat, BigDecimal in_lng, @NotNull String tz,
+           Connection conn) throws IOException {
+       
+ if(liste == null){ 
   try{
    // documentation   https://sunrise-sunset.org/api
    // exemple: https://maps.googleapis.com/maps/api/timezone/json?location=39.6034810,-119.6822510&timestamp=1331161200&key=YOUR1331161200
@@ -113,15 +114,11 @@ and day_length will be expressed in seconds. Optional.
 
 */
       String string_url = "https://api.sunrise-sunset.org/json"
-           //   + "?lat="  + "50.826267"
-              + "?lat="  + in_lat
-          //    + "&lng="  + "4.357043" 
-              + "&lng="  + in_lng 
-           //   + "&date=" + date_in // =2017-04-07
-              + "&date=" + SDF_YYYY.format(date_in) // =2017-04-07
-              + "&formatted=0" //default=1
+              + "?lat="  + in_lat.toString()
+              + "&lng="  + in_lng.toString()
+              + "&date=" + SDF_YYYY.format(date_in)
+              + "&formatted=0" //default = 1
       ;
- 
     URL url = new URL(string_url);
         LOG.info("URL = " + url);
      urlConnection = (HttpsURLConnection) url.openConnection(); // Open the Connection utilise ssl
@@ -144,9 +141,9 @@ and day_length will be expressed in seconds. Optional.
         LOG.info("mapper avec indent\n" + mapper.writeValueAsString(responseSS));
     if(responseSS.getStatus().equals("OK"))
     {     //LOG.info("tz getstatuts is = OK");
-        LOG.info("Founded sunrisesunset response = " + responseSS.getResults().toString());
-        LOG.info("Founded sunrise = " + responseSS.getResults().getSunrise());
-        LOG.info("Founded sunset  = " + responseSS.getResults().getSunset());
+        LOG.info("Found sunrisesunset response = " + responseSS.getResults().toString());
+        LOG.info("Found sunrise = " + responseSS.getResults().getSunrise());
+        LOG.info("Found sunset  = " + responseSS.getResults().getSunset());
         //NOTE: All times are in UTC and summer time adjustments are not included in the returned data !!
         // on transforme ci-après la date UTC reçue en date tenant compte de la tz locale
         ZonedDateTime sunrise = ZonedDateTime.parse(responseSS.getResults().getSunrise(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
@@ -154,16 +151,23 @@ and day_length will be expressed in seconds. Optional.
         Instant instant = sunrise.toInstant();
             LOG.info("instant = " + instant);
         sunrise = instant.atZone(ZoneId.of(tz));
-            LOG.info ("formatted tz sunrise = " + Constants.dtf_HHmm.format(sunrise)); 
+            LOG.info ("formatted tz sunrise = " + ZDF_HOURS.format(sunrise)); 
             LOG.info ("offset = " + sunrise.getOffset());
         
         ZonedDateTime sunset = ZonedDateTime.parse(responseSS.getResults().getSunset(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         sunset = sunset.toInstant().atZone(ZoneId.of(tz)); // présentation synthétique
-            LOG.info ("formatted tz sunset = " + Constants.dtf_HHmm.format(sunset));
-        CreateAllFlights caf = new CreateAllFlights();
-        liste = caf.createTableFlights(sunrise, sunset, tz, 11, conn);
-        
-        return liste;
+            LOG.info ("formatted tz sunset = " + ZDF_HOURS.format(sunset));
+            
+    // mod 28-11-2018
+            Flight f = new Flight();
+            f.setSunrise(sunrise);
+            f.setSunset(sunset);
+            
+            return f;
+   // déplacé 28-11-2018 vers courseC                 
+ ////       CreateAllFlights caf = new CreateAllFlights();
+ ////       liste = caf.createTableFlights(sunrise, sunset, tz, course.getIdcourse(), conn);
+ ////       return liste;
     } else {
         String msg = "responseSS.getStatus() not OK - no Sunrise and Sunset found : " + responseSS.getStatus();
       //  "INVALID_REQUEST": indicates that either lat or lng parameters are missing or invalid;
@@ -192,18 +196,18 @@ and day_length will be expressed in seconds. Optional.
    }
   
    }else{
-     LOG.debug("escaped to createAllFlights repetition thanks to lazy loading");
+       LOG.debug("escaped to findSunriseSunset repetition thanks to lazy loading");
      return liste;  //plusieurs fois ??
     }
   
   } //end method
 
-    public static ArrayList<Flight> getListe() {
+    public static Flight getListe() {
         return liste;
     }
 
-    public static void setListe(ArrayList<Flight> liste) {
-        SunriseSunsetApiController.liste = liste;
+    public static void setListe(Flight liste) {
+        find.SunriseSunset2.liste = liste;
     }
 
 
@@ -214,14 +218,16 @@ and day_length will be expressed in seconds. Optional.
    Date date = SDF.parse("23/07/2018");
    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
     LocalDate localDate = LocalDate.now();
-    LOG.info(dtf.format(localDate)); //2016/11/16
+ //   LOG.info(dtf.format(localDate)); //2016/11/16
     DBConnection dbc = new DBConnection();
    Connection conn = dbc.getConnection();
-   
+  // Course course = new Course();
+  // course.setIdcourse(13);
    String tz = "Europe/Brussels";
-
-  ArrayList<Flight> fl = findSunriseSunset(date,"50.202764", "5.013203",tz, conn);
-           LOG.info("response in main = :"  + fl);
+/// à modifier
+   find.SunriseSunset2 ssac = new find.SunriseSunset2();
+  Flight fl = ssac.findSunriseSunset(date,BigDecimal.valueOf(50.202764), BigDecimal.valueOf(5.013203),tz,conn);
+////           LOG.info("response in main = :"  + fl);
    } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

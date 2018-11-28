@@ -11,9 +11,9 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:pe="http://primefaces.org/ui/extensions"
       xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:o="http://omnifaces.org/ui"
       xmlns:of="http://omnifaces.org/functions"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
 >
 <ui:composition template="templates/masterTemplate.xhtml">
 <ui:define name="title">Credit Card</ui:define>
@@ -75,7 +75,7 @@
                 value="#{courseC.creditcard.totalPrice}"
                 style="font-size: 3em;"
                 >
-     </h:outputText>
+    </h:outputText>
     
     <h:outputText value="#{msg['creditcard.communication']} :" />
     <h:outputText 
@@ -89,7 +89,7 @@
     <p:inputText  label="holder"
                               id="Holder"
                               value="#{courseC.creditcard.creditCardHolder}"
-                              title="#{msg['tooltip.club.clubaddress']}"
+                              title="#{msg['tooltip.creditcard.holdername']}"
                               size="45" 
                               converter="omnifaces.ToUpperCaseConverter"
                          />
@@ -102,7 +102,7 @@
                         valueChangeListener="#{courseC.creditCardNumberListener}"
                         size="21"
                         slotChar="_"
-                       
+                        title="#{msg['tooltip.creditcard.number']}"
                         mask="9999 9999 9999 9999">
       </p:inputMask>
     
@@ -113,7 +113,7 @@
     <p:inputMask  label="holder"
                        id="Verification"
                        value="#{courseC.creditcard.creditCardVerificationCode}"
-                       title="#{msg['tooltip.club.clubaddress']}"
+                       title="#{msg['tooltip.creditcard.verification']}"
                        size="3" 
                        mask="999"
                          />
@@ -142,7 +142,8 @@
      <h:outputText value="#{msg['creditcard.type']} :"   />
      -->
    <h:panelGroup id="panelG2" layout="block" >
-        <h:outputText value="#{msg['creditcard.type']} :"  />
+        <h:outputText value="#{msg['creditcard.type']} :"  
+                     />
                     <span class="ui-inputgroup-addon"><i class="fa fa-cc-amex"></i></span>
                     <span class="ui-inputgroup-addon"><i class="fa fa-cc-diners-club"></i></span>
                     <span class="ui-inputgroup-addon"><i class="fa fa-cc-discover"></i></span>
@@ -151,11 +152,11 @@
                     <span class="ui-inputgroup-addon"><i class="fa fa-cc-paypal"></i></span>
                     <span class="ui-inputgroup-addon"><i class="fa fa-cc-visa"></i></span>
    </h:panelGroup>
-     
-     
+
      <h:selectOneMenu id="TypeCreditcard"
                           required="true"
                           valueChangeListener="#{courseC.creditCardTypeListener}"
+                          title="#{msg['tooltip.creditcard.type']}"
                           value="#{courseC.creditcard.creditCardType}" >
                 <f:selectItems value="#{courseC.creditcard.cards}"/>
                 <f:ajax event="change" render="@form"/>
@@ -172,7 +173,7 @@
             locale="#{languageC.locale}"
             navigator="true"
             yearRange="#{of:formatDate(now, 'yyyy')}:c+2"
-            title="#{msg['title.round.rounddate']}"
+            title="#{msg['tooltip.creditcard.expiration']}"
             readonlyInput="true"
             showButtonPanel="true"
             size="8"
@@ -192,7 +193,7 @@
          <p:commandButton value="#{msg['payment.creditcard']}"
                          id="commandButtonPayment"
                          ajax="false"
-                         update="messages"
+                         update="growl-msg"
                          immediate="false"
                          icon="fa fa-cc-visa"
                          action="creditcard_accepted.xhtml"

@@ -19,10 +19,8 @@ public class PlayedList implements interfaces.Log
 {
      private static List<ECourseList> liste = null;
     
-public List<ECourseList> getPlayedList(final Player player, final Connection conn) throws SQLException
-        // pour un joueur particulier !!!
-    
-{ //  LOG.debug("starting getPlayedList(), Connection = " + conn);
+public List<ECourseList> getPlayedList(final Player player, final Connection conn) throws SQLException{
+ //  LOG.debug("starting getPlayedList(), Connection = " + conn);
     
 if (liste == null)
 {
@@ -30,8 +28,7 @@ if (liste == null)
     LOG.debug("starting PlayedList(), listplayer = {}", liste);
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
      LOG.info("starting getPlayedList.. = " );
      
      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");

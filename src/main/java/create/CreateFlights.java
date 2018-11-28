@@ -18,10 +18,9 @@ public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
 {
     private static Statement stm = null;
 
-    public boolean createFlight(final ArrayList<Flight> flight, final int idcourse, final Connection conn ) throws SQLException
-    {
+  public boolean createFlight(final ArrayList<Flight> flight, final int idcourse, final Connection conn ) throws SQLException{
         PreparedStatement ps = null;
-        try {
+   try {
             LOG.info(" ... entering createFlights() with flight size = " + flight.size());
    //         LOG.info("Round ID = " + round.getIdround());
 //            LOG.info("sc1 = " + Arrays.deepToString(flight));
@@ -33,26 +32,22 @@ public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
        ps = conn.prepareStatement(query);
       // insérer dans l'ordre de la database : 1 = first db field
         for (Flight n : flight) {
-                LOG.info("Flight in for loop = " + n);
+  //              LOG.info("Flight in for loop = " + n);
             ps.setNull(1, java.sql.Types.INTEGER);//  default auto-increment in Database
-        //        LOG.info("line 1 = ok ");
-        //    ps.setTimestamp(2, LCUtil.getSqlTimestamp(SDF_TIME.parse(n.getFlightStart())) );
+
             LocalDateTime d = n.getFlightStart(); //.toLocalDate();
      //           LOG.info("line 2 = ok ");
             java.sql.Timestamp ts = Timestamp.valueOf(d); 
-     //           LOG.info("line 3 = ok");
-      //                  LOG.info("new endDate inserted in DB = " + ts);
             ps.setTimestamp(2, ts);
-       //     ps.setTimestamp(2, LCUtil.getSqlTimestamp(n.getFlightStart()) ); 
             ps.setInt(3, idcourse); 
             ps.setString(4,n.getFlightPeriod()); 
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
             if (row != 0) {
                int key = LCUtil.generatedKey(conn);
-                    LOG.info("flight generatedKey = " + key);
-               String msg = "<br/>Successful insert for flight = " + n;
-                    LOG.info(msg);
+   //                 LOG.info("flight generatedKey = " + key);
+  //             String msg = "<br/>Successful insert for flight = " + n;
+  //                  LOG.info(msg);
               // LCUtil.showMessageInfo(msg);
             } else {
                         String msg = "<br/>NOT NOT insert for flight = " + n;
@@ -65,21 +60,9 @@ public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
                     }
                 } // end for
 return true;
-        } catch (NullPointerException npe) {
-            String msg = "£££ NullPointerException in Insert flight = " + npe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-        } catch (IndexOutOfBoundsException iobe) {
-            String msg = "£££ IndexOutOfBoundsException in Insert flight = " + iobe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
         } catch (SQLException sqle) {
             String msg = "£££ SQLException in Insert flight = " + sqle.getMessage() + " , SQLState = "
                     + sqle.getSQLState() + " , ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-        } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Insert flght = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
         } catch (Exception e) {
@@ -93,11 +76,9 @@ return true;
 return false;
     } //end method
     
-    public static void main(String[] args) throws ParseException //throws IOException
-     {
+  public static void main(String[] args) throws ParseException {
   try{
-
-        
+      
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
@@ -105,7 +86,4 @@ return false;
    }
   
    } // end main//
-    
-    
-    
 } // end class

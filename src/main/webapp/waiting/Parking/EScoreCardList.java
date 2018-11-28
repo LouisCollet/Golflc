@@ -12,7 +12,7 @@ import javax.inject.Named;
 import utils.LCUtil;
 
 @Named
-public class ScoreCard implements Serializable, interfaces.Log, interfaces.GolfInterface
+public class EScoreCardList implements Serializable, interfaces.Log, interfaces.GolfInterface
 {
     private static final long serialVersionUID = 1L;
     //private static final Logger log = Logger.getLogger("golflc");
@@ -70,7 +70,7 @@ public class ScoreCard implements Serializable, interfaces.Log, interfaces.GolfI
     private Short holeStrokeIndex;
    
 
-    public ScoreCard() // constructor
+    public EScoreCardList() // constructor
     {
        
 //        totalDistance=0;
@@ -451,10 +451,10 @@ public String toString()
 
 } // end method
 
-  public static ScoreCard mapScoreCard(ResultSet rs) throws SQLException{
+  public static EScoreCardList mapScoreCard(ResultSet rs) throws SQLException{
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
-        ScoreCard s = new ScoreCard();
+        EScoreCardList s = new EScoreCardList();
    //         s.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
    //         s.setHoleDistance(rs.getShort("HoleDistance") );
             s.setScoreHole(rs.getShort("ScoreHole") );

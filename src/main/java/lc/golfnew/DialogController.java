@@ -1,4 +1,3 @@
-
 package lc.golfnew;
 
 import entite.Flight;
@@ -19,7 +18,6 @@ import utils.LCUtil;
  *http://www.javacodegeeks.com/2015/01/primefaces-opening-external-pages-in-dynamically-generated-dialog.html
  * http://www.journaldev.com/4056/primefaces-utilities-requestcontext-el-functions-dialog-framework-search-expression-framework
  */
-
 @Named("dialogC")
 @SessionScoped
 public class DialogController implements Serializable, interfaces.Log
@@ -85,14 +83,15 @@ public class DialogController implements Serializable, interfaces.Log
 }  
 
   public void onFlightChosen(SelectEvent event){ 
-    //
+      // n'est paz utilisé ?? à vérifier 
         LOG.info("entering onFlightChosen() !");
         LOG.info("entering onFlightChosen() with source = " + event.getSource() );
     Flight flight = (Flight) event.getObject(); 
         String msg = "Dialog return with flight : " + flight.toString();
         LOG.info("msg");
+        LOG.info("Workhour at this moment = " );
+        PrimeFaces.current().ajax().update("form_round:idworkhour");
         LCUtil.showMessageInfo(msg);
-
 } 
 
   public static void onDialogReturn(SelectEvent event) 
@@ -118,7 +117,7 @@ public void closeDialog(Object obj) throws IOException
       // https://github.com/primefaces/primefaces/blob/master/src/main/java/org/primefaces/context/RequestContext.java
       PrimeFaces.current().dialog().closeDynamic(obj); 
       
- //     Faces.refresh();
+ //   Faces.refresh();
  //new 22-10-2018
   //  FacesContext context = FacesContext.getCurrentInstance();
   
@@ -128,8 +127,7 @@ public void closeDialog(Object obj) throws IOException
     viewRoot = handler.createView(facesContext, refreshpage);
     viewRoot.setViewId(refreshpage);
     facesContext.setViewRoot(viewRoot);
-      
-      
+ //      PrimeFaces.current().ajax().update("form_round:idworkhour"); // new 20-11-2018
       String msg = "Dialog closed for = " + obj.toString();
         LOG.info(msg);
   //      LCUtil.showMessageInfo(msg);

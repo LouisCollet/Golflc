@@ -83,12 +83,7 @@
                  #{courseC.player.playerLastName} (#{courseC.player.idplayer})
      </h1>
 </f:facet>    
-<!--    
 
-    <f:facet name="right">
-            second facet
-    </f:facet>
- -->
 <p:column 
           id="rowSingle"
           selectionMode="single"
@@ -152,15 +147,7 @@
                   >
               #{c.round.roundGame}
         </p:column>
-<!--
-<p:column id="colClubName1"
-          sortBy="#{c.clubName}"
-          headerText="#{msg['club.name']}"
-          footerText="#{msg['club.name']}"
-          style="width:100px" >
-   #{c.clubName}
-</p:column>
- -->
+
  	<p:column   id="colClubName2"
                     headerText="#{msg['club.name']}"
                     footerText="#{msg['club.name']}"
@@ -193,12 +180,7 @@
           sortBy="#{c.inscription.playerhasroundFinalResult}"
           style="white-space:pre-line;width:50px" >
    #{c.inscription.playerhasroundFinalResult}  
-<!--        <h:outputText
-            value="(#{c.courseHoles})"
-            rendered="#{c.courseHoles != 18}"
-            >
-        </h:outputText>
--->
+
 </p:column>
 
 <p:column id="colQualifying"

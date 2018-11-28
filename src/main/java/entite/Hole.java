@@ -11,13 +11,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import utils.LCUtil;
-//import javax.validation.constraints.Size;
-//import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author collet
- */
 @Named
 public class Hole implements Serializable, interfaces.Log
 {

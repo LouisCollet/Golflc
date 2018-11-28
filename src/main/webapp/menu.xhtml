@@ -6,9 +6,7 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
-
 >
-
     <h:head>
               <title>IGNORED</title>
     </h:head>
@@ -200,18 +198,15 @@ In this case you should either
          <p:menuitem value ="test match play   "
                      action="#{lists.MatchplayList.main()}"
                      icon="ui-icon-wrench" />
-                 
          <p:menuitem value ="test Junit 5   "
-                 
                      action="#{salaryP.testBasicSalaryWithValidSalary('from menu TOOLS - test Junit 5')}"
                      icon="ui-icon-wrench" />
      <!--  -->                
          <p:menuitem value ="Check Mail"
                      action="#{courseC.checkMail('from menu : checkMail')}"
                      icon="fa-envelope-o" />
-         
           <p:menuitem value ="Check Subscription Reneval"
-                     action="#{courseC.listSubscriptionRenewal('from menu : checkSubscription')}"
+                     action="#{courseC.listSubscriptionRenewal('next month')}"
                      icon="fa-envelope-o" />
           
           <p:menuitem value ="GeoApiController"

@@ -40,16 +40,14 @@
 <!--    <h:body onload="startupSubmit();">  -->
 <h:body>
 <h:head>
-    <!--         async="async"
-        defer="defer"
     <script 
 
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc&amp;language=#{languageC.locale}"
         type="text/javascript" >
     </script>
-    -->
 </h:head>
-    
+    <!--         async="async"
+        defer="defer"-->
 <h:form 
         id="course"
         enctype="application/x-www-form-urlencoded" >
@@ -100,17 +98,17 @@
                     <f:selectItem itemLabel="Holes  9"  itemValue="9" />
                 </p:selectOneButton>
  -->
- 
-        <h:outputText value="#{msg['course.par']} :"  />     
-        <h:selectOneRadio id="par"
-                           value="#{courseC.course.coursePar}"
+ <!-- enlevé 1
+        <h:outputText value="#{msg['course.holes']} :"  />     
+        <p:selectOneButton id="holes"
+                    value="#{courseC.round.roundHoles}"
+                    styleClass="oneradio"
                 >
-                <f:selectItem itemLabel="Par 72" itemValue="71" />
-                <f:selectItem itemLabel="Par 73" itemValue="72" />
-                <f:selectItem itemLabel="Par 71" itemValue="73" />
-        </h:selectOneRadio>
-          
-  <!-- enle vé 2                     
+                <f:selectItem itemLabel="Holes 9 " itemValue="9" />
+                <f:selectItem itemLabel="Holes 18" itemValue="18" />
+        </p:selectOneButton>
+  -->            
+  <!-- enle vé 2      -->                  
                 <h:outputText value="#{msg['course.par']} :"   />
                 <p:selectOneButton
                     id="OneMenuPar"
@@ -120,8 +118,8 @@
                            itemLabel="#{par}"
                            itemValue="#{par}" />
                 </p:selectOneButton>
-   -->                
-<!--  <f:selectItems value="#{of:createIntegerArray(73, 63)}" /> 
+                
+<!--  <f:selectItems value="#{of:createIntegerArray(73, 63)}" /> -->
         <h:outputText value="#{msg['club.web']} :"  />
         <p:lightBox iframe="true"
                     width ="800px"
@@ -131,7 +129,7 @@
                 <h:outputText value="#{courseC.club.clubWebsite}"/>
             </h:outputLink>
         </p:lightBox>
--->
+
 <f:facet name="footer">
         <p:commandButton value="#{msg['button.course.create']}"
                          id="buttonCreate"
@@ -171,9 +169,9 @@ and (courseC.inputClubOperation eq 'create')  -->
 </p:panelGrid>
 
 <br/>
-<!--  
+<!--   50.622616,4.295123    center="#{utilsC.mapCenter}"   zoom="#{utilsC.mapZoom}" 
 
-modifié 26/08/2014 voir dans UtilsController
+modifié 26/08/2014 voir dans UtilsController-->
 <p:gmap center="#{courseC.club.clubLatitude},#{courseC.club.clubLongitude}"
         id="circlemap"
         zoom="15"
@@ -182,9 +180,17 @@ modifié 26/08/2014 voir dans UtilsController
                height:400px;"
         model="#{courseC.mapModel}"
         streetView="true">
-
-</p:gmap>  
+<!--    
+    <p:ajax                margin-left:25em;
+               max-width:60em;"event="overlaySelect" listener="#{utilsC.onMarkerSelect}" />  
+                    <p:gmapInfoWindow >    
+                        <p:outputPanel style="text-align:left;display:block;margin:auto;">    
+                            <h:outputText escape="false" value="#{utilsC.infoWindowText}" />    
+                        </p:outputPanel>    
+                    </p:gmapInfoWindow>
 -->
+</p:gmap>  
+
 </h:form>
 
 </h:body>

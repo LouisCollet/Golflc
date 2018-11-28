@@ -1,12 +1,8 @@
 package find;
 
-import entite.Club;
-import entite.Course;
-import entite.ECourseList;
-import entite.Inscription;
 import entite.Player;
 import entite.Round;
-import entite.Tee;
+import entite.StablefordResult;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,15 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
+import static utils.LCUtil.DatetoLocalDateTime;
 
+/**
+ *
+ * @author collet
+ */
 public class FindSlopeRating implements interfaces.Log {
 
-// private static List<StablefordResult> liste = null;
-  private static List<ECourseList> liste = null;
+ private static List<StablefordResult> liste = null;
 final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
     
- //   public List<StablefordResult> getSlopeRating(final Player player, final Round round, final Connection conn) throws SQLException // pour un joueur particulier !!!
-    public List<ECourseList> getSlopeRating(final Player player, final Round round, final Connection conn) throws SQLException 
+    public List<StablefordResult> getSlopeRating(final Player player, final Round round, final Connection conn) throws SQLException // pour un joueur particulier !!!
     {
         if (liste == null) {
             LOG.debug("starting getSlopeRating(), Player = {}", player.getIdplayer());
@@ -35,23 +34,18 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
             try {
                 LOG.info("starting getSlopeRating.. = ");
                     String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
-         //           String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
-                    String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
-                    String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
-                    String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
-                    String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
-                    String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
-          //          String ha = utils.DBMeta.listMetaColumnsLoad(conn, "handicap");
-                    
+    String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
+    String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
+  // String cl = utils.DBMeta.listMetaColumnsLoad(conn, "Club");
+  //   String co = utils.DBMeta.listMetaColumnsLoad(conn, "Course");
+    String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
                 String query
                         = // attention faut un espace en fin de ligne avant le " !!!!
-                        " SELECT"
-                           + ph + "," + te + "," + cl + "," + co + "," + ro + "," + pl //+ "," + ha
-              //          + " RoundDate, idround,  idplayer, "
-              //          + "          idcourse, CourseHoles, idclub, idtee, tee.TeeClubHandicap, player.PlayerGender, "
-              //          + "          round.RoundCSA, round.RoundQualifying, round.RoundHoles, roundstart, roundcompetition, "
-              //          + "              player_has_round.InscriptionTeeStart, teegender, coursepar,  teeslope, teerating, teestart, "
-              //          + "              roundgame,CourseName,ClubName "
+                        " SELECT RoundDate, idround,  idplayer, "
+                        + "          idcourse, CourseHoles, idclub, idtee, tee.TeeClubHandicap, player.PlayerGender, "
+                        + "          round.RoundCSA, round.RoundQualifying, round.RoundHoles, roundstart, roundcompetition, "
+                        + "              player_has_round.InscriptionTeeStart, teegender, coursepar,  teeslope, teerating, teestart, "
+                        + "              roundgame,CourseName,ClubName "
                         + " FROM round "
                         + " JOIN player "
                         + "	ON player.idplayer = ? "
@@ -74,7 +68,7 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
                 utils.LCUtil.logps(ps);
                 rs = ps.executeQuery();
                 rs.last(); //on récupère le numéro de la ligne
-                LOG.info("ResultSet FindSlopeRating has " + rs.getRow() + " lines.");
+                LOG.info("ResultSet getPlayedList has " + rs.getRow() + " lines.");
                 if (rs.getRow() != 1) {
                     String msg = "-- Empty or too much Result(s) in Table for FindSlopeRating !! ";
                     LOG.error(msg);
@@ -84,39 +78,9 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
                 rs.beforeFirst(); //on replace le curseur avant la première ligne
                 liste = new ArrayList<>();
                 //LOG.info("just before while ! ");
-                
-     while(rs.next()) {
-          ECourseList ecl = new ECourseList();
-
-          Player p = new Player();
-          p = entite.Player.mapPlayer(rs);
-          ecl.setPlayer(p);
- 
-          Club c = new Club();
-          c = entite.Club.mapClub(rs);
-          ecl.setClub(c);
- 
-          Course o = new Course();
-          o = entite.Course.mapCourse(rs);
-          ecl.setCourse(o);
- 
-          Round r = new Round();
-          r = entite.Round.mapRound(rs);
-          ecl.setRound(r);
- 
-          Inscription i = new Inscription();
-          i = entite.Inscription.mapInscription(rs);  
-          ecl.setEinscriptionNew(i);
-
-          Tee t = new Tee();
-          t = entite.Tee.mapTee(rs);
-          ecl.setTee(t);
-    //      ScoreStableford s = new ScoreStableford();
-   //       s = entite.ScoreStableford.mapScoreStableford(rs);  
-    //      ecl.setScoreStableford(s);
-                    
-                    
-               /*     StablefordResult sr = new StablefordResult(); // liste pour sélectionner un round
+                while (rs.next()) {
+                    //LOG.info("just after while ! ");
+                    StablefordResult sr = new StablefordResult(); // liste pour sélectionner un round
 
                     sr.setTeeSlope(rs.getShort("teeslope"));
                     sr.setTeeRating(rs.getBigDecimal("teerating"));
@@ -145,17 +109,19 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
                     sr.setIdclub(rs.getInt("idclub"));
                     sr.setClubName(rs.getString("clubname"));
                     sr.setInscriptionTeeStart(rs.getString("InscriptionTeeStart"));
-                    
-        */            
-          liste.add(ecl);
+                    liste.add(sr);
                 }
-      LOG.info("exiting FindSlopeRating with liste = " + liste.toString());
-      return liste;
+                LOG.info("liste = " + liste.toString());
+                return liste;
             } catch (SQLException e) {
                 String msg = "SQL Exception = " + e.toString() + ", SQLState = " + e.getSQLState()
                         + ", ErrorCode = " + e.getErrorCode();
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
+                return null;
+            } catch (NullPointerException npe) {
+                LOG.error("NullPointerException in FindSlopeRating) " + npe);
+                LCUtil.showMessageFatal("Exception = " + npe.toString());
                 return null;
             } catch (Exception ex) {
                 LOG.error("Exception ! " + ex);
@@ -169,13 +135,14 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
             //     LOG.debug("escaped to listPlayed repetition with lazy loading");
             return liste;  //plusieurs fois ??
         }
+
     } //end method
 
-    public static List<ECourseList> getListe() {
+    public static List<StablefordResult> getListe() {
         return liste;
     }
 
-    public static void setListe(List<ECourseList> liste) {
+    public static void setListe(List<StablefordResult> liste) {
         FindSlopeRating.liste = liste;
     }
 
@@ -189,7 +156,7 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
         player.setIdplayer(324713);
         round.setIdround(260);
         FindSlopeRating fsr = new FindSlopeRating();
-        List<ECourseList> res = fsr.getSlopeRating(player, round, conn);
+        List<StablefordResult> res = fsr.getSlopeRating(player, round, conn);
         LOG.info("main - after");
 //for (int x: par )
 //        LOG.info(x + ",");

@@ -8,7 +8,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
       xmlns:pe="http://primefaces.org/ui/extensions"
-      lang="#{languageC.locale}"
+     
 >
 
 <!--
@@ -20,7 +20,7 @@ SEO (Search Engine Optimization)
 rendered="#{initParam['javax.faces.FACELETS_DEVELOPMENT']}"
         encoding="#{encodingBean.encoding}"
 
-<ui:debug hotkey="w"  />
+<ui:debug hotkey="w"  
 -->
 <f:view id="view_master"
         locale="#{languageC.locale}"
@@ -125,7 +125,7 @@ new next lines 12/8/2016
 </p:layoutUnit>
     
 <p:layoutUnit
-         d="lu_center"
+         id="lu_center"
          position="center"
          >
          <ui:include src="/include/include_messages.xhtml"/>

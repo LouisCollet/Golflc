@@ -144,8 +144,8 @@ public static Inscription mapInscription(ResultSet rs) throws SQLException{
   try{
     Inscription i = new Inscription();
     i.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
-    i.setPlayerhasroundZwanzeursResult(rs.getShort("Player_has_roundZwanzeursResult") );
-    i.setPlayerhasroundZwanzeursGreenshirt(rs.getShort("Player_has_roundZwanzeursGreenshirt") );
+    i.setPlayerhasroundZwanzeursResult(rs.getShort("InscriptionZwanzeursResult") );
+    i.setPlayerhasroundZwanzeursGreenshirt(rs.getShort("InscriptionZwanzeursGreenshirt") );
     i.setInscriptionTeeStart(rs.getString("InscriptionTeeStart"));
     i.setInscriptionInvitedBy(rs.getString("InscriptionInvitedBy"));
 

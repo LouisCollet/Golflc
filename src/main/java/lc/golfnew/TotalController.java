@@ -1,184 +1,156 @@
 package lc.golfnew;
 
-import entite.ScoreCard;
+import entite.ECourseList;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
-import lists.ScoreCard3List;
 /**
- *
+ *https://developer.jboss.org/thread/279087 
  * @author collet
  */
 @Named("totalC")
 @SessionScoped
-
-public class TotalController implements Serializable, interfaces.Log
-{
+//@Stateful
+public class TotalController implements Serializable, interfaces.Log{
     int totalPar = 0;
-    private static List<ScoreCard> listsc3 = null; // used in CalculateController !!
+  //  @Inject
+    private  List<ECourseList> liste;// = null; // used in CalculateController !!
 //    private static List<ClubCourseRound> listround = null;
      
  public TotalController()  // constructor
     {
-       
+  //   liste = null;
     }
 
-@PostConstruct
-public void init()
-{
-        LOG.info(" starting PostConstruct init ()    = ");
-        listsc3 = ScoreCard3List.getListe();
+//@PostConstruct
+public void init(){
+        LOG.info(" starting TotalController PostConstruct init ()    = ");
+        LOG.info("getliste size = " + lists.ScoreCard3List.getListe().size());
+        liste = lists.ScoreCard3List.getListe();
+        LOG.info("TotalController init - liste = " + liste.toString());
   ////      listround = RoundList.getListe();
 }
 public int getTotalPar()
 { int total = 0;
-  listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {total += golf.getScorePar();}
+ LOG.info(" starting getTotalPar () ");
+
+ //  LOG.info("getliste size = " + lists.ScoreCard3List.getListe().size());
+  for (ECourseList golf : liste)
+    {total += golf.EscoreStableford.getScorePar();}
+  LOG.info("total par = " + total);
   return total;
 }
 public int getTotalExtraStroke()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {total += golf.getScoreExtraStroke();}
+//liste = ;
+  for (ECourseList golf : lists.ScoreCard3List.getListe())
+    {total += golf.EscoreStableford.getScoreExtraStroke();}
+  LOG.info("TotalController - total extra strokes = " + total);
   return total;
 }
 
 public int getTotalNet() // new 12/07/2015
 { int total = 0;
-  listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {total += golf.getScoreStroke() - golf.getScoreExtraStroke();}
+  liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {total += golf.EscoreStableford.getScoreStroke() - golf.EscoreStableford.getScoreExtraStroke();}
+  LOG.info("total strokes - extrastrokes= " + total);
   return total;
 }
 
 public int getTotalDistance()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {total += golf.getHoleDistance();}
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {total += golf.Ehole.getHoleDistance();}
+  LOG.info("total distance = " + total);
   return total;
 }
 public int getTotalStroke()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {total += golf.getScoreStroke();}
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {total += golf.EscoreStableford.getScoreStroke();}
+  LOG.info("total strokes = " + total);
   return total;
 }
 public int getTotalPoints()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-      
-    {  // LOG.info("golf = " + golf);
-        total += golf.getScorePoints();}
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    { total += golf.EscoreStableford.getScorePoints();}
+  LOG.info("total points = " + total);
   return total;
 }
 public int getTotalFairway()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {  
-        total += golf.getScoreFairway();}
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {  total += golf.EscoreStableford.getScoreFairway();}
+  LOG.info("total fairway = " + total);
   return total;
 }
 public int getTotalGreen()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {  
-        total += golf.getScoreGreen();}
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {  total += golf.EscoreStableford.getScoreGreen();}
   return total;
 }
 public int getTotalPutts()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {  
-        total += golf.getScorePutts();}
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {  total += golf.EscoreStableford.getScorePutts();}
   return total;
 }
 public int getTotalBunker()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {  
-        total += golf.getScoreBunker();
-    }
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {  total += golf.EscoreStableford.getScoreBunker(); }
   return total;
 }
 public int getTotalPenalty()
 { int total = 0;
-listsc3 = ScoreCard3List.getListe();
-  for (ScoreCard golf : listsc3)
-    {  
-        total += golf.getScorePenalty();
-    }
+liste = lists.ScoreCard3List.getListe();
+  for (ECourseList golf : liste)
+    {  total += golf.EscoreStableford.getScorePenalty();}
   return total;
 }
 
 public int getTotalZwanzeurs()
 { int total = 0;
-/*    listround = lists.__RoundList.getListe();
-    if(listround == null)
-        {return 0;}
-  for (ClubCourseRound golf : listround)
-    {
-        if(golf.getRoundGame().equals("ZWANZEURS") )
-        {
-            total += golf.getPlayerhasroundZwanzeursResult();
-        }
-    }
-*/
   return total;
 }
 public int getTotalGreenshirt()
 { int total = 0;
-/*
- listround = __RoundList.getListe();
- if(listround == null)
-        {return 0;}
-  for (ClubCourseRound golf : listround)
-    {  
-        if(golf.getRoundGame().equals("ZWANZEURS") )
-        {  // LOG.info(" passage for = " + golf.getPlayerhasroundZwanzeursGreenshirt() );
-                                             // LOG.info(" passage for idround = " + golf.getIdround() );
-         //   LOG.info(" passage for game    = " + golf.getRoundGame() );
-            total += golf.getPlayerhasroundZwanzeursGreenshirt();
-        }
-    }
-*/
   return total;
 }
 
-public int getTotalIn() // new 22/7/2013 à développer
-{ 
+public int getTotalIn() { 
 	int j = 0;
         int total = 0;
-        listsc3 = ScoreCard3List.getListe();
+        liste = lists.ScoreCard3List.getListe();
 	while (j < 9)
         {
-		// LOG.info("while = " + listsc3.get(j).getScorePoints() );
-                total += listsc3.get(j).getScorePoints();
+		// LOG.info("while = " + liste.get(j).getScorePoints() );
+                total += liste.get(j).EscoreStableford.getScorePoints();
 		j++;
 	}
   return total;
 }
 
-public int getTotalDistanceIn() // new 08/09/2013
-{ 
+public int getTotalDistanceIn(){ 
 	int j = 0;
         int total = 0;
-        listsc3 = ScoreCard3List.getListe();
+        liste = lists.ScoreCard3List.getListe();
 	while (j < 9)
         {
-		// LOG.info("while = " + listsc3.get(j).getScorePoints() );
-                total += listsc3.get(j).getHoleDistance();
+		// LOG.info("while = " + liste.get(j).getScorePoints() );
+                total += liste.get(j).Ehole.getHoleDistance();
 		j++;
 	}
   return total;

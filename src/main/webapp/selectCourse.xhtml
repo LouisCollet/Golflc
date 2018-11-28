@@ -21,7 +21,7 @@
             id="viewParam_cmd"
             required="false"
             name="cmd"
-            value="#{courseC.inputSelectCourse}"
+            value="#{courseC.course2.inputSelectCourse}"
             requiredMessage="You did not specify a cmd. (The - cmd - parameter is missing)"
             >
             <f:validateLength minimum="3" />
@@ -44,22 +44,22 @@
     <h1>#{msg['message.selectcourse']}
         <h:outputText
             id="Rnd"
-            rendered="#{courseC.inputSelectCourse eq 'CreateRound'}" 
+            rendered="#{courseC.course.inputSelectCourse eq 'CreateRound'}" 
             value="#{msg['message.for.round']}">
         </h:outputText>
         <h:outputText
             id="tarif"
-            rendered="#{courseC.inputSelectCourse eq 'CreateTarif'}" 
+            rendered="#{courseC.course.inputSelectCourse eq 'CreateTarif'}" 
             value="#{msg['message.for.tarif']}">
         </h:outputText>
         <h:outputText
             id="Det"
-            rendered="#{courseC.inputSelectCourse eq 'ChartRound'}" 
+            rendered="#{courseC.course.inputSelectCourse eq 'ChartRound'}" 
             value="#{msg['message.for.detail']}">
         </h:outputText>
         <h:outputText
             id="Avg"
-            rendered="#{courseC.inputSelectCourse eq 'ChartCourse'}" 
+            rendered="#{courseC.course.inputSelectCourse eq 'ChartCourse'}" 
             value="#{msg['message.for.average']}">
         </h:outputText>
         </h1>
@@ -79,7 +79,7 @@
 	<p:column headerText="#{msg['course.selected']}"
                   footerText="#{msg['course.selected']}"
                   style="width:20%"
-                  rendered="#{courseC.inputSelectCourse ne 'CreateTarif'}" 
+                  rendered="#{courseC.course.inputSelectCourse ne 'CreateTarif'}" 
                   id="colCourseSelected" 
          >
             <p:commandButton
@@ -87,7 +87,7 @@
                 action="#{courseC.selectCourse(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="fa fa-check-square-o"
-                rendered="#{courseC.inputSelectCourse ne 'CreateTarif'}" 
+                rendered="#{courseC.course.inputSelectCourse ne 'CreateTarif'}" 
                 >
              </p:commandButton>
 	</p:column>
@@ -116,7 +116,7 @@
     	<p:column headerText="#{msg['round.tarif']}"
                   footerText="#{msg['round.tarif']}"
                   style="width:20%"
-                  rendered="#{courseC.inputSelectCourse eq 'CreateTarif'}" >
+                  rendered="#{courseC.course.inputSelectCourse eq 'CreateTarif'}" >
             <p:commandButton
                 id="selectButtonTarif"
                 action="#{courseC.selectTarif(c)}"
@@ -165,7 +165,7 @@
                   headerText="#{msg['scorecard.show']}"
                   footerText="#{msg['scorecard.show']}"
                   style="width:10%" 
-                  rendered="#{courseC.inputSelectCourse ne 'CreateRound'}" 
+                  rendered="#{courseC.course.inputSelectCourse ne 'CreateRound'}" 
                   >
             <p:commandButton
                 id="selectScorecard"
