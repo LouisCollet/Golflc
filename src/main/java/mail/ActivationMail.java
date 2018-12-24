@@ -15,10 +15,10 @@ import javax.mail.MessagingException;
  *
  * @author Collet
  */
-public class ActivationMail {
+public class ActivationMail{
 
-    public Boolean sendActivationMail(Player player, String href) throws MessagingException, Exception {
-{
+    public Boolean sendMailAccountCreated(Player player) throws MessagingException, Exception {
+
         LOG.info("entering sendActivationMail");
         UUID uuid = UUID.randomUUID();
                LOG.info("Universally Unique Identifier = " + uuid.toString());
@@ -27,7 +27,7 @@ public class ActivationMail {
          String url = utils.LCUtil.firstPartUrl();
          LOG.info("url = " + url);
      //    String href = "http://" + host + ":" + port + uri + "/activation_check.xhtml?key=" + uuid.toString();       
-         href = url + "/password_create.xhtml?faces-redirect=true&uuid=" + uuid.toString(); 
+         String href = url + "/password_create.xhtml?faces-redirect=true&uuid=" + uuid.toString(); 
          //    String href = "http://localhost:8080/GolfNew-1.0-SNAPSHOT/activation_check.xhtml?key=" + uuid.toString();  
       LOG.info("** href for activation = " + href);   
    //      String ms = mailText(player, href);
@@ -49,17 +49,11 @@ public class ActivationMail {
                 + " <br/> Please click this link to activate your account: "
                 + "<b><font color='red';size='12'> WITHIN THE 10 MINUTES</b></font>"
                 + " <a href=" + href + "> "
-              
                 + "Click to authenticate</a>"
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team"
                     ; 
-//Confirm Your Email Adress
- //       A confirmation email has been sent to ???
-            //Click on the confirmation link in the email to activate your account
-                LOG.info(msg);
-
-            // new 10/02/2013
+     //           LOG.info(msg);
             String sujet = "Activate Your Account for GolfLC";
             String to = "louis.collet@skynet.be";
             utils.SendEmail sm = new utils.SendEmail();
@@ -67,7 +61,32 @@ public class ActivationMail {
                 LOG.info("HTML Mail status = " + b);
 return b;
 }
-
-    
+    public Boolean sendMailActivationOK(Player player) throws MessagingException, Exception {
+                     
+            String href =  utils.LCUtil.firstPartUrl() + "/login.xhtml";
+            String sujet = "Succesfull activation to golflc !!!";
+            String msg ="ok with your activation !!"
+                + " <br/><b>ID         = </b>" + player.getIdplayer()
+                + " <br/><b>First Name = </b>" + player.getPlayerFirstName()
+                + " <br/><b>Last Name  = </b>" + player.getPlayerLastName()
+                + " <br/><b>Language   = </b>" + player.getPlayerLanguage()
+                + " <br/><b>City       = </b>" + player.getPlayerCity()
+                + " <br/><b>Email      = </b>" + player.getPlayerEmail()
+                + " <br> for a connection to the application,"
+                + " <br>click on the next url : "
+                + " <a href=" + href + ">"
+                + "Click for connection</a>"
+                + " <br/> The GolfLC team"
+                ;
+                    // à modifier utilier <href ....>
+                    //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
+                     
+ // à mofifier             //       <a href=" + href + ">"
+                     String to = "louis.collet@skynet.be";
+                     utils.SendEmail sm = new utils.SendEmail();
+                     boolean b = sm.sendHtmlMail(sujet,msg,to,"ACTIVATION");
+                        LOG.info("HTML Mail status = " + b);
+     return b;
     }
+
 } // end class

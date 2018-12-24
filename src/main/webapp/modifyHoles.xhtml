@@ -90,6 +90,7 @@ http://docs.oracle.com/javaee/7/javaserver-faces-2-2/vdldocs-facelets/f/viewActi
     <c:forEach var="i" begin="01" end="18" step="1">
              <h:outputText  id="holenumber${i}"
                     label="holenumber"
+                    styleClass="red"
                     value="#{courseC.holesGlobal.dataHoles[i-1][0]}"
                     size="2"
                     />

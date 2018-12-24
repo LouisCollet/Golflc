@@ -73,46 +73,25 @@ try{
             LOG.info("ResultSet getPlayedList has " + rs.getRow() + " lines.");
         rs.beforeFirst(); //on replace le curseur avant la première ligne
         liste = new ArrayList<>();
-          //LOG.info("just before while ! ");
 	while(rs.next())
         {
           ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
           Club c = new Club();
           c = entite.Club.mapClub(rs);
-  /*        	c.setIdclub(rs.getInt("idclub") );
-                c.setClubName(rs.getString("clubName") );
-                c.setClubWebsite(rs.getString("clubWebsite") );
-                c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
-                c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
-                c.setClubCity(rs.getString("clubcity"));*/
           ecl.setClub(c);
           
           Course o = new Course();
           o = entite.Course.mapCourse(rs);
-      /*      o.setIdcourse(rs.getInt("idcourse"));
-            o.setCourseName(rs.getString("CourseName") );
-            o.setCourseBegin(rs.getDate("courseBegin")); // new 13/06/2015
-            o.setCourseEnd(rs.getDate("courseEnd")); // new 13/06/2015*/
           ecl.setCourse(o);
           
           Round r = new Round();
           r = entite.Round.mapRound(rs);
-     /*       r.setIdround(rs.getInt("idround") );
-                java.util.Date d = rs.getTimestamp("roundDate");
-          //      LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            r.setRoundDate(DatetoLocalDateTime(d));
-            r.setRoundGame(rs.getString("roundgame") );
-            r.setRoundCompetition(rs.getString("RoundCompetition") );
-            r.setRoundHoles(rs.getShort("RoundHoles") );
-            r.setRoundQualifying(rs.getString("RoundQualifying") );
-     //       r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-            r.setRoundStart(rs.getShort("RoundStart") );*/
           ecl.setRound(r);
 
           Inscription i = new Inscription();
           i = entite.Inscription.mapInscription(rs);  
        //        phr.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
-          ecl.setEinscriptionNew(i);//.setInscriptionNew(i);
+          ecl.setInscriptionNew(i);//.setInscriptionNew(i);
 	liste.add(ecl);
 	}
     return liste;

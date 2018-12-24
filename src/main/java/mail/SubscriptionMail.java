@@ -9,7 +9,7 @@ import utils.LCUtil;
 
 public class SubscriptionMail {
 
-    public Boolean sendSubscriptionMail(Player player, Subscription subscription) throws MessagingException, Exception {
+    public Boolean sendMail(Player player, Subscription subscription) throws MessagingException, Exception {
 {
         LOG.info("entering sendSubscriptionMail");
        String msg =

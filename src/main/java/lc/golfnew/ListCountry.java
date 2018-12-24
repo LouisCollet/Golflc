@@ -94,7 +94,7 @@ try{
         //    LCUtil.showMessageFatal(msg);
             return null;
         } finally {
-            LOG.info("Done");
+  //          LOG.info("Done");
         }      
     } // end method
 } // end class

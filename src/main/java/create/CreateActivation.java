@@ -36,7 +36,7 @@ public class CreateActivation implements interfaces.Log, interfaces.GolfInterfac
       LOG.info("** href for activation = " + href);   
    //      String ms = mailText(player, href);
         mail.ActivationMail am = new mail.ActivationMail();
-        boolean b =  am.sendActivationMail(player, href);   //envoi du mail
+        boolean b =  am.sendMailAccountCreated(player);   //envoi du mail
          
   //       LCUtil.showMessageInfo(ms);
         String msg = "-- Inserting initial Activation for player = " + player.getIdplayer()

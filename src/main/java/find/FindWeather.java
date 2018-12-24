@@ -1,5 +1,9 @@
 package find;
 //import static interfaces.GolfInterface.OWM_KEY_LC;
+import com.github.fedy2.weather.YahooWeatherService;
+import com.github.fedy2.weather.data.Channel;
+import com.github.fedy2.weather.data.unit.DegreeUnit;
+import java.util.List;
 import net.aksingh.owmjapis.core.OWM;
 import net.aksingh.owmjapis.core.OWM.Language;
 import net.aksingh.owmjapis.core.OWM.Unit;
@@ -7,6 +11,9 @@ import net.aksingh.owmjapis.model.CurrentUVIndex;
 import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.DailyWeatherForecast;
 import net.aksingh.owmjapis.model.HourlyWeatherForecast;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.parser.Parser;
 
 public class FindWeather implements interfaces.GolfInterface, interfaces.Log{
     private static CurrentWeather CWD = null;
@@ -34,6 +41,34 @@ public class FindWeather implements interfaces.GolfInterface, interfaces.Log{
     LOG.info("starting currentWeatherByCityName with city = " + city);
     LOG.info("starting currentWeatherByCityName with country = " + country);
     LOG.info("just before owm");
+    
+    
+   
+//		Channel result = service.getForecast("670807", DegreeUnit.CELSIUS);
+	//	System.out.println(result.getDescription());
+//System.out.println(result.getTitle());
+    String url = "https://query.yahooapis.com/v1/public/yql?q=select%20woeid%20from%20geo.places%20where%20text%3D%22(" + 43.95 + "," + -79.88 + ")%22%20limit%201&diagnostics=false";	
+				
+    Document yahooApiResponse = Jsoup.connect(url).timeout(10 * 1000).get();
+    String xmlString = yahooApiResponse.html();
+    Document doc = Jsoup.parse(xmlString, "", Parser.xmlParser());
+String JSOUP = "";
+    LOG.info("from JSOUP = " + doc.select("woeid").first().text().toString());
+JSOUP = doc.select("woeid").first().text().toString();
+    LOG.info("JSOUP = " + JSOUP);
+
+
+    YahooWeatherService service = new YahooWeatherService();
+    Channel result = service.getForecast(JSOUP, DegreeUnit.CELSIUS);
+    LOG.info("YahooWeathereService Description = " + result.getDescription());
+    LOG.info("YahooWeathereService Title = " + result.getTitle());
+    LOG.info("YahooWeathereService Wind = " + result.getWind());
+    List<Channel> channels = service.getForecastForLocation("Brussels, Belgium", DegreeUnit.CELSIUS).first(3);
+    for (Channel channel:channels){
+        LOG.info("channel = " + channel.getTitle());
+        LOG.info("sunrise = " + channel.getAstronomy().getSunrise());
+        LOG.info("Sunset: " + channel.getAstronomy().getSunset());
+    }
     // declaring object of "OWM" class 
     //    OWM owm = new OWM(OWM_KEY_LC);
     

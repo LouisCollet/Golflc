@@ -25,12 +25,6 @@ public LoadScoreArray() // constructor
       //        LOG.info("j = " + j);
     }
 public int[] LoadScoreArray(Connection conn, final Player player, final Round round) throws SQLException{
-//if (STROKES == null) // ce test ne fonctonne pas !
-//{  // LOG.info("strokes = null YES");
-
-// if (strokes == null) // ce test ne fonctonne pas !
-//{   
-  //  Arrays.fill(strokes, 0); // new 25-10-2018 dumpt !!
     
         LOG.info("starting LoadScoreArray with strokes = " + Arrays.toString(STROKES) );
         LOG.info("player = " + player.toString());
@@ -39,10 +33,12 @@ public int[] LoadScoreArray(Connection conn, final Player player, final Round ro
         
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{    
+try{    
   //  String[] strokes = new String[18];  // mod 31/7/2016
      LOG.info("starting LoadScoreArray= " );
+     
+     String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
+     
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
           "SELECT scorehole, scorepar, scorestrokeindex, ScoreStroke,idround, ScorePoints,"
           + " scoreextrastroke, RoundStart "
@@ -88,10 +84,6 @@ return STROKES;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    LOG.error("NullPointerException in LoadScoreArray() " + npe);
-    LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
     LCUtil.showMessageFatal("Exception in LoadScoreArray = " + ex.toString() );

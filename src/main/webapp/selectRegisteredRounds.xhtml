@@ -32,13 +32,13 @@
 <ui:define name="content">
 
 <h:form id="form_select_participants">
-<ui:include src="include/include_messages.xhtml"/>
 
     <!--	<h1>Score Card for Registered Round list</h1> -->
 
 <p:dataTable id="player_has_played_round"
              value="#{courseC.listRounds()}"
              var="c"
+             emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredCars}"
              >
 

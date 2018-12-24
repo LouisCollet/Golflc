@@ -33,29 +33,30 @@ public class Club implements Serializable, interfaces.Log
   private Integer idclub;
 
 @Pattern(regexp="[a-zA-Z0-9éèàê'!â& ç-]*",message="{club.name.characters}")
-@NotNull(message="{club.name.notnull}")
-@Size(max=45,message="{club.name.size}")
+@NotEmpty(message="{club.name.notnull}")
+@Size(min=3, max=45,message="{club.name.size}")
 @FirstUpper(max=7) // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
     private String clubName;
 //---------------------
 @Pattern(regexp="[a-zA-Z0-9'éèàê'&â!, ç-]*",message="{club.address.characters}")
-@NotNull(message="{club.address.notnull}")
-@Size(max=45,message="{club.address.size}")
+@NotEmpty(message="{club.address.notnull}")
+@Size(min=3, max=45,message="{club.address.size}")
     private String clubAddress;
 
 @Pattern(regexp="[a-zA-Z0-9'éèàê ç-]*",message="{club.city.characters}")
-@NotNull(message="{club.city.notnull}")
-@Size(max=45,message="{club.city.size}")
+@NotEmpty(message="{club.city.notnull}")
+@Size(min=3, max=45,message="{club.city.size}")
     private String clubCity;
 
-@NotNull(message="{club.country.notnull}")
-@Size(max=2,message="{club.country.size}")
+@NotEmpty(message="{club.country.notnull}")
+@Size(min=1, max=2,message="{club.country.size}")
     private String clubCountry;
 //-- latitude : -90 = south pole, 90 = north pole, 0 = equator -->
 
 @NotNull(message="{club.latitude.notnull}")
 @DecimalMin(value="-90.0",message="{club.latitude.min}")
 @DecimalMax(value="90.0",message="{club.latitude.max}")
+@Digits(integer=2, fraction=6,message = "{club.latitude.digits}")
     private BigDecimal clubLatitude;
 
 //-- longitude : -180 = west principal meridien (London), 180 = east, 0 = London -->
@@ -64,15 +65,16 @@ public class Club implements Serializable, interfaces.Log
 @DecimalMax(value="180.0",message="{club.longitude.max}")
     private BigDecimal clubLongitude;
 
-@NotNull(message="{club.latlng.notnull}")
+@NotEmpty(message="{club.latlng.notnull}")
 private LatLng clubLatLng;
+
 private String clubStringLatLng;
 private String coordinates;
 
 @Pattern(regexp = "(http[s]?://|ftp://)?(www\\.)?[a-zA-Z0-9-\\.]+\\.([a-zA-Z]{2,5})$",
-        message = "Bean validation : REGEXP error - the Club Website is not valid")
-@NotNull(message="{club.website.notnull}")
-@Size(max=45,message="{club.website.size}")
+        message = "{club.website.regexp}")
+@NotEmpty(message="{club.website.notnull}")
+@Size(min=3, max=45,message="{club.website.size}")
     private String clubWebsite;
 
     private Date clubModificationDate;
@@ -101,10 +103,12 @@ private String clubFormattedAddress;
     }
 
     public String getClubName() {
+  //      LOG.info("getClubName = " + clubName);
         return clubName;
     }
 
     public void setClubName(String clubName) {
+   //      LOG.info("setClubName = " + clubName);
         this.clubName = clubName;
     }
 

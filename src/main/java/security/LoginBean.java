@@ -14,8 +14,6 @@ import static javax.security.enterprise.AuthenticationStatus.SEND_CONTINUE;
 import static javax.security.enterprise.AuthenticationStatus.SEND_FAILURE;
 import javax.security.enterprise.SecurityContext;
 import static javax.security.enterprise.authentication.mechanism.http.AuthenticationParameters.withParams;
-import javax.security.enterprise.authentication.mechanism.http.CustomFormAuthenticationMechanismDefinition;
-import javax.security.enterprise.authentication.mechanism.http.LoginToContinue;
 import javax.security.enterprise.credential.Credential;
 import javax.security.enterprise.credential.Password;
 import javax.security.enterprise.credential.UsernamePasswordCredential;
@@ -27,12 +25,7 @@ import javax.validation.constraints.Size;
 import utils.LCUtil;
 //https://github.com/rdebusscher/soteria-customform-ldap-example/blob/master/src/main/java/be/c4j/security/soteria/test/LoginBean.java 
 
-@CustomFormAuthenticationMechanismDefinition(
-        loginToContinue = @LoginToContinue(
-                loginPage="login_securityAPI.xhtml",
-                errorPage="error_securityAPI.xhtml" // DRAFT API - must be set to empty for now
-        )
-)
+
 
 @Named("loginBean")
 @RequestScoped
@@ -42,11 +35,11 @@ public class LoginBean {
     private SecurityContext securityContext;
 
     @NotNull
-    @Size(min = 3, max = 15, message = "Username must be between {min} and {max} characters")
+    @Size(min=3, max=15, message = "Username must be between {min} and {max} characters")
     private String username;
 
     @NotNull(message="{password.notnull}")
-    @Size(min = 5, max = 50, message = "Password must be between {min} and {max} characters")
+    @Size(min=5, max=50, message = "Password must be between {min} and {max} characters")
     private String password;
 
     /*

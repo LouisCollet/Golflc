@@ -13,8 +13,7 @@ import utils.LCUtil;
 
 public class DeleteInscription implements interfaces.Log, interfaces.GolfInterface
 {
-  //  public int deleteInscription(final Player player, final Round round, final ClubCourseRound ccr,Connection conn) throws Exception {
-public int deleteInscription(final Player player, final Round round, final ECourseList ecl,Connection conn) throws Exception {
+ public int deleteInscription(final Player player, final Round round, final ECourseList ecl, Connection conn) throws Exception {
         PreparedStatement ps = null;     // a modifier pour tenir compte du round, sinon delete de tous les round !
                 // il faut aussi modifier le nombre de joueurs inscrits dans RoundPlayers !!!
 try
@@ -22,10 +21,11 @@ try
          LOG.info("starting delete for inscription ... = " );
          LOG.info("for player id  = " + player.getIdplayer() );
          LOG.info("for player last name= " + player.getPlayerLastName() );
-        LOG.info("for round = " + round.getIdround() );
+         LOG.info("for round = " + round.getIdround() );
+         LOG.info("for round 2 = " + ecl.Eround.getIdround() );
         
       find.FindCountScore sciu = new find.FindCountScore();
-     int rows = sciu.getCountScore(conn, player, round, "rows");
+      int rows = sciu.getCountScore(conn, player, round, "rows");
        if (rows == 99)
        {  LOG.error("Fatal error in getcountscore/count rows");
 //           throw new Exception(" -- Fatal error in getCountStore, score = " + rows);
@@ -35,7 +35,7 @@ try
            LOG.info(" OK -- Score pas encore enregistré  ! ");
           
        }else{
-              LOG.info(" -- score enregistré, delete refised rows =  " + rows);
+              LOG.info(" -- score enregistré, delete refused rows =  " + rows);
               return 0;
        }
 
@@ -49,8 +49,7 @@ try
     LCUtil.logps(ps); 
     rows = ps.executeUpdate();
         LOG.info("deleted inscription = " + rows);
-if (rows == 0) // no delete !!
-   {
+if (rows == 0){ // no delete !!
     String msg =  LCUtil.prepareMessageBean("inscription.not.canceled");
     msg = msg       + "<br/>player id = " + player.getIdplayer()
                     + " <br/>Player Last Name = " + player.getPlayerLastName()
@@ -59,13 +58,16 @@ if (rows == 0) // no delete !!
     LCUtil.showMessageInfo(msg);
     return 0;
 }else{ // row deleted
-    String msg =  LCUtil.prepareMessageBean("inscription.canceled");
-    msg = msg       + " <br/>player id = " + player.getIdplayer()
-                    + " <br/></h1>player Last Name = " + player.getPlayerLastName()
-                    + " <br/></h1>round id = " + round.getIdround();
-           LOG.info(msg);
+    String msg =  LCUtil.prepareMessageBean("inscription.canceled")
+        + " <br/>player id = " + player.getIdplayer()
+        + " <br/></h1>player Last Name = " + player.getPlayerLastName()
+        + " <br/></h1>round id = " + round.getIdround();
+      LOG.info(msg);
     LCUtil.showMessageInfo(msg);
  //   LOG.info("line 01");
+    mail.DeleteInscriptionMail mdi = new mail.DeleteInscriptionMail();
+    mdi.sendMail(player, round, ecl.Eclub, ecl.Ecourse);
+ /*
     String sujet = "Cancellation of your Round Inscription in GolfLC";
     String mail =
                   " <br/>Annulation Confirmation - GolfLC!"
@@ -89,7 +91,7 @@ if (rows == 0) // no delete !!
     utils.SendEmail sm = new utils.SendEmail();
     boolean b = sm.sendHtmlMail(sujet,mail,to,"DELETE INSCRIPTION");
        LOG.info("HTML Mail status = " + b);
-        
+        */
     return rows;
 }
 /*    

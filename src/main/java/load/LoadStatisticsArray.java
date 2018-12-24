@@ -14,8 +14,7 @@ import utils.LCUtil;
  *
  * @author collet games = new String[7];
  */
-public class LoadStatisticsArray implements interfaces.Log
-{
+public class LoadStatisticsArray implements interfaces.Log{
     private final static String[][] statistics = new String[18][5]; // scorebunker
  //   private static int[] par = new int[18]; //va contenir les par des 18 trous
 
@@ -29,10 +28,13 @@ try
 {    
     LOG.info("starting LoadStatisticsArray with player= = " + player.getIdplayer() 
             + " round = " + round.getIdround() + " connection = " + conn);
-
-  String query =     // attention faut un espace en fin de ligne avant le " !!!!
-          "SELECT scorehole, scorepar, scorestrokeindex, ScoreStroke,idround, ScorePoints, scoreextrastroke,"
-          + " ScoreFairway, ScoreGreen, ScorePutts, ScoreBunker, ScorePenalty "
+     String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
+  //   String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String query =     // attention faut un espace en fin de ligne avant le " !!!!
+          "SELECT "
+          + sc + "," + "round.idround"
+     //     + "scorehole, scorepar, scorestrokeindex, ScoreStroke,idround, ScorePoints, scoreextrastroke,"
+      //    + " ScoreFairway, ScoreGreen, ScorePutts, ScoreBunker, ScorePenalty "
           + "		from score, round"
           + "		where score.player_has_round_player_idplayer = ?"
           + "		and round.idround = ?"

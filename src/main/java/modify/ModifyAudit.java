@@ -18,16 +18,14 @@ public boolean stopAuditLogin(Player player, Connection conn) throws SQLExceptio
     PreparedStatement ps = null;
   //  ResultSet rs = null;
  //   Connection conn = null;
-try
-{
-  //  conn = DBConnection.getConnection();
+try{
       //   LOG.info(" -- getLastAuditLogin - query = " + query);
     String query = " UPDATE audit"
                  + " SET AuditEndDate =? "
                  + " WHERE AuditId=?";
     
     find.FindLastAudit fla = new find.FindLastAudit();
-    int lastAuditId = fla.getLastAuditId(player);
+    int lastAuditId = fla.getLastAuditId(player, conn);
           // faut retrouver row current - last connection  
     ps = conn.prepareStatement(query);
         //log.info(" -- Audit Logout : called auditId = " + lc);

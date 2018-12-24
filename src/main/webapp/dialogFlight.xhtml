@@ -24,7 +24,7 @@
                style="text-align:center;">
 <p:dataTable id="flights"
              value="#{courseC.listFlights()}"
-             var="var_flight"
+             var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredFlights}"
@@ -41,8 +41,7 @@
     <h1>#{msg['message.selectflight']} 
         <h:outputText value="#{courseC.flight.flightStart}">
                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-            </h:outputText>
-       
+         </h:outputText>
     </h1>
 </f:facet>
 
@@ -59,7 +58,7 @@
                   footerText="#{msg['flight.period']}"
                   style="width:20%"
                   filterMatchMode="equals"
-                  filterBy="#{var_flight.flightPeriod}"
+                  filterBy="#{c.flightPeriod}"
                   >
             <f:facet name="filter">
                 <p:selectOneButton onchange="PF('flightsTable').filter()">
@@ -68,7 +67,7 @@
                     <f:selectItem itemLabel="#{msg['flight.period.afternoon']}" itemValue="C" />
                 </p:selectOneButton>
             </f:facet>
-            <h:outputText value="#{var_flight.flightPeriod}" />
+            <h:outputText value="#{c.flightPeriod}" />
 	</p:column>
 
 	<p:column headerText="#{msg['flight.start']}   "
@@ -78,30 +77,30 @@
          >
  <!--
             <c:set var="s0"
-                   value="#{var_flight.flightStart}">
+                   value="#{c.flightStart}">
                    <f:convertDateTime type="localDateTime" pattern="HH:mm" />
             </c:set>
   -->
                
             <p:commandButton
                 id="selectButton"
-                actionListener="#{courseC.selectFlightFromDialog(var_flight)}"
-                value="#{var_flight.flightHourStart}"
+                actionListener="#{courseC.selectFlightFromDialog(c)}"
+                value="#{c.flightHourStart}"
                 icon="fa fa-flag"
                 >
              </p:commandButton>
  	</p:column>            
-
+<!--
 	<p:column   id="colFlightStart"
                     headerText="#{msg['flight.selected']}"
                     footerText="#{msg['flight.selected']}"
                     style="width:20%"
                   >
-            <h:outputText value="#{var_flight.flightStart}">
-                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+            <h:outputText value="#{c.flightStart}">
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
             </h:outputText>
 	</p:column>
-
+-->
 </p:dataTable>
 </p:outputPanel>
 </h:form>

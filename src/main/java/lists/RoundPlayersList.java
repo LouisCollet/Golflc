@@ -11,12 +11,12 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class RoundPlayersList implements interfaces.Log
-{  //en réalité vaut pour tous games !
+public class RoundPlayersList implements interfaces.Log{  
+//en réalité vaut pour tous games !
     private static List<Player> liste = null;
     
-public List<Player> listAllParticipants(final Round round ,final Connection conn) throws SQLException 
-{   
+public List<Player> listAllParticipants(final Round round ,final Connection conn) throws SQLException { 
+ 
 if(liste == null)
 {    LOG.debug("starting RoundPlayersList "  );
      LOG.debug("starting RoundPlayersList for round =  " + round.toString()  );

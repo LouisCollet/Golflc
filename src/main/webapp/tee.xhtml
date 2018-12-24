@@ -71,7 +71,7 @@
                 <p:inputMask  label="slope"
                        id="slope"
                        value="#{courseC.tee.teeSlope}"
-                       title="#{msg['title.tee.teeslope']}"
+                       title="#{msg['tooltip.tee.teeslope']}"
                        size="3"
                        mask="999"
                        />
@@ -80,7 +80,7 @@
                 <p:inputMask  label="rating"
                        id="rating"
                        value="#{courseC.tee.teeRating}"
-                       title="#{msg['title.tee.teerating']}"
+                       title="#{msg['tooltip.tee.teerating']}"
                        size="4"
                        slotChar="_"
                        mask="99.9"
@@ -95,7 +95,7 @@
 <f:facet name="footer">
 
          <p:commandButton 
-                         id="button01"
+                         id="buttonTeeCreate"
                          value="#{msg['button.tee.create']}"
                          update="growl-msg"
                          ajax="false"
@@ -106,7 +106,7 @@
                          action="#{courseC.createTee}"/>
 
          <p:commandButton value="#{msg['button.tee.modify']}"
-                         id="buttonModify"
+                         id="buttonTeeModify"
                          ajax="false"
                          rendered="#{courseC.tee.createModify eq false}" 
                          update="growl-msg"
@@ -115,17 +115,18 @@
                          style="float:left;"
                          action="#{courseC.modifyTee()}"
               />
-         <!--
-         <p:commandButton value="#{msg['Global']}"
-                         id="buttonModifyHoles"
+
+         <p:commandButton value="#{msg['button.holes.global']}"  
+                         id="buttonCreateGlobal"
                          ajax="false"
+                         rendered="#{courseC.tee.createModify eq false}" 
                          update="growl-msg"
                          immediate="false"
                          icon="ui-icon-disk"
                          style="float:left;"
-                         action="modifyHoles.xhtml"
+                         action="#{courseC.createHolesGlobal()}"
               />
-         -->
+
          <p:commandButton 
                           id="button02"
                           value="#{msg['tee.next']}"

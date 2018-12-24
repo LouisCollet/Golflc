@@ -95,7 +95,7 @@ try
           
           Inscription i = new Inscription();
           i = entite.Inscription.mapInscription(rs);  
-          ecl.setEinscriptionNew(i);//.setInscriptionNew(i);
+          ecl.setInscriptionNew(i);//.setInscriptionNew(i);
 
           Player p = new Player();
           p = entite.Player.mapPlayer(rs);  

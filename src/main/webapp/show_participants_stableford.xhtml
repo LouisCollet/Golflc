@@ -16,8 +16,11 @@
 
 <h:form id="participants_rounds">
     <ui:include src="include/include_summary.xhtml"/>
+    
+<!--  supprimé 04-12-2018  double emploi avec include_summary  
 <p:dataTable id="played_rounds_table1"
              value="#{courseC.listStableford1()}"
+             emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
     <h1>Round Description</h1>
@@ -34,7 +37,7 @@
               style="width:100px"
              
               >
-   #{c.round.roundCompetition}  (#{c.round.idround})
+   #{c.round.roundCompetition} (#{c.round.idround})
 </p:column>
     
 <p:column headerText="#{msg['round.game']}" style="width:100px" >
@@ -48,10 +51,11 @@
 </p:column>
     
 </p:dataTable>
-                                                           
+    -->                                                       
 <p:dataTable id="played_rounds_table2"
              value="#{courseC.listStableford()}"
              rowIndexVar="rowIndex"
+             emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
      <h1>#{msg['inscription.players']}</h1>

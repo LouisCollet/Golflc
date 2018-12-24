@@ -23,6 +23,7 @@
     <p:submenu label="CREATE" >
              <p:menuitem value ="Club,Course,Tee,Holes"
                         action="#{courseC.to_club_xhtml('create club')}"
+                        icon="fa fa-flag"
                          />
    <!--          <p:menuitem value ="Course" 
                          action="#{courseC.to_course_xhtml('create course')}"
@@ -38,13 +39,13 @@
                          icon="fa fa-list" />
              <p:menuitem value ="Create Tarif"
                          action="#{courseC.to_selectCourse_xhtml('CreateTarif')}"
-                         icon="fa fa-dollar" />
+                         icon="fa fa-money" />
  <!-- https://www.w3schools.com/icons/fontawesome_icons_intro.asp -->            
     </p:submenu>
     <p:submenu label="MODIFY">
             <p:menuitem value ="Club,Course,Tee"
                         action="#{courseC.to_clubModify_xhtml('modify club')}"
-                        icon="ui-icon-flag" />
+                        icon="fa fa-flag-checkered" />
     </p:submenu>
     <p:submenu label="PLAYER info"  >
          <p:menuitem value ="Show Handicap"
@@ -61,7 +62,7 @@ url="show_played_rounds.xhtml?cmd=ini"
     <p:submenu label="INSCRIPTION"  >
          <p:menuitem value ="Inscription STB/SCR"
                      action="#{courseC.to_select_inscription_xhtml('STABLEFORD')}"
-                     icon="ui-icon-check" />
+                     icon="fa fa-pencil" />
   <!--       <p:menuitem value ="Inscription Scramble"
                      action="#{courseC.to_select_inscription_xhtml('SCRAMBLE')}"
                      icon="ui-icon-check" />
@@ -71,7 +72,7 @@ url="show_played_rounds.xhtml?cmd=ini"
                      icon="ui-icon-check" />
         <p:menuitem value ="Classment Participants Round"
                action="#{courseC.to_selectParticipantsRound_xhtml('ini')}"
-               icon="ui-icon-calendar" />
+               icon="fa fa-list-ol" />
     </p:submenu>
 
 <p:submenu label="REGISTER SCORE"  >
@@ -198,8 +199,8 @@ In this case you should either
          <p:menuitem value ="test match play   "
                      action="#{lists.MatchplayList.main()}"
                      icon="ui-icon-wrench" />
-         <p:menuitem value ="test Junit 5   "
-                     action="#{salaryP.testBasicSalaryWithValidSalary('from menu TOOLS - test Junit 5')}"
+         <p:menuitem value ="test MessagFatal new version  "
+                     action="#{courseC.newMessageFatal('from menu : test new version FatalMessage')}"
                      icon="ui-icon-wrench" />
      <!--  -->                
          <p:menuitem value ="Check Mail"

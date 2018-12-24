@@ -28,10 +28,10 @@ if(liste == null)
                 + fl +
        //         + " flight.idflight, flight.FlightStart, flight.course_idcourse" +
             " FROM flight" +
-            " WHERE   DATE_FORMAT(flight.FlightStart, '%Y-%m-%d %k:%i')" +   // élimine les secondes
+            " WHERE   DATE_FORMAT(flight.FlightStart, '%Y-%m-%d %H:%i')" +   // élimine les secondes
             "     NOT IN" +
             "     (" +
-            "     SELECT DATE_FORMAT(round.RoundDate, '%Y-%m-%d %k:%i')" +
+            "     SELECT DATE_FORMAT(round.RoundDate, '%Y-%m-%d %H:%i')" +
             "     FROM round" +
             "     WHERE round.course_idcourse = flight.course_idcourse" +
             "     )" +
@@ -43,16 +43,9 @@ try{
             while (rs.next())
             { //  
                 Flight f = new Flight(); 
-                f= entite.Flight.mapFlight(rs);
-          /*      f.setIdflight(rs.getInt("idflight") );
-         //       fl.setFlightStart(rs.getDate("FlightStart"));
-                java.util.Date d = rs.getTimestamp("FlightStart");
-             //   LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            //    LocalDateTime date = DatetoLocalDateTime(d);
-                f.setFlightStart(DatetoLocalDateTime(d));
-                
-                f.setCourse_idcourse(rs.getInt("flight.course_idcourse"));
-                f.setFlightPeriod("?");*/
+                f = entite.Flight.mapFlight(rs);
+// ici insérer chargement from mauvaise idée
+//                f.setRoundPlayers(Short.MIN_VALUE);
                liste.add(f);
             } // end while
 

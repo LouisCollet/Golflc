@@ -9,12 +9,10 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class FindPassword implements interfaces.Log
-{
+public class FindPassword implements interfaces.Log{
    final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
    
-public Boolean passwordMatch(final Player player , final Connection conn) throws SQLException
-{   
+public Boolean passwordMatch(final Player player , final Connection conn) throws SQLException{   
 
       LOG.info("starting passwordMatch  ");
       LOG.info("starting passwordMatch for player = " + player.getIdplayer());
@@ -23,8 +21,7 @@ public Boolean passwordMatch(final Player player , final Connection conn) throws
     //  var name = "Java"; //test 08-08-2018 nouveauté JDK10
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{   
+try{   
     String query =
      " SELECT PlayerPassword " +
     "    FROM player" +
@@ -39,8 +36,9 @@ try
     rs.last(); //on récupère le numéro de la ligne
         LOG.info("ResultSet passwordMatch has " + rs.getRow() + " lines.");
     if(rs.getRow() == 1)
-      {   String msg = "££ Password match !!! " + ClassName +  " for player = " + player.getIdplayer()
-              +  " for password = " + player.getWrkpassword();
+      {  // String msg = "££ Password match !!! " + ClassName +  " for player = " + player.getIdplayer()
+         //     +  " for password = " + player.getWrkpassword();
+        String msg =  LCUtil.prepareMessageBean("password.match")+ player.getWrkpassword();
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
         return true;
@@ -57,7 +55,7 @@ try
      //     throw new LCCustomException(msg);
       }
 }catch (SQLException e){
-    String msg = "SQL Exception in FindTeeStart : " + e;
+    String msg = "SQL Exception in FindPassword : " + e;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return false;

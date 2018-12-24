@@ -1,5 +1,7 @@
 package utils;
 
+import entite.ECourseList;
+import entite.Player;
 import entite.ScoreMatchplay;
 import static interfaces.Log.LOG;
 import java.awt.*;
@@ -33,8 +35,10 @@ import java.util.zip.GZIPOutputStream;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.context.Flash;
 import javax.faces.event.PhaseId;
 import javax.imageio.ImageIO;
+import javax.inject.Inject;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletContext;
@@ -50,7 +54,9 @@ public class LCUtil implements interfaces.GolfInterface, interfaces.Log    // co
 {
   private static long startTime;
   private static long stopTime;
-
+  @Inject private static FacesContext fc;
+  @Inject private static Flash flash;
+  @Inject private static ExternalContext ec;
 
 public static Object getSessionMapValue(String key)
 {
@@ -716,15 +722,13 @@ public static long DiskSpace()
     }
 }
 
-public static String prepareMessageBean(String message) // new 17/06/2017
-{     
+public static String prepareMessageBean(String message){
 try{
        //  https://stackoverflow.com/questions/13655540/read-resource-bundle-properties-in-a-managed-bean
        FacesContext context = FacesContext.getCurrentInstance();
        ResourceBundle text = ResourceBundle.getBundle("/messagesBean", context.getViewRoot().getLocale());
        String someKey = text.getString(message);
-       if(someKey.equals(""))
-       {
+       if(someKey.equals("")){
            someKey = "???";
        }    LOG.info("bean internationalisation = " + someKey);
        return someKey;
@@ -733,11 +737,56 @@ try{
             LOG.error(msg);
             utils.LCUtil.showMessageFatal(msg);
             return null;
-        }     
+   }     
 } // end method
 
-//@Inject
-//private Flash flash;
+// défini plus haut
+ //@Inject private FacesContext fc;
+//  @Inject private Flash flash;
+//  @Inject private ExternalContext ec;
+public static void showMessageFatalOld(String summary){
+    try{
+       LOG.info("entering showMessageFatalOld " + FacesContext.getCurrentInstance() );
+  //     fc = new FacesContext();
+ 
+        LOG.info("fc = " + fc.toString());
+       if(RequestContext.getCurrentInstance() == null){
+            LOG.info("RequestContext.getCurrentInstance() == null");   
+    //        RequestContext.getCurrentInstance().execute("{alert('Welcome user - showMessageFatal error!')}");
+        }
+    //   FacesContext fc = FacesContext.getCurrentInstance();
+   //    fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
+      LOG.info("line 01");
+       PrimeFaces pf = PrimeFaces.current();
+       //execute javascript oncomplete
+   //    pf.executeScript("PrimeFaces.info('Hello from the Backing Bean');");
+       if (pf.isAjaxRequest()) {
+         // pf.ajax().update("...");
+  //       LOG.info("this is an AjaxRequest !!");
+        }
+        LOG.info("line 02");
+       if(fc != null){ //JSF session, fc is null for  BATCH sessions
+          //  fc.getExternalContext().getFlash().setKeepMessages(true);
+     //       ec.getFlash().setKeepMessages(true);
+                LOG.info("fc not null - line 03");
+            flash.setKeepMessages(true);
+                LOG.info("line 04");
+            FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary," (Application GolfLC)");
+            fc.addMessage(null, facesMsg);
+             LOG.info("line 04");
+//         rc.showMessageInDialog(facesMsg); // new 20/07/2015
+        //    PrimeFaces.current().dialog().showMessageDynamic(facesMsg);
+            pf.dialog().showMessageDynamic(facesMsg);
+       }else{   // fc is null for  BATCH sessions alert('Welcome user - omnifaces msg!'
+           LOG.info("fc = null - messageFatal this is a batch execution " + summary);
+      //    rc.execute("PrimeFaces.info('Hello from the Backing Bean');");
+           pf.executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
+       }
+  }catch (Exception cv) {
+            String msg = "£££ Exception in addMessageFatal = " + cv;
+            LOG.error(msg);
+   }     
+} // end method
 public static void showMessageFatal(String summary){
     try{
  ////       LOG.info("entering showMessageFatal " + FacesContext.getCurrentInstance() );
@@ -745,26 +794,15 @@ public static void showMessageFatal(String summary){
             LOG.info("RequestContext.getCurrentInstance() == null");   
     //        RequestContext.getCurrentInstance().execute("{alert('Welcome user - showMessageFatal error!')}");
         }
-  // 2.2
-//Flash flash = FacesContext.getCurrentInstance().getExternalContext().getFlash();
-// 2.3  
-
-   //     flash.setKeepMessages(true); ne fonctionne pas avec static context !!!
-
        FacesContext fc = FacesContext.getCurrentInstance();
        fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
 //        LOG.info("face context batch" + FacesContext.getCurrentInstance().getApplication());
 ////    RequestContext rc = RequestContext.getCurrentInstance();
-     
-     
        PrimeFaces pf = PrimeFaces.current();
        if (pf.isAjaxRequest()) {
          // pf.ajax().update("...");
          LOG.info("this is an AjaxRequest !!");
         }
-       
-       
-       
        if(fc != null) //JSF session, fc is null for  BATCH sessions
        {
             fc.getExternalContext().getFlash().setKeepMessages(true);
@@ -777,9 +815,7 @@ public static void showMessageFatal(String summary){
       //    rc.execute("PrimeFaces.info('Hello from the Backing Bean');");
            PrimeFaces.current().executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
        }
-  }
-catch (Exception cv)
-        {
+  }catch (Exception cv){
             String msg = "£££ Exception in addMessageFatal = " + cv;
             LOG.error(msg);
  //           return false;
@@ -1018,7 +1054,7 @@ public static void logps(PreparedStatement ps)
     String p = ps.toString();
  ///   LOG.info("p toString = " + p);
     if(p.contains("WrappedPreparedStatement")){
-        LOG.info("pooled connection");
+//        LOG.info("pooled connection");
     }else{
       //  LOG.info("p 0 = " + p.substring(0));
         LOG.debug("Prepared Statement after bind variables set= " + p.substring(p.indexOf(":"), p.length() ));
@@ -1425,9 +1461,60 @@ public static String[] intArraytoStringArray(int[] int01){
         }
 }
   
+public static String fillRoundPlayersStringEcl(java.util.List<ECourseList> players) {
+
+    ArrayList<Player> p = new ArrayList<>();   // transform player2 in list<player<    
+    for(int i=0; i < players.size() ; i++)
+    {
+//    LOG.info("elem = " + players.get(i).Eplayer.getPlayerLastName());
+    p.add(players.get(i).Eplayer);
+     //       LOG.debug(" -- item in for idplayer # = " + dlPlayers.getTarget().get(i).getIdplayer() );
+    }   
+    return fillRoundPlayersString(p);
+}
+
+public static String fillRoundPlayersString(java.util.List<Player> players) {
+   //  String s = ""; 
+ if(players.isEmpty()){  // was size == 0
+      LOG.info(" exiting fillRoundPlayersString with no player");
+     return "";
+ }
+     StringBuilder sb = new StringBuilder();
+     for(int i=0; i < players.size() ; i++)
+     {
+        sb.append(players.get(i).getPlayerLastName()).append(" (");
+        sb.append(players.get(i).getIdplayer()).append("), ");
+     } // end for 
+      sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
+ //    LOG.info(" exiting fillRoundPlayersString with = " + sb.toString());
+ return sb.toString();
+}
+
   
-public static void main(String[] args) // throws IOException,Exception
-{
+public static class MapToArrayExample {
+    public String[] mapValuesToArray(Map <Integer,String> sourceMap) {
+       Collection <String> values = sourceMap.values();
+       String[] targetArray = values.toArray(new String[values.size()]);
+       return targetArray;
+    }
+    
+    }
+
+public static void main(String[] args){ // throws IOException,Exception
+
+     MapToArrayExample mapToArrayExample = new MapToArrayExample();
+       Map <Integer,String> sourceMap = new HashMap < > ();
+        sourceMap.put(100, "ABC");
+        sourceMap.put(101, "PQR");
+       sourceMap.put(102, "XYZ");
+       String[] targetArray = mapToArrayExample.mapValuesToArray(sourceMap);
+        System.out.println(Arrays.toString(targetArray));
+    
+    
+    
+    
+    
+    
 } //end class main
  public static String creditcardSecret(String creditcardNumber) {
  try{

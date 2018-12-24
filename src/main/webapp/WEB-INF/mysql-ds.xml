@@ -12,7 +12,7 @@ http://middlewaremagic.com/jboss/?p=1050
     -->
   <datasource jndi-name="java:jboss/datasources/MySqlDB" pool-name="MySQLPool">
       <connection-url>jdbc:mysql://localhost:3307/golflc</connection-url>
-      <driver>mysql-connector-java-8.0.12.jar</driver>
+      <driver>mysql-connector-java-8.0.13.jar</driver>
       <pool>
           <min-pool-size>3</min-pool-size>
           <max-pool-size>30</max-pool-size>

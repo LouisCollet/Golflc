@@ -18,7 +18,6 @@
 <ui:define name="content">
 
 <h:form id="form__club_restart">
-<ui:include src="/include/include_messages.xhtml"/>
 
 <!--<h1>Create round : select a Course</h1> -->
 
@@ -62,15 +61,26 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
             #{c.club.clubName}  (#{c.club.idclub})
 	</p:column>
 
+	<p:column headerText="#{msg['club.detail']}"
+                  footerText="#{msg['club.detail']}"
+                  style="width:10%" >
+              <p:commandButton
+                id="loadClubDetail"
+                actionListener="#{courseC.showClubDetail(c)}"
+                icon="fa fa-binocular"
+                value="#{c.club.idclub}"
+               >
+             </p:commandButton>
+	</p:column>
 
 	<p:column headerText="#{msg['club.modify']}"
                   footerText="#{msg['club.modify']}"
                   style="width:10%" >
             <p:commandButton
-                id="loadClub"
+                id="loadClubModify"
                 action="#{courseC.loadClub(c)}"
                 value="#{c.club.idclub}"
-                icon="ui-icon-refresh">
+                icon="fa fa-refresh">
              </p:commandButton>
 	</p:column>
 
@@ -81,7 +91,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                 id="addCourse"
                 action="#{courseC.addCourse(c)}"
                 value="#{c.club.idclub}"
-                icon="ui-icon-refresh">
+                icon="fa fa-plus">
              </p:commandButton>
 	</p:column>
 
@@ -102,7 +112,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                 id="loadCourse"
                 action="#{courseC.loadCourse(c)}"
                 value="#{c.course.idcourse}"
-                icon="ui-icon-arrowreturnthick-1-w">
+                icon="fa fa-refresh">
              </p:commandButton>
 	</p:column>
 
@@ -113,7 +123,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                 id="addTee"
                 action="#{courseC.addTee(c)}"
                 value="#{c.course.idcourse}"
-                icon="ui-icon-refresh">
+                icon="fa fa-plus">
              </p:commandButton>
 	</p:column>
 
@@ -122,7 +132,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                   footerText="#{msg['tee.start']}"
                   style="width:10%"
                   >
-		#{c.tee.teeStart}
+		#{c.tee.teeStart} (#{c.tee.teeGender})
 	</p:column>
 
 	<p:column headerText="#{msg['tee.modify']}"
@@ -132,7 +142,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                 id="loadTee"
                 action="#{courseC.loadTee(c)}"
                 value="#{c.tee.idtee}"
-                icon="ui-icon-arrowreturnthick-1-w">
+                icon="fa fa-refresh">
              </p:commandButton>
 	</p:column>
 
@@ -143,7 +153,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                 id="loadHole"
                 action="#{courseC.loadHoles(c)}"
                 value="#{c.tee.idtee}"
-                icon="ui-icon-arrowreturnthick-1-w">
+                icon="fa fa-refresh">
              </p:commandButton>
 	</p:column>
 

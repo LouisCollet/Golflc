@@ -38,7 +38,6 @@
 <ui:define name="content">
 
 <h:form id="played_rounds">
-  <ui:include src="include/include_messages.xhtml"/>
        
 <!--  screen with DIALOG , il faut :
     - filtered
@@ -54,12 +53,13 @@
             rowKey="#{c.round.idround}"
             resizableColumns="true"
             liveResize="true"
+            emptyMessage="#{msg['message.table.empty']}"
             rowIndexVar="row"
      >
     <p:ajax event="colResize"
-            update=":played_rounds:growl-msg"
+           
             listener="#{utilsC.onResize}" />
-
+<!--   update=":played_rounds:growl-msg"   update=":played_rounds:growl-msg" -->
 
 <f:facet name="header">
             <p:commandButton 
@@ -68,7 +68,7 @@
                 value="View Detail"
                 style="float:left">
                     <p:ajax event="dialogReturn"
-                            update=":played_rounds:growl-msg"
+                          
                             listener="#{dialogC.onDialogReturn()}"/>
             </p:commandButton>
             <p:commandButton 
@@ -98,7 +98,7 @@
      footerText="#"
      style="width:2%;text-align:center"
      >
-             #{row+1}
+             #{row+1} 
 </p:column>
 
 <p:column id="RoundDateColumn"
@@ -168,18 +168,14 @@
                   >
             <h:outputText value="#{c.course.courseName} (#{c.course.idcourse})" />
 	</p:column>
- 
- 
- 
- 
-<!--
+ <!--
 -->
 <p:column headerText="#{msg['round.result.stableford']}"
           footerText="#{msg['round.result.stableford']}"
           id="FinalResultColumn"
           sortBy="#{c.inscription.playerhasroundFinalResult}"
           style="white-space:pre-line;width:50px" >
-   #{c.inscription.playerhasroundFinalResult}  
+   #{c.inscriptionNew.playerhasroundFinalResult} - (#{c.round.idround})
 
 </p:column>
 

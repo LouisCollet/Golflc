@@ -105,7 +105,7 @@ while(rs.next())
           
           Inscription i = new Inscription();
           i = entite.Inscription.mapInscription(rs);  
-          ecl.setEinscriptionNew(i);
+          ecl.setInscriptionNew(i);
 
           ScoreStableford s = new ScoreStableford();
           s = entite.ScoreStableford.mapScoreStableford(rs);  

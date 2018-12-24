@@ -11,7 +11,7 @@
       xmlns:cc="http://xmlns.jcp.org/jsf/composite"
       xmlns:o="http://omnifaces.org/ui"
       xmlns:of="http://omnifaces.org/functions"
-
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
 >
 <ui:composition template="templates/masterTemplate.xhtml">
 <ui:define name="title">Stableford Playing Handicap Page </ui:define>
@@ -38,11 +38,9 @@
         <f:viewAction action="#{courseC.initInputPlayingHcp(0)}"/>
     </f:metadata>
 </ui:define>
-    
-    
-    
+        
 <h:form id="stableford_playing_hcp" enctype="application/x-www-form-urlencoded" >
-<ui:include src="include/include_messages.xhtml"/>
+
 <p:focus for="slope" />
 <p:panelGrid
     id="panel"
@@ -67,6 +65,7 @@
                 <p:inputMask  label="slope"
                        id="slope"
                        value="#{courseC.playingHcp.teeSlope}"
+                       title="#{msg['title.tee.teeslope']}"
                        size="3"
                        slotChar="_"
                        mask="999"
@@ -76,17 +75,21 @@
                 <p:inputMask  label="rating"
                        id="rating"
                        value="#{courseC.playingHcp.teeRating}"
+                       title="#{msg['title.tee.teerating']}"
                        size="4"
                        slotChar="_"
                        mask="99.9"
                        />
                 <h:outputText value="#{msg['course.par']} :"   />
                 
-                <p:selectOneMenu
+                <h:selectOneRadio
                     id="OneMenuPar"
                     value="#{courseC.playingHcp.coursePar}">
-                    <f:selectItems value="#{of:createIntegerArray(73, 63)}" />
-                </p:selectOneMenu>
+                <f:selectItem itemLabel="Par 72" itemValue="71" />
+                <f:selectItem itemLabel="Par 73" itemValue="72" />
+                <f:selectItem itemLabel="Par 71" itemValue="73" />
+
+                </h:selectOneRadio>
                 
                 <h:outputText value="#{msg['handicap.playing']}" />
                 <h:outputText value="#{courseC.playingHcp.playingHandicap}"

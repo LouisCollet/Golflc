@@ -28,7 +28,7 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
         if (liste == null) {
             LOG.debug("starting getSlopeRating(), Player = {}", player.getIdplayer());
             LOG.debug("starting getSlopeRating(), Round = {}", round.getIdround());
-            LOG.debug("starting getSlopeRating(), liste = {}", liste);
+     //       LOG.debug("starting getSlopeRating(), liste = {}", liste);
 
             PreparedStatement ps = null;
             ResultSet rs = null;
@@ -106,47 +106,11 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
  
           Inscription i = new Inscription();
           i = entite.Inscription.mapInscription(rs);  
-          ecl.setEinscriptionNew(i);
+          ecl.setInscriptionNew(i);
 
           Tee t = new Tee();
           t = entite.Tee.mapTee(rs);
           ecl.setTee(t);
-    //      ScoreStableford s = new ScoreStableford();
-   //       s = entite.ScoreStableford.mapScoreStableford(rs);  
-    //      ecl.setScoreStableford(s);
-                    
-                    
-               /*     StablefordResult sr = new StablefordResult(); // liste pour sélectionner un round
-
-                    sr.setTeeSlope(rs.getShort("teeslope"));
-                    sr.setTeeRating(rs.getBigDecimal("teerating"));
-                    sr.setIdtee(rs.getInt("idtee"));
-                    sr.setTeeClubHandicap(rs.getShort("TeeClubHandicap"));  //new 05/07/2016
-                    sr.setTeeStart(rs.getString("teestart"));
-                    sr.setIdcourse(rs.getInt("idcourse"));
-                    sr.setCoursePar(rs.getShort("coursepar"));
-                    sr.setCourseName(rs.getString("coursename"));
-                    sr.setCourseHoles(rs.getShort("CourseHoles"));
-                    sr.setPlayerGender(rs.getString("playergender"));
-                    sr.setRoundCBA(rs.getShort("roundcsa"));
-                    sr.setRoundQualifying(rs.getString("roundqualifying"));
-                    sr.setRoundHoles(rs.getShort("roundholes"));
-                    sr.setIdround(rs.getInt("idround")); // new 22/06/2017
-                    //   sr.setRoundDate(rs.getDate("rounddate"));
-         //           sr.setRoundDate(rs.getTimestamp("roundDate")); // mod 02/08/2015 avec minutes
-                    
-                    java.util.Date d = rs.getTimestamp("roundDate");
-               //     LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                //    LocalDateTime date = DatetoLocalDateTime(d); //.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-                    sr.setRoundDate(DatetoLocalDateTime(d));
-//                    sr.setRoundStart(rs.getShort("roundstart"));
-                    sr.setRoundCompetition(rs.getString("roundcompetition"));
-                    sr.setRoundGame(rs.getString("roundgame"));
-                    sr.setIdclub(rs.getInt("idclub"));
-                    sr.setClubName(rs.getString("clubname"));
-                    sr.setInscriptionTeeStart(rs.getString("InscriptionTeeStart"));
-                    
-        */            
           liste.add(ecl);
                 }
       LOG.info("exiting FindSlopeRating with liste = " + liste.toString());
@@ -187,7 +151,7 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
         Player player = new Player();
         Round round = new Round();
         player.setIdplayer(324713);
-        round.setIdround(260);
+        round.setIdround(401);
         FindSlopeRating fsr = new FindSlopeRating();
         List<ECourseList> res = fsr.getSlopeRating(player, round, conn);
         LOG.info("main - after");

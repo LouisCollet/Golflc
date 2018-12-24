@@ -1,13 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package mail;
 
 import entite.Creditcard;
@@ -26,7 +17,7 @@ import static utils.LCUtil.showMessageFatal;
  */
 public class CreditcardMail3 {
 
-    public Boolean sendCreditcardMailInscription(Creditcard creditcard, Tarif tarif, Round round, PlayerHasRound inscription) throws MessagingException, Exception {
+    public Boolean sendMail(Creditcard creditcard, Tarif tarif, Round round, PlayerHasRound inscription) throws MessagingException, Exception {
 try{
     
      String sujet = "Your creditcard payment for your Round Inscription via GolfLC";

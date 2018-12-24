@@ -136,11 +136,13 @@ public class Course implements Serializable, interfaces.Log
     }
 
     public String getInputSelectCourse() {
+   //     LOG.info("getInputSelectCourse = " + inputSelectCourse);
         return inputSelectCourse;
     }
 
     public void setInputSelectCourse(String inputSelectCourse) {
         this.inputSelectCourse = inputSelectCourse;
+        LOG.info("setInputSelectCourse = " + inputSelectCourse);
     }
 
  @Override

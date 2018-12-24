@@ -121,10 +121,6 @@ return points;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    LOG.error("NullPointerException in LoadPointsArray() " + npe);
-    LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception in LoadPointsArray =  " + ex);
     LCUtil.showMessageFatal("Exception in LoadPointsArray = " + ex.toString() );

@@ -5,24 +5,16 @@ import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.validation.Valid;
 import utils.LCUtil;
 
 public class CreateClub implements interfaces.Log
 {
-   public  boolean createClub(final @Valid Club club, final Connection conn) throws SQLException
+   public  boolean createClub(final Club club, final Connection conn) throws SQLException
    { 
      //   PreparedStatement ps = null;
 //        try (PreparedStatement ps = null;)
 //        {
             LOG.info("club = " + club.toString());
-    //        LOG.info("club Name       = " + club.getClubName());
-    //        LOG.info("club Address    = " + club.getClubAddress());
-    //        LOG.info("club City       = " + club.getClubCity());
-    //        LOG.info("club Country    = " + club.getClubCountry());
-    //        LOG.info("club Latitude   = " + club.getClubLatitude());
-    //        LOG.info("club Longitude  = " + String.format("%.6f", club.getClubLongitude() ) );
-    //        LOG.info("club Web site   = " + club.getClubWebsite());
             LOG.info("club Zone ID   = " + club.getClubTimeZone().getTimeZoneId());
 
             final String query = LCUtil.generateInsertQuery(conn, "club"); // new 15/11/2012
@@ -85,11 +77,6 @@ public class CreateClub implements interfaces.Log
             catch (SQLException sqle) {
             String msg = "£££ exception in Insert Club = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
-        } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Insert Club = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;

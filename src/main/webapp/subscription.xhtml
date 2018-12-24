@@ -32,7 +32,7 @@
     <f:event type="preRenderView" 
              listener="#{facesContext.externalContext.response.setHeader('Cache-Control', 'no-cache, no-store')}" />
 <h:form id="subscription" enctype="application/x-www-form-urlencoded" >
-       <ui:include src="include/include_subscription.xhtml"/>
+   <ui:include src="include/include_subscription.xhtml"/>
 
 <p:panelGrid 
     id="panelsub1" 
@@ -41,39 +41,8 @@
     columnClasses="className">
 
 <f:facet name="header" >
-    <h1>#{msg['subscription.titre']}</h1>
+    <h1>#{msg['subscription.new']}</h1>
 </f:facet>
-  <!--  
-                <h:outputText value="#{msg['player.id']}" />
-                <h:outputText id ="id1"
-                       	value="#{courseC.player.idplayer}" />
-                <h:outputText value="#{msg['player.first']}" />
-		<h:outputText  
-			      value="#{courseC.player.playerFirstName}" />
-
-		<h:outputText value="#{msg['player.last']}"   />
-		<h:outputText  
-			      value="#{courseC.player.playerLastName}" />
-
-		<h:outputText value="#{msg['player.city']}" />
-		<h:outputText  
-                              value="#{courseC.player.playerCity}" />
-
-                <h:outputText value="#{msg['player.country']}" />
-                <h:outputText value="#{courseC.player.playerCountry}" />
- 
-                
-                <h:outputText value="#{msg['subscription.trial']}" />
-                <h:outputText value="#{courseC.subscription.trialCount}" />
-               
-                <h:outputText value="#{msg['subscription.enddate']}" />
-                <h:outputText id = "sub_endDate"
-                              value="#{courseC.subscription.endDate}"
-                             
-                              >
-                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
-                 </h:outputText>
-  -->         
                 <h:outputText value="#{msg['subscription.new']}" />
                 <p:selectOneButton id="subscr"
                                    value="#{courseC.subscription.subCode}"
@@ -82,7 +51,6 @@
                     <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
                     <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
                 </p:selectOneButton>
-
 <f:facet name="footer">
         <p:commandButton
                          value="#{msg['button.subscription.create']}"

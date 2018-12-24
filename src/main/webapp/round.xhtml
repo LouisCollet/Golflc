@@ -60,19 +60,6 @@ In addition, you can use �target� attribute to control where to output the j
 <f:facet name="header">
     <h1>#{msg['round.data']}</h1>
 </f:facet>
-    <!--
-        <h:outputText value="#{msg['club.name']} :"   />
-	<h:outputText
-            id="clubname" 
-            value="#{courseC.club.clubName} (#{courseC.club.idclub})"
-            />
-
-        <h:outputText value="#{msg['course.name']} :"  />
-        <h:outputText
-            id="coursename" 
-            value="#{courseC.course.courseName} (#{courseC.course.idcourse})"
-            />
--->
         
         <h:outputText value="#{msg['round.competition']} *"   />
 	<p:inputText  label="Competition"
@@ -103,14 +90,13 @@ In addition, you can use �target� attribute to control where to output the j
         </p:calendar> 
 <!--           converter="localDateTimeConverter"       pattern="dd/MM/yyyy HH:mm"             -->
 
-
       <h:outputText id="outputHour"
                     value="#{msg['round.hour']}" />
       <h:panelGroup id="panelG1" layout="block" >
           <p:commandButton 
                         id="flightButton"
-                        actionListener="#{dialogC.viewFlight()}"
-                        icon="ui-icon-extlink"
+                        actionListener="#{dialogC.showFlight()}"
+                        icon="fa fa-sun-o"
                         value="Choose Flight Hour"
                         style="float:left"
                         >

@@ -1,8 +1,6 @@
 package exceptions;
 
 public class TimeLimitException extends Exception implements interfaces.Log{
- //   public LCCustomException() {super();}
- //   public LCCustomException(String message){super(message);}
     
     public TimeLimitException(String message, Throwable cause)
    {

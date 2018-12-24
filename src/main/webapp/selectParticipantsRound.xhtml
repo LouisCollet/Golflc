@@ -32,16 +32,13 @@
 <ui:define name="content">
 
 <h:form id="form_select_participants">
-<ui:include src="include/include_messages.xhtml"/>
-
-    <!--	<h1>Score Card for Registered Round list</h1> -->
 
 <p:dataTable id="player_has_played_round"
              value="#{courseC.listRounds()}"
              var="c"
-             filteredValue="#{courseC.filteredCars}"
+             emptyMessage="#{msg['message.table.empty']}"
              >
-
+<!--    filteredValue="#{courseC.filteredCars}" -->
 <f:facet name="header">
      <h1>#{msg['message.selectround']} #{msg['message.for.participants']}</h1>
 </f:facet>
@@ -108,7 +105,7 @@
         </p:column>
 
 <f:facet name="footer">
-      There are #{fn:length(courseC.list)} rounds.
+ <!--     There are #{fn:length(courseC.list)} rounds.-->
 </f:facet>
 
 </p:dataTable>

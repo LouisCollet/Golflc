@@ -63,7 +63,7 @@
     </h:outputText>
     <h:outputText
             id="inscription"
-            rendered="#{coursC.creditcard.typePayment eq 'INSCRIPTION'}" 
+            rendered="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}" 
             value="#{msg['title.payment.round']}">
     </h:outputText>
  </h1>
@@ -188,6 +188,7 @@
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-rotate-left"
+                         rendered="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}" 
                          action="inscription.xhtml"
                          />
          <p:commandButton value="#{msg['payment.creditcard']}"

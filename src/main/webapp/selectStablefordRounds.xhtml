@@ -32,7 +32,6 @@
 <ui:define name="content">
 
 <h:form id="form_select_played_round">
-<ui:include src="include/include_messages.xhtml"/>
 
     <!--	<h1>Played Round list : select for score registration</h1>
     avant il y avait 'sta'
@@ -41,6 +40,7 @@
              rowIndexVar="row"
              value="#{courseC.listStablefordPlayedRounds()}"
              var="c"
+             emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredCars}"
              >
 

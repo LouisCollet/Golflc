@@ -2,8 +2,8 @@ package create;
 
 import entite.Club;
 import entite.Course;
+import entite.Inscription;
 import entite.Player;
-import entite.PlayerHasRound;
 import entite.Round;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +15,7 @@ import utils.LCUtil;
 public class CreateInscription implements interfaces.Log, interfaces.GolfInterface
 {
 public boolean createInscription(final Round round, final Player player, Player invitedBy,
-   final PlayerHasRound inscription, final Club club, final Course course, final Connection conn) throws SQLException
+   final Inscription inscription, final Club club, final Course course, final Connection conn) throws SQLException
     {
     PreparedStatement ps = null;
    try {
@@ -25,6 +25,9 @@ public boolean createInscription(final Round round, final Player player, Player 
             LOG.info("round ID      = " + round.getIdround());
             LOG.info("Player ID     = " + player.getIdplayer());
             LOG.info("Invited By     = " + invitedBy.getIdplayer());
+          //  invitedBy = player;
+            LOG.info("Invited By     = " + invitedBy.getIdplayer());
+            
             LOG.info("Player Email  = " + player.getPlayerEmail());
             
   //          LOG.info("Player Gender = " + player.getPlayerGender() ); // new 19/08/2014
@@ -82,7 +85,7 @@ public boolean createInscription(final Round round, final Player player, Player 
                 LCUtil.showMessageInfo(msg);
                 
                 mail.InscriptionMail im = new mail.InscriptionMail();
-                im.sendInscriptionMail(player, invitedBy, round, club, course);
+                im.sendMail(player, invitedBy, round, club, course);
        return true;
             }else{
                 String msg = "-- NOT NOT successful Insert in create Inscription !!! " + row;
@@ -90,18 +93,6 @@ public boolean createInscription(final Round round, final Player player, Player 
                 LCUtil.showMessageInfo(msg);
                 return false;  // null
             }
-        } //end try
-        catch (NullPointerException npe) {
-            String msg = "£££ NullPointerException in createInscription = " + npe.getMessage()
-                    + " player = " + player.getIdplayer() + " round = " + round.getIdround();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false; // null;
-//        } catch (MySQLIntegrityConstraintViolationException cv) {
-//            String msg = "MySQLIntegrityConstraintViolationException in insert Inscription = " + cv.getMessage();
-//            LOG.error(msg);
-//            LCUtil.showMessageFatal(msg);
- //           return false; //null;
         } catch (SQLException sqle) {
             String msg = "";
             if(sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062 )
@@ -115,11 +106,6 @@ public boolean createInscription(final Round round, final Player player, Player 
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;//null;
-        } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in createInscription = " + nfe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false; //null;
         } catch (Exception e) {
             String msg = "£££ Exception in createInscription = " + e.getMessage();
             LOG.error(msg);

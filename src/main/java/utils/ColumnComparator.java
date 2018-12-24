@@ -1,21 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package utils;
 
-/**
- *
- * @author collet
- */
 import java.util.Comparator;
 
-@SuppressWarnings("rawtypes")
-class ColumnComparator implements Comparator
+//@SuppressWarnings("rawtypes")
+public class ColumnComparator implements Comparator
 {
 int columnToSort;
 
-ColumnComparator(int columnToSort)
+public ColumnComparator(int columnToSort)
 {
 this.columnToSort = columnToSort;
 }  //end constructor
@@ -33,5 +25,4 @@ public int compare(Object o1, Object o2)
  //   return new Integer(intRow1).compareTo(new Integer(intRow2));Integer integer = Integer.valueOf(i);
     return Integer.valueOf(intRow1).compareTo(Integer.valueOf(intRow2));
 } //end method
-
 } //end class

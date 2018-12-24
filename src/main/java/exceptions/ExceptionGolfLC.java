@@ -1,5 +1,5 @@
 
-package lc.golfnew;
+package exceptions;
 
 public class ExceptionGolfLC extends Exception
 {

@@ -7,6 +7,7 @@ private boolean partial_match;
 private GoogleGeometry geometry;
 private Object address_components;
 private Object types;
+
 //private GoogleTimeZone timezone;
 
  public String getFormatted_address() {

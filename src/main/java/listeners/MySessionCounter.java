@@ -39,6 +39,10 @@ private List<String> sessions = new ArrayList<>();
   public void sessionDestroyed(HttpSessionEvent se) {
       
       HttpSession session = se.getSession();
+ //     UserSession user = (UserSession) session.getAttribute("userSession");
+
+      
+      
       sessions.remove(session.getId());
       session.setAttribute(MySessionCounter.COUNTER, this);
       LOG.info(" (session) Destroyed:ID = " + session.getId());

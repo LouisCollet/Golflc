@@ -18,7 +18,6 @@
 
 <h:form id="form_scorecard">
 
-<!-- <ui:include src="include/include_messages.xhtml"/> -->
 <!--
 <p:outputPanel deferred="true" deferredMode="visible"> -->
     <p:outputPanel id="outputpanelOne">
@@ -75,9 +74,7 @@ filteredValue="#{courseC.filteredCars}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
-
                   <h1>#{msg['message.scorecard.course']}</h1>
-
 </f:facet>
 <!-- -->
 <p:column headerText="#{msg['round.competition']}" style="width:100px" >
@@ -89,9 +86,8 @@ filteredValue="#{courseC.filteredCars}"
 </p:column>
 
 <p:column headerText="#{msg['round.date']}" style="width:100px" >
-   <h:outputText value="#{c.round.roundDate}"
-                                 > 
-      <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+   <h:outputText value="#{c.round.roundDate}"> 
+      <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
    </h:outputText>
 </p:column>
 
@@ -104,9 +100,6 @@ filteredValue="#{courseC.filteredCars}"
 </p:column>
 
 </p:dataTable>
-
-    
-<!--  filteredValue="#{courseC.filteredCars}" -->
 
 <p:dataTable id="scorecard2b"
              value="#{courseC.scoreCardList2}"
@@ -260,7 +253,7 @@ filteredValue="#{courseC.filteredCars}"
 
 <p:column headerText="#{msg['score.gross']}" 
           footerText="#{msg['score.gross']} = #{totalC.totalStroke}"
-          style="white-space:pre-line;width:15%;"
+          style="white-space:pre-line;width:5%;"
                 >
     
         <h:outputText

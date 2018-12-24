@@ -14,7 +14,7 @@ public class FindCountHoles implements interfaces.Log {
           LOG.debug("starting findCountHoles, tee = {}", tee);
             PreparedStatement ps = null;
             ResultSet rs = null;
-            try {
+       try{
       //          LOG.info("starting findCountHoles.. = ");
                 String query = " SELECT * from hole where hole.tee_idtee = ?";
                 ps = conn.prepareStatement(query);
@@ -29,10 +29,6 @@ public class FindCountHoles implements interfaces.Log {
                         + ", ErrorCode = " + e.getErrorCode();
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
-                return 0;
-            } catch (NullPointerException npe) {
-                LOG.error("NullPointerException in FindCountHoles() " + npe);
-                LCUtil.showMessageFatal("Exception = " + npe.toString());
                 return 0;
             } catch (Exception ex) {
                 LOG.error("Exception ! " + ex);

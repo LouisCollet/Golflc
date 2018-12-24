@@ -83,7 +83,11 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
 			      value="#{courseC.player.playerLastName}" 
                               />
                 
-                <h:outputText value="#{msg['player.gender']}" style="font-weight:bold"  />
+               <h:panelGroup id="panelG2" layout="block" >
+                 <h:outputText value="#{msg['player.gender']}" style="font-weight:bold"  />
+                 <span class="ui-inputgroup-addon"><i class="fa fa-male"></i></span>
+                 <span class="ui-inputgroup-addon"><i class="fa fa-female"></i></span>
+               </h:panelGroup>
                 <p:selectOneButton id="gender"
                                   value="#{courseC.player.playerGender}"
                                   >
@@ -91,7 +95,13 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                     <f:selectItem itemLabel="#{msg['player.lady']}" itemValue="L" />
                 </p:selectOneButton> 
                      
-                <h:outputText value="#{msg['player.birth']}"  />
+  
+                <h:panelGroup id="panelG2" layout="block" >
+                 <h:outputText value="#{msg['player.birth']}"  />
+                 <span class="ui-inputgroup-addon"><i class="fa fa-child"></i></span>
+                 <span class="ui-inputgroup-addon"><i class="fa fa-calendar"></i></span>
+               </h:panelGroup>
+                
                 <p:calendar
                     immediate="true"
                     value="#{courseC.player.playerBirthDate}"
@@ -110,7 +120,12 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                      
                 
    <!--  yearRange="c-50:"  <f:convertDateTime pattern="dd/MM/yyyy" /> -->             
-                 <h:outputText value="#{msg['player.email']}" />
+   
+                <h:panelGroup id="panelG3" layout="block" >
+                  <h:outputText value="#{msg['player.email']}" />
+                  <span class="ui-inputgroup-addon"><i class="fa fa-envelope"></i></span>
+                </h:panelGroup>
+                 
 		<p:inputText  label="email"
                               id="email"
                               size="45"
@@ -152,7 +167,7 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                 
                          update="growl-msg"
                          immediate="false"
-                         icon="fa fa-male"
+                         icon="fa fa-user"
                          action="#{courseC.validatePlayer}"/>
         <h:outputText value=" " />
         

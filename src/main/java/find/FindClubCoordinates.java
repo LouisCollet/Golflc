@@ -15,7 +15,6 @@ import lc.golfnew.ListCountry;
 import utils.DBConnection;
 import utils.LCUtil;
 
-// liste des tee d'un course //
 public class FindClubCoordinates implements interfaces.Log
 {
    final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
@@ -32,14 +31,25 @@ try{
             LOG.info("club country completed = " + country_completed) ;
     //    de "HU" on obtient "Hungary" pas sûr que ce soit nécessaire !
 ///---------- 
+        if(country_completed == null){
+            String msgerr = "Please complete the country !!!";
+            LOG.error(msgerr);
+            LCUtil.showMessageFatal(msgerr);
+             throw new Exception("Exception throwed" + msgerr);
+  //          return null;
+        }
         String fullAddress = club.getClubAddress() + "," + club.getClubCity() + "," + country_completed; 
             LOG.info("Assembled club fullAdddress = " + fullAddress) ;
         GoogleGeoApiController ggeo = new GoogleGeoApiController();
         GoogleResult gr = ggeo.findLatLng(fullAddress + ", " + country_completed);
+        if(gr == null){
+            LOG.info ("gr == null");
+        }
+        
         LatLng latlng = gr.getGeometry().getLocation().getLatlng();
     //    LatLng latlng = ggeo.findLatLng(fullAddress);
             LOG.info(" returned Google club latlng = " + latlng);
-            
+        
         if(latlng == null){
             club.setClubLatLng(null);
             String msg = "Incorrect or insuffisant Club address - Please correct and retry !! = ";
@@ -81,11 +91,6 @@ try{
   //  LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
     return null;    
-}catch (NullPointerException npe){
-    String msg = "NullPointerException in " + CLASSNAME + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
 }catch (SQLException e){
     String msg = "SQL Exception in FindClubCoordinates : " + e;
 	LOG.error(msg);

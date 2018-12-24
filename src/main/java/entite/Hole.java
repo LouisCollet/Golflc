@@ -36,7 +36,6 @@ public class Hole implements Serializable, interfaces.Log
     private Short holeDistance;
 
 @NotNull(message="{hole.index.notnull}")
-//@NotNull(message="Bean validation : the Hole Stroke Index must be completed")
     @Min(value=1,message="Bean validation : the Hole Index is Min 1")
     @Max(value=18,message="Bean validation : the Hole Index is Max 18")
     private Short holeStrokeIndex;

@@ -77,17 +77,25 @@ public String checkActivation() throws SQLException, Exception, Throwable
                  LOG.info("Sucessfull updated activation in Table player = " + d);
                 setValid(true);
                 // send mail to user
+                
+                String url = utils.LCUtil.firstPartUrl();
+                    //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
+                String href = url + "/login.xhtml";
+                mail.ActivationMail am = new mail.ActivationMail();
+                am.sendMailActivationOK(player);
+           /*     
                      String sujet = "Succesfull activation to golflc !!!";
-                     String msg ="ok with your activation !! click on next url : ";
+                     String msg ="ok with your activation !!"
+                             + " <br> for a connection to the application,"
+                             + " <br>click on the next url : ";
                      String url = utils.LCUtil.firstPartUrl();
-                    // à modifier utilier <href ....>
                     //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
                      String href = msg + url + "/login.xhtml";
- // à mofifier             //       <a href=" + href + ">"
                      String to = "louis.collet@skynet.be";
                      utils.SendEmail sm = new utils.SendEmail();
                      b = sm.sendHtmlMail(sujet,href,to,"ACTIVATION");
                         LOG.info("HTML Mail status = " + b);
+*/
             }
         }
 
@@ -121,7 +129,7 @@ public String checkActivation() throws SQLException, Exception, Throwable
 {
         DBConnection.closeQuietly(conn, null, null, null);
 }
-}
+}  //end method
     public boolean isValid()
     {   LOG.info("isValid = " + valid);
         return valid;
@@ -157,6 +165,4 @@ public String checkActivation() throws SQLException, Exception, Throwable
   //       DBConnection.closeQuietly(conn, null, null , null); 
           }
    } // end main//
-
-
 } // end class

@@ -15,6 +15,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 import javax.validation.constraints.*;
+import org.primefaces.component.dnd.Droppable;
 import org.primefaces.event.DragDropEvent;
 import utils.LCUtil;
 
@@ -359,14 +360,21 @@ public Date getPlayerModificationDate()
         this.droppedPlayers = droppedPlayers;
     }
 
-    public void onPlayerDrop(DragDropEvent ddEvent) {  // used in inscriptions_other_players.xhtml
-            LOG.info("entering onPlayerDrop");
-            LOG.info("DragId = " + ddEvent.getDragId());
-            LOG.info("DropId = " + ddEvent.getDropId());
-        Player player = ((Player) ddEvent.getData());
-            LOG.info("Player dropped = " + player.toString());
+   public void PlayerDrop(DragDropEvent event) {  // used in inscriptions_other_players.xhtml
+   try{
+          LOG.info("entering PlayerDrop");
+             LOG.info("DragId = " + event.getDragId());
+            LOG.info("DropId = " + event.getDropId());
+            
+            Droppable source = (Droppable) event.getSource();
+            String dataSource = source.getDatasource();
+               LOG.info("droppable dataSource = " + dataSource);
+        Player player = ((Player) event.getData());
+            LOG.info("Player dropped = " + player.getPlayerLastName()); //.toString());
+  //          LOG.info("size selectedotherplayers = " + player.getSelectedOtherPlayers().size());
         droppedPlayers.add(player);
-            LOG.info("After add, droppedPlayers = " + droppedPlayers.toString());
+  //      LOG.info("line 101");
+  //          LOG.info("After add, droppedPlayers = " + droppedPlayers.toString());
             LOG.info("After add, number of dropped players = " + droppedPlayers.size());
         if(droppedPlayers.size() == 3){
             String msg = "There are 3 dropped players";
@@ -375,29 +383,24 @@ public Date getPlayerModificationDate()
         } 
         /// A FAIRE limiter à 3 inscriptions !
         selectedOtherPlayers.remove(player);
-            LOG.info("After remove, selectedOtherPlayers = " + selectedOtherPlayers.toString());
-    }
+ //           LOG.info("After remove, selectedOtherPlayers = " + selectedOtherPlayers.toString());
+   } catch (Exception e) {
+            String msg = "£££ Exception in toString entite Player = " + e.getMessage();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+       //     return null;
+     }
+    } // end method
+    
 public String PlayerRemove(Player player) {  // used in inscriptions_other_players.xhtml
             LOG.info("entering PlayerRemove");
-            LOG.info("Player to remove from droppedPlayers = " + player.toString());
-     //       LOG.info("DragId = " + ddEvent.getDragId());
-     //       LOG.info("DropId = " + ddEvent.getDropId());
-    //    Player player = ((Player) ddEvent.getData());
-      //      LOG.info("Player removed = " + player.toString());
+            LOG.info("Player to remove from droppedPlayers = " + player.getPlayerLastName()); //getPl.toString());
         droppedPlayers.remove(player);
-            LOG.info("After remove, droppedPlayers = " + droppedPlayers.toString());
+   //         LOG.info("After remove, droppedPlayers = " + droppedPlayers.toString());
             LOG.info("After remove, number of dropped players = " + droppedPlayers.size());
         getDroppedPlayers(); // refrech screen
-        //    if(droppedPlayers.size() == 3){
-     //   String msg = "There are 3 dropped players";
-     //       LOG.info(msg);
-      //      LCUtil.showMessageInfo(msg);
-      //  } 
-        /// A FAIRE limiter à 3 inscriptions !
-   //     selectedOtherPlayers.remove(player);
-   //         LOG.info("After remove, selectedOtherPlayers = " + selectedOtherPlayers.toString());
    return "inscriptions_other_players.xhtml?faces-redirect=true";
-    }
+ }
 
     public String getPlayerRole() {
         return playerRole;
@@ -408,8 +411,7 @@ public String PlayerRemove(Player player) {  // used in inscriptions_other_playe
     }
     
 @Override
-public String toString()
-{ 
+public String toString(){ 
  try{
    if(this.getIdplayer() != null){
      LOG.info("idplayer : "   + this.getIdplayer());

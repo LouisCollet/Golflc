@@ -190,7 +190,7 @@ http://tandraschko.blogspot.be/ -->
     </resource-ref> -->
     <!-- Welcome page -->
     <welcome-file-list>
-        <welcome-file>/login.xhtml</welcome-file>
+        <welcome-file>/login_securityAPI.xhtml</welcome-file>
     </welcome-file-list>
     <!-- JSF mapping -->
     <servlet>
@@ -435,4 +435,35 @@ C:\Users\collet\Documents\NetBeansProjects\GolfWfly\FileUpload
     <dispatcher>ERROR</dispatcher>
 </filter-mapping>
  -->
+ 
+ <!--   soteria 03-12-2018 
+https://rieckpil.de/howto-simple-form-based-authentication-for-jsf-2-3-with-java-ee-8-security-api/
+    -->
+ <security-constraint> 
+        <web-resource-collection> 
+            <web-resource-name>Application pages</web-resource-name> 
+            <url-pattern>/app/*</url-pattern> 
+        </web-resource-collection> 
+        <auth-constraint> 
+            <role-name>ADMIN</role-name> 
+            <role-name>USER</role-name> 
+        </auth-constraint> 
+    </security-constraint> 
+ 
+    <security-role> 
+        <role-name>USER</role-name> 
+    </security-role> 
+    <security-role> 
+        <role-name>ADMIN</role-name> 
+    </security-role> 
+
+<!--  existe une autre plus haut /login.xhtml 
+     <welcome-file-list> 
+        <welcome-file>app/index.xhtml</welcome-file> 
+    </welcome-file-list> 
+-->
+ 
+ 
+ 
+ 
 </web-app>

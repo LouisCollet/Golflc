@@ -43,8 +43,9 @@ ici c'est pour générer des data pour tester !  -->
                 style="float: right;">
 </h:graphicImage>
 
-    cmd = #{param.cmd}
+<!--    cmd = #{param.cmd}
     typePayment=#{courseC.creditcard.typePayment}
+ -->   
 <h:form id="creditcard_accepted" enctype="application/x-www-form-urlencoded">
         
     <c:if test="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}">
@@ -183,6 +184,7 @@ ici c'est pour générer des data pour tester !  -->
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-rotate-left"
+                         rendered="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}" 
                          action="inscription.xhtml"
                          />
          <p:commandButton value="Mail de confirmation"

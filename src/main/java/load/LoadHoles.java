@@ -29,29 +29,6 @@ try
             " AND hole.tee_idtee = tee.idtee" +
         " ORDER by holenumber"
 ;
-/* attention faut un espace en fin de ligne avant le " !!!!
-"  SELECT idplayer, idcourse, courseName , holenumber, holepar, idtee, idround,"
-          + " TeeStart, hole.HoleStrokeIndex, hole.HoleDistance " +
-    " FROM course " +
-    " JOIN player " +
-"  		ON player.idplayer = ? " +
-    " JOIN round " +
-"		ON round.idround = ? " +
-"		AND round.course_idcourse = course.idcourse " +
-    " JOIN player_has_round  " +
-" 		ON player_has_round.round_idround = round.idround " +
-" 		AND player_has_round.player_idplayer = player.idplayer " +
-    " JOIN tee " +
-" 		ON course.idcourse = tee.course_idcourse " +
-"		AND tee.TeeGender = player.PlayerGender " +
-"		AND tee.TeeStart = player_has_round.InscriptionTeeStart " +
-    " JOIN hole  " +
-"	   ON hole.tee_idtee = tee.idtee  " +
-"	   AND hole.tee_course_idcourse = course.idcourse " +
-"	--     GROUP BY hole.holenumber  " +
-"  ORDER BY holenumber  "
-  ;
-*/
      ps = conn.prepareStatement(query);
      ps.setInt(1, idtee);
  //    ps.setInt(2, idround);
@@ -84,10 +61,6 @@ return hg;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    LOG.error("NullPointerException in LoadHoles() " + npe);
-    LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
     LCUtil.showMessageFatal("Exception in LoadHoles = " + ex.toString() );

@@ -11,8 +11,7 @@ import java.sql.Timestamp;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class FindHandicap implements interfaces.Log, interfaces.GolfInterface
-{
+public class FindHandicap implements interfaces.Log, interfaces.GolfInterface{
     final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
     
 public double findPlayerHandicap(final Player player, final Round round, final Connection conn) throws SQLException
@@ -24,8 +23,7 @@ public double findPlayerHandicap(final Player player, final Round round, final C
 ////{
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
   String query = 
     "SELECT handicap.handicapPlayer" +
 "    from handicap " +
@@ -45,7 +43,6 @@ try
   //  ps.setDate(2, LCUtil.getSqlDate(d));
 
     ps.setTimestamp(2,ts);
-        
         utils.LCUtil.logps(ps);
     rs =  ps.executeQuery();
         rs.last(); //on récupère le numéro de la ligne
@@ -73,11 +70,6 @@ try
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return 0;
-}catch (NullPointerException npe){   
-    String msg = "NullPointerException in FindHandicapPlayer()" + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return 0;
 }catch (Exception ex){
     String msg = "Exception in FindHandicapPlayer()" + ex;
     LOG.error(msg);

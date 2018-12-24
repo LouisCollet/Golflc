@@ -83,7 +83,6 @@ public static void main(String[] args) throws SQLException, Exception // testing
         LOG.info("line 012");
     LoadHandicap lh = new LoadHandicap();
     Handicap h = lh.LoadHandicap(player, round , conn);
-//Course course = LoadCourse(conn, 104);
     LOG.info(" handicap = " + h.toString());
 //for (int x: par )
 //        LOG.info(x + ",");

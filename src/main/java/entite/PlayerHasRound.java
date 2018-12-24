@@ -20,13 +20,12 @@ public class PlayerHasRound implements Serializable
     private Short playerhasroundFinalResult;
     private Short playerhasroundZwanzeursResult;
     private Short playerhasroundZwanzeursGreenshirt;
- //   @Inscription(value = playerGender , round = round_idround) // new 19/08/2014 custom validation !!!
     private String playerGender; // new 19/08/2014
     private String inscriptionTeeStart;
  //   
  //   private String playerhasroundmatchplayresult;
     private Date playerhasroundModificationDate;
-private boolean InscriptionOK = false; // 02/08/2018
+    private boolean InscriptionOK = false; // 02/08/2018
 
     public PlayerHasRound() // constructor
     {

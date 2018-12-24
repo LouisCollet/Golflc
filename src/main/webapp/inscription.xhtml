@@ -59,23 +59,22 @@
 <f:facet name="header">
     <h1>#{msg['inscription.data']}</h1>
 </f:facet>
-<!-- déplacé vers include_summary
-        <h:outputText value="#{msg['round.players']} :" />
-        <h:outputText
-                      id="rcomp" 
-                      value="#{courseC.round.roundPlayers} = #{courseC.round.playersString}" />
--->
         <h:outputText value="#{msg['inscription.team']} :"   />
         <h:outputText id="competition" 
                       value="#{courseC.round.roundTeam}" />
 <!--
 https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling -->
 
-   <h:panelGroup id="panelG2" layout="block" >
+         <h:outputText value="#{msg['player.first']}"
+                    style="width:20%" />
+      <h:outputText
+                    value = "#{courseC.player.playerFirstName} - #{courseC.player.playerLastName}"/>
+
+      <h:panelGroup id="panelG2" layout="block" >
         <h:outputText value="#{msg['tee.gender']} :"  />
                     <span class="ui-inputgroup-addon"><i class="fa fa-male"></i></span>
                     <span class="ui-inputgroup-addon"><i class="fa fa-female"></i></span>
-   </h:panelGroup>
+       </h:panelGroup>
 
         <h:outputText id="teegender2" 
                       value="#{courseC.player.playerGender}" />
@@ -105,9 +104,10 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          ajax="false"
                          immediate="false"
                          icon="fa fa-pencil"
-                         disabled="#{courseC.inscription.inscriptionOK}"
+                       
                          action="#{courseC.createInscription}"
          />
+<!--   disabled="#{courseC.inscriptionNew.inscriptionOK}"  -->
 <p:commandButton 
                          id="buttonWeather"
                          value="#{msg['button.weather']}"

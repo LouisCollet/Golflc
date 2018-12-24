@@ -67,7 +67,7 @@ if(liste == null){
      {
         	LOG.info("Player we send a Subscription Renewal mail = " + item.Eplayer.getPlayerLastName());
              mail.SubscriptionMail sm = new mail.SubscriptionMail();
-             sm.sendSubscriptionMail(item.getPlayer(),item.getSubscription());
+             sm.sendMail(item.getPlayer(),item.getSubscription());
       } //end for
 return liste;
 

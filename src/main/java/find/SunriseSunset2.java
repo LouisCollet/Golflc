@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.Objects;
 import javax.inject.Named;
 import javax.net.ssl.HttpsURLConnection;
-import javax.validation.constraints.NotNull;
 import utils.DBConnection;
 
 @Named("sunrisesunsetapiC")
@@ -51,7 +50,7 @@ public class SunriseSunset2 implements interfaces.Log, interfaces.GolfInterface{
  //// public Flight findSunriseSunset(@NotNull Date date_in, String in_lat, String in_lng,        
  ////         @NotNull String tz, Course course, Connection conn) throws IOException {
  
-   public Flight findSunriseSunset(@NotNull Date date_in, BigDecimal in_lat, BigDecimal in_lng, @NotNull String tz,
+   public Flight findSunriseSunset(Date date_in, BigDecimal in_lat, BigDecimal in_lng, String tz,
            Connection conn) throws IOException {
        
  if(liste == null){ 
@@ -75,32 +74,8 @@ public class SunriseSunset2 implements interfaces.Log, interfaces.GolfInterface{
        } 
 
    /*     http://stackoverflow.com/questions/13092865/timezone-validation-in-java
-        String[] validIDs = TimeZone.getAvailableIDs();
-        for (String str : validIDs) {
-            if (str != null && str.equals(tz)) {
-                LOG.info("Valid ID");
-            }else{
-            return "error time zone";
-            }
-        } // end for
-        
-        ou
-        
-        TimeZone timeZone = TimeZone.getTimeZone(timeZoneToCheck);
-if(input.equals("GMT") || !timeZone.getID().equals("GMT")) {
-    //TODO Valid - use timeZone
-} else {
-    //TODO Invalid - handle the invalid input
-}
-        String[] validIDs = TimeZone.getAvailableIDs();
-for (String str : validIDs) {
-      if (str != null && str.equals("yourString")) {
-        System.out.println("Valid ID");
-      }
-}
-        */
-        
-//   https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400&date=today
+ 
+   https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400&date=today
 /*
     Parameters
 

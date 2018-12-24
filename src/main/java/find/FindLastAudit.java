@@ -2,7 +2,6 @@ package find;
 
 import entite.Course;
 import entite.Player;
-import entite.Tarif;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,13 +13,13 @@ public class FindLastAudit{
  // public class Score_Insert_Update implements interfaces.GolfInterface, interfaces.Log 
 final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
-    public int getLastAuditId(Player player) throws SQLException, Exception
+    public int getLastAuditId(Player player, Connection conn) throws SQLException, Exception
 {   PreparedStatement ps = null;
     ResultSet rs = null;
-    Connection conn = null;
+ //   Connection conn = null;
 try{
-    DBConnection dbc = new DBConnection();
-     conn = dbc.getConnection();
+ //   DBConnection dbc = new DBConnection();
+ //    conn = dbc.getConnection();
      String query =
              "select AuditId from audit"
               + " where AuditPlayerId = ?"
@@ -41,7 +40,7 @@ return auditId;
     throw ex;
 } // end catch
 finally{
-    DBConnection.closeQuietly(conn, null, rs, ps);
+    DBConnection.closeQuietly(null, null, rs, ps);
 }
 
 } // end method getLastAuditId
@@ -52,17 +51,12 @@ finally{
     Course course = new Course();
     course.setIdcourse(102);
   //  FindTarifData ftd = new FindTarifData();
-    Tarif t1 = new FindTarifData().findCourseTarif(course, conn);
-     LOG.info("Tarif extracted from database = "  + t1.toString());
+ //   Tarif t1 = new FindTarifData().findCourseTarif(course, conn);
+ ///    LOG.info("Tarif extracted from database = "  + t1.toString());
 //findPlayerHandicap(player,round, conn);
 //for (int x: par )
 //        LOG.info(x + ",");
 DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
-    
-    
-    
-    
-    
 } // end class

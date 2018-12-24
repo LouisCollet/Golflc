@@ -41,15 +41,15 @@ public Boolean checkPassword(String uuid, Connection conn) throws SQLException, 
 //    LOG.info("keyLC2  = " + keyLC2);
 
     FindActivationPlayer fap = new FindActivationPlayer();  // new instance
-        LOG.info("after fap instantiation");
+//        LOG.info("after fap instantiation");
     Player player = new Player();
     player = fap.findActivationPlayer(conn, uuid);
   // vérifie si uuid est en attente dans table activation
         LOG.info(" checkPassword : player returned from findActivationPlayer = " + player.getIdplayer());
     if(player.getIdplayer() == null){ // pas trouvé dans table Activation
-         String msg = "Error in findActivationPlayer not found or timelimit";
+         String msg = "Player not found in findActivationPlayer";
          LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
+    //     LCUtil.showMessageFatal(msg);
          return false;
       //   throw new Exception(msg);
      } 
@@ -81,18 +81,14 @@ public Boolean checkPassword(String uuid, Connection conn) throws SQLException, 
           }else{
                  String msg = "Sucessfull ModifyPassword/RESET  in Table player = ";
                     LOG.info(msg);
-                 LCUtil.showMessageInfo(msg);
+            //        LCUtil.showMessageInfo(msg);
                 // send mail to user
-                     String sujet = "Succesfull password reset to golflc !!!";
-                      msg = " your password is reseted !! click on next url to connect to golfLC: ";
-                     String url = utils.LCUtil.firstPartUrl();
-                    // à modifier utilier <href ....>
-                    //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
-                     String href = msg + url + "/login.xhtml";
-                     String to = "louis.collet@skynet.be";
-                     utils.SendEmail sm = new utils.SendEmail();
-                     boolean boo = sm.sendHtmlMail(sujet,href,to,"PASSWORD");
-                        LOG.info("HTML Mail status = " + boo);
+                
+                mail.ResetPasswordMail rpm = new mail.ResetPasswordMail();
+                rpm.sendMailResetOK(player);
+
+                        
+                        
                   return true;
             } //end else 1
         } //end else 2
@@ -114,24 +110,13 @@ public Boolean checkPassword(String uuid, Connection conn) throws SQLException, 
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         throw new Exception("time limit for the second time : getCause = " + e.getCause());
-     //   return false; 
- //  } catch (Throwable e) {
-    //         System.err.println(e);
-    //         System.err.println("Cause = " + e.getCause());
-      //       return null;
- // } catch (SQLException sqle) {
- //           String msg = "£££ SQLException in ActivationController = " + sqle.getMessage() + " ,SQLState = "
- //                   + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
- //           LOG.error(msg);
- //           LCUtil.showMessageFatal(msg);
- //           return null;
    } catch (Exception e) {
             String msg = "£££ SQLException in activation controller  = " + e.getMessage(); // + " ,SQLState = "
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return null;        
 }finally{
-         DBConnection.closeQuietly(null, null, null,null); 
+    //     DBConnection.closeQuietly(null, null, null,null); 
           }
 } // end checkPassword
  //   public void setValid(boolean valid) {
@@ -155,7 +140,7 @@ public Boolean checkPassword(String uuid, Connection conn) throws SQLException, 
             LOG.error(msg);
       //      LCUtil.showMessageFatal(msg);
    }finally{
-  //       DBConnection.closeQuietly(conn, null, null , null); 
+         DBConnection.closeQuietly(conn, null, null , null); 
    }
    } // end main//
 } // end class

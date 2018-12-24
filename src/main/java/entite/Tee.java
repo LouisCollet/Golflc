@@ -22,7 +22,7 @@ public class Tee implements Serializable, interfaces.Log
 {
     private static final long serialVersionUID = 1L;
 
-@NotNull(message="Bean validation : the Tee ID must be completed")
+//@NotNull(message="Bean validation : the Tee ID must be completed")
     private Integer idtee;
 
 @NotNull(message="Bean validation : the Gender must be completed")
@@ -34,6 +34,7 @@ public class Tee implements Serializable, interfaces.Log
     private String teeStart;
 
 @NotNull(message="{tee.slope.notnull}")
+//@Size(min=90, max=138, message="{tee.slope.minmax}")
 @Min(value=90,message="{tee.slope.min}")
 @Max(value=138,message="{tee.slope.max}")
     private Short teeSlope;

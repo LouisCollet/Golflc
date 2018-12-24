@@ -37,6 +37,7 @@
              rowIndexVar="row"
              resizableColumns="true"
              var="c"
+             emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredInscriptions}"
              style="border:solid 5px" 
              >
@@ -67,7 +68,7 @@
                 id="selectButton"
                 action="#{courseC.selectRecentInscription(c)}"
                 value="#{c.round.idround} - #{msg['button.select']}"
-                icon="ui-icon-pencil">
+                icon="fa fa-forward">
              </p:commandButton>
 	</p:column>
 
@@ -114,7 +115,7 @@
 
         <p:column headerText="#{msg['round.players']}"
                   footerText="#{msg['round.players']}"
-                  style="width:10%"
+                  style="white-space:pre-line;width:10%;text-align:right"
                   id="teestart"
                   >
                         #{c.round.roundPlayers}

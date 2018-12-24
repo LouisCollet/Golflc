@@ -41,8 +41,7 @@ public boolean modifySubscription(final Subscription subscription, final Connect
             int row = ps.executeUpdate();
             if (row != 0) {
          //          LOG.info("before subscription success msg");
-                 String msg =  "<h1> "+ LCUtil.prepareMessageBean("subscription.success")
-                           + subscription.toString()
+                 String msg =  "<h1> " + LCUtil.prepareMessageBean("subscription.success") + subscription.getEndDate()
                 //         + " , new end date = " + d.format(ZDF_DAY) + "</h1>"
                            ;
                     LOG.info(msg);

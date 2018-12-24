@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Named;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import utils.LCUtil;
@@ -21,20 +20,17 @@ public class Round implements Serializable, interfaces.Log, interfaces.GolfInter
 {
     private static final long serialVersionUID = 1L;
 
-@NotNull(message="Bean validation : the Round ID must be completed")
+//@NotNull(message="Bean validation : the Round ID must be completed")
     private Integer idround;
 
 @NotNull(message="{round.date.notnull}")
   //  private Date roundDate;
-    private LocalDateTime roundDate;  // change also ClubCourseRound and ScoreCard.java and StablefordResult !!!!!!
-
-   private Date workDate;
-
-private String workHour;
-
+    private LocalDateTime roundDate;  // change also ScoreCard.java and StablefordResult !!!!!!
+    private Date workDate;
+    private String workHour;
 
 @NotNull(message="{round.game.notnull}")
-    @Size(min=3,max=20,message="Bean validation : the Round Game is min 3, max 20 characters")
+@Size(min=3,max=20,message="Bean validation : the Round Game is min 3, max 20 characters")
     private String roundGame;
 
 //private String gametype; // new 1/11/2016
@@ -44,13 +40,12 @@ public enum GameType {STABLEFORD,SCRAMBLE,CHAPMAN,STROKEPLAY,ZWANZEURS,MP_FOURBA
     private Short roundCBA;
 
 @NotNull(message="{round.competition.notnull}")
-//@NotNull(message="Bean validation : the Round Competition must be completed")
 @Size(max=45, message="{round.competition.size}")
     private String roundCompetition;
 
 
 @NotNull(message="Bean validation : the Round Qualifying must be completed")
-    @Size(min=1, max=1,message="Bean validation : the Round Qualifying is max 1 character")
+@Size(min=1, max=1,message="Bean validation : the Round Qualifying is max 1 character")
     private String roundQualifying;
 
 @NotNull(message="Bean validation : the Round Holes must be completed (9 or 18)")
@@ -71,18 +66,19 @@ private String RoundScoreString;
 // new !! ajouter à l'objet round la liste des player ??
     // lignes suivantes : ne fonctionne pas !!!
 // @NotEmpty(message="At least one player is required in this round !")
-@Valid
-    private List<Player> players ; //added 01/04/2013
+// @Valid enlevé 29-11-218
+    private List<Player> playersList ; //added 01/04/2013 renamed 30-11-2018
     private String playersString;
     private Short roundPlayers;
     
     public Round() // constructor
     {
-       this.players = new ArrayList<>();
-       roundQualifying="N"; //set default value to radiobutton
+       this.playersList = new ArrayList<>();
+       roundQualifying = "N"; //set default value to radiobutton
        roundCBA = 0;
        roundHoles = 18;
        roundStart = 1;
+       roundPlayers = 0;
     }
 
     public Integer getIdround() {
@@ -96,11 +92,11 @@ private String RoundScoreString;
 
     public List<Player> getPlayers() {
         
-        return players;
+        return playersList;
     }
 
     public void setPlayers(List<Player> players) {
-        this.players = players;
+        this.playersList = players;
     }
 
     public String getPlayersString() {
@@ -111,8 +107,6 @@ private String RoundScoreString;
         this.playersString = playersString;
     }
 
-    
-    
     public LocalDateTime getRoundDate() {
  //       LOG.debug("from getRoundDate");
  //       LOG.info(" from getRoundDate 2 - roundDate = " + roundDate.format(ZDF_TIME));
@@ -241,6 +235,14 @@ private String RoundScoreString;
 
     public void setRoundModificationDate(Date roundModificationDate) {
         this.roundModificationDate = roundModificationDate;
+    }
+
+    public List<Player> getPlayersList() {
+        return playersList;
+    }
+
+    public void setPlayersList(List<Player> playersList) {
+        this.playersList = playersList;
     }
     
     

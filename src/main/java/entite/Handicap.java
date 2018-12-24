@@ -8,8 +8,10 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import javax.inject.Named;
 import javax.validation.constraints.*;
+import org.primefaces.event.SelectEvent;
 import utils.LCUtil;
 
 @Named
@@ -17,7 +19,7 @@ public class Handicap implements Serializable, interfaces.GolfInterface
 {
     private static final long serialVersionUID = 1L;
     
-//@NotNull(message="{handicap.start.notnull}")
+
 @Past(message="{handicap.start.past}")
     private Date handicapStart;
 
@@ -37,6 +39,9 @@ public class Handicap implements Serializable, interfaces.GolfInterface
 
     private Date handicapModificationDate;
 
+    private ECourseList selectedHandicap; // mod 11-12-2018
+    
+    private List <?>filteredHandicaps; // new 03/08/2014
  //   public Handicap()
  //   {
  //   }
@@ -74,8 +79,6 @@ public class Handicap implements Serializable, interfaces.GolfInterface
         this.playingHandicap = playingHandicap;
     }
 
-
-
     public Integer getPlayerIdplayer() {
         return playerIdplayer;
     }
@@ -99,6 +102,47 @@ public class Handicap implements Serializable, interfaces.GolfInterface
     public void setHandicapModificationDate(Date handicapModificationDate) {
         this.handicapModificationDate = handicapModificationDate;
     }
+
+    public ECourseList getSelectedHandicap() {
+        return selectedHandicap;
+    }
+
+    public void setSelectedHandicap(ECourseList selectedHandicap) {
+        this.selectedHandicap = selectedHandicap;
+    }
+
+    public List<?> getFilteredHandicaps() {
+        return filteredHandicaps;
+    }
+
+    public void setFilteredHandicaps(List<?> filteredHandicaps) {
+        this.filteredHandicaps = filteredHandicaps;
+    }
+   // public void onRowSelect(SelectEvent event) {
+    public void onrowSelect(SelectEvent event) {
+        LOG.info("onrowSelect Event fired !");
+    }
+    public void onrowUnselect(SelectEvent event) {
+        LOG.info("onrowUnselect Event fired !");
+    }
+    
+    public void onrowSelectCheckbox(SelectEvent event) {
+        LOG.info("onrowSelectCheckbox Event fired !");
+    }
+    
+    public void onrowUnselectCheckbox(SelectEvent event) {
+        LOG.info("onrowSelectCheckbox Event fired !" + event.getObject().toString());
+    }
+    
+  //  <p:ajax event="rowSelect"           listener="#{courseC.handicap.onrowSelect}"/>
+  //  <p:ajax event="rowUnselect"         listener="#{courseC.handicap.onrowUnselect}"/>
+  //  <p:ajax event="rowSelectCheckbox"   listener="#{courseC.handicap.onrowSelectCheckbox}"/>
+  //  <p:ajax event="rowUnselectCheckbox" listener="#{courseC.handicap.onrowUnselectCheckbox}"/>
+    
+    
+    
+    
+    
  @Override
 public String toString()
 { return 

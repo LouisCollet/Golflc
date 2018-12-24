@@ -61,7 +61,25 @@ but I preferred the rendered in one help file !!
                 alt="image missing :golf_club.jpg"
                 style="float: right;">
 </h:graphicImage>
-
+<style type="text/css">
+    .ui-log {
+        left: 600px;
+        top: 100px;
+    }
+</style>
+ 
+<script type="text/javascript">
+    function handleComplete(xhr, status, args) {
+        if(args.validationFailed) {
+            PrimeFaces.debug("Validation Failed");
+        } 
+        else {
+            PrimeFaces.debug("Save:" + args.saved);
+            PrimeFaces.debug("FirstName: " + args.user.firstname + ", Lastname: " + args.user.lastname);
+        }
+    }
+</script>
+    
 <h:form id="club"
         style="border:solid 5px" 
         enctype="application/x-www-form-urlencoded" >
@@ -72,6 +90,7 @@ but I preferred the rendered in one help file !!
              styleClass="alignmentLeft"
              >
 <f:facet name="header">
+    <!--
     <p:steps activeIndex="0"
              style="border-style:dotted; border-color:red; border-width:2px " >
         <p:menuitem value="#{msg['club.club'] } (#{courseC.club.createModify})"
@@ -80,6 +99,7 @@ but I preferred the rendered in one help file !!
         <p:menuitem value="#{msg['tee.tee']}" />
         <p:menuitem value="#{msg['hole.hole']}" />
     </p:steps>
+    -->
     <h1>#{msg['club.data']} #{request.getParameter('operation')}</h1>
 
 </f:facet>
@@ -169,6 +189,7 @@ Anything listed AFTER '?' within the mask is considered optional user input
                          immediate="true"
                          style="margin-right: 10px;"
                          icon="ui-icon-search"
+                         oncomplete="handleComplete(xhr, status, args)"
                          action="#{courseC.findClubLatLng()}"
                          />
                       
@@ -253,6 +274,7 @@ Anything listed AFTER '?' within the mask is considered optional user input
                          immediate="false"
                          icon="ui-icon-disk"
                          style="width:140px"
+                         oncomplete="handleComplete(xhr, status, args)"
                          action="#{courseC.createClub}"
                          />
         <p:commandButton value="#{msg['button.club.modify']}"
@@ -279,7 +301,7 @@ Anything listed AFTER '?' within the mask is considered optional user input
 </f:facet>
 
 </p:panelGrid>
-
+  <!--   <p:log />   -->
 </h:form>
 </ui:define>
 </ui:composition>

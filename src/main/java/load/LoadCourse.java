@@ -36,14 +36,6 @@ try{
      while(rs.next())
                 {
                    c = entite.Course.mapCourse(rs);
-                      /*
-		c.setIdcourse(rs.getInt("idcourse"));
-                c.setCourseName(rs.getString("coursename") );
-                c.setCourseHoles(rs.getShort("CourseHoles"));
-                c.setCoursePar(rs.getShort("coursepar"));
-                c.setCourseBegin(rs.getDate("courseBegin"));
-                c.setCourseEnd(rs.getDate("courseEnd"));
-                c.setClub_idclub(rs.getInt("club_idclub"));  */
 		}  //end while
     return c;
 }catch (SQLException e){
@@ -52,10 +44,6 @@ try{
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    LOG.error("NullPointerException in LoadCourse() " + npe);
-    LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
   //  LCUtil.showMessageFatal("Exception in LoadClub = " + ex.toString() );

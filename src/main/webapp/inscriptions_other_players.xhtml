@@ -11,21 +11,17 @@
       xmlns:pe="http://primefaces.org/ui/extensions"
         >
 <ui:composition template="templates/masterTemplate.xhtml">
-     
 <ui:define name="title">Inscriptions Other Players Page </ui:define>
-
 <ui:define name="help">
     <ui:include src="/help/help_inscription.xhtml"/>
 </ui:define>
 
 <ui:define name="content">
-
 <h:graphicImage 
                 name="images/draganddrop.png"
                 alt="image missing : draganddrop.png"
                 style="float: left;">
 </h:graphicImage>
-
 <h:graphicImage 
                 name="images/drop zone.png"
                 alt="image missing : draganddrop.jpg"
@@ -117,7 +113,7 @@
                     <p:commandButton
                           id="selectButtonRemove"
                           action="#{courseC.player.PlayerRemove(c)}"
-                          value="#{c.playerLastName}}"
+                          value="#{c.playerLastName}"
                           icon="fa fa-trash-o fa-lg colorDelete1">
                         <p:confirm header="#{msg['message.confirm']}"
                            message="#{msg['message.cancel']}" 
@@ -148,7 +144,7 @@
                  hoverStyleClass="ui-state-hover"
                  datasource="availablePlayersTable"
                  onDrop="handleDrop">
-        <p:ajax listener="#{courseC.player.onPlayerDrop}"
+        <p:ajax listener="#{courseC.player.PlayerDrop}"
                 update="dropArea availablePlayersTable" />
     </p:droppable>
  <ui:include src="include/include_confirmDialog.xhtml"/>

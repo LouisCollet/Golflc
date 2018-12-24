@@ -17,11 +17,10 @@ import javax.mail.MessagingException;
 
 public class InscriptionMail {
 
-    public Boolean sendInscriptionMail(Player player, Player invitedBy, Round round, Club club,Course course ) throws MessagingException, Exception {
+    public Boolean sendMail(Player player, Player invitedBy, Round round, Club club,Course course ) throws MessagingException, Exception {
 {
         LOG.info("entering sendInscriptionMail");
-        
-        
+
         String sujet = "Your Round Inscription via GolfLC";
                 String Smail = 
                   " <br/>Inscription Confirmation - GolfLC!"
@@ -45,21 +44,16 @@ public class InscriptionMail {
                 + " <br/>" + SDF_TIME.format(new java.util.Date() )
                     ; 
                 String to = "louis.collet@skynet.be";
-                
-                
-                // insérer ici le ics
+         // insérer ici le ics
                 mail.InscriptionICS im = new mail.InscriptionICS();
-                FileOutputStream fos = im.createInscriptionMailICS(player, invitedBy, round, club, course);
+                FileOutputStream fos = im.createInscriptionMailICS(player, invitedBy, round, club, course, true);
                     LOG.info("fileoutputstrean fos = " + fos.toString());
          // a faire tester si pas null ??
                 utils.SendEmail sm = new utils.SendEmail();
-                String type = "INSCRIPTION";
-                boolean b = sm.sendHtmlMail(sujet,Smail,to,type);
+                boolean b = sm.sendHtmlMail(sujet,Smail,to,"INSCRIPTION");
                     LOG.info("HTML Mail status = " + b);
-
 return b;
 }
 
-    
     }
 } // end class

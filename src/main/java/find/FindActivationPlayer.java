@@ -33,11 +33,20 @@ try{
         rs.last(); // on se positionne sur la dernière ligne
  //       int last = rs.getRow();//on récupère le numéro de la dernière ligne
             LOG.info("ResultSet Activation has " + rs.getRow() + " lines.");
-            LOG.info("Concerne Player = " + rs.getInt("player_idplayer"));
+  //          LOG.info("Concerne Player = " + rs.getInt("player_idplayer"));
     //    if (rs.getRow() != 1)    
+         if(rs.getRow() == 0)
+            {String msg = "Empty Result for Activation player !! ";
+             LOG.error(msg);
+      //       LCUtil.showMessageFatal(msg);
+             player.setIdplayer(null);
+             return player;
+            }   
+    
+    
         if (rs.getRow() != 1) // soit 0, soit 2
         {
-             String msg = "No Activation found or already activated !! ";
+             String msg = "No Activation found no!= 1 ";
                  LOG.info(msg);
              LCUtil.showMessageFatal(msg);
              player.setIdplayer(null);
@@ -51,20 +60,23 @@ try{
         java.util.Date now = new java.util.Date();
                 LOG.info("current dateTime = " + sdf_timeHHmm.format(new java.util.Date())); 
         long differenceInMinutes = TimeUnit.MILLISECONDS.toMinutes(now.getTime() - d.getTime()); // différence getTime en milliseconds
-                LOG.info("difference in Minutes = " + differenceInMinutes); 
+                LOG.info("Just in time for the 10 minutes " + differenceInMinutes); 
           //      ZonedDateTime now2 = ZonedDateTime.now();
           //      Instant instant = Instant.now() ; 
           //      LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
          //       Duration duration = Duration.between(date, instant); //.toMinutes();
           //      LOG.info("duration modern = " + duration.toMinutes());
      //     LocalDateTime now = LocalDateTime.now();
-                
+         if(now.getTime() > d.getTime() + TimeUnit.MILLISECONDS.toMinutes(10) )   {
+             LOG.info("autre manière : now est > échéance ");
+         }    
 
  //    Player player = new Player();
         if(differenceInMinutes < 10){   //reliable?
                 player.setIdplayer(rs.getInt("player_idplayer"));
                 player.setPlayerLanguage(rs.getString("ActivationPlayerLanguage"));
-                String msg = "Just in time for the 10 minutes :" + rs.getInt("player_idplayer");
+                String msg = "Just in time for the dead line of 10 minutes :" + rs.getInt("player_idplayer")
+                        + " remaining = " + (10 - differenceInMinutes);
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
                 return player;
@@ -97,7 +109,7 @@ try{
         throw new SQLException(msg);
     //    return null;
 }catch (Exception ex){
-    String msg = "NullPointerException in getActivation() " + ex;
+    String msg = "Exception in getActivation() " + ex;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;

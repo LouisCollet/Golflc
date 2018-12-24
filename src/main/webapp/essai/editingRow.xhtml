@@ -37,6 +37,7 @@
                 var="c"
                 value="#{courseC.listCars()}"
                 editable="true"
+                emptyMessage="#{msg['message.table.empty']}"
                 style="margin-bottom:20px">
        <f:facet name="header">
            Row Editing
@@ -111,7 +112,10 @@
        <p:menuitem value="Hide Menu" icon="ui-icon-close" onclick="PF('cMenu').hide()"/>  
    </p:contextMenu> 
  
-   <p:dataTable id="cars2" var="car" value="#{dtEditView.cars2}" editable="true" editMode="cell" widgetVar="cellCars">
+   <p:dataTable id="cars2" var="car" value="#{dtEditView.cars2}" editable="true"
+                editMode="cell"
+                emptyMessage="#{msg['message.table.empty']}"
+                widgetVar="cellCars">
        <f:facet name="header">
            Cell Editing with DoubleClick and RightClick
        </f:facet>

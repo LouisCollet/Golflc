@@ -16,9 +16,6 @@ public class Inscription implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-//@NotNull(message="Bean validation : the Round ID must be completed")
-
-  //  private static Integer round_idround;
     private Integer round_idround; // mod 10/11/2014
     private Integer player_idplayer;
     private Short playerhasroundFinalResult;
@@ -31,7 +28,7 @@ public class Inscription implements Serializable
  //   
  //   private String playerhasroundmatchplayresult;
     private Date playerhasroundModificationDate;
-private boolean InscriptionOK = false; // 02/08/2018
+    private boolean InscriptionOK = true; //  set true 01/12/2018
 
     public Inscription() // constructor
     {

@@ -19,7 +19,7 @@
 
     
 <h:form id="selectPlayers">
-<ui:include src="include/include_messages.xhtml"/>
+
 <ui:include src="include/include_summary.xhtml"/>
 <p:dataTable id="table_players"
              value="#{courseC.listPlayers()}"
@@ -35,7 +35,7 @@
 <f:facet name="header">
             <p:commandButton
                 id="cmd01Button"
-                action="#{courseC.pickListPlayers()}"
+                action="#{courseC.otherPlayers()}"
                 icon="ui-icon-extlink"
                 value="#{msg['button.selectotherplayers']}"
                
@@ -75,8 +75,6 @@
              listener="#{courseC.rowPlayerSelect()}"
              update=":selectPlayers:table_players"
        />
-
-
 
 <!--  gestion disabled Button 
 <p:ajax partialSubmit="true" update="cmd01Button" event="toggleSelect"/> 

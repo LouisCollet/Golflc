@@ -365,34 +365,29 @@ public String getMavenVersion()
 {
      return prop1.getProperty("maven.version");
 }
-public String getHibernateVersion()
-{
+public String getHibernateVersion(){
  //   LOG.info(org.hibernate.Version.getVersionString());
  //   String hibernateVersion = org.hibernate.annotations.common.Version.VERSION;
  //       System.out.println("Hibernate Version: "+ hibernateVersion);
      return "Hibernate Validator " + prop1.getProperty("hibernate.version");
 }
 
-public String getOmnifacesVersion()
-{
+public String getOmnifacesVersion(){
      return prop1.getProperty("omnifaces.version");
 }
 
-public String getJavaVersion()
-{
+public String getJavaVersion(){
     String javaVersion = System.getProperty("java.runtime.version");
     return javaVersion + " from " + System.getProperty("java.vendor");
 }
 
-public String getIpadress6()
-{
+public String getIpadress6(){
  //   String hostAddress = java.net.Inet6Address.getHostAddress();
     String javaVersion = System.getProperty("java.runtime.version");
     return javaVersion + " from " + System.getProperty("java.vendor");
 }
 
-public String getOsVersion() 
-{
+public String getOsVersion(){
     return System.getProperty("os.name") + " " + System.getProperty("os.version")
             + " " + System.getProperty("os.arch");
 }
@@ -402,8 +397,7 @@ public void preProcessPDF(Object document) {
       pdf.open();
     }
     
-public static int getElem(PlayingHcp playingHcp)
-{
+public static int getElem(PlayingHcp playingHcp){
     // used in ??
     // calcule le nombre de players (de 1/2 à 4 ?)
     int counter_players = 0;
@@ -419,8 +413,7 @@ public static int getElem(PlayingHcp playingHcp)
 return counter_players;
 }
 
-public static void printResultSet(ResultSet rs) throws SQLException
-{
+public static void printResultSet(ResultSet rs) throws SQLException{
     ResultSetMetaData rsmd = rs.getMetaData();
     System.out.println("querying SELECT * FROM XXX");
     int columnsNumber = rsmd.getColumnCount();
@@ -497,8 +490,7 @@ return sum;
     public void setOverlay(Overlay overlay) {
         this.overlay = overlay;
     }
-public void onMarkerSelect(OverlaySelectEvent event)   
-    {  
+public void onMarkerSelect(OverlaySelectEvent event){  
         LOG.debug("onMarkerSelect: " + event.getOverlay().getClass().getName());  
         infoWindowText = "blabla";  
     } 

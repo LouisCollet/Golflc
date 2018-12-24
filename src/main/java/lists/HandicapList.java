@@ -11,8 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -20,17 +18,14 @@ public class HandicapList implements interfaces.Log
 {
     private static List<ECourseList> liste = null;
 
-public List<ECourseList> getHandicapList(final @Valid Player player,
-                                                    final @NotNull Connection conn) throws SQLException
-{  
-if(liste == null)
-{
+// public List<ECourseList> getHandicapList(final @Valid Player player,
+public List<ECourseList> getHandicapList(final Player player,        
+                                                    final Connection conn) throws SQLException{  
+if(liste == null){
         LOG.info(" ... entering HandicapList !! ");
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
-    // String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+try{
      String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
      String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
      String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
@@ -71,25 +66,10 @@ String query =
 		ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
                 Handicap h = new Handicap();
                 h = entite.Handicap.mapHandicap(rs);
-/*			ccr.setPlayerFirstName(rs.getString("PlayerFirstName") );
-//                        ccr.setPlayerLastName(rs.getString("PlayerLastName") );
-//                        ccr.setIdplayer(rs.getInt("idplayer") );
-                        h.setHandicapPlayer(rs.getBigDecimal("HandicapPlayer") );
-                        h.setHandicapStart(rs.getDate("idhandicap") );*/
                 ecl.setHandicap(h);
                 
                 Round r = new Round();
                 r = entite.Round.mapRound(rs);
-    /*                r.setIdround(rs.getInt("idround") );
-                    java.util.Date d = rs.getTimestamp("roundDate");
-              //      LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-               //     LocalDateTime date = DatetoLocalDateTime(d);
-                    r.setRoundDate(DatetoLocalDateTime(d));
-                    r.setRoundGame(rs.getString("roundgame") );
-                    r.setRoundCompetition(rs.getString("RoundCompetition") );
-             //       r.setRoundHoles(rs.getShort("RoundHoles") );
-             //       r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-              //      r.setRoundStart(rs.getShort("RoundStart") );*/
                 ecl.setRound(r);
                 
                 Course o = new Course();
@@ -104,11 +84,6 @@ String query =
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    String msg = "NullPointerException in getHandicapList() " + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
 }catch (Exception ex){
     String msg = "Exception in getHandicapList() " + ex;
     LOG.error(msg);

@@ -25,6 +25,10 @@ public int [] LoadParArray(Connection conn, final Player player, final Course co
 try
 {
   //   LOG.info("starting LoadParArray with player = " + player.getIdplayer() + " , course = " + course.getIdcourse() );
+    
+     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
+    
 final String query = "SELECT idcourse, course.CourseName , idhole, holenumber, holepar" +
 " FROM course" +
 " JOIN player" +

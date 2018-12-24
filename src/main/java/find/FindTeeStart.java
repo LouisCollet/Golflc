@@ -1,6 +1,7 @@
 package find;
 
 import entite.Course;
+import entite.Player;
 import exceptions.LCCustomException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,13 +13,11 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 // liste des tee d'un course //
-public class FindTeeStart implements interfaces.Log
-{
+public class FindTeeStart implements interfaces.Log{
    private static List<String> liste = null;
    final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
    
-public List<String> teeStart (final Course course ,final Connection conn) throws SQLException
-{   
+public List<String> teeStart (final Course course , final Player player, final Connection conn) throws SQLException{   
 if(liste == null)
 { 
     LOG.info("starting FindTeeStart for course = " + course.toString());
@@ -27,12 +26,15 @@ if(liste == null)
 try
 {   
     String query =
-     " select idcourse, idtee, teestart from course, tee" +
-"	where course.idcourse = ?" +
-"	and tee.course_idcourse = course.idcourse"
+     " SELECT idcourse, idtee, teestart" +
+      " FROM course, tee" +
+      " WHERE course.idcourse = ?" +
+      " AND tee.TeeGender = ?" +
+      " and tee.course_idcourse = course.idcourse"
     ;
     ps = conn.prepareStatement(query);
     ps.setInt(1, course.getIdcourse()); 
+    ps.setString(2, player.getPlayerGender()); 
          utils.LCUtil.logps(ps); 
     rs =  ps.executeQuery();
     rs.last(); //on récupère le numéro de la ligne

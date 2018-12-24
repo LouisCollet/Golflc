@@ -15,7 +15,7 @@ int max;  //added 1/11/2016
 public void initialize(FirstUpper firstUpper)
 {
     max = firstUpper.max();
-    LOG.info("max == " + max);
+  //  LOG.info("max == " + max);
 	// See JSR 303 Section 2.4.1 for sample implementation.
     // gives access to any attributes of the annotation such min/max fields of the size annotation
 }

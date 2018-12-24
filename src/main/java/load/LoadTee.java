@@ -38,13 +38,6 @@ final String query = "SELECT "
      while(rs.next())
      {
                 t = entite.Tee.mapTee(rs);
-	/*	t.setIdtee(rs.getInt("idtee"));
-                t.setTeeStart(rs.getString("TeeStart"));
-                t.setTeeGender(rs.getString("TeeGender"));
-                t.setTeeSlope(rs.getShort("teeslope"));
-                t.setTeeRating(rs.getBigDecimal("teerating"));
-                t.setTeeClubHandicap(rs.getInt("TeeClubHandicap"));
-                t.setCourse_idcourse(rs.getInt("course_idcourse"));*/
       }  //end while
     return t;
 }catch (SQLException e){
@@ -53,10 +46,6 @@ final String query = "SELECT "
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    LOG.error("NullPointerException in LoadTee() " + npe);
-    LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
   //  LCUtil.showMessageFatal("Exception in LoadClub = " + ex.toString() );
@@ -74,9 +63,6 @@ public static void main(String[] args) throws SQLException, Exception // testing
 {
     DBConnection dbc = new DBConnection();
    Connection conn = dbc.getConnection(); // main
-  //  Club club = new Club();
-//    club.setIdclub(104);
-//round.setIdround(206);
    LoadTee lt = new LoadTee();
    Tee tee = lt.LoadTee(conn, 104);
      LOG.info(" club = " + tee.toString());

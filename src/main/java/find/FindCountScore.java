@@ -17,13 +17,12 @@ public class FindCountScore {
 final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
     public int getCountScore(Connection conn, Player player, Round round, String operation)
-        throws SQLException
-{
+        throws SQLException{
+        
     PreparedStatement ps = null;
     ResultSet rs = null;
     String query = null;
-try
-{
+try{
    //     LOG.info("player  = " + idplayer);
    //     LOG.info("round  =  " + idround);
    //     LOG.info("Connection =  " + conn);
@@ -63,8 +62,8 @@ if (operation.equalsIgnoreCase("rows") )
         LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return 99;
-}catch(NumberFormatException nfe){
-    String msg = "Â£Â£Â£ NumberFormatException in getCountScore = " + nfe.getMessage();
+}catch(Exception nfe){
+    String msg = "Â£Â£Â£ Exception in getCountScore = " + nfe.getMessage();
         LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return 99;

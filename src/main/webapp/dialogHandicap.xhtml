@@ -30,19 +30,19 @@
                 <f:facet name="header">
                     this is the header facet
                 </f:facet>
- <!--  rendered="#{not empty courseC.selectedHandicap}"   -->
+ <!--  rendered="#{not empty courseC.handciap.selectedHandicap}"   on travaille sur un ECourseList -->
                 <h:outputText id="date_handicap" value="#{msg['handicap.start']}" />
-                <h:outputText id="dathcp2" value="#{courseC.selectedHandicap.handicap.handicapStart}" />
+                <h:outputText id="dathcp2" value="#{courseC.handicap.selectedHandicap.handicap.handicapStart}" />
  
                 <h:outputText id="competition" value="#{msg['round.competition']}" />
-                <h:outputText id="compet2" value="#{courseC.selectedHandicap.round.roundCompetition}" />
+                <h:outputText id="compet2" value="#{courseC.handicap.selectedHandicap.round.roundCompetition}" />
  
                 <h:outputText id="game" value="#{msg['round.game']}" />
-                <h:outputText id="game2" value="#{courseC.selectedHandicap.round.roundGame}" 
+                <h:outputText id="game2" value="#{courseC.handicap.selectedHandicap.round.roundGame}" 
                               style="color:silver" />
  
                 <h:outputText id="idround" value="#{msg['round.id']}" />
-                <h:outputText id="idround2" value="#{courseC.selectedHandicap.round.idround}" 
+                <h:outputText id="idround2" value="#{courseC.handicap.selectedHandicap.round.idround}" 
                               style="color:red"/>
 <!--    
                 

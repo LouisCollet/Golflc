@@ -1,5 +1,6 @@
 package lc.golfnew;
 
+import exceptions.ExceptionGolfLC;
 import entite.Player;
 import java.awt.image.BufferedImage;
 import java.io.*;

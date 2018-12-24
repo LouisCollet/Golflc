@@ -44,15 +44,13 @@ public class DialogController implements Serializable, interfaces.Log
     PrimeFaces.current().dialog().openDynamic("dialogHandicap.xhtml", options, null); 
         LOG.info("dialogHandicap.xhtml is opened !");
 }
-
-  public static void viewFlight()
-  {
+    public static void showFlight(){
        LOG.info("entering DialogController viewFlight");
     Map<String,Object> options = new HashMap<>();
     options.put("modal", true);
     options.put("draggable", true);
     options.put("resizable", true);
-    options.put("width", 700);
+    options.put("width", 500);
     options.put("height", 600);
     options.put("contentWidth", "100%");
     options.put("contentHeight", "100%");
@@ -62,10 +60,10 @@ public class DialogController implements Serializable, interfaces.Log
     options.put("modal", true);
     options.put("headerElement", "customheader");
  //   options.put("header", "header by LC");
-//   RequestContext.getCurrentInstance().openDialog("dialogFlight.xhtml", options, null); // deprecated changed 08/02/2018
     PrimeFaces.current().dialog().openDynamic("dialogFlight.xhtml", options, null); 
         LOG.info("exiting DialogController viewFlight");
 }  
+
 
   
   public static void viewRound()

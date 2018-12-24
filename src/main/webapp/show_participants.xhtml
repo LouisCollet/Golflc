@@ -43,10 +43,10 @@
 <ui:define name="content">
 
 <h:form id="participants_rounds">
-<ui:include src="include/include_messages.xhtml"/>
 
 <p:dataTable id="played_rounds_table1"
              value="#{courseC.getListmatchplay()}"
+             emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
     <h1>Round Description</h1>
@@ -54,7 +54,6 @@
     
 <p:column headerText="#{msg['round.date']}" style="width:100px" >
    <h:outputText value="#{c.roundDate}"
-                 
                  >
     <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
 
@@ -77,6 +76,7 @@
                                                            
 <p:dataTable id="played_rounds_table2"
              value="#{courseC.getListmatchplay()}"
+             emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
      <h1>#{msg['round.players']}</h1>

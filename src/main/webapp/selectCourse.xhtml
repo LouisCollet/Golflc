@@ -17,6 +17,7 @@
 
 <ui:define name="metadata">
     <f:metadata>
+        <!--
         <f:viewParam
             id="viewParam_cmd"
             required="false"
@@ -26,8 +27,10 @@
             >
             <f:validateLength minimum="3" />
         </f:viewParam>
+        -->
     </f:metadata>
 </ui:define>
+
 <ui:define name="content">
 <h:form id="form_select_course">
 
@@ -99,7 +102,7 @@
                   filterMatchMode="contains"
                   filterBy="#{c.course.courseName}"
                   >
-            <h:outputText value="#{c.course.courseName} ( #{c.course.idcourse} )" />
+            <h:outputText value="#{c.course.courseName} (#{c.course.idcourse})" />
 	</p:column>
 <!-- attention : casse de la classe :min et MAJ -->
 
@@ -110,7 +113,7 @@
                     filterMatchMode="contains"
                     filterBy="#{c.club.clubName}"
                   >
-            <h:outputText value="#{c.club.clubName} ( #{c.club.idclub} )" />
+            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
 	</p:column>
 
     	<p:column headerText="#{msg['round.tarif']}"

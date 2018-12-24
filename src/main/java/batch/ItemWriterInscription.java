@@ -4,9 +4,9 @@ package batch;
 import create.CreateInscription;
 import entite.Club;
 import entite.Course;
+import entite.Inscription;
 import entite.InscriptionCSV;
 import entite.Player;
-import entite.PlayerHasRound;
 import entite.Round;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -24,7 +24,8 @@ public class ItemWriterInscription extends AbstractItemWriter implements interfa
     private Player player;
     private Club club;
     private Course course;
-    private PlayerHasRound playerhasround;
+//    private PlayerHasRound playerhasround;
+    private Inscription inscriptionNew;
     private InscriptionCSV inscription;
     private int recordsOK = 0;
     private int recordsKO = 0;
@@ -117,7 +118,8 @@ public class ItemWriterInscription extends AbstractItemWriter implements interfa
         LOG.info("entering insertDB with inputRecord = " + inputRecord.toString());
       round = new Round();
       player = new Player();
-      playerhasround = new PlayerHasRound();
+  //    playerhasround = new PlayerHasRound();
+      inscriptionNew = new Inscription();
 
       player.setIdplayer(inputRecord.getIdplayer() );
         LOG.info("step 01");
@@ -128,7 +130,7 @@ public class ItemWriterInscription extends AbstractItemWriter implements interfa
    //       LOG.info("inscription = " + inscription.toString());
            LOG.info("step 10");
       CreateInscription ci = new CreateInscription();
-      boolean b = ci.createInscription(round, player, player, playerhasround, club, course, conn);
+      boolean b = ci.createInscription(round, player, player, inscriptionNew, club, course, conn);
          LOG.info("boolean returned from create inscription = " + b);
       if(b == false) // new 20/10/2014
              {

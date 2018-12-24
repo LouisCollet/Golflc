@@ -49,7 +49,7 @@ public class GoogleGeoApiController
   * "address,city,state,zipcode". Here address means "street number + route"
   * .
   */
- //public LatLng findLatLng(String fullAddress) throws IOException, Exception {
+
      public GoogleResult findLatLng(String fullAddress) throws IOException, Exception {
   /*
    * Create an java.net.URL object by passing the request URL in constructor.
@@ -108,9 +108,17 @@ public class GoogleGeoApiController
         
         GoogleResult gr = new GoogleResult();
         gr.setGeometry(response.getResults()[0].getGeometry());
-        LOG.info("line 01");
+            LOG.info("line 01");
+            LOG.info("is the result Approximate 1 ? " + response.getResults()[0].getGeometry().getLocation_type());
+            LOG.info("is the result Approximate 2 ? " + gr.getGeometry().getLocation_type());
+        if(gr.getGeometry().getLocation_type().equals("APPROXIMATE")){
+             msg = "The result is APPROXIMATE - Please modify your input ! "; // + gr.getGeometry().getLocation_type());
+             LOG.error(msg);
+             LCUtil.showMessageFatal(msg);
+             return null;
+        }
         gr.setFormatted_address(response.getResults()[0].getFormatted_address());
-        LOG.info("line 02");
+             LOG.info("line 02");
   //      LatLng latlng = response.getResults()[0].getGeometry().getLocation().getLatlng(); // les 2 en même temps !!!
       //      LOG.info("Geoapi LatLng latlng  : " + latlng);
       LCUtil.showMessageInfo(msg);
@@ -138,6 +146,13 @@ public class GoogleGeoApiController
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return null;
+   } catch (Exception e) {
+            String msg = "Â£Â£ Exception in finLatLng = " + e.getMessage();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+            return null;           
+            
+            
    }finally{ 
       iStream.close();
    }

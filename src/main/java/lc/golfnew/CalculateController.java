@@ -3,6 +3,7 @@ package lc.golfnew;
 
 import calc.CalcHandicap;
 import calc.CalcScramblePlayingHandicap;
+import calc.GolfCalc;
 import create.CreateHandicap;
 import create.CreateScoreSqueleton;
 import entite.Course;
@@ -26,35 +27,29 @@ import utils.*;
 
 @Named("calcC")
 @SessionScoped 
-public class CalculateController implements Serializable, interfaces.GolfInterface, interfaces.Log
-{
+public class CalculateController implements Serializable, interfaces.GolfInterface, interfaces.Log{
     private static String list[];
-  //  private final static Connection conn = null;
     private static Player pl;
     private static List<Player> listPlayers = null;
         
-public CalculateController()
-{
+public CalculateController(){
     // empty constructor
 };
 
  public String[] calculate(final Player player, final Round round, final Course course
       //   final PlayerHasRound phr
          , final Connection conn)
-        throws SQLException, Exception
-{
+        throws SQLException, Exception{
+ 
     LOG.info(" -- Start of calculate Controller");
     LOG.info(" -- Player : " + player.toString() );
     LOG.info(" -- Round : " + round.toString() );
- //   LOG.info(" -- Game : " + round.getRoundGame());
     LOG.info(" -- Course : " + course.toString() );
-//    LOG.info(" -- PlayerHasRound : " + phr.toString() );
      
     String operation_card = null;
     int holes = round.getRoundHoles();
-      LOG.info(" -- Calculate Controller : Holes = " + holes);
-try
-{
+      LOG.info(" -- Calculate Controller for Holes = " + holes);
+try{
   //  int player.getIdplayer() = player.getIdplayer();
         LOG.info(" -- Calculate Controller : Player = " + player.getIdplayer());
  //   intround.getIdround() = round.getIdround();
@@ -68,8 +63,8 @@ try
     int in_totalpar = course.getCoursePar();
         LOG.info(" -- Calculate Controller : Par = " + in_totalpar);
 
-        find.FindCountScore siu = new find.FindCountScore();
-       int rows = siu.getCountScore(conn, player, round, "rows");
+        find.FindCountScore fcs = new find.FindCountScore();
+       int rows = fcs.getCountScore(conn, player, round, "rows");
        if (rows == 99)
        {
            LOG.error("Fatal error in getcountscore/count rows");
@@ -86,13 +81,13 @@ try
 
 //call # 2  execute stored pro : getParameter
 
-LOG.info("game = " + round.getRoundGame()); 
+    LOG.info("game = " + round.getRoundGame()); 
 int handicap_strokes = 0;
 if("STABLEFORD".equals(round.getRoundGame()) )
     {       LOG.info("gameType is STABLEFORD");
         calc.CalcStablefordPlayingHandicap csph = new calc.CalcStablefordPlayingHandicap();
-            LOG.info("before getPlayingHcp player = " + player.toString());
-            LOG.info("before getPlayingHcp round = " + round.toString());
+         //   LOG.info("before getPlayingHcp player = " + player.toString());
+         //   LOG.info("before getPlayingHcp round = " + round.toString());
         list = csph.getPlayingHcp(conn, player, round);
             LOG.info(" -- Result PlayingHandicap = " + Arrays.deepToString(list) );
         handicap_strokes = parseInt(list[1]);
@@ -117,7 +112,7 @@ if(Round.GameType.SCRAMBLE.toString().equals(round.getRoundGame()))
         pl = new Player();
         pl.setIdplayer(idp);
 //            LOG.info("line 11, id player = " + pl.getIdplayer() );
-        FindHandicap fh = new FindHandicap (); //new 14-08-2018
+        find.FindHandicap fh = new FindHandicap (); //new 14-08-2018
         double player_hcp = fh.findPlayerHandicap(pl, round, conn);
    //     double player_hcp = find.FindHandicap.findPlayerHandicap(pl, round, conn);
             LOG.info("handicap from find.FindHandicap = " + player_hcp);
@@ -133,12 +128,12 @@ if(Round.GameType.SCRAMBLE.toString().equals(round.getRoundGame()))
 //    LOG.info("line B");
      LOG.info("PlayingHcp.HCPSCCR = " + Arrays.deepToString(phcp.getHcpScr()));
  // calcul du handicap de l'équipe    
-     CalcScramblePlayingHandicap csph = new CalcScramblePlayingHandicap();
+     calc.CalcScramblePlayingHandicap csph = new CalcScramblePlayingHandicap();
      handicap_strokes = csph.getScramblePlayingHcp(phcp, listPlayers.size());
        LOG.info(" handicap_strokes  = " + handicap_strokes);
 
   } //end if
-} //end scramble
+} //end SCRAMBLE
     
 //    if(list[0].equals("ERROR") )
  //       { LOG.error(" -- Fatal error in stored List = " + Arrays.deepToString(list) );
@@ -149,32 +144,31 @@ if(Round.GameType.SCRAMBLE.toString().equals(round.getRoundGame()))
     // on adapte la longueur de l'array points aux nombre de holes (9 ou 18)
     // points.length sera utilisé dans la suite pour connaître le nombre de holes
      GolfMySQL gmsp = new GolfMySQL();
-     int [][] points = gmsp.getPoints(holes);// create array length = 9 or 18
+     int [][] points = gmsp.createArrayPoints(holes);// create array length = 9 or 18
        LOG.info(" -- array points in calculatecontroller = " + Arrays.deepToString(points) );
 
 //call # 3 modified 04 05 2013// load array points from table myPoints
   //  LOG.info("line 01");
-    //points = ListController.getPointsArray(conn, points, player.getIdplayer(),round.getIdround());
     load.LoadPointsArray lpa= new load.LoadPointsArray();
     points = lpa.LoadPointsArray(conn, points, player, round); // mod 22/06/2014
         // complete array points à partir database
         LOG.info   (" -- we are back from getPointsArray with filled points ! = " + Arrays.deepToString(points));
     // ici il faut recopier points vers golfcalc et golfmysql !!
-   //     GolfMySQL gms  =new  GolfMySQL();
         gmsp.setPoints(points);
-        GolfCalc.setPoints(points);
-   
-if(operation_card.equals("complete") ) // mod 12/01/2012 intégré dans squeleton
+        calc.GolfCalc.setPoints(points);
+        
+   // complete l'array par les strokes
+if(operation_card.equals("complete") )
 {
     load.LoadStrokesArray lsa = new load.LoadStrokesArray();
     points = lsa.LoadStrokesArray(conn, points, player, round);  // mod 22/06/2014
 }
-          LOG.info   (" -- we are back from getHoleStrokes with filled points ! = " + Arrays.deepToString(points));
+        LOG.info   (" -- we are back from LoadStrokesArray with strokes filled in = " + Arrays.deepToString(points));
         LOG.info   (" -- # Holes = " + holes);
 
  //call # 6 // complète array points with extra strokes
    
-    list = GolfCalc.setArrayExtraStrokes(points, handicap_strokes); //, holes);
+    list = calc.GolfCalc.setArrayExtraStrokes(points, handicap_strokes); //, holes);
         LOG.info(" -- Result setArrayExtrasStroke = OK");
     if(list[0].equals("ERROR") )
         { LOG.error(" -- Fatal error in setExtraStrokes = " + Arrays.deepToString(list) );
@@ -184,7 +178,7 @@ if(operation_card.equals("complete") ) // mod 12/01/2012 intégré dans squeleto
 //call # 7  complète Table score ExtraStrokes pour faire une EMPTY scorecard (empty only !!
 // modifié 24/11/2012
 
-    points = GolfCalc.trfPoints(); // transfère l'array point
+    points = calc.GolfCalc.trfPoints(); // transfère l'array point
         LOG.info(" -- we are back from setArrayExtraStrokes with filled points ! = "
                 + Arrays.deepToString(points));
 
@@ -204,14 +198,14 @@ if(operation_card.equals("complete") ) // mod 12/01/2012 intégré dans squeleto
 // si i > 0 : les strokes sont introduits
 if(operation_card.equals("complete") && (i > 0))  // mod 8/12/2012
 {
-    list = GolfCalc.setArrayPoints(points); // a besoin des strokes dans l'array points !!
+    list = calc.GolfCalc.setArrayPoints(points); // a besoin des strokes dans l'array points !!
         LOG.info(" -- Result setPoints=  OK");
     if(list[0].equals("ERROR") )
         {  LOG.error(" -- Fatal error in " + list[1] + Arrays.deepToString(list) );
            throw new Exception(" -- Fatal error in " + list[1]); //stoppe exécution, génial
         }
 }
-    points = GolfCalc.trfPoints(); // transfère l'array point
+    points = calc.GolfCalc.trfPoints(); // transfère l'array point
         LOG.info(" -- we are back from setArrayPoints with filled points ! = " + NEWLINE 
                 + Arrays.deepToString(points));
         
@@ -219,7 +213,7 @@ if(operation_card.equals("complete") && (i > 0))  // mod 8/12/2012
 //call # 9 complète la table Score à partir array Points
 if(operation_card.equals("complete") )    // only for complete card
 {
-    ModifyScore ms = new ModifyScore();
+    modify.ModifyScore ms = new ModifyScore();
     list = ms.updateScore(conn, points, player.getIdplayer(),round.getIdround());  // mod 21/06/20115
     // update de la table score à partir array points
     if(list[0].equals("ERROR") )
@@ -234,7 +228,7 @@ if(operation_card.equals("complete") )    // only for complete card
 int round_result_stableford = 0;
 if(operation_card.equals("complete") )
 {
-        round_result_stableford = GolfCalc.getRoundStablefordResult(points); //(holes);
+        round_result_stableford = calc.GolfCalc.getRoundStablefordResult(points); //(holes);
         LOG.info   (" -- round_result_stableford = " + round_result_stableford);
  
 //call # 14    getCSA : points supplémentaires en fonction difficulté round
@@ -282,7 +276,7 @@ if(operation_card.equals("complete") )
 if(operation_card.equals("complete") )
 {
 //        LOG.info(" -- Current player Handicap = " + exact_handicap + "\n");
-    FindHandicap fh = new FindHandicap (); //new 14-08-2018
+    find.FindHandicap fh = new FindHandicap (); //new 14-08-2018
     exact_handicap = fh.findPlayerHandicap(player, round, conn);
   //  exact_handicap = find.FindHandicap.findPlayerHandicap(player, round, conn);
         LOG.info(" -- Current player Handicap = " + exact_handicap + NEWLINE);
@@ -344,7 +338,7 @@ LocalDate ldRoundDate = round.getRoundDate().toLocalDate();
     {
         LOG.info(" -- Call 17 - new Handicap = " + round.getRoundQualifying() + " exact = "
                 + exact_handicap + " calculated = " + String.format( "%.1f",calc_handicap));  // Double avec 1 décimale
-           CreateHandicap ch = new CreateHandicap();
+           create.CreateHandicap ch = new CreateHandicap();
            list = ch.createHandicap(conn, player, round, calc_handicap); // new 24/06/2014
         
         if (list[0].equals("ERROR") )
@@ -374,7 +368,6 @@ return list;
          LOG.error(msg + NEWLINE + NEWLINE);
          LCUtil.showMessageFatal(msg);
         return null;
-       // return list;
 }finally{
       //  LOG.info("-- calculate controller finally = !!! ");
     DBConnection.closeQuietly(null, null, null, null); // new 10/12/2011

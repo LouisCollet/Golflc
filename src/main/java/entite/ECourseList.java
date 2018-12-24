@@ -127,11 +127,11 @@ public class ECourseList // implements Comparable<ECourseList>
         this.Ehole = hole;
     }
     
-    public Inscription getEinscriptionNew() {
+    public Inscription getInscriptionNew() {
         return EinscriptionNew;
     }
 
-    public void setEinscriptionNew(Inscription EinscriptionNew) {
+    public void setInscriptionNew(Inscription EinscriptionNew) {
         this.EinscriptionNew = EinscriptionNew;
     }
 

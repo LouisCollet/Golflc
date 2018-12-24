@@ -13,37 +13,6 @@
 >
 <ui:composition template="templates/masterTemplate.xhtml">
    <ui:define name="metadata">
- <!--      
-    <f:metadata>
-        <f:viewParam
-            required="true"
-            name="idplayer"
-            value="#{fileUploadC.upload.idplayer}"
-            requiredMessage="You did not specify a cmd. (The idplayer parameter is missing)"
-            converterMessage="Invalid cmd. (The id parameter is not a number)"
-            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 6 length)">
-            <f:validateLength minimum="6" />
-        </f:viewParam>
-        <f:viewParam
-            required="true"
-            name="playerFirstName"
-            value="#{fileUploadC.upload.playerFirstName}"
-            requiredMessage="You did not specify a operation. (The playerFirstName parameter is missing)"
-            converterMessage="Invalid operation. (The playerFirstName parameter is not a number)"
-            validatorMessage="Invalid operation. (The playerFirstName parameter is not a name, minimum 2 length)">
-            <f:validateLength minimum="2" maximum="20"/>
-        </f:viewParam>
-        <f:viewParam
-            required="true"
-            name="playerLastName"
-            value="#{fileUploadC.upload.playerLastName}"
-            requiredMessage="You did not specify a operation. (The playerLastName parameter is missing)"
-            converterMessage="Invalid operation. (The playerLastName is not a number)"
-            validatorMessage="Invalid operation. (The playerLastName is not a name, minimum 3 length)">
-            <f:validateLength minimum="3" maximum="20"/>
-        </f:viewParam>
-    </f:metadata>
-   -->
    
 </ui:define>
     
@@ -67,7 +36,6 @@
 </h:graphicImage>
 
 <h:form id="upload_form" enctype="multipart/form-data">
-<ui:include src="include/include_messages.xhtml"/>
 
 <p:panelGrid 
     id="panel1"
@@ -124,7 +92,7 @@
              value="#{msg['button.player.restart']}"
              ajax="false"
              immediate="true"
-             icon="ui-icon-power"
+             icon="fa fa-power-off"
              action="confirmation.xthml"
                  />
         <p:commandButton
@@ -132,7 +100,7 @@
              value="Cancel"
              ajax="false"
              immediate="true"
-             icon="ui-icon-cancel"
+             icon="fa fa-remove"
              action="login.xthml"
  
                 />

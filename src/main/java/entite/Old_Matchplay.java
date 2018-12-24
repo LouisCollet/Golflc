@@ -2,7 +2,6 @@
 package entite;
 
 import java.io.Serializable;
-//import java.math.BigDecimal;
 import java.util.Date;
 import javax.inject.Named;
 
@@ -167,16 +166,6 @@ public class Old_Matchplay implements Serializable, interfaces.Log
     public void setRoundGame(String roundGame) {
         this.roundGame = roundGame;
     }
-
-//public void logMatchplay()
-//{
- //   LOG.info("ClubCourseRound : idround     = " + idround);
- //   LOG.info("ClubCourseRound : rounddate   = " + roundDate);
- //   LOG.info("ClubCourseRound : clubname    = " + clubName);
- //   LOG.info("ClubCourseRound : coursename  = " + courseName);
-//    LOG.info("ClubCourseRound : scorehole   = " + scoreHole);
-//    LOG.info("ClubCourseRound : scorestroke = " + scoreStroke);
-//}
 
 @Override
 public String toString()

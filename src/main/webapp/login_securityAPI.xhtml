@@ -10,6 +10,7 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:o="http://omnifaces.org/ui"
       xmlns:of="http://omnifaces.org/functions"
+ 
 >
 
 <ui:composition template="templates/loginTemplate.xhtml">
@@ -58,22 +59,34 @@
             <p:panelGrid columns="2">
                 <h:outputText value="Username"/>
                 <p:inputText id="userName"
-                             value="#{courseC.login.username}"
+                             value="#{loginBacking.username}"
                              />
 
                 <h:outputText value="Password"/>
                 <h:inputSecret id="password"
-                               value="#{courseC.login.password}"
+                               value="#{loginBacking.password}"
                                />
+                
+                <h:outputText value="#{msg['club.name']} :"
+                              id="idClubOut"/>
+		<p:inputText  label="clubname"
+                              id="ClubName"
+                              size="45"
+                              immediate="true"
+                              valueChangeListener="#{courseC.clubNameListener}"
+                              title="#{msg['tooltip.club.clubname']}"
+			      value="#{courseC.club.clubName}" />
+                
+                
             </p:panelGrid>
     <p:commandButton value="#{msg['login.user.old']}"
                          update="growl-msg"
                          immediate="true"
                          ajax="false"
                          icon="fa fa-key"
-                         action="#{courseC.loginAPI}"
+                         action="#{loginBacking.submit}"
                          />
-
+<!-- ajax="false"  -->
  </h:form>
 </ui:define>
 </ui:composition>

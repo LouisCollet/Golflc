@@ -29,17 +29,22 @@
 </ui:define>
 -->
 <h:form id="form_handicap">
-<ui:include src="include/include_messages.xhtml"/>
 
 <p:dataTable id="table_handicap"
              value="#{courseC.listHandicaps()}"
              var="c"
-             selection="#{courseC.selectedHandicap}"
+             selection="#{courseC.handicap.selectedHandicap}"
              rowKey="#{c.handicap.handicapStart}"
              rowIndexVar="row"
              resizableColumns="true"
-             filteredValue="#{courseC.filteredHandicaps}"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.handicap.filteredHandicaps}"
               >
+    <p:ajax event="rowSelect"           listener="#{courseC.handicap.onrowSelect(c)}"/>
+    <p:ajax event="rowUnselect"         listener="#{c.handicap.onrowUnselect()}" />
+    <p:ajax event="rowSelectCheckbox"   listener="#{c.handicap.onrowSelectCheckbox()}"/>
+    <p:ajax event="rowUnselectCheckbox" listener="#{c.handicap.onrowUnselectCheckbox()}"/>
+
 <f:facet name="header">
             <p:commandButton 
                         id="handicapButton"
@@ -47,15 +52,18 @@
                         icon="fa fa-binocular"
                         value="View Detail Hcp"
                         style="float:left"
-                        onmouseover="this.style.cursor='default';this.style.backgroundColor='#F1F1F1';" 
                         >
                 <p:ajax event="dialogReturn"
-                        update=":form_handicap:growl-msg"
+                       
                         listener="#{dialogC.onDialogReturn()}"/>
             </p:commandButton>
+    
+    <!--    action="statChartHandicap.xhtml" update=":form_handicap:growl-msg"onmouseover="this.style.cursor='default';this.style.backgroundColor='#F1F1F1';" 
+    -->
             <p:commandButton 
                 id="showChart"
-                action="statChartHandicap.xhtml"
+             
+                action="#{dialogC.viewHandicap()}"
                 icon="fa fa-line-chart"
                 value="View Chart"
                 style="float:right">
@@ -69,7 +77,7 @@
     <p:row>
             <p:column colspan="2"
                       headerText="View Detail"
-                      style="width:5%"
+                      style="width:15%"
                       styleClass="columnborder1"
                       />
             <p:column colspan="3"
@@ -78,7 +86,7 @@
                       styleClass="columnborder2" />
             <p:column colspan="4"
                       headerText="#{msg['round.result.stableford']}"
-                      style="width:65%"
+                      style="width:55%"
                       styleClass="columnborder1" />
     </p:row>
     <p:row>
@@ -120,7 +128,7 @@
    </h:outputText>
 </p:column>
 
-<!-- new 05/09/2017-->
+<!-- new 05/09/2017 cancelHandicap ne fonctionne pas -->
         <p:column>
             <p:commandButton
                 id="cancelButton"
@@ -136,7 +144,6 @@
             </p:commandButton>
 	</p:column>
 
-
 <!--
 - #{c.idhandicap}
              rendered="#{c.playerhasroundFinalResult eq 0}"
@@ -145,14 +152,12 @@
                 style="font-weight:bold;color:red" />
 -->
 
-
 <p:column>
    <h:outputText value="#{c.round.roundDate}"
        >
        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
    </h:outputText>
 </p:column>
-
 
 <p:column>
    #{c.inscription.playerhasroundFinalResult}
@@ -187,7 +192,7 @@
 </p:columnGroup>
 
 </p:dataTable>
-
+<p:log id="log" />
     <p:commandButton id="btn"
                      value="#{msg['button.print']}"
                      type="button"

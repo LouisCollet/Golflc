@@ -18,12 +18,12 @@ public Club LoadClub(Connection conn, int idclub) throws SQLException
     ResultSet rs = null;
 try{
         LOG.info("entering LoadClub");
-    String s = utils.DBMeta.listMetaColumnsLoad(conn, "club");
-        LOG.info("String from listMetaColumns = " + s);
+    String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+        LOG.info("String from listMetaColumns = " + cl);
      //   LOG.info("simple name = " + club.)
 
 final String query = "SELECT "
-        + s
+        + cl
         + " FROM Club"
         + " WHERE idclub = ?" ;
      //   LOG.info("Club  = " + club.getIdclub() ); 
@@ -36,25 +36,9 @@ final String query = "SELECT "
      rs.beforeFirst();
      Club c = new Club(); 
      while(rs.next())
-                {
+        {
                c = entite.Club.mapClub(rs);
-		/*	sg.setIdclub(rs.getInt("idclub") );
-                        sg.setClubName(rs.getString("clubName") );
-                        sg.setClubAddress(rs.getString("clubAddress") );
-                        sg.setClubCity(rs.getString("clubCity") );
-                        sg.setClubCountry(rs.getString("clubCountry") );
-                        sg.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
-                        sg.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
-                        sg.setClubWebsite(rs.getString("clubWebsite") );
-                  
-                  //      String r = DBMeta.setterGenerator(conn, "club");
-                  //      LOG.info("inserted generator " + r);
-                        
-                        GoogleTimeZone gtz = new GoogleTimeZone();
-                          gtz.setTimeZoneId(rs.getString("clubZoneId") );
-                        sg.setClubTimeZone(gtz);
-                      ccr.getClubModificationDate(rs.getDate("clubModificationDate"));*/
-		}  //end while
+	}  //end while
     return c;
 }catch (SQLException e){
     String msg = "SQLException in LoadClub() = " + ", SQLState = " + e.getSQLState()
@@ -62,10 +46,6 @@ final String query = "SELECT "
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){
-    LOG.error("NullPointerException in LoadClub() " + npe);
-    LCUtil.showMessageFatal("Exception = " + npe.toString() );
-     return null;
 }catch (Exception ex){
     LOG.error("Exception ! " + ex);
   //  LCUtil.showMessageFatal("Exception in LoadClub = " + ex.toString() );
@@ -83,9 +63,6 @@ public static void main(String[] args) throws SQLException, Exception // testing
 {
     DBConnection dbc = new DBConnection();
     Connection conn = dbc.getConnection();
-  //  Club club = new Club();
-//    club.setIdclub(104);
-//round.setIdround(206);
     LoadClub lc = new LoadClub();
     Club club = lc.LoadClub(conn, 104);
        LOG.info(" club = " + club.toString());

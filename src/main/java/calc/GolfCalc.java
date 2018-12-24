@@ -1,9 +1,10 @@
 
-package utils;
+package calc;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.*;
+import utils.ColumnComparator;
 
 public class GolfCalc implements interfaces.GolfInterface , interfaces.Log // GolfInterface // throws IOException
 {
@@ -34,8 +35,7 @@ public static String[] setArrayExtraStrokes (int [][] points, int phcp) //, int 
         // ajoute les strokes à array points
 {
      LOG.info(" -- Start of setArrayExtraStrokes for playing handicap = " + phcp + " ,holes = " + points.length);
-try
-{
+try{
     int holes = points.length; //in_holes;
 
     int res = phcp / holes;
@@ -60,7 +60,7 @@ try
 }catch (Exception e){
       LOG.error(" -- Error" + e );
      array_return_error[0]= "ERROR";
-     array_return_error[1]= "ErrorCode = ArithmeticException";
+     array_return_error[1]= "ErrorCode = Exception";
      array_return_error[2]= e.getMessage();
      return array_return_error;
 }

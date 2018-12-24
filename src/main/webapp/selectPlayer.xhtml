@@ -25,7 +25,6 @@
 
     
 <h:form id="selectPlayer" enctype="application/x-www-form-urlencoded" >
-<ui:include src="include/include_messages.xhtml"/>
 <!--             paginator="true"            rows="10"
 -->
 
@@ -83,7 +82,7 @@
                 id="selectButton"
                 action="#{courseC.selectPlayer(c)}"
                 value="#{msg['button.select']} - #{c.idplayer}"
-                icon="ui-icon-pencil">
+                icon="fa fa-user">
             </p:commandButton>
 	</p:column>
 

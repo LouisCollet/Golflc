@@ -12,10 +12,8 @@ import utils.LCUtil;
  *
  * @author collet new 24/06/2014
  */
-public class CreateHandicap implements interfaces.Log
-{
+public class CreateHandicap implements interfaces.Log{
 
-     // mod 25/10/2015 ajouté @Valid
  public String[] createHandicap(Connection conn, Player player, 
             Round round, double in_newHcp) throws SQLException
     {

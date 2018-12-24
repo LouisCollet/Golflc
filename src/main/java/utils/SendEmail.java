@@ -30,7 +30,7 @@ public boolean sendHtmlMail(final String sujet, String texte, final String to, S
     fromEmail = "louis.collet@skynet.be";
   //  final String port = "25"; // normal mail
  //   final String port = "2525"; // mail crypté
-     final String port = "587"; // authentification required
+    final String port = "587"; // authentification required
     final String username = "louis.collet@skynet.be";
     final String displayName = "GolfLC";
     final String password = "9tygru4m";
@@ -45,7 +45,7 @@ try{
     props.put("mail.smtp.debug", "false"); // mettre aussi session.setDebug(true); voir plus loin, debug dans console only
     
     props.put("mail.debug.auth", "true"); // new 24/02/2017 was "true"
-    props.put("java.security.debug", "true"); // new 26/12/2016
+    props.put("java.security.debug", "false"); // new 26/12/2016  // was true
     props.put("mail.smtp.timeout", 15000); // millisecs new 09/04/2018 testing purposes ...
 
     props.put("mail.user", username);
@@ -70,7 +70,8 @@ try{
 
    Session session = Session.getInstance(props, null); // mod 07/03/2017
     // // Create a new message --
-    session.setDebug(true); // new 26/12/2016
+    session.setDebug(false); // new 26/12/2016  mod 07-12-2018 was true
+        LOG.info("this is a NON debug mail sending !");
     MimeMessage msg = new MimeMessage(session);
     // -- Set the FROM and TO fields --
     msg.setFrom(new InternetAddress(fromEmail, displayName));
@@ -167,11 +168,6 @@ public static void main(String[] args) throws Exception // for testing purposes
    String sujet = "Ceci est le sujet du mail, louis";
    String to = "louis.collet@skynet.be";
    utils.SendEmail sm = new utils.SendEmail();
- //  SendEmail.createvCard cvc = new SendEmail.createvCard();
-//   sm.createvCard(sujet,text,to);
-   
- //  boolean b = sm.sendHtmlMail(sujet,text,to);
-//LOG.info("msg sent = " + b);
 } // end main
 
 private void cleanUp()
