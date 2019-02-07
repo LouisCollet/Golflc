@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+>
+<h:body>
+<ui:composition>
+    <h:outputText
+        escape="false"
+        id="helptextfr"
+        rendered="#{languageC.locale eq 'fr'}" 
+        value="fake">
+        
+<br/>
+Introduction du Tarif Membres
+#{view.viewId}
+<br/>
+<b>Numéro de séquence</b> : géré par le programme
+<br/>
+<b>Date de début période</b> : date de début de la cotisation.  Normalement le 01/01 mais certains clubs acceptent des cotisation portant sur quelques mois de l'année. 
+<br/>
+<b>Date de fin période</b> : date de fin de la cotisation.  Normalement le 31/12. Les dates restent les mêmes pour toute la session d'introduction des données.
+<br/>
+<b>ITEM</b> : une des lignes du tarif.  Exemple : Membres Adultes 21-24 ans, Semainier (2e membre du couple), etc...
+<br/>
+<b><i>Remarque Importante </i></b> : les fees divers (armoire vestiaire, cage sac de golf, ...) commencent par <b>"A-"</b>
+<br/>
+<b>PRIX</b> : le prix de la cotisation.
+<br/>
+<b>Quand l'introduction est faite</b>, cliquez sur "<i>Ajout Tarif Membre</i>".  Ensuite, introduire les autres lignes de votre tarif.
+<br/>
+<b>Quand vous avez terminé</b>, cliquez sur "<i>Création Tarif Membre</i>".
+<br/>
+<b><i>Remarque</i></b> : Vous pouvez à tout moment demander la synthèse de vos introductions en cliquant sur <i>"Visualiser Tarif Membres"</i>
+
+
+
+    </h:outputText>
+
+</ui:composition>
+</h:body>
+</html>

@@ -21,28 +21,29 @@ import qualifiers.Debit;
 @Named("paymentBean")
 @SessionScoped
 public class PaymentBean implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     // Events producers
     @Inject
     @Credit
-     Event<PaymentEvent> creditEventProducer;
+    Event<PaymentEvent> creditEventProducer;
 
     @Inject
     @Debit
-     Event<PaymentEvent> debitEventProducer;
+    Event<PaymentEvent> debitEventProducer;
 
     private BigDecimal amount = new BigDecimal(0);
-    private PaymentTypeEnum paymentOption = PaymentTypeEnum.DEBIT;
+    private PaymentTypeEnum paymentOption; // = PaymentTypeEnum.DEBIT;
 
     @PostConstruct
-    private void init() {
-        LOG.info("entering init");
-        amount = new BigDecimal(0);
-        paymentOption = PaymentTypeEnum.DEBIT;
+    public void init() {
+            LOG.info("entering init");
+        amount = BigDecimal.ZERO;
+        paymentOption = PaymentTypeEnum.CREDIT;  //fills checkbutton
         PaymentHandler ph = new PaymentHandler();
-        ph.setPayments(null);
+            LOG.info("before setPaymentsNull");
+        ph.setPaymentsNull();
+
     }
 
     // Pay Action
@@ -57,7 +58,7 @@ public class PaymentBean implements Serializable {
         switch (pe.getType()) {
             case DEBIT:
                  LOG.info("this is DEBIT");
-                debitEventProducer.fire(pe);
+                debitEventProducer.fire(pe);   //c'est ici que cela se passe'
                 break;
             case CREDIT:
                 creditEventProducer.fire(pe);
@@ -68,11 +69,12 @@ public class PaymentBean implements Serializable {
         }
         // paymentAction
 
-        return "debit-credit.xhtml?faces-redirect=true";    // modifié !!
+        return "debit-credit.xhtml?faces-redirect=true";// modifié !!
     }
 
     // Reset Action
     public void reset() {
+        LOG.info("from reset");
         init();
 
     }
@@ -102,12 +104,13 @@ public class PaymentBean implements Serializable {
     }
 
     public BigDecimal getAmount() {
+        LOG.info("getAmount = " + amount);
         return amount;
     }
 
     public void setAmount(BigDecimal amount) {
+        LOG.info("setAmount = " + amount);
         this.amount = amount;
     }
 
 }
-

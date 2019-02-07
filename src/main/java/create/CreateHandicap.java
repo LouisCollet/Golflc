@@ -27,8 +27,7 @@ public class CreateHandicap implements interfaces.Log{
     LCUtil.showMessageInfo(" -- New Handicap = " + in_newHcp);        
     CallableStatement cs = null;
 
-try
-{
+try{
     final String stored_name = "set_handicap(?,?,?,?,?)";   // nom de la stored pro, 5 parameters
         LOG.info(" -- Before CALL Start with : " + stored_name);
     cs = conn.prepareCall("{CALL " + stored_name + "}");

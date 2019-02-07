@@ -16,32 +16,57 @@ import lc.golfnew.Constants;
 public class DBMeta // implements interfaces.Log //__GolfInterface
 {
 
-public static int getCountColumns(Connection conn, String table) throws SQLException
-{
+public static int CountColumns_old(Connection conn, String table) throws SQLException{
     Statement st = null;
     ResultSet rs = null;
     ResultSetMetaData rsmd = null;
-try
-{
+try{
     final String query = "SELECT * FROM " + table;
     st = conn.createStatement();
     st.executeQuery(query);
     rs = st.getResultSet();
-    rsmd = rs.getMetaData ();
+    rsmd = rs.getMetaData();
     return rsmd.getColumnCount();
-}
-catch (SQLException e)
-{
+}catch (SQLException e){
 	LOG.error("SQLException in getCountColumnsMeta : " + e);
         return 0;
         //throw e;
-}
-finally
-{
+}finally{
     rs.close();
     st.close();
 }
 } // end method
+
+public static int CountColumns(Connection conn, String table) throws SQLException{
+    ResultSet rs = null;
+    PreparedStatement ps = null;
+try{
+    final String query = "SELECT count(*)" +
+        " FROM information_schema.columns" +
+        " WHERE table_name = ?";
+    ps = conn.prepareStatement(query);
+    ps.setString(1, table);
+ //   utils.LCUtil.logps(ps);
+    rs = ps.executeQuery();
+    if(rs.next())
+    {   LOG.debug("resultat : CountColumns = " + rs.getInt(1) );
+      return rs.getInt(1);
+    }else{
+        LOG.error("error : no result found no columns !! = " + rs.getInt(1) );
+        return 99;  //error code
+    }
+}catch (SQLException e){
+	LOG.error("SQLException in CountColumns : " + e);
+        return 0;
+        //throw e;
+}finally{
+    rs.close();
+    ps.close();
+}
+} // end method
+
+
+
 /////////////////////////////////////////
 public static void showColumns(Connection conn, String table) throws SQLException
 {
@@ -458,16 +483,12 @@ StringBuilder sb = new StringBuilder();
 
 } // end method
 
-public static String listMetaColumnsLoad (Connection conn, String table) throws SQLException
-{      ResultSet rs = null;
+public static String listMetaColumnsLoad (Connection conn, String table) throws SQLException{
+    ResultSet rs = null;
 //https://docs.oracle.com/javase/8/docs/api/java/sql/DatabaseMetaData.html#getColumns-java.lang.String-java.lang.String-java.lang.String-java.lang.String-
 try{
 ///    LOG.info("starting listMetaColumnsLoad for table = " + table );
     DatabaseMetaData meta = conn.getMetaData();
-  //  String   catalog          = null;
-  //  String   schemaPattern    = null;
-  //  String   tableNamePattern = table;
-  //  String   columnNamePattern = null;
 //LOG.info("line 01");
 rs = meta.getColumns(null, null, table, null);
 //LOG.info("line 02");
@@ -475,19 +496,20 @@ rs.beforeFirst();
 StringBuilder sb = new StringBuilder();
 sb.append(" "); // space to separate query element
 //LOG.info("line 03");
-   while(rs.next())
-    {
- //    LOG.info("We are now with = " + rs.getString(4));  // column name
+   while(rs.next()){
         sb.append(rs.getString("TABLE_NAME")).append(".").append(rs.getString("COLUMN_NAME"));
-     //   sb.append(table + "." + rs.getString(4));  // column name
         sb.append(", ");
- //       LOG.info("inside loop, sb = " + sb);
     }  //end while
   sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
 
- ///       LOG.info("Table fields for " + table + " = " + sb);
 return sb.toString();
    
+
+
+
+
+
+
 /*http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html
  * The ResultSet returned by the getColumns() method contains a list of columns
  * for the given table. The column with index 4 contains the column name,
@@ -622,8 +644,11 @@ public static void main(String[] args) throws SQLException, Exception // testing
 Connection conn = dbc.getConnection();
 //showColumns(conn,"club");
 //LOG.info(" -- success   !!!! ");
-//int c = getCountColumns(conn,"club");
+int c = CountColumns(conn,"player");
+LOG.info(" -- # columns = " + c);
+// c = CountColumns2(conn,"player");
 //LOG.info(" -- # columns = " + c);
+
 //listMetaTables(conn);
 //listMetaData(conn);
 //String s = listMetaColumnsUpdate(conn, "round");
@@ -631,12 +656,15 @@ Connection conn = dbc.getConnection();
 //String s = setterGenerator(conn, "handicap");
 
 //DBMeta md = new DBMeta();
-String p = listMetaColumnsLoad(conn,"Player");  // is static 
-LOG.info(" main - player = " + p);
-String p1 = listMetaColumnsLoad(conn,"Round"); 
-LOG.info(" main - round = " + NEW_LINE + p);
-p = p + NEW_LINE + "," + p1;
-LOG.info(" main - player + round = " + p);
+
+String play = listMetaColumnsLoad(conn,"player"); 
+LOG.info(" main - player 1 = " + NEW_LINE + play);
+
+//String p = listMetaColumnsLoad2(conn,"player");  // is static 
+//LOG.info(" main - player 2 = " + NEW_LINE + p);
+
+//p = p + NEW_LINE + "," + p1;
+//LOG.info(" main - player + round = " + p);
 /*
 ResultSet rs = md.getTables(null, null, "%", null);
 while (rs.next()) {

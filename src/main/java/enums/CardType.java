@@ -1,6 +1,5 @@
 
-package lc.golfnew;
-
+package enums;
 
 import java.util.regex.Pattern;
 

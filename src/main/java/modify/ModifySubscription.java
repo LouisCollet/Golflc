@@ -1,6 +1,7 @@
 package modify;
 
 import entite.Subscription;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -8,46 +9,52 @@ import java.sql.Timestamp;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class ModifySubscription implements interfaces.Log
-{
-public boolean modifySubscription(final Subscription subscription, final Connection conn) throws SQLException
- {
-        PreparedStatement ps = null;
+public class ModifySubscription{
+public boolean modify(final Subscription subscription, final Connection conn) throws SQLException {
+   PreparedStatement ps = null;
   try {
             LOG.info("starting modifySubscription");
-        //    LOG.info("Player ID = " + player.getIdplayer());
-            LOG.info("Subscription =  " + subscription.toString());
-          //  LOG.info("Subscription endDate =  " + subscription.getEndDate());
-     //       LOG.info("Player ID = " + player.getIdplayer() );
+            LOG.info("with Subscription =  " + subscription.toString());
      
             final String query // à modifier
               = "  UPDATE subscription" +
             "      SET subscription.SubscriptionEndDate = ? ," +
             "          subscription.SubscriptionTrialCount = ?," +
-            "          subscription.SubscriptionPaymentReference = ?" +
+            "          subscription.SubscriptionPaymentReference = ?," +
+            "          subscription.SubscriptionCommunication = ?" +
             "      WHERE" +
-            "          subscription.subscription_player_id = ?";
+            "          subscription.SubscriptionIdPlayer=?";
             
     //          LOG.info(" new end date = " + d);
-              LOG.info(" new trial count = " + subscription.getTrialCount());
+             
             ps = conn.prepareStatement(query);
+            //endDate format LocalDate
             java.sql.Timestamp ts = Timestamp.valueOf(subscription.getEndDate().atStartOfDay());
               LOG.info("new endDate inserted in DB = " + ts);
             ps.setTimestamp(1, ts); // new endDate
+    //          LOG.info(" new trial count = " + subscription.getTrialCount());
+            if(subscription.getSubCode().equals("TRIAL")){
+                Short s = subscription.getTrialCount();
+     //           LOG.info("String s trialcount = " + s);
+                subscription.setTrialCount(++s);  // attention ++ doit se trouver avant !!!
+                LOG.info("This is a TRIAL, new count = " + subscription.getTrialCount());
+              }
             ps.setInt(2, subscription.getTrialCount()); // trial count
-            ps.setString(3, subscription.getPaymentReference()); // new 14-10-22018
-            ps.setInt(4, subscription.getIdplayer());
+            ps.setString(3, subscription.getPaymentReference()); // new 14-10-2018
+            ps.setString(4, subscription.getCommunication()); // new 26-01-2019
+            ps.setInt(5, subscription.getIdplayer());
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate();
+                LOG.info("rows = " + row);
             if (row != 0) {
-         //          LOG.info("before subscription success msg");
+                  LOG.info("before subscription success msg");
                  String msg =  "<h1> " + LCUtil.prepareMessageBean("subscription.success") + subscription.getEndDate()
                 //         + " , new end date = " + d.format(ZDF_DAY) + "</h1>"
                            ;
                     LOG.info(msg);
                  LCUtil.showMessageInfo(msg);
                     return true;
-                 }else{
+             }else{
                    String msg = "NOT NOT Successful update, row = 0 "
     //                            + " hole  = " + (i + 1)
                            + " player = " + subscription.getIdplayer();

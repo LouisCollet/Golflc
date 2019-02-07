@@ -1,6 +1,6 @@
 package lc.golfnew;
 
-import entite.Tarif;
+import entite.TarifGreenfee;
 import static interfaces.Log.LOG;
 import java.io.IOException;
 import java.io.Serializable;
@@ -93,14 +93,6 @@ public class JSONListConverter implements Serializable, interfaces.GolfInterface
        datesSeason[6][0] = ("01/12/2018");
        datesSeason[6][1] = ("31/12/2018");
        datesSeason[6][2] = ("L");
-  //     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // idem ZDF_DAY
-    //   String date = "2016-08-16";
-   //    LocalDate dround = LocalDate.parse("2018-06-28");
-
- 
-   
-   
-   
    
        LocalDateTime dround_in = LocalDateTime.of(2018, Month.JUNE, 29, 12, 15);
        
@@ -253,7 +245,7 @@ public class JSONListConverter implements Serializable, interfaces.GolfInterface
      } // end for
    LOG.info("at the end the price is = " + price);
    
-      Tarif t = new Tarif(datesSeason, teeTimes); 
+      TarifGreenfee t = new TarifGreenfee(datesSeason, teeTimes); 
       t.RemoveNull();
    // trouver la première date 
    LOG.info("première date = " + datesSeason[0][0]);
@@ -268,8 +260,7 @@ public class JSONListConverter implements Serializable, interfaces.GolfInterface
     int dayOfWeekIntValue = dayOfWeek.getValue(); // 6
     LOG.info("dayOfWeekIntValue = " + dayOfWeekIntValue);
  
-       switch(dayOfWeek)
-                {
+       switch(dayOfWeek) {
                     case FRIDAY:
                          LOG.info("tarif for Friday ");
                         break;

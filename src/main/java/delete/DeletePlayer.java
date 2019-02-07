@@ -9,7 +9,7 @@ import utils.LCUtil;
 
 public class DeletePlayer implements interfaces.Log, interfaces.GolfInterface
 {
-    public String deletePlayerAndChilds(final int idplayer,final Connection conn) throws Exception
+    public boolean deletePlayerAndChilds(final int idplayer,final Connection conn) throws Exception
     {
     PreparedStatement ps = null;
 try
@@ -51,19 +51,19 @@ try
                         + " <br/>player = " + row_player;
            LOG.info(msg);
         LCUtil.showMessageInfo(msg);
-        return "Player deleted ! ";
+        return true;
 
 }catch (SQLException e){
     String msg = "SQL Exception in DeletePlayer = " + e.toString() + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }catch (Exception ex){
     String msg = "Exception in DeletePlayer() " + ex;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }finally{
         utils.DBConnection.closeQuietly(null, null, null, ps);
 }
@@ -76,10 +76,10 @@ try
  //       p.setIdplayer(121221);
     //    p.setWrkpassword("test123LC");
     //    LOG.info("01");
-    DeletePlayer dp = new DeletePlayer();
-    String str = dp.deletePlayerAndChilds(121221, conn);
+ //   DeletePlayer dp = new DeletePlayer();
+    boolean OK = new DeletePlayer().deletePlayerAndChilds(121221, conn);
         
-   //     LOG.info("from main, after = " + Boolean.toString(b).toUpperCase());
+        LOG.info("from main, after = " + OK);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

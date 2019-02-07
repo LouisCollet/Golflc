@@ -12,14 +12,12 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class CreateHole implements Serializable,interfaces.Log
-{
+public class CreateHole implements Serializable,interfaces.Log{
 
     public String createHole(final Club club, final Course course,
-        final Tee tee, final Hole hole, List<Integer> strokeIndex, final Connection conn) throws SQLException
-    {
+        final Tee tee, final Hole hole, List<Integer> strokeIndex, final Connection conn) throws SQLException{
         PreparedStatement ps = null;
-        try {
+   try {
             LOG.info("Course ID    = " + course.getIdcourse());
             LOG.info("tee ID    = " + tee.getIdtee());
             LOG.info("Club Name  = " + club.getClubName());
@@ -58,8 +56,7 @@ public class CreateHole implements Serializable,interfaces.Log
              //    String p = ps.toString();
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
-            if (row != 0)
-            {
+            if (row != 0){
                 int key = LCUtil.generatedKey(conn);
                 LOG.info("Hole created = " + key);
                 hole.setIdhole(key);
@@ -83,8 +80,7 @@ public class CreateHole implements Serializable,interfaces.Log
                 // incrémenter le hole number de 1
                 short s = hole.getHoleNumber();
                 s++;
-                if (s > 18) //new 15/01/2013
-                {
+                if (s > 18){ //new 15/01/2013
                     msg = "End inserting holes !!";
                     LOG.info(msg);
                     LCUtil.showMessageInfo(msg);
@@ -109,24 +105,14 @@ public class CreateHole implements Serializable,interfaces.Log
                 LCUtil.showMessageFatal(msg);
                 return null;
             }
-        } catch (ArrayIndexOutOfBoundsException ob) {
-            String msg = "£££ index out of bounds = if from <0 or from > original.length() " + ob.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;
-        } catch (NullPointerException npe) {
-            String msg = "£££ NullPointerException in insert hole = " + npe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;
         } catch (SQLException sqle) {
             String msg = "SQL exception in Insert hole = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return null;
-        } catch (NumberFormatException nfe) {
-            String msg = "NumberFormatException in Insert hole = " + nfe.toString();
+        } catch (Exception nfe) {
+            String msg = "Exception in CreateHole = " + nfe.toString();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return null;

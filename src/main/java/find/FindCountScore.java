@@ -3,7 +3,6 @@ package find;
 import entite.Course;
 import entite.Player;
 import entite.Round;
-import entite.Tarif;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,7 +48,7 @@ if (operation.equalsIgnoreCase("rows") )
   //        utils.LCUtil.logps(ps);
     rs = ps.executeQuery(); // attention !! il ne faut rien mettre entre les ()
         //LOG.debug(" -- resultset = " + rs.toString());
-    if (rs.next())
+    if(rs.next())
     {  // LOG.debug("resultat : getCountScore = " + rs.getInt(1) );
       return rs.getInt(1);
     }else{
@@ -80,9 +79,8 @@ finally
     Connection conn = new DBConnection().getConnection();
     Course course = new Course();
     course.setIdcourse(102);
-  //  FindTarifData ftd = new FindTarifData();
-    Tarif t1 = new FindTarifData().findCourseTarif(course, conn);
-     LOG.info("Tarif extracted from database = "  + t1.toString());
+  //  Tarif t1 = new FindTarifData().findCourseTarif(course, conn);
+  //   LOG.info("Tarif extracted from database = "  + t1.toString());
 //findPlayerHandicap(player,round, conn);
 //for (int x: par )
 //        LOG.info(x + ",");

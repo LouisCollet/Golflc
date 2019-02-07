@@ -94,31 +94,6 @@ return liste;
     //end if
 } //end method
 
-/*
-    private static Player mapPlayer(ResultSet rs) throws SQLException
-{
-        Player p = new Player();
-        p.setIdplayer(rs.getInt("idplayer"));
-            //LOG.info(" -- map : playerId = " + p.getIdplayer() );
-        p.setPlayerFirstName(rs.getString("playerfirstname"));
-        p.setPlayerLastName(rs.getString("playerlastname"));
- //       p.setPlayerCity(rs.getString("playercity"));
- //       p.setPlayerCountry(rs.getString("playerCountry"));
- //       p.setPlayerBirthDate(rs.getDate("playerbirthdate"));
-        p.setPlayerGender(rs.getString("playergender"));
- //       p.setPlayerHomeClub(rs.getInt("playerhomeclub"));
-        p.setPlayerLanguage(rs.getString("playerLanguage"));
-        p.setPlayerEmail(rs.getString("playerEmail"));
-        
-        java.util.Date d = rs.getTimestamp("SubscriptionEndDate");
-     //   LocalDate date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        p.setEndDate(DatetoLocalDate(d));
-  //      p.setEndDate(rs.getString("PlayerPhotoLocation"));
- //       p.setPlayerModificationDate(rs.getTimestamp("playerModificationDate"));
-            //LOG.info("map = success !!!");
-return p;
-} //end method
-*/
     public static List<ECourseList> getListe() {
         return liste;
     }

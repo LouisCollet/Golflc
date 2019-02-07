@@ -89,7 +89,7 @@
                   style="width:20%" >
             <p:commandButton
                 id="selectButtonTarif"
-                action="#{courseC.findTarif(c)}"
+                action="#{courseC.findTarifGreenfee(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="fa fa-dollar fa-lg">
             </p:commandButton>
@@ -156,29 +156,18 @@
                   >
                         #{c.round.roundGame}
         </p:column>
-<!--
-<f:facet name="footer">
-           
-</f:facet>
-
-                        cellpadding="4"
-                         style="width:300px;"
-                         styleClass="ui-widget-content grid"
--->
-
-
-
 
 <p:rowExpansion>
             <h:panelGrid id="display"
                          columns="2"
- >
+            >
 
                 <f:facet name="header">
                     #{msg['inscription.detail']}
                 </f:facet>
 
                 <h:outputText value="Round:"
+                      style="font-weight:bold"
                               />
                 <h:outputText
                       id="reround"

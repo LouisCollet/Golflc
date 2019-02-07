@@ -23,9 +23,11 @@ public class Subscription implements Serializable, interfaces.Log, interfaces.Go
     @NotNull(message="{subscription.notnull}")
     private String subCode;
     @Max(value=5,message="{subscription.trial.max}")
-    private Integer trialCount;
-    public enum etypeSubscrition{TRIAL, MONTHLY, YEARLY};
+    private Short trialCount;
+    public enum etypeSubscription{TRIAL,MONTHLY,YEARLY};
     private String paymentReference;
+    double price;
+    private String communication;
     
 public Subscription()    // constructor
 { 
@@ -68,11 +70,11 @@ public String getSubCode() {
    //      LOG.info("setsubcode subscription = " + subCode);
         this.subCode = subCode;
     }
-    public Integer getTrialCount() {
+    public Short getTrialCount() {
         return trialCount;
     }
 
-    public void setTrialCount(Integer trialCount) {
+    public void setTrialCount(Short trialCount) {
         this.trialCount = trialCount;
     }
 
@@ -82,6 +84,22 @@ public String getSubCode() {
 
     public void setPaymentReference(String paymentReference) {
         this.paymentReference = paymentReference;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getCommunication() {
+        return communication;
+    }
+
+    public void setCommunication(String communication) {
+        this.communication = communication;
     }
 
  @Override
@@ -94,6 +112,8 @@ public String toString()
                + " ,subcode : "    + this.getSubCode()
                + " ,trial count : "  + this.getTrialCount()
                + " ,reference payment : "  + this.getPaymentReference()
+               + " ,price : "  + this.getPrice()
+               + " ,communication : "  + this.getCommunication()
         );
 }
 
@@ -101,12 +121,12 @@ public static Subscription mapSubscription(ResultSet rs) throws SQLException{
     String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Subscription s = new Subscription();
-        s.setIdplayer(rs.getInt("subscription_player_id") );
+        s.setIdplayer(rs.getInt("SubscriptionIdPlayer") );
             java.util.Date d = rs.getTimestamp("SubscriptionStartDate");
         s.setStartDate(DatetoLocalDate(d));
         d = rs.getTimestamp("SubscriptionEndDate");
         s.setEndDate(DatetoLocalDate(d));
-        s.setTrialCount(rs.getInt("SubscriptionTrialCount"));
+        s.setTrialCount(rs.getShort("SubscriptionTrialCount"));
         s.setPaymentReference(rs.getString("SubscriptionPaymentReference"));
    return s;
   }catch(Exception e){

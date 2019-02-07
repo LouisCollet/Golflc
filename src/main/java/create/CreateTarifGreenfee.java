@@ -3,7 +3,7 @@ package create;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import entite.Course;
-import entite.Tarif;
+import entite.TarifGreenfee;
 import static interfaces.GolfInterface.SDF;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
@@ -17,24 +17,20 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 @Named
-public class CreateTarif {
-
-    public boolean createTarif(final Tarif tarif, final Course course, final Connection conn) throws SQLException {
+public class CreateTarifGreenfee {
+    
+//@JsonPropertyOrder({"datesSeason","days","teeTimes","priceEquipments"}) // new 23/01/2019 ajouté, était dans entite TarifGreenfee
+    public boolean createTarif(final TarifGreenfee tarif, final Course course, final Connection conn) throws SQLException {
         PreparedStatement ps = null;
         try{
             LOG.info("starting create Tarif "); 
             LOG.info("with tarif = " + tarif.toString());
+            LOG.info("for course = " + course.toString());
         ObjectMapper om = new ObjectMapper();
-    	om.enable(SerializationFeature.INDENT_OUTPUT);//Set pretty printing of json
-   //     om.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // modified in class !!fields private accepted in class tarif 
-  //      http://www.baeldung.com/jackson-object-mapper-tutorial
- //       DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm a z");
- // df.setTimeZone(TimeZone.getTimeZone("UTC"));
- //       om.setDateFormat(df);
-     //   http://www.baeldung.com/jackson-serialize-dates
- //Disable the timestamp serialization
-   // 	objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);  
-        tarif.RemoveNull(); // remove null from arrays
+   // 	om.enable(SerializationFeature.INDENT_OUTPUT);//Set pretty printing of json
+        om.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+        om.configure(SerializationFeature.INDENT_OUTPUT, true);
+         tarif.RemoveNull(); // remove null from arrays
         String json = om.writeValueAsString(tarif);
             LOG.info("tarif converted in json format = " + json);
             
@@ -68,7 +64,7 @@ public class CreateTarif {
    LocalDateTime ldfin = utils.LCUtil.DatetoLocalDateTime(dfin);
         LOG.info("LocalDateTime dfin = " + ldfin);
       
-   final String query = LCUtil.generateInsertQuery(conn, "tarif");
+   final String query = LCUtil.generateInsertQuery(conn, "tarif_greenfee");
     //        LOG.info("generated query = " + query);
             ps = conn.prepareStatement(query);
             ps.setNull(1,java.sql.Types.INTEGER);  //autoincrement
@@ -91,8 +87,8 @@ public class CreateTarif {
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
              return true;
-   } catch (Exception e) {
-            String msg = "£££ Exception in CreateTarif = " + e.getMessage();
+   }catch (Exception e){
+            String msg = "£££ Exception in CreateTarifGreenfee = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
@@ -100,5 +96,4 @@ public class CreateTarif {
          DBConnection.closeQuietly(null, null, null, ps); 
           }
    } // end main//
-
 } // en class

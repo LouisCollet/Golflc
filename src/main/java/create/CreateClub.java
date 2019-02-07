@@ -15,7 +15,8 @@ public class CreateClub implements interfaces.Log
 //        try (PreparedStatement ps = null;)
 //        {
             LOG.info("club = " + club.toString());
-            LOG.info("club Zone ID   = " + club.getClubTimeZone().getTimeZoneId());
+            LOG.info("line 00");
+   //        LOG.info("club Zone ID   = " + club.getClubTimeZone().toString()); //.getTimeZoneId());
 
             final String query = LCUtil.generateInsertQuery(conn, "club"); // new 15/11/2012
             try (PreparedStatement ps = conn.prepareStatement(query) ) // mod 21/04/2014 try-with-resources jdk1.7
@@ -27,13 +28,24 @@ public class CreateClub implements interfaces.Log
             ps.setString(3, club.getClubAddress());
             ps.setString(4, club.getClubCity());
             ps.setString(5, club.getClubCountry());
+                    LOG.info("line 01");
             ps.setBigDecimal(6, club.getClubLatitude());
+              LOG.info("line 02");
        //     ps.setBigDecimal(7, club.getClubLongitude());
             ps.setBigDecimal(7, club.getClubLongitude().setScale(6,RoundingMode.CEILING) ); // 6 positions décimales
             // format : 4.5555550000000000210320649784989655017852783203125 
+              LOG.info("line 03");
             ps.setString(8, club.getClubWebsite());
-            ps.setString(9, club.getClubTimeZone().getTimeZoneId() ); // new 01/08/2017 using GoogleTimeZone
+              LOG.info("line 04");
+     //       if(club.getClubTimeZone().getTimeZoneId() == null){
+     //           LOG.info("getClubTimeZone().getTimeZoneId() == null");
+                ps.setString(9, "Europe/Brussels" );
+     //       }else{
+      //          ps.setString(9, club.getClubTimeZone().getTimeZoneId() ); // new 01/08/2017 using GoogleTimeZone
+      //      }
+              LOG.info("line 05");
             ps.setTimestamp(10, LCUtil.getCurrentTimeStamp());
+              LOG.info("line 06");
              //    String p = ps.toString();
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
@@ -46,8 +58,7 @@ public class CreateClub implements interfaces.Log
                   //      + "<br/>" + " longit = " + String.format("%.6f", club.getClubLongitude())
                         + "<br/>" + " web = " + club.getClubWebsite();
             
-            if (row != 0)
-            {
+            if (row != 0){
                 int key = LCUtil.generatedKey(conn);
                 club.setIdclub(key);
                 LOG.info("Club created = " + club.getIdclub());
@@ -60,7 +71,7 @@ public class CreateClub implements interfaces.Log
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
                 return true;
-            } else {
+            }else{
                 String msg = "<br/><br/>NOT NOT Successful insert for club = " + club.getIdclub()
                     + " " + s;
                 LOG.info(msg);
@@ -68,12 +79,6 @@ public class CreateClub implements interfaces.Log
                 return false;
             }
         }
-  //          catch (MySQLIntegrityConstraintViolationException cv) {
-  //          String msg = "£££ MySQLIntegrityConstraintViolationException in insert Club = " + cv.getMessage();
-  //          LOG.error(msg);
-   //         LCUtil.showMessageFatal(msg);
-   //         return false;
-   //     }
             catch (SQLException sqle) {
             String msg = "£££ exception in Insert Club = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
@@ -89,5 +94,4 @@ public class CreateClub implements interfaces.Log
          // utils.DBConnection.closeQuietly(conn, null, null, ps); // not used because of try-with-resources
         }
     } // end method createClub
-
 } //end Class

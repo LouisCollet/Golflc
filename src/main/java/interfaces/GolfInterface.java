@@ -4,6 +4,7 @@ import java.text.*;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
+import java.util.Locale;
 
 public interface GolfInterface
 {
@@ -71,7 +72,7 @@ static final String DATE_END_HANDICAP = "2099-12-31";
 static java.text.DateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
 static java.text.DateFormat SDF_YYYY = new SimpleDateFormat("yyyy/MM/dd");
 static java.text.DateFormat SDF_MM = new SimpleDateFormat("yyyy/MM");
-static java.text.DateFormat SDF_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+static java.text.DateFormat SDF_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.getDefault());
 static java.text.DateFormat sdf_timeHHmm  = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 static java.text.DateFormat sdf_timeHHmmss  = new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS");
 static DateTimeFormatter ZDF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm a");

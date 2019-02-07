@@ -1,5 +1,6 @@
 package entite;
 
+import enums.CardType;
 import static interfaces.GolfInterface.SDF_MM;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -12,7 +13,6 @@ import javax.faces.model.SelectItem;
 import javax.inject.Named;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
-import lc.golfnew.CardType;
 import lc.golfnew.MajorIndustryIdentifier;
 import validator.CreditCardV;
 
@@ -21,37 +21,40 @@ public class Creditcard implements Serializable{
     private final static List<SelectItem> CARDS = new ArrayList<>();
     private Double totalPrice;
     
-  @NotNull(message="{tarif.holder.notnull}")
+  @NotNull(message="{creditcard.holder.notnull}")
     private String creditCardHolder;
     
-  @NotNull(message="{tarif.number.notnull}")
+  @NotNull(message="{creditcard.number.notnull}")
   @CreditCardV(max=16) // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
     private String creditCardNumber;
-  @Future(message="expiration date must be in the future")
+  @Future(message="{creditcard.expiration.future}")
     private java.util.Date creditCardExpirationDate;
  //  private LocalDate creditCardExpirationDate;
     private String creditCardType; // input from end user
     private String creditCardIssuer;  // calculated for validtion equality with creditC    ardType
     
-   @NotNull(message="{tarif.verification.notnull}")
+   @NotNull(message="{creditcard.verification.notnull}")
     private String creditCardVerificationCode; 
    private String creditCardMajorIndustryIdentifier;
    private boolean paymentOK = false; // 23/06/2013
    private String selected; // 15/04/2018
    private String communication;
-   private String typePayment;   // values : SUBSCRIPTION, INSCRIPTION
-   public enum etypePayment{SUBSCRIPTION, INSCRIPTION};
+   private String reference;
+   private String typePayment;   // values : SUBSCRIPTION, GREENFEE
+   public enum etypePayment{SUBSCRIPTION, GREENFEE,COTISATION}; 
+   // SUBSCRIPTION à GolfLC
+   // GREENFEE à une partie (green fee et accessoires
+   // MEMBERSHIP devenir membre d'un club
    
-public Creditcard() // constructor 1
-    {
+public Creditcard(){ // constructor 1
+
      //   paymentOK = false;
 }
 // see http://javaevangelist.blogspot.com.es/2017/
 public List<SelectItem> getCards() {
-    if(CARDS.isEmpty())
-    {
+    if(CARDS.isEmpty()){
  //       List<SelectItem> items = new ArrayList<>();
-            LOG.info("cards is empty");
+    //        LOG.info("cards is empty");
         CARDS.add(new SelectItem("", ""));
         CARDS.add(new SelectItem("VISA", "Visa"));  // field 1=selected, field 2 = affoché écran
         CARDS.add(new SelectItem("MAESTRO", "Maestro"));
@@ -87,14 +90,14 @@ public List<SelectItem> getCards() {
     }
 
     public String getCreditCardNumber() {
-        LOG.info("getCreditCardNumber = " + creditCardNumber);
+//        LOG.info("getCreditCardNumber = " + creditCardNumber);
         return utils.LCUtil.creditcardSecret(creditCardNumber);
     }
 
     public void setCreditCardNumber(String creditCardNumber) {
-        LOG.info("setCreditCardNumber = " + creditCardNumber);
+//        LOG.info("setCreditCardNumber = " + creditCardNumber);
         creditCardNumber = creditCardNumber.replaceAll(" ", "");
-        LOG.info("setCreditCardNumber spaces removed = " + creditCardNumber);
+//        LOG.info("setCreditCardNumber spaces removed = " + creditCardNumber);
         this.creditCardNumber = creditCardNumber;
         setCreditCardMajorIndustryIdentifier(MajorIndustryIdentifier.MIIfrom(creditCardNumber).toString()); //from(creditCardNumber);
         setCreditCardIssuer(CardType.detect(creditCardNumber).toString());
@@ -105,7 +108,7 @@ public List<SelectItem> getCards() {
     }
 
     public void setCreditCardType(String creditCardType) {
-        LOG.info("setCreditCardType to = " + creditCardType);
+//        LOG.info("setCreditCardType to = " + creditCardType);
         this.creditCardType = creditCardType;
     }
 
@@ -115,7 +118,7 @@ public List<SelectItem> getCards() {
 
     public void setCreditCardIssuer(String creditCardIssuer) {
         this.creditCardIssuer = creditCardIssuer;
-        LOG.info("set creditCardIssuer =  " + this.creditCardIssuer );
+ //       LOG.info("set creditCardIssuer =  " + this.creditCardIssuer );
     }
 
     public Double getTotalPrice() {
@@ -123,7 +126,7 @@ public List<SelectItem> getCards() {
     }
 
     public void setTotalPrice(Double totalPrice) {
-        LOG.info("setTotalPrice = " + totalPrice);
+  //      LOG.info("setTotalPrice = " + totalPrice);
         this.totalPrice = totalPrice;
     }
 
@@ -137,13 +140,13 @@ public List<SelectItem> getCards() {
 
 
     public java.util.Date getCreditCardExpirationDate() {
-            LOG.info("get expiration date =  " + creditCardExpirationDate );
+//            LOG.info("get expiration date =  " + creditCardExpirationDate );
         return creditCardExpirationDate;
     }
 
     public void setCreditCardExpirationDate(java.util.Date creditCardExpirationDate) {
-        LOG.info("starting set expiration date");
-            LOG.info("set expiration date =  " + creditCardExpirationDate );
+//        LOG.info("starting set expiration date");
+ //           LOG.info("set expiration date =  " + creditCardExpirationDate );
         this.creditCardExpirationDate = creditCardExpirationDate;
     }
 
@@ -153,7 +156,7 @@ public List<SelectItem> getCards() {
 
     public void setCreditCardMajorIndustryIdentifier(String creditCardMajorIndustryIdentifier) {
         this.creditCardMajorIndustryIdentifier = creditCardMajorIndustryIdentifier;
-          LOG.info("set creditCardMajorIndustryIdentifier =  " + this.creditCardMajorIndustryIdentifier );
+  //        LOG.info("set creditCardMajorIndustryIdentifier =  " + this.creditCardMajorIndustryIdentifier );
     }
 
     public boolean isPaymentOK() {
@@ -179,6 +182,14 @@ public List<SelectItem> getCards() {
 
     public void setCommunication(String communication) {
         this.communication = communication;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
 public void setMyStrings(){
@@ -216,6 +227,8 @@ public String toString()
             + " ,Expiration date : "   + SDF_MM.format(this.creditCardExpirationDate)
            + NEW_LINE + "<br>"
            + " ,communication : "   + this.getCommunication()
+           + NEW_LINE + "<br>"
+           + " ,reference : "   + this.getReference()
             );
         } catch (Exception ex) {
            LOG.error("Exception in Creditcard to String" + ex);

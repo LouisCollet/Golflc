@@ -7,7 +7,6 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
       xmlns:p="http://primefaces.org/ui"
       xmlns:pe="http://primefaces.org/ui/extensions"
       xmlns:cc="http://xmlns.jcp.org/jsf/composite"
@@ -30,18 +29,20 @@ ici c'est pour générer des data pour tester ! outcome="selectPlayer.xhtml" -->
 
 <ui:define name="content">
     <h:outputScript library="js" name="totalprice.js" target="head"/>
+    <!--
 <h:link id="link01"
         title="#{msg['login.user.old']}"
         
-        action="#{courseC.printTarif}"
+        action="#{courseC.Greenfee}"
         style="float:left;"
         >
+    -->
 <h:graphicImage 
                 name="images/addtocart.jpg"
                 alt="image missing :tarif1.jpg"
                 style="float: left;">
 </h:graphicImage>
-</h:link>
+<!--</h:link>-->
 <h:graphicImage 
                 name="images/online2.png"
                 alt="image missing :tarif2.jpg"
@@ -97,9 +98,8 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
      columnClasses="className"
     styleClass="alignmentLeft">
        <h:outputText  value="#{msg['tarif.greenfee']} :"/>
-       <h:outputText  label="Greenfee"
-                       id="Greenfee1"
-                       value="#{courseC.tarif.priceGreenfee}"
+       <h:outputText   id="Greenfee1"
+                       value="#{courseC.tarifGreenfee.priceGreenfee}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
@@ -107,7 +107,7 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                         label="greenfee2"
                         id="Greenfee2"
                         onkeyup="totalprice(1, this.form, event);"
-                        value="#{courseC.tarif.quantity[0]}"
+                        value="#{courseC.tarifGreenfee.quantity[0]}"
                         size="2"
                         mask="?9">
                <o:converter converterId="omnifaces.ImplicitNumberConverter"
@@ -115,9 +115,8 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                             currencySymbol="$" />
        </p:inputMask>
  <!-- onkeyup  onkeypress="KeyCode(event);"     onkeypress='return isNumberKey(event)'              -->      
-        <h:outputText  label="Greenfee3"
-                       id="Greenfee3"
-                       value="#{courseC.tarif.priceItem[0]}"
+        <h:outputText  id="Greenfee3"
+                       value="#{courseC.tarifGreenfee.priceItem[0]}"
                        title="#{msg['title.tee.teerating']}"
                        >
             <f:convertNumber type="currency"/>
@@ -126,14 +125,13 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
 
    <p:panelGrid  id="panelGridBuggy"
                   columns="4"
-                       columnClasses="className"
-    styleClass="alignmentLeft"
-                  rendered="#{courseC.tarif.priceEquipments[0] ne '00.0'}"
+                  columnClasses="className"
+                  styleClass="alignmentLeft"
+                  rendered="#{courseC.tarifGreenfee.priceEquipments[0] ne '00.0'}"
                   >
        <h:outputText  value="#{msg['tarif.equipments.buggy']} :"/>
-       <h:outputText  label="Buggy1"
-                       id="Buggy1"
-                       value="#{courseC.tarif.priceEquipments[0]}"
+       <h:outputText   id="Buggy1"
+                       value="#{courseC.tarifGreenfee.priceEquipments[0]}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
@@ -141,13 +139,12 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                    label="buggy2"
                         id="Buggy2"
                         onkeyup="totalprice(2, this.form, event);"
-                        value="#{courseC.tarif.quantity[1]}"
+                        value="#{courseC.tarifGreenfee.quantity[1]}"
                         size="2"
                         mask="?9"
                         />
-        <h:outputText  label="Buggy1"
-                       id="Buggy3"
-                       value="#{courseC.tarif.priceItem[1]}"
+        <h:outputText  id="Buggy3"
+                       value="#{courseC.tarifGreenfee.priceItem[1]}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
@@ -158,12 +155,11 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                columns="4"
                styleClass="alignmentLeft"
                columnClasses="className"
-               rendered="#{courseC.tarif.priceEquipments[1] ne '00.0'}"
+               rendered="#{courseC.tarifGreenfee.priceEquipments[1] ne '00.0'}"
                 >
        <h:outputText  value="#{msg['tarif.equipments.handtrolley']} :"/>
-       <h:outputText  label="HTrolley"
-                       id="HTrolley1"
-                       value="#{courseC.tarif.priceEquipments[1]}"
+       <h:outputText   id="HTrolley1"
+                       value="#{courseC.tarifGreenfee.priceEquipments[1]}"
                        title="#{msg['title.tee.teerating']}"
                        >
         </h:outputText>
@@ -171,13 +167,12 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                    label="hole num"
                         id="HTrolley2"
                         onkeyup="totalprice(3, this.form,event);"
-                        value="#{courseC.tarif.quantity[2]}"
+                        value="#{courseC.tarifGreenfee.quantity[2]}"
                         size="2"
                         mask="?9"
           />
-         <h:outputText  label="HTrolley1"
-                       id="HTrolley3"
-                       value="#{courseC.tarif.priceItem[2]}"
+         <h:outputText id="HTrolley3"
+                       value="#{courseC.tarifGreenfee.priceItem[2]}"
                        title="#{msg['title.tee.teerating']}"
                        >
         </h:outputText>
@@ -187,12 +182,11 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                 columns="4"
                  styleClass="alignmentLeft"
     columnClasses="className"
-                rendered="#{courseC.tarif.priceEquipments[2] ne '00.0'}"
+                rendered="#{courseC.tarifGreenfee.priceEquipments[2] ne '00.0'}"
                 >       
        <h:outputText  value="#{msg['tarif.equipments.electrictrolley']} :"/>
-       <h:outputText  label="MediumSeason"
-                       id="ETrolley1"
-                       value="#{courseC.tarif.priceEquipments[2]}"
+       <h:outputText   id="ETrolley1"
+                       value="#{courseC.tarifGreenfee.priceEquipments[2]}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
@@ -200,13 +194,12 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                    label="hole num"
                         id="ETrolley2"
                         onkeyup="totalprice(4, this.form,event);"
-                        value="#{courseC.tarif.quantity[3]}"
+                        value="#{courseC.tarifGreenfee.quantity[3]}"
                         size="2"
                         mask="?9"
                         />
-              <h:outputText  label="MediumSeason"
-                       id="ETrolley3"
-                       value="#{courseC.tarif.priceItem[3]}"
+              <h:outputText  id="ETrolley3"
+                       value="#{courseC.tarifGreenfee.priceItem[3]}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
@@ -216,13 +209,12 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
   <h:panelGrid id="panelClubs" 
                columns="4"
                 styleClass="alignmentLeft"
-    columnClasses="className"
-               rendered="#{courseC.tarif.priceEquipments[3] ne '00.0'}"
+                columnClasses="className"
+               rendered="#{courseC.tarifGreenfee.priceEquipments[3] ne '00.0'}"
                 >       
        <h:outputText  value="#{msg['tarif.equipments.clubs']} :"/>
-       <h:outputText  label="Clubs1"
-                       id="Clubs1"
-                       value="#{courseC.tarif.priceEquipments[3]}"
+       <h:outputText   id="Clubs1"
+                       value="#{courseC.tarifGreenfee.priceEquipments[3]}"
                        title="#{msg['title.tee.teerating']}"
                        >
         </h:outputText>
@@ -230,13 +222,12 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                    label="hole num"
                         id="Clubs2"
                         onkeyup="totalprice(5, this.form,event);"
-                        value="#{courseC.tarif.quantity[4]}"
+                        value="#{courseC.tarifGreenfee.quantity[4]}"
                         size="2"
                         mask="?9"
                         />
-              <h:outputText  label="Clubs1"
-                       id="Clubs3"
-                       value="#{courseC.tarif.priceItem[4]}"
+              <h:outputText   id="Clubs3"
+                       value="#{courseC.tarifGreenfee.priceItem[4]}"
                        title="#{msg['title.tee.teerating']}"
                        >
         </h:outputText>
@@ -246,12 +237,11 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                 columns="4"
                  styleClass="alignmentLeft"
     columnClasses="className"
-                rendered="#{courseC.tarif.priceEquipments[4] ne '00.0'}"
+                rendered="#{courseC.tarifGreenfee.priceEquipments[4] ne '00.0'}"
                 >               
        <h:outputText  value="#{msg['tarif.equipments.practice']} :"/>
-       <h:outputText  label="Practice"
-                       id="Practice1"
-                       value="#{courseC.tarif.priceEquipments[4]}"
+       <h:outputText   id="Practice1"
+                       value="#{courseC.tarifGreenfee.priceEquipments[4]}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
@@ -259,24 +249,23 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                    label="hole num"
                         id="Practice2"
                         onkeyup="totalprice(6, this.form, event);"
-                        value="#{courseC.tarif.quantity[5]}"
+                        value="#{courseC.tarifGreenfee.quantity[5]}"
                         size="2"
                         mask="?9"
                         />
-              <h:outputText  label="Practice"
-                       id="Practice3"
-                       value="#{courseC.tarif.priceItem[5]}"
+              <h:outputText id="Practice3"
+                       value="#{courseC.tarifGreenfee.priceItem[5]}"
                        title="#{msg['title.tee.teerating']}"
                        >
        </h:outputText>
    </h:panelGrid>
               
    <c:forEach var="i" begin="01" end="02" step="1">
-      <p:column value="" />
+       <h:outputText value= ""/>
    </c:forEach>
               
   <h:outputText id="Total"
-                value="#{msg['payment.amounttobepaid']} :"
+                value="#{msg['creditcard.amounttobepaid']} :"
                 />
   <h:outputText  id="TotalPrice"
                  value="#{courseC.creditcard.totalPrice}"
@@ -298,7 +287,7 @@ onkeypress="return event.keyCode !== 13"<script type="text/javascript">
                          update="growl-msg"
                          immediate="false"
                          icon="ui-icon-disk"
-                         action="#{courseC.printTarif}"/>
+                         action="#{courseC.printTarifGreenfee}"/>
          <p:commandButton value="#{msg['payment.add.cart']}"
                          id="commandButtonPayment"
                          ajax="false"

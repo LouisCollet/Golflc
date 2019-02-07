@@ -82,19 +82,6 @@ String query =
           Handicap h = new Handicap();
           h = entite.Handicap.mapHandicap(rs);  
           ecl.setHandicap(h);
-                
-      /*          
-                cc.setIdplayer(player.getIdplayer() ); // new 09/05/2013 ou chercher dans requÃªte ?
-                cc.setPlayerFirstName(rs.getString("PlayerFirstName") );
-                cc.setPlayerLastName(rs.getString("PlayerLastName") );
-                cc.setPlayerBirthDate(rs.getDate("PlayerBirthDate") );
-                cc.setHandicapPlayer(rs.getBigDecimal("HandicapPlayer") );
-                cc.setPlayerGender(rs.getString("PlayerGender") );
-                cc.setHandicapStart(rs.getDate("idhandicap") );
-                cc.setIdround(rs.getInt("idround"));
-                    LOG.debug("cc = " + cc);
-			//store all data into a List
-*/
 	liste.add(ecl);
 	} //end while
         

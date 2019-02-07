@@ -12,14 +12,11 @@ import lc.golfnew.CourseController;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class CreateScoreStableford implements interfaces.Log
-{
+public class CreateScoreStableford implements interfaces.Log{
   public  boolean createModifyScore(final ScoreStableford score, final Round round, final Player player,
-        //    final String[] sc1,
-            final Connection conn ) throws SQLException
-    {
+            final Connection conn ) throws SQLException{
         PreparedStatement ps = null;
-        try {
+ try {
                 LOG.info(" ... entering createScore() ...");
                 LOG.info("Score = " + score.toString());
                 LOG.info("Round  = " + round.toString());
@@ -165,30 +162,9 @@ public class CreateScoreStableford implements interfaces.Log
            return true;
 //ici ??
  //          setNextScorecard(true); // affiche le bouton next(Scorecard) bas ecran à droite
-        } //end try
-        catch (NullPointerException npe) {
-            String msg = "£££ NullPointerException in Insert or Update Score = " + npe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
-        } catch (IndexOutOfBoundsException iobe) {
-            String msg = "£££ IndexOutOfBoundsException in Insert or Update Score = " + iobe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-//        } catch (MySQLIntegrityConstraintViolationException cv) {
-//            String msg = "£££ MySQLIntegrityConstraintViolationException in Insert or Update Score = " + cv.getMessage();
-//            LOG.error(msg);
-            return false;
-//            LCUtil.showMessageFatal(msg);
-    //return null;
         } catch (SQLException sqle) {
             String msg = "£££ SQLException in Insert or Update score = " + sqle.getMessage() + " , SQLState = "
                     + sqle.getSQLState() + " , ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
-        } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Insert or Update Score = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
@@ -201,6 +177,5 @@ public class CreateScoreStableford implements interfaces.Log
            // DBConnection.closeQuietly(conn, null, null, ps);
             DBConnection.closeQuietly(null, null, null, ps); // new 14/08/5014
         }
-
     } //end method
-}
+} //end class

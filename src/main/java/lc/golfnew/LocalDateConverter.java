@@ -25,7 +25,6 @@ public class LocalDateConverter implements javax.faces.convert.Converter {
 
         LocalDate dateValue = (LocalDate) value;
         
-     //   return dateValue.format(DateTimeFormatter.ofPattern("MM/dd/yyyy"));
      return dateValue.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
     

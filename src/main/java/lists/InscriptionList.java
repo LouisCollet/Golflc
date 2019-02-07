@@ -17,16 +17,13 @@ public class InscriptionList implements interfaces.Log
 {
     private static List<ECourseList> liste = null;
     
-public List<ECourseList> getInscriptionList(final Connection conn) throws SQLException
-{
+public List<ECourseList> getInscriptionList(final Connection conn) throws SQLException{
     LOG.info(" ... entering InscriptionList !!");
-if (liste == null)
-{    
+if (liste == null){
   //  Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
     
      LOG.info("starting getInscriptionList.. = " );
      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
@@ -37,10 +34,8 @@ try
 String query =
         "SELECT "
         + cl + "," + co + "," + ro + //"," + // pl + "," +
-          // attention faut un espace en fin de ligne avant le " !!!!
 //" SELECT  RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundPlayers, RoundStart, " +
 //"         idcourse, CourseName, idclub, ClubName, clubcity, clubcountry, ClubWebsite" +
-          
     "		 FROM round" +
     "		   JOIN course	ON round.course_idcourse = course.idcourse" +
     "			 JOIN club 	ON club.idclub = course.club_idclub" +
@@ -67,34 +62,16 @@ String query =
           ECourseList ecl = new ECourseList(); // liste pour sélectionner un round player = entite.Player.mapPlayer(rs);
           Club c = new Club();
           c = entite.Club.mapClub(rs);
-   //          c.setIdclub(rs.getInt("idclub") );
-   //          c.setClubName(rs.getString("clubName") );
-   //          c.setClubCity(rs.getString("clubcity"));
-   //          c.setClubWebsite(rs.getString("ClubWebsite"));
-   //          c.setClubCountry(rs.getString("ClubCountry"));
           ecl.setClub(c);
           
           Course o = new Course();
           o = entite.Course.mapCourse(rs);
-      //      o.setIdcourse(rs.getInt("idcourse"));
-      //      o.setCourseName(rs.getString("CourseName") );
           ecl.setCourse(o);
           
           Round r = new Round();
           r = entite.Round.mapRound(rs);
-  /*          r.setIdround(rs.getInt("idround") );
-                java.util.Date d = rs.getTimestamp("roundDate");
-            //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-          //  LocalDateTime date = DatetoLocalDateTime(d);
-            r.setRoundDate(DatetoLocalDateTime(d));
-            r.setRoundGame(rs.getString("roundgame") );
-            r.setRoundCompetition(rs.getString("RoundCompetition") );
-            r.setRoundHoles(rs.getShort("RoundHoles") );
-            r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
-            r.setRoundStart(rs.getShort("RoundStart") );*/
           ecl.setRound(r);
-
- 			//store all data into a List
+//store all data into a List
 	liste.add(ecl);
 	} //end while
 // LOG.info("Inscription liste = " + liste.toString());

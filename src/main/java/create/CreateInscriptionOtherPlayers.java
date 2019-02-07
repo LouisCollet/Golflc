@@ -38,9 +38,9 @@ public boolean createInscriptions(final Player player, final Round round, final 
             LOG.debug(" -- item in for idplayer = " + player.getDroppedPlayers().get(i).getIdplayer() );
             
         player2 = player.getDroppedPlayers().get(i);
-        create.CreateInscription ci = new create.CreateInscription();
-        boolean OK = ci.createInscription(round, player2, player, inscription, club, course, conn); // new 21/07/2014
-        if(OK){
+    //    create.CreateInscription ci = new create.CreateInscription();
+        int OK = new create.CreateInscription().create(round, player2, player, inscription, club, course, conn); // new 21/07/2014
+        if(OK == 0){
             LOG.info("Inscription created for other player = " + player2.getIdplayer() + " / " + player2.getPlayerLastName());
   //          LOG.info("roundPlayers is now = " + round.getRoundPlayers());
             LOG.info("roundPlayersString was = " + round.getPlayersString());

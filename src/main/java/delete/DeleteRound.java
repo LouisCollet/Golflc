@@ -8,7 +8,7 @@ import utils.LCUtil;
 
 public class DeleteRound implements interfaces.Log, interfaces.GolfInterface
 {
-    public String deleteRound(final int idround, final Connection conn) throws Exception
+    public boolean deleteRound(final int idround, final Connection conn) throws Exception
     {
     PreparedStatement ps = null;
 try
@@ -26,18 +26,18 @@ try
     String msg = "<br/> <h1>Round deleted = " + idround;
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
-        return "Round deleted ! ";
+        return true;
 }catch (SQLException e){
     String msg = "SQL Exception in DeleteRond = " + e.toString() + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }catch (Exception ex){
     String msg = "Exception in DeleteRound() " + ex;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }finally{
         utils.DBConnection.closeQuietly(null, null, null, ps);
 }

@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import javax.faces.event.ValueChangeEvent;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.GroupSequence;
 import javax.validation.constraints.*;
@@ -38,7 +39,7 @@ public class Club implements Serializable, interfaces.Log
 @FirstUpper(max=7) // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
     private String clubName;
 //---------------------
-@Pattern(regexp="[a-zA-Z0-9'éèàê'&â!, ç-]*",message="{club.address.characters}")
+@Pattern(regexp="[a-zA-Z0-9'éèàê'&â!., ç-]*",message="{club.address.characters}")
 @NotEmpty(message="{club.address.notnull}")
 @Size(min=3, max=45,message="{club.address.size}")
     private String clubAddress;
@@ -79,7 +80,7 @@ private String coordinates;
 
     private Date clubModificationDate;
 //private String clubZoneId;
-
+@Inject
 private GoogleTimeZone clubTimeZone;  // intéressant voir googlemaps.GoogleTimeZone
 // contient 
  ///   private double rawOffset;
@@ -89,7 +90,7 @@ private boolean CreateModify = true; // 12/08/2017
 private String clubFormattedAddress;
     public Club()
     {
-   
+  //      clubTimeZone = new GoogleTimeZone(); // new 03/02/2019 éviter npe
     }
 
     public Integer getIdclub() {
@@ -263,9 +264,9 @@ public String toString()
                + " ,club City : " + this.getClubCity()
                + " ,club Country : " + this.getClubCountry()
                + " ,club Latitude : " + this.getClubLatitude()
-  //             + " ,club Longitude : " + this.getClubLongitude()
+               + " ,club Longitude  = " + String.format("%.6f", this.getClubLongitude())  + " ,club Longitude : " + this.getClubLongitude()
                + " ,club Website : " + this.getClubWebsite()
-               + ", club Longitude  = " + String.format("%.6f", this.getClubLongitude())
+             
        //        + "club Zone ID   = " + this.getClubTimeZone().getTimeZoneId()
       //         + " ,club ZoneId : " + this.clubTimeZone.getTimeZoneId()  // fait tout sauter !!
        //        + " ,club ZoneId : " + this.clubTimeZone.getTimeZoneId()   // fait tout sauter !!!

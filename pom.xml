@@ -30,15 +30,15 @@
         
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> <!-- new 11/05/2014 -->
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
-        <mysql.connectorJ.version>8.0.13</mysql.connectorJ.version> <!-- mod 02-11-2018 was 8.0.12 -->
+        <mysql.connectorJ.version>8.0.14</mysql.connectorJ.version> <!-- mod 02-11-2018 was 8.0.12 -->
         <primefaces.version>6.2</primefaces.version> <!-- 5/3/2017 : was 6.0 and 6.1 6.2.RC1-->
         <primefaces.extension.version>6.2.8</primefaces.extension.version> <!-- mod 08/09/2017 was 6.2.4 -->
         <primefaces.theme.version>1.0.10</primefaces.theme.version><!-- was 1.0.9 -->
         <omnifaces.version>3.2</omnifaces.version> <!-- 07/09/2018 was 3.1 -->
         <junit.version>5.0.0-ALPHA</junit.version> <!-- not used was 4.7 mod 4/6/2016 -->
-        <java.version>11</java.version> <!-- only used via MyPOM properties -->
-        <maven.compiler.source>1.8</maven.compiler.source> <!-- was 1.8 mod 01-11-2018 -->
-        <maven.compiler.target>1.8</maven.compiler.target><!-- was 1.8 mod 01-11-2018 -->
+        <java.version>11</java.version> <!-- for compiler and only used via MyPOM properties -->
+        <maven.compiler.source>1.8</maven.compiler.source> <!-- used before JDK11 -->
+        <maven.compiler.target>1.8</maven.compiler.target><!-- used before jdk 11 -->
         <javaee.version>8.0</javaee.version> <!-- was 7.0 mod 26-04-2014 -->
         <java.mail.version>1.6.1</java.mail.version> <!-- was 7.0 mod 26-04-2014 -->
         <javax.activation.version>1.2.0</javax.activation.version>
@@ -46,7 +46,7 @@
         <!--<glassfish.version>4.1.1</glassfish.version>  was 4.1 on 17/10/2015 -->
         <!--<wildfly.version>Wildfly-10.1.0.Final</wildfly.version> not used meme plus pour via MyPOM properties -->
         <hibernate.version>3.5.3.Final</hibernate.version> <!-- only used via MyPOM properties -->
-        <maven.version>3.5.4</maven.version> <!-- only used via MyPOM properties -->
+        <maven.version>3.6.0</maven.version> <!-- only used via MyPOM properties -->
   <!--  Maven plugins -->       
         <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version><!-- was 3.7.0 mod 25-09-2018 -->
         <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version> <!-- was 3.0.0 mod 14/07/2018 -->
@@ -60,12 +60,12 @@
         
         <netbeans.compile.on.save>all</netbeans.compile.on.save> <!-- new 27/11/2013 -->
         <!--<mojarra.version>2.2.13.SP4</mojarra.version>  not used only used via MyPOM properties 2.2.13.SP4-->
-        <netbeans.version>8.2</netbeans.version> <!-- only used via MyPOM properties 
+        <netbeans.version>10.0</netbeans.version> <!-- only used via MyPOM properties 
 voir plus bas <artifactId>properties-maven-plugin</artifactId>-->
         
         <timestamp>${maven.build.timestamp}</timestamp> <!-- see https://dzone.com/articles/stamping-version-number-and -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
-        <jackson.version>2.9.7</jackson.version> <!-- mod 29/11/2018  was 2.9.6 google maps AddressConverter.java  -->
+        <jackson.version>2.9.8</jackson.version> <!-- mod 04/01/2019  was 2.9.7 google maps AddressConverter.java  -->
         <version.jboss.bom>10.0.0.Final</version.jboss.bom>
         <apache.shiro.version>1.3.2</apache.shiro.version> <!-- new 24-12-2017 1.4.0 gives errors -->
         <itext.version>2.1.7</itext.version>
@@ -120,7 +120,13 @@ voir plus bas <artifactId>properties-maven-plugin</artifactId>-->
 <dependency>
     <groupId>org.primefaces.extensions</groupId>
     <artifactId>primefaces-extensions</artifactId>
-    <version>${primefaces.extension.version}</version> 
+    <version>${primefaces.extension.version}</version>
+ <exclusions>
+  <exclusion>
+   <groupId>com.google.code.gson</groupId>
+   <artifactId>gson</artifactId>
+  </exclusion>
+ </exclusions>
 </dependency>  
 <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 <dependency>
@@ -146,7 +152,7 @@ Les dépendances du scope runtime sont des dépendances nécessaires à l'exécu
 <dependency>
      <groupId>mysql</groupId>
      <artifactId>mysql-connector-java</artifactId>
-     <version>8.0.13</version> <!-- 5.1.22 voir variable dans   <properties> -->
+     <version>${mysql.connectorJ.version}</version> <!-- 5.1.22 voir variable dans   <properties> -->
     <type>jar</type>
 </dependency>
 <!-- new 27/08/2014  <scope>runtime</scope>
@@ -246,7 +252,7 @@ Dependencies, right clic on jEidlib-1.1.jar > Manually install artifact > browse
     <artifactId>maven-clean-plugin</artifactId>
     <version>${maven.clean.plugin.version}</version> <!-- mod 25/09/2018 was fixed value -->
 </dependency> 
-                    
+
 <dependency>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-resources-plugin</artifactId>
@@ -319,19 +325,34 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
     <groupId>com.google.maps</groupId>
     <artifactId>google-maps-services</artifactId>
     <version>0.9.1</version> <!--   was 0.2.7 mod 15/09/2018 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                </exclusion>
+            </exclusions>
 </dependency>
 <!-- https://mvnrepository.com/artifact/com.google.appengine/appengine-api-1.0-sdk -->
 <dependency>
     <groupId>com.google.appengine</groupId>
     <artifactId>appengine-api-1.0-sdk</artifactId>
-    <version>1.9.64</version>  <!-- mod 25-12-2017 was 1.9.54 -->
+    <version>1.9.71</version>  <!-- mod 25-12-2017 was 1.9.54 -->
 </dependency>
-
+<!--
 <dependency>
     <groupId>com.fasterxml.jackson.core</groupId>
     <artifactId>jackson-databind</artifactId>
     <version>${jackson.version}</version>
   </dependency>
+  -->
+    <!-- added 14/07/2018 all jackson needed 
+  <dependency>
+  <groupId>com.fasterxml.jackson</groupId>
+  <artifactId>jackson-bom</artifactId>
+  <version>${jackson.version}</version>
+</dependency>
+  -->
+  
   
   <!-- added 14/07/2018 suite analyze-only l -->
   <dependency>
@@ -344,7 +365,24 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
   <artifactId>jackson-annotations</artifactId>
   <version>${jackson.version}</version>
 </dependency>
+
+ <!-- new 18-01-2019 try silve error Cannot construct instance of
+`java.time.LocalDateTime` (no Creators, like default construct, exist): 
+    https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310-->
 <dependency>
+    <groupId>com.fasterxml.jackson.datatype</groupId>
+    <artifactId>jackson-datatype-jsr310</artifactId>
+    <version>${jackson.version}</version>
+</dependency>
+<!--
+<dependency> 
+    <groupId>com.fasterxml.jackson.datatype</groupId>
+    <artifactId>jackson-datatype-jdk8</artifactId>
+    <version>${jackson.version}</version>
+</dependency>
+   -->
+    
+ <dependency>   
   <groupId>javax.activation</groupId>
   <artifactId>activation</artifactId>
   <version>1.1</version>
@@ -373,18 +411,24 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
     <groupId>net.aksingh</groupId>
     <artifactId>owm-japis</artifactId>
     <version>2.5.2.3</version>
-   
+  <!--   <exclusions>
+    <exclusion>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+     </exclusion>
+    </exclusions> -->
 </dependency>
 
 <!--  https://stackoverflow.com/questions/50586449/java-lang-nosuchmethoderror-com-google-gson-gsonbuilder-setlenientlcom-google -->
 
-<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson <scope>provided</scope>
+<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson <scope>provided</scope>--> 
 <dependency>
     <groupId>com.google.code.gson</groupId>
     <artifactId>gson</artifactId>
-    <version>2.6.2</version>
+    <version>2.8.2</version>
+    <scope>provided</scope>
 </dependency>
- --> 
+
 <!-- https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit 
 <dependency>
     <groupId>com.squareup.retrofit2</groupId>
@@ -401,14 +445,13 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 </dependency>
 -->
 
-
-<!-- https://mvnrepository.com/artifact/com.squareup.okio/okio -->
+<!-- https://mvnrepository.com/artifact/com.squareup.okio/okio 
 <dependency>
     <groupId>com.squareup.okio</groupId>
     <artifactId>okio</artifactId>
     <version>1.14.0</version>
 </dependency>
-
+-->
 <!-- https://mvnrepository.com/artifact/io.github.jnasmartcardio/jnasmartcardio -->
 <dependency>
     <groupId>io.github.jnasmartcardio</groupId>
@@ -418,12 +461,12 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 
 
 
- <!-- https://mvnrepository.com/artifact/org.passay/passay -->
+ <!-- https://mvnrepository.com/artifact/org.passay/passay 
 <dependency>
     <groupId>org.passay</groupId>
     <artifactId>passay</artifactId>
     <version>1.3.1</version>
-</dependency>
+</dependency>-->
 <!-- https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j  new 30-10-2018-->
 <dependency>
     <groupId>org.mnode.ical4j</groupId>
@@ -444,21 +487,62 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 </dependency>
 
 <dependency>
-  <!-- jsoup HTML parser library @ https://jsoup.org/ -->
+  <!-- jsoup HTML parser library @ https://jsoup.org/ 
+    -->
   <groupId>org.jsoup</groupId>
   <artifactId>jsoup</artifactId>
   <version>1.11.3</version>
+  <!--  https://www.slf4j.org/codes.html#multiple_bindings -->
+      <exclusions>
+      <exclusion> 
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+      </exclusion>
+      <exclusion> 
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+      </exclusion>
+    </exclusions> 
+  
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.aesh/aesh-readline-all -->
+<!-- https://mvnrepository.com/artifact/org.aesh/aesh-readline-all 
 <dependency>
     <groupId>org.aesh</groupId>
     <artifactId>aesh-readline-all</artifactId>
     <version>1.10</version>
     <type>pom</type>
 </dependency>
-
-
+-->
+<!-- les 2 qui suivent nécessaire pour jdk11 -->
+<dependency>
+    <groupId>javax.annotation</groupId>
+    <artifactId>javax.annotation-api</artifactId>
+    <version>1.3.2</version>
+</dependency>
+<dependency>
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    <version>2.3.0</version>
+</dependency>
+<!-- 2.2.11
+<dependency>
+    <groupId>com.sun.xml.bind</groupId>
+    <artifactId>jaxb-core</artifactId>
+    <version>2.2.11</version>
+</dependency>
+<dependency>
+    <groupId>com.sun.xml.bind</groupId>
+    <artifactId>jaxb-impl</artifactId>
+    <version>2.2.11</version>
+</dependency>
+-->
+<!-- https://mvnrepository.com/artifact/org.json/json -->
+<dependency>
+    <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20180813</version>
+</dependency>
 
 
 </dependencies>
@@ -486,6 +570,10 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
         </plugin>
       </plugins>
     </pluginManagement>
+      
+        maven.compiler.plugin.version
+          
+            
    -->  
      
  <plugins>
@@ -499,8 +587,8 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
                     <maxmem>2048m</maxmem> <!-- was 1024-->
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                <!--     <release>${maven.compiler.source}</release> new 01-11-2018 -->
-                    <encoding>${project.build.sourceEncoding}</encoding> <!-- new 01-11-2018
+       <!--   -->         <release>${java.version}</release>
+                  <encoding>${project.build.sourceEncoding}</encoding> <!-- new 01-11-2018
       https://docs.oracle.com/javase/10/tools/javac.htm#JSWOR627
 https://www.baeldung.com/javac
 https://github.com/spring-projects/spring-boot/issues/6421  for -processing
@@ -512,7 +600,7 @@ Precede a key by a hyphen (-) to disable the specified warning.-->
                     <showDeprecation>true</showDeprecation> <!--  mod 08-02-2018 was true -->
                     <showWarnings>true</showWarnings> <!-- new 20/01/2013 -->
                     <verbose>false</verbose>   <!--new 20/01/2013 'true' donne liste de toutes les sources -->
-                    <debug>true</debug>
+           <!--         <debug>true</debug> mod 13-01-2019 -->
                   <!--  <debuglevel>lines,vars,source</debuglevel> new 17/11/2018 -->
                 </configuration>
             </plugin>
@@ -699,7 +787,31 @@ http://stackoverflow.com/questions/11500533/in-java-code-how-to-access-maven-pro
 	</dependencies>
 </plugin>
 -->
-
+<!-- new 07/01/2019 
+<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <executions>
+          <execution>
+     
+            <goals>
+              <goal>exec</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <executable>maven</executable>
+     ;;;   optional;;;
+          <workingDirectory>/tmp</workingDirectory>
+          <arguments>
+            <argument>-X</argument>
+            <argument>myproject:dist</argument>
+      
+          </arguments>
+</configuration>
+</plugin>
+-->
 </plugins>
 
 <!-- New 23/10/2015By default the Maven resources plug-in  will not do text substitution (filtering),

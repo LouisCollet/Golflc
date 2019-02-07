@@ -8,7 +8,7 @@ import utils.LCUtil;
 
 public class DeleteTee implements interfaces.Log, interfaces.GolfInterface
 {
-    public String deleteTee(final int idtee, final Connection conn) throws Exception
+    public boolean deleteTee(final int idtee, final Connection conn) throws Exception
     {
     PreparedStatement ps = null;
 try
@@ -26,33 +26,32 @@ try
     String msg = "<br/> <h1>There are " + row_delete + " Tee deleted = " + idtee;
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
-        return "Tee deleted ! ";
+        return true;
 }catch (SQLException e){
     String msg = "SQL Exception in DeleteTee = " + e.toString() + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }catch (Exception ex){
     String msg = "Exception in DeleteTee() " + ex;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }finally{
         utils.DBConnection.closeQuietly(null, null, null, ps);
 }
 } //end method
    
- public static void main(String[] args) throws SQLException, Exception 
- {
+ public static void main(String[] args) throws SQLException, Exception{
      DBConnection dbc = new DBConnection();
      Connection conn = dbc.getConnection();
  try{
        LOG.info("Input main = ");
     int idtee = 339;
  //  Date date =SDF.parse("01/01/2000");
-    DeleteTee dt = new DeleteTee();
-    dt.deleteTee(idtee, conn);
+ //   DeleteTee dt = new DeleteTee();
+    boolean OK = new DeleteTee().deleteTee(idtee, conn);
  } catch (Exception e) {
         String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

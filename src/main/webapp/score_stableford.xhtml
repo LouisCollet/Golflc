@@ -135,7 +135,7 @@
     columns="2">
 <f:facet name="footer">
         <p:commandButton 
-                         id="button01"
+                         id="buttonCreate"
                          value="#{msg['button.score.create']}"
                          update="growl-msg"
                          ajax="false"
@@ -145,7 +145,7 @@
         
         <!--   rendered="#{courseC.showButtonCreateScore}"  -->
         <p:commandButton 
-                         id="button02"
+                         id="buttonStatistics"
                          value="#{msg['button.score.statistics']}"
                          update="growl-msg"
                          immediate="true"
@@ -154,7 +154,8 @@
                          icon="ui-icon-pencil"
                          style="float: right;"
                          action="score_statistics.xhtml"/>
-        <p:commandButton value="#{msg['button.scorecard']}"
+        <p:commandButton id="ButtonShow"
+                         value="#{msg['button.scorecard']}"
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-map-o"

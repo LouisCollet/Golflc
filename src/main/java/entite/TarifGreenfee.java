@@ -2,8 +2,8 @@ package entite;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
@@ -16,9 +16,10 @@ import javax.validation.constraints.NotNull;
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 // @JsonInclude(Include.NON_NULL)  // ne fonctionne pas dans table multidimentional intéressant ?
 @Named
-public class Tarif implements Serializable{
-    
-    @JsonIgnore
+@JsonPropertyOrder({"datesSeason","days","teeTimes","priceEquipments"}) // new 22/01/2019 not working ?
+public class TarifGreenfee implements Serializable{
+
+@JsonIgnore
     @NotNull(message="{tarif.number.notnull}")
     @Min(value=0,message="{tarif.number.min}")
     @Max(value=20,message="{tarif.number.max}")
@@ -26,7 +27,7 @@ public class Tarif implements Serializable{
 @JsonIgnore
     private Integer tarifIndexHours; // pour periods
 @JsonIgnore
-    private Integer tarifIndexEquipments; // pour periods
+    private Integer tarifIndexEquipments;
 @JsonIgnore
     private Integer tarifIndexPayment; // pour periods
 @JsonIgnore
@@ -40,28 +41,34 @@ public class Tarif implements Serializable{
 //   @JsonIgnore
 //    private Integer quantity; 
 @JsonIgnore
-private String [] priceItem;
+    private String [] priceItem;
 @JsonIgnore
-private String [] quantity;
-      
-@JsonFormat(
-      shape = JsonFormat.Shape.STRING,pattern = "dd-MM")
+    private String [] quantity;
+// @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM") // deleted 22-01-2019
    //   pattern = "dd-MM-yyyy hh:mm:ss")
-
-  
+@JsonIgnore
+@NotNull(message="{tarifMember.workitem.notnull}")
+  private String workItem;
+@JsonIgnore
+ @NotNull(message="{tarifMember.workprice.notnull}")
+  private String workPrice;
   private String[][] datesSeason; // low, medium High puis des paires de dates début et fin;
   private String [][] teeTimes; // = new String[10][5];
-  private String [] priceEquipments; // = new String[10]
+//  private String [] priceEquipments; // = new String[10]
+  private String [][] priceEquipments; // mod 24-01-2018
   private String [][] days; // = new String[5][3]
-
-public Tarif() // constructor 1
-    {
+@JsonIgnore
+    private Integer [] equipmentsChoice;
+public TarifGreenfee(){ // constructor 1
         datesSeason = new String[20][3]; // 20 dates (5 paired début et fin), 3 périodes Low, Medium, High
 //            LOG.info("from construtor : dateseason = " + Arrays.deepToString(datesSeason));
         teeTimes = new String[10][5];    //
-        priceEquipments = new String[10];
+        priceEquipments = new String[10][3]; // intem, price, choix pourquoi 3 ??
+        equipmentsChoice = new Integer[priceEquipments.length];  // choice of quantity egals 0, 1
+        Arrays.fill(equipmentsChoice, 0);
         days = new String[5][3];
         priceItem = new String[10];
+        priceGreenfee = 0.0;
         tarifIndexSeasons = 0;
         tarifIndexHours = 0;
         tarifIndexEquipments = 0;
@@ -69,7 +76,7 @@ public Tarif() // constructor 1
         quantity = new String[10];
     } // end constructor
 
-public Tarif(String[][] datesSeason, String [][]teeTimes) // constructor test
+public TarifGreenfee(String[][] datesSeason, String [][]teeTimes) // constructor test
     {
 this.datesSeason = datesSeason;
 this.teeTimes = teeTimes;
@@ -125,11 +132,11 @@ this.teeTimes = teeTimes;
         this.teeTimes = teeTimes;
     }
 
-    public String[] getPriceEquipments() {
+    public String[][] getPriceEquipments() {
         return priceEquipments;
     }
 
-    public void setPriceEquipments(String[] priceEquipments) {
+    public void setPriceEquipments(String[][] priceEquipments) {
         this.priceEquipments = priceEquipments;
     }
 
@@ -142,20 +149,22 @@ this.teeTimes = teeTimes;
     }
 
     public Double getPriceGreenfee() {
+        LOG.info("getPriceGreenfee = " + priceGreenfee);
         return priceGreenfee;
     }
 
     public void setPriceGreenfee(Double priceGreenfee) {
         this.priceGreenfee = priceGreenfee;
+        LOG.info("setPriceGreenfee = " + priceGreenfee);
         this.unitPrice = priceGreenfee;
     }
 
     public void RemoveNull(){
     datesSeason = utils.LCUtil.removeNull2D(datesSeason);
     teeTimes = utils.LCUtil.removeNull2D(teeTimes);
-    priceEquipments = utils.LCUtil.removeNull1D(priceEquipments); // à vérifier
+    priceEquipments = utils.LCUtil.removeNull2D(priceEquipments);
     days = utils.LCUtil.removeNull2D(days);
-     LOG.info("null removed from all Tarif Arrays");
+        LOG.info("null removed from all Tarif Arrays");
 }
 
     public Double getUnitPrice() {
@@ -203,6 +212,30 @@ this.teeTimes = teeTimes;
 
     public void setPriceItem(String[] priceItem) {
         this.priceItem = priceItem;
+    }
+
+    public String getWorkItem() {
+        return workItem;
+    }
+
+    public void setWorkItem(String workItem) {
+        this.workItem = workItem;
+    }
+
+    public String getWorkPrice() {
+        return workPrice;
+    }
+
+    public void setWorkPrice(String workPrice) {
+        this.workPrice = workPrice;
+    }
+
+    public Integer[] getEquipmentsChoice() {
+        return equipmentsChoice;
+    }
+
+    public void setEquipmentsChoice(Integer[] equipmentsChoice) {
+        this.equipmentsChoice = equipmentsChoice;
     }
 
    

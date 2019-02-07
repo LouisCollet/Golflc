@@ -1,6 +1,7 @@
 package create;
 
 import entite.Club;
+import entite.Cotisation;
 import entite.Course;
 import entite.Inscription;
 import entite.Player;
@@ -12,24 +13,19 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class CreateInscription implements interfaces.Log, interfaces.GolfInterface
-{
-public boolean createInscription(final Round round, final Player player, Player invitedBy,
-   final Inscription inscription, final Club club, final Course course, final Connection conn) throws SQLException
-    {
+public class CreateInscription implements interfaces.Log, interfaces.GolfInterface{
+public Integer create(final Round round, final Player player, Player invitedBy,
+   final Inscription inscription, final Club club, final Course course, final Connection conn) throws SQLException{
     PreparedStatement ps = null;
    try {
         List<Player> listPlayers = null;
-       
             LOG.debug(" ... starting createInscription()... ");
             LOG.info("round ID      = " + round.getIdround());
             LOG.info("Player ID     = " + player.getIdplayer());
             LOG.info("Invited By     = " + invitedBy.getIdplayer());
           //  invitedBy = player;
             LOG.info("Invited By     = " + invitedBy.getIdplayer());
-            
             LOG.info("Player Email  = " + player.getPlayerEmail());
-            
   //          LOG.info("Player Gender = " + player.getPlayerGender() ); // new 19/08/2014
             if(round.getRoundDate() != null){
               LOG.info("Round Date = " + round.getRoundDate().format(ZDF_TIME_HHmm));
@@ -43,17 +39,47 @@ public boolean createInscription(final Round round, final Player player, Player 
   //              throw new LCCustomException(msgerr);
   //         }
 //validation 2
-      lists.RoundPlayersList spl = new lists.RoundPlayersList();
-      listPlayers = spl.listAllParticipants(round, conn);
+    //  lists.RoundPlayersList spl = new lists.RoundPlayersList();
+      listPlayers = new lists.RoundPlayersList().listAllParticipants(round, conn);
         LOG.info("there are already {} players for this round ! ", listPlayers.size());
         LOG.info("there are RoundPlayers for this round : " + round.getRoundPlayers());
+        
       if(listPlayers.size() > 4){  // maximum 4 players par flight !
-          String msgerr =  LCUtil.prepareMessageBean("inscription.too much players"); // + listPlayers.size() ;
-          LOG.error(msgerr); 
-          LCUtil.showMessageFatal(msgerr);
-          return false;
+  //        String err =  LCUtil.prepareMessageBean("inscription.too much players"); // + listPlayers.size() ;
+  //        LOG.error(err); 
+   //       LCUtil.showMessageFatal(err);
+          return 01;
           
       }
+  // new 21/01/2019    
+    //  find.FindCotisation fc  = new find.FindCotisation();
+      LOG.info("current player = " + player.getIdplayer());
+   //   if(! player.getIdplayer().equals(324713)){ 
+        if( ! player.getPlayerRole().equals("ADMIN")){ // administateur LC
+          LOG.info("test cotisation for non LC");
+          Cotisation cotisation = new find.FindCotisation().find(player,club,round,conn);
+            LOG.info("in createinscription,Cotisation = " + cotisation.toString());
+                    
+            if(cotisation.getStatus().equals("N")){ 
+   //       String msg = " Vous êtes membre de ce club - inscription acceptée !" + cotisation.getIdclub();
+  //        LOG.info(msg);
+  //        LCUtil.showMessageInfo(msg);
+            return 02;
+            }
+            if(cotisation.getStatus() == null){
+   //       String msg = " Vous êtes membre de ce club - inscription acceptée !" + cotisation.getIdclub();
+  //        LOG.info(msg); 
+  //        LCUtil.showMessageInfo(msg);
+          return 02;
+      }
+      } // end test LC
+      
+      LOG.info("this is LC !!");
+  ///        String err = " Vous avez payé un accessoire mais vous n'êtes pas membre de ce club - Voulez-vous payer un greenfee ?"; // + cotisation.getIdclub();
+  //        LOG.info(err);
+  //        LCUtil.showMessageFatal(err);
+  //        throw new Exception(err);
+   //   }
             final String query = LCUtil.generateInsertQuery(conn, "player_has_round");
             //String query = "INSERT INTO player_has_round VALUES (?,?,?,?)";
             ps = conn.prepareStatement(query);
@@ -70,50 +96,49 @@ public boolean createInscription(final Round round, final Player player, Player 
              //    String p = ps.toString();
                 utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
-            if (row != 0) { //int key = LCUtil.generatedKey(conn);
-                //  LOG.info("Player Has Round generatedKey = " + key);
-//                setNextScorecard(true); // affiche le bouton carte de score ??
+            if (row == 1) { 
+     //           String msg =  LCUtil.prepareMessageBean("inscription.ok");
+     //           msg = msg
+     //                   + "for round = " + round.getIdround()
+     //                   + " <br/> player = " + player.getIdplayer()
+     //                   + " <br/> player name = " + player.getPlayerLastName()
+      //                  + " <br/> round date = " + round.getRoundDate().format(ZDF_TIME_HHmm)
+      //            ;
+       //         LOG.info(msg);
+       //         LCUtil.showMessageInfo(msg);
                 
-                String msg =  LCUtil.prepareMessageBean("inscription.ok");
-                msg = msg
-                        + "for round = " + round.getIdround()
-                        + " <br/> player = " + player.getIdplayer()
-                        + " <br/> player name = " + player.getPlayerLastName()
-                        + " <br/> round date = " + round.getRoundDate().format(ZDF_TIME_HHmm)
-                    ;
-                LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
-                
-                mail.InscriptionMail im = new mail.InscriptionMail();
-                im.sendMail(player, invitedBy, round, club, course);
-       return true;
+     //           mail.InscriptionMail im = new mail.InscriptionMail();
+     //           im.sendMail(player, invitedBy, round, club, course);
+                return 00;
+    //   return 00;
             }else{
                 String msg = "-- NOT NOT successful Insert in create Inscription !!! " + row;
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
-                return false;  // null
+                return 90;  // null
             }
         } catch (SQLException sqle) {
-            String msg = "";
-            if(sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062 )
-            {
-                 msg = "Vous êtes déjà inscrit à ce Tour ! =  player = "
-                         + player.getIdplayer() + " round = " + round.getIdround();
+         //   String msg = "";
+            if(sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062 ){
+                 String msg = LCUtil.prepareMessageBean("create.inscription.duplicate");
+                 msg = msg + player.getIdplayer() + " round = " + round.getIdround();
                  inscription.setInscriptionOK(true); // new 10/7/2017 pour permettre inscription other players in inscription.xhtml
             }else{
-                 msg = "SQLException in createInscription = " + sqle.getMessage() + " ,SQLState = "
-                    + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();}
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;//null;
+                 String msg = "SQLException in createInscription = " + sqle.getMessage() + " ,SQLState = "
+                    + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
+                 LOG.error(msg);
+                 LCUtil.showMessageFatal(msg);
+                return 98;//null;
+            }
         } catch (Exception e) {
             String msg = "£££ Exception in createInscription = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            return false; //null;
+            return 99; //null;
         } finally {
           //  DBConnection.closeQuietly(conn, null, null, ps); // new 10/12/2011
             DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
         }
+   return 95;
     } //end method
 }  //en class

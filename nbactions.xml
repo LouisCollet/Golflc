@@ -39,9 +39,6 @@
                 <goal>clean</goal>
                 <goal>install</goal>
             </goals>
-            <properties>
-                <jpda.listen>maven</jpda.listen>
-            </properties>
         </action>
     <action>
             <actionName>profile.single.main</actionName>

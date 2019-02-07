@@ -21,8 +21,7 @@ import utils.LCUtil;
 
 @Named  // new 05-12-2017
 @SessionScoped // new 05-12-2017
-public class Player implements Serializable, interfaces.Log, interfaces.GolfInterface
-{
+public class Player implements Serializable, interfaces.Log, interfaces.GolfInterface{
      // Constants ----------------------------------------------------------------------------------
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +32,7 @@ public class Player implements Serializable, interfaces.Log, interfaces.GolfInte
 
 @NotNull(message="{player.firstname.notnull}")
 @Size(max=45,message="{player.firstname.size}") 
-@Pattern(regexp = "[a-zA-Z0-9éèàê ç]*",message="Bean validation : REGEXP error for First Name (special characters not allowed)")
+@Pattern(regexp = "[a-zA-Z0-9éèàê ç]*",message="{player.firstname.regex}")
 
 @Produces
 //@PLAYERFIRSTNAME
@@ -47,7 +46,7 @@ private String playerFirstName;
 
 @NotNull(message="{player.city.notnull}")
 @Size(max=45,message="{player.city.size}") 
-@Pattern(regexp = "[a-zA-Z0-9éèàê' ç,-]*",message="Bean validation : REGEXP error for Club City (special characters not allowed)")
+@Pattern(regexp = "[a-zA-Z0-9éèàê' ç,-]*",message="{player.city.regex}")
     private String playerCity;
 
 @NotNull(message="{player.country.notnull}")
@@ -56,7 +55,7 @@ private String playerFirstName;
 
 @NotNull(message="{player.dob.notnull}")
 @Past(message="{player.dob.past}")
-    private Date   playerBirthDate;
+    private Date playerBirthDate;
 
 @NotNull(message="{player.gender.notnull}")
     private String playerGender;
@@ -95,10 +94,22 @@ private Boolean eID;
 private String playerPassword; // new 07-08-2018
 
 @NotNull(message="{player.password.notnull}")
+//@Empty(message="{player.password.notnull}")
 @Size(max=15,message="{player.password.size}") 
 //String pattern = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}\\z";
 @Pattern(regexp = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])\\S{8,}\\z",message="{player.password.regex}")
+//@Pattern(regexp="[a-zA-Z0-9éèàê'!â& ç-]*",message="{club.name.characters}")
 private String wrkpassword;
+
+@NotNull(message="{player.confirmpassword.notnull}")
+@Size(max=15,message="{player.confirmpassword.size}") 
+//String pattern = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}\\z";
+@Pattern(regexp = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])\\S{8,}\\z",message="{player.confirmpassword.regex}")
+//@Pattern(regexp="[a-zA-Z0-9éèàê'!â& ç-]*",message="{club.name.characters}")
+private String wrkconfirmpassword;
+
+private boolean NextPanelPassword = false;  // 16/11//2013
+
 /*
 (?=.*[0-9]) a digit must occur at least once
 (?=.*[a-z]) a lower case letter must occur at least once
@@ -115,10 +126,8 @@ private GoogleTimeZone playerTimeZone;
 private String playerRole;
 private List<Player> selectedOtherPlayers = null; // new 11/07/2017
 private List<Player> droppedPlayers = null; // new 11/07/2017
-
 public Player()    // constructor
 {
-    //idplayer = 324713;
     playerGender="M"; //set default value to Man in radiobutton
     playerHomeClub=0;
     eID = false;
@@ -127,7 +136,7 @@ public Player()    // constructor
 }
 @PostConstruct
     public void init(){
-    //    user = new User("Elder Moraes", "elder@eldermoraes.com");
+
 }
 // getter and setters
 
@@ -352,12 +361,28 @@ public Date getPlayerModificationDate()
         this.wrkpassword = wrkpassword;
     }
 
+    public String getWrkconfirmpassword() {
+        return wrkconfirmpassword;
+    }
+
+    public void setWrkconfirmpassword(String wrkconfirmpassword) {
+        this.wrkconfirmpassword = wrkconfirmpassword;
+    }
+
     public List<Player> getDroppedPlayers() {
         return droppedPlayers;
     }
 
     public void setDroppedPlayers(List<Player> droppedPlayers) {
         this.droppedPlayers = droppedPlayers;
+    }
+
+    public boolean isNextPanelPassword() {
+        return NextPanelPassword;
+    }
+
+    public void setNextPanelPassword(boolean NextPanelPassword) {
+        this.NextPanelPassword = NextPanelPassword;
     }
 
    public void PlayerDrop(DragDropEvent event) {  // used in inscriptions_other_players.xhtml
@@ -423,6 +448,7 @@ public String toString(){
      LOG.info("playerLanguage : " + this.getPlayerLanguage());
      LOG.info("playerBirthDate : " + this.getPlayerBirthDate());
      LOG.info("playerEmail : " + this.getPlayerEmail());
+     LOG.info("playerRole : " + this.getPlayerRole());
    }else{
        LOG.info("idplayer =  null" );
    }
@@ -442,9 +468,13 @@ public String toString(){
                + " ,playerEmail : " + this.getPlayerEmail()
                + " ,playerLanguage : " + this.getPlayerLanguage()
                + " ,playerBirthDate : " + this.getPlayerBirthDate()
-               + " ,Birth Date = " + SDF.format(this.getPlayerBirthDate())
+               + " ,BirthDate SDFformat= " + SDF.format(this.getPlayerBirthDate())
+               + " ,wrkpassword = " + this.getWrkpassword()
+               + " ,wrkconfirmpassword = " + this.getWrkconfirmpassword()
                + " ,playerPassword (encrypted) : " + this.getPlayerPassword()
-       ;
+               + " ,player Home Club : " + this.getPlayerHomeClub()
+               + " ,playerRole : " + this.getPlayerRole();
+           //    );
     return str;
  }
   } catch (Exception e) {
@@ -492,7 +522,7 @@ public String toString(){
 //    LCUtil.showMessageFatal(msg);
 
         p.setPlayerCountry(rs.getString("playerCountry"));
-        p.setPlayerBirthDate(rs.getDate("playerbirthdate"));
+        p.setPlayerBirthDate(rs.getDate("playerbirthdate")); // quelque chose de special avec le format ??
         p.setPlayerGender(rs.getString("playergender"));
         p.setPlayerHomeClub(rs.getInt("playerhomeclub"));
         p.setPlayerLanguage(rs.getString("playerLanguage"));
@@ -501,6 +531,7 @@ public String toString(){
         p.setPlayerPassword(rs.getString("PlayerPassword"));
         p.setPlayerRole(rs.getString("PlayerRole"));
         p.setPlayerModificationDate(rs.getTimestamp("playerModificationDate"));
+        
     //        LOG.info("map = success !!! " + p.toString());
    return p;
   }catch(Exception e){

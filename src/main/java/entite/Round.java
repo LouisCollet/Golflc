@@ -169,14 +169,6 @@ private String RoundScoreString;
         this.roundGame = roundGame;
     }
 
- //   public String getGametype() {
- //       return gametype;
- //   }
-
- //   public void setGametype(String gametype) {
- //       this.gametype = gametype;
- //   }
-
     public Short getRoundCBA() {
         return roundCBA;
     }
@@ -278,8 +270,13 @@ public static Round mapRound(ResultSet rs) throws SQLException{
   try{
         Round r = new Round();
             r.setIdround(rs.getInt("idround") );
+            
+            
                 java.util.Date d = rs.getTimestamp("roundDate");
             r.setRoundDate(DatetoLocalDateTime(d));
+     // new solution 21/01/2019       
+            r.setRoundDate(rs.getTimestamp("roundDate").toLocalDateTime());
+            
             r.setRoundGame(rs.getString("roundgame") );
             r.setRoundCBA(rs.getShort("RoundCSA") );
             r.setRoundCompetition(rs.getString("RoundCompetition") );

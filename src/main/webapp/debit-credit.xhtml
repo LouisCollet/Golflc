@@ -33,59 +33,64 @@
 <p:panelGrid
     id="panel1"
     columns="2"
-    styleClass="alignmentLeft"
-    columnClasses="className">
+ >
  <f:facet name="header">
   <h1>Bill Payment CDI Event Tutorial </h1>  
  </f:facet>
 	<h:outputLabel value="Amount: " for="amt" />
-	<h:inputText id="amt" value="#{paymentBean.amount}" required="true"
-		requiredMessage="An amount is required." maxlength="15" />
+	<h:inputText id="amt" value="#{paymentBean.amount}"
+                     required="true"
+		requiredMessage="An amount is required."
+                maxlength="15" />
 
 	<h:outputLabel value="Payment Options:" for="opt" />
 	<h:selectOneRadio id="opt" value="#{paymentBean.paymentOption}"
-		required="true" requiredMessage="Select Credit Operation or Debit Operation">
-		<f:selectItem id="credit" itemLabel="Credit Operation" itemValue="CREDIT" />
-		<f:selectItem id="debit" itemLabel="Debit Operation" itemValue="DEBIT" />
+		required="true" 
+                requiredMessage="Select Credit Operation or Debit Operation">
+		<f:selectItem id="credit" itemLabel="Credit Operation (+)" itemValue="CREDIT" />
+		<f:selectItem id="debit"  itemLabel="Debit Operation (-)"  itemValue="DEBIT" />
 	</h:selectOneRadio>
 
 <f:facet name="footer">
-	<h:commandButton value="Reset" action="#{paymentBean.reset}"  />
-	<h:commandButton id="submit" value=" Pay " action="#{paymentBean.pay}" />
+        <h:commandButton id="submit" value="Pay" action="#{paymentBean.pay()}" style="float: left;" />
+	<h:commandButton value="Reset" action="#{paymentHandler.setPaymentsNull()}" style="float: right;"  />
+	
 </f:facet>
 </p:panelGrid>
         
  <p:panelGrid
     id="panel2"
     columns="2"
-    styleClass="alignmentLeft"
-    columnClasses="className"
-    
     >
- <f:facet name="header">       
+ <f:facet name="header">
     <h1>Payment Handler Output</h1>
  </f:facet>
 
-
  <p:dataTable id="table1"
               var="c" 
-              value="#{payments}"
+              value="#{paymentHandler.payments}"
               emptyMessage="#{msg['message.table.empty']}"
               rendered="#{not empty payments}"
           >
 <!--   -->
- <p:column headerText="#{msg['round.date']}" style="width:100px" >    
+<p:column headerText="Date" style="width:10%" >
       <h:outputText value="#{c.datetime}"> 
-                <f:convertDateTime type="date" pattern="dd/MM/yyyy hh:mm:ss"/> 
+                <f:convertDateTime type="date" pattern="dd/MM/yyyy HH:mm:ss"/> 
       </h:outputText>
  </p:column>
-<p:column headerText="#{msg['round.competition']}" style="width:100px" >      
+
+<p:column headerText="Mouvement" style="width:8%" >      
       <h:outputText value="#{c.type}"/> 
  </p:column>
-      
- <p:column headerText="#{msg['round.game']}" style="width:100px" >     
+
+ <p:column headerText="Montant" style="width:8%" >     
       <h:outputText value="#{c.amount}"/> 
- </p:column>     
+ </p:column>
+
+<p:column headerText="Total" style="width:8%" >     
+      <h:outputText value="#{c.total}"/> 
+ </p:column>
+
 </p:dataTable>
 
 </p:panelGrid>

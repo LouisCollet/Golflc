@@ -19,7 +19,7 @@ public class FindClubCoordinates implements interfaces.Log
 {
    final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
    
-public Club findClubLatLngTz (final Club club){   
+public Club findClubLatLngTz (final Club club){
 try{
         LOG.info("entering findClubLatLngTz");
         LOG.info("club = " + club.toString()); //getClubAddress() );  // a été complété par playerCityListener, 
@@ -41,9 +41,12 @@ try{
         String fullAddress = club.getClubAddress() + "," + club.getClubCity() + "," + country_completed; 
             LOG.info("Assembled club fullAdddress = " + fullAddress) ;
         GoogleGeoApiController ggeo = new GoogleGeoApiController();
-        GoogleResult gr = ggeo.findLatLng(fullAddress + ", " + country_completed);
+        GoogleResult gr = ggeo.findLatLng(fullAddress + ", " + country_completed); // retourne Latitude et Longitude
         if(gr == null){
-            LOG.info ("gr == null");
+            String msg="GoogleResult == null";
+            // forcer Bruxelles ??
+            LOG.info (msg);
+            
         }
         
         LatLng latlng = gr.getGeometry().getLocation().getLatlng();
@@ -55,11 +58,23 @@ try{
             String msg = "Incorrect or insuffisant Club address - Please correct and retry !! = ";
              LOG.error(msg);
              club.setClubFormattedAddress(msg);
-             club.setClubTimeZone(null);
+       // new 03-02-2019      
+             GoogleTimeZone gtz = new GoogleTimeZone();
+
+                        if(gtz.getTimeZoneId() == null){
+                            LOG.info("GoogleTimeZone is null, forced to Brussels");
+                              gtz.setDstOffset(01); //Standard timezone: UTC/GMT +01:00
+                              gtz.setTimeZoneId("Europe/Brussels"); // le même pour tous ! par defaut
+                              gtz.setTimeZoneName("Central European Time ( CET )");
+                         }
+             
+             
+             club.setClubTimeZone(gtz);
              LCUtil.showMessageFatal(msg);
-             return null; // retourne d'où îl vient = player.xhtml
-            
-        }else{
+             return club;  // mod 13/02/2019
+         //    return null; // retourne d'où îl vient = player.xhtml
+             
+         }else{
             club.setClubLatLng(latlng);
  /// enlevé 01/08/2017 modifié dans club.java   club.setClubStringLatLng(club.getClubLatLng().toString());  // pour affichage dans player.xhtml
             LOG.info("ClubLatLng = " + club.getClubStringLatLng());
@@ -132,7 +147,6 @@ public static void main(String[] args) throws Exception , Exception{
     club.setClubCountry("MX");
     club.setClubName("Riviera Maya");
     
-  //  FindTarifData ftd = new FindTarifData();
     Club t1 = new FindClubCoordinates().findClubLatLngTz(club);
      LOG.info("Tarif extracted from database = "  + t1.toString());
 //findPlayerHandicap(player,round, conn);

@@ -17,8 +17,7 @@ public class CreateResult implements interfaces.Log {
   LOG.info(" -- Result Stableford to be inserted = " + in_result_stableford);
   LOG.info(" -- Result Zwanzeurs  to be inserted = " + in_result_zwanzeurs);
   CallableStatement cs = null;
-try
-{
+try{
     final String stored_name = "set_result(?,?,?,?,?,?)";   // nom de la stored pro, 6 parameters
     LOG.info(" -- Start with : " + stored_name);
     cs = conn.prepareCall("{CALL " + stored_name + "}");
@@ -44,9 +43,7 @@ try
       array_return_error[0]= "NO ERROR";
       array_return_error[1]= array_return_error[2]= "";
       return array_return_error;
-}
-catch(SQLException sqle)
-{
+}catch(SQLException sqle){
        if (sqle.getSQLState().equals("LC001") ) // warning new result = old result
             {LOG.error(" -- NEW Result = OLD result = " + sqle.getErrorCode());
             array_return_error[0]= "WARNING";
@@ -72,5 +69,4 @@ finally
 } // end finally
 
 } //end setStoredResult
-
-}
+} // end class

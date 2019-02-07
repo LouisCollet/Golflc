@@ -11,14 +11,13 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 
-public class CreateTee implements interfaces.Log
-{
+public class CreateTee implements interfaces.Log{
+    
     public boolean createTee(final Club club, final Course course, final Tee tee,
-            final Connection conn) throws SQLException
-    {
+            final Connection conn) throws SQLException    {
   //      Connection conn = null;
         PreparedStatement ps = null;
-        try {
+   try {
             LOG.info("starting createTee() ... = ");
             LOG.info("tee Start position = {}" ,tee.getTeeStart());
             LOG.info("tee Gender = {}" ,tee.getTeeGender() );
@@ -81,9 +80,8 @@ public class CreateTee implements interfaces.Log
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
-        } catch (NumberFormatException nfe) {
-            //LOG.error("-- £££ NumberFormatException in Insert tee " + nfe.toString());
-            String msg = "£££ NumberFormatException in Insert Tee = " + nfe.getMessage();
+        } catch (Exception nfe) {
+            String msg = "£££ Exception in Insert Tee = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
@@ -92,5 +90,4 @@ public class CreateTee implements interfaces.Log
             DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
         }
     } //end createTee
-
 } //end class

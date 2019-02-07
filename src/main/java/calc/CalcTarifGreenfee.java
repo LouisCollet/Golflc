@@ -5,10 +5,11 @@ import entite.Club;
 import entite.Course;
 import entite.Player;
 import entite.Round;
-import entite.Tarif;
-import find.FindTarifData;
+import entite.TarifGreenfee;
+import find.FindTarifGreenfeeData;
 import java.sql.Connection;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,17 +19,15 @@ import java.time.Period;
 import java.util.Arrays;
 import utils.DBConnection;
 import utils.LCUtil;
-import static utils.LCUtil.DatetoLocalDate;
 // rester à faire le cas des invités / guests
 // a faire : greenfee 0 pour memebre du club ! via une table member : greenfee 0 pour les membres du club
 public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.Log{
 
-  public double greenFee (Tarif tarif, Round round, Club club, Player player)
-{
-     LOG.info(" -- Start of greenFee with Tarif = " + tarif.toString());
-     LOG.info(" -- Start of greenFee with round = " + round.toString());
-     LOG.info(" -- Start of greenFee with club = " + club.toString());
-     LOG.info(" -- Start of greenFee with playerBirthDate = " + player.getPlayerBirthDate()); //toString());
+  public double calc (TarifGreenfee tarif, Round round, Club club, Player player){
+     LOG.info(" -- Start of TarifGreenfeegreenFee with Tarif = " + tarif.toString());
+     LOG.info(" --  with round = " + round.toString());
+     LOG.info(" --  with club = " + club.toString());
+   
  try {
  //       LOG.info("printing first elem");
      if(tarif.getDays().length > 0){
@@ -41,7 +40,7 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
         LOG.info("first elem teeTimes    = " + tarif.getTeeTimes()[0][0]);
      }
      if(tarif.getPriceEquipments().length > 0){
-        LOG.info("first elem equipment = "+ tarif.getPriceEquipments()[0]);
+        LOG.info("first elem equipment = "+ tarif.getPriceEquipments()[0][0]);
      }
  //    LOG.info("line 01");
      
@@ -49,11 +48,11 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
         LOG.info("LocalDate ldround = " + ldround);
      LocalTime tround = round.getRoundDate().toLocalTime();
         LOG.info("LocalTime tround = " + tround);
-   //  LocalDate lddob = utils.LCUtil.asLocalDate(player.getPlayerBirthDate(), ZoneId.systemDefault());
-     LocalDate lddob = DatetoLocalDate(player.getPlayerBirthDate()); //, ZoneId.systemDefault());
-        LOG.info("LocalDate lddob = " + lddob);
+        LOG.info("playerBirthDate = " + player.getPlayerBirthDate());
+     LocalDate lddob = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(player.getPlayerBirthDate()) );
+        LOG.info("LocalDate playerBirthDate = " + lddob);
 //1.    // l'ordre a de l'importance : il faut commencer par Days !!  il utilise les 2 premieres cells de dates Season qui existe donc ! 
-     if(tarif.getDays().length > 0){
+if(tarif.getDays().length > 0){
   //          LOG.info("first elem days      = " + tarif.getDays()[0][0]);
             String typePlayer = "A";   // Adult
             Double priceDays = findDays(tarif, ldround, typePlayer, club.getClubCountry(), lddob); // FRIDAY, WEEKEND, WEEK, HOLIDAY
@@ -62,7 +61,7 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
      }
 //2. 
         
-     if(tarif.getDatesSeason().length > 0 || tarif.getTeeTimes().length > 0){   
+     if(tarif.getDatesSeason().length > 0 || tarif.getTeeTimes().length > 0){
         String season = findPeriod(tarif,ldround);
             LOG.info("Season searched = " + season);
         double priceHours = findHours(tarif, tround, season);
@@ -85,14 +84,14 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
 } // end method setNewHandicap
 
     
- public String findPeriod (Tarif tarif, LocalDate ldround)
+ public String findPeriod (TarifGreenfee tarif, LocalDate ldround)
 {
    //  LOG.info(" -- Start of calcTarif with Tarif = " + tarif.toString());
   //   LOG.info(" -- Start of calcTarif with round = " + round.toString());
     // 0 = ddeg
     // 1 = dfin
     // 2 = season H, M or L
-      LOG.info("array datesSeason = " + Arrays.deepToString(tarif.getDatesSeason()));
+      LOG.info("Starting findPeriod with datesSeason = " + Arrays.deepToString(tarif.getDatesSeason()));
  try
  {
   String season = "H";  // default
@@ -136,20 +135,18 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
  }
 } // end method 
   
-   public double findHours (Tarif tarif, LocalTime tround, String season)
-{
+   public double findHours (TarifGreenfee tarif, LocalTime tround, String season){
    //  LOG.info(" -- Start of calcTarif with Tarif = " + tarif.toString());
   //   LOG.info(" -- Start of calcTarif with round = " + round.toString());
- try
- {
-     LOG.info("before search teeTimes " );
+ try {
+     LOG.info("Starting findHours " );
      LOG.info("array teeTimes = " + Arrays.deepToString(tarif.getTeeTimes()));
     // 0 = deb
     // 1 = dfin
     // 2 = price H
     // 3 = price M
     // 4 = price L
-     double price = 0;
+     double price = 0.0;
         for (int row = 0; row < tarif.getTeeTimes().length; row++)
         {
                  if(tarif.getTeeTimes()[row][0] == null){
@@ -203,13 +200,12 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
  }
 } // end method hours
   
-  public Double findDays (Tarif tarif, LocalDate ldround, String typeplayer, String country, LocalDate lddob)
-{   // 0 = "A"dult
+  public Double findDays (TarifGreenfee tarif, LocalDate ldround, String typeplayer, String country, LocalDate lddob){ 
+    // 0 = "A"dult
     // 1 = "G"uest
     // 2 = "J"unior
- try
- {
-     LOG.info("entering search days " );
+ try{
+     LOG.info("entering findDays " );
      LOG.info("array days = " + Arrays.deepToString(tarif.getDays()));
      LOG.info("typepplayer = " + typeplayer);
      
@@ -223,8 +219,8 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
      String day = null;
      double price = 0;
         // is it an holiday ?
-     utils.Holidays ho = new utils.Holidays();
-     boolean ok = ho.CountryHolidays(ldround, country.toUpperCase());   // BE, ES ...
+  //   utils.Holidays ho = new utils.Holidays();
+     boolean ok = new utils.Holidays().CountryHolidays(ldround, country.toUpperCase());   // BE, ES ...
      if (ok){
         LOG.info("this is an Holiday !! " + ldround);
         day = "HOLIDAY";
@@ -289,16 +285,12 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, interfaces.L
  }
 } // end method hours
   
-  
-  
-   public double findEquipments (Tarif tarif)
-{
-     LOG.info(" -- Start of calcTarif with Tarif = " + tarif.toString());
+   public double findEquipments (TarifGreenfee tarif){
+     LOG.info(" -- Start of findEquipments = " + tarif.toString());
   //   LOG.info(" -- Start of calcTarif with round = " + round.toString());
     
 double price = 0.0;
- try
- {
+ try {
   
  return price;
 
@@ -309,9 +301,7 @@ double price = 0.0;
       LOG.error(msg);
       LCUtil.showMessageFatal(msg);
      return 0.0;
- }
- finally
- {
+ } finally {
    // LOG.info(" -- New Handicap = " + LCUtil.myRound(newHcp,2));
  }
 } // end method setNewHandicap
@@ -321,37 +311,33 @@ double price = 0.0;
 public static void main(String[] args) throws ParseException, Exception //throws SQLException // testing purposes
 { LOG.info("starting main");
 
-DBConnection dbc = new DBConnection();
-Connection conn = dbc.getConnection();
+    DBConnection dbc = new DBConnection();
+    Connection conn = dbc.getConnection();
     try{
-Course course = new Course();
-course.setIdcourse(1); // 102=santana  1=americain Tournette
+    Course course = new Course();
+    course.setIdcourse(1); // 102=santana  1=americain Tournette
 
-FindTarifData ft = new FindTarifData();
-Tarif tarif = ft.findCourseTarif(course, conn);
-    LOG.info("main tarif = " + tarif.toString());
+    FindTarifGreenfeeData ft = new FindTarifGreenfeeData();
+    TarifGreenfee tarif = ft.findTarif(course, conn);
+        LOG.info("main tarif = " + tarif.toString());
 
-Round round = new Round(); 
-round.setRoundDate(LocalDateTime.of(2018, Month.FEBRUARY, 17, 12, 15));
-Club club = new Club();
-club.setClubCountry("ES");
-Player player = new Player();
+    Round round = new Round(); 
+    round.setRoundDate(LocalDateTime.of(2018, Month.FEBRUARY, 17, 12, 15));
+    Club club = new Club();
+    club.setClubCountry("ES");
+    Player player = new Player();
 //SDF.parse("01/03/2010");
-player.setPlayerBirthDate(SDF.parse("01/03/2010"));
-CalcTarifGreenfee ct = new CalcTarifGreenfee();
-double dd = ct.greenFee(tarif, round, club, player);
-LOG.info("price greenfee = " + dd);
+    player.setPlayerBirthDate(SDF.parse("01/03/2010"));
+    CalcTarifGreenfee ct = new CalcTarifGreenfee();
+    double dd = ct.calc(tarif, round, club, player);
+    LOG.info("price greenfee = " + dd);
         
  } catch (Exception e) {
-            String msg = "££ Exception in main CalcTarif= " + e.getMessage();
+            String msg = "££ Exception in CalcTarifGrennfee = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
    }finally{
          DBConnection.closeQuietly(conn, null, null,null); 
           }
-  
-//LOG.info(" -- Bravo ! Voici votre nouveau Handicap : = " + hcp );
-
-}// end main    
-
+}
 } //end class

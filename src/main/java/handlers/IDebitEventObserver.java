@@ -7,5 +7,5 @@ import qualifiers.Debit;
 
 
 public interface IDebitEventObserver {
-     void onDebitPaymentEvent(@Observes @Debit PaymentEvent event);
+       void onDebitPaymentEvent(@Observes @Debit PaymentEvent event);
 }

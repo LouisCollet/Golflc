@@ -1,15 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package utils;
 
 import java.security.SecureRandom;
 
-/**
- *
- * @author collet
- */
 public class RandomPassword implements interfaces.Log
 {
 private static final String NUMBERS = "0123456789";
@@ -57,6 +49,4 @@ private static String getRandomPasswordCharacters(int pos)
     return randomChar.toString();
 
 } //end method
-
- 
 } //end Class

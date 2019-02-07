@@ -50,8 +50,8 @@ finally{
     Connection conn = new DBConnection().getConnection();
     Course course = new Course();
     course.setIdcourse(102);
-  //  FindTarifData ftd = new FindTarifData();
- //   Tarif t1 = new FindTarifData().findCourseTarif(course, conn);
+
+
  ///    LOG.info("Tarif extracted from database = "  + t1.toString());
 //findPlayerHandicap(player,round, conn);
 //for (int x: par )

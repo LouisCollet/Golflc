@@ -1,14 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package utils;
 
-/**
- *
- * @author Collet
- */
+import static interfaces.Log.LOG;
+
 public class JavaLuhnAlgorithm {
     public void main(String[] args) {
 		validateCreditCardNumber("12345678903555");
@@ -35,9 +28,9 @@ public class JavaLuhnAlgorithm {
 			sum += ints[i];
 		}
 		if (sum % 10 == 0) {
-			System.out.println(str + " is a valid credit card number");
+			LOG.info(str + " is a valid credit card number");
 		} else {
-			System.out.println(str + " is an invalid credit card number");
+			LOG.info(str + " is an invalid credit card number");
 		}
 	}
 

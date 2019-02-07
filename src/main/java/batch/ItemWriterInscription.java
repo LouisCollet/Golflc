@@ -129,14 +129,14 @@ public class ItemWriterInscription extends AbstractItemWriter implements interfa
         LOG.info("step 03");
    //       LOG.info("inscription = " + inscription.toString());
            LOG.info("step 10");
-      CreateInscription ci = new CreateInscription();
-      boolean b = ci.createInscription(round, player, player, inscriptionNew, club, course, conn);
+    //  CreateInscription ci = new CreateInscription();
+      int b = new CreateInscription().create(round, player, player, inscriptionNew, club, course, conn);
          LOG.info("boolean returned from create inscription = " + b);
-      if(b == false) // new 20/10/2014
+      if(b == 00) // new 20/10/2014
              {
                   LOG.error("inscription not created !!");
              } 
-      return b;
+      return false;
     } //end try
  catch (Exception ex)
     { LOG.error(" -- Exception in insertDB !");

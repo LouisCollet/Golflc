@@ -32,7 +32,7 @@
                 style="float: right;">
 </h:graphicImage>
  <!--  cmd = #{param.cmd}
-    typePayment=#{courseC.creditcard.typePayment} -->
+    -->
  
 <h:form id="creditcard" enctype="application/x-www-form-urlencoded">
  <!--   <div>
@@ -40,10 +40,12 @@
        
     </div>
 -->
-    <c:if test="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}">
+    <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
          <ui:include src="include/include_summary.xhtml"/>
     </c:if>
-    
+    <c:if test="#{courseC.creditcard.typePayment eq 'COTISATION'}">
+         <ui:include src="include/include_summary_club.xhtml"/>
+    </c:if>
     <c:if test="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}">
          <ui:include src="include/include_subscription.xhtml"/>
     </c:if>
@@ -63,13 +65,18 @@
     </h:outputText>
     <h:outputText
             id="inscription"
-            rendered="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}" 
+            rendered="#{courseC.creditcard.typePayment eq 'GREENFEE'}" 
             value="#{msg['title.payment.round']}">
+    </h:outputText>
+    <h:outputText
+            id="membership"
+            rendered="#{courseC.creditcard.typePayment eq 'COTISATION'}" 
+            value="#{msg['title.payment.cotisation']} "> #{courseC.club.clubName}
     </h:outputText>
  </h1>
 </f:facet>
     <h:outputText  id="Total"
-                value="#{msg['payment.amounttobepaid']} :"
+                value="#{msg['creditcard.amounttobepaid']} :"
                 />
     <h:outputText  id="TotalPrice"
                 value="#{courseC.creditcard.totalPrice}"
@@ -85,7 +92,7 @@
                  
                          />
     
-    <h:outputText value="Credit Card Holder :" />
+    <h:outputText value="#{msg['creditcard.holder']} :" />
     <p:inputText  label="holder"
                               id="Holder"
                               value="#{courseC.creditcard.creditCardHolder}"
@@ -117,30 +124,7 @@
                        size="3" 
                        mask="999"
                          />
-        
-  <!--    <h:outputText value="#{msg['creditcard.type']} :"   />
-    
-     valueChangeListener="#{courseC.tarifCreditCardNumberListener}"    -->
-        <!--
-    <h:selectOneMenu  id="TypeCreditcard0"
-                          required="true"
-                          valueChangeListener="#{courseC.creditCardTypeListener}"
-                          value="#{courseC.creditcard.creditCardType}"
-               >
-            <f:selectItem itemLabel="Visa"  itemValue="VISA" />
-            <f:selectItem itemLabel="Maestro"  itemValue="Maestro" />
-            <f:selectItem itemLabel="Mastercard"  itemValue="MASTERCARD" />
-            <f:selectItem itemLabel="JCB"  itemValue="JCB" />
-            <f:selectItem itemLabel="UPI"  itemValue="U" />
-            <f:selectItem itemLabel="Diners Club"  itemValue="DINERS_CLUB" />
-            <f:selectItem itemLabel="American Express"  itemValue="AMERICAN_EXPRESS" />
-            <f:selectItem itemLabel="Discover"  itemValue="DISCOVER" />
-            <f:selectItem itemLabel="China Union Pay"  itemValue="CHINA_UNION_PAY" />
-       </h:selectOneMenu>
-    
-    
-     <h:outputText value="#{msg['creditcard.type']} :"   />
-     -->
+
    <h:panelGroup id="panelG2" layout="block" >
         <h:outputText value="#{msg['creditcard.type']} :"  
                      />
@@ -180,7 +164,7 @@
             >
          
         </p:calendar> 
-    <!-- <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />  -->
+
 <f:facet name="footer">
          <p:commandButton value="#{msg['inscription.back']}"
                          id="commandButtonback"
@@ -188,7 +172,7 @@
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-rotate-left"
-                         rendered="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}" 
+                         rendered="#{courseC.creditcard.typePayment eq 'GREENFEE'}" 
                          action="inscription.xhtml"
                          />
          <p:commandButton value="#{msg['payment.creditcard']}"
@@ -196,7 +180,7 @@
                          ajax="false"
                          update="growl-msg"
                          immediate="false"
-                         icon="fa fa-cc-visa"
+                         icon="fa fa-credit-card"
                          action="creditcard_accepted.xhtml"
                          />
 

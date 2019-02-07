@@ -24,17 +24,8 @@
 
 <ui:define name="content">
 
-<h:graphicImage 
-                name="images/tarif1.jpg"
-                alt="image missing :tarif1.jpg"
-                style="float: left;">
-</h:graphicImage>
-
-<h:graphicImage 
-                name="images/tarif2.jpg"
-                alt="image missing :tarif2.jpg"
-                style="float: right;">
-</h:graphicImage>
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg"  style="float: right;"></h:graphicImage>
 
 <h:form id="tarifSeasons" enctype="application/x-www-form-urlencoded" >
 <!--<ui:include src="include/include_messages.xhtml"/>-->
@@ -50,20 +41,24 @@
     <h1>#{msg['title.period.tarif']}</h1>
 </f:facet>
         
-       <h:outputText value="#{msg['tarif.number']} :"   />
+   <!--    <h:outputText value="#{msg['tarif.number']} :"   />
        <p:inputMask
                    label="hole num"
                         id="holenumb"
                         title="#{msg['tooltip.tarif.date']}"
-                        value="#{courseC.tarif.tarifIndexSeasons}"
+                        value="#{courseC.tarifGreenfee.tarifIndexSeasons}"
                         size="3"
                         mask="?99"
                         />
-
+   -->
+       <h:outputText value="#{msg['tarif.number']} :" />
+       <h:outputText id="index"
+                         value="#{courseC.tarifGreenfee.tarifIndexSeasons} / #{fn:length(courseC.tarifGreenfee.datesSeason)}"
+                        />
        <h:outputText value="#{msg['tarif.seasons']} :"   />
        <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{courseC.tarif.datesSeason[courseC.tarif.tarifIndexSeasons][2]}"
+                          value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][2]}"
                >
             <f:selectItem itemLabel="High"  itemValue="H" />
             <f:selectItem itemLabel="Medium"  itemValue="M" />
@@ -73,7 +68,7 @@
        <h:outputText  value="#{msg['tarif.period.start']} :"/>
        <p:inputMask id="startdate"
                     title="#{msg['tooltip.tarif.date']}"
-                    value="#{courseC.tarif.datesSeason[courseC.tarif.tarifIndexSeasons][0]}"
+                    value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][0]}"
                     size="11"
                     required="true"
 		    label="Start Date" 
@@ -85,7 +80,7 @@
       <h:outputText  value="#{msg['tarif.period.end']} :"/>
              <p:inputMask id="enddate"
                     title="#{msg['tooltip.tarif.date']}"
-                    value="#{courseC.tarif.datesSeason[courseC.tarif.tarifIndexSeasons][1]}"
+                    value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][1]}"
                     size="11"
                     required="true"
 		    label="End Date" 

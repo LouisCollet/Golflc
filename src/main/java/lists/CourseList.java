@@ -61,8 +61,7 @@ String query =
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
       //LOG.debug(" -- query 4= " );
-	while(rs.next())
-        {
+	while(rs.next()){
 		ECourseList ecl = new ECourseList();
                 Club c = new Club();
                 c = entite.Club.mapClub(rs);

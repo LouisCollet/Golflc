@@ -1,9 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
 package lc.golfnew;
 
 import java.io.Serializable;
@@ -36,7 +30,7 @@ public Locale getLocale()
         return locale;
     }
 
-public String getLanguage()
+public static String getLanguage()
     {  // LOG.info("getLanguage, getCountry = " + locale.getCountry() );
        // LOG.info("getLanguage, getDisplayCountry = " + locale.getDisplayCountry() );
        // LOG.info("getLanguage, getDisplayLanguage = " + locale.getDisplayLanguage() );
@@ -57,9 +51,6 @@ public static void setLanguage(String language)
       LOG.info("language switched to = " + locale);
  // new 18/08/2013 - enlevé 25/08/2013
    // refreshPage();
-      
-      
-      
 }
 
 protected static void refreshPage()
@@ -72,7 +63,4 @@ protected static void refreshPage()
  fc.setViewRoot(UIV);
     LOG.info("page refreshed !");
  }
-
-
-
 } // end class

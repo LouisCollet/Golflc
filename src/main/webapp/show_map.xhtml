@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      template="templates/masterTemplate.xhtml"
+>
+ 
+<ui:define name="title">Show Map for testing purposes </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_show_playedrounds.xhtml"/>
+</ui:define>
+
+<ui:define name="content">
+
+<h:form id="show_map">
+       
+<p:dataTable var="mapEntry"
+             value="#{courseC.members.entrySet()}">
+
+<f:facet name="header">
+     <h1>
+         #{msg['round.played']} #{courseC.player.playerFirstName} ,
+                 #{courseC.player.playerLastName} (#{courseC.player.idplayer})
+     </h1>
+</f:facet>
+
+  
+    
+    <h:outputText value="#{courseC.members[mapEntry.key]}" />
+    
+    <p:column  headerText="Key">
+             #{mapEntry.key}
+    </p:column>
+    <p:column headerText="Value">
+      #{mapEntry.value}
+    </p:column>
+
+</p:dataTable>
+
+    <h:head>
+            <title>JSF 2.3: DataModel Sample</title>
+        </h:head>
+
+            <h1>JSF 2.3:Map interface Sample</h1>
+
+            <h2> UIRepeat: Map interface</h2>
+            <ui:repeat var="entry" value="#{courseC.data}">
+                Key: #{entry.key}
+                Value: #{entry.value}
+            </ui:repeat>
+
+            <h2>DataTable: Map Interface</h2>
+            <p:dataTable var="mapEntry" value="#{courseC.data}">
+                <p:column headerText="Key">
+                    #{mapEntry.key}
+                </p:column>
+                <p:column headerText="Value">
+                    #{mapEntry.value}
+                </p:column>
+            </p:dataTable>
+    
+    
+    
+    
+    
+    
+</h:form>
+</ui:define>
+</ui:composition>
+
+
+

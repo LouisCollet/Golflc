@@ -8,7 +8,7 @@ import utils.LCUtil;
 
 public class DeleteClub implements interfaces.Log, interfaces.GolfInterface
 {
-  public String deleteClub(final int idclub, final Connection conn) throws Exception {
+  public boolean deleteClub(final int idclub, final Connection conn) throws Exception {
     PreparedStatement ps = null;
 try{ 
     LOG.info("starting Delete Club ... = " );
@@ -25,18 +25,18 @@ try{
     String msg = "<br/> <h1>There are " + row_delete + " Club deleted = " + idclub;
         LOG.info(msg);
   //      LCUtil.showMessageInfo(msg);
-        return "Club deleted ! ";
+        return true;
 }catch (SQLException e){
     String msg = "SQL Exception in DeleteClub = " + e.toString() + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
     LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }catch (Exception ex){
     String msg = "Exception in DeleteClub() " + ex;
     LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
-    return null;
+    return false;
 }finally{
         utils.DBConnection.closeQuietly(null, null, null, ps);
 }

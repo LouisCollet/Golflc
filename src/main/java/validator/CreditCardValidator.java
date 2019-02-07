@@ -16,29 +16,27 @@ int max;  //added 1/11/2016
 public void initialize(CreditCardV firstUpper)
 {
     max = firstUpper.max();
-    LOG.info("CreditCard Validator with input max = " + max);
+//    LOG.info("CreditCard Validator with input max = " + max);
 	// See JSR 303 Section 2.4.1 for sample implementation.
     // gives access to any attributes of the annotation such min/max fields of the size annotation
 }
 
 @Override
-public boolean isValid(String value, ConstraintValidatorContext context)
-{
-    LOG.info("entering isValid");
-    LOG.info("entering isValid with value = " + value);
-    	if (value == null || value.length() == 0)
-        {
-            LOG.info(" validateCreditCardNumber : card NUMBER is null");
+public boolean isValid(String value, ConstraintValidatorContext context){
+  //  LOG.info("entering isValid");
+   // LOG.info("entering isValid with value = " + value);
+    	if (value == null || value.length() == 0){
+   //         LOG.info(" validateCreditCardNumber : card NUMBER is null");
 	return false;
 	}
     value = value.replaceAll(" ", "");
-    LOG.info("entering isValid with SPACES removed = " + value);//return value.substring(0, 1).equals(value.substring(0, 1).toUpperCase());
+ //   LOG.info("entering isValid with SPACES removed = " + value);//return value.substring(0, 1).equals(value.substring(0, 1).toUpperCase());
     return validateCreditCardNumber(value);
 }
 
 private boolean validateCreditCardNumber(String str) {
-    LOG.info("entering validateCreditCardNumber");
-    LOG.info("entering validateCreditCardNumber with input = " + str);
+ //   LOG.info("entering validateCreditCardNumber");
+ //   LOG.info("entering validateCreditCardNumber with input = " + str);
 		int[] ints = new int[str.length()];
 		for (int i = 0; i < str.length(); i++) {
 			ints[i] = Integer.parseInt(str.substring(i, i + 1));
@@ -57,10 +55,10 @@ private boolean validateCreditCardNumber(String str) {
 			sum += ints[i];
 		}
 		if (sum % 10 == 0) {
-                    LOG.info(" validateCreditCardNumber : card OK");
+   //                 LOG.info(" validateCreditCardNumber : card OK");
 			return true;
 		} else {
-                     LOG.info(" validateCreditCardNumber : card INVALID NUMBER");
+   //                  LOG.info(" validateCreditCardNumber : card INVALID NUMBER");
 			return false;
 		}
 	} //end method
@@ -73,37 +71,20 @@ private boolean validateCreditCardNumber(String str) {
         final Scanner input = new Scanner(System.in);
         final String cardNumber = input.next();
 
-        if (cardNumber.startsWith("4"))
-        {
+        if (cardNumber.startsWith("4")){
             cType = "Visa";
         }
-        else if (cardNumber.startsWith("5"))
-        {
+        else if (cardNumber.startsWith("5")){
             cType =  "MasterCard";
         }
-        else if (cardNumber.startsWith("6"))
-        {
+        else if (cardNumber.startsWith("6")){
             cType =  "Discover";
         }
-        else if (cardNumber.startsWith("37"))
-        {
+        else if (cardNumber.startsWith("37")){
             cType =  "American Express";
-        }
-        else
-        {
+        }else{
             cType =  "Unknown type";
         }
-
-   //     final long total = sumOfEvenPlaces(Long.valueOf(cardNumber)) + (sumOfOddPlaces(Long.valueOf(cardNumber)) * 2);
-
-//        if (isValid(total))
- //       {
- //           System.out.println("The " + cType + " card number is valid");
-  //      }
-  //      else
-  //      {
-  //          System.out.println("The " + cType + " card number is invalid.");
-  //      }
     }
 
 public int luhnCardValidator(int cardNumbers[]) {
@@ -115,16 +96,10 @@ public int luhnCardValidator(int cardNumbers[]) {
                 }
                 return (sum % 10);
             }
-public int[] longToIntArray(long cardNumber){
 
+public int[] longToIntArray(long cardNumber){
 return Long.toString(cardNumber).chars()
     .map(x -> x - '0') //converts char to int 
     .toArray();  //converts to int array
 }
-
-
-
-
-
-
 } // end Class

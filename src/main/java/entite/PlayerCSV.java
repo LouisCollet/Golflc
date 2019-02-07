@@ -75,8 +75,7 @@ public class PlayerCSV implements Serializable, interfaces.Log, interfaces.GolfI
 
 public PlayerCSV()    // constructor
 {
-    //idplayer = 324713;
-    playerGender="M"; //set default value to Man in radiobutton
+      playerGender="M"; //set default value to Man in radiobutton
     playerHomeClub=0;
 }
 

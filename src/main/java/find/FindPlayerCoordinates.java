@@ -114,7 +114,7 @@ public static void main(String[] args) throws Exception , Exception{
     player.setPlayerCity("Brussels");
     player.setPlayerCountry("BE");
     // fille in the fields
-  //  FindTarifData ftd = new FindTarifData();
+
     player = new FindPlayerCoordinates().findPlayerLatLngTz(player); 
      LOG.info("Player is now = " + player.toString());
 //findPlayerHandicap(player,round, conn);

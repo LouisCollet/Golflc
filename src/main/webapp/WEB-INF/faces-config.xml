@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  mod 05-09-2018, replaced bu version 2.3
-<faces-config version="2.2"
-    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlnx.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
->
-    -->
+
 <faces-config
     xmlns="http://xmlns.jcp.org/xml/ns/javaee"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_3.xsd"
     version="2.3"
 >
-
+<!-- default changed to en on 26-01-2019   -->
 <application>
      <locale-config>
-         <default-locale>fr</default-locale>
-         <supported-locale>en</supported-locale>
+         <default-locale>en</default-locale>
+         <supported-locale>fr</supported-locale>
          <supported-locale>nl</supported-locale>
          <supported-locale>us</supported-locale>
      </locale-config>

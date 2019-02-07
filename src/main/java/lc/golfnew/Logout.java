@@ -21,7 +21,7 @@ public class Logout {
    //         final ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
    //         SecurityUtils.getSubject().logout();
   //          externalContext.invalidateSession();  // cleanup user related session state
-   //         externalContext.redirect("login.xhtml?faces-redirect=true");
+   //         externalContext.redirect("login.xhtml?faces-redirect=truelogin.xhtml");
    //     }
     }
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
@@ -104,8 +103,7 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          ajax="false"
                          immediate="false"
                          icon="fa fa-pencil"
-                       
-                         action="#{courseC.createInscription}"
+                         action="#{courseC.createInscription()}"
          />
 <!--   disabled="#{courseC.inscriptionNew.inscriptionOK}"  -->
 <p:commandButton 
@@ -124,7 +122,7 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          ajax="false"
                          immediate="false"
                          icon="fa fa-eur"
-                         action="#{courseC.findTarif()}"
+                         action="#{courseC.findTarifGreenfee()}"
          />
 <p:commandButton 
                          id="OtherPlayers"

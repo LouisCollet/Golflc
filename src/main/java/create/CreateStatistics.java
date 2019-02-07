@@ -10,15 +10,13 @@ import java.util.Arrays;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class CreateStatistics implements interfaces.Log
-
-{
+public class CreateStatistics implements interfaces.Log{
+    
     public boolean createStatistics(final Player player, final Round round,
-            final String[][] sc2, final Connection conn) throws SQLException
-    {
+            final String[][] sc2, final Connection conn) throws SQLException{
   //      Connection conn = null;
         PreparedStatement ps = null;
-        try {
+   try{
             LOG.info(" ... entering createStatistics");
             LOG.info("Round ID = " + round.getIdround());
             int holes = round.getRoundHoles();
@@ -84,33 +82,9 @@ public class CreateStatistics implements interfaces.Log
             } // end UPDATE
 //ici ??
 //            setNextScorecard(true); // affiche le bouton next(Scorecard) bas ecran à droite
-        } //end try
-        catch (NullPointerException npe) {
-            String msg = "£££ NullPointerException in Insert or Update Statistics = " + npe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
-        } catch (IndexOutOfBoundsException iobe) {
-            String msg = "£££ IndexOutOfBoundsException in Insert or Update Statistics = " + iobe.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
-        } 
-  //      catch (MySQLIntegrityConstraintViolationException cv) {
-  //          String msg = "£££ MySQLIntegrityConstraintViolationException in Insert or Update Statistics = " + cv.getMessage();
-  //          LOG.error(msg);
-  //          LCUtil.showMessageFatal(msg);
-  //          return false;
-    //return null;
-  //      }
-        catch (SQLException sqle) {
+        } catch (SQLException sqle) {
             String msg = "£££ SQLException in Insert or Update Statistics = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
-        } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Insert or Update Statistics = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
@@ -126,4 +100,4 @@ public class CreateStatistics implements interfaces.Log
         return false;
 
     } //end method
-}
+} //end class

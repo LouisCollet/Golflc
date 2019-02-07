@@ -44,18 +44,19 @@ ici c'est pour générer des data pour tester !  -->
 </h:graphicImage>
 
 <!--    cmd = #{param.cmd}
-    typePayment=#{courseC.creditcard.typePayment}
+ 
  -->   
 <h:form id="creditcard_accepted" enctype="application/x-www-form-urlencoded">
         
-    <c:if test="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}">
+    <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
          <ui:include src="include/include_summary.xhtml"/>
     </c:if>
-    
     <c:if test="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}">
          <ui:include src="include/include_subscription.xhtml"/>
     </c:if>
-
+    <c:if test="#{courseC.creditcard.typePayment eq 'COTISATION'}">
+         <ui:include src="include/include_summary_club.xhtml"/>
+    </c:if>
 <p:panelGrid
     id="panelGrid1"
     columns="2"
@@ -71,13 +72,18 @@ ici c'est pour générer des data pour tester !  -->
     </h:outputText>
     <h:outputText
             id="inscription"
-            rendered="#{coursC.creditcard.typePayment eq 'INSCRIPTION'}" 
+            rendered="#{coursC.creditcard.typePayment eq 'GREENFEE'}" 
             value="#{msg['title.payment.round']}">
     </h:outputText>
+    <h:outputText
+            id="membership"
+            rendered="#{courseC.creditcard.typePayment eq 'COTISATION'}" 
+            value="#{msg['title.payment.cotisation']}">
+    </h:outputText> 
  </h1>
 </f:facet>
     <h:outputText  id="Total"
-                value="#{msg['payment.amounttobepaid']} :"
+                value="#{msg['creditcard.amounttobepaid']} :"
                 />
      <h:outputText  id="TotalPrice"
                 value="#{courseC.creditcard.totalPrice}"
@@ -85,26 +91,20 @@ ici c'est pour générer des data pour tester !  -->
                 />
     
     <h:outputText value="#{msg['creditcard.communication']} :" />
-    <h:outputText  label="com"
-                  id="Communication"
+    <h:outputText id="Communication"
                   value="#{courseC.creditcard.communication}"
                   title="#{msg['tooltip.club.clubaddress']}"
-                  size="45" 
                   />
     
-    <h:outputText value="Holder :" />
-    <h:outputText  label="holder"
-                              id="Holder"
-                              value="#{courseC.creditcard.creditCardHolder}"
-                              
-                         />
+    <h:outputText value="#{msg['creditcard.holder']} :" />
+    <h:outputText   id="Holder"
+                    value="#{courseC.creditcard.creditCardHolder}"
+              />
     
     <h:outputText  value="#{msg['creditcard.number']} :"/>
-    <h:outputText
-                        label="creditcard"
-                        id="creditcardNumber"
-                        value="#{courseC.creditcard.creditCardNumber}"
-                        >
+    <h:outputText   id="creditcardNumber"
+                    value="#{courseC.creditcard.creditCardNumber}"
+                  >
       </h:outputText>
     
     <h:outputText value="#{msg['creditcard.type']} :"   />
@@ -113,7 +113,7 @@ ici c'est pour générer des data pour tester !  -->
                >
      </h:outputText>
     
-    <h:outputText value="Expiration Date :" />
+    <h:outputText value="#{msg['creditcard.expiration']} :" />
     <h:outputText 
             id="Expiration"
             value="#{courseC.creditcard.creditCardExpirationDate}"
@@ -121,41 +121,25 @@ ici c'est pour générer des data pour tester !  -->
          <f:convertDateTime type="date" pattern="MM/yyyy" />
         </h:outputText> 
     
-    <h:outputText value="Major Industry Identifier :" />
+    <h:outputText value="#{msg['creditcard.industry']} :" />
     <h:outputText 
             id="Industry"
             value="#{courseC.creditcard.creditCardMajorIndustryIdentifier}"
             />
-
+<!--
     <h:outputText value="Issuer calculated from cardnumber :" />
     <h:outputText 
             id="Issuer"
             value="#{courseC.creditcard.creditCardIssuer}"
             />
-  <!--
-    <h:panelGroup id="panelGreenfee"
-                  layout="block"
-                  rendered="#{not empty courseC.tarif.priceItem[0]}"
-                  >
-       <h:outputText  value="#{msg['tarif.greenfee']} :"/>
-       <h:outputText  label="Greenfee3"
-                       id="Greenfee3"
-                       value="#{courseC.tarif.priceItem[0]}"
-                       >
-            <f:convertNumber type="currency"/>
-       </h:outputText>
-    </h:panelGroup>
-        
 -->
-<!-- do not change the id !! see totalprice.js  -->
-
-<p:commandButton value="I accept this payment !"
-                         id="commandButtonPay"
-                         actionListener="#{courseC.startTask}"
-                         rendered="#{courseC.creditcard.paymentOK eq false}"
-                         onclick="jsStartTask()"
-                         update="taskResult"
-                         widgetVar="taskButton"/>
+<p:commandButton value="#{msg['creditcard.payment']} :"
+                 id="taskButton"
+                 actionListener="#{courseC.startTask}"
+                 rendered="#{courseC.creditcard.paymentOK eq false}"
+                 onclick="jsStartTask()"
+                 update="taskResult"
+                 widgetVar="taskButton"/>
     <h:outputText value=" "/>
     
     <p:progressBar  widgetVar="progressBar"
@@ -172,48 +156,31 @@ ici c'est pour générer des data pour tester !  -->
                     />
     </p:progressBar>
     
-    <!--  PF('commandButtonPay').disable();
-                    PF('commandButtonMail').enable();  -->
         <h:outputText id="taskResult"
-                      value="#{courseC.getResultCreditCardSubscription()}"/>
+                      value=" "/> 
 
 <f:facet name="footer">
-         <p:commandButton value="#{msg['inscription.back']}"
+   <!--  
+   <p:commandButton value="#{msg['inscription.back']}"
                          id="commandButtonBack"
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-rotate-left"
-                         rendered="#{courseC.creditcard.typePayment eq 'INSCRIPTION'}" 
+                         rendered="#{courseC.creditcard.typePayment eq 'GREENFEE'}" 
                          action="inscription.xhtml"
                          />
-         <p:commandButton value="Mail de confirmation"
-                         id="commandButtonMail"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="true"
-                         icon="fa fa-envelope"
-                         action="#{courseC.creditCardMail}"
-                         />
-         <!--  rendered="#{courseC.creditcard.paymentOK eq true}" -->
-          <p:commandButton id="btn"
-                         value="#{msg['button.print']}"
-                         type="button"
-                         icon="fa fa-print"
-                         >
-                <p:printer target="creditcard_accepted" />
-          </p:commandButton>
-          <p:commandButton value="#{msg['login.welcome']}"
+-->
+          <p:commandButton value="#{msg['creditcard.stop']}"
                          id="commandButtonWelcome"
                          ajax="false"
                          update="growl-msg"
                          immediate="false"
-                         icon="fa fa-home"
+                         icon="fa fa-remove"
                          action="welcome.xhtml"
                   />
-         
-</f:facet>
 
+</f:facet>
 </p:panelGrid>
 
    <!--  transfer data fromm js to bean
@@ -227,15 +194,9 @@ ici c'est pour générer des data pour tester !  -->
 </h:form>
     <script type="text/javascript">
     function jsOnComplete() {
-        PF('taskButton').enable();
-        console.info("before buttonplay");
-   //     document.getElementById("creditcard_accepted:commandButtonPay").disabled = true;
-
-    //    document.getElementById("creditcard_accepted:").disabled = true; 
-    //    document.getElementById("commandButtonPay").disabled = true;
-
-    //    document.getElementById('creditcard_accepted:commandButtonMail'").enabled = true;
-   //     console.info("after buttonplay : ne fonctionne pas !!");
+ //       alert("Hello! I am an alert box fo jsOnComplete!!");
+ //       PF('taskButton').enable();
+window.setTimeout(function(){ window.location = "creditcard_payment_executed.xhtml"; },1000); //where 1000 is 1 seconds.
     }
     function jsStartTask() {
       PF('taskButton').disable();

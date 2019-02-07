@@ -4,8 +4,6 @@ import entite.ECourseList;
 import entite.Player;
 import entite.ScoreMatchplay;
 import static interfaces.Log.LOG;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,10 +16,13 @@ import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -37,11 +38,9 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.event.PhaseId;
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletContext;
+import lc.golfnew.LanguageController;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import org.primefaces.PrimeFaces;
 import org.primefaces.context.RequestContext;
@@ -54,7 +53,7 @@ public class LCUtil implements interfaces.GolfInterface, interfaces.Log    // co
 {
   private static long startTime;
   private static long stopTime;
-  @Inject private static FacesContext fc;
+ // @Inject private static FacesContext fc;
   @Inject private static Flash flash;
   @Inject private static ExternalContext ec;
 
@@ -180,15 +179,26 @@ try{
     return null;
   }
 }
-
+public static java.sql.Date LocalDateTimetoSqlDate(LocalDateTime date){
+try{
+    //    LOG.info("entering LocalDateTimetoSqlDate with Date = " + date);
+        LocalDateTime ldt = date;
+        return java.sql.Date.valueOf(ldt.toLocalDate());
+ }catch(Exception e){
+   String msg = "£££ Exception in LocalDateTimetoSqlDate = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+}
 public static LocalDate DatetoLocalDate(java.util.Date date){
   try{
-  //     LOG.info("entering DatetoLocalDate with Date = " + date);
+      LOG.info("entering DatetoLocalDate with Date = " + date);
         return date.toInstant()
                    .atZone(ZoneId.systemDefault())
                    .toLocalDate();
    }catch(Exception e){
-   String msg = "£££ Exception in DatetoLocalDate = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   String msg = "£££ Exception in DatetoLocalDate = " + e.getMessage();
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;
@@ -256,7 +266,7 @@ public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat) // java.sql
     public static java.sql.Date toSqlDate(java.util.Date date) {
      return (date != null) ? new java.sql.Date(date.getTime()) : null;
     }
-
+/*
   public int getAvailableMemory() // encore à tester !!!
   {
     // obtenir le type d'environnement graphique sous lequel tourne la JVM
@@ -269,7 +279,7 @@ public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat) // java.sql
  //  int mbytes = 
    return bytes /1048576;
 }
-
+*/
 
 public static String secondsToString(int time){
    int seconds = (time % 60);
@@ -389,21 +399,22 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
    * @param times
    * @return
    */
-  public static String generateInsertQuery (Connection conn, String table) throws SQLException
+  public static String generateInsertQuery_old (Connection conn, String table) throws SQLException{
         // utilisé pour gestion des database, SQL requests
 // construct the SQL. Creates: CheckGameEligibility(?, ?, ?)
-{
-    int times = DBMeta.getCountColumns(conn, table);
+
+    int times = DBMeta.CountColumns(conn, table);
         //LOG.info("times = " + times);
     String s = "?,";
 // = parameters placeholders, un par field
-    StringBuilder sb = new StringBuilder (s.length()*times);
+    StringBuilder sb = new StringBuilder(s.length()*times);
     //StringBuilder sb2 = new StringBuilder(" VALUES (");
-    StringBuilder sb2 = new StringBuilder("INSERT INTO "); // new
-    sb2 = sb2.append(table).append(" VALUES (");
-    for (int i=0; i<times; i++)
+    StringBuilder sb2 = new StringBuilder(); // new
+  //  sb2 = sb2.append(table).append(" VALUES (");
+    sb2.append("INSERT INTO ").append(table).append(" VALUES (");
+    for(int i=0; i<times; i++)
     {
-        sb.append(s);
+        sb.append("?,");
     }
     //LOG.info("sb capacity = " + sb.capacity());
     sb = sb.deleteCharAt(times*2 - 1); // delete dernière virgule
@@ -413,8 +424,20 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
   //      LOG.info("# of question marks = " + sb2.toString());
     return sb2.toString();
 }
-
-public static void printArray2DInt(int[][] a)
+  public static String generateInsertQuery (Connection conn, String table) throws SQLException{
+        // utilisé pour gestion des database, SQL requests
+    int times = DBMeta.CountColumns(conn, table);
+        //LOG.info("times = " + times);
+    StringBuilder sb = new StringBuilder();
+    sb.append("INSERT INTO ").append(table).append(" VALUES (");
+    for(int i=0; i<times; i++){
+        sb.append("?,"); // = parameters placeholders, one par field
+    }
+    sb.deleteCharAt(sb.lastIndexOf(",")).append(");"); // delete dernière virgule
+    return sb.toString();
+}
+  
+ public static void printArray2DInt(int[][] a)
 {
     int ard = getArrayDimension (a);
     System.out.print("[ ");
@@ -530,7 +553,7 @@ public static void reset() {
  *
  * @param fileName
  * @throws Exception
- */
+
 public static void captureScreen(String fileName) throws Exception
 {
    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -539,7 +562,7 @@ public static void captureScreen(String fileName) throws Exception
    BufferedImage image = robot.createScreenCapture(screenRectangle);
    ImageIO.write(image, "png", new File(fileName));
 } //end captureScreen
-
+ */
 
 /**
  *
@@ -547,8 +570,7 @@ public static void captureScreen(String fileName) throws Exception
  * @param searchFor
  * @return
  */
-public static int countOccurences(String base, String searchFor)
-{
+public static int countOccurences(String base, String searchFor){
     int len = searchFor.length();
     int result = 0;
 
@@ -704,8 +726,7 @@ public static long getMemoryUse()
 
 
 //public static void DiskSpace()
-public static long DiskSpace() 
-{
+public static long DiskSpace() {
  try
  { 
      long lc = java.nio.file.Files.getFileStore(Paths.get("c:/")).getUsableSpace();
@@ -725,13 +746,27 @@ public static long DiskSpace()
 public static String prepareMessageBean(String message){
 try{
        //  https://stackoverflow.com/questions/13655540/read-resource-bundle-properties-in-a-managed-bean
-       FacesContext context = FacesContext.getCurrentInstance();
+        FacesContext context = FacesContext.getCurrentInstance();
+        LOG.info("responseComplete has been called : " + context.getResponseComplete());
+        if(context == null){
+            LOG.info("FacesContext.getCurrentInstance() = null");
+            return "***not found***";
+         }
+
        ResourceBundle text = ResourceBundle.getBundle("/messagesBean", context.getViewRoot().getLocale());
+       LOG.info(" text language = " + text.getLocale().getLanguage());
        String someKey = text.getString(message);
        if(someKey.equals("")){
            someKey = "???";
-       }    LOG.info("bean internationalisation = " + someKey);
+       } 
+       LOG.info("bean internationalisation key found = " + someKey);
+       
        return someKey;
+ }catch (java.util.MissingResourceException mr){
+            String msg =  message +  " / Doesn't exists - for language = " + LanguageController.getLanguage() + " / " + mr;
+            LOG.info(msg);
+            utils.LCUtil.showMessageInfo(msg);
+            return null;
   }catch (Exception cv){
             String msg = "£££ Exception in prepare MessageBean = " + cv;
             LOG.error(msg);
@@ -744,6 +779,7 @@ try{
  //@Inject private FacesContext fc;
 //  @Inject private Flash flash;
 //  @Inject private ExternalContext ec;
+/*
 public static void showMessageFatalOld(String summary){
     try{
        LOG.info("entering showMessageFatalOld " + FacesContext.getCurrentInstance() );
@@ -787,33 +823,34 @@ public static void showMessageFatalOld(String summary){
             LOG.error(msg);
    }     
 } // end method
+*/
+
 public static void showMessageFatal(String summary){
     try{
  ////       LOG.info("entering showMessageFatal " + FacesContext.getCurrentInstance() );
-        if(RequestContext.getCurrentInstance() == null){
-            LOG.info("RequestContext.getCurrentInstance() == null");   
-    //        RequestContext.getCurrentInstance().execute("{alert('Welcome user - showMessageFatal error!')}");
-        }
-       FacesContext fc = FacesContext.getCurrentInstance();
-       fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
+ //       if(RequestContext.getCurrentInstance() == null){
+ //           LOG.info("RequestContext.getCurrentInstance() == null");   
+    //     RequestContext.getCurrentInstance().execute("{alert('Welcome user - showMessageFatal error!')}");
+  //      }
+       FacesContext fc1 = FacesContext.getCurrentInstance();
+ //      fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
 //        LOG.info("face context batch" + FacesContext.getCurrentInstance().getApplication());
 ////    RequestContext rc = RequestContext.getCurrentInstance();
-       PrimeFaces pf = PrimeFaces.current();
-       if (pf.isAjaxRequest()) {
-         // pf.ajax().update("...");
-         LOG.info("this is an AjaxRequest !!");
-        }
-       if(fc != null) //JSF session, fc is null for  BATCH sessions
-       {
-            fc.getExternalContext().getFlash().setKeepMessages(true);
+ //      PrimeFaces pf = PrimeFaces.current();
+ //      if (pf.isAjaxRequest()) {
+ //        // pf.ajax().update("...");
+ //        LOG.info("this is an AjaxRequest !!");
+   //     }
+       if(fc1 != null){ //JSF session, 
+            fc1.getExternalContext().getFlash().setKeepMessages(true);
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary," (Application GolfLC)");
-            fc.addMessage(null, facesMsg);
-//         rc.showMessageInDialog(facesMsg); // new 20/07/2015
+            fc1.addMessage(null, facesMsg);
             PrimeFaces.current().dialog().showMessageDynamic(facesMsg);
-       }else{   // fc is null for  BATCH sessions alert('Welcome user - omnifaces msg!'
-//           LOG.info("messageFatal this is a batch execution " + summary);
-      //    rc.execute("PrimeFaces.info('Hello from the Backing Bean');");
-           PrimeFaces.current().executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
+       }else{ //fc is null for BATCH sessions
+           LOG.info("messageFatal this is a batch execution " + summary);
+           PrimeFaces pf = PrimeFaces.current();
+            pf.executeScript("{alert('Welcome user - showMessageFatal error!')}");
+         //  PrimeFaces.current().executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
        }
   }catch (Exception cv){
             String msg = "£££ Exception in addMessageFatal = " + cv;
@@ -879,7 +916,7 @@ try{
 } //end method
 
 
-
+/*
 public static boolean isValidEmailAddress(String email) {
    boolean result = true;
    try {
@@ -890,6 +927,7 @@ public static boolean isValidEmailAddress(String email) {
    }
    return result;
 }
+*/
 /*
 public static PreparedStatement prepareStatement(Connection connection, String sql, Object... values) throws SQLException {
     PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -1318,7 +1356,7 @@ public static String getFileNameFromPart(Part part)
   
   
   public static String[] removeNull1D( String[] arr1d) {
-  //String[] inputs;
+  LOG.info("removeNull1D input = " + Arrays.deepToString(arr1d));
 ArrayList<String> items = new ArrayList<>(arr1d.length);
 for(String input : arr1d) {
    if (input != null) {
@@ -1326,15 +1364,17 @@ for(String input : arr1d) {
    }
 } // end for
 String[] outputs = items.toArray(new String[items.size()]);
+LOG.info("removeNull1D output = " + Arrays.deepToString(arr1d));
   return outputs;
   }
   
   
     
   
-  public static String[][] removeNull2D( String[][] arr2d) {
+  public static String[][] removeNull2D(String[][] arr2d) {
          // https://stackoverflow.com/questions/32099750/delete-null-element-in-2d-array-in-java?lq=1
          // used with tarif 
+         LOG.info("removeNull2D input = " + Arrays.deepToString(arr2d));
         ArrayList<ArrayList<String>> list2d = new ArrayList<>();
         for(String[] arr1d: arr2d){
             ArrayList<String> list1d = new ArrayList<>();
@@ -1353,6 +1393,7 @@ String[] outputs = items.toArray(new String[items.size()]);
         for(ArrayList<String> list1d: list2d){
             cleanArr[next++] = list1d.toArray(new String[list1d.size()]);
         }
+         LOG.info("removeNull2D output = " + Arrays.deepToString(cleanArr));
      return cleanArr;
   }  //end removeNull2D
   
@@ -1500,8 +1541,83 @@ public static class MapToArrayExample {
     
     }
 
-public static void main(String[] args){ // throws IOException,Exception
+public static String extractHHmm (String sunris) {
+  try{
+    LOG.info("input string = " + sunris);
+      int egal1 = sunris.indexOf("=")+1; //, sunrise.indexOf(",") + 1);  // cherche 2e virgule
+        LOG.info("egal 1 = " + egal1);
+      int virgule1 = sunris.indexOf(",");
+        LOG.info("virgule1 = " + virgule1);
+      String hours = sunris.substring(egal1, virgule1);
+      LOG.info("hours = " + hours);
+      
+      int egal2 = sunris.indexOf("=", sunris.indexOf("=") + 1);  // cherche 2e virgule
+        LOG.info("egal 2 = " + egal2);
+      int virgule2 = sunris.indexOf(",", sunris.indexOf(",") + 1);  // cherche 2e virgule     
+        LOG.info("virgule2 = " + virgule2);
+      String minutes = sunris.substring(egal2+1, virgule2);   
+       LOG.info("minutes = " + minutes);
+       
+      int egal3 = sunris.lastIndexOf("="); //, sunris.indexOf("=") + 1);  // cherche 2e virgule
+        LOG.info("egal 3 = " + egal3);
+       
+      String ampm = sunris.substring(egal3+1, egal3+2+1);
+          LOG.info("AMPM = " + ampm);
+      if(ampm.equals("PM")){
+            LOG.info("hours = PM ");
+          int h = Integer.valueOf(hours) + 12;
+          hours = String.valueOf(h);
+          LOG.info("PM hours corrected = " + hours);
+      }else{
+           LOG.info("hours = AM ");
+      }
+      LOG.info("sunrise = " + hours +"." + minutes);
+    return(hours + "." + minutes);
+ //   }
+  }catch (Exception e){
+    String msg = "error findProperties = " + e ;
+    LOG.error(msg);
+    return null;
+        }
+} // end method
 
+ public static int calculateAgeFirstJanuary(java.util.Date birthDate){ //, LocalDate currentDate) {
+ try{
+           LOG.info("entering calculateAgeFirstJanuary" );
+           LOG.info("entering calculateAgeFirstJanuary with birthdate = " + birthDate);
+     if(birthDate != null) {
+        LocalDate localDateBirth = LocalDate.parse(new SimpleDateFormat("yyyy-MM-dd").format(birthDate) );
+    //       LOG.info("localDateBirth = " + localDateBirth);
+	LocalDate firstDayYear = LocalDate.of(LocalDate.now().getYear(), Month.JANUARY, 1);
+   //        LOG.info("first day year = " + firstDayYear);
+        return Period.between(localDateBirth,firstDayYear).getYears();
+     }else{
+            return 99;
+     }
+    }catch(Exception e){
+    String msg = "Error calculateAgeFirstJanuary = " + e ;
+        LOG.error("error = " + msg );
+       return 99;
+    }
+    }//end method
+ 
+    /**
+     * Clones the provided array
+     * 
+     * @param src
+     * @return a new clone of the provided array
+     */
+    public static int[][] cloneArray2D(int[][] src) {
+        int length = src.length;
+        int[][] target = new int[length][src[0].length];
+        for (int i = 0; i < length; i++) {
+            System.arraycopy(src[i], 0, target[i], 0, src[i].length);
+        }
+        return target;
+    }
+
+public static void main(String[] args) throws Exception{ // throws IOException,Exception
+/*
      MapToArrayExample mapToArrayExample = new MapToArrayExample();
        Map <Integer,String> sourceMap = new HashMap < > ();
         sourceMap.put(100, "ABC");
@@ -1509,21 +1625,27 @@ public static void main(String[] args){ // throws IOException,Exception
        sourceMap.put(102, "XYZ");
        String[] targetArray = mapToArrayExample.mapValuesToArray(sourceMap);
         System.out.println(Arrays.toString(targetArray));
-    
-    
-    
+        */
+    DBConnection dbc = new DBConnection();
+    Connection conn = dbc.getConnection();
+    String s = generateInsertQuery(conn, "player");
+        LOG.info("string généré 1 = " + s);
+ //   s = generateInsertQuery(conn, "player");
+ //       LOG.info("string généré 2 = " + s);
+    DBConnection.closeQuietly(conn, null, null,null); 
     
     
     
 } //end class main
  public static String creditcardSecret(String creditcardNumber) {
  try{
+    if(creditcardNumber == null) return null;
     return repeat("*", 12) + creditcardNumber.substring(creditcardNumber.length()-4);
+    // on affiche des * sauf les 4 derniers caractères qui sont affichés
     }catch (Exception e){
     String msg = "error creditcardSecret = " + e ;
         LOG.error("error = " + msg );
         return null;
     }
 }
-
-} // end Class ApexUtil
+} // end Class LCUtil

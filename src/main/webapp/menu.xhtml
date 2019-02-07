@@ -20,26 +20,21 @@
                      icon="fa fa-home" />
     </p:submenu>
 
-    <p:submenu label="CREATE" >
-             <p:menuitem value ="Club,Course,Tee,Holes"
+    <p:submenu label="#{msg['menu.create']}" >
+             <p:menuitem value ="#{msg['menu.create.club']}"
                         action="#{courseC.to_club_xhtml('create club')}"
                         icon="fa fa-flag"
                          />
-   <!--          <p:menuitem value ="Course" 
-                         action="#{courseC.to_course_xhtml('create course')}"
-                         icon="fa fa-flag-checkered" />
-             <p:menuitem value ="Tee Box" 
-                         action="#{courseC.to_tee_xhtml('create tee')}"
-                         icon="fa fa-flag-o" />
-             <p:menuitem value ="Hole" 
-                         url="hole.xhtml?cmd=ini&amp;operation=create"     icon="ui-icon-flag" />
-    -->         
-             <p:menuitem value ="Create Round"
+             <p:menuitem value ="#{msg['menu.create.round']}"
                          action="#{courseC.to_selectCourse_xhtml('CreateRound')}"
                          icon="fa fa-list" />
-             <p:menuitem value ="Create Tarif"
+             <p:menuitem value ="#{msg['menu.create.tarif.greenfee']}"
                          action="#{courseC.to_selectCourse_xhtml('CreateTarif')}"
                          icon="fa fa-money" />
+             <p:menuitem value ="#{msg['menu.create.tarif.member']}"
+                         action="#{courseC.to_selectCourse_xhtml('CreateTarifMember')}"
+                         icon="fa fa-money" />
+
  <!-- https://www.w3schools.com/icons/fontawesome_icons_intro.asp -->            
     </p:submenu>
     <p:submenu label="MODIFY">
@@ -93,7 +88,6 @@ url="show_played_rounds.xhtml?cmd=ini"
  -->   
 </p:submenu>
 <p:submenu label="PLAY A ROUND">
-   
    <p:menuitem value ="Score Card"
                action="#{courseC.to_selectRegisteredRounds_xhtml('ini')}"
                icon="ui-icon-check" />
@@ -108,9 +102,13 @@ url="show_played_rounds.xhtml?cmd=ini"
    <p:menuitem value ="Other Games Playing Hcp" url="othergames_playing_hcp.xhtml?cmd=ini" icon="ui-icon-document" />
 </p:submenu>
 
-<p:submenu label="SUBSCRIPTION" >
-   <p:menuitem value ="Subscription = #{courseC.subscription.endDate}" url="subscription.xhtml" icon="ui-icon-calculator" />
-
+<p:submenu label="PAYMENTS" >
+   <p:menuitem value ="Subscription = #{courseC.subscription.endDate}"
+               url="subscription.xhtml"
+               icon="ui-icon-calculator" />
+   <p:menuitem value ="Payment Tarif Member"
+               action="#{courseC.to_selectCourse_xhtml('PaymentTarifMember')}"
+               icon="fa fa-money" />
 </p:submenu>
     <p:submenu label="UPLOAD" >
          <p:menuitem value ="Upload Photo"
@@ -120,9 +118,6 @@ url="show_played_rounds.xhtml?cmd=ini"
                      action="#{thumbnailsC.thumbs('from menu')}"
                      icon="ui-icon-star" />
     </p:submenu>
-<!--    <p:menuitem value="Go" id="page1LinkID" action="#{navBean.goNav}">     
-                    <f:param id="page1ParamID" name="pageViewID" value="Page1"/>
-                </p:menuitem> -->
 
     <p:submenu label="GitHub">
            <p:menuitem value="GitHub"
@@ -186,16 +181,21 @@ url="show_played_rounds.xhtml?cmd=ini"
            
     </p:submenu>
 
-    
-    
-    
-    
     <p:submenu label="TOOLS/TESTS" >
 <!-- If you are not using "url" but want to go with "action" then remember that you are doing a POST request.
 In this case you should either
 1.Add ?faces-redirect=true to your returning String, like "test.xhtml?faces-redirect=true"
 2.Set ajax=false in your menuitems,  
+
+
+
   -->
+          <p:menuitem value ="Test payment"
+                       action="#{courseC.Testpayment()}"
+                     icon="ui-icon-wrench" />
+          <p:menuitem value ="test tarif members"
+                       action="#{courseC.to_select_tarifMembers_xhtml(101)}"
+                     icon="ui-icon-wrench" />
          <p:menuitem value ="test match play   "
                      action="#{lists.MatchplayList.main()}"
                      icon="ui-icon-wrench" />
@@ -227,9 +227,9 @@ In this case you should either
           <p:menuitem value ="Autocomplete Address" url="autocomplete_address.xhtml" icon="ui-icon-wrench" />
           <p:menuitem value ="Player Autocomplete" url="player_autocomplete.xhtml" icon="ui-icon-wrench" />
     </p:submenu>
-    <!--   a faire : n'afficher que si 324713  -->
+
     <p:submenu label="ADMINISTRATEUR" 
-               rendered="#{courseC.player.idplayer eq '324713'}">
+               rendered="#{courseC.player.playerRole eq 'ADMIN'}">
         <p:menuitem value ="Delete (test) Player" 
                     action="#{courseC.to_delete_player_xhtml('222222')}"
                     icon="ui-icon-calculator" />
@@ -240,6 +240,15 @@ In this case you should either
                     url="othergames_playing_hcp.xhtml?cmd=ini"
                     icon="ui-icon-document" />
     </p:submenu>
+    
+        <p:submenu label="ADMINISTRATEUR LOCAL" 
+               rendered="#{courseC.player.playerRole eq 'ADMIN' or courseC.player.playerRole eq 'admin'}">
+        <p:menuitem value ="Course Unavailable" 
+                    action="#{courseC.to_selectCourse_xhtml('CreateUnavailable')}"
+                    icon="ui-icon-calculator" />
+
+    </p:submenu>
+    
     
     
     <p:submenu label="Resources">

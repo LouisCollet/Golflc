@@ -19,7 +19,7 @@ public class Holidays {
     {
             LOG.info("entering CountryHolidays");
             LOG.info("localdate = " + ld);
-         country = country.toUpperCase();    
+         country = country.toUpperCase();
             LOG.info("country = " + country);
    /*            
     LocalDate date = LocalDate.of(2018, Month.JANUARY,16);
@@ -90,9 +90,8 @@ System.out.println("3e vendredi du mois "+ d); // 2016-12-16
         return b;
     }
 
-  public boolean CountryBelgium(LocalDate lda)
-    {
-        try{
+  public boolean CountryBelgium(LocalDate lda){
+ try{
         boolean b = false;
         int year = lda.getYear();
         String slda = lda.format(ISO_LOCAL_DATE); // yyyy/MM/dd
@@ -103,40 +102,37 @@ System.out.println("3e vendredi du mois "+ d); // 2016-12-16
             LOG.info("easter = " + easter);
 
          Map<LocalDate,String> hol = new LinkedHashMap<>();
-    //        hol.put(EasterSundayDate(year), "Easter");
+            hol.put(LocalDate.of(year, Month.JANUARY, 01), "NewYear");
+            hol.put(easter, "Easter");
             hol.put(easter.plusDays(1), "Easter Monday");
+            hol.put(LocalDate.of(year, Month.MAY, 01), "Labor Day");
             hol.put(easter.plusDays(39), "Ascension");
             hol.put(easter.plusDays(50), "Pentecost");
-            hol.put(LocalDate.of(year, Month.JANUARY, 01), "NewYear");
-            hol.put(LocalDate.of(year, Month.MAY, 01), "Labor Day");
             hol.put(LocalDate.of(year, Month.JULY, 21), "National Day");
             hol.put(LocalDate.of(year, Month.AUGUST, 15), "Assumption");
             hol.put(LocalDate.of(year, Month.NOVEMBER, 01), "Toussaint");
-            hol.put(LocalDate.of(year, Month.NOVEMBER, 01), "Armistice");
+            hol.put(LocalDate.of(year, Month.NOVEMBER, 11), "Armistice");
             hol.put(LocalDate.of(year, Month.DECEMBER, 25), "Christmas");
 
 hol.forEach((k,v) -> LOG.info("Holidays Belgium = Holiday : " + v + " / Date : " + k));
 //SortedSet<String> keys = new TreeSet<String>(hol.keySet());
-
-
 if (hol.containsKey(lda) ) {
-    LOG.info("Hash map contains lda : " + hol.get(lda)+ " /" + slda);
+    LOG.info("Round played  Holiday : " + hol.get(lda)+ " /" + slda);
      return true;
 }else{
     LOG.info("is NOT an holiday : " + slda);
     return false; // is not an holiday
 }
  } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            String msg = "Â£Â£ Exception Country Belgium = " + e.getMessage();
             LOG.error(msg);
       //      LCUtil.showMessageFatal(msg);
    return false;
     } 
  } // end method Country Belgium
   
-    public boolean CountrySpain(LocalDate lda)
-    {
-        try{
+  public boolean CountrySpain(LocalDate lda)    {
+  try{
         boolean b = false;
         String slda = lda.format(ISO_LOCAL_DATE); // yyyy/MM/dd
             LOG.info("entering CountrySpain with localdate = " + lda);
@@ -146,7 +142,7 @@ if (hol.containsKey(lda) ) {
             LOG.info("easter = " + easter);
 
          Map<LocalDate,String> hol = new LinkedHashMap<>();
-    //        hol.put(EasterSundayDate(year), "Easter");
+            hol.put(easter, "Easter");
             hol.put(easter.minusDays(2), "Good Friday - Viernes Santo");
      //       hol.put(easter.plusDays(39), "Ascension");
      //       hol.put(easter.plusDays(50), "Pentecost");
@@ -170,7 +166,7 @@ if (hol.containsKey(lda) ) {
     return false; // is not an holiday
 }
  } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            String msg = "Â£Â£ Exception in Country Spain = " + e.getMessage();
             LOG.error(msg);
       //      LCUtil.showMessageFatal(msg);
    return false;

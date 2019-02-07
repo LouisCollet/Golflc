@@ -24,7 +24,7 @@ import javax.net.ssl.HttpsURLConnection;
 import utils.DBConnection;
 
 @Named("sunrisesunsetapiC")
-public class SunriseSunset2 implements interfaces.Log, interfaces.GolfInterface{
+public class SunriseSunset implements interfaces.Log, interfaces.GolfInterface{
  /*
   * Geocode request URL. Here see we are passing "json" it means we will get
   * the output in JSON format. You can also pass "xml" instead of "json" for
@@ -40,10 +40,10 @@ public class SunriseSunset2 implements interfaces.Log, interfaces.GolfInterface{
  private static Flight liste = null;
 
 // https://sunrise-sunset.org/api
-    public SunriseSunset2() {  // constructor
-        SunriseSunset2.iStream = null;
-        SunriseSunset2.urlConnection = null;
-        SunriseSunset2.responseSS = null;
+    public SunriseSunset() {  // constructor
+        SunriseSunset.iStream = null;
+        SunriseSunset.urlConnection = null;
+        SunriseSunset.responseSS = null;
     } 
 
 // public ArrayList<Flight> findSunriseSunset(@NotNull Date date_in, String in_lat, String in_lng,
@@ -182,7 +182,7 @@ and day_length will be expressed in seconds. Optional.
     }
 
     public static void setListe(Flight liste) {
-        find.SunriseSunset2.liste = liste;
+        find.SunriseSunset.liste = liste;
     }
 
 
@@ -200,7 +200,7 @@ and day_length will be expressed in seconds. Optional.
   // course.setIdcourse(13);
    String tz = "Europe/Brussels";
 /// à modifier
-   find.SunriseSunset2 ssac = new find.SunriseSunset2();
+   find.SunriseSunset ssac = new find.SunriseSunset();
   Flight fl = ssac.findSunriseSunset(date,BigDecimal.valueOf(50.202764), BigDecimal.valueOf(5.013203),tz,conn);
 ////           LOG.info("response in main = :"  + fl);
    } catch (Exception e) {

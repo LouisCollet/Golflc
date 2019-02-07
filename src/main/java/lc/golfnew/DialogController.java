@@ -61,9 +61,44 @@ public class DialogController implements Serializable, interfaces.Log
     options.put("headerElement", "customheader");
  //   options.put("header", "header by LC");
     PrimeFaces.current().dialog().openDynamic("dialogFlight.xhtml", options, null); 
-        LOG.info("exiting DialogController viewFlight");
+        LOG.info("exiting DialogController showFlight");
 }  
-
+    public static void showSelectHomeClub(){
+       LOG.info("entering DialogController showSelectHomeClub");
+    Map<String,Object> options = new HashMap<>();
+    options.put("modal", true);
+    options.put("draggable", true);
+    options.put("resizable", true);
+    options.put("width", 900);
+    options.put("height", 600);
+    options.put("contentWidth", "100%");
+    options.put("contentHeight", "100%");
+ //   options.put("contentHeight", 2440);
+  //  options.put("contentWidth", 740);  //default
+    options.put("closable", true); // in case of bug is useful
+    options.put("modal", true);
+    options.put("headerElement", "customheader");
+ //   options.put("header", "header by LC");
+    PrimeFaces.current().dialog().openDynamic("dialogHomeClub.xhtml", options, null); 
+        LOG.info("exiting DialogController showSelectHomeClub");
+}  
+    public static void showWeather(){
+       LOG.info("entering DialogWeather");
+    Map<String,Object> options = new HashMap<>();
+    options.put("modal", true);
+    options.put("draggable", true);
+    options.put("resizable", true);
+    options.put("width", 900);
+    options.put("height", 600);
+    options.put("contentWidth", "100%");
+    options.put("contentHeight", "100%");
+    options.put("closable", true); // in case of bug is useful
+    options.put("modal", true);
+    options.put("headerElement", "customheader");
+ //   options.put("header", "header by LC");
+    PrimeFaces.current().dialog().openDynamic("dialogWeather.xhtml", options, null); 
+        LOG.info("exiting DialogController showWeather");
+}  
 
   
   public static void viewRound()

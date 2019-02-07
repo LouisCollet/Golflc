@@ -12,13 +12,11 @@ import utils.LCUtil;
 public class FindPassword implements interfaces.Log{
    final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
    
-public Boolean passwordMatch(final Player player , final Connection conn) throws SQLException{   
-
+public Boolean passwordMatch(final Player player , final Connection conn) throws SQLException{
       LOG.info("starting passwordMatch  ");
       LOG.info("starting passwordMatch for player = " + player.getIdplayer());
       LOG.info("starting passwordMatch with wrk password = " + player.getWrkpassword());
       LOG.info("starting passwordMatch with password = " + player.getPlayerPassword());
-    //  var name = "Java"; //test 08-08-2018 nouveauté JDK10
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{   
@@ -35,24 +33,20 @@ try{
     rs =  ps.executeQuery();
     rs.last(); //on récupère le numéro de la ligne
         LOG.info("ResultSet passwordMatch has " + rs.getRow() + " lines.");
-    if(rs.getRow() == 1)
-      {  // String msg = "££ Password match !!! " + ClassName +  " for player = " + player.getIdplayer()
+    if(rs.getRow() == 1){
+        // String msg = "££ Password match !!! " + ClassName +  " for player = " + player.getIdplayer()
          //     +  " for password = " + player.getWrkpassword();
-        String msg =  LCUtil.prepareMessageBean("password.match")+ player.getWrkpassword();
+        String msg = LCUtil.prepareMessageBean("password.match");
+               msg = msg + player.getWrkpassword();
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
         return true;
       }    
-    if(rs.getRow() == 0)
-      {   String msg =  LCUtil.prepareMessageBean("password.notmatch");
-        //  String msg = "££ Password does not match " 
-         //     +  " for password = " + ;
-       
+    if(rs.getRow() == 0){
+        String msg =  LCUtil.prepareMessageBean("password.notmatch");
         LCUtil.showMessageFatal(msg);
             LOG.error(msg + " for player = " + player.getIdplayer() + " // " + player.getWrkpassword());
         return false;
-        
-     //     throw new LCCustomException(msg);
       }
 }catch (SQLException e){
     String msg = "SQL Exception in FindPassword : " + e;

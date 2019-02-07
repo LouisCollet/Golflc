@@ -8,6 +8,7 @@ import javax.activation.FileDataSource;
 import javax.activation.UnsupportedDataTypeException;
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.mail.internet.InternetAddress;
 import lc.golfnew.Constants;
 
 public class SendEmail implements interfaces.Log{

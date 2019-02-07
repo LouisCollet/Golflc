@@ -47,10 +47,7 @@ try{
      while(rs.next())
                 {
                    h = entite.Handicap.mapHandicap(rs);
-	//	h.setHandicapStart(rs.getDate("idhandicap"));
-        //        h.setHandicapEnd(rs.getDate("HandicapEnd") );
-         //       h.setHandicapPlayer(rs.getBigDecimal("handicapPlayer"));
-		}  //end while
+	}  //end while
     return h;
 }catch (SQLException e){
     String msg = "SQLException in LoadHandicap() = " + ", SQLState = " + e.getSQLState()

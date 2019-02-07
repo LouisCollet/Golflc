@@ -6,15 +6,10 @@
 package events;
 
 //mport events.HelloEvent;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 
-/**
- *
- * @author Collet
- */
+
 //@Stateless
 //@LocalBean 
 public class HelloObserver implements interfaces.Log

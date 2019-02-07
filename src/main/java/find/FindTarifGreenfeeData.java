@@ -2,7 +2,7 @@ package find;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entite.Course;
-import entite.Tarif;
+import entite.TarifGreenfee;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,22 +11,23 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class FindTarifData implements interfaces.Log, interfaces.GolfInterface{
+public class FindTarifGreenfeeData implements interfaces.Log, interfaces.GolfInterface{
     
 final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
-public Tarif findCourseTarif(final Course course, final Connection conn) throws SQLException
+public TarifGreenfee findTarif(final Course course, final Connection conn) throws SQLException
 {
-        LOG.info("entering findClubTarif ...");
-        LOG.info("starting findClub Tarif for course = " + course.toString());
+        LOG.info("entering findTarif ...");
+        LOG.info("starting findTarif for course = " + course.toString());
+        final String METHODNAME = Thread.currentThread().getStackTrace()[1].getMethodName(); 
     PreparedStatement ps = null;
     ResultSet rs = null;
 try
 {
   String query = 
     "SELECT TarifJson"
-          + " from tarif"
-          + " where tarif.course_idcourse = ?";
+          + " from tarif_greenfee"
+          + " where tarif_greenfee.course_idcourse = ?";
 
     ps = conn.prepareStatement(query);
     ps.setInt(1, course.getIdcourse() );
@@ -55,11 +56,11 @@ try
         ObjectMapper om = new ObjectMapper();
   //  	om.enable(SerializationFeature.INDENT_OUTPUT);//Set pretty printing of json
  //       om.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // fields private accepted in class tarif 
-        Tarif t = om.readValue(s,Tarif.class);
+        TarifGreenfee t = om.readValue(s,TarifGreenfee.class);
             LOG.info("Tarif extracted from database = "  + t.toString());
         return t;
 }catch (SQLException e){
-    String msg = "SQL Exception FindTarif= " + e.toString() + ", SQLState = " + e.getSQLState()
+    String msg = "SQL Exception for " + METHODNAME + " " + e.toString() + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
@@ -80,8 +81,8 @@ public static void main(String[] args) throws Exception , Exception{
     Connection conn = new DBConnection().getConnection();
     Course course = new Course();
     course.setIdcourse(102);
-  //  FindTarifData ftd = new FindTarifData();
-    Tarif t1 = new FindTarifData().findCourseTarif(course, conn);
+
+    TarifGreenfee t1 = new FindTarifGreenfeeData().findTarif(course, conn);
      LOG.info("Tarif extracted from database = "  + t1.toString());
 //findPlayerHandicap(player,round, conn);
 //for (int x: par )
@@ -91,4 +92,3 @@ DBConnection.closeQuietly(conn, null, null, null);
 }// end main
     
 } // end Class
-

@@ -34,17 +34,8 @@ In addition, you can use �target� attribute to control where to output the j
 <h:head> </h:head>
     -->
     
-<h:graphicImage 
-                name="images/golf_round.png"
-                alt="image missing :golf_round.jpg"
-                style="float: left;">
-</h:graphicImage>
-
-<h:graphicImage 
-                name="images/golf_round.png"
-                alt="image missing :golf_round.jpg"
-                style="float: right;">
-</h:graphicImage>
+<h:graphicImage name="images/golf_round.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/golf_round.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
   <!--  <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;"/>-->
 <h:form id="form_round" enctype="application/x-www-form-urlencoded" >
     
@@ -97,17 +88,13 @@ In addition, you can use �target� attribute to control where to output the j
                         id="flightButton"
                         actionListener="#{dialogC.showFlight()}"
                         icon="fa fa-sun-o"
-                        value="Choose Flight Hour"
+                        value="#{msg['button.round.start']}"
                         style="float:left"
                         >
                  <p:ajax event="dialogReturn"
-                         update=":form_round:idworkhour" 
-                        />
+                         update=":form_round:idworkhour" />
                </p:commandButton>
           
- <!--    <p:ajax event="click"
-                        update="idworkhour"
-                        listener="#{dialogC.onFlightChosen()}"/>-->
           <h:outputText id="idworkhour" 
                         style="font-weight:bold;font-size: 2em;font-style:normal;color: red"
                         value="#{courseC.round.workHour}"

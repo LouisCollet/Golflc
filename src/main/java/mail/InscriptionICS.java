@@ -204,10 +204,7 @@ return fout;
       round.setRoundDate(LocalDateTime.of(2018, Month.NOVEMBER, 17, 12, 15));
       round.setRoundGame("round game : STABLEFORD");
       round.setPlayersString("inscrits précédemment : Corstjens, Bauer");
- //  Date date = SDF.parse("23/07/2018");
-  // DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-  //  LocalDate localDate = LocalDate.now();
-  //  LOG.info(dtf.format(localDate)); //2016/11/16
+
     InscriptionICS ics = new InscriptionICS();
     ics.createInscriptionMailICS(player, invitedBy, round, club, course, false);  // true = tentative, false = cancel
     

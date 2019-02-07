@@ -2,7 +2,6 @@ package find;
 
 import entite.Course;
 import entite.Player;
-import entite.Tarif;
 import static interfaces.GolfInterface.SDF;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
@@ -64,9 +63,9 @@ finally
     Connection conn = new DBConnection().getConnection();
     Course course = new Course();
     course.setIdcourse(102);
-  //  FindTarifData ftd = new FindTarifData();
-    Tarif t1 = new FindTarifData().findCourseTarif(course, conn);
-     LOG.info("Tarif extracted from database = "  + t1.toString());
+
+
+  //   LOG.info("Tarif extracted from database = "  + t1.toString());
 //findPlayerHandicap(player,round, conn);
 //for (int x: par )
 //        LOG.info(x + ",");

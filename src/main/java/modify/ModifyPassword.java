@@ -17,16 +17,21 @@ public boolean modifypassword(final Player player, final Connection conn) throws
         boolean b = false;
         try {
             LOG.info("entering ModifyPassword");
-            LOG.info("player   = " + player.getIdplayer());
-            LOG.info("starting modifyPassword with wrk password = " + player.getWrkpassword());
-            LOG.info("starting modifyPassword with password      = " + player.getPlayerPassword());
+       //     LOG.info("player   = " + player.getIdplayer());
+            LOG.info("starting modifyPassword with player  = " + player.toString());
+      //      LOG.info("starting modifyPassword with password      = " + player.getPlayerPassword());
   //  String s = utils.DBMeta.listMetaColumnsUpdate(conn, "player");
   //      LOG.info("String from listMetaColumns = " + s);
         // encrypted password with SHA2 function of mysql 
   //  s = s.replace("playerpassword=?" , "playerpassword=sha2(?,256)"); // new 07-08-2018 
     
   //      LOG.info("String modified for encryption password sha2 = " + s);
-        
+           if(! player.getWrkpassword().equals(player.getWrkconfirmpassword() )){ 
+                String msgerr =  LCUtil.prepareMessageBean("player.password.notmatch");
+                LOG.error(msgerr); 
+                LCUtil.showMessageFatal(msgerr);
+                return false;
+           } 
     String query = " UPDATE Player " +
 "	SET player.PlayerPassword = SHA2(?,256)" +
 "	WHERE player.idplayer = ?"
@@ -45,18 +50,15 @@ public boolean modifypassword(final Player player, final Connection conn) throws
             utils.LCUtil.logps(ps);
             row = ps.executeUpdate(); // write into database
                 LOG.info("row = " + row);
-            if (row == 1) 
-            {   LOG.info("PlayerPassword created or modified");
+            if(row == 1){
+                LOG.info("PlayerPassword created or modified");
       //          String msg =  LCUtil.prepareMessageBean("player.modify")
-                 String msg = "<h1> successful modify Password : "
-                            + " <br/>ID = " + player.getIdplayer()
-                            + " <br/>password = " + player.getWrkpassword();
-                    //        + " <br/>last = " + player.getPlayerLastName()
-                      LOG.info(msg);
-                      LCUtil.showMessageInfo(msg);
-                return true;
-                         
-     //              LCUtil.showMessageInfo(msg);
+                 String msg = LCUtil.prepareMessageBean("player.password.modified");
+                        msg = msg + " <br/>ID = " + player.getIdplayer();
+                        msg = msg + " <br/>password = " + player.getWrkpassword();
+                 LOG.info(msg);
+                 LCUtil.showMessageInfo(msg);
+              return true;
             }else{
                     String msg = "-- NOT NOT successful modify Player row = 0 !!! ";
                     LOG.error(msg);
@@ -67,18 +69,18 @@ public boolean modifypassword(final Player player, final Connection conn) throws
             }
 //return true;
         } // end try
-catch (SQLException sqle) {
+catch(SQLException sqle){
             String msg = "£££ SQLException in Modify Player = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
-   } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Modify Player = " + nfe.getMessage();
+   }catch (Exception nfe){
+            String msg = "£££ Exception in Modify Player = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
-   } finally {
+   }finally{
             DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
         }
 //         return false;

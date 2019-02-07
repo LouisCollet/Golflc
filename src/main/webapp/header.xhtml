@@ -6,12 +6,9 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-xmlns:o="http://omnifaces.org/ui"
-xmlns:of="http://omnifaces.org/functions"
+           xmlns:p="http://primefaces.org/ui"
+     xmlns:o="http://omnifaces.org/ui"
+     xmlns:of="http://omnifaces.org/functions"
 >
 <ui:composition>
  
@@ -101,11 +98,13 @@ Set this parameter to true if you want to force the browser to get the page from
                   />
 -->
     <h:outputText value=" /Current Player " rendered="#{courseC.player.idplayer != null}"/>
-    <b> <h:outputText value=" #{courseC.player.idplayer}
-                    , first name =  #{courseC.player.playerFirstName}
-                    , last name =  #{courseC.player.playerLastName}"
-                  rendered="#{courseC.player.idplayer != null}"/>
-    </b>
+     <h:outputText value=" #{courseC.player.idplayer}
+                    , first name = #{courseC.player.playerFirstName}
+                    , last name =  #{courseC.player.playerLastName}
+                    , role =  #{courseC.player.playerRole}"
+                    escape="false"
+             rendered="#{courseC.player.idplayer != null}"/>
+    
     
     <h:outputText value=" /Language " rendered="#{courseC.player.idplayer != null}"/>
     <b> <h:outputText value=" #{languageC.locale}" rendered="#{courseC.player.idplayer != null}"/></b>
@@ -143,9 +142,7 @@ Set this parameter to true if you want to force the browser to get the page from
         Welcome #{playerid}, #{playerlastname} you have been logged in!  
     </h:outputText>
     
-<p:separator id="separatorHeaser"/>
+<p:separator id="separatorHeader"/>
 
 </ui:composition>
-
-
 </html>

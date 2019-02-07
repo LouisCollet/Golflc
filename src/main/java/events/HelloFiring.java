@@ -9,12 +9,12 @@ import javax.inject.Inject;
 public class HelloFiring implements Serializable, interfaces.Log
 {
     @Inject
-    private static Event<HelloEvent> ev;
+    private static Event<HelloEvent> event;
     
     public static void doStuff()
     {
         LOG.info("entering dostuff");
-        ev.fire(new HelloEvent("from bean LC, curenttimemillis = " + System.currentTimeMillis()));
+        event.fire(new HelloEvent("from bean LC, curenttimemillis = " + System.currentTimeMillis()));
         LOG.info("after dostuff");
     }  //end method
 

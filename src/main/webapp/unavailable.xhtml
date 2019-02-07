@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      template="templates/masterTemplate.xhtml"
+>
+
+<ui:define name="title">Unavailabilities registration</ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_tarif_members.xhtml"/>
+</ui:define>
+
+<ui:define name="content">
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"> </h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"> </h:graphicImage>
+<h:form id="unavailableLC" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<!-- <p:focus for="startdate" /> -->
+<p:panelGrid
+    id="panel1"
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h1>#{msg['title.unavailable']}</h1>
+</f:facet>
+    <h:outputText  value="#{msg['tarif.period.start']} :"/>
+    <p:calendar value="#{courseC.unavailable.workStartDate}"
+                        id="start"
+                        locale="#{languageC.locale}"
+                        mode="popup"
+                        showOn="both"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        navigator="true"
+                        yearRange="c0:c+1"
+                        readonlyInput="true"
+                 />
+      <h:outputText  value="#{msg['tarif.period.end']} :"/>
+      <p:calendar value="#{courseC.unavailable.workEndDate}"
+                        id="end"
+                        locale="#{languageC.locale}"
+                        mode="popup"
+                        showOn="both"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        navigator="true"
+                        yearRange="c0:c+1"
+                        readonlyInput="true"
+                 />
+
+     <h:outputText value="#{msg['unavailable.cause']} :" />
+     <p:inputText     id="Cause"
+                        size="10"
+                        title="#{msg['tooltip.tarif.item']}"
+                        value="#{courseC.unavailable.cause}"
+               />
+
+<f:facet name="footer">
+         <p:commandButton value="#{msg['unavailable.create']}"
+                         id="commandButtonCreate"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="fa fa-plus"
+                         action="#{courseC.createUnavailable}"/>
+         
+                
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
