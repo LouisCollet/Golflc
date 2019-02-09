@@ -33,15 +33,12 @@ public class CreateUnavailable {
            }
  
    final String query = LCUtil.generateInsertQuery(conn, "unavailable");
-      //      LOG.info("generated query = " + query);
             ps = conn.prepareStatement(query);
             ps.setNull(1,java.sql.Types.INTEGER);  //autoincrement
-        //    ps.setDate(2,LCUtil.getSqlDate(tarifMember.getMemberStartDate()));
-        //    ps.setDate(3,LCUtil.getSqlDate(tarifMember.getMemberEndDate()));
             ps.setInt(2,unavailable.getIdcourse()); 
-            java.sql.Timestamp ts = Timestamp.valueOf(unavailable.getStartDate());
+                java.sql.Timestamp ts = Timestamp.valueOf(unavailable.getStartDate());
             ps.setTimestamp(3,ts);
-            ts = Timestamp.valueOf(unavailable.getEndDate());
+                ts = Timestamp.valueOf(unavailable.getEndDate());
             ps.setTimestamp(4,ts);
             ps.setString(5,unavailable.getCause());
             ps.setTimestamp(6,LCUtil.getCurrentTimeStamp());
