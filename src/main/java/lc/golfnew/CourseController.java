@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.primefaces.PrimeFaces;
+import org.primefaces.event.DragDropEvent;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.FlowEvent;
 import org.primefaces.event.SelectEvent;
@@ -71,14 +72,15 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
      @Inject private Hole hole;
      @Inject private Player player;
      @Inject private Player player2;
+     @Inject private Player localAdmin;
      @Inject private Handicap handicap; 
      @Inject PlayingHcp playingHcp;
      @Inject private ScoreStableford scoreStableford; // mod 20/07/2015
      @Inject private ScoreMatchplay scoreMatchplay; 
      @Inject private ScoreScramble scoreScramble; // new 26/07/2015
  //    @Inject private EScoreCardList scorecard;
-     @Inject private PlayerHasRound inscription;
-     @Inject private Inscription inscriptionNew;
+///     @Inject private PlayerHasRound inscription; deleted 31-03-2019
+     @Inject private Inscription inscription;
      @Inject private Old_Matchplay matchplay;
      @Inject private Subscription subscription;
      @Inject private Cotisation cotisation;
@@ -142,9 +144,7 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
     private Player selectedPlayer;
     
     private List<Player> selectedPlayersMatchPlay; // new 31/08/2014
-  //  private List<Player> selectedOtherPlayers; // new 30/06/2017
     private DualListModel<Player> dlPlayers; // new 03/09/2014
-//    private List<Player> playersTarget; // new 03/09/2014
     List<Player> playersTarget = new ArrayList<>();
     List<ECourseList> subscriptionRenewal;
     private List<Player> fullList;
@@ -190,12 +190,15 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
     private Map<String, String> availableQualifying; // +getter (no setter necessary)
     private Map<String, String> members;
     private Map<Integer, String> data = new HashMap<>();
-    
-    
+    private List<Player> selectedOtherPlayers = null; // new 11/07/2017
+    private List<Player> droppedPlayers = new ArrayList<>();
+ // new 11/07/2017
+  
     public CourseController()  // constructor
     {
         this.listavg = null;
         this.setSunRiseSet(null);
+   //     droppedPlayers = null;
     }
 
  @PostConstruct
@@ -344,6 +347,7 @@ if(currentUser.isPermitted("articles:publish")) {
             LANGUAGES.add(new SelectItem("de", "German"));
             LANGUAGES.add(new SelectItem("fr", "Français"));
             LANGUAGES.add(new SelectItem("nl", "Nederlands"));
+            LANGUAGES.add(new SelectItem("es", "Español"));
         }
              //   LOG.info("LANGUAGES initialized" + LANGUAGES.toString() );//Arrays.toString(games)/
               //  LOG.info("LANGUAGES initialized" + Arrays.toString(LANGUAGES.toArray()));
@@ -499,6 +503,24 @@ public Map<Integer, String> getData() {
         return availableQualifying;
     }
 
+    public List<Player> getSelectedOtherPlayers() {
+        return selectedOtherPlayers;
+    }
+
+    public void setSelectedOtherPlayers(List<Player> selectedOtherPlayers) {
+        this.selectedOtherPlayers = selectedOtherPlayers;
+    }
+
+    public List<Player> getDroppedPlayers() {
+      //  LOG.info("getDroppedPlayers = " + droppedPlayers );
+        return droppedPlayers;
+    }
+
+  //  public void setDroppedPlayers(List<Player> droppedPlayers) {
+  //      this.droppedPlayers = droppedPlayers;
+ //         LOG.info("setDroppedPlayers = " + this.droppedPlayers );
+ //   }
+
     public List<String> getGameList() {
         return gameList;
     }
@@ -534,6 +556,14 @@ public Map<Integer, String> getData() {
 
     public void setPlayer2(Player player2) {
         this.player2 = player2;
+    }
+
+    public Player getLocalAdmin() {
+        return localAdmin;
+    }
+
+    public void setLocalAdmin(Player localAdmin) {
+        this.localAdmin = localAdmin;
     }
     
     public void setGameList(List<String> gameList) {
@@ -665,11 +695,6 @@ if (!(toValidate instanceof UIInput))
         parArrayString = parArrayString.replaceAll(", ", strSeparator).replace("[", "").replace("]", "");
 //          LOG.info("String strNumbers2 = " + parArrayString);
         
-//  lance exÃƒÆ’Ã‚Â©cution d'une fonction Javascript via Primefaces  context.execute("PrimeFaces.info('Hello from the Backing Bean');");
-////        RequestContext c = RequestContext.getCurrentInstance();
-////         c.execute("PrimeFaces.info('Hello from CourseController');");
-////         c.execute("alert('msg from getParArrayString');");
-////         c.execute("return confirm('from CourseController : \\nPress a button!\\nEither OK or Cancel');");
         return parArrayString;
     }
 
@@ -718,40 +743,42 @@ if (!(toValidate instanceof UIInput))
            CourseController.parArray = parArray;
       }
 
-    public PlayerHasRound getInscription() {
-        return inscription;
+   public Inscription getInscription() {
+      return inscription;
     }
 
-    public void setInscription(PlayerHasRound inscription) {
-        this.inscription = inscription;
-    }
+    public void setInscription(Inscription inscription) {
+       this.inscription = inscription;
+   }
 
-    public Inscription getInscriptionNew() {
-        return inscriptionNew;
-    }
+ //   public Inscription getInscriptionNew() {
+ //       return inscriptionNew;
+ //   }
 
-    public void setInscriptionNew(Inscription inscriptionNew) {
-        this.inscriptionNew = inscriptionNew;
-    }
+ //   public void setInscriptionNew(Inscription inscriptionNew) {
+ //       this.inscriptionNew = inscriptionNew;
+ //   }
 
     public  Flight getFlight() {
         return flight;
     }
 
       public void selectFlightFromDialog(Flight flight) throws IOException{
+          
+          
       LOG.info("entering selectflightfromdialog");
       LOG.info("entering selectflightfromdialog with source = " + flight.toString() );
       this.flight = flight;
-     
-        LOG.info("after setflight, flight = " + flight.getFlightStart() );
-//           LOG.info("after setflight, flight HHMM = " + Constants.dtf_HHmm.format(flight.getFlightStart()) );
-           LOG.info("after setflight, flight HHMM = " + flight.getFlightHourStart()) ;
-  //   round.setWorkHour(Constants.dtf_HHmm.format(flight.getFlightStart() ));
+        LOG.info("flightStart format LocalDateTime = " + flight.getFlightStart() );
+
+  //      LOG.info("after setflight, flight HHMM = " + flight.getFlightHourStart()) ;
      round.setWorkHour(flight.getFlightHourStart());  // mod 22-10-2018
-     round.setRoundDate(flight.getFlightStart());
-        LOG.info("getRoundDate = " + round.getRoundDate());
-        LOG.info("getWorkHour = " + round.getWorkHour());
-        LOG.info("other method getFlightHourStart = " + flight.getFlightHourStart());
+//     round.setRoundDate(flight.getFlightStart()); // sera écrasé par input de l'écran
+//     LOG.info("getRoundDate = " + round.getRoundDate());
+     round.setRoundDateTrf(flight.getFlightStart()); // new 21-02-2019 on utilise une zone de transfert
+        LOG.info("getRoundDateTRF = " + round.getRoundDateTrf());
+ //       LOG.info("getWorkHour = " + round.getWorkHour());
+ //       LOG.info("other method getFlightHourStart = " + flight.getFlightHourStart());
      DialogController dc = new DialogController();
      dc.closeDialog("dialogFlight.xhtml");
   }
@@ -1425,10 +1452,6 @@ public CartesianChartModel LineModel() throws SQLException { // new solution 03/
 
 public static String fileUpload() throws SQLException
 {
-  //  FileUploadController.setIdplayer(Integer.toString(player.getIdplayer()) );
-  //  FileUploadController.setPlayerFirstName(player.getPlayerFirstName() );
-  //  FileUploadController.setPlayerLastName(player.getPlayerLastName());
-        
      return "player_file.xhtml?faces-redirect=true";
 }
 
@@ -1534,7 +1557,6 @@ public void playerCountryListener(ValueChangeEvent valueChangeEvent) {
 }
 
 
-
 public void playerCityListener(ValueChangeEvent valueChangeEvent) {
    //     LOG.info("playerCityListener ");
      UIComponent c = valueChangeEvent.getComponent();
@@ -1599,29 +1621,77 @@ public void creditCardTypeListener(ValueChangeEvent valueChangeEvent) {
         showMessageInfo(msg);
     }
 }
-public void roundWorkDate(ValueChangeEvent valueChangeEvent) throws ParseException {
-        LOG.info("roundWorkDate");
- //   utils.LCUtil.printCurrentPhaseID();
-        LOG.info("roundWorkDate OldValue = " + valueChangeEvent.getOldValue());
-        LOG.info("roundWorkDate NewValue Website = " + valueChangeEvent.getNewValue());
-    String s = SDF.format(valueChangeEvent.getNewValue());
-    LOG.info("line 001");
-    LOG.info("s == " + s);
-    round.setWorkDate(SDF.parse(SDF.format(valueChangeEvent.getNewValue())));
-       LOG.info("line 002");
- //   round.setWorkDate(SDF.parse(s));
- //   round.setWorkDate(SDF.parse(s));
-        LOG.info("roundworkdate  =  " + round.getWorkDate());
-}
+
+public void roundWorkDate(ValueChangeEvent valueChangeEvent) throws ParseException, SQLException{ // throws ParseException {
+    try{
+        LOG.info("entering roundWorkDate");
+   //     LOG.info("roundWorkDate NewValue = " + valueChangeEvent.getNewValue());
+       round.setWorkDate(SDF.parse(SDF.format(valueChangeEvent.getNewValue())));
+        LOG.info("roundworkdate format Date =  " + round.getWorkDate());
+    //    vérifier ici si le course est connu
+        LOG.info("course is = " + course.toString());
+        LOG.info("roundDate format LocalDatetime = " + round.getRoundDate());
+        // lancer is test si course available at this date ??
+ 
+ //       unavailable = new find.FindUnavailable().find(course, round, conn);
+ //       LOG.info("after find, unavailable = " + unavailable);
+        // si null = pas d'indisponibilité
+        cptFlight = 0;
+        LOG.info("cptFlight = " + cptFlight);
+ /*         if(unavailable.getCause() != null){ // autre formulation
+             LOG.info("after if, unavailable = " + unavailable);
+   //          LOG.info("line 01");
+      //          String msg = "Il y a une indisponibilité pour : " + unavailable.getCause() + " le " + round.getRoundDate().format(ZDF_DAY);
+              String msg = LCUtil.prepareMessageBean("round.unavailable"); 
+              msg = msg + unavailable.getCause() + " le " + round.getRoundDate().format(ZDF_DAY);
+                LOG.error(msg);
+                showMessageFatal(msg);
+             //   round.setWorkDate(null);
+            //    to_selectCourse_xhtml("CreateRound");  // comme s'il venait du menu
+             //  return "welcome.xhtml?faces-redirect=true";
+          }else{
+   //          LOG.info("line 02");
+              String msg = "Il y a PAS d'indisponibilité "; // + unavailable.getCause() + round.getRoundDate();
+               LOG.error(msg);
+          }
+        */
+   //      LOG.info("line 03");
+      } catch (Exception e) {
+            String msg = "££ Exception in roundWorkDate = " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+      //      return null;
+        }      
+   //  return "round.xhtml?faces-redirect=true";
+} // end method
+// affiche la box, pas le Messagefatal et continue ...
+// que faire ? forcer work?? à null ?
+// forcer un dispatch ?? vers une view
+
    public String otherPlayers() throws SQLException, Exception {  //mod 30-11-2018
         int int1 = 0;
   try{
-       LOG.info("starting otherPlayers ");
-        LOG.info("there are ?? new inscriptions = " + player.getSelectedOtherPlayers().size());
-        LOG.info("here are the selectedOtherPlayers  = " + player.getSelectedOtherPlayers().toString());
+          LOG.info("entering otherPlayers ... ");
+          LOG.info("otherPlayers roundId = ... " + round.getIdround());
+          LOG.info("otherPlayers courseId = ... " + course.getIdcourse());
+       tarifGreenfee = new find.FindTarifGreenfeeData().find(course, round, conn);
+       if(tarifGreenfee == null){
+        String err = "Tarif returned from findTarifdata is null ";
+         LOG.info(err);
+         showMessageFatal(err);
+         return "inscriptions_other_players.xhtml?faces-redirect=true";
+        }
+       
+       LOG.info("greenfee = " + greenfee.toString());
+       LOG.info("Tarif greenfee = " + tarifGreenfee.toString());
+     //  LOG.info("new inscriptions = " + getSelectedOtherPlayers().size());
+       LOG.info("number new inscriptions = " + getSelectedOtherPlayers().size());
+       LOG.info("here are the selectedOtherPlayers  = " + getSelectedOtherPlayers().toString());
    //      LOG.info("déjà inscrits à ce round 1 = " + round.getPlayers().size());
-        LOG.info("déjà inscrits à ce round = " + round.getRoundPlayers());
-        int1 = player.getSelectedOtherPlayers().size() + round.getRoundPlayers();
+       LOG.info("nombre déjà inscrits à ce round = " + round.getRoundPlayers());
+       LOG.info("nom des joueurs déjà inscrits à ce round = " + round.getPlayersList());
+       int1 = getSelectedOtherPlayers().size() + round.getRoundPlayers();
+       LOG.info("total déjà inscrits plus nouveaux candidats = " + int1);
         if(int1 > 4){
             throw new Exception();
         }
@@ -1648,20 +1718,15 @@ public void roundWorkDate(ValueChangeEvent valueChangeEvent) throws ParseExcepti
         LOG.info("there are ?? new inscriptions = " + dlPlayers.getTarget().size()); // joueurs sélectionnés
         // à faire = vérifier que 3 joueurs maximum !
         
-        for(int i=0; i < dlPlayers.getTarget().size() ; i++)
-        {
-            LOG.debug("line 01");
+        for(int i=0; i < dlPlayers.getTarget().size() ; i++){
+ //           LOG.debug("line 01");
      //       LOG.debug(" -- item in for idplayer # = " + dlPlayers.getTarget().get(i).getIdplayer() );
         }
         LOG.info("fulllist = " + fullList.toString());
         LOG.info("for round = " + round.toString());
         LOG.info("for player_has_round = " + inscription.toString());
- //       List<Player> sortedPlayers = Collections.sort(selectedPlayersMatchPlay); // new 04/09/2014
-   //     dlPlayers = new DualListModel<>(selectedPlayersMatchPlay, playersTarget);
         LOG.info("after createOtherPlayers");
     //    boucler sur createInscription 
-        
-        
         return "inscription.xhtml?faces-redirect=true";
     }
    
@@ -1675,24 +1740,24 @@ public void roundWorkDate(ValueChangeEvent valueChangeEvent) throws ParseExcepti
 
     public void uploadListener(FileUploadEvent e) throws Exception{    
          LOG.info(" entering uploadListener = ");
-         FileUploadController.uploadListener(e, player, conn);
+      //   FileUploadController fu = new FileUploadController();
+         new FileUploadController().uploadListener(e, player, conn);
          LOG.info(" after FileUploadController");
       // forcer refresh de listplayers !!
        lists.PlayersList.setListe(null);
-       lists.PlayersList pl = new lists.PlayersList();
-       pl.getListAllPlayers(conn);
+   //    lists.PlayersList pl = new lists.PlayersList();
+       new lists.PlayersList().getListAllPlayers(conn);
   //     return "welcome.xhtml?faces-redirect=true"; retourne quand même player_file.xhtml
     }
     
     public String selectHomeClub(ECourseList ecl) throws IOException { 
-        LOG.info(" selected Home Club, ecl = " + ecl.toString());
-   LOG.info(" player is at this moment = " + player.toString() );
-         
+  try{
+        LOG.info(" entering selected Home Club, ecl = " + ecl.toString());
+        LOG.info(" player is at this moment = " + player.toString() );
+      
          club = ecl.getClub();  // mod 25-11-2018
          player.setPlayerHomeClub(club.getIdclub()); // new 04/02/2019
-   //         LOG.info("setted ClubName as Home Club = " + club.getClubName() + " / " + club.getIdclub());
-    //     player.setPlayerHomeClub(club.getIdclub());
-    //     LOG.info("setted player = " + player.toString());
+         localAdmin = player;
             LOG.info("setted HomeClub = " + player.getPlayerHomeClub());
 
         String msg = "Select Club Successfull = "
@@ -1700,19 +1765,25 @@ public void roundWorkDate(ValueChangeEvent valueChangeEvent) throws ParseExcepti
                 ;
         LOG.info(msg);
         showMessageInfo(msg);
- 
-        
+LOG.info("line 01");
         DialogController dc = new DialogController();
-        dc.closeDialog("dialogHomeClub.xhtml");
-        
-        if(createModifyPlayer.equals("M"))
-        {   LOG.info("This is a modification player = " + createModifyPlayer);
+        dc.closeDialog2("dialogHomeClub.xhtml"); // mod 26-03-2019 was closeDialog
+ LOG.info("line 02");
+        if(createModifyPlayer.equals("M")){
+            LOG.info("This is a modification player = " + createModifyPlayer);
             return "player_modify.xhtml?faces-redirect=true";
         }else{
             LOG.info("This is a creation player = " + createModifyPlayer);
             return "player.xhtml?faces-redirect=true";} 
     //    return null; // mod 06-04-2017 aussi player-modify est possible
-    } // end selectClub
+  } catch (Exception e) {
+            String msg = "££ Exception in selectHomeClub = " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
+ //   return null;
+    } // end class selectcourse
     
 public String to_selectCourse_xhtml(String s){
             LOG.info("entering to_selectCourse_xhtml ... with string = " + s);
@@ -1723,6 +1794,19 @@ public String to_selectCourse_xhtml(String s){
             LOG.info(" course selected for : " + course2.getInputSelectCourse());
        return "selectCourse.xhtml?faces-redirect=true&cmd=" + course2.getInputSelectCourse();
    }
+
+public String to_selectClub_xhtml(String s){
+            LOG.info("entering to_selectClub_xhtml ... with string = " + s);
+       reset("Reset to_selectClub" + s);
+       setFilteredCourses(null);
+  //      LOG.info("s is now = " + s);
+  //
+   //    course2.setInputSelectCourse(s); // field de transition restored to course after created from ecl voir selectCourse
+     //       LOG.info(" course selected for : " + course2.getInputSelectCourse());
+            //
+       return "local_administrator.xhtml?faces-redirect=true&cmd=" + s;
+   }
+
 
  public String selectCourse(ECourseList ecl){ 
   try {
@@ -1756,27 +1840,28 @@ public String to_selectCourse_xhtml(String s){
         if (course.getInputSelectCourse().equals("ini")) {
             return "round.xhtml?faces-redirect=true&cmd=ini";} // mod 30/07/2014
         
-        if (course.getInputSelectCourse().equals("CreateTarif")) {
-            return "tarif_menu.xhtml?faces-redirect=true";} // mod 16-09-2018
+        if (course.getInputSelectCourse().equals("CreateTarifGreenfee")) {
+            return "tarif_greenfee_menu.xhtml?faces-redirect=true";} // mod 16-09-2018
         
         if (course.getInputSelectCourse().equals("CreateTarifMember")) {
    //         tarifMember = new TarifMember();
-            return "tarif_members.xhtml?faces-redirect=true";} // new 05-01-2019
+            return "tarif_members_menu.xhtml?faces-redirect=true";} // new 05-01-2019
        
         if (course.getInputSelectCourse().equals("CreateUnavailable")) {
             return "unavailable.xhtml?faces-redirect=true";} // new 05-01-2019
-        
-        
-        
-        if (course.getInputSelectCourse().equals("PaymentTarifMember")) {
-            tarifMember = new FindTarifMembersData().findTarif(club, conn);
+
+        if(course.getInputSelectCourse().equals("PaymentTarifMember")) {
+   //         loadTarifMember();  // mod 14-02-2019  used in ??.xhtml
+           tarifMember = new FindTarifMembersData().findTarif(club, conn);
             if(tarifMember == null){
                 String msgerr =  LCUtil.prepareMessageBean("tarif.member.notfound");
                 LOG.error(msgerr); 
                 LCUtil.showMessageFatal(msgerr);
                 return null;
             }else{
-                 return "cotisation.xhtml?faces-redirect=true";} // new 05-01-2019
+                 return "cotisation.xhtml?faces-redirect=true";
+            } // new 05-01-2019
+           
             }
            
         
@@ -1792,6 +1877,31 @@ public String to_selectCourse_xhtml(String s){
     return null;
     } // end class selectcourse
 
+ public String findTarifMember() throws SQLException{ 
+     try{
+         LOG.info("entering loadTarifMember");
+         tarifMember = new FindTarifMembersData().findTarif(club, conn);
+         LOG.info("TarifMember = " + tarifMember);
+         course2.setInputSelectCourse("createTarifMember");
+       LOG.info("InputSelectCourse modified = " + course2.getInputSelectCourse());
+         if(tarifMember == null){
+                String msgerr = LCUtil.prepareMessageBean("tarif.member.notfound");
+                LOG.error(msgerr); 
+                LCUtil.showMessageFatal(msgerr);
+             //   return null;
+                return "cotisation_round.xhtml?faces-redirect=true";
+            }else{
+               LOG.info("nombre d'items MembersBase = " + tarifMember.getMembersBase().length);
+                 return "cotisation.xhtml?faces-redirect=true";
+            } 
+ 
+    } catch (Exception e) {
+            String msg = "££ Exception in loadTarifMember = " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+    }
+ }
 public String selectTravel(ECourseList ecl){ 
  try {
         LOG.info(" entering select Travel ...");
@@ -1944,13 +2054,14 @@ public String reset(String ini){
     lists.SubscriptionRenewalList.setListe(null); // new 25-11-2018
     lists.FlightList.setListe(null);
     lists.ClubDetailList.setListe(null);
+    lists.ClubCourseTeeList.setListe(null); // new 29-03-2019
  //2. entites
     if(ini.equals("non_belgian"))
         {   LOG.info("starting reset with non_belgian : " + ini);
             player = new Player();
             LOG.info("new player : " + player);
         }
-    player.setSelectedOtherPlayers(null);  // new 30-11-2018
+    setSelectedOtherPlayers(null);  // new 30-11-2018
     player2 = new Player();
     club = new Club();
 
@@ -1959,7 +2070,7 @@ public String reset(String ini){
     hole = new Hole();
     matchplay = new Old_Matchplay();
     // player = no
-    inscription = new PlayerHasRound();
+    inscription = new Inscription();
     round = new Round();
 //    scorecard = new EScoreCardList();
     scoreMatchplay = new ScoreMatchplay();
@@ -1976,7 +2087,7 @@ public String reset(String ini){
     creditcard.setPaymentOK(false);
     holesGlobal = new HolesGlobal();
     login = new Login();
-    
+    localAdmin = new Player(); // new 26-03-2019
     cptFlight = 0;  // iterations sur 
  //      LOG.info("ending initialize entites , param = " + ini);
     return "reset OK "; // on retourne d'où on vient
@@ -1990,9 +2101,9 @@ public String reset(String ini){
 public void createCourse() throws SQLException // 07/06/2014
 {
         LOG.info("start to create course, clubID = " + club.getIdclub() );
-    create.CreateCourse cc = new create.CreateCourse();
+  //  create.CreateCourse cc = new create.CreateCourse();
  //   boolean ok = cc.createCourse(club, course, conn);
-    if(cc.createCourse(club, course, conn)){  // ok
+    if(new create.CreateCourse().create(club, course, conn)){  // ok
         LOG.info("course created, next step = tee");
         tee.setNextTee(true); // affiche le bouton next(Tee) bas ecran à droite
     }
@@ -2001,17 +2112,17 @@ public void createCourse() throws SQLException // 07/06/2014
 public void createTee() throws SQLException
 {
         LOG.info("Starting createTee !");
-    create.CreateTee ct = new create.CreateTee();
+ //   create.CreateTee ct = new create.CreateTee();
  //   boolean ok = ct.createTee(club, course, tee, conn);
-    if(ct.createTee(club, course, tee, conn)){
+    if(new create.CreateTee().create(club, course, tee, conn)){
         LOG.info("tee created : we go to hole !!");
        hole.setNextHole(true); // affiche le bouton next(Hole) bas ecran à  droite
     }
 }
 
-public void calculateHcpStb() // throws SQLException
-{
+public void calculateHcpStb(){
     LOG.info("Starting Stableford Hcp calculated !");
+    LOG.info("with PlayingHcp = " + playingHcp.toString());
     double exact_handicap = playingHcp.getHandicapPlayer();
         LOG.info("with handicap player = " + exact_handicap );
     double slope = playingHcp.getTeeSlope();
@@ -2021,12 +2132,12 @@ public void calculateHcpStb() // throws SQLException
     double par = playingHcp.getCoursePar();
         LOG.info("with par = " + par );
     short teeClubHandicap = 0;       
-    //    int hcp = utils.GolfMySQL.calculatePlayingHcp(ph, sl, rt, pa);
-    calc.CalcStablefordPlayingHandicap cph = new calc.CalcStablefordPlayingHandicap();
-    int hcp = cph.calculatePlayingHcp(exact_handicap, slope, rating, par, teeClubHandicap);
-    //    LOG.info("Playing Hcp calculated !! = " + hcp);
-    entite.PlayingHcp ph = new entite.PlayingHcp();
-    ph.setPlayingHandicap(hcp);
+
+    int hcp = new calc.CalcStablefordPlayingHandicap()
+            .calculatePlayingHcp(exact_handicap, slope, rating, par, teeClubHandicap);
+       LOG.info("Playing Hcp calculated !! = " + hcp);
+
+    new entite.PlayingHcp().setPlayingHandicap(hcp);
    // PlayingHcp.setPlayingHandicap(hcp); // mod 19-08-2018
             LOG.info("Playing Hcp calculated !! = " + playingHcp.getPlayingHandicap() );
 }
@@ -2036,14 +2147,13 @@ public void calculateHcpScramble() throws Exception // calculate Handicap Scramb
     
 }
 
-public void createHole() throws SQLException
-{
-    create.CreateHole ch = new create.CreateHole();
-    ch.createHole(club, course, tee, hole, STROKEINDEX, conn);
+public void createHole() throws SQLException{
+
+    new create.CreateHole().create(club, course, tee, hole, STROKEINDEX, conn);
 
     // ajouter boolean = correct insert !!!
         LOG.info("hole created : we go to hole !!");
-     setNextStep(true);  // affiche le bouton next(Step) bas ecran Ã Â  droite}
+     setNextStep(true);  // affiche le bouton next(Step) bas ecran à droite}
 }
 
     public List<Integer> indexNumbers(final int max) {
@@ -2079,13 +2189,18 @@ public void createHole() throws SQLException
     
   public void createRound() throws SQLException{
        LOG.info("entering createRound ");
-    create.CreateRound cr = new create.CreateRound();
+  //     LOG.info("round = " + round.toString());
+       round.setRoundDate(round.getRoundDateTrf()); // zone de transfert provenant de Flight
+       LOG.info("round after TRF = " + round.toString());
+  //  create.CreateRound cr = new create.CreateRound();
   //  boolean ok = cr.createRound(round, course, conn);
-    if(cr.createRound(round, course, conn)){
-        LOG.info("round created : we go to course !!");
-         setNextInscription(true); // affiche le bouton next(Inscription) bas ecran Ã  droite
+    if(new create.CreateRound().create(round, course, unavailable,conn)){
+        LOG.info("round created : we go to inscription !!");
+         setNextInscription(true); // affiche le bouton next(Inscription) bas ecran à droite
+    }else{
+        LOG.info("round NOT NOT created !!");
     }
-}
+} // end method
 
     public List<SelectItem> getGames() {
         return GAMES;
@@ -2095,14 +2210,94 @@ public void createHole() throws SQLException
   return START;
     }
     
-  
+  public void PlayerDrop(DragDropEvent event) {  // used in inscriptions_other_players.xhtml
+   try{
+          LOG.info("entering PlayerDrop");
+          LOG.info("event = " + event.getData().toString());
+ ///         LOG.info("c'est fait ! joueurs déjà inscrits = " + CourseController.r2.getPlayersString() );
+          LOG.info("DragId = " + event.getDragId());
+          LOG.info("DropId = " + event.getDropId());
+   //       droppedPlayers.add(event.);
+         //  Droppable source = (Droppable) event.getSource();
+      //      String dataSource = source.getDatasource();
+    //           LOG.info("droppable dataSource = " + dataSource);
+    Player playerDropped = new Player();
+    //    Player playerDropped = ((Player) event.getData());
+        playerDropped = ((Player) event.getData());
+            LOG.info("PlayerLastName dropped = " + playerDropped.getPlayerLastName());
+            LOG.info("Player dropped = " + playerDropped.toString());
+  //LOG.info("droppedPlayers size = " + droppedPlayers.size());
+
+        LOG.info("droppedPlayers is before : " + Arrays.toString(droppedPlayers.toArray()));
+     //   LOG.info("droppedPlayers = " + droppedPlayers.toString());
+
+        droppedPlayers.add(playerDropped);
+          LOG.info("After add, droppedPlayers = " +  Arrays.toString(droppedPlayers.toArray()));
+          LOG.info("After add, number of dropped players = " + droppedPlayers.size());
+        if(droppedPlayers.size() == 3){
+            String msg = "There are 3 dropped players";
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
+        } 
+        /// A FAIRE limiter à 3 inscriptions !
+        selectedOtherPlayers.remove(playerDropped);
+ //           LOG.info("After remove, selectedOtherPlayers = " + selectedOtherPlayers.toString());
+   } catch (Exception e) {
+            String msg = "£££ Exception in PlayerDrop = " + e.getMessage();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+       //     return null;
+     }
+    } // end method
+    
+public String PlayerRemove(Player player) {  // used in inscriptions_other_players.xhtml
+            LOG.info("entering PlayerRemove");
+            LOG.info("Player to remove from droppedPlayers = " + player.getPlayerLastName());
+        droppedPlayers.remove(player);
+   //         LOG.info("After remove, droppedPlayers = " + droppedPlayers.toString());
+            LOG.info("After remove, number of dropped players = " + droppedPlayers.size());
+        getDroppedPlayers(); // refrech screen
+   return "inscriptions_other_players.xhtml?faces-redirect=true";
+ }
+
 public String createInscriptionOtherPlayers() throws SQLException{
   try{
-        LOG.info("entering createInscriptionOtherPlayers");
-     create.CreateInscriptionOtherPlayers ciop = new create.CreateInscriptionOtherPlayers();
-     boolean ok = ciop.createInscriptions(player, round, inscriptionNew, club, course, conn);
-        LOG.info("createInscriptionOtherPlayers result is = " + ok);
-     return null; // retourne d'où il vient
+        LOG.info("entering CourseController.createInscriptionOtherPlayers");
+ // transfert de course vers player pour utilisation ultérieure
+    player.setDroppedPlayers(droppedPlayers); // new 10-03-2019
+     LOG.info("list Dropped players = " + Arrays.toString(player.getDroppedPlayers().toArray()));
+     
+     // tester ici prélablement les rejets pour non membre et non paiement greenfee
+     int size = player.getDroppedPlayers().size();
+     Player p = new Player();
+     for(int i=0; i < size; i++){
+         p = player.getDroppedPlayers().get(i);
+            LOG.info("treating test inscription for = " + p.getPlayerLastName());
+         Cotisation c = new find.FindCotisation().find(p,club,round,conn);
+         boolean b = new find.FindGreenfeePaid().find(p,club,round,conn); 
+         if(c.getIdclub() == null && b == false){
+             LOG.info("pas de cotisation ni de greenfee payé : faut payer un grdenfee !" + p.getPlayerLastName());
+   //        manageGreenfee();
+             LOG.info("back from manageGreenfee !");
+             // calculer le prix du greenfee
+             // new 16-03-2019
+             findTarifGreenfee();
+             LOG.info("afer findTarifGreenfee !");
+       //     tarifGreenfee = new find.FindTarifGreenfeeData().find(course, round, conn);
+       //         LOG.info("tarifGreenfee after load = " + tarifGreenfee.toString());
+       //     greenfee = new load.LoadGreenfee().load(tarifGreenfee, greenfee, club, round); //load(tarifGreenfee, greenfee, club);
+       //         LOG.info("Greenfee after load = " + greenfee.toString());
+            greenfee.setPaymentReference(creditcard.getReference());
+            LOG.info("Greenfee with paymentReference = " + greenfee.toString());
+ 
+         }else{
+              boolean ok = new create.CreateInscriptionOtherPlayers().create(player, round, inscription, club, course, conn);
+              // was inscriptionNew
+                 LOG.info("createInscriptionOtherPlayers result is = " + ok);
+         }
+     } //end for
+ //  return null; // retourne d'où il vient
+    return "price_round_greenfee.xhtml?faces-redirect=true";
    }catch(Exception ex){
     String msg = "creatInscriptionOtherPlayers Exception ! " + ex;
             LOG.error(msg);
@@ -2113,39 +2308,59 @@ public String createInscriptionOtherPlayers() throws SQLException{
 
  
 public String createInscription() throws SQLException{
-  try{
+try{
         LOG.info("entering createInscription");
-    
+        LOG.info("with round = " + round);
     Player invitedBy = player;
-    // new 09-12-2018 complète invitedBy par le nom du player current
-  //  ArrayList<Player> p = new ArrayList<>();   // transform player2 in list<player<    
-  //  p.add(player);
-  //  invitedBy.setDroppedPlayers(p);
+
+ //   inscription.setPlayer_idplayer(player.getIdplayer());
+  //  inscription.setPlayerGender(otherGame);
+    LOG.info("idround inscription = "+  round.getIdround());
+    String s = inscription.getInscriptionTeeStart();
+    String s3 = s.substring(s.length() -3); // 3 dernières positions format : BLUE / L / 01-09 / 154
+    inscription.setInscriptionIdTee(Integer.valueOf(s3));
     
- //   create.CreateInscription ci = new create.CreateInscription();
-    int ret = new create.CreateInscription().create(round, player, invitedBy, inscriptionNew, club, course, conn); // mod 10/11/2014
-    LOG.info("coursec, return from createInscription = " + ret);
+ ////   inscription.setInscriptionIdTee(154); // à modifier
+    
+    
+    int ret = new create.CreateInscription().create(round, player, invitedBy, inscription, club, course, conn); // mod 10/11/2014
+    LOG.info("courseC, return from createInscription = " + ret);
     if(ret == 01){
-        String err =  LCUtil.prepareMessageBean("inscription.too much players"); // + listPlayers.size() ;
+        String err = LCUtil.prepareMessageBean("inscription.too much players"); // + listPlayers.size() ;
          LOG.error(err); 
         LCUtil.showMessageFatal(err);
         inscription.setInscriptionOK(false); // new 16/7/2016 used in inscription.xhtml
         return "inscription.xhtml?faces-redirect=true";
     }
     if(ret == 02){
-        String err = " Vous avez payé un accessoire mais vous n'êtes pas membre de ce club - Voulez-vous payer un greenfee ?"; // + cotisation.getIdclub();
+      //  String err = " "; // + cotisation.getIdclub();
+        String err = LCUtil.prepareMessageBean("cotisation.notfound"); 
+        LOG.info(err);
+        LCUtil.showMessageInfo(err);
+        inscription.setInscriptionOK(false); // new 16/7/2016 used in inscription.xhtml
+            LOG.info("goint to cotisation_round.xhtml?faces-redirect=true");
+        return "cotisation_round.xhtml?faces-redirect=true";
+    }
+        if(ret == 03){
+      //  String err = " "; // + cotisation.getIdclub();
+        String err = LCUtil.prepareMessageBean("cotisation.notmember"); // cotisation equipments only
         LOG.info(err);
         LCUtil.showMessageFatal(err);
         inscription.setInscriptionOK(false); // new 16/7/2016 used in inscription.xhtml
-        return "inscription.xhtml?faces-redirect=true";
+     //   return "inscription.xhtml?faces-redirect=true";
+        return "cotisation_round.xhtml?faces-redirect=true";
     }
+
       if(ret == 00){
           String msg =  LCUtil.prepareMessageBean("inscription.ok");
-          msg = msg
-             + "for round = " + round.getIdround()
+          msg = msg + round.getIdround()
              + " <br/> player = " + player.getIdplayer()
              + " <br/> player name = " + player.getPlayerLastName()
+             + " <br/> club name = " + club.getClubName()
+             + " <br/> course name = " + course.getCourseName()
              + " <br/> round date = " + round.getRoundDate().format(ZDF_TIME_HHmm)
+             + " <br/> gender = " + tee.getTeeGender()
+             + " <br/> Holes Played = " + tee.getTeeHolesPlayed()
                     ;
           LOG.info(msg);
           LCUtil.showMessageInfo(msg);
@@ -2167,8 +2382,8 @@ public String forgetPassword() throws SQLException, Exception{
 try{
     LOG.info("entering forgetPassword");
 // inset into table Activation
-    create.CreateActivationPassword cap = new create.CreateActivationPassword();
-    cap.createActivation(conn, player); // y compris envoi du mail
+  //  create.CreateActivationPassword cap = new create.CreateActivationPassword();
+    new create.CreateActivationPassword().create(conn, player); // y compris envoi du mail
  //   LOG.info("line 02");
   //  LOG.info("line03");
    return null;
@@ -2221,9 +2436,9 @@ public String resetPassword() throws SQLException, Exception, Throwable{
 
 public String createPassword() throws SQLException, Exception{
  try{   LOG.info("entering createPassword");
-    modify.ModifyPassword mp = new modify.ModifyPassword();
+ //   modify.ModifyPassword mp = new modify.ModifyPassword();
   //  boolean ok = mp.modifypassword(player, conn);
-    if(mp.modifypassword(player, conn)){  // true
+    if(new modify.ModifyPassword().modifypassword(player, conn)){  // true
                   LOG.info("boolean returned from modifyPassword is 'true' ");
                   String msg = "<br> <br> <h1>Password Created 2179 !! ";
                    LOG.info(msg + player.getWrkpassword());
@@ -2266,7 +2481,7 @@ try{
         }else{
                   String msg = "Existing password not correct ! ";
                   LOG.error(msg);
-                  LCUtil.showDialogFatal(msg);
+                  LCUtil.showMessageFatal(msg);
                   return null;
              } 
    }catch(Exception ex){
@@ -2311,7 +2526,7 @@ public String modifyPassword() throws SQLException, Exception{
             return null;
 }    
 } // end method
-
+/*
 public void Testpayment() throws SQLException{
  try{
         LOG.info("starting payment test");
@@ -2319,7 +2534,7 @@ public void Testpayment() throws SQLException{
     creditcard = new Creditcard();
     creditcard.setTotalPrice(12345.6);
     creditcard.setCommunication("ceci est la communication de test");
-    creditcard.setTypePayment("COTISATION");
+
     creditcard.setPaymentOK(false);
 ////      boolean OK = CreditcardPayment();
 ////      LOG.info("coming back with this payment information : " + OK);
@@ -2331,10 +2546,10 @@ public void Testpayment() throws SQLException{
      //      return null;
 }    
 }  //end method  
-
-public boolean CreditcardPayment(Subscription subscription) throws SQLException{  // entrypoint for credicard payment
+*/
+public boolean CreditcardPaymentSubscription(Subscription subscription) throws SQLException{  // entrypoint for credicard payment
  try{
-         LOG.info("starting CreditcardPayment real execution");
+         LOG.info("starting CreditcardPayment Subscription");
          LOG.info("subscription = " + subscription.toString());
       if(subscription.getPrice() == 0){
           LOG.info("amount ZERO -- No payment needed !");
@@ -2344,6 +2559,23 @@ public boolean CreditcardPayment(Subscription subscription) throws SQLException{
       creditcard.setTotalPrice(subscription.getPrice());
       creditcard.setCommunication(subscription.getCommunication());
       creditcard.setTypePayment("SUBSCRIPTION");
+      
+      Creditcard c = new find.FindCreditcard().find(player, conn);
+        LOG.info("creditcard found = " + c);
+        LOG.info("creditcard number for test = " + c.getCreditCardNumber());
+      if(c.getCreditCardNumber() == null){
+                LOG.info("First utilisation of a creditcard for user = " + player.getPlayerLastName());
+            creditcard.setCreditCardHolder("first use");
+      }else{ // prefilling 08-03-2019
+            creditcard.setCreditCardHolder(c.getCreditCardHolder());
+            creditcard.setCreditCardNumber(c.getCreditCardNumberNonSecret());
+            creditcard.setCreditCardType(c.getCreditCardType());
+            creditcard.setCreditCardExpirationDate(c.getCreditCardExpirationDate());
+                LOG.info("creditcard completed with db info = " + creditcard);
+       }
+      
+      
+      
          LOG.info("going to creditcard.xhtml");
       FacesContext.getCurrentInstance().getExternalContext().dispatch("creditcard.xhtml");
         LOG.info("after dispatch creditcard.xhtml");
@@ -2364,36 +2596,39 @@ public boolean CreditcardPayment(Subscription subscription) throws SQLException{
 //@Inject
 //ExternalContext externalContext;
 
-public boolean CreditcardPayment(Cotisation cotisation) throws SQLException{  // entrypoint for credicard payment
+public boolean CreditcardPaymentCotisation(Cotisation cotisation) throws SQLException{  // entrypoint for credicard payment
  try{
-         LOG.info("starting CreditcardPayment real execution");
+         LOG.info("starting CreditcardPayment Cotisation");
          LOG.info("Cotisation = " + cotisation.toString());
       if(cotisation.getPrice() == 0){
           LOG.info("amount ZERO nopayment needed !");
           return false;
       }
-      creditcard = new Creditcard();
+      creditcard = new Creditcard();  // tout est réintialisé !
       creditcard.setPaymentOK(false);
       creditcard.setTotalPrice(cotisation.getPrice());
       creditcard.setCommunication(cotisation.getCommunication());
       creditcard.setTypePayment("COTISATION");
+   // prefilling creditcard   
+      Creditcard c = new find.FindCreditcard().find(player, conn);
+        LOG.info("creditcard found = " + c);
+        LOG.info("creditcard number for test = " + c.getCreditCardNumber());
+      if(c.getCreditCardNumber() == null){
+                LOG.info("First utilisation of a creditcard for user = " + player.getPlayerLastName());
+            creditcard.setCreditCardHolder("first use");
+      }else{ //prefilling 08-03-2019
+            creditcard.setCreditCardHolder(c.getCreditCardHolder());
+            creditcard.setCreditCardNumber(c.getCreditCardNumberNonSecret());
+            creditcard.setCreditCardType(c.getCreditCardType());
+            creditcard.setCreditCardExpirationDate(c.getCreditCardExpirationDate());
+                LOG.info("creditcard completed with db info = " + creditcard);
+       }
          LOG.info("going to creditcard.xhtml");
      FacesContext fc = FacesContext.getCurrentInstance();
      ExternalContext eco = fc.getExternalContext();
-  //  ec.redirect("creditcard.xhtml"); non
-  //https://stackoverflow.com/questions/14163457/externalcontext-dispatch-not-working
-  // use normal navigation instead :
-///    NavigationHandler nh = fc.getApplication().getNavigationHandler();
-////    nh.handleNavigation(fc, null, "creditcard.xhtml?faces-redirect=true");
+        LOG.info("externalcontextPath = " + eco.getRequestContextPath());
      Flash flash = eco.getFlash();
      flash.setKeepMessages(true);
-//https://stackoverflow.com/questions/15474345/using-externalcontext-dispatch-in-jsf-error-handler-causes-corrupt-page-renderin/     
-   //  ViewHandler viewHandler = fc.getApplication().getViewHandler();
-   //  UIViewRoot viewRoot = viewHandler.createView(fc, "creditcard.xhtml?faces-redirect=true");
-   //  fc.setViewRoot(viewRoot);
-  //   fc.renderResponse();
-     
-     
      eco.dispatch("creditcard.xhtml?faces-redirect=true");
   //    FacesContext.getCurrentInstance().getExternalContext().redirect("creditcard.xhtml");
       LOG.info("responseComplete has been called : " + fc.getResponseComplete());
@@ -2413,9 +2648,9 @@ public boolean CreditcardPayment(Cotisation cotisation) throws SQLException{  //
 }    
 }  //end method  
 
-public boolean CreditcardPayment(Greenfee greenfee) throws SQLException{  // entrypoint for credicard payment
+public boolean CreditcardPaymentGreenfee(Greenfee greenfee) throws SQLException{  // entrypoint for credicard payment
  try{
-         LOG.info("starting CreditcardPayment real execution");
+         LOG.info("starting CreditcardPayment for Greenfee");
          LOG.info("Greenfee = " + greenfee.toString());
       if(greenfee.getPrice() == 0){
           LOG.info("amount ZERO nopayment needed !");
@@ -2427,12 +2662,26 @@ public boolean CreditcardPayment(Greenfee greenfee) throws SQLException{  // ent
       creditcard.setCommunication(greenfee.getCommunication());
       //"ceci est la communication de test");
       creditcard.setTypePayment("GREENFEE");
+      
+      Creditcard c = new find.FindCreditcard().find(player, conn);
+        LOG.info("creditcard found = " + c);
+        LOG.info("creditcard number for test = " + c.getCreditCardNumber());
+      if(c.getCreditCardNumber() == null){
+            LOG.info("First utilisation of a creditcard for user = " + player.getPlayerLastName());
+            creditcard.setCreditCardHolder("first use");
+      }else{ // prefilling 08/03/2019
+            creditcard.setCreditCardHolder(c.getCreditCardHolder());
+            creditcard.setCreditCardNumber(c.getCreditCardNumberNonSecret());
+            creditcard.setCreditCardType(c.getCreditCardType());
+            creditcard.setCreditCardExpirationDate(c.getCreditCardExpirationDate());
+                LOG.info("creditcard completed with db info = " + creditcard);
+       }
+      
          LOG.info("going to creditcard.xhtml");
      FacesContext fc = FacesContext.getCurrentInstance();
-     ExternalContext xc = fc.getExternalContext();
+  //   ExternalContext xc = fc.getExternalContext();
      ExternalContext eco = fc.getExternalContext();
         LOG.info("externalcontextPath = " + eco.getRequestContextPath());
-     
      Flash flash = eco.getFlash();
      flash.setKeepMessages(true);
      eco.dispatch("creditcard.xhtml?faces-redirect=true");
@@ -2453,30 +2702,71 @@ public boolean CreditcardPayment(Greenfee greenfee) throws SQLException{  // ent
             return false;
 }    
 }  //end method  
+public String findTarifGreenfeeEcl(ECourseList ecl) throws SQLException {
+try{
+            LOG.info("entering findTarif");
+            LOG.info(" findTarif with ecl = " + ecl.toString());
+        club = ecl.Eclub; //.getClub();
+        course = ecl.Ecourse; //getCourse();
+        round = ecl.Eround; //.getRoun; //d();
+        tarifGreenfee = new find.FindTarifGreenfeeData().find(course, round, conn);
+        if(tarifGreenfee == null){
+            String msg = "No Tarif available for this course";
+            LOG.error(msg) ;
+            showMessageFatal(msg);
+        }else{
+            String msg = "Tarif returned = " + tarifGreenfee.toString();
+            LOG.info(msg);
+            showMessageInfo(msg);
+        }
+        // a faire : extraire le prix de la partie !!!
+      
+   // return null;
+    return "tarif_greenfee_menu.xhtml?faces-redirect=true";
+} catch(Exception ex){
+    String msg = "Exception in findTarif ! " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+}    
+} //end method
 
 public String findTarifGreenfee() throws SQLException{  // tarif pour l'inscription (green fee)
+    // used in cotisation_round.xhtml 
  try{
     LOG.info("starting findTarifGreenfee for a round");
-    LOG.info("course = " + course.toString());
+    LOG.info("input data =" + course.toString());
 //    LOG.info("just before player");
     LOG.info("player = " + player.toString());
-    tarifGreenfee = new find.FindTarifGreenfeeData().findTarif(course, conn);
- //   boolean c = create.CreateInscription
-  //  boolean b = create.CreateInscription.createInscription(round, player, inscription, club, course, conn); // mod 10/11/2014
+    LOG.info("round = " + round.toString());
+    LOG.info("round date + = " + round.getRoundDate());
+    LOG.info("course = " + course.toString());
+         course2.setInputSelectCourse("createTarifGreenfee");  // work around 
+       LOG.info("InputSelectCourse modified = " + course2.getInputSelectCourse());
+    // quel genre de tarif ?? GR DA ou IT ??
+                             //les items qui concernent une autre saison
+    tarifGreenfee = new find.FindTarifGreenfeeData().find(course, round, conn);
     if(tarifGreenfee == null){
-         LOG.info("Tarif returned from findTarifdata is null ");
-         //   return "inscription.xhtml?faces-redirect=true";
-         return null;  // donc inscription.xhtml
-    }else{
-             LOG.info("tarif Greenfee OK");
+        String err = "Tarif returned from findTarifdata is null ";
+         LOG.info(err);
+     //    showMessageFatal(err);
+         return null;  // donc inscription.xhtml ??
+    }
+    
+        LOG.info("tarif Greenfee OK");
+        LOG.info("now tarifGreenfee is = " + tarifGreenfee); // new 18/02/2019
+        LOG.info("inputtype tarifGreenfee is = " + tarifGreenfee.getInputtype()); // new 23/02/2019
+             LOG.info("on recherche la season"); // new 18/02/2019
+        String season = new calc.CalcTarifGreenfee().findPeriod(tarifGreenfee,round.getRoundDate().toLocalDate());
+             LOG.info("On a trouvé la season = " + season); // new 18/02/2019
+             tarifGreenfee.setSeason(season); // new 18/02/2019 utilisé pour filter dans price_round_greenfee.xhtml 
+             
           double dd = new calc.CalcTarifGreenfee().calc(tarifGreenfee, round, club, player);
              LOG.info("price green fee = " + dd);
+
              // tester sur la valeur 
           tarifGreenfee.setPriceGreenfee(dd);
-          // il s'agit du paiment d'une inscription new 09-10-2018
-  //        creditcard.setTypePayment(Creditcard.etypePayment.INSCRIPTION.toString()); // à déplacer !!!
-          return "tarif_round.xhtml?faces-redirect=true";
-             } 
+      return "price_round_greenfee.xhtml?faces-redirect=true";
   }catch(Exception ex){
     String msg = "findTarifGreenfee Exception ! " + ex;
             LOG.error(msg);
@@ -2493,8 +2783,8 @@ public void findWeather() throws SQLException, Exception{
     LOG.info("player = " + player.toString());
     LOG.info("round = " + round.toString());
         LOG.info("just before findWeather");
-    find.FindWeather fw = new find.FindWeather();
-    String weather = fw.currentWeatherByCityName(club);
+   // find.FindWeather fw = ;
+    String weather = new find.FindWeather().currentWeatherByCityName(club);
     if(weather == null){
                   LOG.info("Weather returned from findWeather is null ");
                //   return "inscription.xhtml?faces-redirect=true";
@@ -2519,7 +2809,7 @@ try{
         club = ecl.getClub();
         course = ecl.getCourse();
         round = ecl.getRound();
-    return "tarif_menu.xhtml?faces-redirect=true";
+    return "tarif_greenfee_menu.xhtml?faces-redirect=true";
 } catch(Exception ex){
     String msg = "Exception in selectTarif ! " + ex;
             LOG.error(msg);
@@ -2547,7 +2837,7 @@ try{
         LOG.info("exiting printTarifGreenfee with " + tarifGreenfee.toString());
         showMessageInfo(tarifGreenfee.toString());
     }
-    return "tarif_menu.xhtml?faces-redirect=true";
+    return "tarif_greenfee_menu.xhtml?faces-redirect=true";
 } catch(Exception ex){
     String msg = "Exception in printTarifGreenfee ! " + ex;
             LOG.error(msg);
@@ -2556,59 +2846,31 @@ try{
 }    
 } //end method printTarifGreenfee
 
-public String findTarifGreenfee(ECourseList ecl) throws SQLException {
-try{
-            LOG.info("entering findTarif");
-            LOG.info(" findTarif with ecl = " + ecl.toString());
-        club = ecl.Eclub; //.getClub();
-        course = ecl.Ecourse; //getCourse();
-        round = ecl.Eround; //.getRoun; //d();
-    //    find.FindTarifGreenfeeData ft = new find.FindTarifGreenfeeData();
-        tarifGreenfee = new find.FindTarifGreenfeeData().findTarif(course, conn);
-        if(tarifGreenfee == null){
-            String msg = "No Tarif available for this course";
-            LOG.error(msg) ;
-            showMessageFatal(msg);
-        }else{
-            String msg = "Tarif returned = " + tarifGreenfee.toString();
-            LOG.info(msg);
-            showMessageInfo(msg);
-        }
-        // a faire : extraire le prix de la partie !!!
-      
-   // return null;
-    return "tarif_menu.xhtml?faces-redirect=true";
-} catch(Exception ex){
-    String msg = "Exception in findTarif ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-} //end method
 
-  public String selectRecentInscription(ECourseList ecl) throws SQLException {
+
+public String selectRecentInscription(ECourseList ecl) throws SQLException {
  try{       
            LOG.info("entering selectRecentInscrition");
            LOG.info("  selectRecentInscription, ecl = " + ecl);
         club = ecl.getClub();
         course = ecl.getCourse();
         round = ecl.getRound();
-           LOG.info("on cherche le nombre de joueurs  déjà inscrits et leur nom"); 
-    //    lists.RoundPlayersList spl  = new lists.RoundPlayersList();
-  // lp = List<Player>      
+    //       LOG.info("on cherche le nombre de joueurs  déjà inscrits et leur nom"); 
         lp = new lists.RoundPlayersList().listAllParticipants(round, conn);
-           LOG.info("after lists.RoundPlayersList ");
+     //      LOG.info("after lists.RoundPlayersList ");
   if(lp != null){
-         LOG.info("nombre de players stableford = lp size = " + lp.size());
+         LOG.info("nombre de players = " + lp.size());
         inscription.setInscriptionOK(true); // new 12/7/2017 used in inscription.xhtml
         String s = utils.LCUtil.fillRoundPlayersString(lp);
         round.setPlayersString(s);
-         LOG.info("c'est fait ! joueurs déjà inscrits = " + round.getPlayersString() );
+         LOG.info("joueurs déjà inscrits = " + round.getPlayersString() );
   }else{
          LOG.info("nombre de players stableford =  zero" );
-       round.setPlayersString("no players inscrits");
+       round.setPlayersString("no players reservation");
    }
          inscription.setInscriptionTeeStart(ecl.Etee.getTeeStart());
+         // c'est ici qu'i faut modifier !!
+         inscription.setInscriptionIdTee(ecl.Etee.getIdtee()); // new 31-03-2019
           LOG.info("TeeStart = " + inscription.getInscriptionTeeStart());
            
         String msg = "Select RecentInscription EcourseList Successful "
@@ -2631,12 +2893,12 @@ try{
 public String scoreStableford(ECourseList ecl) throws SQLException {
     try{
              LOG.info(" ... entering ScoreStableford "); 
+             LOG.info("scoreStableford = " + scoreStableford.toString());
             LOG.info(" ... entering ScoreStableford  with ecl = " + ecl.toString());
         club = ecl.getClub();
         course = ecl.getCourse();
         round = ecl.getRound();
 
-   //     load.LoadParArray lpa = new load.LoadParArray();
         parArray = new load.LoadParArray().LoadParArray(conn, player, course);  //mod 15/08/2014
         
    /// UPDATE or INSERT ??     
@@ -2644,12 +2906,11 @@ public String scoreStableford(ECourseList ecl) throws SQLException {
         int rows = new find.FindCountScore().getCountScore(conn, player, round, "rows");
         if (rows != 0){ // UPDATE thus prefilling
                 LOG.info("there are : " + rows + " ==> this is a UPDATE, thus we are prefilling the score !");
-      //      load.LoadScoreArray lsa = new load.LoadScoreArray();
+
             int[] int01 = new load.LoadScoreArray().LoadScoreArray(conn, player, round);
                 LOG.info("back from loadscorearray with int01 = " + Arrays.toString(int01));
             scoreStableford.setHoles(intArraytoStringArray(int01));
                LOG.info("scoreStableford OK");
-      //      load.LoadStatisticsArray lstta = new load.LoadStatisticsArray();
             scoreStableford.setStatistics(new load.LoadStatisticsArray().LoadStatisticsArray(conn, player, round) );
                 LOG.info("Score is NOW prefilled !!");
         } // end loading
@@ -2685,9 +2946,16 @@ try{
     String [][] arr = tarifMember.getMembersBase();
     arr[i][0] = tarifMember.getWorkItem();
     arr[i][1] = tarifMember.getWorkPrice();
+        LOG.info("workAge = " + tarifMember.getWorkAge());
+    if(tarifMember.getWorkAge() == null){ // pas complété dans écran
+         tarifMember.setWorkAge("00-00");
+         LOG.info("workAge was null, setted to : " + tarifMember.getWorkAge());
+    }
+    arr[i][2] = tarifMember.getWorkAge();  // new 03-03-2019
     tarifMember.setMembersBase(arr);
     tarifMember.setWorkItem(""); // pour leprochain affichage
     tarifMember.setWorkPrice("");
+     tarifMember.setWorkAge("");
         LOG.info("Members tarif updated = " + tarifMember.toString());
     String msg = "show TarifMembers = "
             + tarifMember.getMemberStartDate().format(ZDF_TIME_DAY)
@@ -2720,14 +2988,19 @@ try{
     LOG.info("entering inputTarifSeasons !");
         LOG.info("entering tarif seasons with course = " + course.toString());
         LOG.info("datesSeason = "  + Arrays.deepToString(tarifGreenfee.getDatesSeason()));
-    String msg = " input Period Seasons = " + tarifGreenfee.getTarifIndexSeasons() + " / " 
-                                            + Arrays.deepToString(tarifGreenfee.getDatesSeason()[tarifGreenfee.getTarifIndexSeasons()]);
+    String msg = "Last Period introduced = " // + tarifGreenfee.getTarifIndexSeasons() + " / " 
+                + Arrays.deepToString(tarifGreenfee.getDatesSeason()[tarifGreenfee.getTarifIndexSeasons()]);
     LOG.info(msg);
     showMessageInfo(msg);
-    
-    tarifGreenfee.setTarifIndexSeasons(tarifGreenfee.getTarifIndexSeasons() + 1);
+     msg = "Total Periods is now = " + tarifGreenfee.getTarifIndexSeasons() + " / " 
+                + Arrays.deepToString(tarifGreenfee.getDatesSeason());
+    LOG.info(msg);
+    showMessageInfo(msg);
+        tarifGreenfee.setTarifIndexSeasons(tarifGreenfee.getTarifIndexSeasons() + 1);
+// ligne suivante à modifier !!
+     ///     tarifGreenfee.setStartDate(SDF.parse("01/01/2000")); // pour le prochain affichage
     LOG.info("Tarif Index Seasons is now :" + tarifGreenfee.getTarifIndexSeasons());
-     return null; // retourne d'ouù il vient
+     return null; // retourne d'où il vient
     // à modifier
  //    boolean ok = create.CreateTarif.createTarif(club, conn);
 }catch(Exception ex){
@@ -2747,7 +3020,7 @@ try{
         LOG.info(msg);
     //    showMessageInfo(msg);
 
-    if(new create.CreateUnavailable().create(unavailable, conn)){
+    if(new create.CreateUnavailable().create(unavailable, round, conn)){
         msg = "Unavailable is created !";
         LOG.info(msg);
         showMessageInfo(msg);
@@ -2779,24 +3052,25 @@ try{
 //    LOG.info("line 02");
     tarifMember.RemoveNull(); // remove null from arrays
  //    LOG.info("line 02");
-    String msg = " Tarif Member to be created = " + tarifMember.toString();
+        String msg = "Tarif Member to be created = " + tarifMember.toString();
         LOG.info(msg);
         showMessageInfo(msg);
     tarifMember.setTarifMemberIndex(tarifMember.getTarifMemberIndex() + 1);
   //  create.CreateTarifMember ctm = new create.CreateTarifMember();// à modfier
   //  boolean ok = new create.CreateTarifMember().createTarif(tarifMember, club, conn);
-    if(new create.CreateTarifMember().createTarif(tarifMember, club, conn)){
-        LOG.info("Tarif is created ? = ");
-        showMessageInfo("Tarif is created ");
-        return null; // retourne d'où il vient
+    if(new create.CreateTarifMember().create(tarifMember, club, conn)){
+        msg = "Tarif is created ";
+        LOG.info(msg);
+        showMessageInfo(msg);
+      //  return null; // retourne d'où il vient
+        return "tarif_members_menu.xhtml?faces-redirect=true";
     }else{
-        LOG.info(" tarif is NOT created " );
-         showMessageInfo("tarif is NOT created");
-        return null;
+         msg = "Tarif is NOT created ";
+         LOG.info(msg);
+         showMessageInfo(msg);
+      //  return null;
+        return "tarif_members_menu.xhtml?faces-redirect=true";
     }
-    
-    // à modifier
- //    boolean ok = create.CreateTarif.createTarif(club, conn);
 }catch(Exception ex){
     String msg = "Exception in createTarifMembers! " + ex;
             LOG.error(msg);
@@ -2814,19 +3088,22 @@ try{
         LOG.info("equipments to be created = " + Arrays.deepToString(tarifGreenfee.getPriceEquipments()));
         LOG.info("days to be created = " + Arrays.deepToString(tarifGreenfee.getDays()));
         LOG.info("tarif index = " + tarifGreenfee.getTarifIndexSeasons());
+        LOG.info("greenfees to be created = " + Arrays.deepToString(tarifGreenfee.getPriceGreenfees()));
+        LOG.info("greenfee index = " + tarifGreenfee.getTarifIndexGreenfee());
     tarifGreenfee.RemoveNull(); // remove null from arrays
     String msg = " Tarif to be created = " + tarifGreenfee.toString();
         LOG.info(msg);
     //    showMessageInfo(msg);
 
-    if(new create.CreateTarifGreenfee().createTarif(tarifGreenfee, course, conn)){
+    if(new create.CreateTarifGreenfee().create(tarifGreenfee, course, conn)){
         msg = " TarifGreenfee Seasons = " + Arrays.deepToString(tarifGreenfee.getDatesSeason());
         msg = msg + " <br/>TarifGreenfee Equipments = " + Arrays.deepToString(tarifGreenfee.getPriceEquipments());
+        msg = msg + " <br/>TarifGreenfee Greenfee = " + Arrays.deepToString(tarifGreenfee.getPriceGreenfees());
         msg = msg + " <br/>TarifGreenfee Times = " + Arrays.deepToString(tarifGreenfee.getTeeTimes());
         msg = msg + " <br/>TarifGreenfee Days = " + Arrays.deepToString(tarifGreenfee.getDays());
         LOG.info(msg);
         showMessageInfo(msg);
-        return "tarif_menu.xhtml?faces-redirect=true";
+        return "tarif_greenfee_menu.xhtml?faces-redirect=true";
     }else{
         msg = "Fatal Error creation tarif Greenfee";
         LOG.info(msg);
@@ -2848,14 +3125,29 @@ public String inputTarifHours() throws SQLException, Exception{
 try{
     LOG.info("entering inputTarifHours !");
         LOG.info("entering tarif Hours with course = " + course.toString());
+        tarifGreenfee.setInputtype("HO");  // for Hours correction, sasntana pas oK
         LOG.info("teeTimes = "  + Arrays.deepToString(tarifGreenfee.getTeeTimes()));
-    String msg = "Tarif Hours = " + tarifGreenfee.getTarifIndexHours() + " / " 
+        int i = tarifGreenfee.getTarifIndexHours();
+        LOG.info("teetimes [0][0] = " + tarifGreenfee.getTeeTimes()[i][0]);
+        String start = SDF_HH_MM.format(tarifGreenfee.getStartDate());
+            LOG.info("string start = " + start);
+        String end = SDF_HH_MM.format(tarifGreenfee.getEndDate());
+            LOG.info("string end = " + end);
+
+        String [][] arr = utils.LCUtil.cloneStringArray2D(tarifGreenfee.getTeeTimes());
+            LOG.info("working arr is before " + Arrays.deepToString(arr));
+        arr[i][0] = start;
+        arr[i][1] = end;
+        arr[i][2] = tarifGreenfee.getWorkSeason();
+        arr[i][3] = tarifGreenfee.getWorkPrice();
+        tarifGreenfee.setTeeTimes(arr);
+        String msg = "Tarif Hours = " + tarifGreenfee.getTarifIndexHours() + " / " 
                                    + Arrays.deepToString(tarifGreenfee.getTeeTimes()); //[tarifGreenfee.getTarifIndexHours()]);
  //+  Arrays.deepToString(tarifGreenfee.getPriceEquipments());
-       LOG.info(msg);
-    showMessageInfo(msg);
-    
-    tarifGreenfee.setTarifIndexHours(tarifGreenfee.getTarifIndexHours() + 1);
+        LOG.info(msg);
+        showMessageInfo(msg);
+        tarifGreenfee.setTarifIndexHours(i + 1);
+        tarifMember.setWorkPrice("");
         LOG.info("tarif index Hours is now :" + tarifGreenfee.getTarifIndexHours());
      return null; // retourne d'ouù il vient
 }catch(Exception ex){
@@ -2865,6 +3157,57 @@ try{
             return null;
 }    
 } // end method
+
+ public String inputTarifMembersEquipments() throws SQLException, Exception{  // used in tarif_equipments.xhtml
+try{
+    LOG.info("entering inputTarifMembersEquipments !");
+        LOG.info("entering inputTarifMembersEquipments for club = " + club.toString());
+        LOG.info("Members priceEquipments = "  + Arrays.deepToString(tarifMember.getPriceEquipments()));
+        LOG.info("Members tarifGreenfee = "  + tarifMember.toString());
+ //   String msg = " input Tarif Member = " + tarifMember.getTarifMemberIndex() + " / " 
+ //               + Arrays.deepToString(tarifMember.getMembersBase()[tarifMember.getTarifMemberIndex()]);
+  //  LOG.info(msg);
+  //  showMessageInfo(msg);
+  // update array
+    LOG.info("workItem = " + tarifMember.getWorkItem());
+    LOG.info("workPrice = " + tarifMember.getWorkPrice());
+    int i = tarifMember.getTarifMemberEquipmentsIndex();
+    LOG.info("i = " + i);
+    String [][] arr = tarifMember.getPriceEquipments();
+    arr[i][0] = tarifMember.getWorkItem();
+    arr[i][1] = tarifMember.getWorkPrice();
+    tarifMember.setPriceEquipments(arr);
+    tarifMember.setWorkItem(""); // init pour le prochain affichage
+    tarifMember.setWorkPrice("");
+        LOG.info("Members tarif updated = " + tarifMember.toString());
+    String msg = "Tarif Equipments = "
+         //   + tarifGreenfee.getPriceEquipments().getMemberStartDate().format(ZDF_TIME_DAY)
+            + " / " 
+         //   + tarifGreenfee.getMemberEndDate().format(ZDF_TIME_DAY)
+            +  Arrays.deepToString(tarifMember.getPriceEquipments());
+        LOG.info(msg);
+        showMessageInfo(msg);
+  //  tarifGreenfee.setTarifMemberIndex(i + 1);
+    tarifMember.setTarifMemberEquipmentsIndex(i+1);
+        LOG.info("length = " + tarifMember.getPriceEquipments().length);
+    // vérifier si longueur max est atteint avec lengnt ou size !!
+        LOG.info("Tarif Index Equipment's is now :" + tarifMember.getTarifMemberEquipmentsIndex());
+    if(tarifMember.getTarifMemberEquipmentsIndex() > tarifMember.getPriceEquipments().length){  // plus de place dans l'array ??
+        LOG.error("maximum items reached ! ");
+    }
+    // à faire : vérifier si on n'a pas changé les dates de début et fin
+ //       LOG.info("");
+    
+      return null; // retourne d'où il vient
+}catch(Exception ex){
+    String msg = "inputTarifMembersEquipments Exception ! " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+}
+ } // end method
+
+
  public String inputTarifEquipments() throws SQLException, Exception{  // used in tarif_equipments.xhtml
 try{
     LOG.info("entering inputTarifEquipments !");
@@ -2910,6 +3253,59 @@ try{
             return null;
 }
 } // end method   
+  public String inputTarifGreenfee() throws SQLException, Exception{  // used in tarif_equipments.xhtml
+try{
+    LOG.info("entering inputTarifGreenfee !");
+        LOG.info("entering tarifGreenfee for course = " + course.toString());
+        LOG.info("Price tarifGreenfees = "  + Arrays.deepToString(tarifGreenfee.getPriceGreenfees()));
+        LOG.info("TarifGreenfee = "  + tarifGreenfee.toString());
+//  LOG.info("line 01");
+    int i = tarifGreenfee.getTarifIndexGreenfee();
+    String [][] arr = tarifGreenfee.getPriceGreenfees();
+
+ //     LOG.info("line 02");
+    arr[i][0] = tarifGreenfee.getWorkItem();
+    arr[i][1] = tarifGreenfee.getWorkSeason();
+    arr[i][2] = tarifGreenfee.getWorkPrice();
+ //   LOG.info("line 03");
+    
+    tarifGreenfee.setPriceGreenfees(arr);
+    tarifGreenfee.setInputtype("GR"); // new 23-02-2019 ser utilisé lors de la recherche du tarif
+    tarifGreenfee.setWorkItem(""); // init pour le prochain affichage
+    tarifGreenfee.setWorkSeason("");
+    tarifGreenfee.setWorkPrice("");
+    // le 3e aussi
+  //     LOG.info("line 04");
+        LOG.info("tarif Greenfee updated = " + tarifGreenfee.toString());
+    String msg = "Tarif Greenfees = "
+         //   + tarifGreenfee.getPriceGreenfees().getMemberStartDate().format(ZDF_TIME_DAY)
+            + " / " 
+         //   + tarifGreenfee.getMemberEndDate().format(ZDF_TIME_DAY)
+            +  Arrays.deepToString(tarifGreenfee.getPriceGreenfees());
+        LOG.info(msg);
+        showMessageInfo(msg);
+  //  tarifGreenfee.setTarifMemberIndex(i + 1);
+  //    LOG.info("line 05");
+        tarifGreenfee.setTarifIndexGreenfee(i+1);
+        LOG.info("length = " + tarifGreenfee.getPriceGreenfees().length);
+    // vérifier si longueur max est atteint avec lengnt ou size !!
+        LOG.info("Tarif Index Greenfee's is now :" + tarifGreenfee.getTarifIndexGreenfee());
+    if(tarifGreenfee.getTarifIndexGreenfee() > tarifGreenfee.getPriceGreenfees().length){  // plus de place dans l'array ??
+        LOG.error("maximum items in PriceGreenfees reached ! ");
+    }
+
+ //       LOG.info("line 06");
+        return "tarif_greenfee_menu.xhtml?faces-redirect=true";  // mod 28-02-2019, 06-03-2019
+     // return null; // retourne d'où il vient
+}catch(Exception ex){
+    String msg = "inputTarifGreenfee Exception ! " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+}
+} // end method   
+ 
+ 
 public String old_inputTarifEquipments() throws SQLException, Exception{
 try{
         LOG.info("entering inputTarifEquipments !");
@@ -2935,12 +3331,17 @@ try{
      LOG.info("entering showTarifMembers for club = " + club.toString());
      tarifMember.RemoveNull(); // remove null from arrays
       String msg = LCUtil.prepareMessageBean("tarif.member.show")
-        + SDF.format(tarifMember.getMemberStartDate()) + " / "
-        + SDF.format(tarifMember.getMemberEndDate())
-        +  Arrays.deepToString(tarifMember.getMembersBase());
+ //       + SDF.format(tarifMember.getMemberStartDate()) + " / "
+ //       + SDF.format(tarifMember.getMemberEndDate())
+        + "<br/> cotisation = " + Arrays.deepToString(tarifMember.getMembersBase())
+        + "<br/> equipment = " +  Arrays.deepToString(tarifMember.getPriceEquipments())
+        + "<br/> comment = " + tarifMember.getComment();
+ 
         LOG.info(msg);
         showMessageInfo(msg);
-     return null; // retourne d'ouù il vient
+         return "tarif_members_menu.xhtml?faces-redirect=true";
+     //   return null; // fonctionne pas
+        
 }catch(Exception ex){
     String msg = "Exception ! " + ex;
             LOG.error(msg);
@@ -2953,8 +3354,82 @@ public String inputTarifDaysOfWeek() throws SQLException, Exception{
 try{
      LOG.info("entering inputTarifDaysOfWeek !");
      LOG.info("entering tarif Days with course = " + course.toString());
-     LOG.info("days = "  + Arrays.deepToString(tarifGreenfee.getDays()));
-     String msg = "days = "  + Arrays.deepToString(tarifGreenfee.getDays());
+     LOG.info("getDays = "  + Arrays.deepToString(tarifGreenfee.getDays()));
+     LOG.info("getDaysWrk = "  + Arrays.deepToString(tarifGreenfee.getDaysWrk()));
+     tarifGreenfee.setInputtype("DA"); // for days
+     int i = tarifGreenfee.getTarifIndexDays();
+        LOG.info("i = " + i);
+    if(i > 2){
+         String msg = "max 3 situations HML sont autorisées !! + "; // / " + Arrays.deepToString(tarifGreenfee.getDays());
+         LOG.error(msg);
+         showMessageFatal(msg);
+         return null;
+        
+    }
+     LOG.info("season at index i = "  + Arrays.deepToString(tarifGreenfee.getDaysWrk()[0]));
+
+   // Because the result is a shallow copy – a change in the employee name of an element of the original array caused the change in the copy array.
+//And so – if we want to do a deep copy of non-primitive types – we can go for the other options described 
+// in the upcoming sections.https://www.baeldung.com/java-array-copy
+
+   //     LOG.info("copiedArray is " + Arrays.deepToString(copiedArray));
+  // current = old ;
+// Assignment operations does not copy elements of one array to another. 
+// You are just making the current matrix refer to the old matrix. You need to do a member wise copy.
+
+    String [][] arr = utils.LCUtil.cloneStringArray2D(tarifGreenfee.getDaysWrk());
+        LOG.info("arr is before " + Arrays.deepToString(arr));
+      LOG.info("current season is = " + tarifGreenfee.getDaysWrk()[0][3]);
+     // répliquer le code HML sur toutes les subarrays
+    arr[1][3] = tarifGreenfee.getDaysWrk()[0][3]; //[i*4][3];  // 4 car 5 éléments fixes, maj du 4e élément
+ //       LOG.info("OK 01, index = " + 1);
+    arr[2][3] = tarifGreenfee.getDaysWrk()[0][3]; // idem
+ //       LOG.info("OK 02, index = " + 2);
+    arr[3][3] = tarifGreenfee.getDaysWrk()[0][3]; // idem
+ //       LOG.info("OK 03, index = " + 3);
+    arr[4][3] = tarifGreenfee.getDaysWrk()[0][3]; // idem
+ //       LOG.info("OK 04, index = " + 4);
+      LOG.info("arr after season manipulation is " + Arrays.deepToString(arr));
+
+ ///   LOG.info("getDays modifié ? " + Arrays.deepToString(tarifGreenfee.getDays()));
+   // deep copy of non-primitive arrays type OPPOSITE to shallow copy
+ 
+   //  String [][] daysW = tarifGreenfee.getDays();  // gross erreur Assignment Operation !!! cherché des heures !!!
+      String [][] daysW = utils.LCUtil.cloneStringArray2D(tarifGreenfee.getDays());
+         LOG.info("daysW created = " + Arrays.deepToString(daysW));
+   if(i == 0){ // à améliorer plus tard !
+       LOG.info(" tarifIndexDays = 0");
+      daysW[0] = arr[0];
+      daysW[1] = arr[1];
+      daysW[2] = arr[2];
+      daysW[3] = arr[3];
+      daysW[4] = arr[4];
+        LOG.info("daysW after manipulation = " + Arrays.deepToString(daysW));
+       tarifGreenfee.setDays(daysW);
+   }
+    if(i == 1){
+       LOG.info("shifting tarifIndexDays = 1");
+      daysW[5] = arr[0];
+      daysW[6] = arr[1];
+      daysW[7] = arr[2];
+      daysW[8] = arr[3];
+      daysW[9] = arr[4];
+      LOG.info("daysW after manipulation = " + Arrays.deepToString(daysW));
+      tarifGreenfee.setDays(daysW); 
+   }
+    if(i == 2){
+       LOG.info("shifting  tarifIndexDays = 2");
+      daysW[10] = arr[0];
+      daysW[11] = arr[1];
+      daysW[12] = arr[2];
+      daysW[13] = arr[3];
+      daysW[14] = arr[4];
+        LOG.info("daysW after manipulation = " + Arrays.deepToString(daysW));
+      tarifGreenfee.setDays(daysW); 
+   }
+     LOG.info("tarifGreenfee at end is = " + tarifGreenfee);
+
+    String msg = "days = " + tarifGreenfee.getTarifIndexDays() + " / " + Arrays.deepToString(tarifGreenfee.getDays());
 //        LOG.info("début période days = " + tarif.getStartDays());
 //        LOG.info("fin période days = " + tarif.getEndDays());
 //    String msg = " input days = "  + Arrays.deepToString(tarif.getDays()) 
@@ -2962,10 +3437,8 @@ try{
     LOG.info(msg);
     showMessageInfo(msg);
     
- //   tarif.setTarifIndexHours(tarif.getTarifIndexHours() + 1);
- //       LOG.info("tarif index Hours is now :" + tarif.getTarifIndex());
-     return null; // retourne d'ouù il vient
-
+  tarifGreenfee.setTarifIndexDays(tarifGreenfee.getTarifIndexDays() + 1);
+     return null; // retourne d'où il vient
 }catch(Exception ex){
     String msg = "Exception ! " + ex;
             LOG.error(msg);
@@ -3160,7 +3633,30 @@ public String show_scorecard_empty(ECourseList ecl) throws SQLException{
 
 public List<Flight> listFlights(){
  try {
-      LOG.info("from CourseController : entering listFlights ... " );
+ //    LOG.info("from CourseController : entering listFlights ... " );
+  cptFlight++;
+//  LOG.info("cptFlight = " + cptFlight);
+if(cptFlight == 1){   /// éviter iteration !!!
+    LOG.info("starting cptFlight loop");
+     LOG.info("unavailable = " + unavailable.toString());
+ // LOG.info("getCause = " + unavailable.getCause());
+    //  if(unavailable.getCause().equals("")){
+      if(unavailable.getCause() == null){
+         String msg = " listFlights : unavailable.getCause() = null";
+         LOG.info(msg);
+       // on continue
+      }else{
+          String msg = " listFlights : unavailable.getCause()not = null and = " + unavailable.getCause();
+         LOG.info(msg);
+       //  showMessageFatal(msg);
+          LOG.info("line 01");
+            cptFlight = 2;
+          //  List<Flight> lf = null;
+            fl = null;
+            return fl;
+         }
+  
+ // LOG.info("round = " + round.toString());
       if(round.getWorkDate() == null){
          String msg = "Test : listFlights : round workdate = null";
          LOG.error(msg);
@@ -3169,6 +3665,7 @@ public List<Flight> listFlights(){
      ///                LOG.info("round workdate = " + round.getWorkDate());
          }
  //               LOG.info("line 222 = ");
+ //LOG.info("club = " + club.toString());
      if(club.getClubLatitude().compareTo(BigDecimal.ZERO) == 0){
             String msgerr = "La Latitude du club n'est pas connue ! stop de l'opération en cours !! "; // + club.getClubLatitude();
             LOG.error(msgerr);
@@ -3176,38 +3673,34 @@ public List<Flight> listFlights(){
             throw new Exception(msgerr);
       }
 
-     // new 28-11-2018
-        cptFlight++;
+ //       cptFlight++;
     //    LOG.info("cptFlight = " + cptFlight);
- if(cptFlight == 1)   /// éviter iteration !!!
- {
+ //if(cptFlight == 1){   /// éviter iteration !!!
           LOG.info("we do it");
       String tz = "Europe/Brussels";
  //  1  ---------------- cherche sunrise et sunset 
-      find.SunriseSunset fss = new find.SunriseSunset();
-      Flight f = fss.findSunriseSunset(round.getWorkDate(),club.getClubLatitude(),club.getClubLongitude(),tz,conn);
-         LOG.info("1-Flight f = " + f.toString());
+    //  find.SunriseSunset fss = new find.SunriseSunset();
+   //   Flight f = new find.SunriseSunset().findSunriseSunset(round.getWorkDate(),club.getClubLatitude(),club.getClubLongitude(),tz,conn);
+      Flight f = new find.SunriseSunset().find(round,club,conn);
+      LOG.info("1-Flight f = " + f.toString());
  // 2 ------------------  creation tableFlights : 1 record toutes les 12 min en partant de sunrise jusque sunset
-      create.CreateAllFlights caf = new create.CreateAllFlights();
-       fl = caf.createTableFlights(f.getSunrise(), f.getSunset(), tz, course.getIdcourse(), conn);
-        LOG.info("2-table created !");
+   //   create.CreateAllFlights caf = new create.CreateAllFlights();
+     //  fl = new create.CreateAllFlights().createTableFlights(f.getSunrise(), f.getSunset(), tz, course.getIdcourse(), conn);
+      fl = new create.CreateAllFlights().createTableFlights(f, tz, conn);
+       LOG.info("2-table created !");
       // new 28/11/2018 déplacé de CreateAllFlights
 //3      
-      create.CreateFlights cf = new create.CreateFlights();
-      boolean OK = cf.createFlight(fl, course.getIdcourse(), conn);  // fake = courseid
+      boolean OK = new create.CreateFlights().create(fl, course.getIdcourse(), conn);  // fake = courseid
         LOG.info("boolean result create.CreateFlights = " + OK);
- 
-  // elimination des flights déjà réservés    
-      lists.FlightList lfl = new lists.FlightList();
-   //   ArrayList<Flight> alf = lfl.listAllFlights(conn);
-      fl = lfl.listAllFlights(conn);
+// elimination des flights déjà réservés    
+      fl = new lists.FlightList().listAllFlights(conn);
 //      LOG.info("boolean result lists.FlightList =  = " + OK);
  //        LOG.info("ArrayList<Flight> = " + lfl);
    //      LOG.info("from CourseController : exiting listFlights() ... " );
    flight = fl.get(0);
    return fl;
  }else{
-   //  LOG.info(" escaped to repetition ... " + cptFlight);
+//     LOG.info(" escaped to repetition ... " + cptFlight);
      return fl;
  }
    } catch (Exception ex) {
@@ -3304,9 +3797,12 @@ public List<ECourseList> listPlayedRounds(String formula) throws SQLException{
 
 public List<ECourseList> listStablefordPlayedRounds(){  // from selectStablefordRounds.xhtml
     try {
-        LOG.debug(" ... entering listPlayedRounds ! " );
-        //    lists.PlayedList pl = new lists.PlayedList();
-            return new lists.PlayedList().getPlayedList(player, conn);
+        LOG.debug(" ... entering listStablefordPlayedRounds ! " );
+     //    lists.PlayedList pl = new lists.PlayedList();
+         List<ECourseList> ecl = new lists.PlayedList().getPlayedList(player, conn);
+         LOG.info("size ecl = " + ecl.size());
+         return ecl;
+   //         return new lists.PlayedList().getPlayedList(player, conn);
         } catch (SQLException ex) {
             LOG.error("Exception in listPlayedRounds  " + ex);
             showMessageFatal("Exception = " + ex.toString());
@@ -3384,10 +3880,8 @@ public String to_selectParticipantsRound_xhtml(String s){
 
 // just fo testing grom menu TEST
 public String to_select_tarifMembers_xhtml(Integer i) throws SQLException {
-            LOG.info("entering to_select_tarifMembers with string = " + i);
         //    FindTarifMembersData ft = new FindTarifMembersData();
             club.setIdclub(i);
-            
             tarifMember = new FindTarifMembersData().findTarif(club,conn);
             reset(String.valueOf(i));
         return "cotisation.xhtml?faces-redirect=true";
@@ -3532,7 +4026,7 @@ public String scorecard(ECourseList ecl) {
 public List<ECourseList> getScoreCardList1() throws SQLException, LCCustomException {
  try{
      //   lists.ScoreCard1List scl = new lists.ScoreCard1List();
-        List<ECourseList> li = new lists.ScoreCard1List().getScoreCardList1(player, round, conn);
+        List<ECourseList> li = new lists.ScoreCard1List().list(player, round, conn);
             LOG.info("exiting getScoreCardList1");
         return li; //scl.getScoreCardList1(player, round, conn);
  }catch (NullPointerException | SQLException ex){
@@ -3561,11 +4055,11 @@ public List<ECourseList> getScoreCardList2() throws SQLException {
       List<ECourseList> li = new find.FindSlopeRating().getSlopeRating(player, round, conn);
     //    return fsr.getSlopeRating(player, round, conn);
         // pour utiliser dans getScoreCardList3
-      inscriptionNew.setInscriptionTeeStart(li.get(0).EinscriptionNew.getInscriptionTeeStart() );
+      inscription.setInscriptionTeeStart(li.get(0).Einscription.getInscriptionTeeStart() );
       LOG.info("exiting getScoreCardList2");
       // astuce !! chiotage ...
-      lists.ScoreCard3List sc = new lists.ScoreCard3List();
-      sc.getScoreCardList3(player, round, inscriptionNew, conn);
+ //     lists.ScoreCard3List sc = new lists.ScoreCard3List();
+      new lists.ScoreCard3List().list(player, round, inscription, conn);
                  return li;
     }catch (Exception ex){
             String msg = "Exception in getScoreCardList2() " + ex;
@@ -3580,7 +4074,7 @@ public List<ECourseList> getScoreCardList2() throws SQLException {
 public List<ECourseList> getScoreCardList3() throws SQLException {
    try{ LOG.info("entering getScoreCardList3");
        //   lists.ScoreCard3List sc = new lists.ScoreCard3List();
-            return new lists.ScoreCard3List().getScoreCardList3(player, round, inscriptionNew, conn);
+            return new lists.ScoreCard3List().list(player, round, inscription, conn);
       }catch (Exception ex){
             String msg = "Exception in getScoreCardList3() " + ex;
                 LOG.error(msg);
@@ -3620,7 +4114,7 @@ public void listSubscriptionRenewal(String s) throws SQLException {
 try {
      LOG.info("... entering listSubscriptionReneval " + s); // a quoi sert le s ? paramètre ?
          //   lists.SubscriptionRenewalList srl = new lists.SubscriptionRenewalList();
-             subscriptionRenewal = new lists.SubscriptionRenewalList().getListSubscriptions(conn);
+             subscriptionRenewal = new lists.SubscriptionRenewalList().list(conn);
     //         subscriptionReneval.forEach(item -> LOG.info("liste " + item));  // java 8 lambda
             String msg = "We send subscription Renewal Mails = " + subscriptionRenewal.size();
             LOG.info(msg);
@@ -3710,7 +4204,7 @@ public void createPlayer() throws SQLException, Exception{
      LOG.info("entering createPlayer");
  //     create.CreatePlayer cp = new create.CreatePlayer();
   //  boolean ok = cp.createPlayer(player, handicap, conn, "A"); // "A" signifie avec Activation (non en batch)
-    if(new create.CreatePlayer().createPlayer(player, handicap, conn, "A")){
+    if(new create.CreatePlayer().create(player, handicap, conn, "A")){
             LOG.info("player created, next step = photo");
         setNextPlayer(true); // affiche le bouton next(photo) bas ecran ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â  droite
     }else{
@@ -3724,7 +4218,63 @@ public void createPlayer() throws SQLException, Exception{
   //          return null;
   }
 } //end method create player
-//////////////////////////////////////////////////////////////////////////////// club
+
+public String selectLocalAdministrator(Player in_player) throws SQLException{
+try{
+     LOG.info(" entering selectLocalAdministrator ");
+  //      player = in_player;
+  //      LOG.info(" player : " + player.toString());
+        localAdmin = in_player;
+            LOG.info("selected localAdmin = " + localAdmin.toString());
+            
+            PrimeFaces.current().dialog().showMessageDynamic(new FacesMessage(FacesMessage.SEVERITY_INFO, "What we do in life", "Echoes in eternity."));
+            
+            
+        DialogController dc = new DialogController();
+        dc.closeDialog2("dialogPlayers.xhtml");
+            LOG.info(" exiting selectLocalAdministrator ");
+    return null; 
+  } catch (Exception e) {
+            String msg = "££ Exception selectLocalAdministrator = " + e.getMessage() + " for player = " + player.getPlayerLastName();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null; // indicates that the same view should be redisplayed
+  }
+} // end method
+
+public void createLocalAdministrator() throws SQLException, Exception{
+ try{
+     LOG.info("entering createLocalAdministrator");
+     LOG.info("club = " + club.toString());
+     LOG.info("localAdmin = " + localAdmin.toString());
+     
+     Player p = new load.LoadPlayer().load(localAdmin,conn);
+     p.setPlayerRole("admin"); // Local Administrator
+     new modify.ModifyPlayer().modify(p, conn);
+     
+  //   Club c = new load.LoadClub().load(club,conn); // pas nécessaire
+     club.setClubLocalAdmin(p.getIdplayer());
+     new modify.ModifyClub().modify(club, conn);
+     
+ //   if(new create.CreatePlayer().create(player, handicap, conn, "A")){
+        String msg = "local administrator created = " + localAdmin.getIdplayer() + " / " +localAdmin.getPlayerLastName();
+        msg = msg + " club = " + club.getIdclub();
+        LOG.info(msg);
+        showMessageInfo(msg);
+ ///       setNextPlayer(true); // affiche le bouton next(photo) bas ecran ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â  droite
+ //   }else{
+        // error in create player
+  //      LOG.info("error : new player ,not created !!");
+  //  }
+ }catch (Exception ex){
+            String msg = "Exception in createPlayer " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+  //          return null;
+  }
+} //end method create player
+
+
 
 public String createClub() throws SQLException, IOException{
         LOG.info("entering CreateClub");
@@ -3732,7 +4282,7 @@ public String createClub() throws SQLException, IOException{
   //  boolean ok = cc.createClub(club, conn);
   LOG.info("entering createclub");
  // LOG.info("with club = " + club.toString());
-    if(new create.CreateClub().createClub(club, conn)){
+    if(new create.CreateClub().create(club, conn)){
         LOG.info("club created : we go to course !!");
         course.setNextCourse(true); // affiche le bouton next(Course) bas ecran a droite
     }
@@ -3742,8 +4292,7 @@ public String createClub() throws SQLException, IOException{
 public String addCourse(ECourseList ecl) throws SQLException, Exception{
  try{
       LOG.info("entering addCourse");
-      //   load.LoadClub lc = new load.LoadClub();
-         club = new load.LoadClub().LoadClub(conn, ecl.Eclub.getIdclub() );  // pour avoir clubname, etc...
+         club = new load.LoadClub().load(ecl.Eclub,conn);  // pour avoir clubname, etc...
          LOG.info("adding a course for idclub = " + ecl.Eclub.getIdclub() + club.getClubName());
         course.setCreateModify(true); // mod 12/122017 was false gestion button dans course.xhtml
          course = new Course(); // added 2018-11-08 pour nettoyer data d'une précédente modification
@@ -3759,9 +4308,7 @@ public String addCourse(ECourseList ecl) throws SQLException, Exception{
 public String addTee(ECourseList ecl) throws SQLException, Exception{
  try{
       LOG.info("entering addTeee");
-      //   load.LoadClub lcl = new load.LoadClub();
-         club = new load.LoadClub().LoadClub(conn, ecl.Eclub.getIdclub() );  // pour avoir clubname, etc...
-      //   load.LoadCourse lco = new load.LoadCourse();
+         club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
          course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse());
             LOG.info("idclub forced at " + ecl.Eclub.getIdclub() + club.getClubName());
          tee.setCreateModify(true); // gestion button dans tee.xhtml
@@ -3779,7 +4326,7 @@ public String deleteClub(ECourseList ecl) throws SQLException, Exception{
  try{
      LOG.info("entering deleteClub for " + ecl.Eclub.getIdclub());
     //   delete.DeleteClub dc= new delete.DeleteClub();
-       boolean OK = new delete.DeleteClub().deleteClub(ecl.Eclub.getIdclub(), conn);
+       boolean OK = new delete.DeleteClub().delete(ecl.Eclub.getIdclub(), conn);
             LOG.info(" result of deleteClub = " + OK);
       lists.CourseList.setListe(null);// reset
       listCourses(); // refresh list without the deleted item
@@ -3796,7 +4343,7 @@ public String deleteCourse(ECourseList ecl) throws SQLException, Exception{
  try{
         LOG.info("entering deleteTee for " + ecl.Ecourse.getIdcourse());
     // delete.DeleteCourse dc = new delete.DeleteCourse();
-     boolean OK = new delete.DeleteCourse().deleteCourse(ecl.Ecourse.getIdcourse(), conn); //.deleteHoles(ecl.Etee.getIdtee(), conn);
+     boolean OK = new delete.DeleteCourse().delete(ecl.Ecourse.getIdcourse(), conn); //.deleteHoles(ecl.Etee.getIdtee(), conn);
             LOG.info(" result of deleteCourse = " + OK);
       lists.CourseList.setListe(null);// reset
       listCourses(); // refresh list without the deleted item
@@ -3813,7 +4360,7 @@ public String deleteTee(ECourseList ecl) throws SQLException, Exception{
  try{
             LOG.info("entering deleteTee for " + ecl.Etee.getIdtee());
     //    delete.DeleteTee dt = new delete.DeleteTee();
-        boolean OK = new delete.DeleteTee().deleteTee(ecl.Etee.getIdtee(), conn);
+        boolean OK = new delete.DeleteTee().delete(ecl.Etee.getIdtee(), conn);
             LOG.info(" result of deleteTee = " + OK);
         lists.CourseList.setListe(null);// reset
         listCourses(); // refresh list without the deleted item    
@@ -3835,8 +4382,7 @@ public  int getCountHoles(int hol) throws SQLException{
 public String deleteHoles(ECourseList ecl) throws SQLException, Exception{ 
  try{
        LOG.info("entering deleteHoles for Tee = " + ecl.Etee.getIdtee());
-  //   delete.DeleteHoles dh = new delete.DeleteHoles();
-     boolean OK = new delete.DeleteHoles().deleteHoles(ecl.Etee.getIdtee(), conn);
+      boolean OK = new delete.DeleteHoles().delete(ecl.Etee.getIdtee(), conn);
        LOG.info(" result of deleteHoles = " + OK);
       lists.CourseList.setListe(null);// reset
       listCourses(); // refresh list without the deleted item
@@ -3862,11 +4408,8 @@ public String loadCourse(ECourseList ecl) throws SQLException, Exception{
        LOG.info("entering loadCourse");
        LOG.info("with ecl = " + ecl.toString());
        LOG.info("idcourse in loadCourse = " + ecl.Ecourse.getIdcourse() );
- //    load.LoadCourse lco = new load.LoadCourse();
      course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() );
-     
-  //   load.LoadClub lcl = new load.LoadClub();
-     club = new load.LoadClub().LoadClub(conn, ecl.Eclub.getIdclub() );  // pour avoir clubname, etc...
+     club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
         LOG.info("idclub after loadCourse= " + club.getIdclub());  // si est null faut complémenter
      if(club.getIdclub() == null){
          club.setIdclub(course.getClub_idclub());
@@ -3893,8 +4436,6 @@ public String loadCourse(ECourseList ecl) throws SQLException, Exception{
  public String modifyCourse() throws Exception {
         LOG.info("entering modifyCourse  "); 
         LOG.info("course to be modified = " + course.toString());
- //   modify.ModifyCourse mc = new modify.ModifyCourse();
-  //  boolean OK = mc.modifyCourse(course, conn);
     if(new modify.ModifyCourse().modifyCourse(course, conn)) {
         String msg = "course Modified !! ";
         LOG.info(msg);
@@ -3907,12 +4448,9 @@ public String loadTee(ECourseList ecl) throws SQLException, Exception{
  try{
         LOG.info("entering loadTee");
         LOG.info("loadTee entering ecl = " + ecl.toString());
-  //   load.LoadTee lt = new load.LoadTee();
-     tee = new load.LoadTee().LoadTee(conn, ecl.Etee.getIdtee() );
-   //  load.LoadCourse lco = new load.LoadCourse();
+     tee = new load.LoadTee().load(ecl.Etee,conn);
      course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
-   //  load.LoadClub lcl = new load.LoadClub();
-     club = new load.LoadClub().LoadClub(conn, ecl.Eclub.getIdclub() );  // pour avoir clubname, etc...
+     club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
         LOG.info("idcourse after loadCourse= " + course.getIdcourse());  // si est null faut coplémter
         LOG.info("idtee after loadCourse= " + tee.getIdtee());  // si est null faut coplémter
      if(course.getIdcourse() == null)
@@ -3939,14 +4477,10 @@ public String loadTee(ECourseList ecl) throws SQLException, Exception{
 public String loadHoles(ECourseList ecl) throws SQLException, Exception{  // multiple Hole
  try{
         LOG.info("entering loadHoles - multiple");
-  //   load.LoadTee lt = new load.LoadTee();
-     tee = new load.LoadTee().LoadTee(conn, ecl.Etee.getIdtee() );
-  //   load.LoadHoles lh = new load.LoadHoles();
+     tee = new load.LoadTee().load(ecl.Etee,conn);
      holesGlobal = new load.LoadHoles().LoadHolesArray(conn, tee.getIdtee());
-  //   load.LoadCourse lco = new load.LoadCourse();
      course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
-  //   load.LoadClub lcl = new load.LoadClub();
-     club = new load.LoadClub().LoadClub(conn, ecl.Eclub.getIdclub() );  // pour avoir clubname, etc...
+     club = new load.LoadClub().load(ecl.Eclub, conn );  // pour avoir clubname, etc...
         LOG.info("course after loadHoles = " + course.toString()); 
         LOG.info("tee after loadHoles = " + tee.toString());
   //       course.setIdcourse(tee.getCourse_idcourse());
@@ -3973,8 +4507,6 @@ public String loadHoles(ECourseList ecl) throws SQLException, Exception{  // mul
    //   boolean OK = chg.createHoles(holesGlobal, tee, course, conn);
  // à restaurer !!
  
-  //  modify.ModifyHolesGlobal mhg = new modify.ModifyHolesGlobal(); 
- //   boolean OK = mhg.updateHoles(holesGlobal, tee, conn);
     if(new modify.ModifyHolesGlobal().updateHoles(holesGlobal, tee, conn)){
          String msg = "Holes Modified !! ";
          LOG.info(msg);
@@ -3993,12 +4525,12 @@ public String loadHoles(ECourseList ecl) throws SQLException, Exception{  // mul
  /// solution de contournement pour créer en une seule fois tous les trous
  /// ne fonctionne pas encore !!!
  //    create.CreateHolesGlobal chg = new create.CreateHolesGlobal(); 
-     boolean OK = new create.CreateHolesGlobal().createHoles(holesGlobal, tee, course, conn);
+     boolean OK = new create.CreateHolesGlobal().create(holesGlobal, tee, course, conn);
  // à restaurer !!
  
  //   ModifyHolesGlobal mhg = new ModifyHolesGlobal(); 
 //    boolean OK = mhg.updateHoles(holesGlobal, tee, conn);
- 
+ // intéger pur gagner des lignes de code !
  
     if(OK){
          String msg = "Holes Modified !! ";
@@ -4011,12 +4543,9 @@ public String loadHoles(ECourseList ecl) throws SQLException, Exception{  // mul
 public String loadHole(ECourseList ecl) throws SQLException, Exception{
  try{
         LOG.info("entering loadTeee");
-  //   load.LoadTee lt = new load.LoadTee();
-     tee = new load.LoadTee().LoadTee(conn, ecl.Etee.getIdtee() );
-  //   load.LoadCourse lco = new load.LoadCourse();
+     tee = new load.LoadTee().load(ecl.Etee,conn);
      course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
-  //   load.LoadClub lcl = new load.LoadClub();
-     club = new load.LoadClub().LoadClub(conn, ecl.Eclub.getIdclub() );  // pour avoir clubname, etc...
+     club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
         LOG.info("idcourse after loadCourse= " + course.getIdcourse());  // si est null faut coplémter
         LOG.info("idtee after loadCourse= " + tee.getIdtee());  // si est null faut coplémter
      if(course.getIdcourse() == null) {
@@ -4044,9 +4573,7 @@ public String loadHole(ECourseList ecl) throws SQLException, Exception{
      //modify club from modifyClubCourseTee.xhtml
         LOG.info("entering modifyTee  "); 
         LOG.info("tee to be modified = " + tee.toString());
-    //    modify.ModifyTee mt = new modify.ModifyTee();
-   //     boolean OK = mt.modifyTee(tee, conn);
-    if(new modify.ModifyTee().modifyTee(tee, conn)){
+    if(new modify.ModifyTee().modify(tee, conn)){
         tee.setNextTee(true); // affiche le bouton next(Course) bas ecran a droite
         LOG.info("tee Modified !!");
     }
@@ -4056,8 +4583,7 @@ public String loadHole(ECourseList ecl) throws SQLException, Exception{
 public String loadClub(ECourseList ecl) throws SQLException, Exception{
  try{
         LOG.info("entering loadClub");
-  //  load.LoadClub lcl = new load.LoadClub();
-    club = new load.LoadClub().LoadClub(conn, ecl.Eclub.getIdclub() );
+    club = new load.LoadClub().load(ecl.Eclub, conn);
     // ajouter boolean = correct insert !!!
     if(club != null){
         club.setCreateModify(false); // gestion button dans club.xhtml
@@ -4082,11 +4608,9 @@ public String loadClub(ECourseList ecl) throws SQLException, Exception{
       //modify club from modifyClubCourseTee.xhtml
         LOG.info("entering modifyClub  ");
         LOG.info("club to be modified = " + club.toString());
-   //     modify.ModifyClub mc = new modify.ModifyClub();
-    //    boolean OK= mc.modifyClub(club, conn);
-    if(new modify.ModifyClub().modifyClub(club, conn)){
+    if(new modify.ModifyClub().modify(club, conn)){
         course.setNextCourse(false); // n'affiche PAS le bouton next(Course) bas ecran a droite
-        LOG.info("club is wel Modified !!");
+        LOG.info("club is Modified !!");
     }
  return null;
     } // end modifyClub
@@ -4095,9 +4619,7 @@ public String loadClub(ECourseList ecl) throws SQLException, Exception{
 public void modifyPlayer() throws SQLException, Exception{
  try{
         LOG.info("entering modiftPlayer");
- //    modify.ModifyPlayer mp = new modify.ModifyPlayer();
-  //   boolean ok = mp.modifyPlayer(player, conn); // "A" signifie avec Activation (non en batch)
-    if(new modify.ModifyPlayer().modifyPlayer(player, conn)){
+    if(new modify.ModifyPlayer().modify(player, conn)){
             LOG.info("player modified, next step = photo");
         setNextPlayer(true); // affiche le bouton next(photo) bas ecran ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â  droite
     //    setCreateModifyPlayer("M");
@@ -4164,26 +4686,31 @@ public void modifyPlayer() throws SQLException, Exception{
 
  public List<ECourseList> listCourses() throws SQLException{
  try {
-          LOG.debug(" -- entering listCourses ");
-          LOG.info("listCourses - course indicator = " + course.getInputSelectCourse());
-  //     lists.CourseList cl = new lists.CourseList();
-   //    List<ECourseList> ec = cl.getCourseList(conn);
-   //    return ec;
-       return new lists.CourseList().getCourseList(conn);
+       return new lists.CourseList().list(conn);
     } catch (Exception ex) {
             String msg = "Exception in listCourses() " + ex;
             LOG.error(msg);
             showMessageFatal(msg);
             return null;
-        } finally {
-      //  DBConnection.closeQuietly(conn, null, rs, ps);
-        }
     } //end method
- public List<ECourseList> listDetailClub() throws SQLException{
+ }
+ 
+  public List<ECourseList> listClubs() throws SQLException{
+ try {
+       return new lists.ClubList().list(conn);
+    } catch (Exception ex) {
+            String msg = "Exception in listCourses() " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+    } //end method
+  }
+ 
+ 
+ public List<ECourseList> listDetailClub() throws SQLException{ // used in dialogClubDetail
  try {
           LOG.debug(" -- entering listDetailClub ");
-   //    lists.ClubDetailList cl = new lists.ClubDetailList();
-       List<ECourseList> ecl = new lists.ClubDetailList().detailList(club, conn); //.getCourseList(conn);
+       List<ECourseList> ecl = new lists.ClubDetailList().list(club, conn);
        club = ecl.get(0).Eclub;
        return ecl; //cl.detailList(course, conn);
     } catch (Exception ex) {
@@ -4200,7 +4727,7 @@ public void modifyPlayer() throws SQLException, Exception{
    //    List<ECourseList> ecl = null;
   //     ecl = cctl.getCourseList(conn);
  //      course = ecl.get(0).Ecourse;
-       return new lists.ClubCourseTeeList().getCourseList(conn);
+       return new lists.ClubCourseTeeList().list(conn);
     } catch (SQLException ex) {
             String msg = "Exception in listClubsCoursesTees() " + ex;
             LOG.error(msg);
@@ -4215,6 +4742,7 @@ public void modifyPlayer() throws SQLException, Exception{
             LOG.debug(" -- entering listInscriptions with inputInscription = " + getInputInscription());
  //       lists.InscriptionList il = new lists.InscriptionList();
         return new lists.InscriptionList().getInscriptionList(conn);
+        
          } catch (Exception ex) {
             String msg = "Exception in getInscriptionList() " + ex;
             LOG.error(msg);
@@ -4303,8 +4831,8 @@ public void modifyPlayer() throws SQLException, Exception{
         LOG.info(" starting cancelRound ");
         LOG.info(" with ecl = " + ecl.toString());
   //    delete.DeleteRound dr = new delete.DeleteRound();
-      new delete.DeleteRound().deleteRound(ecl.Eround.getIdround(), conn);
-      
+      boolean OK = new delete.DeleteRound().delete(ecl.Eround.getIdround(), conn);
+        LOG.info(" result of deleteHoles = " + OK);
       lists.InscriptionList.setListe(null);  // reset
       listInscriptions();  // refresh list without the deleted item
     return "selectInscription.xhtml?faces-redirect=true";  // refresh view without message !
@@ -4320,16 +4848,18 @@ private Map<String, Object> applicationMap;
 public String selectPlayer(Player in_player) throws SQLException{
 try{
     LOG.info(" starting selectPlayer ");
- //   LOG.info(" starting selectPlayer = " + player.getIdplayer().toString());
+ //   deux origines : cas normal player sélectionné
+ // autre cas : localAdmin : comment le savoir ?
         this.player =  in_player;
         // change language according to the user database language 
         LanguageController.setLanguage(player.getPlayerLanguage());
             LOG.info("Language Player = " + player.getPlayerLanguage());
         String msg="selected Player = " + player.toString();
+        localAdmin = new Player();
             LOG.info(msg);
   //         LOG.info("playerbirthdate = " + player.getPlayerBirthDate());
-        int age = utils.LCUtil.calculateAgeFirstJanuary(player.getPlayerBirthDate());
-        LOG.info("Your age at first january current year = " + age);
+        int yourAge = utils.LCUtil.calculateAgeFirstJanuary(player.getPlayerBirthDate());
+        LOG.info("Your age at first january current year = " + yourAge);
   // mod 07-08-2018     
         
  LOG.info("1. verifying if there is a password");
@@ -4346,7 +4876,7 @@ try{
 ////       FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerid", player.getIdplayer());
        sessionMapJSF23.put("playerid", player.getIdplayer());
        sessionMapJSF23.put("playerlastname", player.getPlayerLastName());
-       sessionMapJSF23.put("playerage", age);
+       sessionMapJSF23.put("playerage", yourAge);
             LOG.info("printing sessonMapJSF23 = ");
        utils.LCUtil.logMap(sessionMapJSF23);
        setConnected(true); // affiche le bouton Logout dans header.xhtml
@@ -4434,15 +4964,28 @@ public boolean createCotisation() throws SQLException{  // à adapter ??
  } //end method modify subscription
  // }
 
-public boolean createGreenfee() throws SQLException{  // à adapter ??
+public boolean createGreenfee(){ // throws SQLException{  // à adapter ??
  try{
-     // le greenfee est payée : il faut l'enregistrer en DB
-      LOG.info("entering createGreenfee");
-      LOG.info("with greenfee = " + greenfee);
-      
-   //   create.CreateCotisation cc = new create.CreateCotisation();
-  //    boolean OK = new create.CreateCotisation().create(player, conn);
-      if(new create.CreateGreenfee().create(greenfee, conn)){
+     // le greenfee est payé : il faut l'enregistrer en DB
+        LOG.info("entering createGreenfee");
+        LOG.info("with greenfee = " + greenfee);
+        LOG.info("droppedPlayers is before : " + Arrays.toString(droppedPlayers.toArray()));
+        int size = player.getDroppedPlayers().size();
+        LOG.info("number of iterations players = " + size );
+        if(size != 0){
+            Player p = new Player();
+            for(int i=0; i < size; i++){
+    //        LOG.info(" -- treated idplayer = " + player.getDroppedPlayers().get(i).getIdplayer() );
+                p = player.getDroppedPlayers().get(i);
+                LOG.info("we have to CreateGreenfee for :" + p.toString());
+                boolean b = new create.CreateGreenfee().create(p,greenfee, conn);
+            } //end for
+        
+        } //end if
+        
+        
+        
+      if(new create.CreateGreenfee().create(player,greenfee, conn)){
         LOG.info("after createGreenfee : we are OK");
         String msg = LCUtil.prepareMessageBean("greenfee.success");
         msg = msg + greenfee.getRoundDate().format(ZDF_DAY) + " - " 
@@ -4458,11 +5001,11 @@ public boolean createGreenfee() throws SQLException{  // à adapter ??
         showMessageInfo(msg);
         return false; // retourne d'ou il vient : où ??
     }
- //}catch (SQLException ex){
- //           String msg = "SQLException in handleSubscription " + ex;
- //           LOG.error(msg);
- //           showMessageFatal(msg);
- //           return null;
+ }catch (SQLException ex){
+            String msg = "SQLException in handleSubscription " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return false;
   }catch (Exception ex){
             String msg = "Exception in createCotisation " + ex;
             LOG.error(msg);
@@ -4478,8 +5021,6 @@ public String modifySubscription() throws Exception{
       LOG.info("entering modifySubscription");
       LOG.info("with subscription = " + subscription);
  //   subscription.setPaymentReference(creditcard.getReference());
- //   boolean ok = new modify.ModifySubscription().modify(subscription, conn);
-  //  LOG.info("after modifySubscription");
     // quel est le contexte ??
     // on est dans une nouvelle session ?
     if(new modify.ModifySubscription().modify(subscription, conn)){
@@ -4507,20 +5048,18 @@ public String modifySubscription() throws Exception{
   }
  } //end method modify subscription
  // }
-  public String manageCotisation() throws Exception{ // called from subscription.xhtml
+ public String manageCotisation() throws Exception{ // called from subscription.xhtml
  try{
       LOG.info("entering manageCotisation ");
-   cotisation.setIdplayer(player.getIdplayer());
-      LOG.info("Cotisation = " + cotisation.toString());
-              // concerne le payment avec carte de crédit
+  //    LOG.info("cotisation = " + cotisation);
       LOG.info("tarif Member = " + tarifMember.toString());
-            // il faudrait ici 
- //    fills the data
-       cotisation = new load.LoadCotisation().load(tarifMember, cotisation, club);
+       cotisation = new load.LoadCotisation().load(tarifMember, cotisation, club, player);
+       cotisation.setIdplayer(player.getIdplayer());
+       LOG.info("Cotisation = " + cotisation.toString());
        boolean OK = false;
        if(cotisation.getPrice() != 0){
-          LOG.info("amount non ZERO payment needed !");
-          OK = CreditcardPayment(cotisation);  // le paiement par carte de crédit est exécuté correctement
+          LOG.info("amount non ZERO payment COTISATION needed !");
+          OK = CreditcardPaymentCotisation(cotisation);  // le paiement par carte de crédit est exécuté correctement
       }else{
           String msg = "amount ZERO no payment needed !!";
           LOG.info(msg);
@@ -4531,7 +5070,7 @@ public String modifySubscription() throws Exception{
        
         // tester return ??
        if(OK){
-           String msg = "Paiement par creditcard OK";
+           String msg = "Paiement par creditcard DONE ! ";
             LOG.info(msg);
             showMessageInfo(msg);
         }else{
@@ -4539,7 +5078,7 @@ public String modifySubscription() throws Exception{
             LOG.info(msg);
             showMessageInfo(msg);
         }
-     LOG.info("after call to credidtcardpayment");
+     LOG.info("after call to creditcardpayment");
  }catch (SQLException ex){
             String msg = "SQLException in manageCotisation " + ex;
             LOG.error(msg);
@@ -4554,29 +5093,29 @@ public String modifySubscription() throws Exception{
          return null;
  } //end method manageSubscripti 
   
-  public String manageGreenfee() throws Exception{ // called from subscription.xhtml
+public String manageGreenfee() throws Exception{ // called from subscription.xhtml
  try{
-     
-     // à adapter !! remplacer cotisation par Greenfee !!
-     
-     
-        LOG.info("entering manageGreenfee");
+         LOG.info("entering manageGreenfee");
+         LOG.info("entering manageGreenfee for round = " + round.getIdround());
      greenfee.setIdplayer(player.getIdplayer());
-        LOG.info("Greenfee = " + greenfee.toString());
+     LOG.info("manageGreenfee tarifGreenfee = " + tarifGreenfee.toString());
+  //   LOG.info("manageGreenfee Greenfee = " + greenfee.toString());
+       LOG.info("à ce moment tarif greenfee est uniquement complété par idplayer= "); // + tarifGreenfee.toString());
               // concerne le payment avec carte de crédit
-   //   LOG.info("tarif Member = " + tarifMember.toString());
-            // il faudrait ici 
- //    fills the data
- 
- 
- //???
-       cotisation = new load.LoadCotisation().load(tarifMember, cotisation, club);
+// il faut calculer le prix du greenfee : situation A : avec périodes HML, equipement et greenfees
+// 18/02/2019
+
+      greenfee = new load.LoadGreenfee().load(tarifGreenfee, greenfee, club, round); //load(tarifGreenfee, greenfee, club);
+            LOG.info("Greenfee after load = " + greenfee.toString());
+            greenfee.setPaymentReference(creditcard.getReference());
+            LOG.info("Greenfee with paymentReference = " + greenfee.toString());
        boolean OK = false;
-       if(cotisation.getPrice() != 0){
-          LOG.info("amount non ZERO payment needed !");
-          OK = CreditcardPayment(cotisation);  // le paiement par carte de crédit est exécuté correctement
+       if(greenfee.getPrice() != 0){
+          LOG.info("Greenfee Payment Needed !");
+          OK = CreditcardPaymentGreenfee(greenfee);  // le paiement par carte de crédit est exécuté correctement
+           LOG.info("Greenfee after payment = " + greenfee.toString());
       }else{
-          String msg = "amount ZERO no payment needed !!";
+          String msg = "amount ZERO,  no payment needed !!";
           LOG.info(msg);
           showMessageInfo(msg);
        }
@@ -4585,30 +5124,23 @@ public String modifySubscription() throws Exception{
        
         // tester return ??
        if(OK){
-           String msg = "Paiement par creditcard OK";
+           String msg = "Paiement Greenfee par creditcard OK";
             LOG.info(msg);
             showMessageInfo(msg);
         }else{
-           String msg = "paiement par creditcard KO : quelle conclusion ?";
+           String msg = "paiement Greenfee par creditcard KO : quelle conclusion ?";
             LOG.info(msg);
             showMessageInfo(msg);
         }
      LOG.info("after call to credidtcardpayment");
- }catch (SQLException ex){
-            String msg = "SQLException in manageCotisation " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
   }catch (Exception ex){
-            String msg = "Exception in manageCotisation " + ex;
+            String msg = "Exception in manageGreenfee " + ex;
             LOG.error(msg);
             showMessageFatal(msg);
             return null;
   }
          return null;
- } //end method manageSubscripti 
-  
-  
+ } //end method manageGreenfee
   
   
  public String manageSubscription() throws Exception{ // called from subscription.xhtml
@@ -4637,7 +5169,8 @@ public String modifySubscription() throws Exception{
         subscription = new load.LoadSubscription().load(subscription);
   //    LOG.info("line 02");   
         if(subscription.getPrice() != 0.0){
-            CreditcardPayment(subscription);
+            creditcard.setTypePayment("SUBSCRIPTION");
+            CreditcardPaymentSubscription(subscription);
         }else{
             modifySubscription();
             String msg="Trial accepted, your count is : " + subscription.getTrialCount() + " of a maximum of 5";
@@ -4645,7 +5178,7 @@ public String modifySubscription() throws Exception{
             showMessageInfo(msg);
             return "login.xhtml?faces-redirect=true";
         }
-     LOG.info("after call to credidtcardpayment");
+     LOG.info("after call to creditcardpayment");
  }catch (SQLException ex){
             String msg = "SQLException in manageSubscription " + ex;
             LOG.error(msg);
@@ -4690,11 +5223,10 @@ public void onRowToggle(ToggleEvent event) {
 public void rowPlayerSelect(SelectEvent event) { // used in selectOtherPlayers.xhtml
         // fonctionne ?
         LOG.info("entering rowPlayerSelect");
-        String msg = "size selected players = " + player.getSelectedOtherPlayers().size();
+        String msg = "size selected players = " + getSelectedOtherPlayers().size();
         LOG.info(msg);
      //   showMessageInfo(msg);
-        if (player.getSelectedOtherPlayers().size() > 4) {
-  ///          player.getSelectedOtherPlayers().remove(event.getObject());
+        if (getSelectedOtherPlayers().size() > 4) {
             msg = "You cannot selected more than 4 players";
             LOG.error(msg);
             showMessageFatal(msg);
@@ -4725,10 +5257,6 @@ public String login() throws IOException, SQLException {
         reset("from login"); // new 28/09/2014
         player = new Player(); // new 28/09/2014
             LOG.info("from login : new player !!");
- ////       ec.invalidateSession();
- ////           LOG.info("session invalidated !! - going back to login.xhtml " );
-    //    ec.redirect(ec.getRequestContextPath() + "/sessionExpired.xhtml?cmd=endSession");
- //    return "login_securityAPI.xhtml";  // back to login.xhtml
  
        sessionMapJSF23.put("playerid", "");
        sessionMapJSF23.put("playerlastname", "");
@@ -4744,8 +5272,8 @@ public String logout(String lgt) throws IOException, SQLException {
         LOG.info("entering with parameter = " + lgt);
         // faire ici l'enregistrement du logout dans audit_in_out
      if(player.getIdplayer() != null){
-        modify.ModifyAudit ma = new modify.ModifyAudit();
-        boolean ok = ma.stopAuditLogin(player, conn);
+   //     modify.ModifyAudit ma = new modify.ModifyAudit();
+        boolean ok = new modify.ModifyAudit().stopAuditLogin(player, conn);
      }
 
         reset("from logout"); // new 28/09/2014
@@ -4753,7 +5281,6 @@ public String logout(String lgt) throws IOException, SQLException {
             LOG.info("exiting logout() !!!");
         ec.invalidateSession();
             LOG.info("session invalidated !! - staying on sessionExpired.xhtml " );
- ////   enlevé 29-10-2018    ec.redirect(ec.getRequestContextPath() + "/sessionExpired.xhtml?cmd=endSession");
 // à àfaire : si 
     if(lgt.equals("from button Logout")){
           String msg = "You asked a logout";
@@ -4775,10 +5302,10 @@ public String logout(String lgt) throws IOException, SQLException {
 public String onFlowProcess(FlowEvent event) {
         LOG.info("Current wizard step:" + event.getOldStep());
         LOG.info("Next wizard step:" + event.getNewStep());
-        if (skip) {
+        if(skip){
             skip = false;//reset in case user goes back
             return "confirm";
-        } else {
+        }else{
             return event.getNewStep();
         }
     } //end method
@@ -4820,7 +5347,7 @@ public void savePlayer(ActionEvent actionEvent) {
     public void preRenderCourse() {
         LOG.info("preRenderCourse called");
     }
-
+/*
  public String CurrentTimeWithZoneOffset(){
   try{
         LOG.info("entering CurrentTimeWithZoneOffset with : " + player.getPlayerTimeZone().getTimeZoneId());
@@ -4840,28 +5367,22 @@ public void savePlayer(ActionEvent actionEvent) {
         }
     }  //end method
             
-
+*/
     // new 26/05/2017 used in inscription.xhtml : on n'affiche que les tee existants pour le course
     public List<String> getTeeStartListe() throws SQLException {
-         LOG.info("entering getTeeStartListe = ..." );
+ ///        LOG.info("entering getTeeStartListe = ..." );
 //         LOG.info("course = " + course.toString());
  //        LOG.info("player = " + player.toString());
      try{   
-         find.FindTeeStart fts = new find.FindTeeStart();
-     //    teeStartListe = fts.teeStart(course, player, conn);
-     //       LOG.info("TeeStartListe = " + teeStartListe);
-     //       return teeStartListe;  // YELLOW, BLUE ...
-            return fts.teeStart(course, player, conn);
+            return new find.FindTeeStart().find(course, player, conn);
       } catch (Exception e) {
             String msg = "££ Exception in getTeeStartListe ... = " + e.getMessage();
             LOG.error(msg);
             showMessageFatal(msg);
             return null; // indicates that the same view should be redisplayed
         } finally {
-
         }
     } //end method
-       
 
 public void viewChartPlayedRound() {
     Map<String,Object> options = new HashMap<>();
@@ -4882,11 +5403,21 @@ public String getMdate()
     FacesContext ctx = FacesContext.getCurrentInstance();
     HttpServletRequest sr = (HttpServletRequest) ctx.getExternalContext().getRequest();
  //    LOG.info("servlet = " + Servlet.getServletConfig().ServletConfig.getServletContext() );
-    String uri = sr.getRequestURI();
-    File file = new File(Constants.AP_TARGET + uri);
+   // String uri = sr.getRequestURI();
+ //   File file = new File(Constants.AP_TARGET + uri);
+    File file = new File(Constants.AP_TARGET + sr.getRequestURI());
+ //    ExternalContext eco = FacesContext.getCurrentInstance().getExternalContext();
+ //       LOG.info("eco externalcontextPath = " + eco.getRequestContextPath());
+ //   ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
+ //       LOG.info("getRealPath = " + servletContext.getRealPath("/"));
     return "<b>Last modification :</b> " + SDF_TIME.format(file.lastModified()); // + " / " + file.getName() + file.getPath();
       //  + " for file = " + file.toString()
     //    + " for uri = " + uri;
+    
+    
+    
+    
+    
 } 
 public void participantsMatchplay() throws SQLException{
     // for testing purposes 3/2/2015
@@ -4946,74 +5477,70 @@ private TeeStart[] teeList;
       }     
     } //end method
      
-     
- public void startTask(ActionEvent ae) {
-        LOG.info("starting startTask ActionEvent ");
-      executorService = Executors.newSingleThreadExecutor();
-      executorService.execute(this::startCreditcardProgressBar);
-       LOG.info("exiting startTask");
-  }
-
-private void startCreditcardProgressBar() {  // confirmation du paiement !!!
-try{
-      LOG.info("starting startLongTask");
-      progressInteger.set(0);
-      for (int i = 0; i < 100; i++) {
-          progressInteger.getAndIncrement();  //simulating interaction with creditcard company
-          try {
-              Thread.sleep(ThreadLocalRandom.current().nextInt(1, 100));
-          } catch (InterruptedException e) {
-              LOG.error("Exception in progressInteger loop :" + e);
-          }
-      }
-      LOG.info("progressInteger is now = " + progressInteger.get());
-        LOG.info("ending startLongTask");
-     if(progressInteger.get() == 100){
-        //  String s = handlePayments();
-          LOG.info("100% atteint donc paiement est exécuté = " );
-                     
-      //    FacesContext fc = FacesContext.getCurrentInstance();
-      //    ExternalContext eco = fc.getExternalContext();
-      //    Flash flash = eco.getFlash();
-      //    flash.setKeepMessages(true);
-      //    eco.dispatch("login.xhtml?faces-redirect=true");
-          // ici rediriger vers login.xhtml ??
-      }else{
-         LOG.info("abnormal situation on progressinteger = " + progressInteger.get());
-         creditcard.setPaymentOK(false); // le paiement n'est pas exécuté!
-     }
-      executorService.shutdownNow();
-      executorService = null;
-  } catch (Exception e) {
-            String msg = "££ Exception in startLongTask ... = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-       //     return null; // indicates that the same view should be redisplayed
-        } finally {
-
-        }
-    } //end method
 
 public String handlePayments() {
 try{
             LOG.info("entering handlePayments");
-            LOG.info("creditcard payment executed !");
+            LOG.info("coming from creditcard_payment_executed.xhtml !");
        UUID reference = UUID.randomUUID();
        creditcard.setReference(reference.toString());
        creditcard.setPaymentOK(true); // le paiement est exécuté!
+  //     creditcard.setTypePayment("COTISATION");
             LOG.info("creditcard typePayment = " + creditcard.getTypePayment());
+            LOG.info("at this moment creditcard = " + creditcard.toString());
+            LOG.info("at this moment course = " + course.toString());
+            course.setInputSelectCourse(course2.getInputSelectCourse()); // workaround !!!
+             LOG.info("at this moment course.GetInputSelectCourse = " + course.getInputSelectCourse());
+             if(course.getInputSelectCourse() == null){
+                 course.setInputSelectCourse("PaymentTarifMember");
+                  LOG.info(" setInputSeectCourse was null, forced to : " + course.getInputSelectCourse());
+             }
+        //     new 01-03-2019 workaround solution pas trouvée générait toujours GREENFEE  !!!!
+        if(course.getInputSelectCourse().equals("createTarifGreenfee")){
+            creditcard.setTypePayment("GREENFEE");
+            LOG.info(" setTypePayment = " + creditcard.getTypePayment());
+        }
+        if(course.getInputSelectCourse().equals("createTarifMember")){
+            creditcard.setTypePayment("COTISATION");
+            LOG.info(" setTypePayment normalement pas utilisé ?= " + creditcard.getTypePayment());
+        }
+        if(course.getInputSelectCourse().equals("PaymentTarifMember")){
+            creditcard.setTypePayment("COTISATION");
+            LOG.info(" setTypePayment = " + creditcard.getTypePayment());
+        }
+        
+           LOG.info("after (potential) modification, creditcard = " + creditcard.toString());
+           LOG.info("we store the creditcard info = " + creditcard.toString());
+           
+
+              // updating creditcard   
+      Creditcard c = new find.FindCreditcard().find(player, conn);
+        LOG.info("creditcard found = " + c);
+      if(c.getCreditCardNumber() == null){
+                LOG.info("CREATION : First utilisation of a creditcard for user = " + player.getPlayerLastName());
+          boolean b = new create.CreateCreditcard().create(player, creditcard, conn);
+           LOG.info("creditcard creation = " + b);
+      }else{
+           LOG.info("MODIFICATION : 2nd utilisation of a creditcard for user = " + player.getPlayerLastName());
+          boolean b = new modify.ModifyCreditcard().modify(player, creditcard,conn);
+                LOG.info("creditcard modification = " + b);
+       }
+           
+           
+           
        if(creditcard.getTypePayment().equals("SUBSCRIPTION")){
            subscription.setPaymentReference(creditcard.getReference());
            modifySubscription();
            return "login.xhtml?faces-redirect=true";
        }
        if(creditcard.getTypePayment().equals("COTISATION")){
+           LOG.info("handling COTISATION");
            cotisation.setPaymentReference(creditcard.getReference());
       //     boolean OK = createCotisation(); // dans courseC
            if(createCotisation()){
               String msg = "Create Cotisation SUCCESS"; 
               LOG.info(msg);
-              showMessageInfo(msg);
+         //     showMessageInfo(msg);
               return "login.xhtml?faces-redirect=true";
            }else{
                String msg = "Create Cotisation FAILED";
@@ -5023,13 +5550,17 @@ try{
            }
        }
        if(creditcard.getTypePayment().equals("GREENFEE")){
+           LOG.info("handling GREENFEE");
+           
            greenfee.setPaymentReference(creditcard.getReference());
      //      boolean OK = createCotisation(); // dans courseC
         //   boolean OK = false;
-           if(createCotisation()){
+           if(createGreenfee()){ // means is OK !! dans CourseController
               String msg = "Create Greenfee SUCCESS"; 
               LOG.info(msg);
-              showMessageInfo(msg);
+              LOG.info("we return to createInscription");        //      showMessageInfo(msg);
+              int ret = new create.CreateInscription().create(round, player, player, inscription, club, course, conn); // mod 10/11/2014
+              LOG.info("le retour de CreateInscription est : " + ret); //we return to createInscription");  
               return "login.xhtml?faces-redirect=true";
            }else{
                String msg = "Create Greenfee FAILED";
@@ -5038,10 +5569,6 @@ try{
                return null;
            }
        }
-
-       
-       
-       
  } catch (Exception e) {
             String msg = "££ Exception in handlePayments or CreateCotisation ... = " + e.getMessage();
             LOG.error(msg);
@@ -5081,7 +5608,47 @@ return null;
         LOG.info("dialogClubDetail.xhtml is opened !");
 }
   
-  
+       
+ public void startTask(ActionEvent ae) {
+        LOG.info("starting startTask ActionEvent ");
+      executorService = Executors.newSingleThreadExecutor();
+      executorService.execute(this::startCreditcardProgressBar);
+       LOG.info("exiting startTask");
+  }
+
+private void startCreditcardProgressBar() {  // confirmation du paiement !!!
+try{
+      LOG.info("starting startLongTask");
+      progressInteger.set(0);
+      for (int i = 0; i < 100; i++) {
+          progressInteger.getAndIncrement();  //simulating interaction with creditcard company
+          try {
+              Thread.sleep(ThreadLocalRandom.current().nextInt(1, 100));
+          } catch (InterruptedException e) {
+              LOG.error("Exception in progressInteger loop :" + e);
+          }
+      }
+      LOG.info("progressInteger is now = " + progressInteger.get());
+        LOG.info("ending startLongTask");
+     if(progressInteger.get() == 100){
+        //  String s = handlePayments();
+          LOG.info("100% atteint donc paiement est exécuté = " );
+          creditcard.setPaymentOK(true); // le paiement est exécuté!  new 19-02-2019
+      }else{
+         LOG.info("abnormal situation on progressinteger = " + progressInteger.get());
+         creditcard.setPaymentOK(false); // le paiement n'est pas exécuté!
+     }
+      executorService.shutdownNow();
+      executorService = null;
+  } catch (Exception e) {
+            String msg = "££ Exception in startLongTask ... = " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+       //     return null; // indicates that the same view should be redisplayed
+        } finally {
+
+        }
+    } //end met
   
   
    public void main(String args[]) throws InstantiationException, SQLException, ClassNotFoundException, IllegalAccessException {

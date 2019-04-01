@@ -22,14 +22,13 @@ import utils.LCUtil;
 @Named
 public class CreateTarifMember {
 
-    public boolean createTarif(final TarifMember tarifMember, final Club club, final Connection conn) throws SQLException {
+    public boolean create(final TarifMember tarifMember, final Club club, final Connection conn) throws SQLException {
         PreparedStatement ps = null;
         try{
             LOG.info("starting create TarifMember "); 
             LOG.info("with tarif = " + tarifMember.toString());
             LOG.info("for club = " + club.toString());
-            if(club.getIdclub() == null)
-            {
+            if(club.getIdclub() == null){
                 // for testing purposes
                 LOG.info("clubid was null, forced to La Tournette");
                 club.setIdclub(101); // la tournette
@@ -68,17 +67,12 @@ public class CreateTarifMember {
              LOG.info("getMonth Start = " + tarifMember.getMemberStartDate().getMonthValue());
              LOG.info("getDayMonth Start = " + tarifMember.getMemberStartDate().getDayOfMonth());
              
-             
-             
-             
-        //    LOG.info("first day of startdate = " + month.atDay(1));
- //           month = Month.from(tarifMember.getMemberEndDate());
-//            LOG.info("last day of enddate = " + month...atEndOfMonth());
            
         ObjectMapper om = new ObjectMapper();
         om.registerModule(new JavaTimeModule());  // new 18/01/2019 traiter LocalDateTime format aussi dans finTarifMembersData
-    	om.enable(SerializationFeature.INDENT_OUTPUT);//Set pretty printing of json
-        
+    	om.configure(SerializationFeature.INDENT_OUTPUT,true);//Set pretty printing of json
+        om.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);  // fonctionne ??
+        tarifMember.RemoveNull(); // remove null from arrays
         String json = om.writeValueAsString(tarifMember);
             LOG.info("Tarif Member converted in json format = " + json);
 
@@ -99,7 +93,7 @@ public class CreateTarifMember {
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
              LOG.info("row  = " + row);
-               String msg = "<h1>Tarif Member Created for"
+               String msg = "Tarif Member Created for"
                         + "<br/>Club = " + club.getIdclub()
                         + " / " + club.getClubName();
                 LOG.info(msg);

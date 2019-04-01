@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      template="templates/masterTemplate.xhtml"
+>
+
+<ui:define name="title">Tarif Page Days</ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_tarif_days.xhtml"/>
+</ui:define>
+
+<ui:define name="content">
+
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="tarifDays" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<!--<p:focus for="startdate" />-->
+<p:panelGrid
+    id="panel1"
+    columns="4"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+     <h:outputText escape="false" value="#{msg['title.days.tarif']}" />
+</f:facet>
+ <!--       
+    <h:outputText  value="#{msg['tarif.period.start']} :"/>
+       <p:inputMask id="startdate"
+                    label="Start Date" 
+                    title="#{msg['tooltip.tarif.date']}"
+                    value="#{courseC.tarifGreenfee.datesSeason[0][0]}"
+                    size="11"
+                    required="true"
+                    mask="99/99/9999"
+                    >
+	</p:inputMask>
+       
+      <h:outputText  value="#{msg['tarif.period.end']} :"/>
+             <p:inputMask id="enddate"
+                    title="#{msg['tooltip.tarif.date']}"
+                    value="#{courseC.tarifGreenfee.datesSeason[0][1]}"
+                    size="11"
+                    required="true"
+		    label="End Date" 
+                    mask="99/99/9999"
+                    >
+      	</p:inputMask>
+      -->
+     <h:outputText value="#{msg['tarif.seasons']} "/>
+             <p:selectOneButton id="Season_High-Medium-Low"
+                          required="true"
+                          value="#{courseC.tarifGreenfee.days[0][3]}"
+               >
+            <f:selectItem itemLabel="#{msg['tarif.high']}"    itemValue="H" />
+            <f:selectItem itemLabel="#{msg['tarif.medium']}"  itemValue="M" />
+            <f:selectItem itemLabel="#{msg['tarif.low']}"     itemValue="L" />
+       </p:selectOneButton>
+      
+      <h:outputText value=""/>
+      <h:outputText id="index"
+         value="#{courseC.tarifGreenfee.tarifIndexDays} / #{fn:length(courseC.tarifGreenfee.days)}"
+        />
+      
+   <c:forEach var="i" begin="01" end="05" step="1">
+      <h:outputText  value=""/>
+   </c:forEach>
+ 
+    <h:outputText  value="#{msg['tarif.days.visitor']} :"/>
+    <h:outputText  value="#{msg['tarif.days.invited']} :"/>
+    <h:outputText  value="#{msg['tarif.days.junior']} :"/>
+    
+      <h:outputText  value="#{msg['tarif.days.monday']} :"/>
+       <c:forEach var="i" begin="01" end="03" step="1">
+       <p:inputMask  label="Monday1"
+                       id="monday${i}"
+                       value="#{courseC.tarifGreenfee.days[0][i-1]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="5"
+                       required="true"
+                       requiredMessage="#{msg['tarifGreenfee.notnull']} : line 1, col #{i}"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+        </p:inputMask>
+       </c:forEach>
+       
+       
+       <h:outputText  value="#{msg['tarif.days.week']} :"/>
+         <c:forEach var="i" begin="01" end="03" step="1">
+            <p:inputMask  label="Week1"
+                       id="week${i}"
+                       value="#{courseC.tarifGreenfee.days[1][i-1]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="5"
+                       required="true"
+                       requiredMessage="#{msg['tarifGreenfee.notnull']} : line 2, col #{i}"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+            </p:inputMask>
+         </c:forEach>
+       
+
+       <h:outputText  value="#{msg['tarif.days.friday']} :"/>
+       <c:forEach var="i" begin="01" end="03" step="1">
+       <p:inputMask  label="Friday1"
+                       id="friday${i}"
+                       value="#{courseC.tarifGreenfee.days[2][i-1]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="5"
+                        required="true"
+                        requiredMessage="#{msg['tarifGreenfee.notnull']} : line 3, col #{i}"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+        </p:inputMask>
+       </c:forEach>
+        
+       <h:outputText  value="#{msg['tarif.days.weekend']} :"/>
+        <c:forEach var="i" begin="01" end="03" step="1">
+       <p:inputMask  label="Weekend1"
+                       id="weekend${i}"
+                       value="#{courseC.tarifGreenfee.days[3][i-1]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="5"
+                        required="true"
+                        requiredMessage="#{msg['tarifGreenfee.notnull']} : line 4, col #{i}"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+         </p:inputMask>
+        </c:forEach>
+     
+       <h:outputText  value="#{msg['tarif.days.holidays']} :"/>
+       <c:forEach var="i" begin="01" end="03" step="1">
+       <p:inputMask  label="Holidays1"
+                       id="holidays${i}"
+                       value="#{courseC.tarifGreenfee.days[4][i-1]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="5"
+                       required="true"
+                       requiredMessage="#{msg['tarifGreenfee.notnull']} : line 5, col #{i}"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+       </p:inputMask>
+       </c:forEach>
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['tarif.days.create']}"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.inputTarifDaysOfWeek}"/>
+         <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         style="float: right;"
+                         icon="fa fa-rotate-left"
+                         action="tarif_greenfee_menu.xhtml"
+                         />
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

@@ -68,7 +68,7 @@
 	</p:column>
 
 	<p:column headerText="#{msg['round.date']}"
-                  style="width:100px"
+                  style="width:20%"
                   id="dateColumn">
                   <h:outputText value="#{c.round.roundDate}"
                   
@@ -80,7 +80,7 @@
 
 	<p:column   id="colclubname"
                     headerText="#{msg['club.name']}"
-                    style="width:100px"
+                    style="width:20%"
                     filterMatchMode="contains"
                     filterBy="#{c.club.clubName} "
                   >
@@ -89,7 +89,7 @@
 
 	<p:column id="coursenameColumn"
                   headerText="#{msg['course.name']}"
-                  style="width:100px"
+                  style="width:20%"
                   filterMatchMode="contains"
                   filterBy="#{c.course.courseName}"
                   >
@@ -97,31 +97,31 @@
 	</p:column>
 
         <p:column headerText="#{msg['round.competition']}"
-                  style="width:100px"
+                  style="width:20%"
                   id="competitionColumn"
                   >
                         #{c.round.roundCompetition}
         </p:column>
 
         <p:column headerText="#{msg['round.game']}"
-                  style="width:100px"
+                  style="width:20%"
                   id="gameColumn"
                   >
                         #{c.round.roundGame}
         </p:column>
 
         <p:column headerText="#{msg['round.result.stableford']}"
-                  style="width:10px"
+                  style="width:10%"
                   id="FinalResultColumn"
                   >
-                        #{c.inscription.playerhasroundFinalResult}
+                        #{c.inscriptionNew.playerhasroundFinalResult}
         </p:column>
 
-        <p:column headerText="#{msg['round.result.zwanzeurs']}"
-                  style="width:10px"
-                  id="ZwanzeursResultColumn"
+        <p:column headerText="#{msg['round.holes']}"
+                  style="width:10%"
+                  id="RoundHoles"
                   >
-                        #{c.inscription.playerhasroundZwanzeursResult}
+                        #{c.round.roundHoles}
         </p:column>
 
        <f:facet name="footer">

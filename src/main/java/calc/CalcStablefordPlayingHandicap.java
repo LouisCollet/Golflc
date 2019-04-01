@@ -10,17 +10,15 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-public class CalcStablefordPlayingHandicap implements interfaces.Log 
-{
+public class CalcStablefordPlayingHandicap implements interfaces.Log{
 //private static int round; modifié 15-0-8-2018 supprimé variables de classe inutiles
 
     int handicap_strokes;
   //  double par;
   //  int csa;
-  //  int holes;
+ int holes;
     
- public String [] getPlayingHcp(final Connection conn, final Player player, final Round round) throws SQLException, Exception
-{
+ public String [] getPlayingHcp(final Connection conn, final Player player, final Round round) throws SQLException, Exception{
      LOG.info("very first entering getPlayingHcp !");
     
   //  int starthole;
@@ -35,13 +33,13 @@ try{   //  List<StablefordResult> listeStb;
     LOG.info("round = " + round.toString());
  
     LOG.info("game " + round.getRoundGame() );
-    find.FindSlopeRating fsr = new find.FindSlopeRating();
-    List<ECourseList> stb = fsr.getSlopeRating(player, round, conn);
+ //   find.FindSlopeRating fsr = new find.FindSlopeRating();
+    List<ECourseList> stb = new find.FindSlopeRating().getSlopeRating(player, round, conn);
         LOG.info("List StablefordResult = " + Arrays.toString(stb.toArray() ) );
  //    listeStb = stb.subList(0, 1);
      
-    FindHandicap fh = new FindHandicap (); // mod 14-08-2018
-    double player_hcp = fh.findPlayerHandicap(player, round, conn);
+ //   FindHandicap fh = new FindHandicap (); // mod 14-08-2018
+    double player_hcp = new FindHandicap ().findPlayerHandicap(player, round, conn);
  //   double player_hcp = find.FindHandicap.findPlayerHandicap(player, round, conn);
         LOG.info("OKOK player_hcp = " + player_hcp);
     double slope = stb.get(0).Etee.getTeeSlope(); // new
@@ -65,7 +63,6 @@ try{   //  List<StablefordResult> listeStb;
     int teeClubHandicap = stb.get(0).Etee.getTeeClubHandicap();
         LOG.info("teeClubHandicap = " +  teeClubHandicap);
 
-    
       LOG.info("Elements de calcul du handicap : slope = " + slope +
               ", rating = " + rating + ", player hcp = " + player_hcp +
               ", par = " + par + ", csa = " + csa + ", holes = " + holes
@@ -79,8 +76,7 @@ try{   //  List<StablefordResult> listeStb;
       
         LOG.info("-- calculated  (18 holes) playing hcp  = " + handicap_strokes );
       
-    if (holes == 9)
-       {
+    if (holes == 9){
             handicap_strokes = Math.round(handicap_strokes / 2);
            LOG.info("-- reduced (9 holes) playing hcp  = " + handicap_strokes );
        }
@@ -112,14 +108,11 @@ catch(final Exception e)
        return array_return_error;
 } // end catch
 
-finally
-{
-
- // LOG.info("finally : end of getStoredList ");
+finally{
 
 }
 } //end getPlayingHandicap
-    
+
 //public int calculatePlayingHcp (double exact_hcp, double slope, double rating, double par, short clubhandicap)
         public int calculatePlayingHcp (double exact_hcp, double slope, double rating, double par, int clubhandicap)
 {

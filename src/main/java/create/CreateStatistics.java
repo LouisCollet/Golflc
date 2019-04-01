@@ -23,18 +23,15 @@ public class CreateStatistics implements interfaces.Log{
                 LOG.info("holes = " + round.getRoundHoles());
             int start = round.getRoundStart();
                 LOG.info("start = " + start);
-
-    //        sc2 = score.getStatistics();
             LOG.info("scores array statistics : sc2 = " + Arrays.deepToString(sc2));
-  //          conn = DBConnection.getConnection();
+
        //     int rows = GolfMySQL.getCountScore(conn, player.getIdplayer(), round.getIdround(), "rows");
-            find.FindCountScore sciu = new find.FindCountScore();
-            int rows = sciu.getCountScore(conn, player, round, "rows");
+        //    find.FindCountScore sciu = new find.FindCountScore();
+            int rows = new find.FindCountScore().getCountScore(conn, player, round, "rows");
             LOG.info("there are : " + rows + " if > 0 we replace the previous score");
-            if (rows == 0) // insert
-            {
+            if(rows == 0){ // insert
                 LOG.info("this must be an error !!!");
-            } else { // UPDATE loop
+            }else{ // UPDATE loop
 
                 final String query
                         = "UPDATE score"

@@ -113,8 +113,6 @@ public static void main(String[] args) throws Exception , Exception{
     Player player = new Player();
     player.setPlayerCity("Brussels");
     player.setPlayerCountry("BE");
-    // fille in the fields
-
     player = new FindPlayerCoordinates().findPlayerLatLngTz(player); 
      LOG.info("Player is now = " + player.toString());
 //findPlayerHandicap(player,round, conn);

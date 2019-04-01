@@ -2,6 +2,7 @@
 package create;
 import entite.Course;
 import entite.Round;
+import entite.Unavailable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -10,25 +11,28 @@ import java.time.LocalDateTime;
 import utils.DBConnection;
 import utils.LCUtil;
 import static utils.LCUtil.DatetoLocalDateTime;
+import static utils.LCUtil.showMessageFatal;
 
-public class CreateRound implements interfaces.Log, interfaces.GolfInterface
-{
-    public boolean createRound(final Round round, final Course course, final Connection conn) throws SQLException {
- 
+public class CreateRound implements interfaces.Log, interfaces.GolfInterface{
+    public boolean create(final Round round, final Course course, Unavailable unavailable, final Connection conn) throws SQLException {
         PreparedStatement ps = null;
         try {
+            // lors d'une prochaine modficatin, séparer create de validate comme dans createGreenfee
             LOG.info(" ... starting createRound()");
        //     LOG.info("round competition = " + round.getRoundCompetition());
             LOG.info("round to be created = = " + round.toString());
             LOG.info("entite course = " + course.toString());          
-      //      LOG.info("idcourse    = " + course.getIdcourse());
-      //     LOG.info("Begin course = " + course.getCourseBegin() );
-      //     LOG.info("End course = " + course.getCourseEnd());
-    // à faire : utiliser RoundValidation
-    //    if(round.getRoundDate().before(course.getCourseBegin()) )
- //       LOG.info("line 000");
-      //   LocalDateTime cb = course.getCourseBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-     //      LOG.info("line 00");
+            
+      //      boolean b = new CreateRound().validate(round, course, unavailable);
+       if( ! new CreateRound().validate(round, course, unavailable)){
+           LOG.info("Create Round : there is a validation error");
+           // il y a une erreur de validation
+           return false;
+       }else{
+           // no errors found : we continue ...
+       }
+
+/*
        LocalDateTime cb = DatetoLocalDateTime(course.getCourseBegin());
           LOG.info("LocalDateTime courseBegin = " + cb);
          if(round.getRoundDate().isBefore(cb) ){ 
@@ -47,6 +51,7 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface
                 LCUtil.showMessageFatal(msgerr);
                 return false;
            }
+*/
   //     LOG.info("line 03");
             final String query = LCUtil.generateInsertQuery(conn, "round"); // new 15/11/2012
             ps = conn.prepareStatement(query);
@@ -83,7 +88,7 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface
 //                setNextInscription(true); // affiche le bouton next(Inscription) bas ecran Ã  droite
                 String msg =  LCUtil.prepareMessageBean("round.created"); 
                 msg = msg
-                        + "<h1>" + round.getIdround() + "</h1>"
+                        + round.getIdround() 
                         + " <br/>genre = " + round.getRoundGame()
                         + " <br/>competition = " + round.getRoundCompetition()
                         + " <br/>CBA = " + round.getRoundCBA()
@@ -140,4 +145,56 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface
             DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
         }
     } //end method
-}
+    
+    public boolean validate(final Round round, final Course course,final Unavailable unavailable) throws SQLException{
+  //  PreparedStatement ps = null;
+   try{
+       LOG.info("entering validation before create round");
+       // double emploi avec 
+           if(unavailable.getCause() != null){ // autre formulation
+             LOG.info("after if, unavailable = " + unavailable);
+   //          LOG.info("line 01");
+      //          String msg = "Il y a une indisponibilité pour : " + unavailable.getCause() + " le " + round.getRoundDate().format(ZDF_DAY);
+              String msg = LCUtil.prepareMessageBean("round.unavailable"); 
+              msg = msg + unavailable.getCause() + " le " + round.getRoundDate().format(ZDF_DAY);
+                LOG.error(msg);
+                showMessageFatal(msg);
+             //   round.setWorkDate(null);
+            //    to_selectCourse_xhtml("CreateRound");  // comme s'il venait du menu
+             return false;
+          }else{
+   //          LOG.info("line 02");
+              String msg = "Il y a PAS d'indisponibilité "; // + unavailable.getCause() + round.getRoundDate();
+               LOG.info(msg);
+          }
+         LocalDateTime cb = DatetoLocalDateTime(course.getCourseBegin());
+          LOG.info("LocalDateTime courseBegin = " + cb);
+         if(round.getRoundDate().isBefore(cb) ){ 
+                String msgerr =  LCUtil.prepareMessageBean("round.notopened");
+                LOG.error(msgerr); 
+                LCUtil.showMessageFatal(msgerr);
+                return false;
+           }
+   //      LOG.info("line 02");
+         LocalDateTime ce = DatetoLocalDateTime(course.getCourseEnd());
+           LOG.info("LocalDateTime courseEnd = " + ce);
+         if(round.getRoundDate().isAfter(ce) ){ 
+                String msgerr =  LCUtil.prepareMessageBean("round.closed");
+                LOG.error(msgerr); 
+                LCUtil.showMessageFatal(msgerr);
+                return false;
+           }
+      return true;  // no errors   
+         } catch (Exception e) {
+            String msg = "£££ Exception in validate Inscription = " + e.getMessage();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+            return false;
+        } finally {
+          //  DBConnection.closeQuietly(conn, null, null, ps); // new 10/12/2011
+            DBConnection.closeQuietly(null, null, null, null); // new 14/08/2014
+        }     
+// return false;
+} // end method validate
+    
+} //end class

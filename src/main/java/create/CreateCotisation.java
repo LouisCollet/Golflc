@@ -17,7 +17,7 @@ public class CreateCotisation implements interfaces.Log, interfaces.GolfInterfac
  try {
                 LOG.info("...entering createCotisation");
                 LOG.info("cotisation  = " + cotisation.toString());
-            final String query = LCUtil.generateInsertQuery(conn, "cotisation"); 
+            final String query = LCUtil.generateInsertQuery(conn, "payments_cotisation"); 
             ps = conn.prepareStatement(query);
             ps.setNull(1, java.sql.Types.INTEGER); // AUTO-INCREMENT
             ps.setInt(2, cotisation.getIdclub());
@@ -41,7 +41,7 @@ public class CreateCotisation implements interfaces.Log, interfaces.GolfInterfac
      //               LOG.info("Course created = " + key);
      //           course.setIdcourse(key);
 //                tee.setNextTee(true); // affiche le bouton next(Tee) bas ecran à droite
-                String msg = "<br/><h1>Cotisation created = </h1>" + cotisation.getPrice(); 
+                String msg = "Cotisation created = </h1>" + cotisation.getPrice(); 
                 LOG.info(msg);
          //       LCUtil.showMessageInfo(msg);
                 return true;

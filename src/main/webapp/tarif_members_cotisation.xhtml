@@ -16,7 +16,7 @@
       template="templates/masterTemplate.xhtml"
 >
 
-<ui:define name="title">Members base registration</ui:define>
+<ui:define name="title">Tarif Members Cotisation</ui:define>
 
 <ui:define name="help">
     <ui:include src="/help/help_tarif_members.xhtml"/>
@@ -25,24 +25,24 @@
 <ui:define name="content">
 <h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"> </h:graphicImage>
 <h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"> </h:graphicImage>
-<h:form id="tarifDays" enctype="application/x-www-form-urlencoded" >
+<h:form id="tarif_members_cotisation" enctype="application/x-www-form-urlencoded" >
 
 <ui:include src="include/include_summary_club.xhtml"/>
 <!-- <p:focus for="startdate" /> -->
 <p:panelGrid
     id="panel1"
-    columns="2"
+    columns="3"
     styleClass="alignmentLeft"
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.members.tarif']}</h1>
+     <h:outputText escape="false" value="#{msg['title.members.tarif']}" />
 </f:facet>
        <h:outputText value="#{msg['tarif.number']} :"   />
        <h:outputText    id="index"
                         value="#{courseC.tarifMember.tarifMemberIndex} / #{fn:length(courseC.tarifMember.membersBase)}"
                         />
-       
+       <h:outputText value=""/>
     <h:outputText  value="#{msg['tarif.period.start']} :"/>
                 <p:calendar value="#{courseC.tarifMember.workStartDate}"
                         id="start"
@@ -55,6 +55,7 @@
                         yearRange="c-5:c-0"
                         readonlyInput="true"
                  />
+       <h:outputText value=""/>
       <h:outputText  value="#{msg['tarif.period.end']} :"/>
                 <p:calendar value="#{courseC.tarifMember.workEndDate}"
                         id="end"
@@ -67,16 +68,35 @@
                         yearRange="c-5:c-0"
                         readonlyInput="true"
                  />
+      <h:outputText value=""/>
 
-   <c:forEach var="i" begin="01" end="02" step="1">
-       <h:outputText value="" />
-   </c:forEach>
+      
+      <!--
+         <p:toggleSwitch value="#{selectBooleanView.value2}">
+            <p:ajax listener="#{selectBooleanView.addMessage}" update="msg" />
+        </p:toggleSwitch>
+-->
+   <h:panelGroup id="panelItem" layout="block" >
+     <h:outputText value="#{msg['tarif.members.item']} "
+                   style="font-size: 1.5em;"
+                   />
+     <i class="fas fa-list-ol fa-2x"></i>
+     <i class="fas fa-pen-fancy fa-2x"></i>
+</h:panelGroup>  
+<h:panelGroup id="panelChoice" layout="block" >    
+     <h:outputText value="#{msg['tarif.members.price']} "
+                   style="font-size: 1.5em;"
+                   />
+     <i class="fas fa-euro-sign fa-2x"></i>
+     <i class="fas fa-donate fa-2x"></i>
+</h:panelGroup>
+    <h:panelGroup id="panelAge" layout="block" >
+        <h:outputText value="Age: "
+                      style="font-size: 1.5em;"
+                      />
+        <i class="fas fa-birthday-cake fa-2x"></i>
+    </h:panelGroup>
 
-     <h:outputText value="#{msg['tarif.members.item']} :" />
-     <h:outputText value="#{msg['tarif.members.price']} :" />
- <!--    
-   <c:forEach var="i" begin="01" end="03" step="1">
- -->      
         <p:inputText     id="MembersText"
                         size="20"
                         title="#{msg['tooltip.tarif.item']}"
@@ -91,58 +111,17 @@
                        mask="9999.9" 
                   >
         </p:inputMask>
-
-
-  <!--     
-       <p:inputText 
-                        id="MembersText${i}"
-                        size="20"
-                        title="#{msg['tooltip.club.clubname']}"
-	                value="#{courseC.tarifMember.membersBase[i-1][0]}"
-             />
-        <p:inputMask
-                       id="MembersAmount${i}"
-                       value="#{courseC.tarifMember.membersBase[i-1][1]}"
-                       title="#{msg['tooltip.tarif.price3']}"
+        <p:inputMask   id="MembersAge"
+                       value="#{courseC.tarifMember.workAge}"
+                       title="#{msg['tooltip.tarif.price4']}"
                        size="6"
-                       required="true"
-                       requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                       validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
                        slotChar="_"
-                       mask="9999.9" 
-                       >
+                       mask="99-99" 
+                  >
         </p:inputMask>
-      
-  </c:forEach>
+
 
 <f:facet name="footer">
-        <p:commandButton value="#{msg['tarif.members.show']}"
-                         id="commandButtonShow"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="false"
-                         icon="fa fa-binoculars"
-                         action="#{courseC.inputTarifMembers}"/>
-         <p:commandButton value="#{msg['tarif.members.create']}"
-                         id="commandButtonCreate"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="false"
-                         icon="fa fa-plus"
-                         action="#{courseC.createTarifMembers}"/>
-
-</f:facet>
---> 
-<f:facet name="footer">
- <!--       <p:commandButton value="#{msg['tarif.members.show']}"
-                         id="commandButtonShow"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="true"
-                         rendered="#{courseC.tarifMember.tarifMemberIndex gt 0}"
-                         icon="fa fa-binoculars"
-                         action="#{courseC.showTarifMembers}"/>
- -->
         <p:commandButton value="#{msg['tarif.members.add']}"
                          id="commandButtonInput"
                          ajax="false"
@@ -150,22 +129,17 @@
                          immediate="false"
                          icon="fa fa-plus"
                          action="#{courseC.inputTarifMembers}"/>
-        <p:commandButton value="#{msg['tarif.members.create']}"
-                         id="commandButtonCreate"
+        <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonback"
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         rendered="#{courseC.tarifMember.tarifMemberIndex gt 0}"
-                         icon="fa fa-plus"
-                         action="#{courseC.createTarifMembers}"/>
+                         icon="fa fa-rotate-left"
+                         action="tarif_members_menu.xhtml"
+                         />
 </f:facet>
 
 </p:panelGrid>
-<!--
-<pe:tooltip global="true" myPosition="left center" atPosition="right center"
-            showEvent="focus" hideEvent="blur" styleClass="qtip-default"
-            />
--->
 </h:form>
 </ui:define>
 </ui:composition>

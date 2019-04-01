@@ -16,8 +16,7 @@ import utils.LCUtil;
  * @author collet
  */
 @Named
-public class Course implements Serializable, interfaces.Log
-{
+public class Course implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
 
 @NotNull(message="Bean validation : the Course ID must be completed")
@@ -146,17 +145,25 @@ public class Course implements Serializable, interfaces.Log
     }
 
  @Override
-public String toString()
-{ return 
+public String toString(){
+    try{
+        LOG.info("starting toString Course !");
+    return 
         ( NEWLINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
-        + " idcourse : "   + this.getIdcourse()
-               + " ,course Name : " + this.getCourseName()
-               + " ,course Par : " + this.getCoursePar()
-               + " ,course Holes : " + this.getCourseHoles()
-               + " ,Begin course = " + this.getCourseBegin()
-               + " ,End course = " + this.getCourseEnd()
-               + " ,inputSelectCourse = " + this.getInputSelectCourse()
+          + " idcourse : "   + this.getIdcourse()
+          + " ,course Name : " + this.getCourseName()
+          + " ,course Par : " + this.getCoursePar()
+          + " ,course Holes : " + this.getCourseHoles()
+          + " ,Begin course = " + this.getCourseBegin()
+          + " ,End course = " + this.getCourseEnd()
+          + " ,inputSelectCourse = " + this.getInputSelectCourse()
         );
+        }catch(Exception e){
+        String msg = "£££ Exception in Course.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }
   public static Course mapCourse(ResultSet rs) throws SQLException{
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 

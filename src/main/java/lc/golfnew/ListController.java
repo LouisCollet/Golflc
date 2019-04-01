@@ -35,7 +35,7 @@ public ListController()    // constructor
 
 public int getGreenshirt()
 {
-       greenshirt = ScoreCard3List.getListe().get(0).EinscriptionNew.getPlayerhasroundZwanzeursGreenshirt();
+       greenshirt = ScoreCard3List.getListe().get(0).Einscription.getPlayerhasroundZwanzeursGreenshirt();
   //  LOG.debug("greenshirt listsc3 = " + greenshirt);
         return greenshirt;
 }
@@ -44,9 +44,8 @@ public int getGreenshirt()
         ListController.greenshirt = greenshirt;
     }
 
-public int getZwanzeur()
-{
-    zwanzeur = ScoreCard3List.getListe().get(0).EinscriptionNew.getPlayerhasroundZwanzeursResult();
+public int getZwanzeur(){
+    zwanzeur = ScoreCard3List.getListe().get(0).Einscription.getPlayerhasroundZwanzeursResult();
     LOG.debug("zwanzeur listsc3 = " + zwanzeur);
         return zwanzeur;
   //  }

@@ -95,8 +95,6 @@ public String toString()
                + " ,startDate : "  + this.getStartDate()
                + " ,endDate : "    + this.getEndDate()
                + " ,cause : "    + this.getCause()
-         //      + " ,trial count : "  + this.getTrialCount()
-  //             + " ,cause : "  + this..getPaymentReference()
         );
 }
 
@@ -104,16 +102,10 @@ public static Unavailable mapUnavailable(ResultSet rs) throws SQLException{
     String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Unavailable u = new Unavailable();
-  //      c.setIdclub(rs.getInt("CotisationIdClub"));
-  //      c.setIdplayer(rs.getInt("CotisationIdPlayer"));
-//           LOG.info("line 01");
- //       c.setStartDate(rs.getTimestamp("CotisationStartDate").toLocalDateTime());
- //       c.setEndDate(rs.getTimestamp("CotisationEndDate").toLocalDateTime());
- //       c.setPaymentReference(rs.getString("CotisationPaymentReference"));
-//        c.setCommunication(rs.getString("CotisationCommunication"));
- //       c.setItems(rs.getString("CotisationItems"));
- //       c.setStatus(rs.getString("CotisationStatus"));
-        
+        u.setIdcourse(rs.getInt("UnavailableIdCourse"));
+        u.setStartDate(rs.getTimestamp("UnavailableStartDate").toLocalDateTime());
+        u.setEndDate(rs.getTimestamp("UnavailableEndDate").toLocalDateTime());
+        u.setCause(rs.getString("UnavailableCause"));
    return u;
   }catch(Exception e){
    String msg = "£££ Exception in rs = " + METHODNAME + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();

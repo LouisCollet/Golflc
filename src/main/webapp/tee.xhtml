@@ -10,24 +10,15 @@
       xmlns:pe="http://primefaces.org/ui/extensions"
 >
 <ui:composition template="templates/masterTemplate.xhtml">
-<ui:define name="title">Tee Page </ui:define>
+<ui:define name="title">Tee Page</ui:define>
 <ui:define name="help">
     <ui:include src="/help/help_tee.xhtml"/>
 </ui:define>
 <ui:define name="content">
-<h:graphicImage 
-                name="images/golf_tee.jpg"
-                alt="image missing :golf_tee.jpg"
-                style="float: left;">
-</h:graphicImage>
-
-<h:graphicImage 
-                name="images/golf_tee.jpg"
-                alt="image missing :golf_tee.jpg"
-                style="float: right;">
-</h:graphicImage>
+<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
     <!-- -->
-<h:form id="tee" enctype="application/x-www-form-urlencoded" >
+<h:form id="form_tee" enctype="application/x-www-form-urlencoded" >
 
 <ui:include src="include/include_summary_club.xhtml"/>
 <p:focus for="slope" />
@@ -67,6 +58,18 @@
                     <f:selectItems value="#{courseC.start}" />
                 </p:selectOneMenu>
  
+                <h:outputText value="#{msg['tee.holes.played']} :"   />
+                <p:selectOneMenu id="holesPlayed"
+                                 value="#{courseC.tee.teeHolesPlayed}"
+                                  styleClass="selectOneRadioColumn"
+                                  style="border-style: none !important;">
+                   <f:selectItem itemLabel="18 Holes"      itemValue="18-18" />
+                   <f:selectItem itemLabel="Holes 1-9"     itemValue="01-09" />
+                   <f:selectItem itemLabel="Holes 10-18"   itemValue="10-18" />
+                </p:selectOneMenu>
+                
+                
+                
                 <h:outputText value="#{msg['tee.slope']} :"   />
                 <p:inputMask  label="slope"
                        id="slope"

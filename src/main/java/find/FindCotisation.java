@@ -17,22 +17,24 @@ public class FindCotisation implements interfaces.Log, interfaces.GolfInterface
     
 public Cotisation find(final Player player, final Club club, final Round round, final Connection conn) throws SQLException{
      String CLASSNAME2 = Thread.currentThread().getStackTrace()[1].getClassName(); 
-    LOG.info("entering : " + CLASSNAME2); 
+    LOG.info("entering : " + CLASSNAME2);
+
     LOG.info("starting findCotisation.find for player = " + player.toString());
     LOG.info("starting findCotisation.find for round = " + round.toString());
     LOG.info("starting findCotisation.find for club = " + club.toString());
     PreparedStatement ps = null;
     ResultSet rs = null;
+    Cotisation cotisation = new Cotisation();
 try{ 
-    String c= utils.DBMeta.listMetaColumnsLoad(conn, "cotisation");
+    String c = utils.DBMeta.listMetaColumnsLoad(conn, "payments_cotisation");
     String query = 
     " SELECT " 
        + c +
-"	FROM cotisation " +
-"       WHERE cotisation.CotisationIdPlayer = ?" +
-"	  AND cotisation.CotisationIdClub = ?" +
+"	FROM payments_cotisation " +
+"       WHERE CotisationIdPlayer = ?" +
+"	  AND CotisationIdClub = ?" +
 "	  AND DATE(?) BETWEEN (cotisationStartDate AND cotisationEndDate)" +
-"	AND cotisation.CotisationStatus = 'Y' "
+"	AND CotisationStatus = 'Y' "
      ;
     ps = conn.prepareStatement(query);
     ps.setInt(1, player.getIdplayer());
@@ -44,12 +46,12 @@ try{
         rs.last(); //on récupère le numéro de la ligne
             LOG.info("ResultSet FindCotisation has " + rs.getRow() + " lines.");
          if(rs.getRow() == 0){
-            String err = "Vous n'êtes PAS membre de ce club - Vous devez payer un greenfee !" ;//+ cotisation.getIdclub();
-            LOG.info(err);
-            LCUtil.showMessageFatal(err);
-      //         throw new Exception(err + " / " + rs.getRow() );
-            Cotisation cotisation = new Cotisation();
-            cotisation.setStatus("N");
+        //    String err = " !" ;//+ cotisation.getIdclub();
+            String msg = LCUtil.prepareMessageBean("cotisation.notfound");
+            LOG.info(msg);
+     //       LCUtil.showMessageFatal(msg);
+        //    Cotisation cotisation = new Cotisation();
+            cotisation.setStatus("NF");
             return cotisation;
          }
          //rs.last(); //on récupère le numéro de la ligne
@@ -61,7 +63,7 @@ try{
         }
         rs.beforeFirst(); //on replace le curseur avant la première ligne
           //LOG.info("just before while ! ");
-        Cotisation cotisation = null;
+     
 	while(rs.next())
         {
              cotisation = entite.Cotisation.mapCotisation(rs);
@@ -84,22 +86,17 @@ try{
 }
 }//end method
 
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
-  //  LOG.info("Input main = " + s);
-    DBConnection dbc = new DBConnection();
-Connection conn = dbc.getConnection();
+public static void main(String[] args) throws SQLException, Exception {// testing purposes
+    Connection conn = new DBConnection().getConnection();
     Player player = new Player();
-  //  Round round =new Round(); 
-player.setIdplayer(324713);
-//round.setIdround(260);
-FindPlayer fp = new FindPlayer();
-  //  String str = pc.checkPassword(uuid, conn);
-Player p1 = fp.findPlayer(player.getIdplayer(), conn);
-LOG.info("player found = " + p1.toString());
-//for (int x: par )
-//        LOG.info(x + ",");
-DBConnection.closeQuietly(conn, null, null, null);
+    player.setIdplayer(324713);
+    Round round = new Round(); 
+    round.setIdround(260);
+    Club club = new Club();
+    club.setIdclub(1006);
+    Cotisation p1 = new FindCotisation().find(player, club, round, conn);
+        LOG.info("cotisation found = " + p1.toString());
+    DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
     

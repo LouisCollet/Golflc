@@ -13,18 +13,18 @@ import utils.LCUtil;
 
 @Named("thumbnailsC")
 @SessionScoped
-//@RequestScoped   //quelle différence ??
-public class ThumbnailsController implements Serializable, interfaces.Log
-{
+public class ThumbnailsController implements Serializable, interfaces.Log{
+    
 final private static File SOURCEDIR = new File(Constants.photos_library);
 final private static File DESTINATIONDIR = new File(Constants.thumbnails_library);
 
-public static String thumbs(String s) throws ExceptionGolfLC, IOException
-{
+public static String thumbs(String s) throws ExceptionGolfLC, IOException{
     //http://thumbnailator.googlecode.com/hg-history/0.4.8/javadoc/net/coobird/thumbnailator/Thumbnails.html
 try{
-    boolean b = true;
+ //   boolean b = true;
      LOG.info("... entering thumbs all files !! with param = " + s);
+     LOG.info("source dir = " + SOURCEDIR);
+     LOG.info("destination dir = " + DESTINATIONDIR);
     Thumbnails.of(SOURCEDIR.listFiles())
         .scale(0.30)  // fonctionne !!
         .outputFormat("jpg")
@@ -32,19 +32,18 @@ try{
         .toFiles(DESTINATIONDIR, Rename.PREFIX_DOT_THUMBNAIL); // ajoute "thumbnail" au début du file name
     
     LOG.info(" finishing thumbsAll ...");
-    if(b == false) // essai, pas utilisé
-    {
-        throw new ExceptionGolfLC ("ExceptionGolfLC : Something bad happened");
-    }
+ //   if(b == false) // essai, pas utilisé    {
+ //       throw new ExceptionGolfLC ("ExceptionGolfLC : Something bad happened");
+ //   }
     return "menu.xhtml";
-}catch(ExceptionGolfLC ex){
+//}catch(ExceptionGolfLC ex){
   // Print error and terminate application.
-    String msg = "ExceptionGolfLC() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return "error";
-}catch(IOException ioex){
-    String msg = "IOException in thumbs() " + ioex;
+ //   String msg = "ExceptionGolfLC() " + ex;
+ //   LOG.error(msg);
+ //   LCUtil.showMessageFatal(msg);
+//    return "error";
+}catch(Exception ex){
+    String msg = "IOException in thumbs() " + ex;
     LOG.error(" error = " + msg);
     LCUtil.showMessageFatal(msg);
     return "error";
@@ -54,12 +53,12 @@ try{
 } //end method
 
 // les 2 méthodes portent le même nom mais la signature est différente !!
-public static boolean thumbs(String s, File f) throws ExceptionGolfLC, IOException
-{
+public static boolean thumbs(String s, File f) throws ExceptionGolfLC, IOException{
     //just for one file - 2e constructor
 try{
      LOG.info("... entering thumbs One Thumbnail in One file !! with param = " + s +" for file = " + f.getName());
  //   Thumbnails.of(sourceDir.listFiles())
+ 
     Thumbnails.of(Constants.photos_library + f.getName())
      //   .scale(0.30)  // fonctionne !! was 0.25
         .size(100,100)   // mod 04/08/2017 
@@ -88,10 +87,11 @@ public static boolean thumbsPhoto(String s, File f) throws ExceptionGolfLC, IOEx
     //just for one file - 2e constructor
 try{
   //   LOG.info("... entering thumbs One Photo in One file !! with param = " + s +" for file = " + f.getName());
-     LOG.info("... entering thumbs One Photo in One file !! with param = " + s +" for file = " + f.getAbsoluteFile());
+     LOG.info("... entering thumbs for one file !! with param = " + s +" for file = " + f.getAbsoluteFile());
   //   LOG.info("... entering thumbs One Photo in One file !! with param = " + s +" for file = " + f.getAbsolutePath());
   //   LOG.info("... entering thumbs One Photo in One file !! with param = " + s +" for file = " + f.getCanonicalPath());
- 
+     LOG.info("source dir = " + SOURCEDIR);
+     LOG.info("destination dir = " + DESTINATIONDIR);
   //  Thumbnails.of(f.getAbsoluteFile())
     Thumbnails.of(Constants.photos_library + f.getName())
      //   .scale(0.30)  // fonctionne !! was 0.25
@@ -99,7 +99,7 @@ try{
  //       .outputFormat("jpg") // mod 03/08/2017 change le format en jpg et ajout l'extension '.jpg'
          .toFiles(SOURCEDIR, Rename.NO_CHANGE); // conserve le nom du fichier
    //     .toFiles(DESTINATIONDIR, Rename.NO_CHANGE); 
-    LOG.info(" finishing thumbsOnePhoto" );
+    LOG.info(" finishing thumbsPhoto" );
     return true;
 }catch(IOException ioex){
     String msg = "IOException in thumbs() : " + ioex;

@@ -26,14 +26,12 @@ select * from handicap
 ajouter une colonne à show_handicap.xhtml
         */
         
-public class DeleteHandicap implements interfaces.Log, interfaces.GolfInterface
-{
-    public String deleteHandicap(final int idplayer, final Date date, final Connection conn) throws Exception
-    {
+public class DeleteHandicap implements interfaces.Log, interfaces.GolfInterface{
+    
+    public String delete(final int idplayer, final Date date, final Connection conn) throws Exception{
     PreparedStatement ps = null;
     int row_update = 0;
-try
-{   //encore à  faire : delete du record activation s'il existe ...
+try{   //encore à  faire : delete du record activation s'il existe ...
      LOG.info("starting Delete Handicap ... = " );
      LOG.info("Delete Handicap for idplayer = "  + idplayer);
      LOG.info("Delete Handicap for date     = "  + SDF.format(date));
@@ -107,18 +105,15 @@ if(row_delete > 0)
 }
 } //end method
    
- public static void main(String[] args) throws SQLException, Exception 
- {
-     DBConnection dbc = new DBConnection();
-     Connection conn = dbc.getConnection();
+ public static void main(String[] args) throws SQLException, Exception{
+  //   DBConnection dbc = new DBConnection();
+     Connection conn = new DBConnection().getConnection();
  try{
-       LOG.info("Input main = ");
-    
     int idplayer = 2014102;
     Date date =SDF.parse("01/01/2000");
     DeleteHandicap dh = new DeleteHandicap();
-    dh.deleteHandicap(idplayer,date, conn);
-  //  DBConnection.closeQuietly(conn, null, null, null);
+    String b = new DeleteHandicap().delete(idplayer,date, conn);
+       LOG.info("from main - resultat deleteCourse = " + b);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

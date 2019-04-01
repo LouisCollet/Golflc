@@ -48,8 +48,8 @@ try{
     ps.setString(1, table);
  //   utils.LCUtil.logps(ps);
     rs = ps.executeQuery();
-    if(rs.next())
-    {   LOG.debug("resultat : CountColumns = " + rs.getInt(1) );
+    if(rs.next()){  
+//        LOG.debug("resultat : CountColumns = " + rs.getInt(1) );
       return rs.getInt(1);
     }else{
         LOG.error("error : no result found no columns !! = " + rs.getInt(1) );
@@ -501,7 +501,7 @@ sb.append(" "); // space to separate query element
         sb.append(", ");
     }  //end while
   sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
-
+ //  LOG.info("MetaDataColumns = " + sb.toString());
 return sb.toString();
    
 

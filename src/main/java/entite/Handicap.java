@@ -30,15 +30,10 @@ public class Handicap implements Serializable, interfaces.GolfInterface
 @Min(value=0,message="{handicap.player.min}")
 @Max(value=54,message="{handicap.player.max}")
     private BigDecimal handicapPlayer;
-
     private BigDecimal playingHandicap;
-
     private Integer playerIdplayer;
-
     private Integer roundIdround;
-
     private Date handicapModificationDate;
-
     private ECourseList selectedHandicap; // mod 11-12-2018
     
     private List <?>filteredHandicaps; // new 03/08/2014
@@ -157,13 +152,9 @@ public String toString()
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Handicap h = new Handicap();
-      //  h.setHandicapStart(rs.getDate("idhandicap") );
-         h.setHandicapStart(rs.getTimestamp("idhandicap")) ;
-         h.setHandicapEnd(rs.getTimestamp("HandicapEnd") );
-  //      c.setCourseBegin(rs.getTimestamp("courseBegin")); // format 'DATE' in database
-  //      c.setCourseEnd(rs.getTimestamp("courseend")); // format 'DATE' in database
+        h.setHandicapStart(rs.getTimestamp("idhandicap")) ;
+        h.setHandicapEnd(rs.getTimestamp("HandicapEnd") );
         h.setHandicapPlayer(rs.getBigDecimal("HandicapPlayer") );
-    
    return h;
   }catch(Exception e){
    String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();

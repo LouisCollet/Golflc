@@ -12,7 +12,7 @@
     </h:head>
     <h:body>
 <ui:composition>
-<h:form id="menu"      enctype="application/x-www-form-urlencoded" >
+<h:form id="form_menu"      enctype="application/x-www-form-urlencoded" >
 <p:panelMenu id="panel_menu">
     <p:submenu label="HOME LC" icon="ui-icon-wrench">
          <p:menuitem value ="Reset   "
@@ -28,16 +28,32 @@
              <p:menuitem value ="#{msg['menu.create.round']}"
                          action="#{courseC.to_selectCourse_xhtml('CreateRound')}"
                          icon="fa fa-list" />
-             <p:menuitem value ="#{msg['menu.create.tarif.greenfee']}"
-                         action="#{courseC.to_selectCourse_xhtml('CreateTarif')}"
+    </p:submenu>
+    
+     <p:submenu label="SYSTEM ADMINISTRATOR" 
+               rendered="#{courseC.player.playerRole eq 'ADMIN'}">
+        <p:menuitem value ="Désignation Administrateur Local" 
+                    action="#{courseC.to_selectClub_xhtml('LocalAdministrator')}"
+                    icon="ui-icon-calculator" />
+    </p:submenu>
+    
+     <p:submenu label="ADMINISTRATEUR LOCAL" 
+               rendered="#{courseC.player.playerRole eq 'ADMIN' or courseC.player.playerRole eq 'admin'}">
+        <p:menuitem value ="Course Unavailable" 
+                    action="#{courseC.to_selectCourse_xhtml('CreateUnavailable')}"
+                    icon="ui-icon-calculator" />
+        <p:menuitem value ="#{msg['menu.create.tarif.greenfee']}"
+                         action="#{courseC.to_selectCourse_xhtml('CreateTarifGreenfee')}"
                          icon="fa fa-money" />
-             <p:menuitem value ="#{msg['menu.create.tarif.member']}"
+        <p:menuitem value ="#{msg['menu.create.tarif.member']}"
                          action="#{courseC.to_selectCourse_xhtml('CreateTarifMember')}"
                          icon="fa fa-money" />
-
- <!-- https://www.w3schools.com/icons/fontawesome_icons_intro.asp -->            
     </p:submenu>
-    <p:submenu label="MODIFY">
+    
+    
+    <p:submenu label="MODIFY"
+               rendered="#{courseC.player.playerRole eq 'ADMIN'}"
+               >
             <p:menuitem value ="Club,Course,Tee"
                         action="#{courseC.to_clubModify_xhtml('modify club')}"
                         icon="fa fa-flag-checkered" />
@@ -106,7 +122,7 @@ url="show_played_rounds.xhtml?cmd=ini"
    <p:menuitem value ="Subscription = #{courseC.subscription.endDate}"
                url="subscription.xhtml"
                icon="ui-icon-calculator" />
-   <p:menuitem value ="Payment Tarif Member"
+   <p:menuitem value ="Payment Cotisation Member"
                action="#{courseC.to_selectCourse_xhtml('PaymentTarifMember')}"
                icon="fa fa-money" />
 </p:submenu>
@@ -161,7 +177,9 @@ url="show_played_rounds.xhtml?cmd=ini"
          <p:menuitem value ="About"            url="result.xhtml" icon="ui-icon-star" />
          <p:menuitem value ="Technical info"   url="technical_info.xhtml" icon="ui-icon-star" />
     </p:submenu>
-    <p:submenu label="BATCH">
+    <p:submenu label="BATCH"
+               rendered="#{courseC.player.playerRole eq 'ADMIN'}"
+               >
          <p:menuitem value ="Batch concat images" url="batch.xhtml" icon="ui-icon-star" />
          <p:menuitem value ="LC Import Players"
                      action="#{importPlayers.main('from menu : louis')}"
@@ -181,14 +199,13 @@ url="show_played_rounds.xhtml?cmd=ini"
            
     </p:submenu>
 
-    <p:submenu label="TOOLS/TESTS" >
+    <p:submenu label="TOOLS/TESTS"
+               rendered="#{courseC.player.playerRole eq 'ADMIN'}"
+               >
 <!-- If you are not using "url" but want to go with "action" then remember that you are doing a POST request.
 In this case you should either
 1.Add ?faces-redirect=true to your returning String, like "test.xhtml?faces-redirect=true"
 2.Set ajax=false in your menuitems,  
-
-
-
   -->
           <p:menuitem value ="Test payment"
                        action="#{courseC.Testpayment()}"
@@ -241,16 +258,7 @@ In this case you should either
                     icon="ui-icon-document" />
     </p:submenu>
     
-        <p:submenu label="ADMINISTRATEUR LOCAL" 
-               rendered="#{courseC.player.playerRole eq 'ADMIN' or courseC.player.playerRole eq 'admin'}">
-        <p:menuitem value ="Course Unavailable" 
-                    action="#{courseC.to_selectCourse_xhtml('CreateUnavailable')}"
-                    icon="ui-icon-calculator" />
 
-    </p:submenu>
-    
-    
-    
     <p:submenu label="Resources">
            <p:menuitem value ="Download "    url="download.xhtml"/>
            <p:menuitem value="Demo"     url="http://www.primefaces.org/showcase-labs/ui/home.jsf" icon="ui-icon-extlink" />
@@ -263,8 +271,6 @@ In this case you should either
 
 </p:panelMenu>
 
-
-<!-- ______________________________________________ -->
 </h:form>
  </ui:composition>   
 </h:body>

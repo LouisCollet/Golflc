@@ -52,20 +52,19 @@ try
         LOG.info("deleted inscription = " + rows);
     if (rows == 0){ // no delete !!
         String msg =  LCUtil.prepareMessageBean("inscription.not.canceled");
-        msg = msg       + "<br/>player id = " + player.getIdplayer()
-                    + " <br/>Player Last Name = " + player.getPlayerLastName()
-                    + " <br/>Round id = " + round.getIdround();
+        msg = msg   + "<br/>player id = " + player.getIdplayer();
+        msg = msg   + "<br/>Player Last Name = " + player.getPlayerLastName();
+        msg = msg   + "<br/>Round id = " + round.getIdround();
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
         return false;
 }else{ // row deleted
     String msg =  LCUtil.prepareMessageBean("inscription.canceled")
-        + " <br/>player id = " + player.getIdplayer()
-        + " <br/></h1>player Last Name = " + player.getPlayerLastName()
-        + " <br/></h1>round id = " + round.getIdround();
+        + " <br/>Player id = " + player.getIdplayer()
+        + " <br/>Player Last Name = " + player.getPlayerLastName()
+        + " <br/>Round id = " + round.getIdround();
       LOG.info(msg);
     LCUtil.showMessageInfo(msg);
- //   LOG.info("line 01");
     mail.DeleteInscriptionMail mdi = new mail.DeleteInscriptionMail();
     mdi.sendMail(player, round, ecl.Eclub, ecl.Ecourse);
     return true;

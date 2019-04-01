@@ -10,13 +10,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
 >
 <ui:composition template="templates/loginTemplate.xhtml">
-  <!--  
-    <ui:define name="metadata">
-    <f:metadata>
-        <f:viewAction action="#{courseC.listHandicaps}"/>
-    </f:metadata>
-</ui:define>
- -->   
+
 <ui:define name="title">Player List Page </ui:define>
 <ui:define name="help">
     <ui:include src="/help/help_select_player.xhtml"/>
@@ -25,8 +19,6 @@
 
     
 <h:form id="selectPlayer" enctype="application/x-www-form-urlencoded" >
-<!--             paginator="true"            rows="10"
--->
 
 <p:dataTable id="table_players"
              value="#{courseC.listPlayers()}"
@@ -35,7 +27,6 @@
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredPlayers}"
              rowHover="true"
-       
              >
 
 <f:facet name="header">
@@ -46,24 +37,12 @@
                      icon="ui-icon-calculator"
                    
                      />
-    <h1>#{msg["message.playerslist"]}</h1>
-  <p:columnToggler datasource="table_players"
+   <h:outputText escape="false" value="#{msg['message.playerslist']}" />
+   <p:columnToggler datasource="table_players"
                    trigger="toggler" />
 
 </f:facet>
- <!-- new test table 2D 31/07/2016 
-<c:forEach items="#{courseC.listPlayers()}" var="row">
-    <c:forEach items="#{row}" var="nested_row">
-        #{nested_row.name}
-    </c:forEach>
-</c:forEach>
-    
-    <c:forEach items="#{courseC.listPlayers()}" var="row">
-            #{row.playerLastName}
-    </c:forEach>
-    -->
-    
-    
+
 <p:column
      headerText="#"
      footerText="#"
@@ -127,7 +106,7 @@
         </p:column>
 
 <f:facet name="footer">
-     <!--      In total there are #{fn:length(courseC.listPlayer)} players. -->
+   
 </f:facet>
 </p:dataTable>
 </h:form>

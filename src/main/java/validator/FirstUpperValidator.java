@@ -7,8 +7,7 @@ import javax.validation.ConstraintValidatorContext;
 // http://stackoverflow.com/questions/19802209/how-to-apply-jsf-validator-after-annotations-constraints
 // http://workingonbits.com/2011/02/28/custom-constraints-with-bean-validation/
 
-public class FirstUpperValidator implements ConstraintValidator<FirstUpper, String>, interfaces.Log
-{
+public class FirstUpperValidator implements ConstraintValidator<FirstUpper, String>, interfaces.Log{
 int max;  //added 1/11/2016
 
 @Override
@@ -21,8 +20,7 @@ public void initialize(FirstUpper firstUpper)
 }
 
 @Override
-public boolean isValid(String value, ConstraintValidatorContext context)
-{
+public boolean isValid(String value, ConstraintValidatorContext context){
 	if (value == null || value.length() == 0)
         {
 		return true;

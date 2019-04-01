@@ -5,7 +5,7 @@ import entite.Club;
 import entite.Cotisation;
 import entite.Creditcard;
 import entite.Greenfee;
-import entite.PlayerHasRound;
+import entite.Inscription;
 import entite.Round;
 import entite.Subscription;
 import entite.TarifGreenfee;
@@ -21,7 +21,8 @@ import static utils.LCUtil.showMessageFatal;
  */
 public class CreditcardMail {
 
-    public Boolean sendMailInscription(Creditcard creditcard, TarifGreenfee tarif, Round round, PlayerHasRound inscription) throws MessagingException, Exception {
+    public Boolean sendMailInscription(Creditcard creditcard, TarifGreenfee tarif, Round round,
+            Inscription inscription) throws MessagingException, Exception {
 try{
      String sujet = "Your creditcard payment for your Round Inscription via GolfLC";
                 String mail = 

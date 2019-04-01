@@ -1,6 +1,5 @@
 package find;
 
-import entite.Course;
 import entite.Player;
 import static interfaces.GolfInterface.SDF;
 import static interfaces.Log.LOG;
@@ -57,19 +56,14 @@ finally
 
 } // end method 
 
-    
     public static void main(String[] args) throws Exception , Exception{
 
     Connection conn = new DBConnection().getConnection();
-    Course course = new Course();
-    course.setIdcourse(102);
-
-
-  //   LOG.info("Tarif extracted from database = "  + t1.toString());
-//findPlayerHandicap(player,round, conn);
-//for (int x: par )
-//        LOG.info(x + ",");
-DBConnection.closeQuietly(conn, null, null, null);
+    Player player = new Player();
+    player.setIdplayer(324713);
+    Timestamp i = new FindLastLogin().lastAuditLogin(player, conn);
+        LOG.info("last audit login = " + i);
+    DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
     

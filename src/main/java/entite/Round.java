@@ -13,7 +13,6 @@ import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import utils.LCUtil;
-import static utils.LCUtil.DatetoLocalDateTime;
 
 @Named
 public class Round implements Serializable, interfaces.Log, interfaces.GolfInterface
@@ -26,6 +25,7 @@ public class Round implements Serializable, interfaces.Log, interfaces.GolfInter
 @NotNull(message="{round.date.notnull}")
   //  private Date roundDate;
     private LocalDateTime roundDate;  // change also ScoreCard.java and StablefordResult !!!!!!
+private LocalDateTime roundDateTrf;
     private Date workDate;
     private String workHour;
 
@@ -33,7 +33,6 @@ public class Round implements Serializable, interfaces.Log, interfaces.GolfInter
 @Size(min=3,max=20,message="Bean validation : the Round Game is min 3, max 20 characters")
     private String roundGame;
 
-//private String gametype; // new 1/11/2016
 public enum GameType {STABLEFORD,SCRAMBLE,CHAPMAN,STROKEPLAY,ZWANZEURS,MP_FOURBALL,MP_FOURSOME,MP_SINGLE}
 
 @NotNull(message="{round.cba.notnull}")
@@ -42,7 +41,6 @@ public enum GameType {STABLEFORD,SCRAMBLE,CHAPMAN,STROKEPLAY,ZWANZEURS,MP_FOURBA
 @NotNull(message="{round.competition.notnull}")
 @Size(max=45, message="{round.competition.size}")
     private String roundCompetition;
-
 
 @NotNull(message="Bean validation : the Round Qualifying must be completed")
 @Size(min=1, max=1,message="Bean validation : the Round Qualifying is max 1 character")
@@ -130,11 +128,12 @@ private String RoundScoreString;
             
         return workDate;
     }
-    
+
     public void setWorkDate(Date workDate) {
-        LOG.debug("from setWorkDate 1");
-  //      LOG.info(" from setWorkDate 2 - roundDate = " + SDF_TIME.format(getWorkDate()));
         this.workDate = workDate;
+       LOG.debug("setted setWorkDate Date format = " + this.workDate);
+    // ici charger date en format LocalDateTime   
+       setRoundDate(utils.LCUtil.DatetoLocalDateTime(this.workDate));
     }
     
     public String getWorkHour() {
@@ -142,6 +141,7 @@ private String RoundScoreString;
     }
 
     public void setWorkHour(String workHour) {
+         LOG.debug("setted setWorkHour String = " + this.workDate);
         this.workHour = workHour;
     }
 
@@ -236,20 +236,32 @@ private String RoundScoreString;
     public void setPlayersList(List<Player> playersList) {
         this.playersList = playersList;
     }
-    
+
+    public LocalDateTime getRoundDateTrf() {
+        return roundDateTrf;
+    }
+
+    public void setRoundDateTrf(LocalDateTime roundDateTrf) {
+        this.roundDateTrf = roundDateTrf;
+    }
     
  @Override
-public String toString()
-{ 
-    LOG.info("starting toString for Round = " + this.getIdround());
-    if(this.getRoundDate() != null || this.getIdround() != null){
+public String toString(){ 
+LOG.info("starting toString for Round!");
+    try{
+ //   LOG.info("starting toString for Round = " + this.getIdround()); // enlevé le 21/02/2019
+  //  if(this.getRoundDate() != null || this.getIdround() != null){
        return 
         (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
                + " ,idround : "   + this.getIdround()
                + " ,Round Players : "   + this.getRoundPlayers()
-               + " ,Round Date: "   + this.getRoundDate().format(ZDF_TIME)
+               + " ,Work Date format Date : "   + this.getWorkDate()
+               + " ,Work Hours : "   + this.getWorkHour()
+               + " ,RoundDate format LocalDateTime: "   + this.getRoundDate().format(ZDF_TIME)
+               + " ,Round Date Trf : "   + this.getRoundDateTrf().format(ZDF_TIME)
                + " ,Round Date HHmm : "   + this.getRoundDate().format(ZDF_TIME_HHmm)
            //    + " ,Round Date/Time: "   + Round.SDF_TIME.format(getRoundDate() )
+               
                + " ,Round Competition : " + this.getRoundCompetition()
                + " ,Round Game : " + this.getRoundGame()
                + " ,Round Qualifying : " + this.getRoundQualifying()
@@ -259,24 +271,27 @@ public String toString()
                + " ,Nombre Players : "   + this.getPlayers()
                + " ,Name Players : "   + this.getPlayersString()
         );
-   }else{
-        return
-        (NEW_LINE + "from entite : " + this.getClass().getSimpleName() + NEWLINE 
-          + " idRound = null !!");
-    }
+//   }else{
+ //       return
+ //       (NEW_LINE + "from entite : " + this.getClass().getSimpleName() + NEWLINE 
+ //         + " idRound = null !!");
+  //  }
+        }catch(Exception e){
+        String msg = " EXCEPTION in Round.toString = " + e.getMessage();
+        LOG.error(msg);
+     //   LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }
 public static Round mapRound(ResultSet rs) throws SQLException{
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Round r = new Round();
             r.setIdround(rs.getInt("idround") );
-            
-            
-                java.util.Date d = rs.getTimestamp("roundDate");
-            r.setRoundDate(DatetoLocalDateTime(d));
+  //               java.util.Date d = rs.getTimestamp("roundDate");
+   //         r.setRoundDate(DatetoLocalDateTime(d));
      // new solution 21/01/2019       
             r.setRoundDate(rs.getTimestamp("roundDate").toLocalDateTime());
-            
             r.setRoundGame(rs.getString("roundgame") );
             r.setRoundCBA(rs.getShort("RoundCSA") );
             r.setRoundCompetition(rs.getString("RoundCompetition") );

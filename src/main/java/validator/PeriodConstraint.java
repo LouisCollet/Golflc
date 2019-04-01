@@ -14,7 +14,7 @@ import javax.validation.Constraint;
 @Retention(RUNTIME)
 public @interface PeriodConstraint{
 //String message() default "{club.class.validation}";
-String message() default "Start date must be beforer end date";
+String message() default "Start date must be before end date";
 // required by validation runtime
 Class<?>[] groups() default {};
 //Class<? extends Payload>[] payload() default {};

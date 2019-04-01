@@ -8,7 +8,7 @@ import javax.inject.Named;
 
 @Named("inscription")
 @SessionScoped
-public class PlayerHasRound implements Serializable
+public class __PlayerHasRound implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -22,12 +22,12 @@ public class PlayerHasRound implements Serializable
     private Short playerhasroundZwanzeursGreenshirt;
     private String playerGender; // new 19/08/2014
     private String inscriptionTeeStart;
- //   
+    private Integer inscriptionIdTee;
  //   private String playerhasroundmatchplayresult;
     private Date playerhasroundModificationDate;
     private boolean InscriptionOK = false; // 02/08/2018
 
-    public PlayerHasRound() // constructor
+    public __PlayerHasRound() // constructor
     {
         inscriptionTeeStart="YELLOW";
         //setInscriptionOK(false);
@@ -105,6 +105,14 @@ public class PlayerHasRound implements Serializable
         this.InscriptionOK = InscriptionOK;
     }
 
+    public Integer getInscriptionIdTee() {
+        return inscriptionIdTee;
+    }
+
+    public void setInscriptionIdTee(Integer inscriptionIdTee) {
+        this.inscriptionIdTee = inscriptionIdTee;
+    }
+
    
 
  //   public String getPlayerhasroundmatchplayresult() {
@@ -121,10 +129,9 @@ public String toString()
         ("from entite.PlayerHasRound = "
                + " ,idplayer : "   + this.getPlayer_idplayer()
                + " ,idround : "   + this.getRound_idround()
-               + " ,Start : "   + this.getInscriptionTeeStart()
-
+               + " ,TeeStart : "   + this.getInscriptionTeeStart()
+               + " ,idtee : "   + this.getInscriptionIdTee()
+        
         );
 }
-
-
 } // end class

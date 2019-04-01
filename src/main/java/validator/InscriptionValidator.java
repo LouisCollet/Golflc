@@ -5,8 +5,7 @@ import javax.validation.ConstraintValidatorContext;
 
 // see example http://softwarecave.org/2014/03/27/custom-bean-validation-constraints/
 
-public class InscriptionValidator implements ConstraintValidator<FirstUpper, String>, interfaces.Log
-{
+public class InscriptionValidator implements ConstraintValidator<FirstUpper, String>, interfaces.Log{
 
 @Override
 public void initialize(FirstUpper firstUpper)
@@ -24,5 +23,4 @@ public boolean isValid(String value, ConstraintValidatorContext context)
 	}
 return value.substring(0, 1).equals(value.substring(0, 1).toUpperCase());
 }
-
 } // end Class

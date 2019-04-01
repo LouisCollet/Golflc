@@ -11,8 +11,8 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:pe="http://primefaces.org/ui/extensions"
       xmlns:cc="http://xmlns.jcp.org/jsf/composite"
-      xmlns:o="http://omnifaces.org/ui"
-      xmlns:of="http://omnifaces.org/functions"
+   
+     
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
 >
 <ui:composition template="templates/masterTemplate.xhtml">
@@ -64,23 +64,26 @@ ici c'est pour générer des data pour tester !  -->
     columnClasses="className">
 
 <f:facet name="header">
- <h1>
+  #{courseC.creditcard.typePayment}
+ <!--  <h:outputText escape="false" value="#{msg['title.payment.executed']}" />-->
     <h:outputText
             id="subscription"
+            escape="false"
             rendered="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
             value="#{msg['title.payment.subscription']}">
     </h:outputText>
     <h:outputText
             id="inscription"
-            rendered="#{coursC.creditcard.typePayment eq 'GREENFEE'}" 
+            escape="false"
+            rendered="#{courseC.creditcard.typePayment = 'GREENFEE'}" 
             value="#{msg['title.payment.round']}">
     </h:outputText>
     <h:outputText
             id="membership"
+            escape="false"
             rendered="#{courseC.creditcard.typePayment eq 'COTISATION'}" 
             value="#{msg['title.payment.cotisation']}">
     </h:outputText> 
- </h1>
 </f:facet>
     <h:outputText  id="Total"
                 value="#{msg['creditcard.amounttobepaid']} :"
@@ -132,7 +135,7 @@ ici c'est pour générer des data pour tester !  -->
             id="Issuer"
             value="#{courseC.creditcard.creditCardIssuer}"
             />
--->
+
 <p:commandButton value="#{msg['creditcard.payment']} :"
                  id="taskButton"
                  actionListener="#{courseC.startTask}"
@@ -141,7 +144,7 @@ ici c'est pour générer des data pour tester !  -->
                  update="taskResult"
                  widgetVar="taskButton"/>
     <h:outputText value=" "/>
-    
+ -->   
     <p:progressBar  widgetVar="progressBar"
                     id="progressBar1"
                     ajax="true"
@@ -176,10 +179,17 @@ ici c'est pour générer des data pour tester !  -->
                          ajax="false"
                          update="growl-msg"
                          immediate="false"
-                         icon="fa fa-remove"
+                         icon="fa fas fa-undo"
                          action="welcome.xhtml"
                   />
-
+<p:commandButton value="#{msg['creditcard.payment']} :"
+                 id="taskButton"
+                 icon="fas fa-handshake"
+                 actionListener="#{courseC.startTask}"
+                 rendered="#{courseC.creditcard.paymentOK eq false}"
+                 onclick="jsStartTask()"
+                 update="taskResult"
+                 widgetVar="taskButton"/>
 </f:facet>
 </p:panelGrid>
 

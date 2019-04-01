@@ -7,9 +7,9 @@ http://middlewaremagic.com/jboss/?p=1050
             <logger category="org.jboss.jca">
                 <level name="TRACE"/>
             </logger>
-à ajouter à standalone-full.xml pour un loggin très détaillé
+à ajouter à standalone-full.xml pour un loggin très détaillé 
 
-    -->
+   
   <datasource jndi-name="java:jboss/datasources/MySqlDB" pool-name="MySQLPool">
       <connection-url>jdbc:mysql://localhost:3307/golflc</connection-url>
       <driver>mysql-connector-java-8.0.14.jar</driver>
@@ -22,6 +22,7 @@ http://middlewaremagic.com/jboss/?p=1050
           <password>lc1lc2</password>
       </security>
   </datasource>
+  -->
   <!-- utilisée dans golflc attention &amp; !!!!! -->
   <datasource jta="true"
               jndi-name="java:jboss/datasources/golflc" 

@@ -38,7 +38,6 @@ public boolean modifypassword(final Player player, final Connection conn) throws
             ;
         LOG.info("query Modify Player 1 = " + query);
             ps = conn.prepareStatement(query);
-            // insérer dans l'ordre de la database : 1 = first db field
             // si password oublié : o le réinitialise à NULL
             if(player.getWrkpassword().equals("RESET PASSWORD")){
                 ps.setNull(1, java.sql.Types.CHAR);  // reset PlayerPassword to NULL

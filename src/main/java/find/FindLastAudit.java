@@ -1,6 +1,5 @@
 package find;
 
-import entite.Course;
 import entite.Player;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
@@ -16,10 +15,7 @@ final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1
     public int getLastAuditId(Player player, Connection conn) throws SQLException, Exception
 {   PreparedStatement ps = null;
     ResultSet rs = null;
- //   Connection conn = null;
 try{
- //   DBConnection dbc = new DBConnection();
- //    conn = dbc.getConnection();
      String query =
              "select AuditId from audit"
               + " where AuditPlayerId = ?"
@@ -42,21 +38,16 @@ return auditId;
 finally{
     DBConnection.closeQuietly(null, null, rs, ps);
 }
-
 } // end method getLastAuditId
     
     public static void main(String[] args) throws Exception , Exception{
 
     Connection conn = new DBConnection().getConnection();
-    Course course = new Course();
-    course.setIdcourse(102);
-
-
- ///    LOG.info("Tarif extracted from database = "  + t1.toString());
-//findPlayerHandicap(player,round, conn);
-//for (int x: par )
-//        LOG.info(x + ",");
-DBConnection.closeQuietly(conn, null, null, null);
+    Player player = new Player();
+    player.setIdplayer(324713);
+    int i = new FindLastAudit().getLastAuditId(player, conn);
+        LOG.info("last audit id = " + i);
+    DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
 } // end class

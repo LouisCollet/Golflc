@@ -14,7 +14,7 @@ import utils.LCUtil;
  */
 public class CreateHandicap implements interfaces.Log{
 
- public String[] createHandicap(Connection conn, Player player, 
+ public String[] create(Connection conn, Player player, 
             Round round, double in_newHcp) throws SQLException
     {
        String []array_return_error = new String [3];

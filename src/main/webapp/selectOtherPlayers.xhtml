@@ -17,7 +17,6 @@
 </ui:define>
 <ui:define name="content">
 
-    
 <h:form id="selectPlayers">
 
 <ui:include src="include/include_summary.xhtml"/>
@@ -27,24 +26,20 @@
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredPlayers}"
-             selection="#{courseC.player.selectedOtherPlayers}"
-       
+             selection="#{courseC.selectedOtherPlayers}"
              rowKey="#{c.idplayer}">
-
 
 <f:facet name="header">
             <p:commandButton
                 id="cmd01Button"
                 action="#{courseC.otherPlayers()}"
                 icon="ui-icon-extlink"
-                value="#{msg['button.selectotherplayers']}"
+                value="#{msg['button.selectotherplayers']} #{4 - courseC.round.roundPlayers} joueurs"
                
                 style="float:left">
             </p:commandButton>
-    <!--   disabled="#{empty courseC.selectedPlayersMatchPlay}" -->
-    
-    
-        <p:commandButton id="toggler" 
+
+    <p:commandButton id="toggler" 
                      type="button"
                      value="Columns"
                      style="float:right"
@@ -52,8 +47,7 @@
         <p:columnToggler id="colToggler"
                      datasource="table_players"
                      trigger="toggler" />
-       <h1>#{msg["message.playerslist"]}</h1>
-  <!--  -->
+        <h:outputText escape="false" value="#{msg['message.playerslist']}" />
 </f:facet>
 
 <p:column
@@ -72,7 +66,7 @@
      footerText="Select"
           />
   <p:ajax event="rowSelectCheckbox" 
-             listener="#{courseC.rowPlayerSelect()}"
+             listener="#{courseC.rowPlayerSelect}"
              update=":selectPlayers:table_players"
        />
 
@@ -83,8 +77,8 @@
 -->
 	<p:column id="colPlayerSelected"
                   toggleable="false"
-                  headerText="#{msg['player.selected']}"
-                  footerText="#{msg['player.selected']}"
+                  headerText="#{msg['player.other.selected']}"
+                  footerText="#{msg['player.other.selected']}"
                   style="width:5%" >
             <h:outputText value="#{c.idplayer}" />
          </p:column>
@@ -125,7 +119,7 @@
 	<p:column headerText="#{msg['player.country']}"
                   footerText="#{msg['player.country']}"
                   style="width:15%" >
-            <h:outputText value="#{c.playerCity}" />   <!-- à corriger -->
+            <h:outputText value="#{c.playerCity}" />
 	</p:column>
 
         <p:column headerText="#{msg['message.modification']}"
@@ -136,11 +130,8 @@
                         </h:outputText>
         </p:column>
 
-<f:facet name="footer">
-facet
-</f:facet>
 </p:dataTable>
-
+<!--
 <p:dialog header="Selected Players"
           widgetVar="multiPlayerDialog"
           modal="true"
@@ -155,8 +146,7 @@ facet
             </ui:repeat>
         </p:outputPanel>
     </p:dialog>
-
-
+-->
 </h:form>
 </ui:define>
 </ui:composition>

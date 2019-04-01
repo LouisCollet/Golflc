@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      
+      template="templates/masterTemplate.xhtml"
+>
+   <!-- following snippet shows a view parameter which only
+   accepts non null Strings that are at least 3 characters long
+   There's nothing really fancy going on here. When a GET request
+   like localhost:8080/mypage?fooId=1 is processed,
+   setFooId() is called,
+   and when the page is rendered getFooId() is called
+  
+    -->
+
+
+<ui:define name="title">Club Page </ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_club.xhtml"/>
+</ui:define>
+<ui:define name="content">
+<h:graphicImage library="images" name="golf_club.jpg" alt="image missing :golf_club.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage library="images" name="golf_club.jpg" alt="image missing :golf_club.jpg" style="float: right;"></h:graphicImage>
+<h:form id="trade-order-form">
+        <!--... todo: put some form fields here ...-->
+        <p:commandButton value="Place Trade Order"
+                         widgetVar="placeOrderButton"
+                         actionListener="#{tradeOrderView.placeOrder}"
+                         onstart="PF('placeOrderButton').disable();PF('progressPanel').show();"
+                         oncomplete="PF('placeOrderButton').enable();PF('progressPanel').close();"/>
+        <br/><br/>
+        <p:panel widgetVar="progressPanel"
+                 visible="false"
+                 style="border:none;"
+                 closable="true"
+                 toggleable="true">
+            <p:progressBar style="height:20px;width:400px;"
+                           mode="indeterminate"/>
+        </p:panel>
+    </h:form>
+
+
+</ui:define>
+</ui:composition>

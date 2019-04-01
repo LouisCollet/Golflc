@@ -43,7 +43,7 @@ import javax.servlet.ServletContext;
 import lc.golfnew.LanguageController;
 import static org.apache.commons.lang3.StringUtils.repeat;
 import org.primefaces.PrimeFaces;
-import org.primefaces.context.RequestContext;
+//import org.primefaces.context.RequestContext;
 //import org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8;
 /**
  *
@@ -168,7 +168,10 @@ public static void delayLC() {// throws InterruptedException, ExecutionException
 }
 public static LocalDateTime DatetoLocalDateTime(java.util.Date date){
 try{
- //       LOG.info("entering DatetoLocalDateTime with Date = " + date);
+   //    LOG.info("entering DatetoLocalDateTime with Date = " + date);
+       if(date == null){
+          return null;
+       }
         return date.toInstant()
                    .atZone(ZoneId.systemDefault())
                    .toLocalDateTime();
@@ -181,19 +184,40 @@ try{
 }
 public static java.sql.Date LocalDateTimetoSqlDate(LocalDateTime date){
 try{
-    //    LOG.info("entering LocalDateTimetoSqlDate with Date = " + date);
-        LocalDateTime ldt = date;
-        return java.sql.Date.valueOf(ldt.toLocalDate());
+        LOG.info("entering LocalDateTimetoSqlDate with Date = " + date);
+        if(date == null){
+          return null;
+        }
+        return java.sql.Date.valueOf(date.toLocalDate());
  }catch(Exception e){
-   String msg = "£££ Exception in LocalDateTimetoSqlDate = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   String msg = "£££ Exception in LocalDateTimetoSqlDate = " + e.getMessage();
    LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;
   }
 }
+public static LocalDate LocalDateTimetoLocalDate(LocalDateTime date){
+try{
+        LOG.info("entering LocalDateTimetoLocalDate with date = " + date);
+        if(date == null){
+          return null;
+        }
+        return date.toLocalDate();
+ }catch(Exception e){
+   String msg = "£££ Exception in LocalDateTimetoLocalDate = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+}
+
+
 public static LocalDate DatetoLocalDate(java.util.Date date){
   try{
       LOG.info("entering DatetoLocalDate with Date = " + date);
+      if(date == null){
+          return null;
+      }
         return date.toInstant()
                    .atZone(ZoneId.systemDefault())
                    .toLocalDate();
@@ -237,8 +261,7 @@ public static LocalDate DatetoLocalDate(java.util.Date date){
         throw new UnsupportedOperationException("Don't know hot to convert " + date.getClass().getName() + " to java.util.Date");
     }
 
-public static java.sql.Date getSqlDate(java.util.Date dat)
-{
+public static java.sql.Date getSqlDate(java.util.Date dat){
        // LOG.debug("calendar date input = " + dat);
 ////    java.sql.Date d = new java.sql.Date(dat.getTime()); 
 
@@ -246,8 +269,8 @@ public static java.sql.Date getSqlDate(java.util.Date dat)
   return new java.sql.Date(dat.getTime());
 }
   //Then the conversion from java.util.Date to java.sql.Date is quite simple:
-public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat) // java.sql.Date : mod 09/05/2013
-{
+public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat){
+
     /*The biggest difference between java.sql.Date and java.sql.Timestamp
     is that the java.sql.Date only keeps the date, not the time,
     of the date it represents. So, for instance,
@@ -345,8 +368,7 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
    return dDouble;
 }
 
-  public static Double myRound(Double value, int decimalPlaces)
-{
+  public static Double myRound(Double value, int decimalPlaces){
     //methodName = Thread.currentThread().getStackTrace()[1].getMethodName();
     if (decimalPlaces > 17)
         {return value;}
@@ -412,8 +434,7 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
     StringBuilder sb2 = new StringBuilder(); // new
   //  sb2 = sb2.append(table).append(" VALUES (");
     sb2.append("INSERT INTO ").append(table).append(" VALUES (");
-    for(int i=0; i<times; i++)
-    {
+    for(int i=0; i<times; i++){
         sb.append("?,");
     }
     //LOG.info("sb capacity = " + sb.capacity());
@@ -434,6 +455,7 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
         sb.append("?,"); // = parameters placeholders, one par field
     }
     sb.deleteCharAt(sb.lastIndexOf(",")).append(");"); // delete dernière virgule
+ //   LOG.info("generated sb = " + sb);
     return sb.toString();
 }
   
@@ -759,7 +781,7 @@ try{
        if(someKey.equals("")){
            someKey = "???";
        } 
-       LOG.info("bean internationalisation key found = " + someKey);
+  //     LOG.info("bean internationalisation key found = " + someKey);
        
        return someKey;
  }catch (java.util.MissingResourceException mr){
@@ -775,77 +797,39 @@ try{
    }     
 } // end method
 
-// défini plus haut
- //@Inject private FacesContext fc;
-//  @Inject private Flash flash;
-//  @Inject private ExternalContext ec;
-/*
-public static void showMessageFatalOld(String summary){
-    try{
-       LOG.info("entering showMessageFatalOld " + FacesContext.getCurrentInstance() );
-  //     fc = new FacesContext();
- 
-        LOG.info("fc = " + fc.toString());
-       if(RequestContext.getCurrentInstance() == null){
-            LOG.info("RequestContext.getCurrentInstance() == null");   
-    //        RequestContext.getCurrentInstance().execute("{alert('Welcome user - showMessageFatal error!')}");
-        }
-    //   FacesContext fc = FacesContext.getCurrentInstance();
-   //    fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
-      LOG.info("line 01");
-       PrimeFaces pf = PrimeFaces.current();
-       //execute javascript oncomplete
-   //    pf.executeScript("PrimeFaces.info('Hello from the Backing Bean');");
-       if (pf.isAjaxRequest()) {
-         // pf.ajax().update("...");
-  //       LOG.info("this is an AjaxRequest !!");
-        }
-        LOG.info("line 02");
-       if(fc != null){ //JSF session, fc is null for  BATCH sessions
-          //  fc.getExternalContext().getFlash().setKeepMessages(true);
-     //       ec.getFlash().setKeepMessages(true);
-                LOG.info("fc not null - line 03");
-            flash.setKeepMessages(true);
-                LOG.info("line 04");
-            FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary," (Application GolfLC)");
-            fc.addMessage(null, facesMsg);
-             LOG.info("line 04");
-//         rc.showMessageInDialog(facesMsg); // new 20/07/2015
-        //    PrimeFaces.current().dialog().showMessageDynamic(facesMsg);
-            pf.dialog().showMessageDynamic(facesMsg);
-       }else{   // fc is null for  BATCH sessions alert('Welcome user - omnifaces msg!'
-           LOG.info("fc = null - messageFatal this is a batch execution " + summary);
-      //    rc.execute("PrimeFaces.info('Hello from the Backing Bean');");
-           pf.executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
-       }
-  }catch (Exception cv) {
-            String msg = "£££ Exception in addMessageFatal = " + cv;
-            LOG.error(msg);
-   }     
-} // end method
-*/
 
 public static void showMessageFatal(String summary){
     try{
- ////       LOG.info("entering showMessageFatal " + FacesContext.getCurrentInstance() );
- //       if(RequestContext.getCurrentInstance() == null){
- //           LOG.info("RequestContext.getCurrentInstance() == null");   
-    //     RequestContext.getCurrentInstance().execute("{alert('Welcome user - showMessageFatal error!')}");
-  //      }
        FacesContext fc1 = FacesContext.getCurrentInstance();
- //      fc.getExternalContext().getFlash().setKeepMessages(true); // afficher message si redirection redirect=true
-//        LOG.info("face context batch" + FacesContext.getCurrentInstance().getApplication());
-////    RequestContext rc = RequestContext.getCurrentInstance();
- //      PrimeFaces pf = PrimeFaces.current();
- //      if (pf.isAjaxRequest()) {
- //        // pf.ajax().update("...");
- //        LOG.info("this is an AjaxRequest !!");
-   //     }
        if(fc1 != null){ //JSF session, 
             fc1.getExternalContext().getFlash().setKeepMessages(true);
+            summary = "<h3>" + summary + "</h3>";  // new 18-02-2019
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary," (Application GolfLC)");
             fc1.addMessage(null, facesMsg);
-            PrimeFaces.current().dialog().showMessageDynamic(facesMsg);
+         //   PrimeFaces.current().dialog().showMessageDynamic(facesMsg);
+            showDialogFatal(facesMsg);
+            
+       }else{ //fc is null for BATCH sessions
+           LOG.info("messageFatal this is a batch execution " + summary);
+           PrimeFaces pf = PrimeFaces.current();
+           pf.executeScript("{alert('Welcome user - showMessageFatal error!')}");
+         //  PrimeFaces.current().executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
+       }
+  }catch (Exception cv){
+            String msg = "£££ Exception in addMessageFatal = " + cv;
+            LOG.error(msg);
+ //           return false;
+        }     
+} // end method
+public static void showMessageFatal2(String summary, String summary2){
+    try{
+       FacesContext fc1 = FacesContext.getCurrentInstance();
+       if(fc1 != null){ //JSF session, 
+            fc1.getExternalContext().getFlash().setKeepMessages(true);
+            summary = "<h3>" + summary + "</h3>";  // new 18-02-2019
+            FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary,summary2);
+            fc1.addMessage(null, facesMsg);
+            showDialogFatal(facesMsg);
        }else{ //fc is null for BATCH sessions
            LOG.info("messageFatal this is a batch execution " + summary);
            PrimeFaces pf = PrimeFaces.current();
@@ -858,7 +842,6 @@ public static void showMessageFatal(String summary){
  //           return false;
         }     
 } // end method
-
 public static void showMessageInfo(String summary)
 {
    // https://stackoverflow.com/questions/13685633/how-to-show-faces-message-in-the-redirected-page
@@ -868,11 +851,11 @@ public static void showMessageInfo(String summary)
         
 try{
        FacesContext fc = FacesContext.getCurrentInstance();
-       RequestContext rc = RequestContext.getCurrentInstance();
+//       RequestContext rc = RequestContext.getCurrentInstance();
  // https://stackoverflow.com/questions/13685633/how-to-show-faces-message-in-the-redirected-page
   //     fc.getExternalContext().getFlash().setKeepMessages(true); // new 24/07/2017 forcer affichage messages si redirection ex: dans 
-       if(fc != null)
-       {
+       if(fc != null){
+            summary = "<h2>" + summary + "</h2>";  // new 18-02-2019
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_INFO,summary," (Application GolfLC)");
             fc.getExternalContext().getFlash().setKeepMessages(true); // new 24/07/2017 forcer affichage messages si redirection e
             fc.addMessage(null, facesMsg);
@@ -889,12 +872,9 @@ try{
         }
 } //end method
 
-public static void showDialogInfo(String summary)
-{
+public static void showDialogInfo(String summary){
 try{
-       RequestContext rc = RequestContext.getCurrentInstance();
        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, summary," (Application GolfLC)");
-    //   rc.showMessageInDialog(msg);  // deprecated
        PrimeFaces.current().dialog().showMessageDynamic(msg);
 }catch(Exception cv){
        String msg = "£££ Exception in showDialogInfo = " + cv;
@@ -902,16 +882,14 @@ try{
         }
 } //end method
 
-public static void showDialogFatal(String summary)
-{
+public static void showDialogFatal(FacesMessage msg){
 try{
-       RequestContext rc = RequestContext.getCurrentInstance();
-       FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_FATAL, summary," (Application GolfLC)");
-//       rc.showMessageInDialog(msg);  // deprecated
+      
+   //    FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_FATAL, summary," (Application GolfLC)");
        PrimeFaces.current().dialog().showMessageDynamic(msg);
-}catch(Exception cv){
-       String msg = "£££ Exception in showDialogFatal = " + cv;
-            LOG.error(msg);
+ }catch(Exception cv){
+       String err = "£££ Exception in showDialogFatal = " + cv;
+            LOG.error(err);
         }
 } //end method
 
@@ -1381,11 +1359,15 @@ LOG.info("removeNull1D output = " + Arrays.deepToString(arr1d));
             for(String s: arr1d){
                 if(s != null && s.length() > 0) {   // isEmpty() ?
                     list1d.add(s);
+                }else{
+      //              LOG.info("s = " + s); // new 18/02/2019
                 }
             }
             // you will possibly not want empty arrays in your 2d array so I removed them
             if(list1d.size() > 0){
                 list2d.add(list1d);
+            }else{
+      //          LOG.info("list1d.size = 0");
             }
         }
         String[][] cleanArr = new String[list2d.size()][];
@@ -1565,7 +1547,7 @@ public static String extractHHmm (String sunris) {
           LOG.info("AMPM = " + ampm);
       if(ampm.equals("PM")){
             LOG.info("hours = PM ");
-          int h = Integer.valueOf(hours) + 12;
+          int h = Integer.parseInt(hours) + 12;
           hours = String.valueOf(h);
           LOG.info("PM hours corrected = " + hours);
       }else{
@@ -1616,6 +1598,16 @@ public static String extractHHmm (String sunris) {
         return target;
     }
 
+  public static String[][] cloneStringArray2D(String[][] src) {
+      //deep copy of non-primitive arrays type, OPPOSITE to shallow copy
+    String[][] dst = new String[src.length][];
+    for (int i = 0; i < src.length; i++) {
+        dst[i] = Arrays.copyOf(src[i], src[i].length);
+    }
+    return dst;
+}
+
+    
 public static void main(String[] args) throws Exception{ // throws IOException,Exception
 /*
      MapToArrayExample mapToArrayExample = new MapToArrayExample();

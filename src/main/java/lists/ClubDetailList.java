@@ -14,7 +14,7 @@ import utils.LCUtil;
 public class ClubDetailList implements interfaces.Log{
     private static List<ECourseList> liste = null;
 
-public List<ECourseList> detailList(Club club, final Connection conn) throws SQLException{
+public List<ECourseList> list(Club club, final Connection conn) throws SQLException{
 if(liste == null){
         LOG.info(" ... entering ClubDetailList !! ");
         LOG.info(" ... entering ClubDetailList with club = " + club);
@@ -106,4 +106,27 @@ String query =
     public static void setListe(List<ECourseList> liste) {
         ClubDetailList.liste = liste;
     }
+    
+         public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+  try{
+     //   Player player = new Player();
+     //   player.setIdplayer(324713);
+     //   Round round = new Round(); 
+     //   round.setIdround(300);
+     Club club = new Club();
+     club.setIdclub(101);
+     List<ECourseList> ec = new ClubDetailList().list(club, conn);
+        LOG.info("from main, ec = " + ec);
+ }catch (Exception e){
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+      //      LCUtil.showMessageFatal(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
+    
+    
+    
 } //end class

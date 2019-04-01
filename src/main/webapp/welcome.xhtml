@@ -27,7 +27,7 @@
     columns="2" >
 
 <f:facet name="header">
-    <h1>#{msg['message.welcome']}</h1>
+    <h:outputText escape="false" value="#{msg['message.welcome']}" />
 </f:facet>
         <h:outputText value="#{courseC.player.playerFirstName}" style="font-weight:bold" />
         <h:outputText value="#{courseC.player.playerLastName}" style="font-weight:bold" />

@@ -7,29 +7,24 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class ModifyPlayerPhotoLocation implements interfaces.Log, interfaces.GolfInterface
-{
-     public String updateRecordFromPlayer(Player player, Connection conn) throws SQLException        
-{
+public class ModifyPlayerPhotoLocation implements interfaces.Log, interfaces.GolfInterface{
+    
+  public String updateRecordFromPlayer(Player player, Connection conn) throws SQLException{
     PreparedStatement ps = null;
-try
-{
+try{
         LOG.info("starting update photolocation for. = " + player.getIdplayer() + " photolocation = " 
                                             + player.getPlayerPhotoLocation() );
     String query = "UPDATE player "
             + " SET PlayerPhotoLocation = ? "
             + " WHERE idplayer = ?";
     ps = conn.prepareStatement(query);
-    //
     ps.setString(1,player.getPlayerPhotoLocation());
-//    ps.setInt(2,Integer.parseInt(player.getIdplayer()) );
     ps.setInt(2,player.getIdplayer());
-         //    String p = ps.toString();
          utils.LCUtil.logps(ps);
    int row = ps.executeUpdate();
-      if (row!=0)
-        { //LOG.info("-- successful UPDATE player " + upload.getIdplayer());
-        String msg = "<br/><h1>Successful UPDATE </h1> file = " + player.getPlayerPhotoLocation()
+      if (row!=0){ 
+//LOG.info("-- successful UPDATE player " + upload.getIdplayer());
+        String msg = "<br/>Successful UPDATE file = " + player.getPlayerPhotoLocation()
                 + "<br/> for player = " + player.getIdplayer();
             LOG.info(msg);
             LCUtil.showMessageInfo(msg);
@@ -42,7 +37,7 @@ try
   //        return null;
         }
 }catch (SQLException e){
-    String msg = "SQL Exception in update player = " + e.toString() + ", SQLState = " + e.getSQLState().toString()
+    String msg = "SQL Exception in update player = " + e.toString() + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
@@ -55,7 +50,5 @@ try
 }finally{
         DBConnection.closeQuietly(null, null, null, ps);
 }
-
 } //end method
-
 } //end class

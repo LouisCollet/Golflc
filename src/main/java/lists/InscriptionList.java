@@ -4,6 +4,7 @@ import entite.Club;
 import entite.Course;
 import entite.ECourseList;
 import entite.Round;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,8 +14,7 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class InscriptionList implements interfaces.Log
-{
+public class InscriptionList implements interfaces.Log{
     private static List<ECourseList> liste = null;
     
 public List<ECourseList> getInscriptionList(final Connection conn) throws SQLException{
@@ -56,8 +56,7 @@ String query =
         rs.beforeFirst(); //on replace le curseur avant la première ligne
         liste = new ArrayList<>();
           //LOG.info("just before while ! ");
-	while(rs.next())
-       {
+	while(rs.next()){
 			//LOG.info("just after while ! ");
           ECourseList ecl = new ECourseList(); // liste pour sélectionner un round player = entite.Player.mapPlayer(rs);
           Club c = new Club();
@@ -106,4 +105,23 @@ String query =
     public static void setListe(List<ECourseList> liste) {
         InscriptionList.liste = liste;
     }
+    
+  public static void main(String[] args) throws SQLException, Exception {// testing purposes
+    Connection conn = new DBConnection().getConnection();
+  //  Player player = new Player();
+  //  player.setIdplayer(324713);
+  //  Round round = new Round(); 
+  //  round.setIdround(260);
+  //  Club club = new Club();
+  //  club.setIdclub(1006);
+    List<ECourseList> p1 = new InscriptionList().getInscriptionList(conn);
+        LOG.info("Inscription list = " + p1.toString());
+    DBConnection.closeQuietly(conn, null, null, null);
+
+}// end main
+    
+    
+    
+    
+    
 } //end class

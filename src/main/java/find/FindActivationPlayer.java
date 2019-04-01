@@ -120,18 +120,11 @@ finally
 }
 } //end method
 
-public static void main(String[] args) throws SQLException, Exception, Throwable // testing purposes
-{
-    LOG.info("Input main = ");
-    DBConnection dbc = new DBConnection();
-    Connection conn = dbc.getConnection();
-    FindActivationPlayer  fap = new FindActivationPlayer();
-  //  Player player = new Player();
-    Player player = fap.findActivationPlayer(conn, "b03cfec9-974d-4e54-bc04-2810a5bf13c0");
+public static void main(String[] args) throws SQLException, Exception, Throwable {// testing purposes
+    Connection conn = new DBConnection().getConnection();
+    Player player = new FindActivationPlayer().findActivationPlayer(conn, "b03cfec9-974d-4e54-bc04-2810a5bf13c0");
         LOG.info("after call = " + player.toString());
-
-DBConnection.closeQuietly(conn, null, null, null);
-
+    DBConnection.closeQuietly(conn, null, null, null);
 }// end main
     
 } // end Class

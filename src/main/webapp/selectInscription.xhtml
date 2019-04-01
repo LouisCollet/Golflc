@@ -77,24 +77,22 @@
                   style="width:15%"
                   id="rdate">
                   <h:outputText value="#{c.round.roundDate}"
-                                
                                 > 
                       <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
                   </h:outputText>
-            
 	</p:column>
-
+<!-- enlevé 18/02/2019
     	<p:column headerText="#{msg['round.tarif']}"
                   footerText="#{msg['round.tarif']}"
                   style="width:20%" >
             <p:commandButton
                 id="selectButtonTarif"
-                action="#{courseC.findTarifGreenfee(c)}"
+                action="#{courseC.findTarifGreenfeeEcl(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="fa fa-dollar fa-lg">
             </p:commandButton>
 	</p:column>
-
+-->
 <!-- new 13/11/2017-->
         <p:column headerText="#{msg['round.canceled']}"
                   footerText="#{msg['round.canceled']}"

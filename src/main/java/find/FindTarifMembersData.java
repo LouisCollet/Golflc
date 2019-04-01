@@ -16,9 +16,7 @@ public class FindTarifMembersData implements interfaces.Log, interfaces.GolfInte
     
 final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
- //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
- 
- 
+
 public TarifMember findTarif(final Club club, final Connection conn) throws SQLException{
         final String METHODNAME = Thread.currentThread().getStackTrace()[1].getMethodName();
         LOG.info("entering " + CLASSNAME+"."+METHODNAME + " ...");
@@ -38,13 +36,12 @@ try{
         rs =  ps.executeQuery();
         rs.last(); //on récupère le numéro de la ligne
             LOG.info("ResultSet " + CLASSNAME +  " has " + rs.getRow() + " lines.");
-        if(rs.getRow() == 0)
-            { //  String msg = " -- No tarif found for this course = ";
-                String msgerr =  LCUtil.prepareMessageBean("tarif.notfound");
-                LOG.error(msgerr);
-                LCUtil.showMessageFatal(msgerr);
+        if(rs.getRow() == 0){ 
+                String err =  LCUtil.prepareMessageBean("tarif.notfound");
+                err = err + " findTarif " + club.getClubName() + " / " + club.getIdclub();
+                LOG.error(err);
+                LCUtil.showMessageFatal(err);
                 return null;
-            //    throw new Exception(msg);
             }
  //       if(rs.getRow() > 1)
  //           {   throw new Exception(" -- More than 1 tarif = " + rs.getRow() );  }
@@ -56,12 +53,12 @@ try{
 	}
 
    ObjectMapper om = new ObjectMapper();
-   om.registerModule(new JavaTimeModule()); // handle LocalDateTime
+   om.registerModule(new JavaTimeModule()); // important !! handle LocalDateTime  cherché lontemps ...
  //       LOG.info("line 03");
   //https://stackoverflow.com/questions/48868034/cannot-construct-instance-of-java-time-localdate-spring-boot-elasticseach
         TarifMember tm = om.readValue(s,TarifMember.class);
             LOG.info("TarifMember extracted from database = "  + tm.toString());
-            LOG.info("length = " + tm.getMembersBase().length);
+            LOG.info("nombre d'items MembersBase = " + tm.getMembersBase().length);
         return tm;
 }catch (SQLException e){
     String msg = "SQL Exception for " + METHODNAME + " " + e.toString() + ", SQLState = " + e.getSQLState()

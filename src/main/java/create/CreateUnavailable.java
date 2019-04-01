@@ -1,11 +1,14 @@
 package create;
 
+import entite.ECourseList;
+import entite.Round;
 import entite.Unavailable;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 import javax.inject.Named;
 import utils.DBConnection;
 import utils.LCUtil;
@@ -13,17 +16,11 @@ import utils.LCUtil;
 @Named
 public class CreateUnavailable {
 
-    public boolean create(final Unavailable unavailable, final Connection conn) throws SQLException {
+    public boolean create(final Unavailable unavailable, Round round, final Connection conn) throws SQLException {
         PreparedStatement ps = null;
         try{
             LOG.info("starting create Unavailable "); 
             LOG.info("with unavailable = " + unavailable.toString());
-    //        LOG.info("for club = " + club.toString());
-   //         if(club.getIdclub() == null){
-                // for testing purposes
-   //             LOG.info("clubid was null, forced to La Tournette");
-    //            club.setIdclub(101); // la tournette
-   //         }
  // validations           
             if(unavailable.getEndDate().isBefore(unavailable.getStartDate()) ){ 
                 String msgerr =  LCUtil.prepareMessageBean("tarif.member.endbeforestart");
@@ -46,12 +43,27 @@ public class CreateUnavailable {
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
              LOG.info("row  = " + row);
-               String msg = "<h1>Unavailable Created for"
+             if (row != 0){
+               String msg = "Unavailable Created for"
                         + "<br/>Course = " + unavailable.getIdcourse();
                  //       + " / " + club.getClubName();
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
+   //  vérification si des rounds sont réservés pour la période d'indisponibilité
+                List<ECourseList> ecl = new find.FindCancellation().find(unavailable,round,conn);
+         // les joueurs sont prévenus par mail
+                boolean b = new mail.CancellationMail().dispatch(ecl);
+        //  a faire : stocker les infos dans une table
+        // qui sera accessible par l'admnistrateur local du club
              return true;
+            }else{
+                String msg = "<br/><br/>NOT NOT Successful insert for unavailable = " ;
+         //               + " " + s;
+                LOG.info(msg);
+                LCUtil.showMessageFatal(msg);
+                return false;
+            }
+ 
    } catch (Exception e) {
             String msg = "£££ Exception in CreateUnavailable = " + e.getMessage();
             LOG.error(msg);

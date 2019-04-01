@@ -40,7 +40,7 @@ however this is a fallback and will be removed in future releases.
 see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
 -->
 <f:facet name="header">
-    <h1>#{msg['message.selectclub.modify']}</h1>
+    <h:outputText escape="false" value="#{msg['message.selectclub.modify']}" />
 </f:facet>
 
 <p:column
@@ -132,7 +132,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                   footerText="#{msg['tee.start']}"
                   style="width:10%"
                   >
-		#{c.tee.teeStart} (#{c.tee.teeGender})
+		#{c.tee.teeStart}/#{c.tee.teeGender}/#{c.tee.teeHolesPlayed}
 	</p:column>
 
 	<p:column headerText="#{msg['tee.modify']}"

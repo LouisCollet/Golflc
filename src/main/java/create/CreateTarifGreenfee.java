@@ -20,17 +20,16 @@ import utils.LCUtil;
 public class CreateTarifGreenfee {
     
 //@JsonPropertyOrder({"datesSeason","days","teeTimes","priceEquipments"}) // new 23/01/2019 ajouté, était dans entite TarifGreenfee
-    public boolean createTarif(final TarifGreenfee tarif, final Course course, final Connection conn) throws SQLException {
+    public boolean create(final TarifGreenfee tarif, final Course course, final Connection conn) throws SQLException {
         PreparedStatement ps = null;
         try{
             LOG.info("starting create Tarif "); 
             LOG.info("with tarif = " + tarif.toString());
             LOG.info("for course = " + course.toString());
         ObjectMapper om = new ObjectMapper();
-   // 	om.enable(SerializationFeature.INDENT_OUTPUT);//Set pretty printing of json
         om.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-        om.configure(SerializationFeature.INDENT_OUTPUT, true);
-         tarif.RemoveNull(); // remove null from arrays
+        om.configure(SerializationFeature.INDENT_OUTPUT, true);//Set pretty printing of json
+        tarif.RemoveNull(); // remove null from arrays
         String json = om.writeValueAsString(tarif);
             LOG.info("tarif converted in json format = " + json);
             
@@ -40,37 +39,56 @@ public class CreateTarifGreenfee {
    //     conn = DBConnection.getConnection();
    LOG.info(" tarif : DatesSeason =  " + Arrays.deepToString(tarif.getDatesSeason()));
    LOG.info(" tarif : DatesSeason length =  " + tarif.getDatesSeason().length);
-   LOG.info(" tarif : Days =  " + tarif.getDays().length);
-   LOG.info(" tarif : Hours =  " + tarif.getTeeTimes().length);
-   LOG.info(" tarif : Equipment =  " + tarif.getPriceEquipments().length);
+   if(tarif.getDatesSeason().length == 0){
+       String msgerr = LCUtil.prepareMessageBean("create.greenfee.season.empty");
+       LOG.error(msgerr);
+       LCUtil.showMessageFatal(msgerr);
+        return false;
+     }
+      if(tarif.getPriceEquipments().length == 0){
+       String msgerr = LCUtil.prepareMessageBean("create.greenfee.equipments.empty");
+       LOG.error(msgerr);
+       LCUtil.showMessageFatal(msgerr);
+       return false;
+     }
+      
+   LOG.info(" length : Seasons =  " + tarif.getDatesSeason().length);
+   LOG.info(" length : Days =  " + tarif.getDays().length);
+   LOG.info(" length : Hours =  " + tarif.getTeeTimes().length);
+   LOG.info(" length : Equipment =  " + tarif.getPriceEquipments().length);
+   LOG.info(" length : Greenfee =  " + tarif.getPriceGreenfees().length);
+   
    if(tarif.getDatesSeason().length == 0 
      && tarif.getDays().length == 0
      && tarif.getTeeTimes().length == 0
-     && tarif.getPriceEquipments().length == 0)
-     {
-       String msgerr =  LCUtil.prepareMessageBean("tarif.empty");
+     && tarif.getPriceEquipments().length == 0
+     && tarif.getPriceGreenfees().length == 0){
+       String msgerr =  LCUtil.prepareMessageBean("create.greenfee.empty");
        LOG.error(msgerr);
        LCUtil.showMessageFatal(msgerr);
        throw new Exception(msgerr);
      }
-   
+   LOG.info("line 01");
    java.util.Date ddeb = SDF.parse(tarif.getDatesSeason()[0][0]);  // première ligne, première colonne
-        LOG.info("Date ddeb = " + ddeb);
+        LOG.info("Date format ddeb = " + ddeb);
    LocalDateTime lddeb = utils.LCUtil.DatetoLocalDateTime(ddeb);
-        LOG.info("LocalDateTime ddeb = " + lddeb);
+        LOG.info("LocalDateTime format ddeb = " + lddeb);
+   tarif.setDatesSeason(utils.LCUtil.removeNull2D(tarif.getDatesSeason()));  // sinon sernière date = null donc 01-01-1970
    int le = tarif.getDatesSeason().length;
-   java.util.Date dfin = SDF.parse(tarif.getDatesSeason()[le - 1][1]);  // dernière ligne, 2e colonne
-//        LOG.info("LocalDateTime date dernière date = " + dfin);
+   java.util.Date dfin = SDF.parse(tarif.getDatesSeason()[le - 1][1]);  // dernière ligne, 2e colonne=date de fin
+     LOG.info("Date format dfin from dernière ligne = " + dfin);
    LocalDateTime ldfin = utils.LCUtil.DatetoLocalDateTime(dfin);
-        LOG.info("LocalDateTime dfin = " + ldfin);
+        LOG.info("LocalDateTime format dfin = " + ldfin);
       
    final String query = LCUtil.generateInsertQuery(conn, "tarif_greenfee");
     //        LOG.info("generated query = " + query);
             ps = conn.prepareStatement(query);
             ps.setNull(1,java.sql.Types.INTEGER);  //autoincrement
                java.sql.Timestamp ts = Timestamp.valueOf(lddeb);
+               LOG.info("ts lddeb = " + ts.toString() );
             ps.setTimestamp(2,ts);
                ts = Timestamp.valueOf(ldfin);
+               LOG.info("ts ldfin = " + ts.toString() );
             ps.setTimestamp(3,ts);
             ps.setInt(4,course.getIdcourse()); 
             ps.setString(5,json);
@@ -79,11 +97,11 @@ public class CreateTarifGreenfee {
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
              LOG.info("row  = " + row);
-               String msg = "<br/><br/><h1>Tarif Created for = "
+               String msg = "Tarif Created for = "
                   //      + course.getIdcourse() + "</h1>"
                         // + "<br/>name club = " + club.getClubName()
-                        + "<br/>Course = " + course.getIdcourse()
-                        + " / " + course.getCourseName();
+                        + " Course = " + course.getIdcourse()
+                        + "(" + course.getCourseName() + ")";
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
              return true;

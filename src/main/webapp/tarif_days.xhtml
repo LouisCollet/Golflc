@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<ui:composition
+<html
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -10,12 +10,9 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:pe="http://primefaces.org/ui/extensions"
       xmlns:cc="http://xmlns.jcp.org/jsf/composite"
-      xmlns:o="http://omnifaces.org/ui"
-      xmlns:of="http://omnifaces.org/functions"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
-      template="templates/masterTemplate.xhtml"
 >
-
+<ui:composition template="templates/masterTemplate.xhtml">
 <ui:define name="title">Tarif Page Days</ui:define>
 
 <ui:define name="help">
@@ -24,12 +21,12 @@
 
 <ui:define name="content">
 
-<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:graphicImage name="images/days1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/days2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
 <h:form id="tarifDays" enctype="application/x-www-form-urlencoded" >
 
 <ui:include src="include/include_summary_club.xhtml"/>
-<p:focus for="startdate" />
+<!--<p:focus for="startdate" />-->
 <p:panelGrid
     id="panel1"
     columns="4"
@@ -37,9 +34,10 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.days.tarif']}</h1>
+     <h:outputText escape="false" value="#{msg['title.days.tarif']}" />
+     <h:outputText value="#{playerage} - #{courseC.tarifGreenfee.inputtype}"/>
 </f:facet>
-        
+ <!--       
     <h:outputText  value="#{msg['tarif.period.start']} :"/>
        <p:inputMask id="startdate"
                     label="Start Date" 
@@ -61,6 +59,21 @@
                     mask="99/99/9999"
                     >
       	</p:inputMask>
+      -->
+     <h:outputText value="#{msg['tarif.seasons']} "/>
+             <p:selectOneButton id="Season_High-Medium-Low"
+                          required="true"
+                          value="#{courseC.tarifGreenfee.daysWrk[0][3]}"
+               >
+            <f:selectItem itemLabel="#{msg['tarif.high']}"    itemValue="H" />
+            <f:selectItem itemLabel="#{msg['tarif.medium']}"  itemValue="M" />
+            <f:selectItem itemLabel="#{msg['tarif.low']}"     itemValue="L" />
+       </p:selectOneButton>
+
+      <h:outputText value=""/>
+      <h:outputText id="index"
+         value="#{courseC.tarifGreenfee.tarifIndexDays + 1} / 3"
+        />
 
    <c:forEach var="i" begin="01" end="05" step="1">
       <h:outputText  value=""/>
@@ -74,12 +87,11 @@
        <c:forEach var="i" begin="01" end="03" step="1">
        <p:inputMask  label="Monday1"
                        id="monday${i}"
-                       value="#{courseC.tarifGreenfee.days[0][i-1]}"
+                       value="#{courseC.tarifGreenfee.daysWrk[0][i-1]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                        required="true"
-                       requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
+                       requiredMessage="#{msg['tarifGreenfee.notnull']} : line 1, col #{i}"
                        slotChar="_"
                        mask="999.9"
                        >
@@ -91,12 +103,11 @@
          <c:forEach var="i" begin="01" end="03" step="1">
             <p:inputMask  label="Week1"
                        id="week${i}"
-                       value="#{courseC.tarifGreenfee.days[1][i-1]}"
+                       value="#{courseC.tarifGreenfee.daysWrk[1][i-1]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
-                        required="true"
-                        requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                        validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
+                       required="true"
+                       requiredMessage="#{msg['tarifGreenfee.notnull']} : line 2, col #{i}"
                        slotChar="_"
                        mask="999.9"
                        >
@@ -108,12 +119,11 @@
        <c:forEach var="i" begin="01" end="03" step="1">
        <p:inputMask  label="Friday1"
                        id="friday${i}"
-                       value="#{courseC.tarifGreenfee.days[2][i-1]}"
+                       value="#{courseC.tarifGreenfee.daysWrk[2][i-1]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                         required="true"
-                        requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
+                        requiredMessage="#{msg['tarifGreenfee.notnull']} : line 3, col #{i}"
                        slotChar="_"
                        mask="999.9"
                        >
@@ -124,12 +134,11 @@
         <c:forEach var="i" begin="01" end="03" step="1">
        <p:inputMask  label="Weekend1"
                        id="weekend${i}"
-                       value="#{courseC.tarifGreenfee.days[3][i-1]}"
+                       value="#{courseC.tarifGreenfee.daysWrk[3][i-1]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                         required="true"
-                        requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
+                        requiredMessage="#{msg['tarifGreenfee.notnull']} : line 4, col #{i}"
                        slotChar="_"
                        mask="999.9"
                        >
@@ -140,12 +149,11 @@
        <c:forEach var="i" begin="01" end="03" step="1">
        <p:inputMask  label="Holidays1"
                        id="holidays${i}"
-                       value="#{courseC.tarifGreenfee.days[4][i-1]}"
+                       value="#{courseC.tarifGreenfee.daysWrk[4][i-1]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
-                        required="true"
-                        requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
+                       required="true"
+                       requiredMessage="#{msg['tarifGreenfee.notnull']} : line 5, col #{i}"
                        slotChar="_"
                        mask="999.9"
                        >
@@ -165,17 +173,15 @@
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
+                         style="float: right;"
                          icon="fa fa-rotate-left"
-                         action="tarif_menu.xhtml"
+                         action="tarif_greenfee_menu.xhtml"
                          />
 </f:facet>
 
 </p:panelGrid>
-<!--
-<pe:tooltip global="true" myPosition="left center" atPosition="right center"
-            showEvent="focus" hideEvent="blur" styleClass="qtip-default"
-            />
--->
+
 </h:form>
 </ui:define>
 </ui:composition>
+</html>

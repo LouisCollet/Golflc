@@ -9,28 +9,24 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class LoadClub
-{
+public class LoadClub{
 
-public Club LoadClub(Connection conn, int idclub) throws SQLException
-{
+public Club load(Club club,Connection conn) throws SQLException{
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
         LOG.info("entering LoadClub");
     String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
         LOG.info("String from listMetaColumns = " + cl);
-     //   LOG.info("simple name = " + club.)
 
 final String query = "SELECT "
         + cl
         + " FROM Club"
         + " WHERE idclub = ?" ;
-     //   LOG.info("Club  = " + club.getIdclub() ); 
-        LOG.info("Selected Club  = " + idclub); 
+
+        LOG.info("Selected Club  = " + club.toString()); 
      ps = conn.prepareStatement(query);
-  //   ps.setInt(1, club.getIdclub());
-     ps.setInt(1, idclub);
+     ps.setInt(1, club.getIdclub());
      utils.LCUtil.logps(ps); 
      rs =  ps.executeQuery();
      rs.beforeFirst();
@@ -59,16 +55,13 @@ finally
 
 } //end method
 
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
-    DBConnection dbc = new DBConnection();
-    Connection conn = dbc.getConnection();
-    LoadClub lc = new LoadClub();
-    Club club = lc.LoadClub(conn, 104);
-       LOG.info(" club = " + club.toString());
-//for (int x: par )
-//        LOG.info(x + ",");
-DBConnection.closeQuietly(conn, null, null, null);
+public static void main(String[] args) throws SQLException, Exception{ // testing purposes
+    Connection conn = new DBConnection().getConnection();
+    Club club = new Club();
+    club.setIdclub(1104);
+    Club c = new LoadClub().load(club, conn);
+       LOG.info(" club = " + c.toString());
+    DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
 } // end class

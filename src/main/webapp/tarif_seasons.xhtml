@@ -15,22 +15,19 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       template="templates/masterTemplate.xhtml"
 >
-
-<ui:define name="title">Tarif Page</ui:define>
-
+<ui:define name="title">Tarif Seasons Page</ui:define>
 <ui:define name="help">
     <ui:include src="/help/help_tarif_seasons.xhtml"/>
 </ui:define>
-
 <ui:define name="content">
 
 <h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
 <h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg"  style="float: right;"></h:graphicImage>
 
 <h:form id="tarifSeasons" enctype="application/x-www-form-urlencoded" >
-<!--<ui:include src="include/include_messages.xhtml"/>-->
+
 <ui:include src="include/include_summary_club.xhtml"/>
-<p:focus for="startdate" />
+<!-- <p:focus for="startdate" /> -->
 <p:panelGrid
     id="panel1"
     columns="2"
@@ -38,34 +35,46 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.period.tarif']}</h1>
+     <h:outputText escape="false" value="#{msg['title.period.tarif']}" />
+     <h:outputText value="#{playerage} - #{courseC.tarifGreenfee.inputtype}"/>
 </f:facet>
         
-   <!--    <h:outputText value="#{msg['tarif.number']} :"   />
-       <p:inputMask
-                   label="hole num"
-                        id="holenumb"
-                        title="#{msg['tooltip.tarif.date']}"
-                        value="#{courseC.tarifGreenfee.tarifIndexSeasons}"
-                        size="3"
-                        mask="?99"
-                        />
-   -->
        <h:outputText value="#{msg['tarif.number']} :" />
        <h:outputText id="index"
                          value="#{courseC.tarifGreenfee.tarifIndexSeasons} / #{fn:length(courseC.tarifGreenfee.datesSeason)}"
                         />
-       <h:outputText value="#{msg['tarif.seasons']} :"   />
+ <!--      <h:outputText value="#{msg['tarif.seasons']} :"   />  -->
+       <h:panelGroup id="panelPrice" layout="block" >    
+     <h:outputText value="#{msg['tarif.season']} " 
+                   style="font-size: 1.5em;"/>
+     <i class="fas fa-snowflake fa-2x"></i>
+     <i class="fas fa-cloud-sun fa-2x"></i>
+     <i class="fas fa-sun fa-2x"></i>
+     </h:panelGroup>
        <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
                           value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][2]}"
                >
-            <f:selectItem itemLabel="High"  itemValue="H" />
-            <f:selectItem itemLabel="Medium"  itemValue="M" />
-            <f:selectItem itemLabel="Low"  itemValue="L" />
+            <f:selectItem itemLabel="#{msg['tarif.high']}"   itemValue="H" />
+            <f:selectItem itemLabel="#{msg['tarif.medium']}" itemValue="M" />
+            <f:selectItem itemLabel="#{msg['tarif.low']}"    itemValue="L" />
        </p:selectOneButton>
        
        <h:outputText  value="#{msg['tarif.period.start']} :"/>
+                             <p:calendar
+                        value="#{courseC.tarifGreenfee.startDate}"
+                        id="start"
+                        locale="#{languageC.locale}"
+                        mode="popup"
+                        showOn="both"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        navigator="true"
+                        yearRange="c:c+2"
+                        readonlyInput="true"
+                 />
+       
+  <!--     
        <p:inputMask id="startdate"
                     title="#{msg['tooltip.tarif.date']}"
                     value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][0]}"
@@ -76,9 +85,22 @@
                     >
 
 	</p:inputMask>
-       
+  -->     
       <h:outputText  value="#{msg['tarif.period.end']} :"/>
-             <p:inputMask id="enddate"
+                      <p:calendar
+                        value="#{courseC.tarifGreenfee.endDate}"
+                        id="end"
+                        locale="#{languageC.locale}"
+                        mode="popup"
+                        showOn="both"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        navigator="true"
+                        yearRange="c:c+2"
+                        readonlyInput="true"
+                 />
+      
+ <!--            <p:inputMask id="enddate"
                     title="#{msg['tooltip.tarif.date']}"
                     value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][1]}"
                     size="11"
@@ -87,7 +109,7 @@
                     mask="99/99/9999"
                     >
       	</p:inputMask>
-
+-->
 <!-- 
        <h:inputText id="enddate"
                     title="#{msg['tooltip.tarif.date']}"
@@ -113,7 +135,7 @@
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-rotate-left"
-                         action="tarif_menu.xhtml"
+                         action="tarif_greenfee_menu.xhtml"
                          />
 
  <!--   <p:resetInput target="@form" /> -->       

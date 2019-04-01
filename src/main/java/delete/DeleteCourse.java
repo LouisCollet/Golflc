@@ -8,8 +8,7 @@ import utils.LCUtil;
 
 public class DeleteCourse implements interfaces.Log, interfaces.GolfInterface
 {
-    public boolean deleteCourse(final int idcourse, final Connection conn) throws Exception
-    {
+    public boolean delete(final int idcourse, final Connection conn) throws Exception{
     PreparedStatement ps = null;
 try
 {       LOG.info("starting Delete Course ... = " );
@@ -23,7 +22,7 @@ try
     LCUtil.logps(ps); 
     int row_delete = ps.executeUpdate();
         LOG.info("deleted Course = " + row_delete);
-    String msg = "<br/> <h1>There are " + row_delete + " Course deleted = " + idcourse;
+    String msg = "<br/>There are " + row_delete + " Course deleted = " + idcourse;
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
         return true;
@@ -43,16 +42,12 @@ try
 }
 } //end method
    
- public static void main(String[] args) throws SQLException, Exception 
- {
-     DBConnection dbc = new DBConnection();
-     Connection conn = dbc.getConnection();
+ public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
  try{
-       LOG.info("Input main = ");
     int idcourse = 339;
- //  Date date =SDF.parse("01/01/2000");
-    DeleteCourse dc = new DeleteCourse();
-    dc.deleteCourse(idcourse, conn);
+    boolean b = new DeleteCourse().delete(idcourse, conn);
+       LOG.info("from main - resultat deleteCourse = " + b);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

@@ -13,8 +13,7 @@ import javax.validation.constraints.NotNull;
 import utils.LCUtil;
 
 @Named
-public class Hole implements Serializable, interfaces.Log
-{
+public class Hole implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
 
 @NotNull(message="Bean validation : the Hole ID must be completed")
@@ -39,17 +38,13 @@ public class Hole implements Serializable, interfaces.Log
     @Min(value=1,message="Bean validation : the Hole Index is Min 1")
     @Max(value=18,message="Bean validation : the Hole Index is Max 18")
     private Short holeStrokeIndex;
-
     private Integer tee_idtee;
-
     private Integer tee_course_idcourse;
-
     private Date holeModificationDate;
 private boolean NextHole; // 15/01/2013
 private boolean CreateModify = true; // 12/08/2017
 
-    public Hole()
-    {
+    public Hole() {
         holePar = 4; // default value radio button
         holeNumber = 1;
     }
@@ -138,23 +133,38 @@ private boolean CreateModify = true; // 12/08/2017
     }
     
  @Override
-public String toString()
-{ return 
+public String toString(){
+ try{   
+    LOG.info("starting toString Hole!");
+    return 
         (NEW_LINE + "FROM ENTITE = "+ this.getClass().getSimpleName().toUpperCase()+ NEW_LINE
                + " ,idhole : "   + this.getIdhole()
-               + " ,Hole StrokeIndex : " + this.getHoleStrokeIndex()
+               + " ,hole number: "   + this.getHoleNumber()
                + " ,Hole Par : " + this.getHolePar()
+               + " ,Hole Distance : " + this.getHoleDistance()
+               + " ,Hole StrokeIndex : " + this.getHoleStrokeIndex()
+               + " ,Hole id tee : " + this.getTee_idtee()
+               + " ,Hole id course : " + this.getTee_course_idcourse()
         );
+    }catch(Exception e){
+        String msg = "£££ Exception in Hole.toString = " + e.getMessage();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }
 
   public static Hole mapHole(ResultSet rs) throws SQLException{
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Hole h = new Hole();
+        h.setIdhole(rs.getInt("idhole"));
         h.setHoleNumber(rs.getShort("HoleNumber") );
         h.setHolePar(rs.getShort("HolePar") );
         h.setHoleDistance(rs.getShort("HoleDistance") );
         h.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
+        h.setTee_idtee(rs.getInt("tee_idtee"));
+        h.setTee_course_idcourse(rs.getInt("tee_course_idcourse"));
         return h;
   }catch(Exception e){
    String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage();

@@ -13,7 +13,7 @@ import utils.LCUtil;
 // encore à faire !! dans le futur, l'appeler à partir de create player n'est pas utilisé !!!
 // called from FindSubscriptionStatus
 public class CreateSubscription implements interfaces.Log, interfaces.GolfInterface{
-    public boolean createSubscription(final Player player, final Connection conn) throws SQLException{
+    public boolean create(final Player player, final Connection conn) throws SQLException{
         PreparedStatement ps = null;
         try {
             LOG.info("...entering createSubscription");
@@ -21,7 +21,7 @@ public class CreateSubscription implements interfaces.Log, interfaces.GolfInterf
             //LOG.info("club City  = " + club.getClubCity() );
        //     LOG.info("subscription code  = " + subscription.getSubCode());
 
-            final String query = LCUtil.generateInsertQuery(conn, "subscription"); 
+            final String query = LCUtil.generateInsertQuery(conn, "payments_subscription"); 
             ps = conn.prepareStatement(query);
             // insérer dans l'ordre de la database : 1 = first db field
             ps.setNull(1, java.sql.Types.INTEGER);

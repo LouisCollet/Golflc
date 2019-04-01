@@ -151,11 +151,10 @@ boolean b = false;
                   LOG.info("handicap = " + handicap.toString());
   //           }  
              LOG.info("write player and handicap for record = " + i);
-              create.CreatePlayer cp = new create.CreatePlayer();
-             b = cp.createPlayer(player, handicap, conn, "B");
-             LOG.info("boolean returned from create player = " + b);
-             if(b == false) // new 20/10/2014
-             {
+       //       create.CreatePlayer cp = new create.CreatePlayer();
+       //      b = new create.CreatePlayer().create(player, handicap, conn, "B");
+       //      LOG.info("boolean returned from create player = " + b);
+             if( ! new create.CreatePlayer().create(player, handicap, conn, "B")){ // new 20/10/2014
                   LOG.info("boolean returned from create player is false ==> rollback ");
                   array_return[0]= "ERROR";
                   array_return[1]= "ROLLBACK started";

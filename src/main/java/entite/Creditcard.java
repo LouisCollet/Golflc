@@ -1,10 +1,11 @@
 package entite;
 
 import enums.CardType;
-import static interfaces.GolfInterface.SDF_MM;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,13 +15,14 @@ import javax.inject.Named;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import lc.golfnew.MajorIndustryIdentifier;
+import static utils.LCUtil.showMessageFatal;
 import validator.CreditCardV;
 
 @Named
 public class Creditcard implements Serializable{
     private final static List<SelectItem> CARDS = new ArrayList<>();
     private Double totalPrice;
-    
+     private Integer idplayer;
   @NotNull(message="{creditcard.holder.notnull}")
     private String creditCardHolder;
     
@@ -41,9 +43,9 @@ public class Creditcard implements Serializable{
    private String communication;
    private String reference;
    private String typePayment;   // values : SUBSCRIPTION, GREENFEE
-   public enum etypePayment{SUBSCRIPTION, GREENFEE,COTISATION}; 
+   public enum etypePayment{SUBSCRIPTION, GREENFEE, COTISATION}; 
    // SUBSCRIPTION à GolfLC
-   // GREENFEE à une partie (green fee et accessoires
+   // GREENFEE pour inscription à une partie (green fee et accessoires
    // MEMBERSHIP devenir membre d'un club
    
 public Creditcard(){ // constructor 1
@@ -74,6 +76,7 @@ public List<SelectItem> getCards() {
     }
 
     public void setTypePayment(String typePayment) {
+        LOG.info("setTypePayment %%% = " + typePayment);
         this.typePayment = typePayment;
     }
 
@@ -94,6 +97,12 @@ public List<SelectItem> getCards() {
         return utils.LCUtil.creditcardSecret(creditCardNumber);
     }
 
+        public String getCreditCardNumberNonSecret() {
+//        LOG.info("getCreditCardNumber non secret = " + creditCardNumber);
+        return creditCardNumber;
+    }
+    
+    
     public void setCreditCardNumber(String creditCardNumber) {
 //        LOG.info("setCreditCardNumber = " + creditCardNumber);
         creditCardNumber = creditCardNumber.replaceAll(" ", "");
@@ -192,6 +201,14 @@ public List<SelectItem> getCards() {
         this.reference = reference;
     }
 
+    public Integer getIdplayer() {
+        return idplayer;
+    }
+
+    public void setIdplayer(Integer idplayer) {
+        this.idplayer = idplayer;
+    }
+
 public void setMyStrings(){
     //info coming from payment.xhtml et totalprice.js
     LOG.info("entering setMyStrings");
@@ -206,13 +223,30 @@ public void setMyStrings(){
   //  LOG.info("Buggy in Bean = " + buggy);
 
  }
-
+public static Creditcard mapCreditcard(ResultSet rs) throws SQLException{
+    String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+        Creditcard c = new Creditcard();
+        c.setIdplayer(rs.getInt("CreditcardIdPlayer"));
+        c.setCreditCardHolder(rs.getString("CreditcardHolder"));
+        c.setCreditCardNumber(rs.getString("CreditcardNumber"));
+        c.setCreditCardExpirationDate(rs.getTimestamp("CreditcardExpirationDate") );
+        c.setCreditCardType(rs.getString("CreditcardType"));
+   return c;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    showMessageFatal(msg);
+    return null;
+  }
+} //end method
  @Override
-public String toString()
-{       try {
+public String toString(){
+ try { 
+     LOG.info("entering creditcard toString()");
+     LOG.info(NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName().toUpperCase());
     return
-            (NEW_LINE 
-            + "from entite :" + this.getClass().getSimpleName()
+            (NEW_LINE + "from entite :" + this.getClass().getSimpleName().toUpperCase()
             + NEW_LINE + "<br>"
             + " , TotalPrice : "   + this.getTotalPrice()
             + NEW_LINE + "<br>"
@@ -223,16 +257,22 @@ public String toString()
             + " ,Number: "   + this.creditCardNumber
             + NEW_LINE + "<br>"
             + " ,Type : "   + this.getCreditCardType()
-            + NEW_LINE + "<br>"
-            + " ,Expiration date : "   + SDF_MM.format(this.creditCardExpirationDate)
+      //      + NEW_LINE + "<br>"
+  //          + " ,Expiration date : "   + SDF_MM.format(this.creditCardExpirationDate)
            + NEW_LINE + "<br>"
            + " ,communication : "   + this.getCommunication()
            + NEW_LINE + "<br>"
            + " ,reference : "   + this.getReference()
+             + NEW_LINE + "<br>"
+           + " ,typePayment : "   + this.getTypePayment()
+                         + NEW_LINE + "<br>"
+           + " ,idPlayer : "   + this.getIdplayer()
             );
-        } catch (Exception ex) {
-           LOG.error("Exception in Creditcard to String" + ex);
-           return null;
-        }
+    }catch(Exception e){
+        String msg = "£££ Exception in Creditcard.toString = " + e.getMessage();
+        LOG.error(msg);
+        showMessageFatal(msg);
+        return msg;
+  }
 } //end method
 } // end class Creditcard

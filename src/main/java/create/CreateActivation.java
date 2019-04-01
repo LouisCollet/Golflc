@@ -12,23 +12,14 @@ import utils.LCUtil;
 
 public class CreateActivation implements interfaces.Log, interfaces.GolfInterface
 {
-    public  boolean createActivation(Connection conn, Player player, Handicap handicap) throws Exception 
+    public  boolean create(Connection conn, Player player, Handicap handicap) throws Exception 
     {
          PreparedStatement ps = null;
          int row = 0;
   try {
          UUID uuid = UUID.randomUUID();
                LOG.info("Universally Unique Identifier = " + uuid.toString());
-  //              setNextPlayer(true); // affiche le bouton next(photo) bas ecran à droite
-  //      ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-   //     ec.getRequestContextPath();
-  //      String uri = ec.getRequestContextPath();
-     //    **uri = /GolfNew-1.0-SNAPSHOT 
-   //     String host = ec.getRequestServerName();
-   //       LOG.info("** application host = " + host);   
-    //    int port = ec.getRequestServerPort();
-     //   http://<host>:<port>/<contextPath>/index.html
-         // Return the portion of the request URI that identifies the web application context for this request.
+
          String url = utils.LCUtil.firstPartUrl();
      //    String href = "http://" + host + ":" + port + uri + "/activation_check.xhtml?key=" + uuid.toString();       
         String href = url + "/activation_check.xhtml?faces-redirect=true&uuid=" + uuid.toString(); 

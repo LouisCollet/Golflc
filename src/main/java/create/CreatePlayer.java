@@ -8,7 +8,7 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
     // private final static String photoFile = "no photo";
     private static String photo;
      
-    public boolean createPlayer(final entite.Player player, final entite.Handicap handicap,
+    public boolean create(final entite.Player player, final entite.Handicap handicap,
                 final java.sql.Connection conn, final String batch) throws Exception{
         java.sql.PreparedStatement ps = null;
         int row = 0;
@@ -57,7 +57,7 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
             row = ps.executeUpdate(); // write into database
                 LOG.info("row = " + row);
             if (row != 0){
-                String msg = "<h1> successful insert Player : "
+                String msg = "Successful insert Player : "
                             + " <br/></h1>ID = " + player.getIdplayer()
                             + " <br/>first = " + player.getPlayerFirstName()
                             + " <br/>last = " + player.getPlayerLastName();
@@ -73,8 +73,8 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
             }
     // new 15/11/2012
             if (row != 0){ // insert initial handicap, si successfull insert player
-                CreateInitialHandicap cih = new CreateInitialHandicap();
-                b = cih.createHandicap(conn, player, handicap, batch);  // new 24/06/2014
+              //  CreateInitialHandicap cih = new CreateInitialHandicap();
+                b = new CreateInitialHandicap().create(conn, player, handicap, batch);  // new 24/06/2014
                 LOG.info("returning from CreateInitialHandicap with = " + b);
                 if(b == false){
                     String msg = "boolean returned from create InitialHandicap is false ==> rollback ";
@@ -86,7 +86,7 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
 
         // new 02/02/2019
             if (row != 0){ // insert initial Subscription, si successfull insert player
-                if(new CreateSubscription().createSubscription(player, conn)){
+                if(new CreateSubscription().create(player, conn)){
                     String msg = "Initial Susbscription created !!";
                     LOG.info(msg);
                     LCUtil.showMessageInfo(msg);
@@ -105,10 +105,10 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
             if ((row != 0) && (! batch.equals("B")) && (b == true)){ // insert initial Activation , si successfull insert player and handicap
                                                     // pas d'activation en batch mode
                 LOG.info("not batch activation");
-                CreateActivation ca = new CreateActivation();
-                b = ca.createActivation(conn, player, handicap);
-                LOG.info("returning from create activation with = " + b);
-                if(b == false){
+          //      CreateActivation ca = new CreateActivation();
+          //      b = new CreateActivation().create(conn, player, handicap);
+           //     LOG.info("returning from create activation with = " + b);
+                if( ! new CreateActivation().create(conn, player, handicap)){
                     String msg = "boolean returned from create activation is false ==> rollback ";
                     LOG.info(msg);
                     LCUtil.showMessageInfo(msg);

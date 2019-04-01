@@ -79,7 +79,7 @@ private String coordinates;
     private String clubWebsite;
 
     private Date clubModificationDate;
-//private String clubZoneId;
+    private String clubZoneId;
 @Inject
 private GoogleTimeZone clubTimeZone;  // intéressant voir googlemaps.GoogleTimeZone
 // contient 
@@ -88,6 +88,7 @@ private GoogleTimeZone clubTimeZone;  // intéressant voir googlemaps.GoogleTime
  ///   private String timeZoneName;
 private boolean CreateModify = true; // 12/08/2017
 private String clubFormattedAddress;
+private Integer clubLocalAdmin; // new 14-02-2018
     public Club()
     {
   //      clubTimeZone = new GoogleTimeZone(); // new 03/02/2019 éviter npe
@@ -203,13 +204,13 @@ private String clubFormattedAddress;
         this.clubModificationDate = clubModificationDate;
     }
 
- //   public String getClubZoneId() {
- //       return clubZoneId;
- //   }
+   public String getClubZoneId() {
+       return clubZoneId;
+   }
 
-  //  public void setClubZoneId(String clubZoneId) {
-  //      this.clubZoneId = clubZoneId;
-  //  }
+   public void setClubZoneId(String clubZoneId) {
+      this.clubZoneId = clubZoneId;
+  }
 
   public GoogleTimeZone getClubTimeZone() {
        return clubTimeZone;
@@ -253,10 +254,20 @@ private String clubFormattedAddress;
     public void setCreateModify(boolean CreateModify) {
         this.CreateModify = CreateModify;
     }
+
+    public Integer getClubLocalAdmin() {
+        return clubLocalAdmin;
+    }
+
+    public void setClubLocalAdmin(Integer clubLocalAdmin) {
+        this.clubLocalAdmin = clubLocalAdmin;
+    }
     
  @Override
-public String toString()
-{ return 
+public String toString(){
+ try{ 
+    LOG.info("starting toString Club!");
+ return 
         ( NEWLINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase() + NEWLINE 
         + " idclub : "   + this.getIdclub()
                + " ,club Name : " + this.getClubName()
@@ -266,18 +277,23 @@ public String toString()
                + " ,club Latitude : " + this.getClubLatitude()
                + " ,club Longitude  = " + String.format("%.6f", this.getClubLongitude())  + " ,club Longitude : " + this.getClubLongitude()
                + " ,club Website : " + this.getClubWebsite()
-             
        //        + "club Zone ID   = " + this.getClubTimeZone().getTimeZoneId()
-      //         + " ,club ZoneId : " + this.clubTimeZone.getTimeZoneId()  // fait tout sauter !!
-       //        + " ,club ZoneId : " + this.clubTimeZone.getTimeZoneId()   // fait tout sauter !!!
+               + " ,club ZoneId : " + this.getClubZoneId() //.clubTimeZone.getTimeZoneId()  // fait tout sauter !!
+               + " ,club Local Admin : " + this.getClubLocalAdmin()
               );
+    }catch(Exception e){
+        String msg = "£££ Exception in ECourseList.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }   
 public static Club mapClub(ResultSet rs) throws SQLException{
     String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Club c = new Club();
         c.setIdclub(rs.getInt("idclub") );
-           //                 LOG.debug("idcclub setted = " + c.getIdclub() );
+ //            LOG.debug("idclub setted = " + c.getIdclub() );
         c.setClubName(rs.getString("clubName") );
           //                  LOG.debug("clubname setted = " + c.getClubName() );       
         c.setClubCity(rs.getString("clubCity") );
@@ -297,6 +313,8 @@ public static Club mapClub(ResultSet rs) throws SQLException{
          c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
          c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
          c.setClubWebsite(rs.getString("ClubWebsite"));
+         c.setClubZoneId(rs.getString("ClubZoneId"));
+         c.setClubLocalAdmin(rs.getInt("ClubLocalAdmin") );
    return c;
   }catch(Exception e){
    String msg = "£££ Exception in rs = " + METHODNAME + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();

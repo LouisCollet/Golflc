@@ -1,5 +1,12 @@
 package test_instruction;
 //import net.aksingh.owmjapis.core.OpenWeatherMap;
+import static interfaces.Log.LOG;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -16,9 +23,65 @@ import static java.util.Comparator.comparingInt;
 import net.aksingh.owmjapis.api.APIException;
 
 public class TimeDateExample1 {
-    public static void main(String[] args) throws APIException {
+    // https://www.logicbig.com/how-to/java-8-date-time-api.html
+    public static LocalDateTime getCreationDateTime (File file) throws IOException {
+
+            BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+            return attr.creationTime()
+                       .toInstant()
+                       .atZone(ZoneId.systemDefault())
+                       .toLocalDateTime();
+    }
+    public class FileTimeToFormattedString {
         
+    }
+  private static final DateTimeFormatter DATE_FORMATTER_WITH_TIME = DateTimeFormatter
+          .ofPattern("MMM d, yyyy HH:mm:ss.SSS");
+
+  public static String fileTimeToString(FileTime fileTime) {
+      String s = parseToString(
+              fileTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+      return s;
+  }
+
+  public static FileTime fileTimeFromString(String dateTimeString) {
+      LocalDateTime localDateTime = parseFromString(dateTimeString);
+      return FileTime.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+  }
+
+  public static String parseToString(LocalDateTime localDateTime) {
+      return localDateTime.format(DATE_FORMATTER_WITH_TIME);
+  }
+
+  public static LocalDateTime parseFromString(String date) {
+      return LocalDateTime.parse(date, DATE_FORMATTER_WITH_TIME);
+  }
+    public static void main(String[] args) throws APIException {
    try{
+       Path path = Files.createTempFile("test", ".txt");
+      System.out.println("path  = " + path);
+      System.out.println("files exists path " + Files.exists(path));
+      path.toFile().deleteOnExit();
+      //get creation time
+      BasicFileAttributes bfa = Files.readAttributes(path, BasicFileAttributes.class);
+  //    bfa.creationTime();
+      FileTime fileTime = bfa.creationTime();
+      System.out.println("fileTime: " + fileTime);
+      //convert creation time to string
+      String s = fileTimeToString(fileTime);
+      System.out.println("FileTime toString: " + s);
+
+      FileTime fileTime1 = fileTimeFromString(s);
+      System.out.println("FileTime fromString: " + fileTime1);
+       
+       
+       
+       
+       
+       
+       
+       
+       
        LocalDate date = LocalDate.of(2014, 2, 15); // 2014-06-15
        LocalDateTime startOfDay = date.atStartOfDay(); // 2014-02-15 00:00
 //LocalDateTime d = LocalDateTime.parse("2017-02-03T12:30:30");
@@ -61,8 +124,10 @@ else{
         System.out.println("tarif 4 - localtime after lt1530 !! , lt = " + lt1 + " /lt1530 = " + lt1530);
 }
 
-
-
+ LocalDate d1 = LocalDate.of(2019, 3, 23);
+    LocalTime t1 = LocalTime.of(9, 57, 0, 0);
+    LOG.info("resultat = " + LocalDateTime.of(d1,t1));
+    
  System.out.println("hour of day = " + localDateTime.getHour());
  System.out.println("minute of day = " + localDateTime.getMinute());
 
@@ -155,6 +220,7 @@ ZoneId.getAvailableZoneIds().stream()
     public static void isWeekend(LocalDate dt) {
     
 }
-    
+
+
     
 } // end class

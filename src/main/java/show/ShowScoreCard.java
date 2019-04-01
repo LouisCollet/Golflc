@@ -3,8 +3,8 @@ package show;
 
 import entite.Club;
 import entite.Course;
+import entite.Inscription;
 import entite.Player;
-import entite.PlayerHasRound;
 import entite.Round;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,11 +12,12 @@ import java.util.Arrays;
 import lc.golfnew.CalculateController;
 import utils.LCUtil;
 
-public class ShowScoreCard implements interfaces.Log, interfaces.GolfInterface
-{
+public class ShowScoreCard implements interfaces.Log, interfaces.GolfInterface{
+
     public String show_scorecard(final Player player, final Club club,
-            final Course course, final Round round, final PlayerHasRound phr, final Connection conn) throws SQLException
-    {
+            final Course course, final Round round,
+            final Inscription phr, //final PlayerHasRound phr, mod 31-03-2019
+            final Connection conn) throws SQLException {
         try {
             LOG.info("starting show_scorecard with : ");
             LOG.info("idPlayer = " + player.getIdplayer());
@@ -71,7 +72,9 @@ public class ShowScoreCard implements interfaces.Log, interfaces.GolfInterface
     } //end method scorecard
     
     public static String show_scorecard_empty(final Player player, final Club club,
-            final Course course, final Round round, final PlayerHasRound phr, final Connection conn) throws SQLException
+            final Course course, final Round round,
+            final Inscription phr, // was PlayerhasRound
+            final Connection conn) throws SQLException
     {
         /// à modifiere
         try {

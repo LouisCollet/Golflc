@@ -56,21 +56,17 @@ public String checkActivation() throws SQLException, Exception, Throwable
     if(player.getIdplayer() != null) // trouvé dans table Activation
     {
         LOG.info("idplayer ready for activation  = " + player.getIdplayer() );
-//       DBConnection dbc = new DBConnection();
-      
-        DeleteActivation da = new DeleteActivation();
-        boolean b = da.deleteActivation(conn, uuid);
+        boolean b = new DeleteActivation().delete(conn, uuid);
         // delete record dans table Activation
-        if(b == false)
-        { LOG.info("echec delete record Table activation !!!");
+        if(b == false){
+            LOG.info("echec delete record Table activation !!!");
             setValid(false);
         }else{
             LOG.info("OK record deleted in Table activation  = ");
             // update player !!
             ModifyPlayerActivation mpa = new ModifyPlayerActivation();
             String d = mpa.updateRecordFromPlayer(player); // setPlayerActivation = 1 
-            if(d==null)
-            {
+            if(d==null){
                 LOG.info("echec update activation in Table player !!!");
                 setValid(false);
             }else{
@@ -82,31 +78,16 @@ public String checkActivation() throws SQLException, Exception, Throwable
                     //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
                 String href = url + "/login.xhtml";
                 mail.ActivationMail am = new mail.ActivationMail();
-                am.sendMailActivationOK(player);
-           /*     
-                     String sujet = "Succesfull activation to golflc !!!";
-                     String msg ="ok with your activation !!"
-                             + " <br> for a connection to the application,"
-                             + " <br>click on the next url : ";
-                     String url = utils.LCUtil.firstPartUrl();
-                    //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
-                     String href = msg + url + "/login.xhtml";
-                     String to = "louis.collet@skynet.be";
-                     utils.SendEmail sm = new utils.SendEmail();
-                     b = sm.sendHtmlMail(sujet,href,to,"ACTIVATION");
-                        LOG.info("HTML Mail status = " + b);
-*/
+                new mail.ActivationMail().sendMailActivationOK(player);
             }
         }
-
     }else{
         setValid(false);
         LOG.info("Player = null ");
     }
      LOG.info("final result valid in check = " + valid);
    // return valid;
-     if(valid)
-     { 
+     if(valid){ 
          String language = player.getPlayerLanguage();
          String playerid = Integer.toString(player.getIdplayer());
          //
@@ -151,10 +132,9 @@ public String checkActivation() throws SQLException, Exception, Throwable
     public static void main(String[] args) throws Exception, Throwable {
  //    Connection conn = DBConnection.getConnection();
   try{
-        Player p = new Player();
-        p.setIdplayer(566666); // 456895
-        ActivationController ac = new  ActivationController();
-        String s = ac.checkActivation(); //"fcb35e1e-970d-46fc-88f0-929a8555d0d8");
+     //   Player p = new Player();
+     //   p.setIdplayer(566666); // 456895
+        String s = new  ActivationController().checkActivation(); //"fcb35e1e-970d-46fc-88f0-929a8555d0d8");
   //          LOG.info("01");
             LOG.info("from main, after !! = " + s);
  } catch (Exception e) {

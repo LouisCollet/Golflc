@@ -35,7 +35,7 @@
     <p:fieldset id="availablePlayers"
                 legend="#{msg['player.available']}">
     <p:dataTable id="availablePlayersTable"
-                     value="#{courseC.player.selectedOtherPlayers}"
+                     value="#{courseC.selectedOtherPlayers}"
                      var="c"
                      emptyMessage="#{msg['message.table.empty']}"
                      >
@@ -48,11 +48,21 @@
                              helper="clone"
                              scope="player"
                              cursor="move"
+                             axis="y"
                              />
             </p:column>
- 
+ <!--<p:draggable for="vpnl" axis="y" />
+  <h:outputText value="I can only be dragged vertically" />-->
             <p:column headerText="#{msg['player.id']}">
-                <h:outputText value="#{c.idplayer}" />
+                <h:outputText id="colPlayerId"
+                              value="#{c.idplayer}" />
+                <p:draggable for="colPlayerId"
+                             revert="true"
+                             helper="clone"
+                             scope="player"
+                             cursor="move"
+                             axis="y"
+                             />
             </p:column>
  
             <p:column headerText="#{msg['player.last']}">
@@ -74,12 +84,12 @@
                 style="margin-top:20px">
         <p:outputPanel id="dropArea">
             <h:outputText value="This is the Drop Zone !!!" 
-                          rendered="#{empty courseC.player.droppedPlayers}"
+                          rendered="#{empty courseC.droppedPlayers}"
                           style="font-size:24px;" />
             <p:dataTable id="selectedCarsTable"
-                         value="#{courseC.player.droppedPlayers}"
+                         value="#{courseC.droppedPlayers}"
                          var="c"
-                         rendered="#{not empty courseC.player.droppedPlayers}">
+                         rendered="#{not empty courseC.droppedPlayers}">
                 <p:column headerText="#{msg['player.id']}">
                     <h:outputText value="#{c.idplayer}" />
                 </p:column>
@@ -108,28 +118,25 @@
                 </p:column>
                 
                 <p:column headerText="#{msg['button.inscription.delete']}"
-            
-                  style="width:20%" >
+                          style="width:20%" >
                     <p:commandButton
                           id="selectButtonRemove"
-                          action="#{courseC.player.PlayerRemove(c)}"
+                          action="#{courseC.PlayerRemove(c)}"
                           value="#{c.playerLastName}"
-                          icon="fa fa-trash-o fa-lg colorDelete1">
+                          icon="fa fa-trash-o fa-lg ">
                         <p:confirm header="#{msg['message.confirm']}"
                            message="#{msg['message.cancel']}" 
                            icon="fa fa-exclamation-triangle"
                            />   
             </p:commandButton>
 	</p:column>
-                
-                
-            </p:dataTable>
+   </p:dataTable>
             
         <p:commandButton value="#{msg['button.inscription.create']}"
                          id="cb1"
                          update="messages"
                          ajax="false"
-                         rendered="#{not empty courseC.player.droppedPlayers}"
+                         rendered="#{not empty courseC.droppedPlayers}"
                          immediate="false"
                          icon="ui-icon-disk"
                          style="width:140px"
@@ -144,7 +151,7 @@
                  hoverStyleClass="ui-state-hover"
                  datasource="availablePlayersTable"
                  onDrop="handleDrop">
-        <p:ajax listener="#{courseC.player.PlayerDrop}"
+        <p:ajax listener="#{courseC.PlayerDrop}"
                 update="dropArea availablePlayersTable" />
     </p:droppable>
  <ui:include src="include/include_confirmDialog.xhtml"/>

@@ -68,10 +68,6 @@ try
               
              liste = c; //dd(c); 
 	}
-         // Print the name from the list....
- ////       for(PlayerHasRound model : liste) {
-////            LOG.info("TeePlayer = "  + model.getInscriptionTeeStart() );}
- ////       String t = liste.get(0).getInscriptionTeeStart();
         LOG.info("exiting with Classment = "  + liste.toString());
         return liste;
 }catch (SQLException e){

@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import entite.Club;
 import entite.Flight;
+import entite.Round;
 import googlemaps.SunriseSunsetResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Connection;
 import java.time.Instant;
@@ -50,26 +51,29 @@ public class SunriseSunset implements interfaces.Log, interfaces.GolfInterface{
  //// public Flight findSunriseSunset(@NotNull Date date_in, String in_lat, String in_lng,        
  ////         @NotNull String tz, Course course, Connection conn) throws IOException {
  
-   public Flight findSunriseSunset(Date date_in, BigDecimal in_lat, BigDecimal in_lng, String tz,
-           Connection conn) throws IOException {
-       
+//   public Flight findSunriseSunset(Date date_in, BigDecimal in_lat, BigDecimal in_lng, String tz,
+//           Connection conn) throws IOException {
+  public Flight find(Round round, Club club, Connection conn) throws IOException {
  if(liste == null){ 
   try{
    // documentation   https://sunrise-sunset.org/api
    // exemple: https://maps.googleapis.com/maps/api/timezone/json?location=39.6034810,-119.6822510&timestamp=1331161200&key=YOUR1331161200
-        LOG.info("welcome to findSunriseSunset with date =  " + date_in);  // format 2017-04-09
-        LOG.info("welcome to findSunriseSunset with timezone =  " + tz);  // format 2017-04-09
+        LOG.info("welcome to findSunriseSunset with date =  " + round.getRoundDate());  // format 2017-04-09
+        LOG.info("welcome to findSunriseSunset with timezone =  " + club.getClubZoneId());  // format 2017-04-09
         
-        Objects.requireNonNull(date_in, "requireNonNull - date_in = null -  - Back to sender");
-        Objects.requireNonNull(tz, "requireNonNull - tz = null -  - Back to sender");
+        Objects.requireNonNull(round, "requireNonNull - date_in = null -  - Back to sender");
+        Objects.requireNonNull(club, "requireNonNull - tz = null -  - Back to sender");
         
   //      if (date_in == null){ 
   //              LOG.info("date_in == null - immediatly exiting findSunriseSunset");
   //          return null;} 
-        boolean b = utils.LCUtil.isValidTimeZone(tz);
-            LOG.info("TimeZone is Valid or Not : " + b);
-       if(b == false){
-            LOG.info("time zone == false - immediatly exiting findSunriseSunset");
+     //   boolean b = utils.LCUtil.isValidTimeZone(club.getClubZoneId()); // mod 08/02/2019
+      //      LOG.info("TimeZone is Valid or Not : " + b);
+     //  if(b == false){
+        if(! utils.LCUtil.isValidTimeZone(club.getClubZoneId())){
+            String msg = "time zone not valid - immediatly exiting findSunriseSunset";
+            LOG.info(msg);
+            utils.LCUtil.showMessageFatal(msg);
             return null;
        } 
 
@@ -89,9 +93,11 @@ and day_length will be expressed in seconds. Optional.
 
 */
       String string_url = "https://api.sunrise-sunset.org/json"
-              + "?lat="  + in_lat.toString()
-              + "&lng="  + in_lng.toString()
-              + "&date=" + SDF_YYYY.format(date_in)
+          //    + "?lat="  + in_lat.toString()club
+              + "?lat="  + club.getClubLatitude().toString() // mod 08/02/2019
+         //     + "&lng="  + in_lng.toString()
+              + "&lng="  + club.getClubLongitude().toString()
+              + "&date=" + SDF_YYYY.format(round.getWorkDate()) // mod 08/02/22019
               + "&formatted=0" //default = 1
       ;
     URL url = new URL(string_url);
@@ -125,13 +131,14 @@ and day_length will be expressed in seconds. Optional.
             LOG.info("ZonedDateTime with iso-offset_date_time: " + sunrise);
         Instant instant = sunrise.toInstant();
             LOG.info("instant = " + instant);
-        sunrise = instant.atZone(ZoneId.of(tz));
-            LOG.info ("formatted tz sunrise = " + ZDF_HOURS.format(sunrise)); 
+     //   sunrise = instant.atZone(ZoneId.of(tz));
+        sunrise = instant.atZone(ZoneId.of(club.getClubZoneId())); // mod 08/02/2019
+            LOG.info ("formatted HH:mm sunrise = " + ZDF_HOURS.format(sunrise)); 
             LOG.info ("offset = " + sunrise.getOffset());
-        
-        ZonedDateTime sunset = ZonedDateTime.parse(responseSS.getResults().getSunset(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        sunset = sunset.toInstant().atZone(ZoneId.of(tz)); // présentation synthétique
-            LOG.info ("formatted tz sunset = " + ZDF_HOURS.format(sunset));
+       ZonedDateTime sunset = ZonedDateTime.parse(responseSS.getResults().getSunset(), DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+     //   sunset = sunset.toInstant().atZone(ZoneId.of(tz)); // présentation synthétique
+        sunset = sunset.toInstant().atZone(ZoneId.of(club.getClubZoneId())); // mod 08/02/2019
+            LOG.info ("formatted HH:mm sunset = " + ZDF_HOURS.format(sunset));
             
     // mod 28-11-2018
             Flight f = new Flight();
@@ -139,10 +146,6 @@ and day_length will be expressed in seconds. Optional.
             f.setSunset(sunset);
             
             return f;
-   // déplacé 28-11-2018 vers courseC                 
- ////       CreateAllFlights caf = new CreateAllFlights();
- ////       liste = caf.createTableFlights(sunrise, sunset, tz, course.getIdcourse(), conn);
- ////       return liste;
     } else {
         String msg = "responseSS.getStatus() not OK - no Sunrise and Sunset found : " + responseSS.getStatus();
       //  "INVALID_REQUEST": indicates that either lat or lng parameters are missing or invalid;
@@ -151,17 +154,17 @@ and day_length will be expressed in seconds. Optional.
         LOG.error(msg);
         return null;
     }
-  } catch (JsonGenerationException e) {
+  }catch(JsonGenerationException e) {
 	String msg = "££ JsonGenerationException in findSunriseSunset = " + e.getMessage();
             LOG.error(msg);
             utils.LCUtil.showMessageFatal(msg);
         return null;
-  } catch (JsonMappingException e) {
+  }catch(JsonMappingException e) {
 	String msg = "££ JsonMappingException in findSunriseSunset = " + e.getMessage();
             LOG.error(msg);
             utils.LCUtil.showMessageFatal(msg);
         return null;
-  } catch (Exception e) {
+  }catch(Exception e) {
             String msg = "££ Exception in findSunriseSunset = " + e.getMessage();
             LOG.error(msg);
             utils.LCUtil.showMessageFatal(msg);
@@ -200,8 +203,8 @@ and day_length will be expressed in seconds. Optional.
   // course.setIdcourse(13);
    String tz = "Europe/Brussels";
 /// à modifier
-   find.SunriseSunset ssac = new find.SunriseSunset();
-  Flight fl = ssac.findSunriseSunset(date,BigDecimal.valueOf(50.202764), BigDecimal.valueOf(5.013203),tz,conn);
+ //  find.SunriseSunset ssac = new find.SunriseSunset();
+ ////////// à modifier Flight fl = ssac.find(date,BigDecimal.valueOf(50.202764), BigDecimal.valueOf(5.013203),tz,conn);
 ////           LOG.info("response in main = :"  + fl);
    } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();

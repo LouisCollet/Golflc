@@ -14,13 +14,12 @@ import utils.LCUtil;
 
 public class CreateScoreStableford implements interfaces.Log{
   public  boolean createModifyScore(final ScoreStableford score, final Round round, final Player player,
-            final Connection conn ) throws SQLException{
+            final Connection conn) throws SQLException{
         PreparedStatement ps = null;
  try {
                 LOG.info(" ... entering createScore() ...");
                 LOG.info("Score = " + score.toString());
                 LOG.info("Round  = " + round.toString());
- 
                 LOG.info("Round Game = " + round.getRoundGame());
                 LOG.info("Player  = " + player.toString());
             String[] sc1 = score.getHoles();
@@ -37,7 +36,7 @@ public class CreateScoreStableford implements interfaces.Log{
                 LOG.info("there are existing rows : " + rows + " if > 0 we replace the previous score");
     if (rows == 0) // insert
             {
-                LOG.info("we are insterting");
+                LOG.info("we are inserting");
                 final String query = LCUtil.generateInsertQuery(conn, "score"); // new 15/11/2012
                 //  String query = "INSERT INTO score VALUES (?,?,?,?,?)";
                 ps = conn.prepareStatement(query);
@@ -116,11 +115,10 @@ public class CreateScoreStableford implements interfaces.Log{
                         + "  AND player_has_round_round_idround=?";
             //    for (int i = 0; (i < 18) && (sc1[i] != null); i++) // voir explication dans insert
               //   for (int i=start-1; i<18; i++) // new 3/12/2013
-            for (int i=start-1; i<start+holes-1; i++) // new 4/12/2013
+            for (int i=start-1; i<start+holes-1; i++){ // new 4/12/2013
                          // start=10, holes=9, de 9 à 18
                          // start=1,  holes=9, de 0 à 9
                          // start=1,  holes=18,de 0 à 18
-                {
                     ps = conn.prepareStatement(query);
                     // updated fields
                     ps.setInt(1, Integer.parseInt(sc1[i]));  //ici scoreStroke //
@@ -136,7 +134,6 @@ public class CreateScoreStableford implements interfaces.Log{
                     int x = ps.executeUpdate();
                     if (x != 0) {
    //                     setShowButtonCreateScore(false);  // n'affiche plus le bouton bas ecran
-                       
                         String msg = "Successful update, hole  = " + (i + 1)
                                 + " , Strokes = " + sc1[i]; // mod 10/05/2013
                         LOG.info(msg);
@@ -157,7 +154,7 @@ public class CreateScoreStableford implements interfaces.Log{
                         CourseController.setShowButtonCreateStatistics(true);  // affiche le bouton bas ecran
                         score.setScoreCardOK(true); // new 17/7/2017 pour permettre affichage scorecard dans ??
                         LOG.info(msg);
-                        LCUtil.showMessageInfo(msg);
+               //         LCUtil.showMessageInfo(msg);
 
            return true;
 //ici ??

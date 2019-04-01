@@ -40,19 +40,11 @@ public class FindCountHoles implements interfaces.Log {
             }
     } //end method
 
-    public static void main(String s) throws SQLException, Exception // testing purposes
-    {
-        LOG.info("Input main = " + s);
-        DBConnection dbc = new DBConnection();
-        Connection conn = dbc.getConnection();
-  //      Player player = new Player();
-  //      Round round = new Round();
-  //      player.setIdplayer(324713);
-   //     round.setIdround(260);
-//        List<StablefordResult> res = getSlopeRating(player, round, conn);
-        LOG.info("main - after");
-//for (int x: par )
-//        LOG.info(x + ",");
+    public static void main(String[] args) throws SQLException, Exception {// testing purposes
+        
+        Connection conn = new DBConnection().getConnection();
+        int i = new FindCountHoles().findCountHoles(147, conn);  // teeid
+        LOG.info("main - after holes = " + i);
         DBConnection.closeQuietly(conn, null, null, null);
 
     }// end main

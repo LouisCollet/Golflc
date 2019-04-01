@@ -169,6 +169,21 @@ Anything listed AFTER '?' within the mask is considered optional user input
 
 -->
 <!-- latitude : -90 = south pole, 90 = north pole, 0 = equator -->
+
+                <h:outputText value="#{msg['club.web']} :"   />
+                <h:panelGroup>
+                <p:inputText  label="web"
+                       id="ClubWebsite"
+                       value="#{courseC.club.clubWebsite}"
+                       title="#{msg['tooltip.club.clubwebsite']}"
+                       size="45"
+                       immediate="true"
+                       valueChangeListener="#{courseC.clubWebsiteListener}"
+                       />
+
+
+
+
                 <h:outputText value="#{msg['club.latitude']} :"   />
                 <h:panelGroup>
                 <p:inputMask  label="latitude"
@@ -220,16 +235,7 @@ Anything listed AFTER '?' within the mask is considered optional user input
                         >  
             </p:inputNumber>  
 
-                <h:outputText value="#{msg['club.web']} :"   />
-                <h:panelGroup>
-                <p:inputText  label="web"
-                       id="ClubWebsite"
-                       value="#{courseC.club.clubWebsite}"
-                       title="#{msg['tooltip.club.clubwebsite']}"
-                       size="45"
-                       immediate="true"
-                       valueChangeListener="#{courseC.clubWebsiteListener}"
-                       />
+
 <p:commandButton 
                          value="#{msg['button.club.testwebsite']}"
                          id="ButtonClubWebsite"

@@ -10,8 +10,6 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:pe="http://primefaces.org/ui/extensions"
       xmlns:cc="http://xmlns.jcp.org/jsf/composite"
-      xmlns:o="http://omnifaces.org/ui"
-      xmlns:of="http://omnifaces.org/functions"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       template="templates/masterTemplate.xhtml"
 >
@@ -23,8 +21,8 @@
 </ui:define>
 
 <ui:define name="content">
-<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"> </h:graphicImage>
-<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"> </h:graphicImage>
+<h:graphicImage name="images/site unavailable.jpg" alt="image missing :site unavailable.jpg" style="float: left;"> </h:graphicImage>
+<h:graphicImage name="images/temporarily unavailable.jpg" alt="image missing :temporarily unavailable.jpg" style="float: right;"> </h:graphicImage>
 <h:form id="unavailableLC" enctype="application/x-www-form-urlencoded" >
 
 <ui:include src="include/include_summary_club.xhtml"/>
@@ -36,7 +34,7 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.unavailable']}</h1>
+     <h:outputText escape="false" value="#{msg['title.unavailable']}" />
 </f:facet>
     <h:outputText  value="#{msg['tarif.period.start']} :"/>
     <p:calendar value="#{courseC.unavailable.workStartDate}"
@@ -78,12 +76,8 @@
                          immediate="false"
                          icon="fa fa-plus"
                          action="#{courseC.createUnavailable}"/>
-         
-                
 </f:facet>
-
 </p:panelGrid>
-
 </h:form>
 </ui:define>
 </ui:composition>

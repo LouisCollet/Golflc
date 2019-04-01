@@ -13,20 +13,14 @@ import utils.LCUtil;
 
 public class CreateTee implements interfaces.Log{
     
-    public boolean createTee(final Club club, final Course course, final Tee tee,
+    public boolean create(final Club club, final Course course, final Tee tee,
             final Connection conn) throws SQLException    {
   //      Connection conn = null;
         PreparedStatement ps = null;
    try {
-            LOG.info("starting createTee() ... = ");
-            LOG.info("tee Start position = {}" ,tee.getTeeStart());
-            LOG.info("tee Gender = {}" ,tee.getTeeGender() );
-            LOG.info("tee Slope  = {}" ,tee.getTeeSlope());
-            LOG.info("tee Rating = {}" ,tee.getTeeRating());
-            LOG.info("courseId = {}" ,course.getIdcourse());
-            LOG.info("clubId = {}" ,club.getIdclub() );
-
-            final String query = LCUtil.generateInsertQuery(conn, "tee"); // new 29/11/2012
+                LOG.info("starting createTee() ... = ");
+                LOG.info("with tee = " + tee.toString());
+            final String query = LCUtil.generateInsertQuery(conn, "tee");
             //String query = "INSERT INTO tee VALUES (?,?,?,?,?,?,?)";
             ps = conn.prepareStatement(query);
             // insérer dans l'ordre de la database : 1 = first db field
@@ -35,10 +29,10 @@ public class CreateTee implements interfaces.Log{
             ps.setString(3, tee.getTeeStart());
             ps.setInt(4, tee.getTeeSlope());
             ps.setBigDecimal(5, tee.getTeeRating());
-            ps.setInt(6, tee.getTeeClubHandicap());  //new 05/07/2016
-            ps.setInt(7, course.getIdcourse());
-            ps.setTimestamp(8, LCUtil.getCurrentTimeStamp());
-             //    String p = ps.toString();
+            ps.setInt(6, tee.getTeeClubHandicap());
+            ps.setString(7, tee.getTeeHolesPlayed()); // new 29-03-2019
+            ps.setInt(8, course.getIdcourse());
+            ps.setTimestamp(9, LCUtil.getCurrentTimeStamp());
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
             if (row != 0) {
@@ -46,13 +40,15 @@ public class CreateTee implements interfaces.Log{
                 LOG.info("Tee created = {}" ,key);
                 tee.setIdtee(key);
  //               hole.setNextHole(true); // affiche le bouton next(Hole) bas ecran à droite
-                String msg = "<br/><br/><h1>Tee created = " + tee.getIdtee()
+                String msg = "Tee created = " + tee.getIdtee()
                         + " <br/> </h1> name club = " + club.getClubName()
                         + " <br/> name course = " + course.getCourseName()
                         + " <br/> gender = " + tee.getTeeGender()
                         + " <br/> Start = " + tee.getTeeStart()
                         + " <br/> Slope = " + tee.getTeeSlope()
-                        + " <br/> Rating = " + tee.getTeeRating();
+                        + " <br/> Rating = " + tee.getTeeRating()
+                        + " <br/> HolesPlayed = " + tee.getTeeHolesPlayed()
+                                ;
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
                 return true;

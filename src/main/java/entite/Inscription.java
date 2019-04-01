@@ -1,6 +1,7 @@
 package entite;
 
 //import custom_validations.Inscription;@Named  this is teh new version of PlayerHasRound.java !!!!!
+import static interfaces.GolfInterface.NEWLINE;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -9,6 +10,7 @@ import java.util.Date;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import utils.LCUtil;
+import static utils.LCUtil.showMessageFatal;
 
 @Named("inscriptionNew")
 @SessionScoped
@@ -24,12 +26,12 @@ public class Inscription implements Serializable
  //   @Inscription(value = playerGender , round = round_idround) // new 19/08/2014 custom validation !!!
     private String playerGender; // new 19/08/2014
     private String inscriptionTeeStart;
+    private Integer inscriptionIdTee; // new 31-03-2019
     private String inscriptionInvitedBy;
- //   
- //   private String playerhasroundmatchplayresult;
     private Date playerhasroundModificationDate;
     private boolean InscriptionOK = true; //  set true 01/12/2018
 
+    
     public Inscription() // constructor
     {
         inscriptionTeeStart="YELLOW";
@@ -116,6 +118,14 @@ public class Inscription implements Serializable
         this.inscriptionInvitedBy = inscriptionInvitedBy;
     }
 
+    public Integer getInscriptionIdTee() {
+        return inscriptionIdTee;
+    }
+
+    public void setInscriptionIdTee(Integer inscriptionIdTee) {
+        this.inscriptionIdTee = inscriptionIdTee;
+    }
+
    
 
  //   public String getPlayerhasroundmatchplayresult() {
@@ -127,24 +137,40 @@ public class Inscription implements Serializable
  //   }
 
  @Override
-public String toString()
-{ return 
-        ("from entite.PlayerHasRound = "
+public String toString(){
+try {
+     LOG.info("starting toString Inscription!");
+    return 
+        (NEWLINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase() + NEWLINE 
                + " ,idplayer : "   + this.getPlayer_idplayer()
+               + " ,player Gender : "   + this.getPlayerGender()
+               + " ,Final Result : "   + this.getPlayerhasroundFinalResult()
                + " ,idround : "   + this.getRound_idround()
                + " ,Start : "   + this.getInscriptionTeeStart()
-
+               + " ,idtee : "   + this.getInscriptionIdTee()
+            
+            
+            // à compléter
         );
+    }catch(Exception e){
+        String msg = "£££ Exception in Inscription.toString = " + e.getMessage(); 
+        LOG.error(msg);
+        showMessageFatal(msg);
+        return msg;
+  }
+    
 }
 public static Inscription mapInscription(ResultSet rs) throws SQLException{
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
     Inscription i = new Inscription();
     i.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
+ //       LOG.info("PlayerhasroundFinalResult = " + i.getPlayerhasroundFinalResult());
     i.setPlayerhasroundZwanzeursResult(rs.getShort("InscriptionZwanzeursResult") );
     i.setPlayerhasroundZwanzeursGreenshirt(rs.getShort("InscriptionZwanzeursGreenshirt") );
     i.setInscriptionTeeStart(rs.getString("InscriptionTeeStart"));
     i.setInscriptionInvitedBy(rs.getString("InscriptionInvitedBy"));
+    i.setInscriptionIdTee(rs.getInt("InscriptionIdTee")); // new 31-03-2019
 
    return i;
   }catch(Exception e){
@@ -154,5 +180,4 @@ public static Inscription mapInscription(ResultSet rs) throws SQLException{
     return null;
   }
 } //end method map
-
 } // end class

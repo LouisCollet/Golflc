@@ -9,8 +9,7 @@ import javax.inject.Named;
 import utils.LCUtil;
 
 @Named
-public class Cotisation implements Serializable, interfaces.Log, interfaces.GolfInterface
-{
+public class Cotisation implements Serializable, interfaces.Log, interfaces.GolfInterface{
      // Constants ----------------------------------------------------------------------------------
     private static final long serialVersionUID = 1L;
 
@@ -29,8 +28,7 @@ public class Cotisation implements Serializable, interfaces.Log, interfaces.Golf
     private String items;
     private String status;
     
-public Cotisation()    // constructor
-{ 
+public Cotisation(){    // constructor
 // empty
 }
 
@@ -113,8 +111,10 @@ public Cotisation()    // constructor
 
 
  @Override
-public String toString()
-{ return 
+public String toString(){
+    try{
+        LOG.info("starting toString Cotisation!");
+    return 
         (NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName()
                + " ,idplayer : "   + this.getIdplayer()
                + " ,startDate : "  + this.getStartDate()
@@ -128,6 +128,12 @@ public String toString()
                + " ,club : "  + this.getIdclub()
                + " ,status : "  + this.getStatus()
         );
+        }catch(Exception e){
+        String msg = "£££ Exception in Cotisation.toString = " + e.getMessage();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }
 
 public static Cotisation mapCotisation(ResultSet rs) throws SQLException{
@@ -136,16 +142,7 @@ public static Cotisation mapCotisation(ResultSet rs) throws SQLException{
         Cotisation c = new Cotisation();
         c.setIdclub(rs.getInt("CotisationIdClub"));
         c.setIdplayer(rs.getInt("CotisationIdPlayer"));
-//           LOG.info("line 01");
         c.setStartDate(rs.getTimestamp("CotisationStartDate").toLocalDateTime());
- //             LOG.info("line 02");
-   //        LOG.info("first solution = + " + rs.getTimestamp("CotisationStartDate").toLocalDateTime());
- ////       java.util.Date d = rs.getTimestamp("CotisationStartDate");   
- ////       c.setStartDate(utils.LCUtil.DatetoLocalDateTime(d));
- ////       LOG.info("second solution = + " + utils.LCUtil.DatetoLocalDateTime(d));
-   //     Timestamp ts = Timestamp.valueOf(cotisation.getStartDate());
- ////       d = rs.getTimestamp("CotisationEndDate");
-     //    c.setEndDate(utils.LCUtil.DatetoLocalDateTime(d));
         c.setEndDate(rs.getTimestamp("CotisationEndDate").toLocalDateTime());
         c.setPaymentReference(rs.getString("CotisationPaymentReference"));
         c.setCommunication(rs.getString("CotisationCommunication"));

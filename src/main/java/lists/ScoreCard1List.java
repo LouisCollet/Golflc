@@ -24,7 +24,7 @@ public class ScoreCard1List implements interfaces.Log
     private static List<ECourseList> liste = null;
 //    private static BigDecimal HandicapPlayer;
     
-public List<ECourseList> getScoreCardList1(final Player player, final Round round,
+public List<ECourseList> list(final Player player, final Round round,
         final Connection conn) throws SQLException, NullPointerException, LCCustomException{  
   //  LOG.debug("  ... entering ScoreCard1List !!!");
     
@@ -128,19 +128,17 @@ String query =
         ScoreCard1List.liste = liste;
     }
     
- public static void main(String[] args) throws SQLException, Exception 
-     {
-         DBConnection dbc = new DBConnection();
-     Connection conn = dbc.getConnection();
+ public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
   try{
         Player player = new Player();
-        Round round = new Round(); 
         player.setIdplayer(324713);
+        Round round = new Round(); 
         round.setIdround(300);
-        ScoreCard1List sc1l = new ScoreCard1List();
-        sc1l.getScoreCardList1(player, round, conn);
-        LOG.info("from main, after");
- } catch (Exception e) {
+    //    ScoreCard1List sc1l = new ScoreCard1List();
+       List<ECourseList> ec = new ScoreCard1List().list(player, round, conn);
+        LOG.info("from main, ec = " + ec);
+ }catch (Exception e){
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
       //      LCUtil.showMessageFatal(msg);

@@ -29,13 +29,12 @@ public List<Subscription> subscriptionDetail (final Player player , Connection c
     Subscription subscription;
  //   conn = DBConnection.getPooledConnection();
 try{
-     String s= utils.DBMeta.listMetaColumnsLoad(conn, "subscription");
+     String s= utils.DBMeta.listMetaColumnsLoad(conn, "payments_subscription");
     String query =
      " SELECT "
         + s +
-            //subscription_player_id, SubscriptionStartDate, SubscriptionEndDate, SubscriptionTrialCount" +
-     " FROM subscription" +
-     " WHERE subscription.subscriptionIdPlayer=?"
+     " FROM payments_subscription" +
+     " WHERE subscriptionIdPlayer=?"
     ;
      ps = conn.prepareStatement(query);
      ps.setInt(1, player.getIdplayer()); 
@@ -47,7 +46,7 @@ try{
          String msg = "££ Empty Result Table in " + ClassName + " for player = " + player.getIdplayer();
         LOG.error(msg);
     //    LCUtil.showMessageFatal(msg);
-        return null;        
+        return null;
        //   throw new LCCustomException(msg);
       }     
     rs.beforeFirst(); //on replace le curseur avant la première ligne
@@ -91,4 +90,16 @@ finally
     public static void setListe(List<Subscription> liste) {
         FindSubscription.liste = liste;
     }
+    
+    public static void main(String[] args) throws SQLException, Exception{ // testing purposes
+
+    Connection conn = new DBConnection().getConnection();
+    Player player = new Player();
+    player.setIdplayer(324713);
+    List<Subscription> p1 = new FindSubscription().subscriptionDetail(player, conn);
+        LOG.info("player found = " + p1.toString());
+    DBConnection.closeQuietly(conn, null, null, null);
+
+}// end main
+    
 }  // end class

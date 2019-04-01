@@ -35,6 +35,13 @@ http://flask.pocoo.org/docs/0.12/patterns/errorpages/
     <location>/errors/error.xhtml</location>
 </error-page>
 -->
+
+    <mime-mapping>
+        <extension>png</extension>
+        <mime-type>image/png</mime-type>
+    </mime-mapping>
+
+
     <mime-mapping>
         <extension>jpeg</extension>
         <mime-type>image/jpeg</mime-type>
@@ -67,6 +74,9 @@ http://flask.pocoo.org/docs/0.12/patterns/errorpages/
         <extension>ttf</extension>
         <mime-type>application/font-ttf</mime-type>
     </mime-mapping>
+    
+    
+    
     <!--  http://www.journaldev.com/3229/primefaces-fileupload-component-example-tutorial -->
     <context-param>
         <description>State saving method: 'client' or 'server' (=default)</description>
@@ -185,14 +195,7 @@ http://tandraschko.blogspot.be/ -->
     <param-name>javax.faces.validator.ENABLE_VALIDATE_WHOLE_BEAN</param-name>
     <param-value>true</param-value>
 </context-param>
-    <!-- enlevé 15/12/2012
-    <resource-ref>
-        <description>MySQL DB Connection</description>
-        <res-ref-name>java:/MySqlDS</res-ref-name>
-        <res-type>javax.sql.DataSource</res-type>
-        <res-auth>Container</res-auth>
-        <res-sharing-scope>Shareable</res-sharing-scope>
-    </resource-ref> -->
+
     <!-- Welcome page -->
     <welcome-file-list>
         <welcome-file>/login_securityAPI.xhtml</welcome-file>
@@ -389,7 +392,7 @@ C:\Users\collet\Documents\NetBeansProjects\GolfWfly\FileUpload
     -->
     
     <session-config>
-        <session-timeout>20</session-timeout>  <!-- Session idle timeout in MINUTES new 8/12/2014 -->
+        <session-timeout>40</session-timeout>  <!-- Session idle timeout in MINUTES new 8/12/2014 -->
     </session-config>
     <!-- new 8/12/2014 -->
     <error-page>

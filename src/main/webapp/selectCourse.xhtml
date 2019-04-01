@@ -55,7 +55,7 @@
         </h:outputText>
         <h:outputText
             id="tarif"
-            rendered="#{courseC.course2.inputSelectCourse eq 'CreateTarif'}" 
+            rendered="#{courseC.course2.inputSelectCourse eq 'CreateTarifGreenfee'}" 
             value="#{msg['message.for.tarif']}">
         </h:outputText>
         <h:outputText
@@ -95,7 +95,7 @@
 	<p:column headerText="#{msg['course.selected']}"
                   footerText="#{msg['course.selected']}"
                   style="width:20%"
-                  rendered="#{courseC.course2.inputSelectCourse ne 'CreateTarif'}" 
+                  rendered="#{courseC.course2.inputSelectCourse ne 'CreateTarifGreenfee'}" 
                   id="colCourseSelected" 
          >
             <p:commandButton
@@ -103,7 +103,7 @@
                 action="#{courseC.selectCourse(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="fa fa-check-square-o"
-                rendered="#{courseC.course2.inputSelectCourse ne 'CreateTarif'}" 
+                rendered="#{courseC.course2.inputSelectCourse ne 'CreateTarifGreenfee'}" 
                 >
              </p:commandButton>
 	</p:column>
@@ -124,7 +124,7 @@
      	<p:column headerText="#{msg['round.tarif']}"
                   footerText="#{msg['round.tarif']}"
                   style="width:20%"
-                  rendered="#{courseC.course2.inputSelectCourse eq 'CreateTarif'}" >
+                  rendered="#{courseC.course2.inputSelectCourse eq 'CreateTarifGreenfee'}" >
             <p:commandButton
                 id="selectButtonTarif"
                 action="#{courseC.selectCourse(c)}"

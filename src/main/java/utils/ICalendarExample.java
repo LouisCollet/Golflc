@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.UUID;
 import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
@@ -71,10 +71,10 @@ public class ICalendarExample {
   long diff = endCal.getTimeInMillis() - startCal.getTimeInMillis();
   int min = (int)(diff / (1000 * 60));
   
-  Dur dur = new Dur(0,0,min,0);
+//  Dur dur = new Dur(0,0,min,0);
   
   //Creating a meeting event
-  VEvent meeting = new VEvent(startDt,dur,subject);
+  VEvent meeting = new VEvent(startDt, Duration.ofMinutes(min),subject);
   meeting.getProperties().add(new Location(location));
   meeting.getProperties().add(new Description(description));/// was an error
   meeting.getProperties().add(new Uid(UUID.randomUUID().toString()));

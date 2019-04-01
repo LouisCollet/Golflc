@@ -5,7 +5,6 @@ import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.primefaces.PrimeFaces;
-import org.primefaces.context.RequestContext;
 import utils.DBConnection;
 
 
@@ -42,9 +41,6 @@ public ImportPlayers()
   ////        }else{
   ////          LOG.info("OK for = " );
     ////      }
-       RequestContext c = RequestContext.getCurrentInstance();
- //      c.execute("ImportPlayers('Hello from the Backing Bean');");
-    //   c.execute("alert('msg from ImportPlayers');");
         PrimeFaces.current().executeScript("alert('msg from ImportPlayers')");
         
  //      conn.commit();

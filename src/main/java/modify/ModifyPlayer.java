@@ -11,30 +11,12 @@ import utils.LCUtil;
 
 public class ModifyPlayer implements Serializable, interfaces.Log, interfaces.GolfInterface{
 
-public boolean modifyPlayer(final Player player, final Connection conn) throws Exception{
+public boolean modify(final Player player, final Connection conn) throws Exception{
         PreparedStatement ps = null;
         int row = 0;
         boolean b = false;
         try {
             LOG.info("player   = " + player.toString());
-/*
-    String query = 
-     "UPDATE player" +
-"        SET player.PlayerFirstName=?," +
-"		player.PlayerLastName=?," +
-"		player.PlayerCity=?," +
-"		player.PlayerCountry=?," +
-"		player.PlayerBirthDate=?," +
-"		player.PlayerGender=?," +
-"		player.PlayerHomeClub=?," +
-// "		player.PlayerPhotoLocation=?," +
-"		player.PlayerLanguage=?," +
-"		player.PlayerEmail=?," +
-// "		player.PlayerActivation=?," +
-"		player.PlayerZoneId=?," +
-"		player.PlayerLatLng=?" +
-//"		player.PlayerModificationDate=?" +
-"*/
     String s = utils.DBMeta.listMetaColumnsUpdate(conn, "player");
         LOG.info("String from listMetaColumns = " + s);
         // encrypted password with SHA2 function of mysql 
@@ -59,8 +41,10 @@ public boolean modifyPlayer(final Player player, final Connection conn) throws E
             ps.setString(9, player.getPlayerEmail()); // new 15/11/2012
             ps.setString(10, player.getPlayerTimeZone().getTimeZoneId() ); // new 28/03/2017 using GoogleTimeZone
             ps.setString(11, player.getPlayerLatLng().toString()); // new 28/03/2017
-     //       ps.setString(12, "secret2"); // new 07/08/2018 -- à modifier utiliser le mot de passe en clair !!!
-            ps.setInt(12, player.getIdplayer()); // was 12
+     //      le mot de passe est modifié par ModifyPassword.java
+            ps.setString(12, player.getPlayerRole());
+            
+            ps.setInt(13, player.getIdplayer()); //used fo WHERE ?
     //        ps.setTimestamp(15, LCUtil.getCurrentTimeStamp());
             utils.LCUtil.logps(ps);
       //      ps = ps.replace();

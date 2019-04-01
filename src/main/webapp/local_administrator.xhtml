@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      template="templates/masterTemplate.xhtml"
+>
+<ui:define name="title">Tarif Greenfee Page</ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_tarif_equipments.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:graphicImage name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="form_local_admin" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_subscription.xhtml"/>
+
+<p:panelGrid 
+    id="panel2" 
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+         <h:outputText value="#{msg['club.name']}" />
+         <h:panelGroup layout="block" id="container2">
+                <p:inputMask
+                       id="inputHomeClub"
+                       value="#{courseC.localAdmin.playerHomeClub}"
+                       size="5"
+                       style="margin-right: 10px;"
+                       mask="?9999"
+                    />
+                <p:commandButton 
+                         id="ButtonHomeClub"
+                         value="#{msg['button.player.homeclub']}"
+                         actionListener="#{dialogC.showSelectHomeClub()}"
+                         style="margin-right: 10px;"
+                         icon="ui-icon-search"
+                        >
+                    <p:ajax event="dialogReturn"
+                         update=":form_local_admin:inputHomeClub,clubName,playerHomeClub" />
+                  </p:commandButton>
+            
+                <h:outputText id="clubName"
+                              value=" #{courseC.club.clubName}" 
+                              style="font-style:italic"/>  
+  <!--              <h:outputText value=" #{courseC.club.idclub}" 
+                              style="font-style:italic"/>  
+  -->
+                <h:outputText id="playerHomeClub"
+                              value=" #{courseC.localAdmin.playerHomeClub}"
+                              style="font-weight:bold;font-size: 2em;font-style:italic;color: blue"
+                              />  
+          </h:panelGroup>
+         
+         
+         
+         
+    
+         <h:outputText value="#{msg['player.localAdmin']}" />
+         <h:panelGroup layout="block" id="container4">
+                <p:inputText
+                       id="inputPlayer"
+                       value="#{courseC.player.idplayer}"
+                       size="7"
+                       style="margin-right: 10px;"
+                    />
+              <p:commandButton 
+                         id="ButtonLocalAdmin"
+                         value="#{msg['button.player.list']}"
+                         actionListener="#{dialogC.showSelectPlayer()}"
+                         style="margin-right: 10px;"
+                         icon="ui-icon-search"
+                        >
+                    <p:ajax event="dialogReturn"
+                            update=":form_local_admin:inputPlayer,playerName,localid" />
+                    <p:ajax update="inputPlayer" />
+                  </p:commandButton>
+
+                <h:outputText id="playerName"
+                              value="#{courseC.localAdmin.playerLastName}" 
+                              style="font-style:italic;margin-right: 10px;"
+                              />
+                <h:outputText id="localid"
+                              value="#{courseC.localAdmin.idplayer}"
+                              style="font-weight:bold;font-size: 2em;font-style:italic;color: blue;"/>
+          </h:panelGroup>
+
+<f:facet name="footer">
+        <p:commandButton
+                         value="#{msg['button.localadmin.create']}"
+                         id="createPlayer"
+                         ajax="false"
+                         style="font-weight:normal "
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.createLocalAdministrator}"/>
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

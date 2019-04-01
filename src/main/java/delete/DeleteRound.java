@@ -8,7 +8,7 @@ import utils.LCUtil;
 
 public class DeleteRound implements interfaces.Log, interfaces.GolfInterface
 {
-    public boolean deleteRound(final int idround, final Connection conn) throws Exception
+    public boolean delete(final int idround, final Connection conn) throws Exception
     {
     PreparedStatement ps = null;
 try
@@ -21,8 +21,8 @@ try
     ps = conn.prepareStatement(query);
     ps.setInt(1, idround);
     LCUtil.logps(ps); 
-    int row_delete = ps.executeUpdate();
-        LOG.info("deleted Round = " + row_delete);
+    int row_deleted = ps.executeUpdate();
+        LOG.info("deleted Round = " + row_deleted);
     String msg = "<br/> <h1>Round deleted = " + idround;
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
@@ -43,16 +43,13 @@ try
 }
 } //end method
    
- public static void main(String[] args) throws SQLException, Exception 
- {
-     DBConnection dbc = new DBConnection();
-     Connection conn = dbc.getConnection();
+ public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
  try{
-       LOG.info("Input main = ");
     int idround = 339;
- //  Date date =SDF.parse("01/01/2000");
     DeleteRound dr = new DeleteRound();
-    dr.deleteRound(idround, conn);
+    boolean b = new DeleteRound().delete(idround, conn);
+      LOG.info("from main - resultat deleteRound = " + b);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

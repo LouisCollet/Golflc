@@ -35,17 +35,9 @@
     -->
 </h:head>
 
-<h:graphicImage 
-                name="images/OK.png"
-                alt="image missing :golf_round.jpg"
-                style="float: left;">
-</h:graphicImage>
-<h:graphicImage 
-                name="images/OK.png"
-                alt="image missing :golf_round.jpg"
-                style="float: right;">
-</h:graphicImage>
-    
+<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
+
 <h:form id="inscription" enctype="application/x-www-form-urlencoded" >
 
 <ui:include src="include/include_summary.xhtml"/>
@@ -56,7 +48,7 @@
              columnClasses="col1,col2">
     
 <f:facet name="header">
-    <h1>#{msg['inscription.data']}</h1>
+    <h:outputText escape="false" value="#{msg['inscription.data']}" />
 </f:facet>
         <h:outputText value="#{msg['inscription.team']} :"   />
         <h:outputText id="competition" 

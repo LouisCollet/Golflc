@@ -1,45 +1,96 @@
 package calc;
 
+import entite.Player;
 import entite.TarifMember;
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Arrays;
 import utils.LCUtil;
-// rester à faire le cas des invités / guests
-// a faire : greenfee 0 pour membre du club ! via une table member : greenfee 0 pour les membres du club
+import static utils.LCUtil.myRound;
+
 public class CalcTarifCotisation implements interfaces.GolfInterface, interfaces.Log{
 
-public double findTarif (TarifMember tarifMember){
-     LOG.info(" -- Start of CalcTarifCotisation");
-     LOG.info(" -- Start of CalcTarifCotisation with tarifMember= " + tarifMember.toString());
+public double findTarif (TarifMember tarifMember, Player player){
+     LOG.info(" -- Start of CalcTarifCotisation.findTarif");
+     LOG.info(" -- Start of CalcTarifCotisation.findTarif with tarifMember= " + tarifMember.toString());
  try {
  //       à faire : proportion pour abonnement en cours d'année (année incomplète)
- double total = 0;
- double amount = 0;
+          LOG.info("validating cotisation age range- --------");
+    int yourAge = utils.LCUtil.calculateAgeFirstJanuary(player.getPlayerBirthDate());
+    LOG.info("player age = " + yourAge);
+  	for(int i = 0 ; i < tarifMember.getMembersBase().length ; i++) {
+                LOG.info("i = " + i);
+                LOG.info("base for calculation = " + Arrays.toString(tarifMember.getMembersBase()[i]));
+                LOG.info("choice for calculation = " + tarifMember.getMembersChoice()[i]);
+             if(tarifMember.getMembersChoice()[i] == 0){
+                 LOG.info("skipped : you are not paying this cotisation");
+                 continue;} // passe item suivant
+             String range = tarifMember.getMembersBase()[i][2];
+                LOG.info("age range for this item = " + range);
+             if(range.equals("00-00")){
+                 LOG.info("accepted : not considering age range");
+                 continue;}
+             int start = Integer.parseInt(range.substring(0,2));
+                LOG.info("start for this item = " + start);
+             if(start < 18){
+                 LOG.info("accepted : you are older, but we consider you are paying for your kids");
+         //        i = i + 1;
+                 continue;}
+             int end = Integer.parseInt(range.substring(range.length()-2));
+                LOG.info("end for this item = " + end);
+             if(yourAge < start || yourAge > end){
+                String msg = " rejected !!wrong cotisation range for your age !! " + range;
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                Integer [] arr = tarifMember.getMembersChoice();
+                arr[i] = 0;
+                tarifMember.setMembersChoice(arr);
+       //         return 9999999.9;
+             }
+             
+        } //end calcul cotisation
+ 
+ 
+ BigDecimal total = BigDecimal.ZERO;
+ double da = 0;
  int quantity = 0;
- //String selectedItems = "";
+         LOG.info("calculating cotisation -----------------");
  	for(int i = 0 ; i < tarifMember.getMembersBase().length ; i++) {
+                LOG.info("i = " + i);
+                LOG.info("base for calculation = " + Arrays.toString(tarifMember.getMembersBase()[i]));
+                LOG.info("choice for calculation = " + tarifMember.getMembersChoice()[i]);
+            BigDecimal bda = new BigDecimal(tarifMember.getMembersBase()[i][1]); // from String
+                LOG.info("amount = " + bda);
+            BigDecimal bdq = BigDecimal.valueOf(tarifMember.getMembersChoice()[i]);  // from int
+                LOG.info("quantity = " + bdq);
+            total = total.add(bda.multiply(bdq));
+                LOG.info("total cotisation = " + total);
+        } //end calcul cotisation
+        
+              LOG.info("calculating equipments-----------------");
+ 	for(int i = 0 ; i < tarifMember.getPriceEquipments().length ; i++) {
             LOG.info("i = " + i);
-            LOG.info("base for calculation = " + Arrays.toString(tarifMember.getMembersBase()[i]));
-            LOG.info("choice for calculation = " + tarifMember.getMembersChoice()[i]);
-            amount = Double.parseDouble(tarifMember.getMembersBase()[i][1]);
-                LOG.info("amount = " + amount);
-            quantity = tarifMember.getMembersChoice()[i];
-                LOG.info("quantity = " + quantity);
-       //     if(quantity > 0){
-       //         LOG.info("item sélectionné = " + tarifMember.getMembersBase()[i][0]);
-      //          selectedItems = selectedItems + tarifMember.getMembersBase()[i][0] + ",";
-        //    }
-            total = total + amount * quantity;
-                LOG.info("total = " + total);
+            LOG.info("getPriceEquipments = " + Arrays.deepToString(tarifMember.getPriceEquipments()[i]));
+            LOG.info("choiceEquipments = " + Arrays.deepToString(tarifMember.getEquipmentsChoice()));
+            da = Double.parseDouble(tarifMember.getPriceEquipments()[i][1]);
+        //    amount = Double.parseDouble(tarifMember.getPriceEquipments()[i][1]); //[1]);
+            BigDecimal bda = BigDecimal.valueOf(da);
+                LOG.info("equipment price = " + bda);
+            quantity = tarifMember.getEquipmentsChoice()[i];
+            BigDecimal bdq = BigDecimal.valueOf(quantity);
+                LOG.info("quantity = " + bdq);
+         //       LOG.info("quantity = " + quantity);
+              total = total.add(bda.multiply(bdq));   
+                  LOG.info("total after = " + total);
         }
-          //   return Double.valueOf(price);
-          return total;
+         LOG.info("total for cotisation and equipments = " + total);
+          return myRound(total.doubleValue(),2); // arrondi à deux décimales
           
  } catch (Exception e) {
       String msg = " -- Error in calcTarifCotisation " + e.getMessage();
       LOG.error(msg);
       LCUtil.showMessageFatal(msg);
-      return 99.9;
+      return 9999999.9;
  }
  finally {
    //return 0.0;

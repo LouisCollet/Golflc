@@ -3,6 +3,7 @@ package lists;
 import entite.ECourseList;
 import entite.Player;
 import entite.Subscription;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,35 +18,31 @@ public class SubscriptionRenewalList implements interfaces.Log{
     PreparedStatement ps = null;
     ResultSet rs = null;
     
-public List<ECourseList> getListSubscriptions(final Connection conn) throws Exception{
+public List<ECourseList> list(final Connection conn) throws Exception{
 if(liste == null){
     try{
            LOG.debug("starting getListSubscriptions = " );
        liste = new ArrayList<>();
-       String su = utils.DBMeta.listMetaColumnsLoad(conn, "subscription");
+       String su = utils.DBMeta.listMetaColumnsLoad(conn, "payments_subscription");
        String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
        final String query =
         "SELECT "
              + su + "," + pl +
-     //           "subscription_player_id, SubscriptionStartDate, SubscriptionEndDate, SubscriptionTrialCount," +
-      //  "     player.idplayer, player.PlayerFirstName, player.PlayerLastName, player.PlayerGender, player.PlayerEmail, player.PlayerLanguage" +
-        " FROM subscription" +
+        " FROM payments_subscription" +
         " JOIN player" +
-        "   on player.idplayer = subscription.subscription_player_id" +
+        "   on player.idplayer = subscriptionIdPlayer" +
         "   and PlayerActivation = '1' " +
         " WHERE " +
-        "          YEAR(SubscriptionEndDate) = YEAR(CURRENT_DATE())" +
+        "     YEAR(SubscriptionEndDate) = YEAR(CURRENT_DATE())" +
         "     AND MONTH(SubscriptionEndDate) = MONTH(CURRENT_DATE()) + 1"  // subscriptions à échéance le mois suivant
         ;
        ps = conn.prepareStatement(query);
        rs = ps.executeQuery();
        rs.last(); //on récupère le numéro de la ligne
             LOG.info("SubscriptionRenewalList  has {} players ", rs.getRow() );
-
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>(); // new 02/06/2013
-    while(rs.next())
-     {
+    while(rs.next()){
           ECourseList ecl = new ECourseList(); // est réi, donc total = 0
 
           Player p = new Player();
@@ -101,4 +98,23 @@ return liste;
     public static void setListe(List<ECourseList> liste) {
         SubscriptionRenewalList.liste = liste;
     }
-} //end Class
+    
+     public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+  try{
+     //   Player player = new Player();
+     //   player.setIdplayer(324713);
+     //   Round round = new Round(); 
+     //   round.setIdround(300);
+       List<ECourseList> ec = new SubscriptionRenewalList().list(conn);
+        LOG.info("from main, ec = " + ec);
+ }catch (Exception e){
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+      //      LCUtil.showMessageFatal(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
+} //end class
+    

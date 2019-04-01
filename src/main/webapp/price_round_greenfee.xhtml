@@ -35,93 +35,107 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.equipments.choice']}</h1>
+    <h:outputText escape="false" value="#{msg['title.greenfee.choice']}" />
 </f:facet>
       
-  <!--
-    <h:panelGroup id="panelStart" layout="block" >
-        <h:outputText  value="#{msg['tarif.period.start']} : "/>
-        <i class="fas fa-calendar-plus"></i>
-    </h:panelGroup>
-    <h:outputText value="#{courseC.tarifMember.memberStartDate}">
-         <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-    </h:outputText>
- 
-age du player car beaucoup de cotisations sont fonction de l'âge
-<h:panelGroup id="panelEnd" layout="block" >
-    <h:outputText  value="#{msg['tarif.period.end']} : "/><i class="fas fa-calendar-plus"></i>
-</h:panelGroup>
-    <h:outputText value="#{courseC.tarifMember.memberEndDate}">
-         <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-    </h:outputText>
-    <h:outputText value=" "/>
-  
-     
-    <i class="fas fa-birthday-cake/></i>
-  -->  
-
-    <h:outputText value="Age au 01/01/2019: "/> 
+    <h:outputText value="Votre age au 01/01/#{of:formatDate(now,'yyyy')}" /> 
     <i class="fas fa-birthday-cake fa-2x"></i>
-    <h:outputText value="#{playerage}"/>
+    <h:outputText value="#{playerage} - #{courseC.tarifGreenfee.inputtype}"/>
 
 <h:panelGroup id="panelItem" layout="block" >
      <h:outputText value="#{msg['tarif.members.item']} "
                    style="font-size: 1.5em;"
                    />
-     <i class="fas fa-pen-square fa-2x"></i>
      <i class="fas fa-list-ol fa-2x"></i>
-     <i class="fas fa-pen-fancy fa-2x"></i>
 </h:panelGroup>  
-<h:panelGroup id="panelPrice" layout="block" >    
+<h:panelGroup id="panelPrice" layout="block" >
      <h:outputText value="#{msg['tarif.members.price']} " 
                    style="font-size: 1.5em;"/>
-     <i class="fas fa-donate fa-2x"></i>
      <i class="fas fa-euro-sign fa-2x"></i>
 </h:panelGroup>
-<h:panelGroup id="panelChoice" layout="block" >    
+<h:panelGroup id="panelGroupChoice" layout="block" >    
      <h:outputText value="#{msg['tarif.members.choice']} "
                    style="font-size: 1.5em;"
                    />
-     <i class="fas fa-euro-sign fa-2x"></i>
-     <i class="fas fa-donate fa-2x"></i>
+     <i class="fas fa-cart-plus fa-2x"></i>
 </h:panelGroup>
-  
-     <h:outputText  value="#{msg['tarif.greenfee']} :"/>
+  <!--     <i class="fas fa-euro-sign fa-2x"></i>
+     <i class="fas fa-donate fa-2x"></i>  -->
+<!--  greenfee si via écran DAYS OF WEEKs  -->
+     <h:outputText  value="#{msg['tarif.greenfee']} :"
+                    rendered="#{courseC.tarifGreenfee.inputtype eq 'DA' or courseC.tarifGreenfee.inputtype eq 'HO'}"
+                    />
      <h:outputText   id="greenfee"
                      value="#{courseC.tarifGreenfee.priceGreenfee}"
+                     rendered="#{courseC.tarifGreenfee.inputtype eq 'DA'or courseC.tarifGreenfee.inputtype eq 'HO'}"
                      title="#{msg['title.tee.teerating']}"
                      >
      </h:outputText>
-     <h:panelGroup id="panelGreenfee" layout="block" >
+
+     <h:panelGroup id="panelGroup" layout="block"
+                   rendered="#{courseC.tarifGreenfee.inputtype eq 'DA'or courseC.tarifGreenfee.inputtype eq 'HO'}">
                 <p:inputNumber
 			id="memberchoice${i}"
-			value="#{courseC.tarifGreenfee.equipmentsChoice[i-1]}"
+			
+                        value="#{courseC.tarifGreenfee.greenfeesChoice[0]}"
 			minValue="0"
-                        maxValue="1"
+                        maxValue="4"
+                        required="true"
+                        maxlength="1"
+                        size="1"
+                        emptyValue="0"
+                        title="#{msg['tooltip.tarif.choice']}"
+                        
+                        >  
+      </p:inputNumber>  
+             
+      </h:panelGroup>
+<!--  greenfees   -->
+<c:forEach var="i" 
+              begin="01"
+              step="1"
+              rendered="#{courseC.tarifGreenfee.inputtype eq 'GR'}"
+              end="#{fn:length(courseC.tarifGreenfee.priceGreenfees)}" 
+              >
+        <h:outputText id="GreenfeeItem${i}"
+	             value="#{courseC.tarifGreenfee.priceGreenfees[i-1][0]}"
+                     rendered="#{courseC.tarifGreenfee.priceGreenfees[i-1][1] eq courseC.tarifGreenfee.season}"/>
+        <h:outputText id="GreenfeeAmount${i}"
+                      value="#{courseC.tarifGreenfee.priceGreenfees[i-1][2]}"
+                      rendered="#{courseC.tarifGreenfee.priceGreenfees[i-1][1] eq courseC.tarifGreenfee.season}"/>
+  <!--      <h:panelGroup id="panelGreenfee3" layout="block" >-->
+              <p:inputNumber
+			id="GreenfeeChoice${i}"
+			value="#{courseC.tarifGreenfee.greenfeesChoice[i-1]}"
+                        rendered="#{courseC.tarifGreenfee.priceGreenfees[i-1][1] eq courseC.tarifGreenfee.season}"
+			minValue="1"
+                        maxValue="4"
                         required="true"
                         maxlength="1"
                         size="1"
                         emptyValue="0"
                         title="#{msg['tooltip.tarif.choice']}"
                         >  
-      </p:inputNumber>  
-              <i class="fas fa-cart-plus fa-2x"></i>
-            </h:panelGroup>
-    
+              </p:inputNumber>
+     <!--    </h:panelGroup>-->
+</c:forEach>     
+     
+<!-- equipments -->
 <c:forEach var="i" 
-              begin="01" 
-              end="#{fn:length(courseC.tarifGreenfee.priceEquipments)}" 
-              step="1">
-        <h:outputText id="MembersItem${i}"
+           begin="01" 
+           end="#{fn:length(courseC.tarifGreenfee.priceEquipments)}" 
+           step="1">
+        <h:outputText id="EquipmentsItem${i}"
 	             value="#{courseC.tarifGreenfee.priceEquipments[i-1][0]}" />
-        <h:outputText id="MembersAmount${i}"
-                      value="#{courseC.tarifGreenfee.priceEquipments[i-1][1]}" />
+        <h:outputText id="EquipmentsAmount${i}"
+                      value="#{courseC.tarifGreenfee.priceEquipments[i-1][1]}">
+        </h:outputText>
         <h:panelGroup id="panelG1" layout="block" >
               <p:inputNumber
-			id="memberchoice${i}"
+			id="Equipmentchoice${i}"
 			value="#{courseC.tarifGreenfee.equipmentsChoice[i-1]}"
 			minValue="0"
-                        maxValue="1"
+                        maxValue="4"
                         required="true"
                         maxlength="1"
                         size="1"
@@ -129,45 +143,9 @@ age du player car beaucoup de cotisations sont fonction de l'âge
                         title="#{msg['tooltip.tarif.choice']}"
                         >  
               </p:inputNumber>  
-              <i class="fas fa-cart-plus fa-2x"></i>
+    <!--          <i class="fas fa-cart-plus fa-2x"></i> -->
          </h:panelGroup>
-        
 </c:forEach>
-    <!--
-       <h:outputText  value="#{msg['tarif.equipments.buggy']} :"/>
-       <h:outputText   id="buggy"
-                       value="#{courseC.tarifGreenfee.priceEquipments[0]}"
-                       title="#{msg['title.tee.teerating']}"
-                       >
-       </h:outputText>
-       
-       <h:outputText  value="#{msg['tarif.equipments.handtrolley']} :"/>
-       <h:outputText   id="hand"
-                       value="#{courseC.tarifGreenfee.priceEquipments[1]}"
-                       title="#{msg['title.tee.teerating']}"
-                       >
-        </h:outputText>
-       
-       <h:outputText  value="#{msg['tarif.equipments.electrictrolley']} :"/>
-       <h:outputText   id="medium"
-                       value="#{courseC.tarifGreenfee.priceEquipments[2]}"
-                       title="#{msg['title.tee.teerating']}"
-                       >
-       </h:outputText>
-       
-       <h:outputText  value="#{msg['tarif.equipments.clubs']} :"/>
-       <h:outputText   id="clubs"
-                       value="#{courseC.tarifGreenfee.priceEquipments[3]}"
-                       title="#{msg['title.tee.teerating']}"
-                       >
-        </h:outputText>
-       <h:outputText  value="#{msg['tarif.equipments.practice']} :"/>
-       <h:outputText   id="practice"
-                       value="#{courseC.tarifGreenfee.priceEquipments[4]}"
-                       title="#{msg['title.tee.teerating']}"
-                       >
-       </h:outputText>
--->
 
 <f:facet name="footer">
         <p:commandButton value="#{msg['tarif.print']}"
@@ -189,19 +167,14 @@ age du player car beaucoup de cotisations sont fonction de l'âge
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
-                         immediate="true"
+                         immediate="false"
                          icon="fa fa-credit-card"
                          action="#{courseC.manageGreenfee()}"
                          />
- 
+
 </f:facet>
 
 </p:panelGrid>
-<!--
-<pe:tooltip global="true" myPosition="left center" atPosition="right center"
-            showEvent="focus" hideEvent="blur" styleClass="qtip-default"
-            />
--->
 </h:form>
 </ui:define>
 </ui:composition>

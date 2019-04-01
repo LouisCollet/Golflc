@@ -17,13 +17,13 @@ public boolean modify(final Subscription subscription, final Connection conn) th
             LOG.info("with Subscription =  " + subscription.toString());
      
             final String query // à modifier
-              = "  UPDATE subscription" +
-            "      SET subscription.SubscriptionEndDate = ? ," +
-            "          subscription.SubscriptionTrialCount = ?," +
-            "          subscription.SubscriptionPaymentReference = ?," +
-            "          subscription.SubscriptionCommunication = ?" +
+              = "  UPDATE payments_subscription" +
+            "      SET SubscriptionEndDate = ? ," +
+            "          SubscriptionTrialCount = ?," +
+            "          SubscriptionPaymentReference = ?," +
+            "          SubscriptionCommunication = ?" +
             "      WHERE" +
-            "          subscription.SubscriptionIdPlayer=?";
+            "          SubscriptionIdPlayer=?";
             
     //          LOG.info(" new end date = " + d);
              
@@ -48,7 +48,7 @@ public boolean modify(final Subscription subscription, final Connection conn) th
                 LOG.info("rows = " + row);
             if (row != 0) {
                   LOG.info("before subscription success msg");
-                 String msg =  "<h1> " + LCUtil.prepareMessageBean("subscription.success") + subscription.getEndDate()
+                 String msg =  LCUtil.prepareMessageBean("subscription.success") + subscription.getEndDate()
                 //         + " , new end date = " + d.format(ZDF_DAY) + "</h1>"
                            ;
                     LOG.info(msg);

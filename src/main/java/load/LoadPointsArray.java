@@ -33,10 +33,7 @@ try
      String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
      
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
-          "SELECT "
-          + ho + ","
-          //HoleNumber, HolePar ,HoleStrokeIndex,"
-          + " idtee, idround, player_has_round.InscriptionTeeStart"
+          "SELECT " + ho + " ,idtee, idround, player_has_round.InscriptionTeeStart"
           + "    FROM course"
           + "    JOIN player"
           + "       ON player.idplayer = ?"
@@ -65,20 +62,17 @@ try
      ps = conn.prepareStatement(query);
      ps.setInt(1, player.getIdplayer());
      ps.setInt(2, round.getIdround());
-
           //    String p = ps.toString();
           utils.LCUtil.logps(ps); 
 		//get round data from database
     rs =  ps.executeQuery();
     //// control 
     int j = 0;
-    while(rs.next())
-    {
+    while(rs.next()) {
      j++;
     }
   //  LOG.debug("nombre réponses 1 from ResultSet = " + j); value == null || value.length() == 0
-    if(j==9 || j==18)
-    {
+    if(j==9 || j==18) {
       //  LOG.info("");
     }else{
         String ms = "Number of holes not Correct (9 or 18) for this round = " + j;
@@ -91,8 +85,8 @@ try
     rs.beforeFirst(); //  Initially the cursor is positionned before the first row
       int rowNum = 0; //The method getRow lets you check the number of the row
                         //where the cursor is currently positioned
-      while (rs.next())
-        {rowNum = rs.getRow() - 1;
+      while (rs.next()){
+            rowNum = rs.getRow() - 1;
             points [rowNum][0]= rs.getInt("HoleNumber");   //  hole #
             points [rowNum][1]= rs.getInt("HolePar");   //  hole par
             points [rowNum][2]= rs.getInt("HoleStrokeIndex");   //  hole index
@@ -107,8 +101,7 @@ try
       LOG.info(NEW_LINE + Arrays.deepToString(points));
       int stop = points.length;
         LOG.info("points length = " + stop);
-       for (int i=0; i<stop; i++)
-         {
+       for (int i=0; i<stop; i++){
             LOG.info(" -- ending : hole = " + points [i][0]
                     + " , Par = "     + points [i][1]
                     + " , Index = "   + points [i][2] );
@@ -125,13 +118,8 @@ return points;
     LOG.error("Exception in LoadPointsArray =  " + ex);
     LCUtil.showMessageFatal("Exception in LoadPointsArray = " + ex.toString() );
      return null;
-}
-finally
-{
-       // DBConnection.closeQuietly(conn, null, rs, ps);
+}finally{
     DBConnection.closeQuietly(null, null, rs, ps);
 }
-
 } //end method
-
 } // end class

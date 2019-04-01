@@ -4,20 +4,32 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import static interfaces.GolfInterface.NEWLINE;
+import static interfaces.GolfInterface.SDF;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Date;
 import javax.inject.Named;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import static utils.LCUtil.showMessageFatal;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 // @JsonInclude(Include.NON_NULL)  // ne fonctionne pas dans table multidimentional intéressant ?
 @Named
 @JsonPropertyOrder({"datesSeason","days","teeTimes","priceEquipments"}) // new 22/01/2019 not working ?
 public class TarifGreenfee implements Serializable{
+@JsonIgnore
+   @NotNull(message="{tarifMember.startdate.notnull}")
+    private Date startDate;
+
+@JsonIgnore
+    @NotNull(message="{tarifMember.enddate.notnull}")
+    private Date endDate;
+    
 
 @JsonIgnore
     @NotNull(message="{tarif.number.notnull}")
@@ -27,9 +39,13 @@ public class TarifGreenfee implements Serializable{
 @JsonIgnore
     private Integer tarifIndexHours; // pour periods
 @JsonIgnore
+    private Integer tarifIndexDays; // new 24-02-2019
+@JsonIgnore
     private Integer tarifIndexEquipments;
 @JsonIgnore
-    private Integer tarifIndexPayment; // pour periods
+    private Integer tarifIndexGreenfee; // new 17/02/2019
+@JsonIgnore
+    private Integer tarifIndexPayment; // pour period
 @JsonIgnore
     private Double priceGreenfee; // pour periods
 @JsonIgnore
@@ -52,27 +68,45 @@ public class TarifGreenfee implements Serializable{
 @JsonIgnore
  @NotNull(message="{tarifMember.workprice.notnull}")
   private String workPrice;
-  private String[][] datesSeason; // low, medium High puis des paires de dates début et fin;
+@JsonIgnore
+ @NotNull(message="{tarifMember.workseason.notnull}")
+  private String workSeason;
+  private String[][]  datesSeason; // low, medium High puis des paires de dates début et fin;
   private String [][] teeTimes; // = new String[10][5];
-//  private String [] priceEquipments; // = new String[10]
   private String [][] priceEquipments; // mod 24-01-2018
-  private String [][] days; // = new String[5][3]
+  private String [][] priceGreenfees; // new 17/02/2019
+  private String [][] days;//first array lundi ... second array normal,invited,junior, HML
+  @JsonIgnore
+  private String [][] daysWrk;//first array lundi ... second array normal,invited,junior, HML
+  private String inputtype; // new 23-02-2019 GR = greenfee, DA = days, TI = Times
 @JsonIgnore
     private Integer [] equipmentsChoice;
+@JsonIgnore
+    private Integer [] greenfeesChoice;
+    private String season;
 public TarifGreenfee(){ // constructor 1
         datesSeason = new String[20][3]; // 20 dates (5 paired début et fin), 3 périodes Low, Medium, High
 //            LOG.info("from construtor : dateseason = " + Arrays.deepToString(datesSeason));
-        teeTimes = new String[10][5];    //
-        priceEquipments = new String[10][3]; // intem, price, choix pourquoi 3 ??
+        teeTimes        = new String[20][5];
+        priceEquipments = new String[15][3]; // item, price, choix pourquoi 3 ??
+     //   days            = new String[15][4]; // 15 = 3 hml * 5 possibilités dns la semaine
+        days            = new String[15][4]; // 15 = 3 hml * 5 possibilités dns la semaine
+        daysWrk = new String[5][4];
+        priceGreenfees = new String[10][3]; // item, H/M/L, prix
         equipmentsChoice = new Integer[priceEquipments.length];  // choice of quantity egals 0, 1
+        greenfeesChoice = new Integer[priceGreenfees.length];
         Arrays.fill(equipmentsChoice, 0);
-        days = new String[5][3];
+        Arrays.fill(greenfeesChoice, 0); // new 18/02/2019
+        
+   //     daysWrk = new String[5][4];
         priceItem = new String[10];
         priceGreenfee = 0.0;
         tarifIndexSeasons = 0;
         tarifIndexHours = 0;
         tarifIndexEquipments = 0;
         tarifIndexPayment = 0;
+        tarifIndexGreenfee = 0; // new 18/02/2019
+        tarifIndexDays = 0; // new 24/02/2019
         quantity = new String[10];
     } // end constructor
 
@@ -163,6 +197,7 @@ this.teeTimes = teeTimes;
     datesSeason = utils.LCUtil.removeNull2D(datesSeason);
     teeTimes = utils.LCUtil.removeNull2D(teeTimes);
     priceEquipments = utils.LCUtil.removeNull2D(priceEquipments);
+    priceGreenfees = utils.LCUtil.removeNull2D(priceGreenfees);  // new 18/02/2019
     days = utils.LCUtil.removeNull2D(days);
         LOG.info("null removed from all Tarif Arrays");
 }
@@ -195,6 +230,14 @@ this.teeTimes = teeTimes;
 
     public void setTarifIndexPayment(Integer tarifIndexPayment) {
         this.tarifIndexPayment = tarifIndexPayment;
+    }
+
+    public Integer getTarifIndexDays() {
+        return tarifIndexDays;
+    }
+
+    public void setTarifIndexDays(Integer tarifIndexDays) {
+        this.tarifIndexDays = tarifIndexDays;
     }
 
     public String[] getQuantity() {
@@ -230,12 +273,92 @@ this.teeTimes = teeTimes;
         this.workPrice = workPrice;
     }
 
+    public String getWorkSeason() {
+        return workSeason;
+    }
+
+    public void setWorkSeason(String workSeason) {
+        this.workSeason = workSeason;
+    }
+
     public Integer[] getEquipmentsChoice() {
         return equipmentsChoice;
     }
 
     public void setEquipmentsChoice(Integer[] equipmentsChoice) {
         this.equipmentsChoice = equipmentsChoice;
+    }
+
+    public Integer[] getGreenfeesChoice() {
+        return greenfeesChoice;
+    }
+
+    public void setGreenfeesChoice(Integer[] greenfeesChoice) {
+        this.greenfeesChoice = greenfeesChoice;
+    }
+
+    public Integer getTarifIndexGreenfee() {
+        return tarifIndexGreenfee;
+    }
+
+    public void setTarifIndexGreenfee(Integer tarifIndexGreenfee) {
+        this.tarifIndexGreenfee = tarifIndexGreenfee;
+    }
+
+    public String[][] getPriceGreenfees() {
+        return priceGreenfees;
+    }
+
+    public void setPriceGreenfees(String[][] priceGreenfees) {
+        this.priceGreenfees = priceGreenfees;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+      // ici modifier    value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][0]}"
+        datesSeason[tarifIndexSeasons][0] = SDF.format(startDate);
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        // ici modifier value="#{courseC.tarifGreenfee.datesSeason[courseC.tarifGreenfee.tarifIndexSeasons][1]}"
+        // date to String : quel format
+        //static java.text.DateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
+//String s = SDF.format(endDate);
+        datesSeason[tarifIndexSeasons][1] = SDF.format(endDate);
+        this.endDate = endDate;
+    }
+
+    public String getSeason() {
+        return season;
+    }
+
+    public void setSeason(String season) {
+        this.season = season;
+        LOG.info("setted setSeason = " + season);
+    }
+
+    public String getInputtype() {
+        return inputtype;
+    }
+
+    public void setInputtype(String inputtype) {
+        this.inputtype = inputtype;
+    }
+
+    public String[][] getDaysWrk() {
+        return daysWrk;
+    }
+
+    public void setDaysWrk(String[][] daysWrk) {
+        this.daysWrk = daysWrk;
     }
 
    
@@ -257,25 +380,41 @@ private void updateTotalPrice() {
 }
 */
  @Override
-public String toString()
-{       try {
+public String toString(){
+ try {
+      LOG.info("starting toString TarifGreenfee !");
     return
-            (NEW_LINE 
-            + "from entite :" + this.getClass().getSimpleName()
+            ( NEWLINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase()
             + NEW_LINE + "<br>"
             + " ,seasons : "   + Arrays.deepToString(getDatesSeason() )
             + NEW_LINE + "<br>"
             + " ,tee Times : "   + Arrays.deepToString(getTeeTimes() )
             + NEW_LINE + "<br>"
-            + " ,equipments : "   + Arrays.deepToString(getPriceEquipments() )
+            + " ,PriceEquipments : "   + Arrays.deepToString(getPriceEquipments() )
+            + NEW_LINE + "<br>"
+            + " , EquipmentsChoice : "   + Arrays.deepToString(getEquipmentsChoice())
+            + NEW_LINE + "<br>"
+            + " ,getPriceGreenfee : "   + this.getPriceGreenfee()
+            + NEW_LINE + "<br>"
+            + " ,PriceGreenfees: "   + Arrays.deepToString(getPriceGreenfees())
+            + NEW_LINE + "<br>"
+            + " ,GreenfeesChoice: "   + Arrays.deepToString(getGreenfeesChoice())
+    //        + NEW_LINE + "<br>"
+    //        + " ,greenfees : "   + Arrays.deepToString(getPriceGreenfees() )
             + NEW_LINE + "<br>"
             + " ,days : "   + Arrays.deepToString(getDays() )
             + NEW_LINE + "<br>"
-            + " ,price Greenfee: "   + this.getPriceGreenfee()
+            + " ,daysWrk : "   + Arrays.deepToString(getDaysWrk() )
+            + NEW_LINE + "<br>"
+            + " ,input Type : "   + this.getInputtype() // GR ou TI ou DA
+            + NEW_LINE + "<br>"
+            + " ,season : "   + this.getSeason()
             );
-        } catch (Exception ex) {
-           LOG.error("Exception in Tarif to String" + ex);
-           return null;
+ }catch(Exception e){
+    String msg = "£££ Exception in TarifGreenfee.toString = " + e.getMessage(); 
+        LOG.error(msg);
+        showMessageFatal(msg);
+        return msg;
         }
 } //end method
 } // end class

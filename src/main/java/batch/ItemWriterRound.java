@@ -4,6 +4,7 @@ package batch;
 import create.CreateRound;
 import entite.Course;
 import entite.Round;
+import entite.Unavailable;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.Arrays;
@@ -130,8 +131,9 @@ public class ItemWriterRound extends AbstractItemWriter implements interfaces.Lo
 //       LOG.info("step 09");
           LOG.info("course = " + course.toString());
  //          LOG.info("step 10");
-      CreateRound cr = new CreateRound();
-      boolean b = cr.createRound(round, course, conn);
+    //  CreateRound cr = new CreateRound();
+    Unavailable unavailable = new Unavailable();
+      boolean b = new CreateRound().create(round, course, unavailable, conn);
          LOG.info("boolean returned from create round = " + b);
       if(b == false) // new 20/10/2014
              {

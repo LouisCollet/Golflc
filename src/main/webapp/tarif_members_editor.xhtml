@@ -1,0 +1,70 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      
+      >
+    
+    <h:head id="headEditor"/>
+
+        <h:outputStylesheet library="css" name="primefacesLC.css"/>
+<h:graphicImage name="images/editor1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/quilljs.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+        
+        
+  <h:form  id="tarif-members_editor" enctype="application/x-www-form-urlencoded" >    
+
+    <p:panel id="panel1" 
+             header="#{msg['title.members.tarif']}" 
+             footer="Tarif footer"
+             styleClass="redColoredPanel"
+             >
+    <ui:include src="/header.xhtml"/>
+           locale="#{languageC.locale}"
+    <p:textEditor id="textEditor"
+                  widgetVar="editor1"
+                  value="#{courseC.tarifMember.comment}"
+                  height="100"
+                  style="margin-bottom:10px"/>
+     
+    <p:commandButton id="commandSubmit"
+                     value="Submit" 
+                     update="display"
+                     oncomplete="PF('dlg').show()"
+                     icon="pi pi-save" />
+    <p:commandButton id="commandClear"
+                     value="Clear"
+                     type="button" onclick="PF('editor1').clear();"
+                     icon="pi pi-times" />
+    <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-rotate-left"
+                         action="tarif_members_menu.xhtml"
+                         />
+         <f:facet name="options">
+            <p:menu>
+                <p:submenu label="Settings">
+                    <p:menuitem value="Toggle" url="#" icon="pi pi-clone" onclick="PF('panel1').toggle()" />
+                    <p:menuitem value="Remove" url="#" icon="pi pi-times" onclick="PF('panel1').close()" />
+                </p:submenu>
+            </p:menu>
+        </f:facet>
+
+    </p:panel>
+ 
+    <p:dialog header="Here is your Comment about your Membership" widgetVar="dlg" showEffect="fade" hideEffect="fade">
+        <p:outputPanel id="display">
+            Your Comment =
+            <h:outputText value="#{courseC.tarifMember.comment}" escape="false" />
+        </p:outputPanel>
+    </p:dialog>
+
+    </h:form>
+</html>

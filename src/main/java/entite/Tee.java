@@ -18,8 +18,7 @@ import utils.LCUtil;
 
 
 @Named
-public class Tee implements Serializable, interfaces.Log
-{
+public class Tee implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
 
 //@NotNull(message="Bean validation : the Tee ID must be completed")
@@ -55,8 +54,11 @@ private Date teeModificationDate;
 private boolean NextTee; // 23/06/2013
 private boolean CreateModify = true; // 12/08/2017
 
-    public Tee() // connector
-    {
+@NotNull(message="Bean validation : the TeeStart must be completed")
+// @Size(max = 5,message="Bean validation : the Hcp is maximum 5 characters")
+    private String teeHolesPlayed;
+
+    public Tee(){ // connector
         teeGender="M"; // default for radio button
         teeStart="YELLOW";
         teeClubHandicap = 0;
@@ -143,17 +145,35 @@ private boolean CreateModify = true; // 12/08/2017
     public void setCreateModify(boolean CreateModify) {
         this.CreateModify = CreateModify;
     }
+
+    public String getTeeHolesPlayed() {
+        return teeHolesPlayed;
+    }
+
+    public void setTeeHolesPlayed(String teeHolesPlayed) {
+        this.teeHolesPlayed = teeHolesPlayed;
+    }
     
 @Override
-public String toString()
-{ return 
+public String toString(){
+    try{
+        LOG.info("starting toString Tee!");
+    return 
         ( NEW_LINE  + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase() + NEW_LINE
                + " idtee : "   + this.getIdtee()
                + " ,TeeStart : " + this.getTeeStart()
                + " ,Tee Slope : " + this.getTeeSlope()
+               + " ,Tee Rating : " + this.getTeeRating()
                + " ,Tee Gender : " + this.getTeeGender()
                + " ,idcourse : " + this.getCourse_idcourse()
+               + " ,holes played : " + this.getTeeHolesPlayed()
         );
+        }catch(Exception e){
+        String msg = "£££ Exception in Tee.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }   
 
   public static Tee mapTee(ResultSet rs) throws SQLException{
@@ -167,6 +187,8 @@ public String toString()
         t.setTeeRating(rs.getBigDecimal("teerating"));
         t.setTeeClubHandicap(rs.getInt("TeeClubHandicap"));
         t.setCourse_idcourse(rs.getInt("tee.course_idcourse"));
+        t.setTeeHolesPlayed(rs.getString("TeeHolesPlayed")); // new 29-03-2019
+                ;
         
    return t;
   }catch(Exception e){

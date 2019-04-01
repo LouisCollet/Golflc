@@ -15,7 +15,7 @@ import utils.LCUtil;
 public class CreateInitialHandicap implements interfaces.Log, interfaces.GolfInterface
 {
 
-    public boolean createHandicap(Connection conn, Player player, Handicap handicap, String batch) throws SQLException
+    public boolean create(Connection conn, Player player, Handicap handicap, String batch) throws SQLException
     {
         PreparedStatement ps = null;
         int row = 0;

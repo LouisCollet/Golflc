@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
@@ -23,7 +24,6 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.DateTime;
-import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
@@ -36,6 +36,7 @@ import net.fortuna.ical4j.util.CompatibilityHints;
 import net.fortuna.ical4j.util.MapTimeZoneCache;
 import static utils.LCUtil.asUtilDate;
 import static utils.LCUtil.showMessageFatal;
+
 public class InscriptionICS {
 
   public FileOutputStream createInscriptionMailICS(Player player, Player invitedBy,
@@ -56,33 +57,31 @@ public class InscriptionICS {
     LOG.info("round getPlayersString = " + round.getPlayersString());
 round.getPlayers().forEach(item -> LOG.info("existing players - round.getPlayers = " + item + "/")); // java 8 lambda
     LOG.info("list invitedBy DroppedPlayers = " + invitedBy.getDroppedPlayers());
-invitedBy.getDroppedPlayers().forEach(item -> LOG.info("invitedBy : List new Players " + item + "/")); // java 8 lambda
-//LOG.info("line 01");
+// invitedBy.getDroppedPlayers().forEach(item -> LOG.info("invitedBy : List new Players " + item + "/")); // java 8 lambda
+LOG.info("line 01");
 
    String hostEmail = "louis.collet@skynet.be";
 
    // http://ical4j.github.io/docs/ical4j/api/2.0.0/net/fortuna/ical4j/model/DateTime.html
    // https://github.com/ical4j/ical4j/wiki/DateTime
+   //http://ical4j.github.io/docs/ical4j/api/3.0.4/
      //Creating a new calendar
      CalendarBuilder builder = new CalendarBuilder();
      TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
      VTimeZone tz = registry.getTimeZone("Europe/Brussels").getVTimeZone();
      
-     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_OUTLOOK_COMPATIBILITY, true); // new 09-12-018
-// LOG.info("line 02");
+     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_OUTLOOK_COMPATIBILITY, true); // new 09-12-2018
+ LOG.info("line 02");
      Calendar c = new Calendar();
      c.getProperties().add(new ProdId("-//Ben Fortuna//iCal4j 1.0//EN"));
      c.getProperties().add(Version.VERSION_2_0);
      c.getProperties().add(CalScale.GREGORIAN);
      c.getComponents().add(tz);
-// LOG.info("line 03");
-
-
+LOG.info("line 03");
     java.util.Date rd = asUtilDate(round.getRoundDate(), ZoneId.of("Europe/Brussels"));
         LOG.info("roundDate converted from localdatetime = " + rd);
     DateTime start = new DateTime(rd); // format ical4j
         LOG.info("round dte format ical4j = " + start);
-    Dur duration = new Dur(0,5,0,0);   // 5 heures le temps estimé d'une partie de golf
     String AT = "";
     if(isMeetingInvite){
         AT = "Réservation";
@@ -90,8 +89,9 @@ invitedBy.getDroppedPlayers().forEach(item -> LOG.info("invitedBy : List new Pla
         AT = "Cancellation";
     }
     String eventName = "Golf Round " + AT + " : " + club.getClubName() + " - " + course.getCourseName();
-    VEvent e = new VEvent(start, duration, eventName);  // also start, end, eventName
+    VEvent e = new VEvent(start, Duration.ofHours(5), eventName); // 5 heures = le temps estimé d'une partie de golf
 // add timezone information..
+LOG.info("line 04");
     e.getProperties().add(new Location(club.getClubName() + ", " + club.getClubAddress() + ", " + club.getClubCity()));
     e.getProperties().add(new Description(round.getRoundGame() + " " + course.getCourseName()
                             + " Les autres participants sont : " + round.getPlayersString()));
@@ -99,8 +99,7 @@ invitedBy.getDroppedPlayers().forEach(item -> LOG.info("invitedBy : List new Pla
 //  e.getProperties().add(new Organizer("MAILTO:" + hostEmail));
     e.getProperties().add(new Name("this is a new Name"));   //sert à quoi ?
     e.getProperties().add(tz.getTimeZoneId());
-    
-  //  e.getProperties().add(new Cn("To ... Joueur : " + player.getPlayerLastName()));
+    LOG.info("line 05");
 
    e.getProperties().add(new Sequence("1"));
    e.getProperties().removeAll(e.getProperties(Property.STATUS)); // You can only have one status so make sure we remove any previous ones.
@@ -125,13 +124,12 @@ invitedBy.getDroppedPlayers().forEach(item -> LOG.info("invitedBy : List new Pla
          a.getParameters().add(Role.REQ_PARTICIPANT);
          a.getParameters().add(new Cn("To ... Joueur : " + player.getPlayerLastName()));
      e.getProperties().add(a);
-    
-    Organizer o = new Organizer(URI.create("mailto:" + "louis.collet@skynet.be"));
+    LOG.info("line 06");
+    Organizer o = new Organizer(URI.create("mailto:" + hostEmail));
          o.getParameters().add(Role.CHAIR);
          o.getParameters().add(new Cn("Louis Collet"));
-         o.getParameters().add(new SentBy(URI.create("louis.collet@skynet.be")));
+         o.getParameters().add(new SentBy(URI.create(hostEmail)));
     e.getProperties().add(o);
-
 // ajout du composant au calendrier
     c.getComponents().add(e);
   //Saving an iCalendar file c'est pas bon : va être envoyé par sendEmail si mail : "INSCRIPTION"
@@ -139,15 +137,13 @@ invitedBy.getDroppedPlayers().forEach(item -> LOG.info("invitedBy : List new Pla
     String fcal = "c:\\aa (LC Data)\\GolfCalendar.ics";
     FileOutputStream fout = new FileOutputStream(fcal);
     CalendarOutputter outputter = new CalendarOutputter();
- //   LOG.info("before validation");
+  LOG.info("before validation");
     outputter.setValidating(true);
     outputter.output(c, fout);
-  
+  LOG.info("line 07");
   //Now Parsing an iCalendar file
     FileInputStream fin = new FileInputStream(fcal);
-//  CalendarBuilder builder = new CalendarBuilder();
     c = builder.build(fin);
-//   LOG.info("meeting ical = " + NEW_LINE + e);
     LOG.info("line 102");
 //Attaching binary data
         FileInputStream bin = new FileInputStream(images_library + "calendar.png");
@@ -165,7 +161,6 @@ invitedBy.getDroppedPlayers().forEach(item -> LOG.info("invitedBy : List new Pla
     LOG.info("line 104");
     LOG.info("binary attach + "); // + attach);
  //       c = builder.build(bin);   provoque error
-
     LOG.info("line 105");    
    LOG.info("calendar = " + NEW_LINE + c); 
    
@@ -190,44 +185,33 @@ return fout;
       Player player3 = new Player();
       player3.setIdplayer(2014102);  
       ArrayList<Player> p = new ArrayList<>();   // transform player2 in list<player<    
-      p.add(player2); //.setDroppedPlayers(player)).;
+      p.add(player2);
       p.add(player3);
       player.setDroppedPlayers(p);
-      
+ 
       Player invitedBy = new Player();
       invitedBy.setIdplayer(324713);
       player.setPlayerLastName("Collet");
+
       Club club = new Club();
       club.setClubName("Cabopino");
+
       Course course = new Course();
+ 
       Round round = new Round(); 
       round.setRoundDate(LocalDateTime.of(2018, Month.NOVEMBER, 17, 12, 15));
       round.setRoundGame("round game : STABLEFORD");
       round.setPlayersString("inscrits précédemment : Corstjens, Bauer");
 
-    InscriptionICS ics = new InscriptionICS();
-    ics.createInscriptionMailICS(player, invitedBy, round, club, course, false);  // true = tentative, false = cancel
-    
-    String to = "louis.collet@skynet.be";
-    utils.SendEmail sm = new utils.SendEmail();
-    boolean b = sm.sendHtmlMail("sujet de test","message du mail",to,"INSCRIPTION");
-       LOG.info("HTML Mail status = " + b);
- //   DBConnection dbc = new DBConnection();
- //  Connection conn = dbc.getConnection();
-   
-//   String tz = "Europe/Brussels";
+    new InscriptionICS().createInscriptionMailICS(player, invitedBy, round, club, course, false);  // true = tentative, false = cancel
 
- // ArrayList<Flight> fl = findSunriseSunset(date,"50.202764", "5.013203",tz, conn);
-  //         LOG.info("response in main = :"  + fl);
+    String to = "louis.collet@skynet.be";
+    boolean b = new utils.SendEmail().sendHtmlMail("sujet de test from main","message du mail",to,"INSCRIPTION");
+       LOG.info("HTML Mail status = " + b);
    } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
 //            LCUtil.showMessageFatal(msg);
    }
-  
    } // end main//
-
-  
-  
-  
 } // end class

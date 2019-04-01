@@ -25,14 +25,26 @@
 
 <h:form id="creditcard_payment_executed" enctype="application/x-www-form-urlencoded">
 
-<p:panelGrid
+<script type="text/javascript">
+setTimeout(function() {
+ document.getElementById('creditcard_payment_executed:commandButtonPayment').click();}
+ , 3000);
+    
+function startUp(){
+alert("Vous serez redirigé dans 3 secondes ");
+}
+
+window.onload=startUp();
+</script>
+    
+ <p:panelGrid
     id="panelGrid1"
     columns="2"
     styleClass="alignmentLeft"
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.payment.executed']}</h1>
+    <h:outputText escape="false" value="#{msg['title.payment.executed']}" />
 </f:facet>
     <h:outputText  id="Total"
                 value="#{msg['creditcard.amountpaid']} :"
@@ -51,7 +63,6 @@
     <h:outputText value="#{msg['creditcard.holder']} :" />
     <h:outputText  id="Holder"
                    value="#{courseC.creditcard.creditCardHolder}"
-                              
                          />
     
     <h:outputText  value="#{msg['creditcard.number']} :"/>
@@ -70,15 +81,6 @@
                       value="#{courseC.creditcard.reference}"/>
 
 <f:facet name="footer">
-    <!--     <p:commandButton value="Mail de confirmation"
-                         id="commandButtonMail"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="true"
-                         icon="fa fa-envelope"
-                         action="#{courseC.creditCardMail}"
-                         />
-         -->
          <p:commandButton value="Lancer la mise à jour"
                          id="commandButtonPayment"
                          ajax="false"
@@ -87,11 +89,9 @@
                          icon="fa fa-database"
                          action="#{courseC.handlePayments()}"
                          />
-         <!--  rendered="#{courseC.creditcard.paymentOK eq true}" -->
-   
+
 </f:facet>
 </p:panelGrid>
-
    <!--  transfer data fromm js to bean
    https://stackoverflow.com/questions/7221495/pass-parameter-to-premotecommand-from-javascript/18510102#18510102
    https://stackoverflow.com/questions/26849704/pass-variable-from-jsf-javascript-to-bean
@@ -99,7 +99,6 @@
    -->
    <p:remoteCommand name="SetMyStrings"
                     actionListener="#{courseC.creditcard.setMyStrings}" />
-   
 </h:form>
 </ui:define>
 </ui:composition>

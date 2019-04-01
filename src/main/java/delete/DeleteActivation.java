@@ -1,21 +1,19 @@
 
 package delete;
 
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import utils.DBConnection;
 import utils.LCUtil;
 
 public class DeleteActivation implements interfaces.Log, interfaces.GolfInterface
 {
-    public Boolean deleteActivation(final Connection conn, String in_uuid) throws Exception
-    {
-  //  Connection conn = null;
+    public Boolean delete(final Connection conn, String in_uuid) throws Exception {
     PreparedStatement ps = null;
     Boolean b = false;
- try
-{
- // conn = utils.DBConnection.getConnection();
+ try{
      LOG.info("entering  delete from Table Activation ... = " );
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
           "DELETE"
@@ -24,12 +22,10 @@ public class DeleteActivation implements interfaces.Log, interfaces.GolfInterfac
      ;
         ps = conn.prepareStatement(query); 
         ps.setString(1, in_uuid);
-          //    String p = ps.toString();
           utils.LCUtil.logps(ps); 
         int x = ps.executeUpdate();
             //LOG.info(" -- Table Activation - Rows deleted = " + x);
-    if(x == 1)
-            {
+    if(x == 1){
                 LOG.info("-- Successfull Delete 1 row of table Activation = ");
                 return true;
     }else{
@@ -52,4 +48,23 @@ public class DeleteActivation implements interfaces.Log, interfaces.GolfInterfac
 }
 
 } //end method
+    
+  public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+ try{
+  //  int idtee = 339;
+    String uuid = "rrrrrrrrrrr";
+    boolean b = new DeleteActivation().delete(conn, uuid);
+        LOG.info("from main - resultat deletectivation = " + b);
+ } catch (Exception e) {
+        String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+      //      LCUtil.showMessageFatal(msg);
+   }finally{
+       DBConnection.closeQuietly(conn, null, null, null); 
+          }
+} // end method main
+    
+    
+    
 } //end class

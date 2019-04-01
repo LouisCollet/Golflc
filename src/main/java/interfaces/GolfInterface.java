@@ -70,6 +70,7 @@ static final String DATE_END_COURSE = "2099-12-31";
 static final String DATE_END_HANDICAP = "2099-12-31";
 
 static java.text.DateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
+static java.text.DateFormat SDF_HH_MM = new SimpleDateFormat("HH:mm");
 static java.text.DateFormat SDF_YYYY = new SimpleDateFormat("yyyy/MM/dd");
 static java.text.DateFormat SDF_MM = new SimpleDateFormat("yyyy/MM");
 static java.text.DateFormat SDF_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.getDefault());

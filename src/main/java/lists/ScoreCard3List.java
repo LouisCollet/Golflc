@@ -15,15 +15,13 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class ScoreCard3List implements interfaces.Log
-{
+public class ScoreCard3List implements interfaces.Log{
     private static List<ECourseList> liste = null; 
     
-public List<ECourseList> getScoreCardList3(final Player player, final Round round ,
+public List<ECourseList> list(final Player player, final Round round ,
      //    final PlayerHasRound phr, final Connection conn) throws SQLException{ 
      final Inscription phr, final Connection conn) throws SQLException{ 
-if(liste == null)
-{    
+if(liste == null){
     LOG.debug("starting getScoreCardList3... = ");
     LOG.info("player = ... = " + player.toString());
     LOG.info("round = ... = " + round.toString());
@@ -40,13 +38,8 @@ try{
     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
   
     String query =
-         "SELECT"
-         + sc + "," + ho + "," + ro + "," + ph
-    //      " ScoreHole, ScorePar ,HoleStrokeIndex, ScoreExtraStroke, HoleDistance,"
-   //     + "  ScoreStroke, ScorePoints, ScoreFairway, ScoreGreen, ScorePutts, ScoreBunker, ScorePenalty,"
-   //     + " idround, RoundCSA, RoundHoles, RoundCompetition, RoundGame,RoundQualifying, "
- //   + " Player_has_roundZwanzeursResult, Player_has_roundZwanzeursGreenshirt"
-
+        "SELECT"
+        + sc + "," + ho + "," + ro + "," + ph
         + " FROM course"
         + " JOIN player"
         + "     ON player.idplayer = ?"
@@ -91,8 +84,7 @@ try{
     liste = new ArrayList<>(); // new 02/06/2013
   //  ECourseList cc = new ECourseList(); mod
 
-while(rs.next())
-{
+while(rs.next()){
           ECourseList ecl = new ECourseList(); // est réi, donc total = 0
 
           Hole h = new Hole();
@@ -110,31 +102,6 @@ while(rs.next())
           ScoreStableford s = new ScoreStableford();
           s = entite.ScoreStableford.mapScoreStableford(rs);  
           ecl.setScoreStableford(s);
-/*
-            cc.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
-            cc.setHoleDistance(rs.getShort("HoleDistance") );
-            
-            cc.setScoreHole(rs.getShort("ScoreHole") );
-            cc.setScorePar(rs.getShort("ScorePar") );
-            cc.setScoreExtraStroke(rs.getShort("ScoreExtraStroke") );
-            cc.setScoreStroke(rs.getShort("ScoreStroke") );
-            cc.setScorePoints(rs.getShort("ScorePoints") );
-            cc.setScoreFairway(rs.getShort("ScoreFairway") );
-            cc.setScoreGreen(rs.getShort("ScoreGreen") );
-            cc.setScorePutts(rs.getShort("ScorePutts") );
-            cc.setScoreBunker(rs.getShort("ScoreBunker") );
-            cc.setScorePenalty(rs.getShort("ScorePenalty") );
-            
-            cc.setIdround(rs.getInt("idround"));
-            cc.setRoundCBA(rs.getShort("RoundCSA") );
-            cc.setRoundHoles(rs.getShort("RoundHoles") );
-            cc.setRoundCompetition(rs.getString("RoundCompetition") );
-            cc.setRoundGame(rs.getString("RoundGame") );
-            cc.setRoundQualifying(rs.getString("RoundQualifying") );
-            
-            cc.setPlayerhasroundZwanzeursResult(rs.getShort("Player_has_roundZwanzeursResult") );
-            cc.setPlayerhasroundZwanzeursGreenshirt(rs.getShort("Player_has_roundZwanzeursGreenshirt") );
-*/
             liste.add(ecl );//store all data into a List
             //    LOG.info("just after add to listsc3");
 } //end while
@@ -169,6 +136,24 @@ return liste;
         ScoreCard3List.liste = liste;
     }
 
-
+ public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+  try{
+        Player player = new Player();
+        Round round = new Round(); 
+        player.setIdplayer(324713);
+        round.setIdround(300);
+        Inscription inscription = new Inscription();
+    //    ScoreCard1List sc1l = new ScoreCard1List();
+       List<ECourseList> ec = new ScoreCard3List().list(player, round, inscription, conn);
+        LOG.info("from main, ec = " + ec);
+ }catch (Exception e){
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+      //      LCUtil.showMessageFatal(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
 
 } //end Class

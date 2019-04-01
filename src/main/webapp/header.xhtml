@@ -11,11 +11,11 @@
      xmlns:of="http://omnifaces.org/functions"
 >
 <ui:composition>
- 
+ <h:form id="form_header" enctype="application/x-www-form-urlencoded" >
             <p:commandButton
                          id="buttonLogout"
                          ajax="true"
-                         value="#{msg['button.logout']}"
+                         value="Logout"
                          immediate="true"
                          icon="ui-icon-power"
                          action="#{courseC.logout('from button Logout')}"
@@ -33,7 +33,6 @@
                          immediate="true"
                          icon="fa fa-language"
                          action="#{languageC.setLanguage('fr')}"
-                     
                          onclick="setTimeout(function(){window.location.reload();},200);"
                         >
             </p:commandButton>
@@ -67,6 +66,18 @@ Set this parameter to true if you want to force the browser to get the page from
                          onclick="setTimeout(function(){window.location.reload();},100);"
                          />
 &nbsp;
+            <p:commandButton
+                         id="buttonEspanol"
+                         title="Pantallas en español"
+                         ajax="true"
+                         value="#{msg['button.spain']}"
+                         immediate="true"
+                         icon="fa fa-language"
+                         action="#{languageC.setLanguage('es')}"
+                         onclick="setTimeout(function(){window.location.reload();},100);"
+                         />
+
+
 <!--
 #{courseC.emoji}
 -->
@@ -92,10 +103,6 @@ Set this parameter to true if you want to force the browser to get the page from
       <f:ajax render="Zonedtime"/>
     </h:commandButton>
   
-    <h:outputText id="Zonedtime"
-                  value="#{courseC.CurrentTimeWithZoneOffset()}" 
-                  rendered="#{courseC.player.idplayer != null}"
-                  />
 -->
     <h:outputText value=" /Current Player " rendered="#{courseC.player.idplayer != null}"/>
      <h:outputText value=" #{courseC.player.idplayer}
@@ -115,9 +122,6 @@ Set this parameter to true if you want to force the browser to get the page from
     <h:outputText value=" /Subscription Trial : " rendered="#{courseC.player.idplayer != null}"/>
     <b> <h:outputText value=" #{courseC.subscription.trialCount}" rendered="#{courseC.player.idplayer != null}"/> </b> 
 
-    
-    
-    
     <h:outputText value=" /ZoneId Time Zone : " 
                   rendered="#{courseC.player.idplayer != null}"/>
     <b> <h:outputText value=" #{courseC.player.getPlayerTimeZone().getTimeZoneId()}"
@@ -130,11 +134,7 @@ Set this parameter to true if you want to force the browser to get the page from
         
     <h:outputText value=" /Execution : " />
     <b> <h:outputText value="#{settings['Execution']}"/> </b> 
-    
-    <!-- <h:outputText value="#{utilsC.sessionCount}"/>  -->
-    <b>
-    <h:outputText  value="/Sessions :  " />
-    </b>
+    <b> <h:outputText  value="/Sessions :  " /> </b>
  
     also == #{mySessionCounter.activeSessions}
     
@@ -143,6 +143,6 @@ Set this parameter to true if you want to force the browser to get the page from
     </h:outputText>
     
 <p:separator id="separatorHeader"/>
-
+ </h:form>
 </ui:composition>
 </html>

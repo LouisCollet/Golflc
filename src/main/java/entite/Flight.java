@@ -21,6 +21,8 @@ public class Flight implements Serializable, interfaces.Log
     private String flightPeriod;
     private ZonedDateTime sunrise;
     private ZonedDateTime sunset;
+    private ZonedDateTime firstFlight;
+    private ZonedDateTime lastFlight;
     
  public Flight()
     {
@@ -79,15 +81,39 @@ public class Flight implements Serializable, interfaces.Log
         this.sunset = sunset;
     }
 
+    public ZonedDateTime getFirstFlight() {
+        return firstFlight;
+    }
+
+    public void setFirstFlight(ZonedDateTime firstFlight) {
+        this.firstFlight = firstFlight;
+    }
+
+    public ZonedDateTime getLastFlight() {
+        return lastFlight;
+    }
+
+    public void setLastFlight(ZonedDateTime lastFlight) {
+        this.lastFlight = lastFlight;
+    }
+
      @Override
-public String toString()
-{ return 
+public String toString(){
+    try{
+        LOG.info("starting toString Flight !");
+    return 
         (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName()
                + " ,idflight : "   + this.getIdflight()
                + " ,FlightStart : " + this.getFlightStart()
                + " ,course_idcourse : " + this.getCourse_idcourse()
                + " ,period : " + this.getFlightPeriod()
         );
+        }catch(Exception e){
+        String msg = "£££ Exception in Flight.toString = " + e.getMessage();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }
 public static Flight mapFlight(ResultSet rs) throws SQLException{
     String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 

@@ -23,13 +23,13 @@
 </ui:define>
 <ui:define name="content">
 
-<h:graphicImage  name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage  name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:graphicImage  name="images/hours1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage  name="images/hours2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
 
 <h:form id="tarifHours" enctype="application/x-www-form-urlencoded" >
   
 <ui:include src="include/include_summary_club.xhtml"/>
-<p:focus for="starttime" />
+<!-- <p:focus for="starttime" /> -->
 <p:panelGrid
     id="panel1"
     columns="2"
@@ -37,18 +37,15 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.hours.tarif']}</h1>
+      <h:outputText escape="false" value="#{msg['title.hours.tarif']}" />
+       <h:outputText value="#{playerage} - #{courseC.tarifGreenfee.inputtype}"/>
 </f:facet>
         
-       <h:outputText value="#{msg['tarif.number']} :"   />
-       <p:inputMask
-                   label="hole num"
-                        id="holenumb"
-                        title="#{msg['tooltip.tarif.date']}"
-                        value="#{courseC.tarifGreenfee.tarifIndexHours}"
-                        size="3"
-                        mask="?99"
-                        />
+  <h:outputText value="#{msg['tarif.number']} :"   />
+  <h:outputText id="index"
+                value="#{courseC.tarifGreenfee.tarifIndexHours} / #{fn:length(courseC.tarifGreenfee.teeTimes)}"
+                />
+  <!--     
 <h:outputText  value="#{msg['tarif.period.start']} :"/>
        <p:inputMask id="startdate"
                     title="#{msg['tooltip.tarif.date']}"
@@ -59,7 +56,6 @@
 		    label="Start Date" 
                     mask="99/99/9999"
                     >
-<!--   value="#{courseC.tarif.datesSeason[courseC.tarif.tarifIndexSeasons][0]}"  -->
 	</p:inputMask>
        
       <h:outputText  value="#{msg['tarif.period.end']} :"/>
@@ -73,82 +69,82 @@
                     mask="99/99/9999"
                     >
       	</p:inputMask>
-      
-      <!--  value="#{courseC.tarif.datesSeason[courseC.tarif.tarifIndexSeasons][1]}"  -->
-       <h:outputText  value="#{msg['tarif.hours.start']} :"/>
-       <p:inputMask  label="Start Time"
-                       id="starttime"
-                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][0]}"
-                       title="#{msg['tooltip.tarif.hour']}"
-                       size="6"
-                       required="true"
-                       slotChar="_"
-                       mask="99:99"
-                       >
-       	</p:inputMask>
-<!--
   
-       <h:inputText id="starttime"
-                    title="#{msg['tooltip.tarif.date']}"
-                    value="#{courseC.tarif.teeTimes[courseC.tarif.tarifIndexHours][0]}"
-                    size="6"
-                    required="true"
-		    label="Start Date" >
-        	<f:convertDateTime pattern="HH:mm" />
-	</h:inputText>
- -->      
-       <h:outputText  value="#{msg['tarif.hours.end']} :"/>
-       <p:inputMask id="endtime"
-                    title="#{msg['tooltip.tarif.hour']}"
-                    value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][1]}"
-                    size="6"
-                    required="true"
-                    slotChar="_"
-                    mask="99:99"
-		    label="End Time" >
-	</p:inputMask>
-       
+     
+     <h:outputText value="#{msg['tarif.seasons']} :"   />-->
+     <h:panelGroup id="panelPrice" layout="block" >    
+     <h:outputText value="#{msg['tarif.season']} " 
+                   style="font-size: 1.5em;"/>
+     <i class="fas fa-snowflake fa-2x"></i>
+     <i class="fas fa-cloud-sun fa-2x"></i>
+     <i class="fas fa-sun fa-2x"></i>
+    </h:panelGroup>
+
+     <p:selectOneButton id="Season_High-Medium-Low"
+                          required="true"
+                          value="#{courseC.tarifGreenfee.workSeason}"
+               >
+            <f:selectItem itemLabel="#{msg['tarif.high']}"   itemValue="H" />
+            <f:selectItem itemLabel="#{msg['tarif.medium']}" itemValue="M" />
+            <f:selectItem itemLabel="#{msg['tarif.low']}"    itemValue="L" />
+       </p:selectOneButton>
+     
+     <!-- value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][2]}"
+     value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][0]}"   -->
+       <h:outputText  value="#{msg['tarif.hours.start']} :"/>
+       <pe:timePicker id="starttime"
+                         value="#{courseC.tarifGreenfee.startDate}"
+                         mode="popup"
+                         widgetVar="popupBtnTimeWidget"
+                         showOn="both"
+                         label="Popup time picker with button"
+                         startHours="7"
+                         endHours="19"
+                         intervalMinutes="10"
+                       /> 
        <!--
-       <h:outputText value="Time"/>
-<h:inputText value="#{courseC.tarif.time}" 
-             id="LC"
-             converter="localHoursConverter"
-             timeZone="#{courseC.tarif.timeZone}"
-             >
-                  
-</h:inputText>
+        <p:datePicker id="expirationdate"
+                   view="month"
+                   inline="popup"
+                   immediate="true"
+                   value="#{courseC.tarifGreenfee.startDate}"
+                   timeOnly="true"
+                   yearNavigator="true"
+                   monthNavigator="true"
+                   yearRange="2019:2021"
+                   stepHour="1"
+                   stepMinute="1"
+                   showButtonBar="true"
+                   selectionMode="single"
+                   showIcon="true"
+                   readonlyInput="true"
+                   locale="#{languageC.locale}"
+                   size="8"
+                   />
        -->
+
+         <h:outputText  value="#{msg['tarif.hours.end']} :"/>
+         <pe:timePicker id="endtime"
+                        value="#{courseC.tarifGreenfee.endDate}"
+                         mode="popup"
+                         widgetVar="popupBtnTimeWidget"
+                         showOn="both"
+                         startHours="7"
+                         endHours="19"
+                         intervalMinutes="10"
+                       />  
        
-       <h:outputText  value="#{msg['tarif.hours.high']} :"/>
+       <h:outputText  value="#{msg['tarif.members.price']} :"/>
        <p:inputMask  label="HighSeason"
                        id="high"
-                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][2]}"
+                       value="#{courseC.tarifGreenfee.workPrice}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="6"
                        slotChar="_"
                        mask="999.9"
                        >
        </p:inputMask>
-        <h:outputText  value="#{msg['tarif.hours.medium']} :"/>
-       <p:inputMask  label="MediumSeason"
-                       id="medium"
-                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][3]}"
-                       title="#{msg['tooltip.tarif.price3']}"
-                       size="6"
-                       slotChar="_"
-                       mask="999.9"
-                       >
-        </p:inputMask>
-       <h:outputText  value="#{msg['tarif.hours.low']} :"/>
-       <p:inputMask  label="LowSeasong"
-                       id="low"
-                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][4]}"
-                       title="#{msg['tooltip.tarif.price3']}"
-                       size="6"
-                       slotChar="_"
-                       mask="999.9"
-                       >
-         </p:inputMask>
+
 <f:facet name="footer">
         <p:commandButton value="#{msg['tarif.hours.create']}"
                          id="commandButton1"
@@ -163,12 +159,11 @@
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-rotate-left"
-                         action="tarif_menu.xhtml"
+                         action="tarif_greenfee_menu.xhtml"
                          />
 </f:facet>
 
 </p:panelGrid>
-
 </h:form>
 </ui:define>
 </ui:composition>

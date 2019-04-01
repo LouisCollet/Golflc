@@ -21,7 +21,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.inject.Named;
 import javax.servlet.ServletException;
-import org.primefaces.context.RequestContext;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.ColumnResizeEvent;
 import org.primefaces.event.map.OverlaySelectEvent;
 import org.primefaces.event.map.PointSelectEvent;
@@ -97,8 +97,7 @@ public UtilsController() throws IOException // constructor
                 "Welcome Back", "Well, that's a long coffee break!"));
     }
     
-public void logFile() throws IOException
-{
+public void logFile() throws IOException{
     Runtime runtime = Runtime.getRuntime();
     runtime.exec(new String[] { "C:\\Program Files\\JGsoft\\EditPadLite\\EditPadLite7.exe", "C:\\log\\golflc.log" } );
 }
@@ -158,8 +157,7 @@ public void setContent(final String content)
 //      return (new Date()); // used in /header.xhtml @110,52 value="#{utilsC.now}":
 //   }
 
-public void onStateChange(StateChangeEvent event)
-{
+public void onStateChange(StateChangeEvent event){
  LatLngBounds bounds = event.getBounds();
  int zoomLevel = event.getZoomLevel();
 
@@ -169,21 +167,18 @@ addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Zoom Level", String.val
  addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "SouthWest", bounds.getSouthWest().toString()));
  }
 
-public void onPointSelect(PointSelectEvent event)
-{
+public void onPointSelect(PointSelectEvent event){
  LatLng latlng = event.getLatLng();
 
 addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Point Selected",
         "Lat:" + latlng.getLat() + ", Lng:" + latlng.getLng()));
  }
 
-public void addMessage(FacesMessage message)
-{
+public void addMessage(FacesMessage message){
  FacesContext.getCurrentInstance().addMessage(null, message);
  }
 
-public void onResize(ColumnResizeEvent event)
-{
+public void onResize(ColumnResizeEvent event){
         //FacesMessage msg = new FacesMessage("Column " + event.getColumn().getClientId()
         //        + " resized", "W:" + event.getWidth() + ", H:" + event.getHeight());
         addMessage(new FacesMessage("The Column " + event.getColumn().getClientId()
@@ -213,16 +208,12 @@ public int getSessionCount() {
     }
 */
 
-public String getClientIpAddress() throws UnknownHostException, ServletException
-{
-
+public String getClientIpAddress() throws UnknownHostException, ServletException{
 return InetAddress.getLocalHost().toString();
-
 }
-public String getClientMacAddress() throws UnknownHostException
-{
-try
-{
+
+public String getClientMacAddress() throws UnknownHostException{
+try{
     InetAddress ip = InetAddress.getLocalHost(); //getByName("192.168.46.53");
     StringBuilder sb = new StringBuilder();
     /*
@@ -230,11 +221,9 @@ try
     * the hardware address.
     */
     NetworkInterface ni = NetworkInterface.getByInetAddress(ip);
-    if (ni != null)
-    {
+    if (ni != null)    {
       byte[] mac = ni.getHardwareAddress();
-      if (mac != null)
-      {
+      if (mac != null) {
          /*
          * Extract each array of mac address and convert it 
          * to hexa with the following format 
@@ -247,7 +236,7 @@ try
            //                     mac[i], (i < mac.length - 1) ? "-" : "");
            sb.append(String.format("%02X%s",mac[i], (i < mac.length - 1) ? "-" : "") );
          }
-         }else{
+      }else{
               LOG.info("Address doesn't exist or is not accessible.");
          }
      }else{ // ni = null
@@ -321,17 +310,13 @@ public String getImplementationTitle()
 }
 
 
-public String getPrimefacesVersion()
-{
-  //  return prop1.getProperty("primefaces.version");  // mod 14/04/2017
-    return RequestContext.getCurrentInstance().getApplicationContext().getConfig().getBuildVersion();
-  //  return org.primefaces.util.Constants.LIBRARY + " - broken in 4.0." ;
-         //  + org.primefaces.util.Constants.VERSION;
+public String getPrimefacesVersion(){
+    return PrimeFaces.class.getPackage().getImplementationVersion(); //07-03-2019
 }
 
 public String getPrimefacesExtensionVersion()
 {
-     return "PrimeFaces Extensions" + prop1.getProperty("primefaces.extension.version");
+     return "PrimeFaces Extensions " + prop1.getProperty("primefaces.extension.version");
  //   return "Running on PrimeFaces Extensions {0}", VersionProvider.getVersion();
     
    // return org.primefaces.extensions.util.Constants.LIBRARY + " broken 1.0.0.RC1 " ;
@@ -340,11 +325,12 @@ public String getPrimefacesExtensionVersion()
 public String getGlassfishVersion()
 {     return prop1.getProperty("glassfish.version");}
 
-public String getWildflyVersion()
-{     return prop1.getProperty("wildfly.version");}
+//public String getWildflyVersion()
+//{     return prop1.getProperty("wildfly.version");}
 
 public String getLog4j2Version()
 { return prop1.getProperty("log4j2.version");  }
+
 public String getNetbeansVersion()
 {  return prop1.getProperty("netbeans.version"); }
 

@@ -38,7 +38,7 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.cotisation.choice']}</h1>
+    <h:outputText escape="false" value="#{msg['title.cotisation.choice']}" />
 </f:facet>
     <h:panelGroup id="panelStart" layout="block" >
         <h:outputText  value="#{msg['tarif.period.start']} : "/>
@@ -48,7 +48,8 @@
          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
     </h:outputText>
     <h:panelGroup id="panelAge" layout="block" >
-        <h:outputText value="Age: #{playerage} "/> <i class="fas fa-birthday-cake"></i>
+        <h:outputText value="Age: #{playerage} "/>
+        <i class="fas fa-birthday-cake"></i>
     </h:panelGroup>
     
 <!-- age du player car beaucoup de cotisations sont fonction de l'âge -->
@@ -64,10 +65,9 @@
      <h:outputText value="#{msg['tarif.members.item']} "
                    style="font-size: 1.5em;"
                    />
-     <i class="fas fa-pen-square fa-2x"></i>
-     <i class="fas fa-list-ol fa-2x"></i>
-     <i class="fas fa-pen-fancy fa-2x"></i>
+      <i class="fas fa-list-ol fa-2x"></i>
 </h:panelGroup>  
+    <!--     <i class="fas fa-pen-square fa-2x"></i>    <i class="fas fa-donate fa-2x"></i>  <i class="fas fa-pen-fancy fa-2x"></i>-->
 <h:panelGroup id="panelPrice" layout="block" >    
      <h:outputText value="#{msg['tarif.members.price']} " 
                    style="font-size: 1.5em;"/>
@@ -78,23 +78,66 @@
      <h:outputText value="#{msg['tarif.members.choice']} "
                    style="font-size: 1.5em;"
                    />
-     <i class="fas fa-euro-sign fa-2x"></i>
-     <i class="fas fa-donate fa-2x"></i>
+     <i class="fas fa-question-circle fa-2x"></i>
+     <i class="fas fa-cart-plus fa-2x"></i>
 </h:panelGroup>
+
 <c:forEach var="i" 
               begin="01" 
               end="#{fn:length(courseC.tarifMember.membersBase)}" 
               step="1">
-        <h:outputText id="MembersItem${i}"
-	             value="#{courseC.tarifMember.membersBase[i-1][0]}" />
+        <h:outputText id="Members1Item${i}"
+                      rendered="#{courseC.tarifMember.membersBase[i-1][2] ne '00-00'}" 
+	              value="#{courseC.tarifMember.membersBase[i-1][0]} (#{courseC.tarifMember.membersBase[i-1][2]})"> 
+        </h:outputText> 
+        <h:outputText id="Members2Item${i}"
+                      rendered="#{courseC.tarifMember.membersBase[i-1][2] eq '00-00'}" 
+	              value="#{courseC.tarifMember.membersBase[i-1][0]}"> 
+        </h:outputText> 
+    
+   <!-- #{courseC.tarifMember.membersBase[i-1][2]}
+        <
+    rendered="#{not empty courseC.tarifMember.membersBase[i-1][2] }" 
+   h:outputText id="MembersItem${i}"
+                      rendered="#{empty courseC.tarifMember.membersBase[i-1][2]}" 
+	              value="#{courseC.tarifMember.membersBase[i-1][0]} " />
+   -->
         <h:outputText id="MembersAmount${i}"
                       value="#{courseC.tarifMember.membersBase[i-1][1]}" />
-         <h:panelGroup id="panelG1" layout="block" >
-              <p:inputNumber
+         <h:panelGroup id="panelMembers" layout="block" >
+         <p:inputNumber
 			id="memberchoice${i}"
 			value="#{courseC.tarifMember.membersChoice[i-1]}"
 			minValue="0"
-                        maxValue="1"
+                        maxValue="4"
+                        required="true"
+                        maxlength="1"
+                        size="1"
+                        emptyValue="0"
+                        title="#{msg['tooltip.tarif.choice']}"
+                        > 
+            
+          </p:inputNumber>  
+<!--   <f:validator validatorId="rangeAgeValidator" /> <i class="fas fa-cart-plus fa-2x"></i> -->
+             
+         </h:panelGroup>
+</c:forEach>
+<!-- equipments -->
+<c:forEach var="i" 
+           begin="01" 
+           end="#{fn:length(courseC.tarifMember.priceEquipments)}" 
+           step="1">
+        <h:outputText id="EquipmentsItem${i}"
+	             value="#{courseC.tarifMember.priceEquipments[i-1][0]}" />
+        <h:outputText id="EquipmentsAmount${i}"
+                      value="#{courseC.tarifMember.priceEquipments[i-1][1]}">
+        </h:outputText>
+        <h:panelGroup id="panelEquipments" layout="block" >
+              <p:inputNumber
+			id="Equipmentchoice${i}"
+			value="#{courseC.tarifMember.equipmentsChoice[i-1]}"
+			minValue="0"
+                        maxValue="4"
                         required="true"
                         maxlength="1"
                         size="1"
@@ -102,12 +145,20 @@
                         title="#{msg['tooltip.tarif.choice']}"
                         >  
               </p:inputNumber>  
-<!-- ici fa-cart-plus sous forme de button si on clique field devient "1" via un javascript -->
-              <i class="fas fa-cart-plus fa-2x"></i>
-        
+    <!--          <i class="fas fa-cart-plus fa-2x"></i> -->
          </h:panelGroup>
-        
 </c:forEach>
+
+<h:outputText value="#{courseC.tarifMember.comment}"
+              escape="false" 
+              style="width:25%"
+              />
+<!-- <h:outputText value="#{bean.string.length() gt 50 ? bean.string.substring(0,47).concat('...') : bean.string}" />
+<p>Abbreviate a long string: #{of:abbreviate(string1, 20)}</p>
+-->
+<h:outputText value="" />
+<h:outputText value="" />
+
 <!--
 <i class="fab fa-cc-discover"></i>
 
@@ -146,15 +197,9 @@
 <i class="far fa-circle fa-2x"></i>  
 -->
 
+
 <f:facet name="footer">
-    <!--    <p:commandButton value="#{msg['tarif.members.show']}"
-                         id="commandButton1"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="false"
-                         icon="ui-icon-disk"
-                         action="#{courseC.showTarifMembers}"/>  -->
-         <p:commandButton value="Manage Cotisation"
+         <p:commandButton value="#{msg['payment.selected']}"
                          id="commandButtonManage"
                          ajax="false"
                          update="growl-msg"

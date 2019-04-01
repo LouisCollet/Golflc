@@ -28,7 +28,7 @@ if(liste == null)
                 + fl +
        //         + " flight.idflight, flight.FlightStart, flight.course_idcourse" +
             " FROM flight" +
-            " WHERE   DATE_FORMAT(flight.FlightStart, '%Y-%m-%d %H:%i')" +   // élimine les secondes
+            " WHERE DATE_FORMAT(flight.FlightStart, '%Y-%m-%d %H:%i')" +   // élimine les secondes
             "     NOT IN" +
             "     (" +
             "     SELECT DATE_FORMAT(round.RoundDate, '%Y-%m-%d %H:%i')" +

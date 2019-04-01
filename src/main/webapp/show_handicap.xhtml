@@ -134,7 +134,7 @@
                 id="cancelButton"
                 actionListener="#{courseC.cancelHandicap(c)}"
                 value="#{msg['button.delete']} "
-                icon="fa fa-trash-o fa-lg colorDelete1"
+                icon="fa fa-trash"
                 update="growl-msg"
                 >
                 <p:confirm header="#{msg['message.confirm']}"
@@ -200,12 +200,6 @@
                      >
         <p:printer target="form_handicap" />
     </p:commandButton>
-<!--
-<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-check-square-o" />
-        <p:commandButton value="No"  type="button" styleClass="ui-confirmdialog-no"  icon="fa fa-close" />
-</p:confirmDialog>
--->
 <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
 </ui:define>

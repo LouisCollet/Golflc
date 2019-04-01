@@ -4,17 +4,17 @@ package entite;
 import static interfaces.GolfInterface.NEWLINE;
 import static interfaces.Log.LOG;
 import javax.inject.Named;
+import utils.LCUtil;
 
 @Named
-public class ECourseList // implements Comparable<ECourseList> 
-{
+public class ECourseList{
     public Club Eclub; 
     public Course Ecourse;
     public Tee Etee;   // new 09/08/017
     public Round Eround;  // new 20/01/2018
     public Handicap Ehandicap;
-    public PlayerHasRound Eplayerhasround;
-    public Inscription EinscriptionNew;
+ //   public PlayerHasRound Eplayerhasround;
+    public Inscription Einscription;
     public Player Eplayer;
     public Classment Eclassment;
     public ScoreStableford EscoreStableford;
@@ -23,16 +23,14 @@ public class ECourseList // implements Comparable<ECourseList>
  //   private int totalExtraStrokes;
   //  private Short playerhasroundFinalResult;
 
- public ECourseList()
-    {
-
+ public ECourseList(){
         Eclub = new Club();
         Ecourse = new Course();
         Etee = new Tee();
         Eround = new Round();
         Ehandicap = new Handicap();
-        Eplayerhasround = new PlayerHasRound();
-        EinscriptionNew = new Inscription();
+  //      Eplayerhasround = new PlayerHasRound();
+        Einscription = new Inscription();
         Eplayer = new Player();
         Eclassment = new Classment();
         EscoreStableford = new ScoreStableford();
@@ -95,12 +93,12 @@ public class ECourseList // implements Comparable<ECourseList>
         this.Ehandicap = handicap;
     }
 
-    public PlayerHasRound getInscription() {
-        return Eplayerhasround;
+    public Inscription getInscription() {
+        return Einscription;
     }
 
-    public void setInscription(PlayerHasRound inscription) {
-        this.Eplayerhasround = inscription;
+    public void setInscription(Inscription inscription) {
+        this.Einscription = inscription;
     }
 
     public Player getPlayer() {
@@ -128,21 +126,22 @@ public class ECourseList // implements Comparable<ECourseList>
     }
     
     public Inscription getInscriptionNew() {
-        return EinscriptionNew;
+        return Einscription;
     }
 
     public void setInscriptionNew(Inscription EinscriptionNew) {
-        this.EinscriptionNew = EinscriptionNew;
+        this.Einscription = EinscriptionNew;
     }
 
 @Override
-public String toString()
-{ 
+public String toString(){ 
+ try{
     LOG.info("starting toString ECourseList!");
     return 
         (NEWLINE 
             + "from entite " + getClass().getSimpleName() + " : "
        +  Eclub.toString()
+    //        LOG.info("after club");
        +  Ecourse.toString()
        +  Etee.toString()
        +  Eround.toString()
@@ -150,7 +149,14 @@ public String toString()
        +  Eclassment.toString()
        +  EscoreStableford.toString()
        +  Ehole.toString()
-       + Esubscription.toString()
+       +  Esubscription.toString()
+       +  Einscription.toString()
         );
-}   
+    }catch(Exception e){
+        String msg = "£££ Exception in ECourseList.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
+} //end method   
 } // end class

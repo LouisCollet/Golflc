@@ -58,7 +58,7 @@ public Boolean checkPassword(String uuid, Connection conn) throws SQLException, 
         LOG.info("OK : idplayer ready for activation  = " + player.getIdplayer() );
     //     conn = DBConnection.getConnection();
         DeleteActivation da = new DeleteActivation();
-        boolean b = da.deleteActivation(conn, uuid);
+        boolean b = da.delete(conn, uuid);
         // delete record dans table Activation
         if(b == false){
             String msg = "Failure delete record Table activation !!!";

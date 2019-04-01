@@ -8,8 +8,7 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class FindPlayer implements interfaces.Log, interfaces.GolfInterface
-{
+public class FindPlayer implements interfaces.Log, interfaces.GolfInterface{
     final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
     
 public Player findPlayer(final int in_idplayer, final Connection conn) throws SQLException{
@@ -55,29 +54,18 @@ try{
     LCUtil.showMessageFatal(msg);
      return null;
 }finally{
-  //  DBConnection.closeQuietly(conn, null, rs, ps);
     DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 }//end method
 
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
-  //  LOG.info("Input main = " + s);
-    DBConnection dbc = new DBConnection();
-Connection conn = dbc.getConnection();
+public static void main(String[] args) throws SQLException, Exception{ // testing purposes
+
+    Connection conn = new DBConnection().getConnection();
     Player player = new Player();
-  //  Round round =new Round(); 
-player.setIdplayer(324713);
-//round.setIdround(260);
-FindPlayer fp = new FindPlayer();
-  //  String str = pc.checkPassword(uuid, conn);
-Player p1 = fp.findPlayer(player.getIdplayer(), conn);
-LOG.info("player found = " + p1.toString());
-//for (int x: par )
-//        LOG.info(x + ",");
-DBConnection.closeQuietly(conn, null, null, null);
+    player.setIdplayer(324713);
+    Player p1 = new FindPlayer().findPlayer(player.getIdplayer(), conn);
+       LOG.info("player found = " + p1.toString());
+    DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
-    
 } // end Class
-

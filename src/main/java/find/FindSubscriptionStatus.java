@@ -6,9 +6,11 @@ import entite.Player;
 import entite.Subscription;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import utils.DBConnection;
 import utils.LCUtil;
 
 public class FindSubscriptionStatus {
@@ -18,20 +20,16 @@ public class FindSubscriptionStatus {
      {
      try{
          LOG.info("entering subcriptionStatus");
-     //    LOG.info("entering subcriptionStatus with conn :" + conn);
-     //    conn = utils.DBConnection.getConnection2(); 
-   //  conn = DBConnection.getPooledConnection();
-  //       LOG.info("entering subcriptionStatus with new conn :" + conn);
-     //    find.FindSubscription fs = new find.FindSubscription();
          subscr = new find.FindSubscription().subscriptionDetail(player, conn);
          if(subscr == null){  // il n'existe pas de record Subscription pour ce player
-             String msg = "No subscription known : we start creating a subscription record for player = " + player.getIdplayer();
-                LOG.info(msg);
+          //   String msg = "No subscription known : we start creating a subscription record for player = " + player.getIdplayer();
+            String msg = LCUtil.prepareMessageBean("subscription.notfound");
+             LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
-             if(new CreateSubscription().createSubscription(player, conn)){ // resultat = ok
-                msg = "Subscription created";
+             if(new CreateSubscription().create(player, conn)){ // resultat = ok
+                msg = "Initial Subscription created ";
                 LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
+             //   LCUtil.showMessageInfo(msg);
                 return true;
              }else{
                   msg = "Subscription NOT created";
@@ -51,9 +49,9 @@ public class FindSubscriptionStatus {
         LOG.info("subscription endDate " + subscription.getEndDate());
         LOG.info("subscription Trial Count " + subscription.getTrialCount());
        
-     if(subscription.getTrialCount() > 5)
-          {//LOG.info("subscription Trial > 5 - Use Subscription Month of Year instead !!!");
-            String msg = "subscription Trial > 5 - Use Subscription Month of Year instead !!! "
+     if(subscription.getTrialCount() > 5 && LocalDate.now().isAfter(subscription.getEndDate())){  // new 22-02-2019 
+          String msg = LCUtil.prepareMessageBean("subscription.create.toomuchtrials")
+        //    String msg = "subscription Trial > 5 - Use Subscription Month of Year instead !!! "
                   + " player = " + player.getIdplayer()
                   + " , trial  = <h1>" + subscription.getTrialCount() + "</h1>"
                   ;
@@ -65,8 +63,7 @@ public class FindSubscriptionStatus {
          //   return "subscription.xhtml?faces-redirect=true";}
       
        LOG.info("LocalDate now() = " + LocalDate.now());
-      if(LocalDate.now().isAfter(subscription.getEndDate()))
-             {
+      if(LocalDate.now().isAfter(subscription.getEndDate())){
                  String msg = "now is after endLocal - subscription NOT valid !!!";
         //     throw new Exception (msg);
      //        LOG.info("return subscription.xhtml");
@@ -79,7 +76,6 @@ public class FindSubscriptionStatus {
             return true;
         //    return "welcome.xhtml?faces-redirect=true";
       }  // le player est en ordre de souscription
-      
       }catch (Exception e){
             String msg = "££ Exception subscriptionStatus = " + e.getMessage();
             LOG.error(msg);
@@ -88,4 +84,20 @@ public class FindSubscriptionStatus {
         } finally {
         }         
     } //end method
+  
+      public static void main(String[] args)throws SQLException, Exception{ // testing purposes
+
+    Connection conn = new DBConnection().getConnection();
+    Player player = new Player();
+    player.setIdplayer(324713);
+    Subscription subscription = new Subscription();
+    // compléter ic certains éléments
+    Boolean p1 = new FindSubscriptionStatus().subscriptionStatus(subscription, player, conn);
+        LOG.info("player found = " + p1.toString());
+//for (int x: par )
+//        LOG.info(x + ",");
+    DBConnection.closeQuietly(conn, null, null, null);
+
+}// end main
+  
 } // end Class

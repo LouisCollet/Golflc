@@ -15,18 +15,14 @@ public class Greenfee implements Serializable, interfaces.Log, interfaces.GolfIn
     private Integer idplayer;
     private LocalDateTime roundDate;
  //   private LocalDateTime endDate; // mod 30/01/2017
+    private Integer idround;
     private Integer idclub;
- //   @NotNull(message="{subscription.notnull}")
- //   private String subCode;
- //   @Max(value=5,message="{subscription.trial.max}")
- //   private Integer trialCount;
- //   public enum etypeSubscription{TRIAL,MONTHLY,YEARLY};
     private String paymentReference;
     double price;
     private String communication;
     private String items;
     private String status;
-    
+
 public Greenfee()    // constructor
 { 
 // empty
@@ -90,6 +86,14 @@ public Greenfee()    // constructor
         this.idclub = idclub;
     }
 
+    public Integer getIdround() {
+        return idround;
+    }
+
+    public void setIdround(Integer idround) {
+        this.idround = idround;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -101,9 +105,11 @@ public Greenfee()    // constructor
 
 
  @Override
-public String toString()
-{ return 
-        (NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName()
+public String toString(){
+  try{
+      LOG.info("starting toString Greenfee !");
+     return 
+        (NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName().toUpperCase()
                + " ,idplayer : "   + this.getIdplayer()
                + " ,startDate : "  + this.getRoundDate()
          //      + " ,endDate : "    + this.getEndDate()
@@ -114,30 +120,30 @@ public String toString()
                + " ,communication : "  + this.getCommunication()
                + " ,items : "  + this.getItems()
                + " ,club : "  + this.getIdclub()
+               + " ,round : "  + this.getIdround()
                + " ,status : "  + this.getStatus()
         );
+        }catch(Exception e){
+        String msg = "£££ Exception in Greenfee.toString = " + e.getMessage();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }
 
 public static Greenfee mapGreenfee(ResultSet rs) throws SQLException{
     String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+    
   try{
         Greenfee g = new Greenfee();
         g.setIdclub(rs.getInt("GreenfeeIdClub"));
         g.setIdplayer(rs.getInt("GreenfeeIdPlayer"));
-//           LOG.info("line 01");
+        g.setIdround(rs.getInt("GreenfeeIdRound"));
         g.setRoundDate(rs.getTimestamp("GreenfeeRoundDate").toLocalDateTime());
- //             LOG.info("line 02");
-   //        LOG.info("first solution = + " + rs.getTimestamp("CotisationStartDate").toLocalDateTime());
- ////       java.util.Date d = rs.getTimestamp("CotisationStartDate");   
- ////       c.setStartDate(utils.LCUtil.DatetoLocalDateTime(d));
- ////       LOG.info("second solution = + " + utils.LCUtil.DatetoLocalDateTime(d));
-   //     Timestamp ts = Timestamp.valueOf(cotisation.getStartDate());
- ////       d = rs.getTimestamp("CotisationEndDate");
-     //    c.setEndDate(utils.LCUtil.DatetoLocalDateTime(d));
-     //   c.setEndDate(rs.getTimestamp("CotisationEndDate").toLocalDateTime());
         g.setPaymentReference(rs.getString("GreenfeePaymentReference"));
         g.setCommunication(rs.getString("GreenfeeCommunication"));
         g.setItems(rs.getString("GreenfeeItems"));
+        g.setPrice(rs.getDouble("GreenfeeAmount"));
         g.setStatus(rs.getString("GreenfeeStatus"));
    return g;
   }catch(Exception e){

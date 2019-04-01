@@ -22,10 +22,9 @@ public class PlayedList implements interfaces.Log
 public List<ECourseList> getPlayedList(final Player player, final Connection conn) throws SQLException{
  //  LOG.debug("starting getPlayedList(), Connection = " + conn);
     
-if (liste == null)
-{
+if(liste == null){
     LOG.debug("starting getPlayedList(), Player = {}", player.getIdplayer());
-    LOG.debug("starting PlayedList(), listplayer = {}", liste);
+  //  LOG.debug("starting PlayedList(), listplayer = {}", liste);
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -61,7 +60,7 @@ try{
    + "   JOIN club"
    + "      ON club.idclub = course.club_idclub"
    + "   GROUP by round.idround"
-   + "   ORDER by date(RoundDate) desc"
+   + "   ORDER by DATE(RoundDate) DESC"
      ;
  //       LOG.info("player = " + player.toString()) ;
     ps = conn.prepareStatement(query);
@@ -73,28 +72,33 @@ try{
             LOG.info("ResultSet getPlayedList has " + rs.getRow() + " lines.");
         rs.beforeFirst(); //on replace le curseur avant la première ligne
         liste = new ArrayList<>();
-	while(rs.next())
-        {
+	while(rs.next()){
+  //LOG.info("line 01");
           ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
           Club c = new Club();
           c = entite.Club.mapClub(rs);
           ecl.setClub(c);
-          
+  //LOG.info("line 02");
           Course o = new Course();
           o = entite.Course.mapCourse(rs);
           ecl.setCourse(o);
-          
+  //LOG.info("line 03");
           Round r = new Round();
           r = entite.Round.mapRound(rs);
           ecl.setRound(r);
-
+//LOG.info("line 04");
           Inscription i = new Inscription();
           i = entite.Inscription.mapInscription(rs);  
        //        phr.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
           ecl.setInscriptionNew(i);//.setInscriptionNew(i);
+ //LOG.info("line 05");
 	liste.add(ecl);
-	}
+	} //end while
+        LOG.info("line 07");
+        LOG.info("line 06 there are elements in liste = " + liste.size()); 
+     //     liste.forEach(item -> LOG.info("PlayedList " + item));  // java 8 lambda
     return liste;
+    
 }catch (SQLException e){
     String msg = "SQL Exception in getPlayedList() = " + e.toString() + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
@@ -110,7 +114,7 @@ try{
         DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 }else{
-         LOG.debug("escaped to listPlayed repetition with lazy loading");
+   //      LOG.debug("escaped to listPlayed repetition with lazy loading");
     return liste;  //plusieurs fois ??
 }
 

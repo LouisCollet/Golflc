@@ -14,6 +14,7 @@ import javax.inject.Named;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import utils.LCUtil;
+import static utils.LCUtil.showMessageFatal;
 /**
  *http://www.javacodegeeks.com/2015/01/primefaces-opening-external-pages-in-dynamically-generated-dialog.html
  * http://www.journaldev.com/4056/primefaces-utilities-requestcontext-el-functions-dialog-framework-search-expression-framework
@@ -22,8 +23,7 @@ import utils.LCUtil;
 @SessionScoped
 public class DialogController implements Serializable, interfaces.Log
 {
-  public static void viewHandicap()
-  {
+  public static void viewHandicap(){
         LOG.info("entering viewHandicap");
     Map<String,Object> options = new HashMap<>();
     options.put("modal", true);
@@ -34,18 +34,11 @@ public class DialogController implements Serializable, interfaces.Log
     options.put("closable", true); // closed by a button
     options.put("includeViewParams", true); 
     
- //   String bookName = "Grapes of wrath"; // exemple fictif
-///    Map<String, List<String>> params = new HashMap<>();
-///    List<String> values = new ArrayList<>();
-///    values.add("Grapes of wrath");
-///    params.put("param1", values); 
-  //  RequestContext rc = RequestContext.getCurrentInstance();
-//   RequestContext.getCurrentInstance().openDialog("dialogHandicap.xhtml", options, null); //deprecated mod 08/02/2018
     PrimeFaces.current().dialog().openDynamic("dialogHandicap.xhtml", options, null); 
         LOG.info("dialogHandicap.xhtml is opened !");
 }
     public static void showFlight(){
-       LOG.info("entering DialogController viewFlight");
+       LOG.info("entering DialogController showFlight");
     Map<String,Object> options = new HashMap<>();
     options.put("modal", true);
     options.put("draggable", true);
@@ -82,6 +75,30 @@ public class DialogController implements Serializable, interfaces.Log
     PrimeFaces.current().dialog().openDynamic("dialogHomeClub.xhtml", options, null); 
         LOG.info("exiting DialogController showSelectHomeClub");
 }  
+    
+    public static void showSelectPlayer(){
+        // https://primefaces.github.io/primefaces/7_0/#/core/dialogframework
+       LOG.info("entering DialogController showSelectPlayer");
+    Map<String,Object> options = new HashMap<>();
+    options.put("modal", true);
+    options.put("draggable", true);
+    options.put("resizable", true);
+    options.put("width", 900);
+    options.put("height", 600);
+    options.put("contentWidth", "100%");
+    options.put("contentHeight", "100%");
+ //   options.put("contentHeight", 2440);
+  //  options.put("contentWidth", 740);  //default
+    options.put("closable", true); // in case of bug is useful
+    options.put("modal", true);
+    options.put("headerElement", "clubName"); // Client id of the element to display inside header.
+    options.put("dynamic", true);
+ //   options.put("header", "header by LC");
+    PrimeFaces.current().dialog().openDynamic("dialogPlayers.xhtml", options, null); 
+        LOG.info("exiting DialogController showSelectPlayer");
+}  
+    
+    
     public static void showWeather(){
        LOG.info("entering DialogWeather");
     Map<String,Object> options = new HashMap<>();
@@ -143,8 +160,8 @@ private FacesContext facesContext;
 @Inject
 private UIViewRoot viewRoot;
 
-public void closeDialog(Object obj) throws IOException
-    { // if(obj == null
+public void closeDialog(Object obj) throws IOException{ // if(obj == null
+    try{
         LOG.info("entering closeDialog with : " + obj.toString() );
 //      RequestContext.getCurrentInstance().closeDialog("LC - closeDialog");  // deprecated 08/02/2018
       // https://github.com/primefaces/primefaces/blob/master/src/main/java/org/primefaces/context/RequestContext.java
@@ -164,13 +181,20 @@ public void closeDialog(Object obj) throws IOException
       String msg = "Dialog closed for = " + obj.toString();
         LOG.info(msg);
   //      LCUtil.showMessageInfo(msg);
+        } catch (Exception e) {
+            String msg = "££ Exception in closeDialog = " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+      //      return null;
+        }      
     }
 
-public static void closeDialog2(Object obj) throws IOException{ // if(obj == null
-        LOG.info("entering closeDialog with : " + obj.toString() );
-//      RequestContext.getCurrentInstance().closeDialog("LC - closeDialog");  // deprecated 08/02/2018
+public void closeDialog2(Object obj) throws IOException{ // if(obj == null
+        LOG.info("entering closeDialog2 with : " + obj.toString() );
       // https://github.com/primefaces/primefaces/blob/master/src/main/java/org/primefaces/context/RequestContext.java
       PrimeFaces.current().dialog().closeDynamic(obj); 
+      String msg = "Dialog2 closed for = " + obj.toString();
+        LOG.info(msg);
 }
 
   } //end class

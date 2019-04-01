@@ -103,9 +103,11 @@ public String getSubCode() {
     }
 
  @Override
-public String toString()
-{ return 
-        (NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName()
+public String toString(){
+  try{  
+      LOG.info("starting toString Subscription!");
+    return 
+        (NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName().toUpperCase()
                + " ,idplayer : "   + this.getIdplayer()
                + " ,startDate : "  + this.getStartDate()
                + " ,endDate : "    + this.getEndDate()
@@ -115,6 +117,12 @@ public String toString()
                + " ,price : "  + this.getPrice()
                + " ,communication : "  + this.getCommunication()
         );
+    }catch(Exception e){
+        String msg = "£££ Exception in Subscription.toString = " + e.getMessage();
+        LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return msg;
+  }
 }
 
 public static Subscription mapSubscription(ResultSet rs) throws SQLException{

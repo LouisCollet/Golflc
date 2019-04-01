@@ -19,14 +19,13 @@ private static final long serialVersionUID = 1L;
 private static Locale locale = null;
 
 @PostConstruct
-public void init()
-{
+public void init(){
     locale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
      //   LOG.info("from Postconstruct locale = " + locale);
 }
 
-public Locale getLocale()
-    {  //  LOG.info("getLocale = " + locale);
+public Locale getLocale() { 
+    //  LOG.info("getLocale = " + locale);
         return locale;
     }
 

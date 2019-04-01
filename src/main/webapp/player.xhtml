@@ -40,7 +40,7 @@
     columnClasses="className">
 
 <f:facet name="header" >
-    <h1>#{msg['player.create.data']}</h1>
+      <h:outputText escape="false" value="#{msg['player.create.data']}" />
 </f:facet>
 
                 <h:outputText value="#{msg['player.id']}" />
@@ -186,6 +186,8 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                          value="#{listCtry.getCountriesMap()}" />
                 </p:selectOneMenu>  
                 
+  <!--   https://www.mkyong.com/jsf2/jsf-2-valuechangelistener-example/      -->     
+
 		<h:outputText value="#{msg['player.city']}" />
 		<p:inputText  id="city"
                               size="45"

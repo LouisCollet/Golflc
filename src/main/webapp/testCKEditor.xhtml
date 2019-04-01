@@ -1,0 +1,57 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions">
+    <h:head id="CKEhead">
+        <script type="text/javascript">
+            src="https://cdn.ckeditor.com/ckeditor5/11.2.0/classic/ckeditor.js;">
+        </script>
+        
+    </h:head>
+
+  <h:form  id="testCKEditor" enctype="application/x-www-form-urlencoded" >    
+    <h3 style="margin-top:0">Basic</h3>
+ <!--   <p:textEditor id="textEditor" widgetVar="editor1" value="#{editorC.text}" height="100" style="margin-bottom:10px"/>
+     -->
+    >  
+  <p:growl id="growl" showDetail="true" /> 
+<pe:ckEditor id="editor"
+             value="#{editorCtext}"
+             interfaceColor="#{editorC.color}"
+             toolbar="[['Cut','Copy','Paste','PasteText','PasteFromWord','-', 'SpellChecker', 'Scayt']]"> 
+             >  
+    <p:ajax event="save" 
+            listener="#{editorC.saveListener}"
+            update="growl"/>  
+</pe:ckEditor>  
+
+   <!-- 
+    <p:commandButton id="commandSubmit"
+                     value="Submit" 
+                     update="display"
+                     oncomplete="PF('dlg').show()"
+                     icon="pi pi-save" />
+
+    <p:commandButton id="commandClear" value="Clear" type="button" onclick="PF('editor1').clear();" icon="pi pi-times" />
+    -->
+    
+ <p:commandButton actionListener="#{editorC.changeColor}" update="editor"  
+                 value="Change color with AJAX" style="margin-top:10px;"/>  
+   
+
+             <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-rotate-left"
+                         action="tarif_members_menu.xhtml"
+                         />
+</h:form>
+
+
+</html>

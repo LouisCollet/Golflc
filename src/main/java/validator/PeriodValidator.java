@@ -5,10 +5,6 @@ import static interfaces.Log.LOG;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-/**
- *
- * @author collet
- */
 public class PeriodValidator implements ConstraintValidator<PeriodConstraint, Period>{
 // ne fonctionne pas !!
 //@Override

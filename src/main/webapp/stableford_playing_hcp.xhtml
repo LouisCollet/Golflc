@@ -20,17 +20,8 @@
     <ui:include src="/help/help_stableford_playing_hcp.xhtml"/>
 </ui:define>
 <ui:define name="content">
-<h:graphicImage 
-                name="images/golf_tee.jpg"
-                alt="image missing :golf_tee.jpg"
-                style="float: left;">
-</h:graphicImage>
-
-<h:graphicImage 
-                name="images/golf_tee.jpg"
-                alt="image missing :golf_tee.jpg"
-                style="float: right;">
-</h:graphicImage>
+<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
     <!--value="#{courseC.inputPlayingHcp(inputPlayingHcp)}" -->
     
 <ui:define name="metadata">
@@ -65,7 +56,7 @@
                 <p:inputMask  label="slope"
                        id="slope"
                        value="#{courseC.playingHcp.teeSlope}"
-                       title="#{msg['title.tee.teeslope']}"
+                       title="#{msg['tooltip.tee.teeslope']}"
                        size="3"
                        slotChar="_"
                        mask="999"
@@ -75,7 +66,7 @@
                 <p:inputMask  label="rating"
                        id="rating"
                        value="#{courseC.playingHcp.teeRating}"
-                       title="#{msg['title.tee.teerating']}"
+                       title="#{msg['tooltip.tee.teerating']}"
                        size="4"
                        slotChar="_"
                        mask="99.9"
@@ -85,25 +76,40 @@
                 <h:selectOneRadio
                     id="OneMenuPar"
                     value="#{courseC.playingHcp.coursePar}">
-                <f:selectItem itemLabel="Par 72" itemValue="71" />
-                <f:selectItem itemLabel="Par 73" itemValue="72" />
-                <f:selectItem itemLabel="Par 71" itemValue="73" />
-
+                <f:selectItem itemLabel="Par 70" itemValue="70" />
+                <f:selectItem itemLabel="Par 71" itemValue="71" />
+                <f:selectItem itemLabel="Par 72" itemValue="72" />
+                <f:selectItem itemLabel="Par 73" itemValue="73" />
                 </h:selectOneRadio>
+                
+        <h:outputText value="#{msg['round.holes']} *"   />
+        <p:selectOneButton id="holes"
+                value="#{courseC.playingHcp.roundHoles}"
+                styleClass="oneradio"
+                >
+                <f:selectItem itemLabel="Holes 9 " itemValue="9" />
+                <f:selectItem itemLabel="Holes 18" itemValue="18" />
+        </p:selectOneButton>
+                
+        <h:outputText value="#{msg['round.start']} *"   />
+        <p:selectOneButton id="start"
+                value="#{courseC.playingHcp.roundStart}"
+                styleClass="oneradio"
+                >
+                <f:selectItem itemLabel="Start 1 " itemValue="1" />
+                <f:selectItem itemLabel="Start 10" itemValue="10" />
+        </p:selectOneButton>
                 
                 <h:outputText value="#{msg['handicap.playing']}" />
                 <h:outputText value="#{courseC.playingHcp.playingHandicap}"
                               style="font-size: 3em;" />
-
 <f:facet name="footer">
-
-
          <p:commandButton 
                          id="button01"
                          value="#{msg['button.hcp.calculate']}"
                          update="growl-msg"
                          ajax="false"
-                         immediate="false"
+                         immediate="true"
                          icon="ui-icon-disk"
                          action="#{courseC.calculateHcpStb}"/>
 

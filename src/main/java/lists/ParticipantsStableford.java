@@ -174,4 +174,25 @@ try
         ParticipantsStableford.liste = liste;
     }
 
+    
+      public static void main(String[] args) throws SQLException, Exception {// testing purposes
+    Connection conn = new DBConnection().getConnection();
+  //  Player player = new Player();
+  //  player.setIdplayer(324713);
+   Round round = new Round(); 
+   round.setIdround(414);
+  //  Club club = new Club();
+  //  club.setIdclub(1006);
+    List<ECourseList> p1 = new ParticipantsStableford().listAllParticipants(round, conn);
+        LOG.info("Inscription list = " + p1.toString());
+    DBConnection.closeQuietly(conn, null, null, null);
+
+}// end main
+    
+    
+    
+    
+    
+    
+    
 } //end class

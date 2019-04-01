@@ -13,7 +13,7 @@ import utils.LCUtil;
 public class CreateCourse implements interfaces.Log, interfaces.GolfInterface{
     
     
-    public boolean createCourse(final Club club, final Course course, final Connection conn) throws SQLException    {
+    public boolean create(final Club club, final Course course, final Connection conn) throws SQLException    {
         PreparedStatement ps = null;
         try {
             LOG.info("...entering createCourse");
@@ -41,13 +41,12 @@ public class CreateCourse implements interfaces.Log, interfaces.GolfInterface{
              //    String p = ps.toString();
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
-            if (row != 0) 
-            {
+            if (row != 0){
                 int key = LCUtil.generatedKey(conn);
                     LOG.info("Course created = " + key);
                 course.setIdcourse(key);
 //                tee.setNextTee(true); // affiche le bouton next(Tee) bas ecran à droite
-                String msg = "<br/><br/><h1>Course Created = " + course.getIdcourse() + "</h1>"
+                String msg = "Course Created = " + course.getIdcourse() + "</h1>"
                         // + "<br/>name club = " + club.getClubName()
                         + "<br/>id club = " + club.getIdclub()
                         + "<br/>name course = " + course.getCourseName()

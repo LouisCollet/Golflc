@@ -14,7 +14,7 @@ import utils.LCUtil;
 
 public class CreateHole implements Serializable,interfaces.Log{
 
-    public String createHole(final Club club, final Course course,
+    public String create(final Club club, final Course course,
         final Tee tee, final Hole hole, List<Integer> strokeIndex, final Connection conn) throws SQLException{
         PreparedStatement ps = null;
    try {

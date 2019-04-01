@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Choice between greenfee and Annual Cotisation</ui:define>
+<ui:define name="help">
+    <ui:include src="/help/help_score_statistics.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="tarifRound" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary.xhtml"/>
+
+<p:panelGrid
+    id="panel1"
+    columns="3"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.cotisation.choice']}" />
+</f:facet>
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['tarif.print']}"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="welcome.xhtml"
+                         />
+         <p:commandButton value="Je choisis un Greenfee"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-rotate-left"
+                         action="#{courseC.findTarifGreenfee()}"
+                         />
+         <p:commandButton value="Je deviens membre"
+                         id="commandButtonPayment"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-credit-card"
+                         action="#{courseC.findTarifMember()}"
+                         />
+ 
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+    </html>

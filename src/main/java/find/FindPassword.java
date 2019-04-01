@@ -71,17 +71,14 @@ finally
 return false;
 } //end method
 
-    public static void main(String[] args) throws Exception {
-        DBConnection dbc = new DBConnection();
-     Connection conn = dbc.getConnection();
+public static void main(String[] args) throws Exception {
+    Connection conn = new DBConnection().getConnection();
   try{
         Player p = new Player();
         p.setIdplayer(121221);
         p.setWrkpassword("test123LC");
-        FindPassword fp = new FindPassword();
-        boolean b = fp.passwordMatch(p, conn);
-        
-        LOG.info("from main, after = " + Boolean.toString(b).toUpperCase());
+        boolean b = new FindPassword().passwordMatch(p, conn);
+            LOG.info("from main, after = " + Boolean.toString(b).toUpperCase());
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
@@ -90,6 +87,4 @@ return false;
          DBConnection.closeQuietly(conn, null, null , null); 
           }
    } // end main//
-    
-    
 }  // end class

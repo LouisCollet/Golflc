@@ -24,7 +24,7 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
     
  //   public List<StablefordResult> getSlopeRating(final Player player, final Round round, final Connection conn) throws SQLException // pour un joueur particulier !!!
     public List<ECourseList> getSlopeRating(final Player player, final Round round, final Connection conn) throws SQLException 
-    {
+{
         if (liste == null) {
             LOG.debug("starting getSlopeRating(), Player = {}", player.getIdplayer());
             LOG.debug("starting getSlopeRating(), Round = {}", round.getIdround());
@@ -41,17 +41,10 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
                     String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
                     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
                     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
-          //          String ha = utils.DBMeta.listMetaColumnsLoad(conn, "handicap");
-                    
                 String query
                         = // attention faut un espace en fin de ligne avant le " !!!!
                         " SELECT"
                            + ph + "," + te + "," + cl + "," + co + "," + ro + "," + pl //+ "," + ha
-              //          + " RoundDate, idround,  idplayer, "
-              //          + "          idcourse, CourseHoles, idclub, idtee, tee.TeeClubHandicap, player.PlayerGender, "
-              //          + "          round.RoundCSA, round.RoundQualifying, round.RoundHoles, roundstart, roundcompetition, "
-              //          + "              player_has_round.InscriptionTeeStart, teegender, coursepar,  teeslope, teerating, teestart, "
-              //          + "              roundgame,CourseName,ClubName "
                         + " FROM round "
                         + " JOIN player "
                         + "	ON player.idplayer = ? "
@@ -145,16 +138,13 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
 
     public static void main(String[] args) throws SQLException, Exception // testing purposes
     {
- //       LOG.info("Input main = " + s);
-        DBConnection dbc = new DBConnection();
-        Connection conn = dbc.getConnection();
+        Connection conn = new DBConnection().getConnection();
         Player player = new Player();
-        Round round = new Round();
         player.setIdplayer(324713);
+        Round round = new Round();
         round.setIdround(401);
-        FindSlopeRating fsr = new FindSlopeRating();
-        List<ECourseList> res = fsr.getSlopeRating(player, round, conn);
-        LOG.info("main - after");
+        List<ECourseList> res = new FindSlopeRating().getSlopeRating(player, round, conn);
+        LOG.info("main - after res = " + res.toString());
 //for (int x: par )
 //        LOG.info(x + ",");
         DBConnection.closeQuietly(conn, null, null, null);

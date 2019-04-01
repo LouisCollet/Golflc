@@ -8,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -57,10 +60,7 @@ try{
         {
              t = rs.getBigDecimal("handicapPlayer");
 	}
-         // Print the name from the list....
- ////       for(PlayerHasRound model : liste) {
-////            LOG.info("TeePlayer = "  + model.getInscriptionTeeStart() );}
- ////       String t = liste.get(0).getInscriptionTeeStart();
+
         LOG.info("HandicapPlayer = "  + t);
   //  return liste;
         return t.doubleValue();
@@ -87,18 +87,22 @@ finally
 public static void main(String[] args) throws SQLException, Exception // testing purposes
 {
   //  LOG.info("Input main = " + s);
-    DBConnection dbc = new DBConnection();
-Connection conn = dbc.getConnection();
+ //   DBConnection dbc = new DBConnection();
+    Connection conn = new DBConnection().getConnection();
     Player player = new Player();
-    Round round =new Round(); 
-player.setIdplayer(324713);
-round.setIdround(260);
-FindHandicap fh = new FindHandicap ();
-  //  String str = pc.checkPassword(uuid, conn);
-fh.findPlayerHandicap(player,round, conn);
-//for (int x: par )
-//        LOG.info(x + ",");
-DBConnection.closeQuietly(conn, null, null, null);
+    player.setIdplayer(324713);
+    Round round = new Round(); // round 431
+    
+    LocalDate d = LocalDate.of(2019, 3, 23);
+    LocalTime t = LocalTime.of(9, 57, 0, 0);
+  //  LocalDateTime dt = LocalDateTime.of(d, t);
+ //       System.out.println(dt);
+    // alternative pour s'amuser !!
+  //  round.setRoundDate(LocalDateTime.of(2019, Month.MARCH, 23, 9,57));
+    round.setRoundDate(LocalDateTime.of(d,t));
+    double dd = new FindHandicap ().findPlayerHandicap(player,round, conn);
+        LOG.info("handicap = " + dd);
+    DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
     

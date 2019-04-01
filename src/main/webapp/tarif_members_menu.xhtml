@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+     
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Tarif Members Menu Page </ui:define>
+<ui:define name="head"> </ui:define>
+<ui:define name="help">
+     <ui:include src="/help/help_tarif_menu.xhtml"/>
+</ui:define>
+
+<ui:define name="content">
+    <!-- 
+        <h:outputScript library="js" name="forms.js" target="head"/>-->
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+
+<h:form id="tarif_members_menu" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.equipments.tarif']}" />
+</f:facet>
+<p:panelMenu id="panel_menu"
+             style="font-size: 1.5em;">
+    <p:submenu label="Input Data Members Tarif" 
+               icon="ui-icon-wrench"
+               style="font-size: 2.0em;"
+               >
+         <p:menuitem value ="Members Cotisation = #{courseC.tarifMember.tarifMemberIndex}"
+                     outcome="tarif_members_cotisation.xhtml"
+                     style="font-size: 1.5em;"
+                     icon="fa fa-calendar-o" />
+         <p:menuitem value="Members Equipments = #{courseC.tarifMember.tarifMemberEquipmentsIndex}"
+                     rendered="#{courseC.tarifMember.tarifMemberIndex gt 0}"
+                     icon="fa fa-sun-o"
+                     style="font-size: 1.5em;"
+                     outcome="tarif_members_equipments.xhtml" />
+
+    </p:submenu>
+    <p:separator/>
+    <p:submenu label="Create Members Tarif "
+               icon="ui-icon-wrench"
+               rendered="#{courseC.tarifMember.tarifMemberIndex gt 0}"
+                >
+         <p:menuitem  value="#{msg['tarif.print']}"
+                     icon="fa fa-list"
+                     style="font-size: 1.5em;"
+                     action="#{courseC.showTarifMembers()}"/>
+         <p:menuitem  value="#{msg['tarif.editor']}"
+                     icon="fa fa-edit"
+                     style="font-size: 1.5em;"
+                     outcome="tarif_members_editor.xhtml" />
+         <p:menuitem value="#{msg['tarif.create']}"
+                     icon="fa fa-database"
+                     style="font-size: 1.5em;"
+                     action="#{courseC.createTarifMembers}"/>
+    </p:submenu> 
+</p:panelMenu>
+<!--   rendered="#{courseC.tarifMember.tarifMemberIndex gt 0}" -->
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

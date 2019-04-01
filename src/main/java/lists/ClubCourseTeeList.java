@@ -14,13 +14,11 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 
-public class ClubCourseTeeList implements interfaces.Log
-{
+public class ClubCourseTeeList implements interfaces.Log{
     private static List<ECourseList> liste = null;
 
-public List<ECourseList> getCourseList(final Connection conn) throws SQLException{  
-if(liste == null)
-{
+public List<ECourseList> list(final Connection conn) throws SQLException{
+if(liste == null){
         LOG.info(" ... entering getCourseList !! ");
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -29,12 +27,9 @@ try{
      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
      String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
      String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
-
 String query =
         "SELECT "
           +  co + "," + cl + "," + te + 
-     //   + " idclub, clubname, idcourse,coursename,tee.idtee,clubcity, clubcountry, clubAddress,  clubLatitude, clubLongitude ,  courseholes," +
-     //   " coursepar,  courseBegin, courseEnd , tee.TeeStart " +
         " FROM club, course, tee " +
         " WHERE club.idclub = course.club_idclub" +
         "	 and tee.course_idcourse = course.idcourse" +
@@ -48,18 +43,17 @@ String query =
     rs =  ps.executeQuery();
     rs.last(); //on récupère le numéro de la ligne
         LOG.info("ResultSet CourseList has " + rs.getRow() + " lines.");
-           if(rs.getRow() == 0)
-            {String msg = "-- Empty Result Table for CourseList !! ";
+        if(rs.getRow() == 0){
+             String msg = "-- Empty Result Table for CourseList !! ";
              LOG.error(msg);
              LCUtil.showMessageFatal(msg);
              throw new Exception(msg);
-            }    
+         }
         
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
       //LOG.debug(" -- query 4= " );
-	while(rs.next())
-        {
+	while(rs.next()){
 		ECourseList ecl = new ECourseList();
                 Club c = new Club();
                 c = entite.Club.mapClub(rs);
@@ -105,4 +99,23 @@ String query =
     public static void setListe(List<ECourseList> liste) {
         ClubCourseTeeList.liste = liste;
     }
+    
+  public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+  try{
+ //   Player player = new Player();
+ //*   player.setIdplayer(324713);
+    List<ECourseList> lp = new ClubCourseTeeList().list(conn);
+        LOG.info("from main, after lp = " + lp);
+ } catch (Exception e) {
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
+    
+    
+    
+    
 } //end class

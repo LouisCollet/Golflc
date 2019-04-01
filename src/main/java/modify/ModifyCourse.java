@@ -11,8 +11,7 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class ModifyCourse implements Serializable, interfaces.Log, interfaces.GolfInterface
-{
+public class ModifyCourse implements Serializable, interfaces.Log, interfaces.GolfInterface{
 
 public boolean modifyCourse(final Course course, final Connection conn) throws Exception
     {

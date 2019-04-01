@@ -18,7 +18,7 @@ public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
 {
     private static Statement stm = null;
 
-  public boolean createFlight(final ArrayList<Flight> flight, final int idcourse, final Connection conn ) throws SQLException{
+  public boolean create(final ArrayList<Flight> flight, final int idcourse, final Connection conn ) throws SQLException{
         PreparedStatement ps = null;
    try {
             LOG.info(" ... entering createFlights() with flight size = " + flight.size());
@@ -35,7 +35,7 @@ public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
   //              LOG.info("Flight in for loop = " + n);
             ps.setNull(1, java.sql.Types.INTEGER);//  default auto-increment in Database
 
-            LocalDateTime d = n.getFlightStart(); //.toLocalDate();
+            LocalDateTime d = n.getFlightStart();
      //           LOG.info("line 2 = ok ");
             java.sql.Timestamp ts = Timestamp.valueOf(d); 
             ps.setTimestamp(2, ts);

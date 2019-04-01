@@ -8,7 +8,7 @@ import java.util.UUID;
 import utils.LCUtil;
 
 public class CreateActivationPassword implements interfaces.Log, interfaces.GolfInterface{
-    public  boolean createActivation(Connection conn, Player player) throws Exception     {
+    public  boolean create(Connection conn, Player player) throws Exception     {
          PreparedStatement ps = null;
          int row = 0;
       //   UUID uuid = UUID.randomUUID();

@@ -8,7 +8,7 @@ import utils.LCUtil;
 
 public class DeleteHoles implements interfaces.Log, interfaces.GolfInterface
 {
-    public boolean deleteHoles(final int idtee, final Connection conn) throws Exception
+    public boolean delete(final int idtee, final Connection conn) throws Exception
     {
     PreparedStatement ps = null;
 try
@@ -21,9 +21,9 @@ try
     ps = conn.prepareStatement(query);
     ps.setInt(1, idtee);
     LCUtil.logps(ps); 
-    int row_delete = ps.executeUpdate();
-        LOG.info("deleted Holes = " + row_delete);
-    String msg = "<br/> <h1> There are " + row_delete + " Holes deleted for tee = " + idtee;
+    int row_deleted = ps.executeUpdate();
+        LOG.info("deleted Holes = " + row_deleted);
+    String msg = "<br/> <h1> There are " + row_deleted + " Holes deleted for tee = " + idtee;
         LOG.info(msg);
         LCUtil.showMessageInfo(msg);
         return true;
@@ -43,16 +43,12 @@ try
 }
 } //end method
    
- public static void main(String[] args) throws SQLException, Exception 
- {
-     DBConnection dbc = new DBConnection();
-     Connection conn = dbc.getConnection();
+ public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
  try{
-       LOG.info("Input main = ");
     int idtee = 339;
- //  Date date =SDF.parse("01/01/2000");
-    DeleteHoles dh = new DeleteHoles();
-    dh.deleteHoles(idtee, conn);
+    boolean b = new DeleteHoles().delete(idtee, conn);
+        LOG.info("from main - resultat deleteRound = " + b);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

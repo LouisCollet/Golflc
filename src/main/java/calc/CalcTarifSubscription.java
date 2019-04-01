@@ -5,7 +5,7 @@ import entite.Subscription;
 import java.text.ParseException;
 import utils.LCUtil;
 // rester à faire le cas des invités / guests
-// a faire : greenfee 0 pour membre du club ! via une table member : greenfee 0 pour les membres du club
+
 public class CalcTarifSubscription implements interfaces.GolfInterface, interfaces.Log{
 
   public double findTarif (Subscription subscription){
@@ -43,7 +43,7 @@ public class CalcTarifSubscription implements interfaces.GolfInterface, interfac
  public static void main(String[] args) throws ParseException, Exception {//throws SQLException // testing purposes
 try{
     LOG.info("starting main");
-//LOG.info("price greenfee = " + dd);
+//LOG.info("price  = " + dd);
 
  } catch (Exception e) {
             String msg = "££ Exception in main CalcTarif= " + e.getMessage();

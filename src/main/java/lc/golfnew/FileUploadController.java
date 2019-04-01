@@ -1,7 +1,7 @@
 package lc.golfnew;
 
-import exceptions.ExceptionGolfLC;
 import entite.Player;
+import exceptions.ExceptionGolfLC;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.FileAlreadyExistsException;
@@ -18,11 +18,10 @@ import utils.LCUtil;
 
 @Named("fileUploadC")
 @SessionScoped
-public class FileUploadController implements Serializable, interfaces.Log, interfaces.GolfInterface
-{
+public class FileUploadController implements Serializable, interfaces.Log, interfaces.GolfInterface{
     private static UploadedFile uploadedFile; 
 
-public static void uploadListener(FileUploadEvent event, Player player, Connection conn){
+public void uploadListener(FileUploadEvent event, Player player, Connection conn){
 try{
         LOG.info("starting uploadListener, player = " + player);
 
@@ -31,15 +30,15 @@ try{
             LOG.info(" file content type= " + uploadedFile.getContentType() ) ;
             LOG.info(" file size = " + uploadedFile.getSize() ); 
 
-        File file3 = new File(Constants.photos_library + "/" + uploadedFile.getFileName());    
-              LOG.info("Destination photo file file3 = " + file3 );
+        File file3 = new File(Constants.photos_library + "/" + uploadedFile.getFileName());
+              LOG.info("Destination photo file = " + file3 );
   // copy from input to /resources/images/   
         InputStream is = uploadedFile.getInputstream();
         Files.copy(is, file3.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            LOG.info("after file copy" );
+  //          LOG.info("after file copy" );
   // resize to 200*200
-        boolean b = ThumbnailsController.thumbsPhoto("from upload", file3); // new 06/08/2017
-        if (b){        
+    //    boolean b = ThumbnailsController.thumbsPhoto("from upload", file3); // new 06/08/2017
+        if(ThumbnailsController.thumbsPhoto("from upload", file3)){
             String msg = "<h1>Succesful upload Photo </h1> for file = " + file3.getName();
     //        LOG.info("new size file3 = " + file3.get");
             LOG.info(msg);
@@ -48,7 +47,7 @@ try{
                 LOG.info("New width = " + image.getWidth());
                 LOG.info("New wheight = " + image.getHeight());
         }else{
-            String msg = "<h1>NO NO upload Photo </h1> for file = " + file3.getName();
+            String msg = "<h1>FAILIURE NO upload Photo </h1> for file = " + file3.getName();
             LOG.info(msg);
             LCUtil.showMessageInfo(msg);
         }
@@ -56,12 +55,12 @@ try{
         player.setPlayerPhotoLocation(file3.getName() );
          LOG.info("file uploaded , player = ! " + player.toString());
  // mise à jour table player     
-        modify.ModifyPlayerPhotoLocation mppl = new modify.ModifyPlayerPhotoLocation();
-        mppl.updateRecordFromPlayer(player, conn);
-            LOG.info("after modify player Photolocation ");
+    //    modify.ModifyPlayerPhotoLocation mppl = new modify.ModifyPlayerPhotoLocation();
+        new modify.ModifyPlayerPhotoLocation().updateRecordFromPlayer(player, conn);
+    //        LOG.info("after modify player Photolocation ");
  // mise à jour thumbnails, size 100*100
-        b = ThumbnailsController.thumbs("from upload", file3);
-        if (b){        
+     //   b = ThumbnailsController.thumbs("from upload", file3);
+        if(ThumbnailsController.thumbs("from upload", file3)){
             String msg = "<h1>Succesful upload Thumbnail </h1> for file = " + file3.getName();
             LOG.info(msg);
             LCUtil.showMessageInfo(msg);
@@ -73,7 +72,7 @@ try{
             LOG.info(msg);
             LCUtil.showMessageInfo(msg);
         }
-        LOG.info("exiting UploadListener ");    
+    //    LOG.info("exiting UploadListener ");
 }catch (FileAlreadyExistsException ex){
             String msg = "FileAlreadyExistsException,"// + e.getFile().getFileName()
                     + " file NOT uploaded : " + ex.getMessage();

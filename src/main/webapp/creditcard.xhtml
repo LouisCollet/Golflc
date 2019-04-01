@@ -20,26 +20,18 @@
 
 <ui:define name="content">
 
-<h:graphicImage 
-                name="images/credit-card-1.jpg"
-                alt="image missing :tarif1.jpg"
-                style="float: left;">
-</h:graphicImage>
-
-<h:graphicImage 
-                name="images/credit-card-2.png"
-                alt="image missing :tarif2.jpg"
-                style="float: right;">
-</h:graphicImage>
+<h:graphicImage name="images/credit-card-1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/credit-card-2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
  <!--  cmd = #{param.cmd}
     -->
- 
+    <style type="text/css">
+    .value {
+        font-weight: bold;
+    }
+</style>
+
+    
 <h:form id="creditcard" enctype="application/x-www-form-urlencoded">
- <!--   <div>
-        <a href=" https://openweathermap.org/img/w/10d.png">openweathermap</a>
-       
-    </div>
--->
     <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
          <ui:include src="include/include_summary.xhtml"/>
     </c:if>
@@ -57,23 +49,25 @@
     columnClasses="className">
 
 <f:facet name="header">
- <h1>
     <h:outputText
             id="subscription"
+            escape="false"
             rendered="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
             value="#{msg['title.payment.subscription']}">
     </h:outputText>
     <h:outputText
             id="inscription"
+            escape="false"
             rendered="#{courseC.creditcard.typePayment eq 'GREENFEE'}" 
             value="#{msg['title.payment.round']}">
     </h:outputText>
     <h:outputText
             id="membership"
+            escape="false"
             rendered="#{courseC.creditcard.typePayment eq 'COTISATION'}" 
-            value="#{msg['title.payment.cotisation']} "> #{courseC.club.clubName}
+            value="#{msg['title.payment.cotisation']} ">
     </h:outputText>
- </h1>
+
 </f:facet>
     <h:outputText  id="Total"
                 value="#{msg['creditcard.amounttobepaid']} :"
@@ -112,10 +106,7 @@
                         title="#{msg['tooltip.creditcard.number']}"
                         mask="9999 9999 9999 9999">
       </p:inputMask>
-    
-    <!--   converter="creditcardConverter"  -->
-    
-    
+
     <h:outputText value="Verification Code :" />
     <p:inputMask  label="holder"
                        id="Verification"
@@ -128,15 +119,25 @@
    <h:panelGroup id="panelG2" layout="block" >
         <h:outputText value="#{msg['creditcard.type']} :"  
                      />
-                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-amex"></i></span>
-                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-diners-club"></i></span>
-                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-discover"></i></span>
-                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-jcb"></i></span>
-                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-mastercard"></i></span>
-                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-paypal"></i></span>
-                    <span class="ui-inputgroup-addon"><i class="fa fa-cc-visa"></i></span>
+                    <i class="fab fa-cc-amex"></i>
+                    <i class="fab fa-cc-diners-club"></i>
+                    <i class="fab fa-cc-discover"></i>
+                    <i class="fab fa-cc-jcb"></i>
+                    <i class="fab fa-cc-mastercard"></i>
+                    <i class="fab fa-cc-paypal"></i>
+                    <i class="fab fa-cc-visa"></i>
    </h:panelGroup>
 
+    <!--
+    <span class="ui-inputgroup-addon"><i class="fab fa-cc-amex"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fab fa-cc-diners-club"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fab fa-cc-discover"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fab fa-cc-jcb"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fab fa-cc-mastercard"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fab fa-cc-paypal"></i></span>
+                    <span class="ui-inputgroup-addon"><i class="fab fa-cc-visa"></i></span>
+    -->
+    
      <h:selectOneMenu id="TypeCreditcard"
                           required="true"
                           valueChangeListener="#{courseC.creditCardTypeListener}"
@@ -147,7 +148,8 @@
             </h:selectOneMenu>
 
     <h:outputText value="Credit Card Expiration Date :" />
-    <p:calendar 
+<!-- 
+   <p:calendar 
             id="Expiration"
             immediate="true"
             value="#{courseC.creditcard.creditCardExpirationDate}"
@@ -156,14 +158,31 @@
             showOn="both"
             locale="#{languageC.locale}"
             navigator="true"
-            yearRange="#{of:formatDate(now, 'yyyy')}:c+2"
+            yearRange="#{of:formatDate(now,'yyyy')}:c+2"
             title="#{msg['tooltip.creditcard.expiration']}"
             readonlyInput="true"
-            showButtonPanel="true"
+            showButtonPanel="false"
             size="8"
             >
-         
         </p:calendar> 
+     -->    
+
+     <p:datePicker id="expirationdate"
+                   view="month"
+                   inline="popup"
+                   immediate="true"
+                   value="#{courseC.creditcard.creditCardExpirationDate}"
+                   pattern="MM/yyyy"
+                   yearNavigator="true"
+                   monthNavigator="true"
+                   yearRange="2019:2021"
+                   
+                   selectionMode="single"
+                   showIcon="true"
+                   readonlyInput="true"
+                   locale="#{languageC.locale}"
+                   size="8"
+                   />
 
 <f:facet name="footer">
          <p:commandButton value="#{msg['inscription.back']}"
@@ -171,21 +190,55 @@
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         icon="fa fa-rotate-left"
+                         icon="fa fas fa-undo"
                          rendered="#{courseC.creditcard.typePayment eq 'GREENFEE'}" 
                          action="inscription.xhtml"
                          />
+         <!--
+         <p:commandButton value="Submit"
+                          icon="fa fas fa-undo"
+                          update="display"
+                          onclick="PF('dlg').show();"
+                         
+                          />
+         -->
+         <!--  oncomplete="PF('dlg').show()"  -->
          <p:commandButton value="#{msg['payment.creditcard']}"
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
                          immediate="false"
-                         icon="fa fa-credit-card"
+                         icon="fas fa-credit-card"
                          action="creditcard_accepted.xhtml"
                          />
 
 </f:facet>
 </p:panelGrid>
+    <!--
+     <p:dialog widgetVar="dlg" modal="true" resizable="false" height="100" header="Creditcard Values" showEffect="fade"> 
+        <p:panelGrid id="display" columns="2" columnClasses="label,value">
+            <h:outputText value="Date: " />
+            <h:outputText id="dateValue" value="" />
+ 
+            <h:outputText value="Phone: " />
+            <h:outputText id="phoneValue" value="" />
+ 
+            <h:outputText value="Phone with Ext: " />
+            <h:outputText id="phoneWithExtValue" value=""/>
+ 
+            <h:outputText value="taxId: " />
+            <h:outputText id="taxValue" value="" />
+ 
+            <h:outputText value="SSN: " />
+            <h:outputText id="ssnValue" value="" />
+ 
+            <h:outputText value="Product Key: " />
+            <h:outputText id="keyValue" value="" />
+        </p:panelGrid>
+    </p:dialog>
+-->
+    
+    
 </h:form>
 </ui:define>
 </ui:composition>

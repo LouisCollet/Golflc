@@ -35,7 +35,7 @@
     columnClasses="className">
 
 <f:facet name="header">
-    <h1>#{msg['title.equipments.tarif']}</h1>
+    <h:outputText escape="false" value="#{msg['title.equipments.tarif']}" />
 </f:facet>
     
            <h:outputText value="#{msg['tarif.number']} :" />
@@ -65,9 +65,25 @@
                     >
             </p:inputMask>
       
-   <c:forEach var="i" begin="01" end="02" step="1">
+<!--   <c:forEach var="i" begin="01" end="02" step="1">
        <h:outputText value="" />
-   </c:forEach>
+   </c:forEach>  -->
+      
+     <h:panelGroup id="panelItem" layout="block" >
+     <h:outputText value="#{msg['tarif.members.item']} "
+                   style="font-size: 1.5em;"
+                   />
+     <i class="fas fa-list-ol fa-2x"></i>
+     <i class="fas fa-pen-fancy fa-2x"></i>
+    </h:panelGroup>  
+    <h:panelGroup id="panelChoice" layout="block" >    
+     <h:outputText value="#{msg['tarif.members.price']} "
+                   style="font-size: 1.5em;"
+                   />
+     <i class="fas fa-euro-sign fa-2x"></i>
+     <i class="fas fa-donate fa-2x"></i>
+</h:panelGroup>
+      
          <p:inputText     id="MembersText"
                         size="20"
                         title="#{msg['tooltip.tarif.item']}"
@@ -82,58 +98,7 @@
                        mask="99.9" 
                   >
         </p:inputMask> 
-      <!--
-       <h:outputText  value="#{msg['tarif.equipments.buggy']} :"/>
-       <p:inputMask  label="Buggy"
-                       id="buggy"
-                       value="#{courseC.tarifGreenfee.priceEquipments[0]}"
-                       title="#{msg['tooltip.tarif.price2']}"
-                       size="5"
-                       slotChar="_"
-                       mask="99.9"
-                       >
-       </p:inputMask>
-        <h:outputText  value="#{msg['tarif.equipments.handtrolley']} :"/>
-       <p:inputMask  label="HTrolley"
-                       id="hand"
-                       value="#{courseC.tarifGreenfee.priceEquipments[1]}"
-                       title="#{msg['tooltip.tarif.price2']}"
-                       size="5"
-                       slotChar="_"
-                       mask="99.9"
-                       >
-        </p:inputMask>
-        <h:outputText  value="#{msg['tarif.equipments.electrictrolley']} :"/>
-       <p:inputMask  label="MediumSeason"
-                       id="medium"
-                       value="#{courseC.tarifGreenfee.priceEquipments[2]}"
-                       title="#{msg['tooltip.tarif.price2']}"
-                       size="5"
-                       slotChar="_"
-                       mask="99.9"
-                       >
-        </p:inputMask>
-       <h:outputText  value="#{msg['tarif.equipments.clubs']} :"/>
-       <p:inputMask  label="Clubs"
-                       id="clubs"
-                       value="#{courseC.tarifGreenfee.priceEquipments[3]}"
-                       title="#{msg['tooltip.tarif.price2']}"
-                       size="5"
-                       slotChar="_"
-                       mask="99.9"
-                       >
-         </p:inputMask>
-       <h:outputText  value="#{msg['tarif.equipments.practice']} :"/>
-       <p:inputMask  label="Practice"
-                       id="practice"
-                       value="#{courseC.tarifGreenfee.priceEquipments[4]}"
-                       title="#{msg['tooltip.tarif.price2']}"
-                       size="5"
-                       slotChar="_"
-                       mask="99.9"
-                       >
-       </p:inputMask>
--->
+
 <f:facet name="footer">
         <p:commandButton value="#{msg['tarif.equipments.create']}"
                          id="commandButton1"
@@ -141,19 +106,17 @@
                          update="growl-msg"
                          immediate="false"
                          icon="ui-icon-disk"
-                         action="#{courseC.inputTarifEquipments}"/>
+                         action="#{courseC.inputTarifEquipments()}"/>
          <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
                          icon="fa fa-rotate-left"
-                         action="tarif_menu.xhtml"
+                         action="tarif_greenfee_menu.xhtml"
                          />
 </f:facet>
-
 </p:panelGrid>
-
 </h:form>
 </ui:define>
 </ui:composition>

@@ -1,14 +1,9 @@
 package find;
 //import static interfaces.GolfInterface.OWM_KEY_LC;
-import com.github.fedy2.weather.YahooWeatherService;
-import com.github.fedy2.weather.data.Channel;
-import com.github.fedy2.weather.data.unit.DegreeUnit;
 import entite.Club;
 import entite.Player;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -17,20 +12,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.StringJoiner;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.annotation.SessionMap;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import net.aksingh.owmjapis.core.OWM;
+import net.aksingh.owmjapis.core.OWM.Language;
+import net.aksingh.owmjapis.core.OWM.Unit;
 import net.aksingh.owmjapis.model.CurrentUVIndex;
 import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.DailyWeatherForecast;
 import net.aksingh.owmjapis.model.HourlyWeatherForecast;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.parser.Parser;
 import static utils.LCUtil.showMessageFatal;
 
 
@@ -80,7 +72,7 @@ private Map<String, Object> sessionMapJSF23;
 //System.out.println(result.getTitle());
 // https://piunikaweb.com/2019/01/07/query-yahooapis-com-and-weather-yahooapis-com-not-working-heres-why/
 // function stops on 03/02/2019  what a pity !!!
-
+/*
     String url = "https://query.yahooapis.com/v1/public/yql?q=select%20woeid%20from%20geo.places%20where%20text%3D%22("
             + club.getClubLatitude()// 43.95
             + "," 
@@ -221,9 +213,9 @@ private Map<String, Object> sessionMapJSF23;
           LOG.info("ending with sj = " + sj);
       return sj.toString();   // fake
     
-/*
+*/
     // declaring object of "OWM" class 
-    //    OWM owm = new OWM(OWM_KEY_LC);
+  //    OWM owm = new OWM(OWM_KEY_LC);
   //  LOG.info("end of Yahoo");
   //  LOG.info("");
         
@@ -246,7 +238,7 @@ private Map<String, Object> sessionMapJSF23;
 StringBuilder sb = new StringBuilder ();
 
     LOG.info("Sunrise: " + SDF_TIME.format(CWD.getSystemData().getSunriseDateTime()));
-    sj.add("Sunrise: " + SDF_TIME.format(CWD.getSystemData().getSunriseDateTime()));
+//    sj.add("Sunrise: " + SDF_TIME.format(CWD.getSystemData().getSunriseDateTime()));
     LOG.info("Sunset: " + SDF_TIME.format(CWD.getSystemData().getSunsetDateTime()));
     LOG.info("component 4: " + CWD.getSystemData().component4());
     LOG.info("component 7: " + CWD.getSystemData().component7());
@@ -261,7 +253,7 @@ StringBuilder sb = new StringBuilder ();
 
 if (CWD.getWindData().getDegree() != null) {
     LOG.info("wind degree: " + CWD.getWindData().getDegree() );
-     wd = WIND_DIRECTION[(int)Math.floor((CWD.getWindData().getDegree() % 360) / 22.5)];
+     String wd = WIND_DIRECTION[(int)Math.floor((CWD.getWindData().getDegree() % 360) / 22.5)];
     LOG.info("wind direction : " + wd );
 }else{
     LOG.info("wind direction : unknown" );
@@ -321,7 +313,7 @@ if (CWD.getWindData().getDegree() != null) {
 //   } catch (APIException api) {
 //    LOG.info("API OWM exception by LC =  = " + api);
 //    return(null);
-*/
+
 //return null;
    } catch (Exception e) {
      String msg = "OWM exception by LC =  = " + e;

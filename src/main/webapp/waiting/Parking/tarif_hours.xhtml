@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://xmlns.jcp.org/jsp/jstl/functions"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pe="http://primefaces.org/ui/extensions"
+      xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      template="templates/masterTemplate.xhtml"
+>
+
+<ui:define name="title">Tarif Page for Hours </ui:define>
+
+<ui:define name="help">
+    <ui:include src="/help/help_tarif_hours.xhtml"/>
+</ui:define>
+<ui:define name="content">
+
+<h:graphicImage  name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage  name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+
+<h:form id="tarifHours" enctype="application/x-www-form-urlencoded" >
+  
+<ui:include src="include/include_summary_club.xhtml"/>
+<p:focus for="starttime" />
+<p:panelGrid
+    id="panel1"
+    columns="2"
+    styleClass="alignmentLeft"
+    columnClasses="className">
+
+<f:facet name="header">
+      <h:outputText escape="false" value="#{msg['title.hours.tarif']}" />
+</f:facet>
+        
+       <h:outputText value="#{msg['tarif.number']} :"   />
+       <p:inputMask
+                   label="hole num"
+                        id="holenumb"
+                        title="#{msg['tooltip.tarif.date']}"
+                        value="#{courseC.tarifGreenfee.tarifIndexHours}"
+                        size="3"
+                        mask="?99"
+                        />
+<h:outputText  value="#{msg['tarif.period.start']} :"/>
+       <p:inputMask id="startdate"
+                    title="#{msg['tooltip.tarif.date']}"
+                   
+                    value="#{courseC.tarifGreenfee.datesSeason[0][0]}"
+                    size="11"
+                    required="true"
+		    label="Start Date" 
+                    mask="99/99/9999"
+                    >
+<!--   value="#{courseC.tarif.datesSeason[courseC.tarif.tarifIndexSeasons][0]}"  -->
+	</p:inputMask>
+       
+      <h:outputText  value="#{msg['tarif.period.end']} :"/>
+             <p:inputMask id="enddate"
+                    title="#{msg['tooltip.tarif.date']}"
+                    
+                    value="#{courseC.tarifGreenfee.datesSeason[0][1]}"
+                    size="11"
+                    required="true"
+		    label="End Date" 
+                    mask="99/99/9999"
+                    >
+      	</p:inputMask>
+      
+      <!--  value="#{courseC.tarif.datesSeason[courseC.tarif.tarifIndexSeasons][1]}"  -->
+       <h:outputText  value="#{msg['tarif.hours.start']} :"/>
+       <p:inputMask  label="Start Time"
+                       id="starttime"
+                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][0]}"
+                       title="#{msg['tooltip.tarif.hour']}"
+                       size="6"
+                       required="true"
+                       slotChar="_"
+                       mask="99:99"
+                       >
+       	</p:inputMask>
+<!--
+  
+       <h:inputText id="starttime"
+                    title="#{msg['tooltip.tarif.date']}"
+                    value="#{courseC.tarif.teeTimes[courseC.tarif.tarifIndexHours][0]}"
+                    size="6"
+                    required="true"
+		    label="Start Date" >
+        	<f:convertDateTime pattern="HH:mm" />
+	</h:inputText>
+ -->      
+       <h:outputText  value="#{msg['tarif.hours.end']} :"/>
+       <p:inputMask id="endtime"
+                    title="#{msg['tooltip.tarif.hour']}"
+                    value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][1]}"
+                    size="6"
+                    required="true"
+                    slotChar="_"
+                    mask="99:99"
+		    label="End Time" >
+	</p:inputMask>
+       
+       <!--
+       <h:outputText value="Time"/>
+<h:inputText value="#{courseC.tarif.time}" 
+             id="LC"
+             converter="localHoursConverter"
+             timeZone="#{courseC.tarif.timeZone}"
+             >
+                  
+</h:inputText>
+       -->
+       
+       <h:outputText  value="#{msg['tarif.hours.high']} :"/>
+       <p:inputMask  label="HighSeason"
+                       id="high"
+                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][2]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="6"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+       </p:inputMask>
+        <h:outputText  value="#{msg['tarif.hours.medium']} :"/>
+       <p:inputMask  label="MediumSeason"
+                       id="medium"
+                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][3]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="6"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+        </p:inputMask>
+       <h:outputText  value="#{msg['tarif.hours.low']} :"/>
+       <p:inputMask  label="LowSeasong"
+                       id="low"
+                       value="#{courseC.tarifGreenfee.teeTimes[courseC.tarifGreenfee.tarifIndexHours][4]}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="6"
+                       slotChar="_"
+                       mask="999.9"
+                       >
+         </p:inputMask>
+<f:facet name="footer">
+        <p:commandButton value="#{msg['tarif.hours.create']}"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="ui-icon-disk"
+                         action="#{courseC.inputTarifHours}"/>
+         <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-rotate-left"
+                         action="tarif_greenfee_menu.xhtml"
+                         />
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

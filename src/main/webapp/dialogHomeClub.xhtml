@@ -21,7 +21,7 @@
 <!--<h1>Create round : select a Course</h1> -->
 
 <p:dataTable id="rounds"
-             value="#{courseC.listCourses()}"
+             value="#{courseC.listClubs()}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
@@ -29,9 +29,9 @@
              >
 
 <f:facet name="header">
-    <h1>#{msg['message.selectclub']} #{msg['message.for.home']}</h1>
+    <h:outputText escape="false" value="#{msg['message.selectclub']}" />
 </f:facet>
-
+<!--  #{msg['message.for.home']}   -->
 <p:column
      headerText="#"
      footerText="#"

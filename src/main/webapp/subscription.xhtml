@@ -44,13 +44,23 @@
     <h1>#{msg['subscription.new']}</h1>
 </f:facet>
                 <h:outputText value="#{msg['subscription.new']}" />
-                <p:selectOneButton id="subscr"
+                <p:selectOneButton id="subscr5"
                                    value="#{courseC.subscription.subCode}"
+                                   rendered="#{courseC.subscription.trialCount le 5}"
                                   >
                     <f:selectItem itemLabel="#{msg['subscription.trial']}" itemValue="TRIAL">   </f:selectItem>
                     <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
                     <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
                 </p:selectOneButton>
+                <p:selectOneButton id="subscr6"
+                                   value="#{courseC.subscription.subCode}"
+                                   rendered="#{courseC.subscription.trialCount gt 5}"
+                                  >
+                    <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
+                    <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
+                </p:selectOneButton>
+                
+                
 <f:facet name="footer">
         <p:commandButton
                          value="#{msg['button.subscription.create']}"

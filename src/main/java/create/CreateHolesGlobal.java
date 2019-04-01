@@ -12,7 +12,7 @@ import utils.LCUtil;
 
 public class CreateHolesGlobal // implements // interfaces.GolfInterface{
     {
- public boolean createHoles(HolesGlobal hg, Tee tee, Course course, Connection conn) throws SQLException
+ public boolean create(HolesGlobal hg, Tee tee, Course course, Connection conn) throws SQLException
 {
         LOG.info("entering createHolesGlobal - updateHoles "); 
         LOG.info("holesGlobal - new holes values = " + hg.toString());;
