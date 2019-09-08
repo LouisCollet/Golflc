@@ -5,6 +5,7 @@ import entite.Average;
 import entite.Course;
 import entite.Player;
 import entite.Round;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,9 +19,8 @@ import utils.DBConnection;
  *
  * @author collet
  */
-public class RoundDetail implements interfaces.Log
-{
-    private static List<Average> listavg = null; // used in CalculateController !!
+public class RoundDetail {
+    private static List<Average> listavg = null;
 
 public List<Average> getRoundDetail(final Connection conn, final Player player, final Course course,
         final Round round) throws SQLException

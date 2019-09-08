@@ -39,8 +39,7 @@ import utils.*;
 @Named("utilsC")
 @SessionScoped
 
-public class UtilsController implements Serializable, interfaces.GolfInterface, interfaces.Log
-{
+public class UtilsController implements Serializable, interfaces.GolfInterface, interfaces.Log{
 
 private String content;
 //private static String locale;
@@ -62,8 +61,7 @@ private final ClassLoader clo;
 private final InputStream str ;
 private final Properties prop1;
 
-public UtilsController() throws IOException // constructor
-{
+public UtilsController() throws IOException {// constructor
     super();  
         this.clo = Thread.currentThread().getContextClassLoader();
         this.str = clo.getResourceAsStream("myPOM.properties"); // loaded in pom.xml via properties-maven-plugin
@@ -79,7 +77,6 @@ public UtilsController() throws IOException // constructor
         circle.setFillColor("yellow");  
         circle.setFillOpacity(0.3);  
         mapModel.addOverlay(circle);  
-
 }
 
     public void setFmd(String fmd) {
@@ -91,12 +88,12 @@ public UtilsController() throws IOException // constructor
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, 
                 "No activity.", "What are you doing over there?"));
     }
- 
+
     public void onActive() {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
                 "Welcome Back", "Well, that's a long coffee break!"));
     }
-    
+
 public void logFile() throws IOException{
     Runtime runtime = Runtime.getRuntime();
     runtime.exec(new String[] { "C:\\Program Files\\JGsoft\\EditPadLite\\EditPadLite7.exe", "C:\\log\\golflc.log" } );

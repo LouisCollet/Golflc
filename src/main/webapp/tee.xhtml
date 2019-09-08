@@ -63,12 +63,24 @@
                                  value="#{courseC.tee.teeHolesPlayed}"
                                   styleClass="selectOneRadioColumn"
                                   style="border-style: none !important;">
-                   <f:selectItem itemLabel="18 Holes"      itemValue="18-18" />
+                   <f:selectItem itemLabel="18 Holes"      itemValue="01-18" />
                    <f:selectItem itemLabel="Holes 1-9"     itemValue="01-09" />
                    <f:selectItem itemLabel="Holes 10-18"   itemValue="10-18" />
                 </p:selectOneMenu>
                 
-                
+                 <h:outputText value="#{msg['course.par']} :"  />     
+                 <h:selectOneRadio id="par"
+                           value="#{courseC.tee.teePar}"
+                >
+                <f:selectItem itemLabel="Par 72" itemValue="72" />
+                <f:selectItem itemLabel="Par 73" itemValue="73" />
+                <f:selectItem itemLabel="Par 71" itemValue="71" />
+                <f:selectItem itemLabel="Par 70" itemValue="70" />
+                <f:selectItem itemLabel="Par 34" itemValue="34" />
+                <f:selectItem itemLabel="Par 35" itemValue="35" />
+                <f:selectItem itemLabel="Par 36" itemValue="36" />
+               </h:selectOneRadio>
+          
                 
                 <h:outputText value="#{msg['tee.slope']} :"   />
                 <p:inputMask  label="slope"

@@ -21,7 +21,7 @@ public class CreateHole implements Serializable,interfaces.Log{
             LOG.info("Course ID    = " + course.getIdcourse());
             LOG.info("tee ID    = " + tee.getIdtee());
             LOG.info("Club Name  = " + club.getClubName());
-            LOG.info("ourse name  = " + course.getCourseName());
+            LOG.info("Course name  = " + course.getCourseName());
             LOG.info("hole Number = " + hole.getHoleNumber());
             LOG.info("hole Par = " + hole.getHolePar());
             LOG.info("hole Distance = " + hole.getHoleDistance());

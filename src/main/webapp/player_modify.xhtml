@@ -38,15 +38,10 @@ see http://incepttechnologies.blogspot.be/2014/08/how-to-call-method-during-vari
                 style="float: left;">
 </h:graphicImage>
 -->
-<h:graphicImage 
-                name="images/jack_nicklaus.png"
-                alt="image missing :golf_club.jpg"
-                style="float: right;">
-</h:graphicImage>
+<h:graphicImage name="images/jack_nicklaus.png" alt="image missing :golf_club.jpg" style="float: right;"></h:graphicImage>
     
-<h:form id="player" enctype="application/x-www-form-urlencoded" >
+<h:form id="form_player_modify" enctype="application/x-www-form-urlencoded" >
     
-
 <p:focus for="idplayer" />
 
 <p:panelGrid 
@@ -167,7 +162,7 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                 <h:outputText value="#{msg['player.country']}" />
                 <p:selectOneMenu
                     id="country"
-                    name="country"
+                
                     immediate="true"
                     valueChangeListener="#{courseC.playerCountryListener}"
                     value="#{courseC.player.playerCountry}"
@@ -181,7 +176,7 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                 
 		<h:outputText value="#{msg['player.city']}" />
 		<p:inputText  
-                              name="city"
+                             
                               id="city"
                               size="45"
                               immediate="true"
@@ -206,45 +201,51 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
          <h:outputText value="#{msg['player.homeclub']}" />
             <h:panelGroup layout="block" id="container2">
                 <p:inputMask
-                       label="HomeClub"
+                       label="inputHomeClub"
                        styleClass="mystyle"
-                       id="homeClub"
+                       id="inputHomeClub"
                        value="#{courseC.player.playerHomeClub}"
                        size="5"
                        style="margin-right: 10px;"
                        mask="?9999"
                     />
-                <!--  24-03-2017 with immediate = true on peut l'utiliser sans provoquer d'erreurs de validation ! -->
-                <p:commandButton 
-                         value="#{msg['button.player.homeclub']}"
+                <!--  24-03-2017 with immediate = true on peut l'utiliser sans provoquer d'erreurs de validation ! 
+-->
+                       <p:commandButton 
                          id="ButtonHomeClub"
-                         update="homeClub"
-                         ajax="false"
-                         immediate="true"
-                         style="margin-right: 10px;"
+                         value="#{msg['button.player.homeclub']}"
+                         actionListener="#{dialogC.showSelectHomeClub()}"
+                         style="float:left;"
                          icon="ui-icon-search"
-                         action="#{courseC.findHomeClub()}"
-                        
-                  />
-
-                <h:outputText value=" #{courseC.club.clubName}" 
+                        >
+                    <p:ajax event="dialogReturn"
+                         update=":form_player_modify:inputHomeClub,clubName,playerHomeClub" />
+                  </p:commandButton>
+                
+                
+                <h:outputText id="clubName"
+                              value=" #{courseC.club.clubName}" 
                               style="font-style:italic"/>  
+                <h:outputText id="playerHomeClub"
+                              value=" #{courseC.player.playerHomeClub}"
+                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red"
+                              />  
             </h:panelGroup>
  
     <h:outputText value="#{msg['player.zoneid']}" />    
    <h:panelGroup layout="block" id="container3">
-	<h:outputText label="ZoneId"
+	<h:outputText 
                       id="zone"
                       style="margin-right: 20px;"
                       value="#{courseC.player.playerTimeZone.timeZoneId}" />
-        <h:outputText label="ZoneName"
+        <h:outputText 
                       id="zonename"
                       value="#{courseC.player.playerTimeZone.timeZoneName}" />
    </h:panelGroup>
 
  
         <h:outputText value="#{msg['player.latlng']}" />
-	<h:outputText label="latlng"
+	<h:outputText 
                       id="latlng"
                       value="#{courseC.player.playerStringLatLng}" />
 

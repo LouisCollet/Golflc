@@ -36,12 +36,14 @@ String query =
         + cl + "," + co + "," + ro + //"," + // pl + "," +
 //" SELECT  RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundPlayers, RoundStart, " +
 //"         idcourse, CourseName, idclub, ClubName, clubcity, clubcountry, ClubWebsite" +
-    "		 FROM round" +
-    "		   JOIN course	ON round.course_idcourse = course.idcourse" +
-    "			 JOIN club 	ON club.idclub = course.club_idclub" +
-    "			    WHERE RoundDate > DATE_SUB(current_date(),INTERVAL 03 month)" +
-    "				    GROUP BY idround" +
-    "                       ORDER by rounddate desc "
+    "	 FROM round" +
+    "	   JOIN course"
+        + "	ON round.course_idcourse = course.idcourse" +
+    "	 JOIN club "
+        + "	ON club.idclub = course.club_idclub" +
+    "	    WHERE RoundDate > DATE_SUB(current_date(),INTERVAL 3000 month)" +  // à réduire après corrections
+    "	    GROUP BY idround" +
+    "       ORDER by rounddate desc "
 ;
 
        // LOG.info("player = " + player.getIdplayer() ) ;

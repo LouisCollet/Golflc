@@ -1,10 +1,21 @@
 package test_instruction;
+import static interfaces.Log.LOG;
 import java.text.ParseException;
 
 public class test_3{
 
-  public static void main(String[] args) throws ParseException
-  {/*
+  public static void main(String[] args) throws ParseException{
+      
+      String s = "YELLOW / M / 01-18 / 1040"; 
+      LOG.info("length string s = " + s.length());
+            String s3 = s.substring(s.length() -3);
+        LOG.info("string s3 = " + s3);
+     //       faut substring dernier / jusque fin de string
+            // 3 dernières positions format : BLUE / L / 01-09 / 154
+      //      inscription.setInscriptionIdTee(Integer.valueOf(s3));
+        LOG.info("connection closed : " + s.substring(s.lastIndexOf("/")+2,s.length() ) );
+      
+      /*
       String str = "MON, Mon Dec 31  CET 2018, low=6, high=8, Cloudy, code=26 / Cloudy";
       LOG.info("str before = " + str);
       // delete 5 premiers charactères

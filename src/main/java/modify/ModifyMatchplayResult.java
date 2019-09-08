@@ -29,8 +29,8 @@ public class ModifyMatchplayResult implements interfaces.Log
               = "  UPDATE player_has_round" +
                 "  SET player_has_round.Player_has_roundMatchplayResult = ?, Player_has_roundModificationDate = ? " +
                 "  WHERE " +
-                "       player_has_round.player_idplayer = ?" +
-                "   AND player_has_round.round_idround = ?";
+                "       InscriptionIdPlayer = ?" +
+                "   AND InscriptionIdRound = ?";
             
                     ps = conn.prepareStatement(query);
                     ps.setString(1, result);  //ici scoreStroke 

@@ -1,7 +1,5 @@
 package modify;
 
-//import create.*;
-//import entite.Handicap;
 import entite.Tee;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
@@ -18,11 +16,11 @@ public class ModifyTee implements Serializable, interfaces.Log, interfaces.GolfI
         //    int row = 0;
         boolean b = false;
         try {
-            LOG.info("entering modifyTee = ");
+            LOG.info("entering modifyTee ... ");
             LOG.info("with tee  = " + tee.toString());
 
             String s = utils.DBMeta.listMetaColumnsUpdate(conn, "tee");
-            LOG.info("String from listMetaColumns = " + s);
+   //         LOG.info("String from listMetaColumns = " + s);
             String query = "UPDATE tee SET "
                     + s
                     + "  WHERE tee.idtee=?";
@@ -36,12 +34,15 @@ public class ModifyTee implements Serializable, interfaces.Log, interfaces.GolfI
             ps.setBigDecimal(4, tee.getTeeRating());
             ps.setInt(5, tee.getTeeClubHandicap());
             ps.setString(6, tee.getTeeHolesPlayed()); // new 29-03-2019
-            ps.setInt(7, tee.getIdtee());  // ne pas oublier
-
+            ps.setShort(7, tee.getTeePar()); // new 03-04-2019
+            ps.setInt(8, tee.getTeeMasterTee());// new 03-04-2019
+            
+            ps.setInt(9, tee.getIdtee());  // ne pas oublier = where
+            // next = key
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
             LOG.info("row = " + row);
-            if (row != 0) {
+            if(row != 0) {
                 String msg = LCUtil.prepareMessageBean("tee.modify");
                 msg = msg // + " successful modify Player : "
                         + " <br/>ID = " + tee.getIdtee()
@@ -65,8 +66,8 @@ public class ModifyTee implements Serializable, interfaces.Log, interfaces.GolfI
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
-        } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Modify Tee = " + nfe.getMessage();
+        } catch (Exception nfe) {
+            String msg = "£££ Exception in Modify Tee = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;

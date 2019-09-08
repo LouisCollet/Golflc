@@ -11,12 +11,10 @@ import javax.sql.DataSource;
 public class DBConnection implements interfaces.GolfInterface, interfaces.Log{
 
     static private Connection conn = null;
-static private DataSource ds = null;
-//static private Connection connPool = null;
+    static private DataSource ds = null;
 
+public Connection getConnection() throws SQLException, Exception{
 
-public Connection getConnection() throws SQLException, Exception   // was static
-{
 /* Load Driver pas nécessaire !! enlevé le 02-09-2018 car le driver est dans le path
     https://stackoverflow.com/questions/5484227/jdbc-class-forname-vs-drivermanager-registerdriver
     excellent article !!
@@ -65,6 +63,9 @@ try{
         meta = conn.getMetaData();
          LOG.info(" -- Meta JDBC Version = " + meta.getJDBCMajorVersion() + '.' + meta.getJDBCMinorVersion());
          LOG.info(" -- Meta JDBC Connector Version = " + meta.getDriverVersion() );
+         
+    //     utils.DBMeta.cursorHoldabilitySupport(conn); // new 13-05-2019
+         
 	return conn;
 }catch (SQLException e){
 	LOG.error("SQLException in Opening Connection : " + db_connection + " Errorcode = " + e);
@@ -86,7 +87,48 @@ try{
         LOG.info("Connection returned : {} on database = {}", c.substring(c.lastIndexOf("@"),c.length()), conn.getCatalog() );
 }
 } // end method
-
+public Connection getConnection(String type) throws SQLException, Exception{
+    String db_connection = null;
+    Properties p = null;
+try{
+    LOG.info("attention ! we are using DB = " + type);
+       ClassLoader clo = Thread.currentThread().getContextClassLoader();
+       InputStream is = clo.getResourceAsStream("jdbc.properties");
+       p = new Properties();
+       p.load(is);
+         db_connection = p.getProperty("jdbc.mysql")
+                       + p.getProperty("jdbc.host")
+                  //     + p.getProperty("jdbc.dbname")
+                       + type
+                       + p.getProperty("jdbc.params");
+        conn = DriverManager.getConnection(db_connection,
+                p.getProperty("jdbc.username"), 
+                p.getProperty("jdbc.password"));
+        DatabaseMetaData meta = null;
+        meta = conn.getMetaData();
+         LOG.info(" -- Meta JDBC Version = " + meta.getJDBCMajorVersion() + '.' + meta.getJDBCMinorVersion());
+         LOG.info(" -- Meta JDBC Connector Version = " + meta.getDriverVersion() );
+	return conn;
+}catch (SQLException e){
+	LOG.error("SQLException in Opening Connection : " + db_connection + " Errorcode = " + e);
+        return null;//conn = null;
+        //throw e;
+}catch (Exception e){
+	LOG.error(NEW_LINE + "/"
+                + NEW_LINE + "/"
+                + NEW_LINE + "/"
+                + NEW_LINE + "NO DATABASE FOUND !!!!!!!!!!!!!!!: " + p.getProperty("jdbc.dbname")
+                + NEW_LINE + " Errorcode = " + e
+                + NEW_LINE + "/");
+        e.printStackTrace();
+        return null;//conn = null;
+        //throw e;        
+ }finally{  
+  //  LOG.info("conn = " + conn.toString());
+    String c = conn.toString();
+        LOG.info("Connection returned : {} on database = {}", c.substring(c.lastIndexOf("@"),c.length()), conn.getCatalog() );
+}
+} // end method
 /////////////////////////////////////////
 public static void closeQuietly(Connection connection, Statement statement,
   // enlevé static      public static void closeQuietly(Connection connection, Statement statement,
@@ -214,7 +256,22 @@ properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.wildfly.naming.client.WildF
 public static void setDataSource() throws Exception{ 
 try{   
     LOG.info("starting getDataSource" );
-    
+    /*
+    databaseTerm 
+
+MySQL uses the term "schema" as a synonym of the term"database," while Connector/J historically takes theJDBC term "catalog"
+    as synonymous to "database". Thisproperty sets for Connector/J which of the JDBC terms"catalog" and "schema" is used in
+    an application torefer to a database. The property takes one of the twovalues CATALOG or SCHEMA and uses it to determine
+    (1)which Connection methods can be used to set/get thecurrent database (e.g. setCatalog() or setSchema()?),
+    (2) which arguments can be used within the variousDatabaseMetaData methods to filter results 
+    (e.g. thecatalog or schemaPattern argument of getColumns()?),and (3) which fields in the ResultSet returned
+    byDatabaseMetaData methods contain the databaseidentification information (i.e., the TABLE_CAT orTABLE_SCHEM
+    field in the ResultSet returned bygetTables()?). 
+If databaseTerm=CATALOG, schemaPattern for searchesare ignored and calls of schema methods (likesetSchema()
+    or getSchema()) become no-ops, and viceversa. 
+Default: CATALOG 
+Since version: 8.0.17 
+    */
     ClassLoader clo = Thread.currentThread().getContextClassLoader();
      // Netbeans Files en haut à gauche /src/main/resources
     InputStream is = clo.getResourceAsStream("jdbc.properties");
@@ -225,7 +282,7 @@ try{
           // properties.put(Context.INITIAL_CONTEXT_FACTORY, "org.jboss.naming.remote.client.InitialContextFactory");  
           // properties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");  
           
-          Context ctx = new InitialContext(p);  
+          Context ctx = new InitialContext(p);
              LOG.info("Context ctx = " + ctx);
   
           if(ctx == null){
@@ -241,11 +298,9 @@ try{
           //<datasource jta="true" jndi-name="java:jboss/datasources/golflc" pool-name="MySqlDS" enabled="true" use-java-context="true" use-ccm="true">
                     <connection-url>jdbc:mysql://localhost:3307/golflc</connection-url>
                     <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
-                    <driver>mysql-connector-java-8.0.12.jar</driver>
-          */
+            */
              LOG.info("-- Using datasource string : " + s);
           ds = (DataSource)ctx.lookup(s);
-             
           if (ds != null){
               LOG.info("-- found datasource : " + ds);
       //       connPool = ds.getConnection(p.getProperty("jdbc.username"),p.getProperty("jdbc.password"));
@@ -287,7 +342,7 @@ try{
  //// voir jdbc.properties            conn.setCatalog(DB_NAME); // from webGolfInterface mod 4/12/2011
             LOG.info("-- getPooledConnection Database opened = " + connPool.getCatalog() );
             LOG.info("-- getPooledConnection isValid ? = " + connPool.isValid(5)); // timeout 5 seconds ;
-            LOG.info("-- PooledConnection = " + connPool);
+       //     LOG.info("-- PooledConnection ClientInfo = " + connPool.getClientInfo().toString());
             
           DatabaseMetaData meta = null;
           meta = connPool.getMetaData();
@@ -295,6 +350,7 @@ try{
          LOG.info(" -- Meta JDBC Connector Version = " + meta.getDriverVersion() );
             
      //        conn.setAutoCommit(true); //
+ //     utils.DBMeta.cursorHoldabilitySupport(conn); // new 13-05-2019
              return connPool;
         }else{
              LOG.info("-- getPooledConnection NOT established = null" );
@@ -339,8 +395,7 @@ public String toString()
 //         LOG.info("NumIdle: " + bds.getNumIdle());
 //     }
 
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
+public static void main(String[] args) throws SQLException, Exception{
 
  //   DBConnection dbc = new DBConnection();
  //   conn = dbc.getConnection();

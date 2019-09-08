@@ -23,8 +23,8 @@ try{
         //    int count = 0;
             LocalDate endDate = null;
    //         LOG.info("line 01");
-            switch(subscription.getSubCode())
-                {   // switch ne fonctionne pas avec enum !! compile type
+            switch(subscription.getSubCode()){
+                // switch ne fonctionne pas avec enum !! compile type
                     case "TRIAL":  // trial one day
                             LOG.info("getSubCode(): TRIAL");
                     //    d = subscription.getEndDate().plusDays(1);  // ok si enddate dans le futur !!

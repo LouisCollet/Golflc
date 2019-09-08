@@ -1,16 +1,8 @@
 
 package entite;
 
-/**
- *
- * @author collet
- */
-
 import java.io.Serializable;
 import javax.inject.Named;
-//import javax.faces.component.UIComponent;
-//import javax.faces.context.FacesContext;
-//import javax.faces.bean.ManagedProperty;
 @Named
 public class InscriptionCSV implements Serializable, interfaces.Log, interfaces.GolfInterface
 {

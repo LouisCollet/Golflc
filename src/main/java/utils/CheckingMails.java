@@ -32,6 +32,7 @@ public class CheckingMails implements interfaces.Log {
       properties.put("mail.pop3.host", host);
       properties.put("mail.pop3.port", "587");  //was 995
       properties.put("mail.pop3.starttls.enable", "true");
+      //https://javaee.github.io/javamail/FAQ#getdefaultinstance
       Session emailSession = Session.getDefaultInstance(properties);
   
       //create the POP3 store object and connect with the pop server

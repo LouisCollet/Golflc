@@ -1,25 +1,24 @@
 
 package modify;
 
-//import static interfaces.GolfInterface.NEWLINE;
-//import static interfaces.Log.LOG;
+import entite.Tee;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
+import utils.DBConnection;
 import utils.LCUtil;
 
 public class ModifyScore implements interfaces.Log, interfaces.GolfInterface{
  
    final private static String []array_return_error = new String [3]; 
    
-public String[] updateScore(Connection conn, int[][] points, int in_player, int in_round) throws SQLException
-{
+public String[] modify(Connection conn, int[][] points, int in_player, int in_round) throws SQLException{
     LOG.info(" -- \nStart of setScore with array = " +  Arrays.deepToString(points) );
     LOG.info(" -- \nStart of setScore for player = " + in_player +" , round = " + in_round);
     PreparedStatement ps = null;
-try
-{
+try{
     final String query =
          "UPDATE score"
        + " SET ScorePar=?, ScoreStrokeIndex=?, ScoreStroke=?, ScoreExtraStroke=?,"
@@ -28,9 +27,8 @@ try
        + "  AND player_has_round_player_idplayer=?"
        + "  AND player_has_round_round_idround=?"
        ;
-
-    for (int i=0; i<points.length; i++)
-    {
+// test java 10 var au lieu de int : quel intérêt ??
+    for (var i=0; i<points.length; i++){
         //    LOG.info("Starting loop with i = " + i);
         ps = conn.prepareStatement(query);
    // updated fields
@@ -83,5 +81,23 @@ try
    //     return array_return_error;
     }
 } //end setScore
+
+ public static void main(String[] args) throws SQLException, Exception {
+   Connection conn = new DBConnection().getConnection();
+   try {
+            Tee tee = new Tee();
+            tee.setIdtee(140);
+            Tee t = new load.LoadTee().load(tee, conn);
+
+    //        boolean b = new ModifyScore().modify(t, conn);
+    //        LOG.info("from main, teemodified = " + b);
+        } catch (Exception e) {
+            String msg = "££ Exception in main Modify Score = " + e.getMessage();
+            LOG.error(msg);
+            //      LCUtil.showMessageFatal(msg);
+        } finally {
+            DBConnection.closeQuietly(conn, null, null, null);
+        }
+    } // end main//
 
 } // end class

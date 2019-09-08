@@ -59,8 +59,8 @@ try
 "       JOIN club " +
 "       	ON course.club_idclub = club.idclub " +
 "       JOIN player_has_round " +
-"           ON  player_has_round.player_idplayer = player.idplayer " +
-"           AND player_has_round.round_idround = round.idround " +
+"           ON  InscriptionIdPlayer = player.idplayer " +
+"           AND InscriptionIdRound = round.idround " +
 //"        GROUP BY roundgame" +   // new 30/06/2016
 "        ORDER by player_has_round.InscriptionFinalResult DESC " 
     ;

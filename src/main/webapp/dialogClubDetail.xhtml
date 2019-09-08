@@ -26,10 +26,10 @@
  <p:panelGrid  columns="2"
                columnClasses="label,value">
     <f:facet name="header">
-                    this is the header of dialogClubDetail #{param.bookName}
+                    ClubDetail for id = #{param.IdClub}
     </f:facet>
 <p:dataTable id="courses"
-             value="#{courseC.listDetailClub()}"
+             value="#{courseC.listDetailClub(param.IdClub)}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
@@ -38,7 +38,7 @@
 <p:column
      headerText="#"
      footerText="#"
-     style="width:2%"
+     width="2%"
      id="colRow">
              #{row+1}
 </p:column>

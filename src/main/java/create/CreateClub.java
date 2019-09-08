@@ -40,7 +40,7 @@ public class CreateClub implements interfaces.Log{
             ps.setInt(10,324713);  // mod 29-03-2019
               LOG.info("line 06");
             ps.setTimestamp(11, LCUtil.getCurrentTimeStamp());
-              
+
               
              //    String p = ps.toString();
             utils.LCUtil.logps(ps);

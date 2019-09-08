@@ -25,15 +25,22 @@ static final double [][] BUFFER_ZONE =    // avant 2014
     {4.0,18.5,26.4, 32, 36,0.1,0.4},
     {5.0,26.5,36.0, 31, 36,0.2,0.5},
     };
+// EGA Exact handicap entre col2 et col3
+// buffer zone = entre col4 et col5
+// ajustement à la hausse : col 6
+// ajustement à la baisse : col 7
 
-static final double [][] BUFFER_ZONE_2014 =    // à partir de 2014
-    {
+//   0    1     2     3  4   5   6
+static final double [][] BUFFER_ZONE_2014 = {   // à partir de 2014
     {1.0, 0.0,  4.4, 33,36, 0.1, 0.1},
     {2.0, 4.5, 11.4, 32,36, 0.1, 0.2},
     {3.0, 11.5,18.4, 31,36, 0.1, 0.3},
     {4.0, 18.5,26.4, 30,36, 0.1, 0.4},
     {5.0, 26.5,36.0, 30,36, 0.2, 0.5},
+ //   {6.0, 36.1,54.0, 30,36, 0.2, 0.5},  // new category 6 on 01/05/2019
+    {6.0, 37.0,54.0, 30,36, 0.0, 1},  // new category 6 on 01/05/2019
     };
+
 
 /* modification 11-09-2018 : utilisation de jdbc.properties dans DBConnection
 static final String DB_DRIVER = "com.mysql.jdbc.Driver()";

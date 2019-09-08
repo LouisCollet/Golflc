@@ -1,11 +1,13 @@
-package utils;
+package calc;
 
+import static interfaces.Log.LOG;
+import static interfaces.Log.TAB;
 import java.sql.*;
 import java.util.*;
+import utils.DBConnection;
+import utils.LCUtil;
 
-public class GolfMySQL implements interfaces.GolfInterface, interfaces.Log    // constantes
-{
-// variables instance
+public class CalcWorkHcpStb implements interfaces.GolfInterface{     // constantes
 
 final private static String []array_return_error = new String [3];
 private static int nb = 0;     // nb par constructor Ã  chaque appel Ã  la classe!!
@@ -17,8 +19,7 @@ private static int csa;
 private static String qualifying;
 private static int [][] points = null; //new int [18][6];
 
-public GolfMySQL()    // constructor
-{
+public CalcWorkHcpStb(){    // constructor
     nb++;    // comment
     //LOG.info("class Name = " + className);
   //  LOG.info(" from constructor GolfMySQL = " + nb);
@@ -36,8 +37,8 @@ try{
       rs.beforeFirst(); //  Initially the cursor is positionned before the first row
       int rowNum = 0; //The method getRow lets you check the number of the row
                         //where the cursor is currently positioned
-      while (rs.next())
-        {rowNum = rs.getRow() - 1;
+      while (rs.next()){
+          rowNum = rs.getRow() - 1;
             points [rowNum][0]= rs.getInt(1);   //  hole #
             points [rowNum][1]= rs.getInt(2);   //  hole par
             points [rowNum][2]= rs.getInt(3);   //  hole index
@@ -55,8 +56,7 @@ try{
       //LOG.info(NEWLINE + " -- End of getQueryLoadArray for 09th element = " + points[9] [3]); // 3=strokes : pas de points introduits
       //LOG.info("  -- table myPoints, player = " + rs.getInt(5));
 
-       for (int i=0; i<points.length; i++)
-    {
+       for (int i=0; i<points.length; i++) {
             //int strokes = points [i][3];
             LOG.info(" -- ending : hole = " + points [i][0] + " , strokes = " + points [i][3]);
     } 
@@ -76,8 +76,8 @@ return array_return_error;
 
 } // end catch
 
-finally
-{ rs.close();
+finally{
+    rs.close();
   st.close();
   //meta.close();
   //LOG.info(" -- end of method\n");
@@ -159,12 +159,10 @@ finally
 
 } //end method
 */
-public String [] getIdRoundPro(Connection conn, String in_round_date, int in_player) throws SQLException
-{
+public String [] getIdRoundPro(Connection conn, String in_round_date, int in_player) throws SQLException{
     LOG.info(" -- Start of getIdRoundPro with round date = " + in_round_date);
     CallableStatement cs = null;
-try
-{
+try{
     final String stored_name = "get_idround(?,?,?)";   // nom de la stored pro, 30 parameters
         LOG.info(" -- Start with : " + stored_name + " player = " + in_player + " round = " + in_round_date);
     cs = conn.prepareCall("{CALL " + stored_name + "}");
@@ -210,33 +208,29 @@ finally
 } //end getIdRound
 // -----------------------------------------------------------------------------
 
-public int getIdRound() throws SQLException
-{
+public int getIdRound() throws SQLException{
     return round;
 }
-public int getCSA() throws SQLException
-{
+public int getCSA() throws SQLException{
     return csa;
 }
 
-    public void setPoints(int[][] points)
-    {
-        GolfMySQL.points = points;
+    public void setPoints(int[][] points){
+        CalcWorkHcpStb.points = points;
         LOG.info("GolfMySQL : points transferred !");
     }
 
 
-public int[][] createArrayPoints(int holes) throws SQLException, Exception
-{   // nod 21/06/2015 argument holes
-    LOG.info(" ... entering creatgeArrayPoints with holes = " + holes);
-    switch (holes) {
+public int[][] createArrayPoints(int holes) throws SQLException, Exception{  
+    LOG.info(" ... entering createArrayPoints() with holes = " + holes);
+    switch(holes){
         case 9:
-                points = new int [9][6];
-            LOG.info("array created for holes  = " + holes);
+            points = new int [9][6];
+                LOG.info("array created for holes  = " + holes);
             break;
         case 18:
-                points = new int [18][6];
-            LOG.info("array created for holes  = " + holes);
+            points = new int [18][6];
+                LOG.info("array created for holes  = " + holes);
             break;
         default:
             LOG.info("[][]holes = not 9 or 18 " + holes);
@@ -244,14 +238,22 @@ public int[][] createArrayPoints(int holes) throws SQLException, Exception
     }
     points = LCUtil.initArrayPoints(points);
 return points;
-}
+} // end method
 
-public static String getQualifying() throws SQLException
-{
+public static String getQualifying() throws SQLException{
     return qualifying;
 }
 
-public static void main(String[] args) throws SQLException // testing purposes
-{
-}// end main
+public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+  try{
+ //   List<ECourseList> lp = new CourseList().list(conn);
+  //      LOG.info("from main, after lp = " + lp);
+ } catch (Exception e) {
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
 } // end Class GolfMySQL

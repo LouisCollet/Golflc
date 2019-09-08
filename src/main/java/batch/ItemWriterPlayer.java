@@ -146,9 +146,7 @@ public class ItemWriterPlayer extends AbstractItemWriter implements interfaces.L
          LOG.info("handicap = " + handicap.toString());
          
         LOG.info("just before create player");
-     create.CreatePlayer cp = new create.CreatePlayer();
-   //     interfaces.PlayerDao cp = new interfaces.PlayerDao();
-      boolean b = cp.create(player, handicap, conn, "B");
+      boolean b = new create.CreatePlayer().create(player, handicap, conn, "B");
          LOG.info("boolean returned from create player = " + b);
       if(b == false) // new 20/10/2014
              {

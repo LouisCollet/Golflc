@@ -28,8 +28,7 @@ try{
  //    String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
   //   String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
 String query =
-        "SELECT "
-        + cl 
+        "SELECT " + cl 
             + "        FROM club "
     //        + "        WHERE club.idclub = course.club_idclub"
     //        + "    AND course.CourseEnd >=  MAKEDATE(year(now()),1)"   // new 28/07/2017 >= 01/01 année en cours

@@ -397,7 +397,7 @@ public String toString(){
      LOG.info("playerEmail : " + this.getPlayerEmail());
      LOG.info("playerRole : " + this.getPlayerRole());
    }else{
-       LOG.info("idplayer =  null" );
+       LOG.info("idplayer nothing printed !=  null" );
    }
  //    LOG.info("playerTimeZoneId : " + this.getPlayerTimeZone().getTimeZoneId());
  //    LOG.info("playerLatLng : " + this.getPlayerLatLng());
@@ -421,6 +421,7 @@ public String toString(){
                + " ,playerPassword (encrypted) : " + this.getPlayerPassword()
                + " ,player Home Club : " + this.getPlayerHomeClub()
                + " ,playerPhoto : " + this.getPlayerPhotoLocation()
+               + " ,playerRole : " + this.getPlayerRole()
      //          + " ,playersList : " + Arrays.toString(this.getlistPlayers.toArray())
              ;
     return str;

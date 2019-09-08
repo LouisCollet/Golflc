@@ -74,7 +74,7 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
         <p:selectOneMenu id="teestart"
                          value="#{courseC.inscription.inscriptionTeeStart}"
                            >
-                    <f:selectItems value="#{courseC.teeStartListe}" />
+                    <f:selectItems value="#{courseC.teeStartList('current_player')}" />
         </p:selectOneMenu>
         
         <h:outputText value="#{msg['club.web']} :"  />
@@ -88,8 +88,7 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
         </p:lightBox>
 
 <f:facet name="footer">
-<p:commandButton 
-                         id="buttonCreate"
+<p:commandButton         id="buttonCreate"
                          value="#{msg['button.inscription.create']}"
                          update="growl-msg"
                          ajax="false"
@@ -97,7 +96,6 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          icon="fa fa-pencil"
                          action="#{courseC.createInscription()}"
          />
-<!--   disabled="#{courseC.inscriptionNew.inscriptionOK}"  -->
 <p:commandButton 
                          id="buttonWeather"
                          value="#{msg['button.weather']}"

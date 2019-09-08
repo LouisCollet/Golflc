@@ -48,14 +48,13 @@ public String checkActivation() throws SQLException, Exception, Throwable
     String keyLC2 = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("uuid");
     LOG.info("keyLC2  = " + keyLC2);
     
-    FindActivationPlayer fap = new FindActivationPlayer();  // new instance
-    player = fap.findActivationPlayer(conn, uuid);
+  //  FindActivationPlayer fap = new FindActivationPlayer();  // new instance
+    player = new FindActivationPlayer().find(conn, uuid);
     // mod 19/08/20108 encore à tester 
  ///   player = findActivationPlayer(uuid); // vérifie si uuid est en attente dans table activation
         LOG.info(" return from = " + player.getIdplayer());
-    if(player.getIdplayer() != null) // trouvé dans table Activation
-    {
-        LOG.info("idplayer ready for activation  = " + player.getIdplayer() );
+    if(player.getIdplayer() != null){ // trouvé dans table Activation
+            LOG.info("idplayer ready for activation  = " + player.getIdplayer() );
         boolean b = new DeleteActivation().delete(conn, uuid);
         // delete record dans table Activation
         if(b == false){

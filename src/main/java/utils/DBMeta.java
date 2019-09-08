@@ -13,8 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import lc.golfnew.Constants;
 
-public class DBMeta // implements interfaces.Log //__GolfInterface
-{
+public class DBMeta{
 
 public static int CountColumns_old(Connection conn, String table) throws SQLException{
     Statement st = null;
@@ -37,44 +36,16 @@ try{
 }
 } // end method
 
-public static int CountColumns(Connection conn, String table) throws SQLException{
-    ResultSet rs = null;
-    PreparedStatement ps = null;
-try{
-    final String query = "SELECT count(*)" +
-        " FROM information_schema.columns" +
-        " WHERE table_name = ?";
-    ps = conn.prepareStatement(query);
-    ps.setString(1, table);
- //   utils.LCUtil.logps(ps);
-    rs = ps.executeQuery();
-    if(rs.next()){  
-//        LOG.debug("resultat : CountColumns = " + rs.getInt(1) );
-      return rs.getInt(1);
-    }else{
-        LOG.error("error : no result found no columns !! = " + rs.getInt(1) );
-        return 99;  //error code
-    }
-}catch (SQLException e){
-	LOG.error("SQLException in CountColumns : " + e);
-        return 0;
-        //throw e;
-}finally{
-    rs.close();
-    ps.close();
-}
-} // end method
+
 
 
 
 /////////////////////////////////////////
-public static void showColumns(Connection conn, String table) throws SQLException
-{
+public static void showColumns(Connection conn, String table) throws SQLException{
     Statement st = null;
     ResultSet rs = null;
     ResultSetMetaData rsmd = null;
-try
-{
+try{
     st = conn.createStatement();
     st.executeQuery("select * from " + table);
     rs = st.getResultSet();
@@ -92,18 +63,13 @@ try
                 + rsmd.getColumnType(i) );
         } // end for
 }
-catch (NullPointerException npe)
-{
+catch (NullPointerException npe){
 	LOG.error("NullPointerException showColumns : " + npe);
         throw npe;
-}
-catch (SQLException e)
-{
+}catch (SQLException e){
 	LOG.error("SQLException in showColumns : " + e);
         //throw e;
-}
-finally
-{
+}finally{
     LOG.error("finally2 executed ! ");
     DBConnection.closeQuietly(null, st, rs, null);
 }
@@ -358,9 +324,7 @@ public static String datetime(String c) {
     return sb9.toString();
 }
 
-public static String setterGenerator(Connection conn, String table) throws SQLException
-{
-
+public static String setterGenerator(Connection conn, String table) throws SQLException{
     ResultSet rs = null;
 try{
     DatabaseMetaData meta = conn.getMetaData();
@@ -482,33 +446,59 @@ StringBuilder sb = new StringBuilder();
 }
 
 } // end method
-
+public static int CountColumns(Connection conn, String table) throws SQLException{
+    ResultSet rs = null;
+    PreparedStatement ps = null;
+try{
+    final String query = "SELECT count(*)" +
+        " FROM information_schema.columns" +
+        " WHERE " +
+        " table_schema = ?" +  // new 12-04-2019 comptait 2 x car 2 db avec le même nom de table !!!
+        " AND table_name = ?";
+    ps = conn.prepareStatement(query);
+    ps.setString(1, conn.getCatalog()); // database name
+    ps.setString(2, table);
+    
+ //   utils.LCUtil.logps(ps);
+    rs = ps.executeQuery();
+    if(rs.next()){  
+//        LOG.debug("resultat : CountColumns = " + rs.getInt(1) );
+      return rs.getInt(1);
+    }else{
+        LOG.error("error : no result found no columns !! = " + rs.getInt(1) );
+        return 99;  //error code
+    }
+}catch (SQLException e){
+	LOG.error("SQLException in CountColumns : " + e);
+        return 0;
+        //throw e;
+}finally{
+    rs.close();
+    ps.close();
+}
+} // end method
 public static String listMetaColumnsLoad (Connection conn, String table) throws SQLException{
     ResultSet rs = null;
 //https://docs.oracle.com/javase/8/docs/api/java/sql/DatabaseMetaData.html#getColumns-java.lang.String-java.lang.String-java.lang.String-java.lang.String-
 try{
 ///    LOG.info("starting listMetaColumnsLoad for table = " + table );
     DatabaseMetaData meta = conn.getMetaData();
-//LOG.info("line 01");
-rs = meta.getColumns(null, null, table, null);
-//LOG.info("line 02");
-rs.beforeFirst();
-StringBuilder sb = new StringBuilder();
-sb.append(" "); // space to separate query element
-//LOG.info("line 03");
+  rs = meta.getColumns(conn.getCatalog(), null, table, null);
+ //    LOG.info("database catalog = " + conn.getCatalog());
+  rs.beforeFirst();
+  StringBuilder sb = new StringBuilder();
+  sb.append(" "); // space to separate query element
    while(rs.next()){
         sb.append(rs.getString("TABLE_NAME")).append(".").append(rs.getString("COLUMN_NAME"));
+   //     if(rs.getString("COLUMN_NAME").equals("player_has_round")){
+  //          LOG.info("sb is now = " +sb.toString());
+     //   }
         sb.append(", ");
     }  //end while
   sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
  //  LOG.info("MetaDataColumns = " + sb.toString());
 return sb.toString();
    
-
-
-
-
-
 
 /*http://docs.oracle.com/javase/6/docs/api/java/sql/DatabaseMetaData.html
  * The ResultSet returned by the getColumns() method contains a list of columns
@@ -581,24 +571,29 @@ try{
   //  String   tableNamePattern = table;
    // String   columnNamePattern = null;
 
- rs = meta.getColumns(null, null, table, null);
+ //rs = meta.getColumns(null, null, table, null);
+ rs = meta.getColumns(conn.getCatalog(), null, table, null);
 
 //rs.beforeFirst();
 rs.first();  // grosse astuce ! ne pas prendre la première field : idplayer, idclub, etc ...
+     // parce que c'est toujours ?? la clé ??
 StringBuilder sb = new StringBuilder();
-// les colonnes suivantes ne doivent pas être MAJ en update
-List<String> blacklist = Arrays.asList(
-        "playerphotolocation", "playeractivation", "playermodificationdate" , "playerpassword", "playerRole",  // TOUT EN MINUSCULES !!!!
+
+ // http://mysql-0v34c10ck.blogspot.com/2011/05/better-way-to-get-primary-key-columns.html
+// les colonnes suivantes ne doivent pas être MAJ en update car ce sont des clés ou des zones protégées
+List<String> blacklist = Arrays.asList(  // attention tout en minuscules !!
+        "playerphotolocation", "playeractivation", "playermodificationdate" , "playerpassword", // "playerrole",  // TOUT EN MINUSCULES !!!!
         "clubmodificationdate","club_idclub",
         "coursemodificationdate","course_idcourse",// "courseholes",
         "teemodificationdate", "tee_idtee", "tee_course_idcourse",
-        "holenumber", "holemodificationdate"
-        ); // 07-08-208
+        "holenumber", "holemodificationdate",
+        "auditstartdate","auditmodificationdate" // lower cases !!
+        );
 String s = "";
-   while(rs.next())
-    {   s = rs.getString(4).toLowerCase(); // 4.COLUMN_NAME String => column name 
-        if(blacklist.contains(s))
-            { LOG.info("rejected field = " + s);
+   while(rs.next()){
+       s = rs.getString(4).toLowerCase(); // 4.COLUMN_NAME String => column name 
+        if(blacklist.contains(s)){
+            LOG.info("we will not update this field = " + s);
              continue;
             }
         sb.append(s).append("=?, "); 
@@ -611,18 +606,16 @@ return sb.toString();
       LOG.error("Exception " + e);
       return null;
 }finally{
-    //LOG.error("finally2 executed ! ");
     DBConnection.closeQuietly(null, null, rs, null);
 }
-} //en method
+} //end method
 
 public static void listMetaStoredPro(Connection conn, String nomProcedure)
         throws SQLException
 {   DatabaseMetaData meta = conn.getMetaData();
     ResultSet rs = meta.getProcedureColumns(conn.getCatalog(),null,nomProcedure,"%");
         LOG.info("listMetaStoredPro : ############## " + nomProcedure);
-    while(rs.next())
-    {
+    while(rs.next()){
         LOG.info("\n");
         LOG.info("Nom parametre  = " + rs.getString("COLUMN_NAME"));
         LOG.info("Type paramètre = " + rs.getInt("COLUMN_TYPE"));
@@ -633,32 +626,60 @@ public static void listMetaStoredPro(Connection conn, String nomProcedure)
  //   meta.close());
 } // end method
 
+
+public static void cursorHoldabilitySupport(Connection conn) throws SQLException {
+
+    DatabaseMetaData dbMetaData = conn.getMetaData();
+    LOG.info("ResultSet.HOLD_CURSORS_OVER_COMMIT = " +
+        ResultSet.HOLD_CURSORS_OVER_COMMIT);
+
+    LOG.info("ResultSet.CLOSE_CURSORS_AT_COMMIT = " +
+        ResultSet.CLOSE_CURSORS_AT_COMMIT);
+
+    LOG.info("Default cursor holdability: " +
+        dbMetaData.getResultSetHoldability());
+
+    LOG.info("Supports HOLD_CURSORS_OVER_COMMIT? " +
+        dbMetaData.supportsResultSetHoldability(
+            ResultSet.HOLD_CURSORS_OVER_COMMIT));
+
+    LOG.info("Supports CLOSE_CURSORS_AT_COMMIT? " +
+        dbMetaData.supportsResultSetHoldability(
+            ResultSet.CLOSE_CURSORS_AT_COMMIT));
+}
+
+
+
+
+
+
 /**
  *
  * @param args
      * @throws java.sql.SQLException
  */
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
-    DBConnection dbc = new DBConnection();
-Connection conn = dbc.getConnection();
+public static void main(String[] args) throws SQLException, Exception{
+
+Connection conn = new DBConnection().getConnection("testgolflc");
 //showColumns(conn,"club");
 //LOG.info(" -- success   !!!! ");
+
 int c = CountColumns(conn,"player");
-LOG.info(" -- # columns = " + c);
-// c = CountColumns2(conn,"player");
+LOG.info(" -- # columns player = " + c);
+
+ // c = CountColumns(conn,"player");
 //LOG.info(" -- # columns = " + c);
 
 //listMetaTables(conn);
 //listMetaData(conn);
-//String s = listMetaColumnsUpdate(conn, "round");
-
+String s = listMetaColumnsUpdate(conn, "round");
+LOG.info(" columns for update = + "+ s);
 //String s = setterGenerator(conn, "handicap");
 
 //DBMeta md = new DBMeta();
 
-String play = listMetaColumnsLoad(conn,"player"); 
-LOG.info(" main - player 1 = " + NEW_LINE + play);
+String play = listMetaColumnsLoad(conn,"player_has_round"); 
+LOG.info(" main - columns = " + NEW_LINE + play);
 
 //String p = listMetaColumnsLoad2(conn,"player");  // is static 
 //LOG.info(" main - player 2 = " + NEW_LINE + p);

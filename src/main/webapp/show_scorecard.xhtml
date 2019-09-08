@@ -24,7 +24,7 @@
     
     <p:dataTable id="scorecard1"
              filteredValue="#{courseC.filteredCars}"
-             value="#{courseC.scoreCardList1}"
+             value="#{courseC.ScoreCardList1()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
@@ -50,7 +50,7 @@
          <f:convertDateTime pattern="dd/MM/yyyy" />
     </h:outputText>
 </p:column>
-
+  <ui:include src="include/include_thumbnails_ecourselist.xhtml"/>
 <p:column headerText="#{msg['handicap.player']}" style="width:20%" >
     <h:outputText value="#{c.handicap.handicapPlayer}"/>
 </p:column>
@@ -70,60 +70,65 @@
 filteredValue="#{courseC.filteredCars}"
 -->
 <p:dataTable id="scorecard2a"
-             value="#{courseC.scoreCardList2}"
+             value="#{courseC.ScoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
                   <h1>#{msg['message.scorecard.course']}</h1>
 </f:facet>
 <!-- -->
-<p:column headerText="#{msg['round.competition']}" style="width:100px" >
+<p:column headerText="#{msg['round.competition']}" style="width:10%" >
    <h:outputText value="#{c.round.roundCompetition} (#{c.round.idround})"/>
 </p:column>
 
-<p:column headerText="#{msg['round.game']}" style="width:100px" >
+<p:column headerText="#{msg['round.game']}" style="width:10%" >
     <h:outputText value="#{c.round.roundGame} (#{c.round.roundQualifying})"/>
 </p:column>
 
-<p:column headerText="#{msg['round.date']}" style="width:100px" >
+<p:column headerText="#{msg['round.date']}" style="width:10%" >
    <h:outputText value="#{c.round.roundDate}"> 
       <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
    </h:outputText>
 </p:column>
 
-<p:column headerText="#{msg['club.name']}" style="width:100px" >
+<p:column headerText="#{msg['club.name']}" style="width:10%" >
    <h:outputText value="#{c.club.clubName} (#{c.club.idclub})"/>
 </p:column>
 
-<p:column headerText="#{msg['course.name']}" style="width:100px" >
+<p:column headerText="#{msg['course.name']}" style="width:10%" >
    <h:outputText value="#{c.course.courseName} (#{c.course.idcourse})"/>
 </p:column>
-
 </p:dataTable>
 
+
+<p:separator id="separator2"/>
+<p:spacer height="30" />
+
 <p:dataTable id="scorecard2b"
-             value="#{courseC.scoreCardList2}"
+             value="#{courseC.ScoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
-
-<p:column headerText="#{msg['course.holes']}" style="width:100px" >
-   <h:outputText value="#{c.course.courseHoles} (joué = #{c.round.roundHoles})"/>
+<!--<f:facet name="header">
+                  <h1>#{msg['message.scorecard.result']}</h1>
+</f:facet> -->
+<p:column headerText="#{msg['course.holes']}" style="width:10%" >
+   <h:outputText value="#{c.round.roundHoles}"/>
 </p:column>
 
-<p:column headerText="#{msg['course.par']}" style="width:100px" >
-   <h:outputText value="#{c.course.coursePar}"/>
+<p:column headerText="#{msg['course.par']}" style="width:10%" >
+   <h:outputText value="#{c.tee.teePar}"/>
 </p:column>
 
-<p:column headerText="#{msg['tee.slope']}" style="width:100px" >
+<p:column headerText="#{msg['tee.slope']}" style="width:10%" >
    <h:outputText value="#{c.tee.teeSlope}"/>
 </p:column>
 
-<p:column headerText="#{msg['tee.rating']}" style="width:100px" >
+<p:column headerText="#{msg['tee.rating']}" style="width:10%" >
    <h:outputText value="#{c.tee.teeRating}"/>
 </p:column>
 
-<p:column headerText="#{msg['round.cba']}" style="width:100px" >
-   <h:outputText value="#{c.round.roundCBA}"/>
+<p:column headerText="#{msg['tee.master']}" style="width:10%" >
+    <h:outputText value="#{c.tee.teeMasterTee}"/>
 </p:column>    
 
 <!--     {c.playerGender}  {c.inscriptionTeeStart},MBT, MFT,  LBT, LFT  <h:outputText value="*" 
@@ -132,21 +137,25 @@ filteredValue="#{courseC.filteredCars}"
     <h:outputText value="MBT(#{c.idtee})" rendered="#{c.playerGender eq 'M' and c.inscriptionTeeStart eq 'B'}"/>
     <h:outputText value="LFT(#{c.idtee})" rendered="#{c.playerGender eq 'L' and c.inscriptionTeeStart eq 'F'}"/>
     <h:outputText value="LBT(#{c.idtee})" rendered="#{c.playerGender eq 'L' and c.inscriptionTeeStart eq 'B'}"/>
--->
+
 
 <p:column headerText="#{msg['tee.start']}" style="width:10%" >
     <h:outputText value="#{c.inscription.inscriptionTeeStart} (#{c.tee.idtee})" styleClass="classYellow" rendered="#{c.inscription.inscriptionTeeStart eq 'YELLOW'}" />
     <h:outputText value="#{c.inscription.inscriptionTeeStart} (#{c.tee.idtee})" styleClass="classBlue"   rendered="#{c.inscription.inscriptionTeeStart eq 'BLUE'}" />
 </p:column>
+-->
+<p:column headerText="#{msg['tee.start']}" style="width:10%" >
+    <h:outputText value="#{c.inscription.inscriptionTeeStart} (idtee=#{c.tee.idtee})" />
+</p:column>
 
-<p:column headerText="#{msg['hole.start']}" style="width:100px" >
+
+<p:column headerText="#{msg['hole.start']}" style="width:10%" >
    <h:outputText value="#{c.round.roundStart}"/>
 </p:column>
 <!-- à modifier : afficher uniquement si 9 holes value="#{c.teeStart} rendered="#{c.teeStart eq 'F'}"-->
 </p:dataTable>
 
-<p:separator id="separator2"/>
-<p:spacer height="30" />
+
 </p:outputPanel>
 
 <p:outputPanel id="outputpanelTwo"
@@ -154,8 +163,12 @@ filteredValue="#{courseC.filteredCars}"
                deferredMode="visible"
                >
     <!--   -->
+ <p:separator id="separator3" style="height:30px"/>
+<p:spacer height="30" />
+<hr/>
+    
 <p:dataTable id="scorecard3"
-             value="#{courseC.scoreCardList3}"
+             value="#{courseC.ScoreCardList3()}"
              emptyMessage="#{msg['message.table.empty']}"
              rowIndexVar="row"
              var="c" >
@@ -166,63 +179,71 @@ filteredValue="#{courseC.filteredCars}"
  <p:spacer height="30" rendered="#{row+1 == 9}" />
  <!--  https://stackoverflow.com/questions/4731622/insert-a-new-row-into-datatable  -->
 <p:column headerText="#{msg['score.hole']}"
-          style="width:5%" >
+          style="width:3%" >
         <h:outputText value="#{c.scoreStableford.scoreHole}"/>
 </p:column>
 
 <p:column headerText="#{msg['score.par']}" 
           footerText="#{msg['score.par']} = #{courseC.TotalPar()}"
-          style="width:5%" >
+          width="3%" >
     <h:outputText value="#{c.scoreStableford.scorePar}"
-                      style="font-size: 1.5em;font-weight: bold"/>
+                      style="text-align:center;font-size: 1.5em;font-weight: bold"/>
 </p:column>
 
 <p:column headerText="#{msg['hole.index']}"
           footerText="#{msg['hole.index']}"
-          style="white-space:pre-line;width:5%;" >
+          style="white-space:pre-line;width:3%;" >
         <h:outputText value="#{c.hole.holeStrokeIndex}"/>
 </p:column>
 
 <p:column headerText="#{msg['score.extra']}" 
           footerText="#{msg['score.extra']} = #{totalC.totalExtraStroke}"
-          style="width:5%" >
-      <h:outputText value="*"   rendered="#{c.scoreStableford.scoreExtraStroke eq 1}" style="font-size: 1.5em;font-weight: bold"/>
-      <h:outputText value="**"  rendered="#{c.scoreStableford.scoreExtraStroke eq 2}" style="font-size: 1.5em;font-weight: bold" />
-      <h:outputText value="***" rendered="#{c.scoreStableford.scoreExtraStroke eq 3}" style="font-size: 1.5em;font-weight: bold" />            
+          style="text-align:center;font-size: 1.5em;font-weight: bold;"
+          width="3%">
+
+      <h:outputText value="*"    rendered="#{c.scoreStableford.scoreExtraStroke eq 1}"/>
+      <h:outputText value="**"   rendered="#{c.scoreStableford.scoreExtraStroke eq 2}"/>
+      <h:outputText value="***"  rendered="#{c.scoreStableford.scoreExtraStroke eq 3}"/>
+      <h:outputText value="****" rendered="#{c.scoreStableford.scoreExtraStroke eq 4}"/>
 </p:column>
 
 <p:column headerText="#{msg['score.fairway']}" 
           footerText="#{msg['score.fairway']} = #{totalC.totalFairway}"
-          style="white-space:pre-line;width:5%;" >
+          style="white-space:pre-line;"
+          width="3%" >
        <h:outputText value="#{c.scoreStableford.scoreFairway}"/>
 </p:column>
     
 <p:column headerText="#{msg['score.green']}"
           footerText="#{msg['score.green']} = #{totalC.totalGreen}"
-          style="white-space:pre-line;width:5%;">
+          style="white-space:pre-line;"
+          width="3%" >
        <h:outputText value="#{c.scoreStableford.scoreGreen}"/>
 </p:column>
     
 <p:column headerText="#{msg['score.putts']}" 
           footerText="#{msg['score.putts']} = #{totalC.totalPutts}"
-          style="white-space:pre-line;width:5%;" >
+          style="white-space:pre-line"
+          width="3%" >
        <h:outputText value="#{c.scoreStableford.scorePutts}"/>
 </p:column>
     
 <p:column headerText="#{msg['score.bunker']}"
           footerText="#{msg['score.bunker']} = #{totalC.totalBunker}"
-          style="white-space:pre-line;width:5%;" >
+          style="white-space:pre-line"
+          width="3%" >
        <h:outputText value="#{c.scoreStableford.scoreBunker}"/>
 </p:column> 
     
  <p:column headerText="#{msg['score.penalty']}"
           footerText="#{msg['score.penalty']} = #{totalC.totalPenalty}"
-          style="white-space:pre-line;width:5%;" >
+          style="white-space:pre-line"
+          width="3%" >
        <h:outputText value="#{c.scoreStableford.scorePenalty}"/>
 </p:column> 
  
 <p:column headerText="#{msg['hole.distance']}"
-          style="width:5%">
+          width="3%" >
       <f:facet name="footer">
          <h:outputText value="#{totalC.totalDistance}">
            <f:convertNumber pattern="#,###" />
@@ -239,13 +260,14 @@ filteredValue="#{courseC.filteredCars}"
                 <f:convertNumber pattern="#,###" />
            </h:outputText>
    
-    <p:separator style="width:500px;height:20px"
+    <p:separator id="separator4"
+                style="width:500px;height:20px"
                  rendered="#{row+1 == 9}"/>
 
         <h:outputText
             value="IN = #{totalC.totalDistance - totalC.totalDistanceIn}"
             rendered="#{row+1 == 18}"
-            style="float: right;"
+            style="float:right;width:5%;"
             >
             <f:convertNumber pattern="#,###" />
         </h:outputText>
@@ -253,9 +275,9 @@ filteredValue="#{courseC.filteredCars}"
 
 <p:column headerText="#{msg['score.gross']}" 
           footerText="#{msg['score.gross']} = #{totalC.totalStroke}"
-          style="white-space:pre-line;width:5%;"
+          style="white-space:pre-line;"
+          width="5%"
                 >
-    
         <h:outputText
             value="X"
             rendered="#{c.scoreStableford.scoreStroke == 10}"
@@ -266,48 +288,50 @@ filteredValue="#{courseC.filteredCars}"
         <h:outputText
             value="#{c.scoreStableford.scoreStroke}"
             rendered="#{c.scoreStableford.scoreStroke != 0 and c.scoreStableford.scoreStroke != 10}"
-            style="white-space: nowrap;"
+            style="white-space: nowrap;margin-right: 10px;"
             >
         </h:outputText>
         <h:outputText
             value="PAR"
             rendered="#{c.scoreStableford.scoreStroke == c.scoreStableford.scorePar}"
-            style="white-space: nowrap;float: right;color: blue; font-weight: bold;"
+            style="white-space: nowrap;color: blue; font-weight: bold;margin-right: 20px;"
             >
         </h:outputText>
         <h:graphicImage
-        name="images/par.png"
-        rendered="#{c.scoreStableford.scoreStroke == c.scoreStableford.scorePar}"
-        style="white-space: nowrap;"
+            name="images/par.png"
+            rendered="#{c.scoreStableford.scoreStroke == c.scoreStableford.scorePar}"
+            style="width:20%;white-space: nowrap;"
         />
     
         <h:outputText
             value="BIRDIE"
             rendered="#{c.scoreStableford.scoreStroke == c.scoreStableford.scorePar - 1}"
-            style="white-space: nowrap;float: right; color: red; font-weight: bold;"
+            style="white-space: nowrap; color: red; font-weight: bold;width:10%"
             >
         </h:outputText>
         <h:graphicImage
         name="images/birdie.png"
+        style="width:20%;"
         rendered="#{c.scoreStableford.scoreStroke == c.scoreStableford.scorePar - 1}"
         />
         
         <h:outputText
             value="EAGLE"
             rendered="#{c.scoreStableford.scoreStroke == c.scoreStableford.scorePar - 2}"
-            style="white-space: nowrap;float: right; color: red; font-weight: bold;"
+            style="white-space: nowrap;float: right; color: red; font-weight: bold;width:10%"
             >
         </h:outputText>
         <h:graphicImage
         name="images/eagle.png"
         title="Eagle Title"
+        style="width:20%"
         rendered="#{c.scoreStableford.scoreStroke == c.scoreStableford.scorePar - 2}"
         />
 </p:column>
 <!--  new 12/07/2015  -->
  <p:column headerText="#{msg['score.net']}" 
           footerText="#{msg['score.net']} = #{totalC.totalNet}"
-          style="width:5%" >
+          width="3%" >
      
      <h:outputText value="#{c.scoreStableford.scoreStroke - c.scoreStableford.scoreExtraStroke}"
                    rendered="#{c.scoreStableford.scoreStroke != 0 and c.scoreStableford.scoreStroke != 10}"
@@ -321,47 +345,36 @@ filteredValue="#{courseC.filteredCars}"
  
  <p:column headerText="#{msg['score.points']}" 
           footerText="#{msg['score.points']} = #{totalC.totalPoints - c.roundCBA}"
-          style="white-space:nowrap;width:15%"
+          style="white-space:nowrap;width:10%"
                      >
         <h:outputText
             value="#{c.scoreStableford.scorePoints}" rendered="#{c.scoreStableford.scorePoints != 0}"
-            style="font-size: 2em; font-weight:bold"
+            style="font-size: 2em; font-weight:bold;width:5%;"
             >
         </h:outputText>
         <h:outputText
             value="OUT = #{totalC.totalIn}"
             rendered="#{row+1 == 9}"
-            style="font-size: 1.5em;float: right;"
+            style="font-size: 1.5em;width:10%;"
             >
         </h:outputText>
         <h:outputText
-            value="IN = #{totalC.totalPoints - totalC.totalIn}" 
+            value="IN = #{totalC.totalPoints - totalC.totalIn} - #{totalC.totalDistance - totalC.totalDistanceIn}" 
             rendered="#{row+1 == 18}"
-            style="float: right;font-size: 1.5em;"
+            style="font-size: 1.5em;width:10%;"
             >
         </h:outputText>
         <h:outputText
             value="#{courseC.htmlBr}Correction CBA : - #{c.round.roundCBA}"
             escape="yes"
             rendered="#{row+1 == 18 and c.round.roundCBA != 0}"
-            style="float:right;font-weight:bold"
+            style="float:right;font-weight:bold;width:10%;"
             >
         </h:outputText>
 </p:column>
 
-<!--    
- <f:facet name="footer">
-     <h:outputText
-         value = "Classement Zwanzeurs : #{listC.zwanzeur} , Greenshirt = #{listC.greenshirt} "
-         rendered="#{listC.zwanzeur != 0}"
-        />
-<br/>
-</f:facet>
--->
 </p:dataTable>
 </p:outputPanel>
-<p:spacer height="30" />
-
 <p:spacer height="30" />
 
 <p:panel header="Export PDF">
@@ -384,10 +397,7 @@ filteredValue="#{courseC.filteredCars}"
             fileName="MessagesAndDetails"/>
     </p:commandLink>
     <!--   preProcessor="#{utilsC.preProcessPDF}" -->
-</p:panel>
-            
-
-<p:spacer height="30" />
+    
     <p:commandButton id="btn"
                      value="#{msg['button.print']}"
                      type="button"
@@ -395,6 +405,8 @@ filteredValue="#{courseC.filteredCars}"
                      >
         <p:printer target="form_scorecard" />
     </p:commandButton>
+</p:panel>
+
 
 </h:form>
 </ui:define>

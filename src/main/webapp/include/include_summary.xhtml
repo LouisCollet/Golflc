@@ -16,19 +16,17 @@
 <p:panelGrid
     id="panelgridSummary"
     styleClass="alignmentLeft"
-    columnClasses="col1,col2"
-    columns="2" >
+    columnClasses="col1,col2,col3,col4"
+    columns="4" >
 
 <f:facet name="header">
     <h:outputText escape="false" value="#{msg['title.summary']}" />
 </f:facet>
-    
-    
       <h:outputText value="#{msg['round.id']} :" />
       <h:outputText
             id="idroundsummary" 
             value="#{courseC.round.roundCompetition} (#{courseC.round.idround})"
-            title="This tooltip is displayed when input gets the focus" />
+            /> 
 
       <h:outputText value="#{msg['club.name']} :"   />
 	<h:outputText
@@ -44,7 +42,6 @@
       <h:outputText
             id="rounddatesummary" 
             value="#{courseC.round.roundDate}"
-           
             >
           <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
       </h:outputText>
@@ -64,10 +61,8 @@
       <h:outputText value="Tee :" />
       <h:outputText
             id="teeSummary" 
-            value="#{courseC.tee.idtee}"
+            value="#{courseC.inscription.inscriptionTeeStart} - #{courseC.tee.idtee} - #{courseC.tee.teeMasterTee}"
             />
-      
-      
       
       <h:outputText value="#{msg['round.players']} :" />
       <h:outputText

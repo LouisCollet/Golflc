@@ -139,7 +139,7 @@ li.ui-selectonemenu-item{
 
 /*v  utilisé pour colonne 1 = standard (voir ci-dessus panelGrid : bold
 colonne 2 : enlève le bold par defaut, ajoute italic 
-exemple : participants.xhtml
+exemple : participants.xhtmlet include_summary.xhtml
 <p:panelGrid id="panel"
              columns="2"
              styleClass="alignmentLeft"
@@ -418,6 +418,47 @@ body {
     {
     font-size: 100% !important;
 }
+/*  ligne horizontale 05-04-2019 */
+hr{
+display:block;
+height: 4px;
+background-color: red;
+border: none;
+}
+
+/*
+https://stackoverflow.com/questions/6382023/changing-the-color-of-an-hr-element
+hr {
+  border-style: solid;
+  border-color: cornflowerblue; 
+}
+
+hr.light { 
+    width:70%; 
+    margin:0 auto; 
+    border:0px none white; 
+    border-top:1px solid lightgrey; 
+}
+<hr class="light" />
+
+
+
+
+
+
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0; 
+}
+*/
+
+
+
 /*      .myCustomClass .qtip-content{
 	font-size: 12px;
 }    !important;

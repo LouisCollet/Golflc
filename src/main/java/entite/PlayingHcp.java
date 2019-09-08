@@ -24,7 +24,7 @@ public class PlayingHcp implements Serializable, interfaces.Log{
 @NotNull(message="{tee.slope.notnull}")
 @Min(value=95,message="{tee.slope.min}")
 @Max(value=138,message="{tee.slope.max}")
-    private double teeSlope;
+    private Integer teeSlope;
 
 @NotNull(message="{tee.rating.notnull}")
 @DecimalMin(value="60.0",message="{tee.rating.min}")
@@ -66,7 +66,7 @@ private Double[] HcpScr; // faut Double et pas double !!!
         return teeSlope;
     }
 
-    public void setTeeSlope(double teeSlope) {
+    public void setTeeSlope(Integer teeSlope) {
         this.teeSlope = teeSlope;
     }
 

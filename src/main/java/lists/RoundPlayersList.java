@@ -15,24 +15,32 @@ public class RoundPlayersList implements interfaces.Log{
 //en réalité vaut pour tous games !
     private static List<Player> liste = null;
     
-public List<Player> listAllParticipants(final Round round ,final Connection conn) throws SQLException { 
+public List<Player> list(final Round round ,final Connection conn) throws SQLException { 
  
 if(liste == null)
 {    LOG.debug("starting RoundPlayersList "  );
-     LOG.debug("starting RoundPlayersList for round =  " + round.toString()  );
+ //    LOG.debug("starting RoundPlayersList for round =  " + round.toString()  );
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{   
+try{
+   ///      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
+  //   String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
+     String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
+     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+     String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
+     
+     
     String query =
-     " SELECT playerLastName, playerlanguage, playeremail, playercity, player_has_round.player_idplayer,"
-     + " round.RoundGame, round.idround, round.RoundGame,"
-     + " round.RoundCompetition, round.roundTeam" +
-"	from player_has_round, round, player" +
+      "SELECT " + ph + "," + ro + "," + pl + // ","  + 
+  //   " SELECT playerLastName, playerlanguage, playeremail, playercity, InscriptionIdPlayer,"
+  //   + " round.RoundGame, round.idround, round.RoundGame,"
+  //   + " round.RoundCompetition, round.roundTeam" +
+            
+    "	from player_has_round, round, player" +
 "	where round.idround = ?" +
 // mod 11/06/2017 "	and round.RoundGame = 'SCRAMBLE'" +
-"	and player_has_round.round_idround = round.idround" +
-    "   and player.idplayer = player_has_round.player_idplayer"
+    "	and InscriptionIdRound = round.idround" +
+    "   and player.idplayer = InscriptionIdPlayer"
     ;
      ps = conn.prepareStatement(query);
      ps.setInt(1, round.getIdround()); 
@@ -50,19 +58,20 @@ try
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
       //LOG.debug(" -- query 4= " );
-		while(rs.next())
-                {
-			Player cc = new Player();
-             //           cc = null;
-                        cc.setIdplayer(rs.getInt("player_has_round.player_idplayer") );
-                        cc.setPlayerLastName(rs.getString("playerlastname"));
-                        cc.setPlayerEmail(rs.getString("playeremail"));
-                        cc.setPlayerLanguage(rs.getString("playerlanguage"));
-                        cc.setPlayerCity(rs.getString("playercity"));
-                         LOG.info("idplayer = " + cc.getIdplayer());
-			//store all data into a List
-			liste.add(cc);
-                         LOG.info("cc size = " + liste.size());
+	while(rs.next()){
+            Player p = new Player();
+            p = entite.Player.mapPlayer(rs);
+         //   p.setPlayer(p);
+          
+    //      cc.setIdplayer(rs.getInt("InscriptionIdPlayer") );
+    //                    cc.setPlayerLastName(rs.getString("playerlastname"));
+    //                    cc.setPlayerEmail(rs.getString("playeremail"));
+    //                    cc.setPlayerLanguage(rs.getString("playerlanguage"));
+    //                    cc.setPlayerCity(rs.getString("playercity"));
+           LOG.info("idplayer = " + p.getIdplayer());
+		//store all data into a List
+		liste.add(p);
+           LOG.info("cc size = " + liste.size());
 		}
 //LOG.debug(" -- query 5= listcc = "  );
 //LOG.debug(" -- query 5= playercity = " + liste.get(0).getPlayerCity() );
@@ -70,7 +79,6 @@ try
     return liste;
 
 //}catch (LCCustomException e){
-  //  String msg = " SQL Exception in getScoreCardList1() " + e;
   //  LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
 //    return null;    
@@ -112,16 +120,13 @@ try
   //  Player player = new Player();
   //  player.setIdplayer(324713);
    Round round = new Round(); 
-   round.setIdround(414);
+   round.setIdround(437);
+   
   //  Club club = new Club();
   //  club.setIdclub(1006);
-    List<Player> p1 = new RoundPlayersList().listAllParticipants(round, conn);
+    List<Player> p1 = new RoundPlayersList().list(round, conn);
         LOG.info("Inscription list = " + p1.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 }// end main
-    
-    
-    
-    
-    
+
 } //end class

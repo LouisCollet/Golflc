@@ -1,6 +1,8 @@
 
 package delete;
 
+import entite.Club;
+import entite.Course;
 import entite.ECourseList;
 import entite.Player;
 import entite.Round;
@@ -11,19 +13,18 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class DeleteInscription implements interfaces.Log, interfaces.GolfInterface
-{
- public boolean deleteInscription(final Player player, final Round round, final ECourseList ecl, Connection conn) throws Exception {
+public class DeleteInscription implements interfaces.Log, interfaces.GolfInterface{
+ public boolean delete(final Player player, final Round round, final Club club, Course course, Connection conn) throws Exception {
         PreparedStatement ps = null;     // a modifier pour tenir compte du round, sinon delete de tous les round !
                 // il faut aussi modifier le nombre de joueurs inscrits dans RoundPlayers !!!
-try
-{   //encore Ã  faire : delete du record activation s'il existe ...
+try{   //encore Ã  faire : delete du record activation s'il existe ...
          LOG.info("starting delete for inscription ... = " );
-         LOG.info("for player id  = " + player.getIdplayer() );
+         LOG.info("for player  = " + player.toString() );
          LOG.info("for player last name= " + player.getPlayerLastName() );
-         LOG.info("for round = " + round.getIdround() );
-         LOG.info("for round 2 = " + ecl.Eround.getIdround() );
-        
+         LOG.info("for round = " + round.toString() );
+         LOG.info("for club = " + club.toString() );
+         LOG.info("for course = " + course.toString() );
+ 
    //   find.FindCountScore sciu = new find.FindCountScore();
       int rows = new find.FindCountScore().getCountScore(conn, player, round, "rows");
        if (rows == 99){
@@ -42,8 +43,8 @@ try
 
     String query = " DELETE" +
         " from player_has_round" +
-        " WHERE player_has_round.player_idplayer = ?" +
-        " AND player_has_round.round_idround     = ?";
+        " WHERE InscriptionIdPlayer = ?" +
+        " AND InscriptionIdRound = ?";
     ps = conn.prepareStatement(query); 
     ps.setInt(1, player.getIdplayer());
     ps.setInt(2, round.getIdround());
@@ -66,7 +67,7 @@ try
       LOG.info(msg);
     LCUtil.showMessageInfo(msg);
     mail.DeleteInscriptionMail mdi = new mail.DeleteInscriptionMail();
-    mdi.sendMail(player, round, ecl.Eclub, ecl.Ecourse);
+    mdi.sendMail(player, round, club, course);
     return true;
 }
 /*    
@@ -133,8 +134,7 @@ try
     ECourseList ecl = new ECourseList();
     player.setIdplayer(324733);
     round.setIdround(323);
-  //  DeleteInscription di  = new DeleteInscription();
-    new DeleteInscription().deleteInscription(player,round, ecl, conn);
+//    boolean b = new DeleteInscription().delete(player,round, club, course, conn);
     DBConnection.closeQuietly(conn, null, null, null);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();

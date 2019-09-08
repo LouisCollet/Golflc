@@ -53,8 +53,8 @@ public class ResetPasswordMail {
                 LOG.info("mail to be sended = " + msg);
 
             String to = "louis.collet@skynet.be";
-            utils.SendEmail sm = new utils.SendEmail();
-            boolean b = sm.sendHtmlMail(sujet,msg,to,"PASSWORD");
+      //      utils.SendEmail sm = new utils.SendEmail();
+            boolean b = new utils.SendEmail().sendHtmlMail(sujet,msg,to,"PASSWORD");
                 LOG.info("HTML Mail status = " + b);
 return b;
 } //end method
@@ -82,8 +82,8 @@ return b;
                     //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
                 //     String href = msg + url + "/login.xhtml";
                      String to = "louis.collet@skynet.be";
-                     utils.SendEmail sm = new utils.SendEmail();
-                     boolean b = sm.sendHtmlMail(sujet,msg,to,"PASSWORD");
+             //        utils.SendEmail sm = new utils.SendEmail();
+                     boolean b = new utils.SendEmail().sendHtmlMail(sujet,msg,to,"PASSWORD");
                         LOG.info("HTML Mail status = " + b);
          
     return true;

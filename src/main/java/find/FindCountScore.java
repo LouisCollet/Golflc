@@ -12,7 +12,6 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 public class FindCountScore {
- // public class Score_Insert_Update implements interfaces.GolfInterface, interfaces.Log 
 final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
     public int getCountScore(Connection conn, Player player, Round round, String operation)
@@ -22,7 +21,7 @@ final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1
     ResultSet rs = null;
     String query = null;
 try{
-   //     LOG.info("player  = " + idplayer);
+        LOG.info("entering " + CLASSNAME);
    //     LOG.info("round  =  " + idround);
    //     LOG.info("Connection =  " + conn);
 if (operation.equalsIgnoreCase("rows") )
@@ -40,38 +39,32 @@ if (operation.equalsIgnoreCase("rows") )
           + " and player_has_round_round_idround=?"
           ;
     }
-
     ps = conn.prepareStatement(query);
     ps.setInt(1,player.getIdplayer());
     ps.setInt(2,round.getIdround());
-          //    String p = ps.toString();
-  //        utils.LCUtil.logps(ps);
     rs = ps.executeQuery(); // attention !! il ne faut rien mettre entre les ()
         //LOG.debug(" -- resultset = " + rs.toString());
-    if(rs.next())
-    {  // LOG.debug("resultat : getCountScore = " + rs.getInt(1) );
+    if(rs.next()){ 
+        // LOG.debug("resultat : getCountScore = " + rs.getInt(1) );
       return rs.getInt(1);
     }else{
       //  LOG.debug("no next : getCountScore = " + rs.getInt(1) );
         return 99;  //error code
     }
 } catch(SQLException sqle){
-    String msg = "Â£Â£Â£ SQLException in getCountScore = " + sqle.getMessage() + " ,SQLState = " +
+    String msg = "Â£Â£Â£ SQLException in FindCountScore = " + sqle.getMessage() + " ,SQLState = " +
             sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
         LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return 99;
 }catch(Exception nfe){
-    String msg = "Â£Â£Â£ Exception in getCountScore = " + nfe.getMessage();
+    String msg = "Â£Â£Â£ Exception in FindCountScore = " + nfe.getMessage();
         LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return 99;
-}
-finally
-{
+}finally{
       DBConnection.closeQuietly(null, null, rs, ps);
 }
-
 } //end method
     
     public static void main(String[] args) throws Exception , Exception{
@@ -87,9 +80,4 @@ finally
 DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
-    
-    
-    
-    
-    
 } // end class

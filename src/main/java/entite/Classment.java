@@ -2,11 +2,13 @@ package entite;
 
 import static interfaces.GolfInterface.NEWLINE;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.inject.Named;
+import utils.LCUtil;
 
 @Named
-public class Classment implements Serializable, interfaces.Log
-{
+public class Classment implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
 
    
@@ -17,8 +19,7 @@ public class Classment implements Serializable, interfaces.Log
     private Integer last1;
  
     private Integer totalExtraStrokes;
-    public Classment()
-    {
+    public Classment(){
        
     }
 
@@ -69,7 +70,25 @@ public class Classment implements Serializable, interfaces.Log
     public void setLast1(Integer last1) {
         this.last1 = last1;
     }
+public static Classment mapClassment(ResultSet rs) throws SQLException{
+    String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
+  try{
+              Classment c = new Classment();
+              c.setTotalExtraStrokes(rs.getInt("TotalExtraStrokes"));
+              c.setTotalPoints(rs.getInt("TotalScore")); 
+              c.setLast9(rs.getInt("Last9"));
+              c.setLast6(rs.getInt("Last6"));
+              c.setLast3(rs.getInt("Last3"));
+              c.setLast1(rs.getInt("Last1"));
 
+   return c;
+  }catch(Exception e){
+   String msg = "£££ Exception in rs = " + METHODNAME + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+  }
+} //end method
  @Override
 public String toString()
 { return 

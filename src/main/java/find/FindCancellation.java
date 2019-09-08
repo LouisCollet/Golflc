@@ -45,10 +45,10 @@ public List<ECourseList> find(final Unavailable unavailable, final Round round, 
      "SELECT " + cl + "," + co + "," + ro + "," + pl + "," + ph +
 "     FROM player" +
 "     JOIN player_has_round" +
-"         ON player_has_round.player_idplayer = player.idplayer" +
+"         ON InscriptionIdPlayer = player.idplayer" +
 "     AND player_has_round.InscriptionFinalResult = 0" +
 "      JOIN round" +
-"         ON player_has_round.round_idround = round.idround" +
+"         ON InscriptionIdRound = round.idround" +
 "           AND DATE(round.RoundDate) >= DATE(?) " +
 "           AND DATE(round.RoundDate) <= DATE(?)" +
 "           AND DATE(round.RoundDate) > NOW()" +

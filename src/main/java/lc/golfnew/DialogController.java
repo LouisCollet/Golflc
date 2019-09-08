@@ -1,9 +1,12 @@
 package lc.golfnew;
 
+import entite.Club;
 import entite.Flight;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.ViewHandler;
@@ -56,6 +59,31 @@ public class DialogController implements Serializable, interfaces.Log
     PrimeFaces.current().dialog().openDynamic("dialogFlight.xhtml", options, null); 
         LOG.info("exiting DialogController showFlight");
 }  
+    
+      // new 21-04-2019 - coming from courseC
+    public void showClubDetail(Club c){
+ //       LOG.info("entering showClubDetail");
+ //       LOG.info("withclub = " + c);
+    Map<String,Object> options = new HashMap<>();
+    options.put("modal", true);
+    options.put("draggable", false);
+    options.put("resizable", true);
+    options.put("width", 900);
+    options.put("height", 800);
+    options.put("contentWidth", "100%");
+    options.put("contentHeight", "100%");
+    options.put("closable", true); // closed by a button
+    options.put("includeViewParams", true); 
+    Map<String, List<String>> params = new HashMap<>(); 
+    List<String> values = new ArrayList<>(); 
+    values.add(Integer.toString(c.getIdclub())); 
+    params.put("IdClub", values);
+    PrimeFaces.current().dialog().openDynamic("dialogClubDetail.xhtml", options, params);
+        LOG.info("dialogClubDetail.xhtml is opened !");
+}
+    
+    
+    
     public static void showSelectHomeClub(){
        LOG.info("entering DialogController showSelectHomeClub");
     Map<String,Object> options = new HashMap<>();

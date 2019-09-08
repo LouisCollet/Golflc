@@ -84,7 +84,6 @@ public static void main(String[] args) throws Exception , Exception{
 
     TarifMember tm = new FindTarifMembersData().findTarif(club, conn);
      LOG.info("Tarif extracted from database = "  + tm.toString());
-//findPlayerHandicap(player,round, conn);
 //for (int x: par )
 //        LOG.info(x + ",");
 DBConnection.closeQuietly(conn, null, null, null);

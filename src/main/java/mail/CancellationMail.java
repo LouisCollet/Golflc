@@ -80,8 +80,8 @@ public class CancellationMail {
                 FileOutputStream fos = im.createInscriptionMailICS(player, invitedBy, round, club, course, true);
                     LOG.info("fileoutputstrean fos = " + fos.toString());
          // a faire tester si pas null ??
-                utils.SendEmail sm = new utils.SendEmail();
-                boolean b = sm.sendHtmlMail(sujet,Smail,to,"INSCRIPTION");
+           //     utils.SendEmail sm = new utils.SendEmail();
+                boolean b = new utils.SendEmail().sendHtmlMail(sujet,Smail,to,"INSCRIPTION");
                     LOG.info("HTML Mail status = " + b);
 return b;
 }

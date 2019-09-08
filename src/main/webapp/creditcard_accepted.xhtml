@@ -47,7 +47,7 @@ ici c'est pour générer des data pour tester !  -->
  
  -->   
 <h:form id="creditcard_accepted" enctype="application/x-www-form-urlencoded">
-        
+       
     <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
          <ui:include src="include/include_summary.xhtml"/>
     </c:if>
@@ -65,6 +65,7 @@ ici c'est pour générer des data pour tester !  -->
 
 <f:facet name="header">
   #{courseC.creditcard.typePayment}
+   creditcardType = #{creditcardType}
  <!--  <h:outputText escape="false" value="#{msg['title.payment.executed']}" />-->
     <h:outputText
             id="subscription"

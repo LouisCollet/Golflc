@@ -15,8 +15,7 @@ import javax.validation.constraints.Size;
 import utils.LCUtil;
 
 @Named
-public class Round implements Serializable, interfaces.Log, interfaces.GolfInterface
-{
+public class Round implements Serializable, interfaces.Log, interfaces.GolfInterface{
     private static final long serialVersionUID = 1L;
 
 //@NotNull(message="Bean validation : the Round ID must be completed")
@@ -69,8 +68,7 @@ private String RoundScoreString;
     private String playersString;
     private Short roundPlayers;
     
-    public Round() // constructor
-    {
+    public Round(){
        this.playersList = new ArrayList<>();
        roundQualifying = "N"; //set default value to radiobutton
        roundCBA = 0;
@@ -248,18 +246,21 @@ private String RoundScoreString;
  @Override
 public String toString(){ 
 LOG.info("starting toString for Round!");
-    try{
- //   LOG.info("starting toString for Round = " + this.getIdround()); // enlevé le 21/02/2019
+ try{
+    LOG.info("idround : "   + this.getIdround());
+    LOG.info("RoundDate no format: "   + this.getRoundDate());
+    LOG.info("RoundDate format LocalDateTime: "   + this.getRoundDate().format(ZDF_TIME));
+    
   //  if(this.getRoundDate() != null || this.getIdround() != null){
        return 
         (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
                + " ,idround : "   + this.getIdround()
                + " ,Round Players : "   + this.getRoundPlayers()
-               + " ,Work Date format Date : "   + this.getWorkDate()
-               + " ,Work Hours : "   + this.getWorkHour()
-               + " ,RoundDate format LocalDateTime: "   + this.getRoundDate().format(ZDF_TIME)
-               + " ,Round Date Trf : "   + this.getRoundDateTrf().format(ZDF_TIME)
-               + " ,Round Date HHmm : "   + this.getRoundDate().format(ZDF_TIME_HHmm)
+     //          + " ,Work Date format Date : "   + this.getWorkDate()
+     //          + " ,Work Hours : "   + this.getWorkHour()
+          + " ,RoundDate format LocalDateTime: "   + this.getRoundDate().format(ZDF_TIME)
+     //          + " ,Round Date Trf : "   + this.getRoundDateTrf().format(ZDF_TIME)
+     //          + " ,Round Date HHmm : "   + this.getRoundDate().format(ZDF_TIME_HHmm)
            //    + " ,Round Date/Time: "   + Round.SDF_TIME.format(getRoundDate() )
                
                + " ,Round Competition : " + this.getRoundCompetition()
@@ -270,6 +271,7 @@ LOG.info("starting toString for Round!");
                + " ,Start : "   + this.getRoundStart()
                + " ,Nombre Players : "   + this.getPlayers()
                + " ,Name Players : "   + this.getPlayersString()
+               + " ,idCourse : "   + this.getCourseIdcourse()
         );
 //   }else{
  //       return
@@ -300,7 +302,7 @@ public static Round mapRound(ResultSet rs) throws SQLException{
             r.setRoundStart(rs.getShort("RoundStart") );// start
             r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
             r.setRoundTeam(rs.getString("roundTeam"));
-            
+            r.setCourseIdcourse(rs.getInt("course_idcourse"));
       //      r.setCourse_idcourse(rs.getInt("course_idcourse"));
            
    return r;

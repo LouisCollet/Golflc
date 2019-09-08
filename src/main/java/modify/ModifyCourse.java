@@ -13,8 +13,7 @@ import utils.LCUtil;
 
 public class ModifyCourse implements Serializable, interfaces.Log, interfaces.GolfInterface{
 
-public boolean modifyCourse(final Course course, final Connection conn) throws Exception
-    {
+public boolean modifyCourse(final Course course, final Connection conn) throws Exception{
         PreparedStatement ps = null;
     //    int row = 0;
         boolean b = false;

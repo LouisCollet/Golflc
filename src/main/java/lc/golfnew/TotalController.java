@@ -16,7 +16,7 @@ import javax.inject.Named;
 public class TotalController implements Serializable, interfaces.Log{
     int totalPar = 0;
   //  @Inject
-private  List<ECourseList> liste;// = null; // used in CalculateController !!
+private  List<ECourseList> liste;
      
  public TotalController()  // constructor
     {

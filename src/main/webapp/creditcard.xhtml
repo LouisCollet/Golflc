@@ -32,6 +32,8 @@
 
     
 <h:form id="creditcard" enctype="application/x-www-form-urlencoded">
+    
+     creditcardType = #{creditcardType}
     <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
          <ui:include src="include/include_summary.xhtml"/>
     </c:if>

@@ -2,6 +2,7 @@
 package create;
 
 import entite.Flight;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class CreateAllFlights implements interfaces.Log, interfaces.GolfInterface{
+public class CreateAllFlights implements interfaces.GolfInterface{
     
 private static Statement stm = null;
 private static ResultSet rs = null;

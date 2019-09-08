@@ -19,13 +19,13 @@ import javax.inject.Named;
 import net.aksingh.owmjapis.core.OWM;
 import net.aksingh.owmjapis.core.OWM.Language;
 import net.aksingh.owmjapis.core.OWM.Unit;
+import net.aksingh.owmjapis.core.OWMPro;
 import net.aksingh.owmjapis.model.CurrentUVIndex;
 import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.DailyWeatherForecast;
 import net.aksingh.owmjapis.model.HourlyWeatherForecast;
 import static utils.LCUtil.showMessageFatal;
-
-
+// 23/07/2019 version 2.5.3.0 changed 
 @Named("findWeather")
 @SessionScoped
 public class FindWeather implements Serializable, interfaces.GolfInterface, interfaces.Log{
@@ -36,7 +36,7 @@ public class FindWeather implements Serializable, interfaces.GolfInterface, inte
     final private static String WIND_DIRECTION[] = {
           "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
       "S", "SSW", "SW", "WSW", "W", "West-Northwest", "NW", "NNW"};
-    private static OWM owm = null;
+    private static OWMPro owm = null; // mod OWM to OWMPro 23/07/2019
     private List<String> myList = new ArrayList<>(9);
     private String pattern = "EEE MMM dd HH:mm:ss z uuuu"; // uuuu = yyyy i strict mode
     private final DateTimeFormatter DTF = DateTimeFormatter.ofPattern(pattern).withLocale(Locale.US)
@@ -56,15 +56,16 @@ private Map<String, Object> sessionMapJSF23;
     try{
   //  see   https://openweathermap.org/
 
- //   String owmApiKey = "65b6810c7fb377fb322b6a7486bfb87a"; /* YOUR OWM API KEY HERE */ //key LC
+    String owmApiKey = "e33f7134856ab9fbbe79a544cc23bc39"; /* YOUR OWM API KEY HERE */ //key LC
   //    String owmApiKey ="9229fc57d217e84684dfb717867b67f5"; // found internet
        // key found https://github.com/tiabaldu/weather/blob/master/WeatherStore/src/main/java/com/tia/weatherStorePack/WeatherRetreiver.java
         // declaring object of "OWM" class
-   //     OWM owm = new OWM(owmApiKey);
+        owm = new OWMPro(owmApiKey);
     //    owm = new OWM(owmApiKey);
     LOG.info("starting currentWeatherByCityName");
-    LOG.info("starting currentWeatherByCityName with club latitude = " + club.getClubLatitude());
-    LOG.info("starting currentWeatherByCityName with club longitude = " + club.getClubLongitude());
+    LOG.info("starting currentWeatherByCityName with club = " + club);
+  //  LOG.info("starting currentWeatherByCityName with club latitude = " + club.getClubLatitude());
+  //  LOG.info("starting currentWeatherByCityName with club longitude = " + club.getClubLongitude());
  //   LOG.info("just before owm");
 
 //		Channel result = service.getForecast("670807", DegreeUnit.CELSIUS);
@@ -221,11 +222,12 @@ private Map<String, Object> sessionMapJSF23;
         
     
     if (null == owm) {
-	owm = new OWM(OWM_KEY_LC);
+//	owm = new OWMPro(OWM_KEY_LC); // changed 23/07/2019
+        owm = new OWMPro("1dcd0e1749fbf3af2f6ce66495886d14");
         LOG.info("owm was null, new created");
     }
 
-         LOG.info("key OK");
+         LOG.info("owm was not null ==> key OK");
         // getting current weather data 
         owm.setLanguage(Language.ENGLISH);
         owm.setUnit(Unit.METRIC);
@@ -299,7 +301,7 @@ if (CWD.getWindData().getDegree() != null) {
  LOG.info("HourlyWeatherForecast prettyPrint = " + HourlyWeatherForecast.toJsonPretty(HWF)); 
   
   
-  owm = new OWM("9229fc57d217e84684dfb717867b67f5");
+  owm = new OWMPro("9229fc57d217e84684dfb717867b67f5");
  // owm = new OWM(OWM_KEY_LC);
 
   owm.setLanguage(OWM.Language.DUTCH);  //FRENCH etc ...
@@ -326,7 +328,7 @@ if (CWD.getWindData().getDegree() != null) {
    public String dailyWeatherByCityName(String city, String country, Integer forecastDays) throws Exception {
     try{
  //  OWM owm = new OWM("9229fc57d217e84684dfb717867b67f5");
-    owm = new OWM("9229fc57d217e84684dfb717867b67f5");
+    owm = new OWMPro("9229fc57d217e84684dfb717867b67f5");
 //               owm = new OWM(owmApiKey);
 dwf = owm.dailyWeatherForecastByCityName(city, OWM.Country.BELGIUM, forecastDays); 
 // LOG.info("after daily brussels forecast ");
@@ -408,6 +410,7 @@ java.util.Date date1 = SDF.parse("16/04/2018 10:01");
   //  }
         FindWeather fw = new FindWeather();
         Club club = new Club();
+        club.setClubCity("Brussels");
         String s = fw.currentWeatherByCityName(club);
         LOG.info("current  returned is :" + s);
     //    s = dailyWeatherByCityName("Brussels", "Be",15);

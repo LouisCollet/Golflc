@@ -1,7 +1,6 @@
 
 package create;
 
-//import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import entite.Handicap;
 import entite.Player;
 import java.sql.Connection;
@@ -9,27 +8,22 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.UUID;
 import utils.LCUtil;
+import static utils.LCUtil.printSQLException;
 
-public class CreateActivation implements interfaces.Log, interfaces.GolfInterface
-{
-    public  boolean create(Connection conn, Player player, Handicap handicap) throws Exception 
-    {
+public class CreateActivation implements interfaces.Log, interfaces.GolfInterface{
+ // question : pourquoi le handicap ?
+    public  boolean create(Connection conn, Player player, Handicap handicap) throws Exception {
          PreparedStatement ps = null;
          int row = 0;
   try {
          UUID uuid = UUID.randomUUID();
                LOG.info("Universally Unique Identifier = " + uuid.toString());
-
          String url = utils.LCUtil.firstPartUrl();
      //    String href = "http://" + host + ":" + port + uri + "/activation_check.xhtml?key=" + uuid.toString();       
         String href = url + "/activation_check.xhtml?faces-redirect=true&uuid=" + uuid.toString(); 
          //    String href = "http://localhost:8080/GolfNew-1.0-SNAPSHOT/activation_check.xhtml?key=" + uuid.toString();  
       LOG.info("** href for activation = " + href);   
-   //      String ms = mailText(player, href);
-        mail.ActivationMail am = new mail.ActivationMail();
-        boolean b =  am.sendMailAccountCreated(player);   //envoi du mail
-         
-  //       LCUtil.showMessageInfo(ms);
+ 
         String msg = "-- Inserting initial Activation for player = " + player.getIdplayer()
                         + "Handicap   = " + handicap.getHandicapPlayer()
                         + "Handicap start = " + handicap.getHandicapStart();
@@ -53,10 +47,10 @@ public class CreateActivation implements interfaces.Log, interfaces.GolfInterfac
                   + " <br/>first = " + player.getPlayerFirstName()
                   + " <br/>last = " + player.getPlayerLastName()
                   + " <br/>date handicap = " + handicap.getHandicapStart()
-                            + " <br/>handicap = " + handicap.getHandicapPlayer();
+                  + " <br/>handicap = " + handicap.getHandicapPlayer();
             LOG.info(msg);
             LCUtil.showMessageInfo(msg);
-                    
+               boolean b =  new mail.ActivationMail().sendMailAccountCreated(player);   //envoi du mail
             return true;
             } else {
                msg = "!! NOT  NOT successful insert Activation : "
@@ -69,20 +63,20 @@ public class CreateActivation implements interfaces.Log, interfaces.GolfInterfac
                     LCUtil.showMessageFatal(msg);
                     return false;
                 } // end if
-        } catch (SQLException sqle) {
-            String msg = "£££ SQLException in Insert Player = " + sqle.getMessage() + " ,SQLState = "
+   } catch (SQLException sqle) {
+            printSQLException(sqle); // new 13-05-2019
+            String msg = "£££ SQLException in CreateActivation = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
-        } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Insert Player = " + nfe.getMessage();
+   } catch (NumberFormatException nfe) {
+            String msg = "£££ NumberFormatException in CreateActivation = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
         } finally {
          //  DBConnection.closeQuietly(conn, null, null, ps);
-   //      return false;
          } 
 
 } // end method

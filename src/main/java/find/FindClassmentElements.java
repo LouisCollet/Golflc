@@ -12,8 +12,7 @@ public class FindClassmentElements implements interfaces.Log, interfaces.GolfInt
     private static Classment liste = null;
     final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
     
-public Classment findClassment(int id_player, final int id_round, final Connection conn) throws SQLException
-{
+public Classment findClassment(int id_player, final int id_round, final Connection conn) throws SQLException{
     
     LOG.info("starting findClassmentElements for idplayer = " + id_player);
     LOG.info("starting findClassmentElements for idround = " + id_round);
@@ -21,8 +20,7 @@ public Classment findClassment(int id_player, final int id_round, final Connecti
 //
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
   String query = 
     "SELECT " +
 "	score.player_has_round_player_idplayer," +
@@ -49,15 +47,17 @@ try
     rs =  ps.executeQuery();
         rs.last(); //on récupère le numéro de la ligne
             LOG.info("ResultSet FindClassmentElements " + rs.getRow() + " lines.");
-        if(rs.getRow() > 1)
-            {   throw new Exception(" -- More than 1 sum extra strokes = " + rs.getRow() );  }
+        if(rs.getRow() > 1){ 
+            throw new Exception(" -- More than 1 sum extra strokes = " + rs.getRow() );  }
         rs.beforeFirst(); //on replace le curseur avant la première ligne
   ////      liste = new ArrayList<>();
           //LOG.info("just before while ! ");
   //      int t = 0;
   //  liste = new ArrayList<>();    
-	while(rs.next())
-        {
+	while(rs.next()) {
+            
+  // à faire           c = entite.Classment.mapClassment(rs);
+   //  liste.add(entite.Classment.mapClassment(rs));          
              Classment c = new Classment();
               c.setTotalExtraStrokes(rs.getInt("TotalExtraStrokes"));
               c.setTotalPoints(rs.getInt("TotalScore")); 
@@ -87,7 +87,6 @@ try
     LCUtil.showMessageFatal(msg);
      return null;
 }finally{
-  //  DBConnection.closeQuietly(conn, null, rs, ps);
     utils.DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 //}else{
@@ -99,8 +98,7 @@ try
 //} // 
 }//end method
 
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
+public static void main(String[] args) throws SQLException, Exception{
     LOG.info("Input main = " );
  //   DBConnection dbc = new DBConnection();
 //Connection conn = dbc.getConnection();
@@ -112,8 +110,7 @@ public static void main(String[] args) throws SQLException, Exception // testing
 //round.setIdround(260);
    FindClassmentElements ftes = new FindClassmentElements();
    ftes.findClassment(324713,260, conn);
-//for (int x: par )
-//        LOG.info(x + ",");
+
 utils.DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main

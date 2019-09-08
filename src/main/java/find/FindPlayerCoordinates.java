@@ -80,7 +80,6 @@ LOG.info("entering findPlayerLatLngTz " );
     return player;
 
 }catch (LCCustomException e){
-  //  String msg = " SQL Exception in getScoreCardList1() " + e;
   //  LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
     return null;    

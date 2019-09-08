@@ -15,16 +15,15 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class PlayedList implements interfaces.Log
-{
+public class PlayedList implements interfaces.Log{
      private static List<ECourseList> liste = null;
     
-public List<ECourseList> getPlayedList(final Player player, final Connection conn) throws SQLException{
+public List<ECourseList> list(final Player player, final Connection conn) throws SQLException{
  //  LOG.debug("starting getPlayedList(), Connection = " + conn);
     
 if(liste == null){
-    LOG.debug("starting getPlayedList(), Player = {}", player.getIdplayer());
-  //  LOG.debug("starting PlayedList(), listplayer = {}", liste);
+        LOG.debug("starting getPlayedList(), Player = {}", player.getIdplayer());
+        LOG.debug("with player = " + player.toString());
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -39,20 +38,14 @@ try{
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
      "SELECT "
            + cl + "," + co + "," + ro + "," + pl + "," + ph
-  //        + "idplayer, RoundDate, idround, player_has_round.InscriptionFinalResult,"
- //  + " player_has_round.Player_has_roundZwanzeursResult, player_has_round.Player_has_roundZwanzeursGreenshirt,"
- //  + " RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundStart,"
- //  + " idcourse, CourseName, CourseBegin, CourseEnd, "
-//   + " idclub, ClubName, ClubCity, ClubWebsite, ClubLatitude, ClubLongitude, round.RoundQualifying"
-          
    + "   FROM tee" 
    + "   JOIN player"
    + "      ON player.idplayer = ?"
    + "   JOIN player_has_round"
-   + "      ON player_has_round.player_idplayer = player.idplayer"
+   + "      ON InscriptionIdPlayer = player.idplayer"
 // mod 14/07/2013  + "      AND player_has_round.InscriptionFinalResult = 0"
    + "   JOIN round"
-   + "      ON round.idround = player_has_round.round_idround"
+   + "      ON round.idround = InscriptionIdRound"
  //  + "      AND RoundDate > DATE_SUB(current_date() , INTERVAL 6 month)" mod 29/03/2016
  //  + "       AND substring(round.roundgame,1,3)= UPPER('sta') " // new line 27/07/2015 mod 29/03/2016
    + "   JOIN course"
@@ -110,7 +103,6 @@ try{
     LCUtil.showMessageFatal("Exception getPlayedList= " + ex.toString() );
      return null;
 }finally{
-     //   DBConnection.closeQuietly(conn, null, rs, ps);
         DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 }else{
@@ -128,15 +120,12 @@ try{
         PlayedList.liste = liste;
     }
     
-    public static void main(String[] args) throws SQLException, Exception 
-     {
-         DBConnection dbc = new DBConnection();
-     Connection conn = dbc.getConnection();
+    public static void main(String[] args) throws SQLException, Exception {
+     Connection conn = new DBConnection().getConnection();
   try{
     Player player = new Player();
     player.setIdplayer(324713);
-    PlayedList pl = new PlayedList();
-    List<ECourseList> lp = pl.getPlayedList(player, conn);
+    List<ECourseList> lp = new PlayedList().list(player, conn);
         LOG.info("from main, after lp = " + lp);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
@@ -145,6 +134,5 @@ try{
          DBConnection.closeQuietly(conn, null, null , null); 
           }
    } // end main//
-    
-    
+
 } //end Class

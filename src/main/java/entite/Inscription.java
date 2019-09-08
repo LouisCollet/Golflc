@@ -1,12 +1,10 @@
 package entite;
 
-//import custom_validations.Inscription;@Named  this is teh new version of PlayerHasRound.java !!!!!
 import static interfaces.GolfInterface.NEWLINE;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import utils.LCUtil;
@@ -28,12 +26,11 @@ public class Inscription implements Serializable
     private String inscriptionTeeStart;
     private Integer inscriptionIdTee; // new 31-03-2019
     private String inscriptionInvitedBy;
-    private Date playerhasroundModificationDate;
+ //   private Date inscriptionModificationDate;
     private boolean InscriptionOK = true; //  set true 01/12/2018
 
     
-    public Inscription() // constructor
-    {
+    public Inscription(){
         inscriptionTeeStart="YELLOW";
         //setInscriptionOK(false);
     }
@@ -62,13 +59,13 @@ public class Inscription implements Serializable
         this.playerhasroundFinalResult = playerhasroundFinalResult;
     }
 
-    public Date getPlayerhasroundModificationDate() {
-        return playerhasroundModificationDate;
-    }
+ //   public Date getInscriptionModificationDate() {
+ //       return inscriptionModificationDate;
+ //   }
 
-    public void setPlayerhasroundModificationDate(Date playerhasroundModificationDate) {
-        this.playerhasroundModificationDate = playerhasroundModificationDate;
-    }
+ //   public void setInscriptionModificationDate(Date inscriptionModificationDate) {
+ //       this.inscriptionModificationDate = inscriptionModificationDate;
+ //   }
 
     public Short getPlayerhasroundZwanzeursResult() {
         return playerhasroundZwanzeursResult;

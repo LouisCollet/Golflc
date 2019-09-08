@@ -42,7 +42,12 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
 <f:facet name="header">
     <h:outputText escape="false" value="#{msg['message.selectclub.modify']}" />
 </f:facet>
-
+ <!--       <p:headerRow>
+            <p:column colspan="10">
+                <h:outputText value=" #{c.club.clubName}  (#{c.club.idclub})" />
+            </p:column>
+        </p:headerRow>
+-->
 <p:column
      headerText="#"
      footerText="#"
@@ -57,16 +62,17 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                     style="width:20%"
                     filterMatchMode="contains"
                     filterBy="#{c.club.clubName}"
+                    groupRow="true"
                   >
             #{c.club.clubName}  (#{c.club.idclub})
 	</p:column>
-
+<!--  groupRow="true" -->
 	<p:column headerText="#{msg['club.detail']}"
                   footerText="#{msg['club.detail']}"
                   style="width:10%" >
               <p:commandButton
                 id="loadClubDetail"
-                actionListener="#{courseC.showClubDetail(c)}"
+                actionListener="#{dialogC.showClubDetail(c.club)}"
                 icon="fa fa-binocular"
                 value="#{c.club.idclub}"
                >
@@ -91,6 +97,7 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
                 id="addCourse"
                 action="#{courseC.addCourse(c)}"
                 value="#{c.club.idclub}"
+                
                 icon="fa fa-plus">
              </p:commandButton>
 	</p:column>
@@ -137,13 +144,14 @@ see http://forum.primefaces.org/viewtopic.php?f=3&t=25928
 
 	<p:column headerText="#{msg['tee.modify']}"
                   footerText="#{msg['tee.modify']}"
-                  style="width:10%" >
+                  width="10%"
+                   >
             <p:commandButton
                 id="loadTee"
                 action="#{courseC.loadTee(c)}"
-                value="#{c.tee.idtee}"
+                value="#{c.tee.idtee} MT=#{c.tee.teeMasterTee}"
                 icon="fa fa-refresh">
-             </p:commandButton>
+           </p:commandButton> 
 	</p:column>
 
 	<p:column headerText="#{msg['hole.modify']}"

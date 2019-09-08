@@ -43,8 +43,8 @@ try
 "       JOIN club " +
 "       	ON course.club_idclub = club.idclub " +
 "       JOIN player_has_round " +
-"           ON  player_has_round.player_idplayer = player.idplayer " +
-"           AND player_has_round.round_idround = round.idround " +
+"           ON  InscriptionIdPlayer = player.idplayer " +
+"           AND InscriptionIdRound = round.idround " +
 "        ORDER by player_has_round.Player_has_roundTeam ASC " 
     ;
      ps = conn.prepareStatement(query);

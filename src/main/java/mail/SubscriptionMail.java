@@ -30,8 +30,8 @@ public class SubscriptionMail {
 
                 String sujet = "Your Subscription Renewal for GolfLC";
                 String to = "louis.collet@skynet.be";
-                utils.SendEmail sm = new utils.SendEmail();
-                boolean b = sm.sendHtmlMail(sujet,msg,to,"RENEWAL");
+         //       utils.SendEmail sm = new utils.SendEmail();
+                boolean b = new utils.SendEmail().sendHtmlMail(sujet,msg,to,"RENEWAL");
                     LOG.info("HTML Mail status = " + b);
                     LCUtil.showDialogInfo("sending one subscription Renewal Mail !!");
 

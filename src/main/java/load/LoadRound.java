@@ -1,6 +1,6 @@
 package load;
 
-import entite.Tee;
+import entite.Round;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,40 +9,41 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class LoadTee{
+public class LoadRound{
 
-public Tee load(Tee tee,Connection conn) throws SQLException{
+public Round load(Round round,Connection conn) throws SQLException{
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
-        LOG.info("entering LoadTee");
-    String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
+        LOG.info("entering LoadRound");
+        LOG.info("Round to be loaded = " + round.getIdround()); 
+    String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
   //      LOG.info("String from listMetaColumns = " + te);
 
-final String query = "SELECT " + te
-        + " FROM Tee "
-        + " WHERE idtee = ?" ;
+final String query = "SELECT " + ro
+        + " FROM Round "
+        + " WHERE idround = ?" ;
 
-        LOG.info("Tee loaded = " + tee.getIdtee()); 
      ps = conn.prepareStatement(query);
-     ps.setInt(1, tee.getIdtee()); // where
+     ps.setInt(1, round.getIdround()); // where
      utils.LCUtil.logps(ps); 
      rs =  ps.executeQuery();
      rs.beforeFirst();
-     Tee t = new Tee(); 
+     Round r = new Round(); 
      while(rs.next()){
-           t = entite.Tee.mapTee(rs);
+           r = entite.Round.mapRound(rs);
       }  //end while
-    return t;
+    return r;
 }catch (SQLException e){
-    String msg = "SQLException in LoadTee() = " + ", SQLState = " + e.getSQLState()
+    String msg = "SQLException in LoadRound() = " + ", SQLState = " + e.getSQLState()
             + ", ErrorCode = " + e.getErrorCode();
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
 }catch (Exception ex){
-    LOG.error("Exception ! " + ex);
-    LCUtil.showMessageFatal("Exception in LoadClub = " + ex.toString() );
+    String msg = "Exception in LoadRound = " + ex.toString();
+    LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
      return null;
 }finally{
     DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
@@ -51,10 +52,10 @@ final String query = "SELECT " + te
 
 public static void main(String[] args) throws SQLException, Exception{ // testing purposes
    Connection conn = new DBConnection().getConnection(); // main
-   Tee t = new Tee();
-   t.setIdtee(140);
-   Tee tee = new LoadTee().load(t,conn);
-     LOG.info(" loaded tee = " + tee.toString());
+   Round r = new Round();
+   r.setIdround(443);
+   r  = new LoadRound().load(r,conn);
+     LOG.info(" loaded tee = " + r.toString());
    DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main

@@ -14,28 +14,32 @@ public class DeletePlayer implements interfaces.Log, interfaces.GolfInterface{
 try{   //encore Ã  faire : delete du record activation s'il existe ...
      LOG.info("starting deletePlayersAnd Childs from Table Player cascading ... = " );
      // on commende par le niveau le plus bas !
-  String query = " delete from score where score.player_has_round_player_idplayer = ?";
+  String query = " delete from score"
+               + " where score.player_has_round_player_idplayer = ?";
     ps = conn.prepareStatement(query); 
     ps.setInt(1, idplayer);
     LCUtil.logps(ps); 
     int row_score = ps.executeUpdate();
         LOG.info("deleted score = " + row_score);
     
-    query = " delete from player_has_round where player_has_round.player_idplayer = ?";
+    query = " delete from player_has_round "
+          + " where InscriptionIdPlayer = ?";
     ps = conn.prepareStatement(query); 
     ps.setInt(1, idplayer);
     LCUtil.logps(ps); 
     int row_phr = ps.executeUpdate();
-        LOG.info("deleted inscription = " + row_score);
+        LOG.info("deleted inscription = " + row_phr);
     
-    query = " delete from handicap where handicap.player_idplayer = ?";
+    query = " delete from handicap"
+          + " where handicap.player_idplayer = ?";
     ps = conn.prepareStatement(query); 
     ps.setInt(1, idplayer);
     LCUtil.logps(ps); 
     int row_hcp = ps.executeUpdate();
         LOG.info("deleted handicap = " + row_hcp);
     
-    query = " delete from player where player.idplayer = ?";
+    query = " delete from player"
+          + " where player.idplayer = ?";
     ps = conn.prepareStatement(query); 
     ps.setInt(1, idplayer);
     LCUtil.logps(ps); 

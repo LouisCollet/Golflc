@@ -10,17 +10,12 @@ import java.time.LocalDate;
 import utils.DBConnection;
 import utils.LCUtil;
 
-// encore à faire !! dans le futur, l'appeler à partir de create player n'est pas utilisé !!!
-// called from FindSubscriptionStatus
 public class CreateSubscription implements interfaces.Log, interfaces.GolfInterface{
-    public boolean create(final Player player, final Connection conn) throws SQLException{
+  public boolean create(final Player player, final Connection conn) throws SQLException{
         PreparedStatement ps = null;
-        try {
+  try {
             LOG.info("...entering createSubscription");
             LOG.info("player  = " + player.getIdplayer());
-            //LOG.info("club City  = " + club.getClubCity() );
-       //     LOG.info("subscription code  = " + subscription.getSubCode());
-
             final String query = LCUtil.generateInsertQuery(conn, "payments_subscription"); 
             ps = conn.prepareStatement(query);
             // insérer dans l'ordre de la database : 1 = first db field
@@ -38,8 +33,7 @@ public class CreateSubscription implements interfaces.Log, interfaces.GolfInterf
             ps.setTimestamp(8, LCUtil.getCurrentTimeStamp());
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
-            if (row != 0) 
-            {
+            if (row != 0){
      //           int key = LCUtil.generatedKey(conn);
      //               LOG.info("Course created = " + key);
      //           course.setIdcourse(key);
@@ -54,19 +48,18 @@ public class CreateSubscription implements interfaces.Log, interfaces.GolfInterf
                 LCUtil.showMessageFatal(msg);
                 return false;
             }
-        }catch (SQLException sqle) {
-            //LOG.error("-- SQLException in Insert Course " + sqle.toString());
+  }catch (SQLException sqle) {
             String msg = "SQLException in createsubscription = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
-        } catch (Exception e) {
+ } catch (Exception e) {
             String msg = "£££ Exception in createsubscription = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
-        } finally {
+ } finally {
             DBConnection.closeQuietly(null, null, null, ps); // new 14/8/2014
         }
     } //end method

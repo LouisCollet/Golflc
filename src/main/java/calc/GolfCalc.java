@@ -1,22 +1,24 @@
 
 package calc;
+import entite.Player;
+import entite.Round;
+import static interfaces.Log.LOG;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 import utils.ColumnComparator;
+import utils.DBConnection;
 
-public class GolfCalc implements interfaces.GolfInterface , interfaces.Log // GolfInterface // throws IOException
+public class GolfCalc implements interfaces.GolfInterface // GolfInterface // throws IOException
 {
 private static int nb = 0; 
 private static String []array_return_error = new String [3];
 private static int [][] points = null; //new int [18][6];
 private final static int PTS = 0;
-/**
- *
- */
-public GolfCalc()// constructor
- {
+
+public GolfCalc(){
     nb++;
     //LOG.info(" from constructor GolfWriteLog = ");
  }
@@ -30,10 +32,9 @@ public static  int[][] trfPoints() throws SQLException
     return points;
 }
 
-public static String[] setArrayExtraStrokes (int [][] points, int phcp) //, int in_holes)
+public static String[] setArrayExtraStrokes (int [][] points, int phcp){ //, int in_holes)
         // input = playing handicap
         // ajoute les strokes à array points
-{
      LOG.info(" -- Start of setArrayExtraStrokes for playing handicap = " + phcp + " ,holes = " + points.length);
 try{
     int holes = points.length; //in_holes;
@@ -45,7 +46,6 @@ try{
     LOG.info(" -- setArrayExtraStrokes - loop Uncomplete = " + rem);
 
     if (res !=0) {setArrayExtraComplete(points, res);} //,holes);} 13/01/2013
-        
     if (rem !=0) {setArrayExtraUncomplete(points, rem);} //,holes);} 13/01/2013
  array_return_error[0]= "NO ERROR";
  array_return_error[1]= "Handicap = " + Integer.toString(phcp);
@@ -63,22 +63,17 @@ try{
      array_return_error[1]= "ErrorCode = Exception";
      array_return_error[2]= e.getMessage();
      return array_return_error;
-}
-finally
-{
+}finally{
 
 LOG.info(NEWLINE + Arrays.deepToString(points) );
  }
 } // end method setExtra Strokes
 
 // -----------------------------------------------------
-private static void setArrayExtraComplete (final int [][] points, final int in_times) //13/01/2013 , final int holes) // ajoute un stroke à chaque hole
-{
+private static void setArrayExtraComplete (final int [][] points, final int in_times){ //13/01/2013 , final int holes) // ajoute un stroke à chaque hole
   LOG.info(" -- Start of setArrayExtraComplete for the " + in_times + " times" );
- for (int k=0; k<in_times;k++)
-{
-      for (int[] point : points) // mod 11/01/2013
-      {
+ for (int k=0; k<in_times;k++){
+      for (int[] point : points){ // mod 11/01/2013
           point[4]++;
           // LOG.info(className + "." + methodName + " -- complete Extra added = " + i + " " + points [i][4]);
       } // end for2
@@ -88,13 +83,10 @@ LOG.info(NEWLINE + Arrays.deepToString(points) );
 } // end method
 // -------------------------------------------
 @SuppressWarnings("unchecked")
-private static void setArrayExtraUncomplete (final int [][] points, final int in_strokes) //13/01/2013, final int holes)
-{
+private static void setArrayExtraUncomplete (final int [][] points, final int in_strokes){ //13/01/2013, final int holes)
    LOG.info(" Start of setArrayExtraUncomplete for strokes = " + in_strokes + " ,holes = " + points.length);
-try
-{
-if (points.length == 9) // new 12/01/2012
-{
+try{
+if (points.length == 9){
     // why ? ex bawette si = 10,8,12,18,16,4,14,6,2
     // first , sort on an other (work) array = bz
  //http://techthinking.net/2010/02/sorting-two-dimensional-string-array-using-java/
@@ -105,7 +97,7 @@ if (points.length == 9) // new 12/01/2012
         LOG.info(" bz sorted = " + NEWLINE + Arrays.deepToString(bz) );
     int hit = 0;
         LOG.info(" -- uncomplete Extra Stroke = " + " strokes = " + in_strokes);
-    for (int[] bz1 : bz) {
+    for (int[] bz1 : bz){
         if (hit < in_strokes) {
             LOG.info(" stroke added for hole = " + bz1[0] + " ,hit = " + hit + " ,index = " + bz1[2]);
             bz1[4]++;
@@ -124,12 +116,12 @@ if (points.length == 9) // new 12/01/2012
 } // enf if 9 holes
 
    //if (in_strokes != 0)
-if (points.length == 18) // new 11/01/2012
-{ //int max = 18 - strokes;  // trous les + difficiles, 1 aux trous dont l'index >
+if (points.length == 18){ 
+//int max = 18 - strokes;  // trous les + difficiles, 1 aux trous dont l'index >
      int max = in_strokes + 1; // new 17/7/2011
     //for (int i=0; i<holes; i++)
-    for (int[] point : points) {
-        if (point[2] < max) {
+    for (int[] point : points){
+        if (point[2] < max){
             //LOG.info("before = " + points[i][2] + " / " + points[i][4]);
             point[4]++;
             LOG.info(" -- added for hole = " + point[0]);
@@ -146,9 +138,7 @@ if (points.length == 18) // new 11/01/2012
      //array_return_error[1]= "ErrorCode = ";
      array_return_error[2]= e.getMessage(); // from throw new exception !!!
 //     e.printStackTrace();
- }
- finally
- {
+ } finally {
     //LOG.info(" -- array = " + Arrays.deepToString(points) );
     LOG.info(points.length + " HOLES, Stroke Index adapted = " + NEWLINE + Arrays.deepToString(points) );
     //return array_return_error;
@@ -157,26 +147,23 @@ if (points.length == 18) // new 11/01/2012
 
 // --------------------------
 
-public static String[] setArrayPoints(int[][] points) // (int in_holes)
+public static String[] setArrayPoints(int[][] points){ // (int in_holes)
         // points comme les pros - sans points stableford
         // ajouter une field in_holes pour distinguer 9 et 18 holes
-{
     LOG.info(" -- Start setArrayPoints with holes = " + points.length );
-try
-{
+try{
     // points [i][0] = hole
     // points [i][1] = par
     // points [i][2] = index
     // points [i][3] = strokes
     // points [i][4] = extra
     // points [i][5] = points stableford
-    for (int i=0; i<points.length; i++)
-    {
+    for (int i=0; i<points.length; i++){
                 LOG.info(" -- setArrayPoints = " + Arrays.deepToString(points) );
             int strokes = points [i][3];
   ////              LOG.info(" -- setArrayPoints, strokes 01 = " + strokes);
-            if (strokes == 0)  // pas possible !!!
-            {   LOG.info(" -- ERROR:strokes = 0, setArrayPoints, strokes [3] = " + points[i][3] + " /i= " + i);
+            if(strokes == 0){  // pas possible !!!
+               LOG.info(" -- ERROR:strokes = 0, setArrayPoints, strokes [3] = " + points[i][3] + " /i= " + i);
                 LOG.info(" -- ERROR:strokes = 0, setArrayPoints, extra   [4] = " + points[i][4]);
                 array_return_error[0]= "ERROR";
                 array_return_error[1]= "  -- Exception GolfCalc.setArrayPoints = null strokes : " + Integer.toString(strokes);
@@ -186,8 +173,8 @@ try
             int net = 0;
             net = points [i][3] - points [i][4];         // strokes - extra
   ////              LOG.info(" -- setArrayPoints, strokes 02 = " + net);
-            if (net < 0)  // pas possible !!!
-            {   LOG.info(" -- ERROR, strokes negative, setArrayPoints, strokes [3] = " + points[i][3] + " /i= " + i);
+            if (net < 0){  // pas possible !!!
+                LOG.info(" -- ERROR, strokes negative, setArrayPoints, strokes [3] = " + points[i][3] + " /i= " + i);
                 LOG.info(" -- ERROR, strokes negative, setArrayPoints, extra   [4] = " + points[i][4]);
                 array_return_error[0]= "ERROR";
                 array_return_error[1]= "  -- Exception GolfCalc.setArrayPoints = throw negative strokes : " + Integer.toString(net);
@@ -208,9 +195,7 @@ try
      array_return_error[2]= e.getMessage(); // from throw new exception !!!
 //     e.printStackTrace();
     return array_return_error;
- }
- finally
- {
+ } finally {
     //LOG.info(" -- array = " + Arrays.deepToString(points) );
     LOG.info(NEWLINE + Arrays.deepToString(points) );
  //   return array_return_error;
@@ -218,10 +203,9 @@ try
 } // end method setPointsWithoutExtraStrokes
 // ---------------------------
 
-private static int getPointsNew(final int net, final int par)
-{ // nouvelle méthode de calcul des points - 21/08/2016
-    switch (par - net)
-    {
+private static int getPointsNew(final int net, final int par){ 
+// nouvelle méthode de calcul des points - 21/08/2016
+    switch (par - net){
         case 0  : return 2; // par
         case -1 : return 1; // bogey
         case 1  : return 3; // birdie
@@ -229,16 +213,15 @@ private static int getPointsNew(final int net, final int par)
         case 3  : return 5; // albatros
         default:
            String msg = " -- Falling in Default in getPointsNew - 0 points, par = " + par + " net = " + net;
-           LOG.info(msg) ;
+           LOG.error(msg) ;
            return 0;
     } // end switch
 } // end method
 
 // -----------------------------------------------------------------------------
 
-public static int getRoundStablefordResult (int [][] points) //(int in_holes)
+public static int getRoundStablefordResult (int [][] points){ //(int in_holes)
         // totalise les points par hole
-{
   LOG.info(" -- Start of getRoundStablefordResult with holes = " + points.length);
   LOG.info(NEWLINE + Arrays.deepToString(points) );
   int roundResult = 0;
@@ -290,12 +273,9 @@ public static int getRoundGreenshirtResult (int [][] points, int in_handicap, St
     LOG.info(" -- competition contains hiver = " + green_hiver); 
     LOG.info(NEWLINE + Arrays.deepToString(points) );
   int roundResult = 0;
-if (green_hiver == false) // zwanzeurs : les points par/greenshirt ne comptent pas pour les greens d'hiver
-{
-    for (int i=0; i<points.length; i++)
-    {
-       if (points [i][1] == points [i][3]) // si Par   = strokes
-       { 
+if (green_hiver == false){ // zwanzeurs : les points par/greenshirt ne comptent pas pour les greens d'hiver
+    for (int i=0; i<points.length; i++) {
+       if (points [i][1] == points [i][3]){ // si Par   = strokes
            roundResult = roundResult + (in_handicap*2); // autant de points greenshirt que handicap
        }
     }
@@ -306,10 +286,23 @@ return roundResult;
 } // end method getRoundGreenshirtResult
 // -----------------------------------------------------------------------------
 
-public static void main(String[] args) //throws SQLException // testing purposes
-{
-//double res = calcNewHandicap (41,33.2,round ??);
-// LOG.info(" -- res = " + res );
+public static void main(String[] args) throws SQLException, Exception{
+  
+    Connection conn = new DBConnection().getConnection();
+    Player player = new Player();
+    player.setIdplayer(324713);
+ //   LOG.info("line 010");
+    Round round = new Round();
+    round.setIdround(437);
+ //    LOG.info("line 011");
+   // LocalDateTime ldt = LocalDateTime.of(2017,Month.AUGUST,26,0,0);
+   // round.setRoundDate(ldt);
+ //   int [][] points = new CalcWorkHcpStb().createArrayPoints(18);
+  //        LOG.info("line 012");
+ //   int[][] a = new LoadStrokesArray().load(conn, points, player, round);
+ //   LOG.info(" array points filled = " + Arrays.deepToString(a));
+
+DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
 

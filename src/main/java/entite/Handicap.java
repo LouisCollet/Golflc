@@ -15,10 +15,8 @@ import org.primefaces.event.SelectEvent;
 import utils.LCUtil;
 
 @Named
-public class Handicap implements Serializable, interfaces.GolfInterface
-{
+public class Handicap implements Serializable, interfaces.GolfInterface{
     private static final long serialVersionUID = 1L;
-    
 
 @Past(message="{handicap.start.past}")
     private Date handicapStart;
@@ -129,26 +127,7 @@ public class Handicap implements Serializable, interfaces.GolfInterface
         LOG.info("onrowSelectCheckbox Event fired !" + event.getObject().toString());
     }
     
-  //  <p:ajax event="rowSelect"           listener="#{courseC.handicap.onrowSelect}"/>
-  //  <p:ajax event="rowUnselect"         listener="#{courseC.handicap.onrowUnselect}"/>
-  //  <p:ajax event="rowSelectCheckbox"   listener="#{courseC.handicap.onrowSelectCheckbox}"/>
-  //  <p:ajax event="rowUnselectCheckbox" listener="#{courseC.handicap.onrowUnselectCheckbox}"/>
-    
-    
-    
-    
-    
- @Override
-public String toString()
-{ return 
-        (NEW_LINE + "FROM ENTITE = " + this.getClass().getSimpleName()
-             + " ,Handicap Start : "   + Handicap.SDF.format(getHandicapStart() )
-             + " ,Player Handicap : " + this.getHandicapPlayer() 
-     //        + " ,Playing Handicap : " + this.getPlayingHandicap()
-             + " ,Handicap End : " + this.getHandicapEnd()
-        );
-}
-  public static Handicap mapHandicap(ResultSet rs) throws SQLException{
+ public static Handicap mapHandicap(ResultSet rs) throws SQLException{
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Handicap h = new Handicap();
@@ -162,6 +141,28 @@ public String toString()
     LCUtil.showMessageFatal(msg);
     return null;
   }
-} //end method map
+} //end method map   
 
+ @Override
+public String toString(){ 
+    LOG.info("starting toString for Handicap!");
+ try{
+    LOG.info("idhandicap : "   + this.getHandicapStart());
+  //  LOG.info("RoundDate no format: "   + this.getRoundDate());
+  //  LOG.info("RoundDate format LocalDateTime: "   + this.getRoundDate().format(ZDF_TIME));
+//
+    return 
+        (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
+             + " ,Handicap Start : "   + Handicap.SDF.format(getHandicapStart() )
+             + " ,Player Handicap : " + this.getHandicapPlayer() 
+     //        + " ,Playing Handicap : " + this.getPlayingHandicap()
+             + " ,Handicap End : " + this.getHandicapEnd()
+        );
+  }catch(Exception e){
+        String msg = " EXCEPTION in Handicap.toString = " + e.getMessage();
+        LOG.error(msg);
+     //   LCUtil.showMessageFatal(msg);
+        return msg;
+  }
+} //end to String
 } //end class

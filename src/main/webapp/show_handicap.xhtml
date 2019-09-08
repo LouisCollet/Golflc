@@ -13,21 +13,6 @@
     <ui:include src="/help/help_show_handicap.xhtml"/>
 </ui:define>
 <ui:define name="content">
-<!--    
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewParam
-            required="true"
-            name="cmd"
-            value="#{courseC.inputHandicap}"
-            requiredMessage="You did not specify a cmd. (The id parameter is missing)"
-            converterMessage="Invalid cmd. (The id parameter is not a number)"
-            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
-            <f:validateLength minimum="3" />
-        </f:viewParam>
-    </f:metadata>
-</ui:define>
--->
 <h:form id="form_handicap">
 
 <p:dataTable id="table_handicap"
@@ -41,9 +26,9 @@
              filteredValue="#{courseC.handicap.filteredHandicaps}"
               >
     <p:ajax event="rowSelect"           listener="#{courseC.handicap.onrowSelect(c)}"/>
-    <p:ajax event="rowUnselect"         listener="#{c.handicap.onrowUnselect()}" />
-    <p:ajax event="rowSelectCheckbox"   listener="#{c.handicap.onrowSelectCheckbox()}"/>
-    <p:ajax event="rowUnselectCheckbox" listener="#{c.handicap.onrowUnselectCheckbox()}"/>
+    <p:ajax event="rowUnselect"         listener="#{c.handicap.onrowUnselect(c)}" />
+    <p:ajax event="rowSelectCheckbox"   listener="#{c.handicap.onrowSelectCheckbox(event)}"/>
+    <p:ajax event="rowUnselectCheckbox" listener="#{c.handicap.onrowUnselectCheckbox(event)}"/>
 
 <f:facet name="header">
             <p:commandButton 
@@ -53,9 +38,6 @@
                         value="View Detail Hcp"
                         style="float:left"
                         >
-                <p:ajax event="dialogReturn"
-                       
-                        listener="#{dialogC.onDialogReturn()}"/>
             </p:commandButton>
     
     <!--    action="statChartHandicap.xhtml" update=":form_handicap:growl-msg"onmouseover="this.style.cursor='default';this.style.backgroundColor='#F1F1F1';" 
@@ -77,61 +59,66 @@
     <p:row>
             <p:column colspan="2"
                       headerText="View Detail"
-                      style="width:15%"
-                      styleClass="columnborder1"
-                      />
+                      width="5%"
+                      styleClass="columnborder1" />
             <p:column colspan="3"
                       headerText="Handicap"
-                      style="width:30%"
+                      width="5%"
                       styleClass="columnborder2" />
             <p:column colspan="4"
                       headerText="#{msg['round.result.stableford']}"
-                      style="width:55%"
+                      width="5%"
                       styleClass="columnborder1" />
     </p:row>
+    
     <p:row>
-            <p:column headerText="View" selectionMode="single" style="width:2%"/>
-            <p:column headerText="#" style="border-right-width:5px;width:2%;" />
+            <p:column headerText="View" selectionMode="single" />
+            <p:column headerText="#" style="border-right-width:5px" />
             
-            <p:column headerText="#{msg['handicap.player']}"   style="white-space:pre-line;width:10%" />
-            <p:column headerText="#{msg['handicap.start']}"    style="white-space:pre-line;width:10%" />
-            <p:column headerText="#{msg['handicap.canceled']}" style="border-right-width:5px;white-space:pre-line;width:50%"/>
+            <p:column headerText="#{msg['handicap.player']}"   style="white-space:pre-line;" width="1%" />
+            <p:column headerText="#{msg['handicap.start']}"    style="white-space:pre-line;" width="1%" />
+            <p:column headerText="#{msg['handicap.canceled']}" style="border-right-width:5px;white-space:pre-line;" width="1%"/>
             
-            <p:column headerText="#{msg['round.date']}"        style="white-space:pre-line;width:50%"/>
-            <p:column headerText="#{msg['playerhasround.result']}" style="width:5%"/>
-            <p:column headerText="#{msg['round.competition']}" style="width:10%" />
-            <p:column headerText="#{msg['course.name']}"       style="width:10%" />
+            <p:column headerText="#{msg['round.date']}"        style="white-space:pre-line;" width="1%"/>
+            <p:column headerText="#{msg['playerhasround.result']}" width="1%"/>
+            <p:column headerText="#{msg['round.competition']}" width="1%" />
+            <p:column headerText="#{msg['course.name']}" width="1%"      />
     </p:row>
+    
 </p:columnGroup>
 
 <!-- data columns colspan 1 -->
 <p:column
     id="singlerow"
     selectionMode="single"
-    style="text-align:center"
+    style="text-align:center;width:5px"
     />
 
-<p:column
-
-     style="text-align:center"
-     id="rrow">
-             #{row+1}
+<p:column  width="1%">
+    <h:outputText  id="rrow"
+                   value="#{row+1}"
+                   style="text-align:center">
+   </h:outputText>
 </p:column>
 
-<p:column>
-   #{c.handicap.handicapPlayer}
+<p:column width="1%">
+    <h:outputText value="#{c.handicap.handicapPlayer}"
+                   >
+   </h:outputText>
 </p:column>
 
-<p:column>
-    <h:outputText value="#{c.handicap.handicapStart}">
+<p:column width="1%">
+    <h:outputText value="#{c.handicap.handicapStart}"
+                  style="width:5%">
         <f:convertDateTime pattern="dd-MM-yyyy" />
    </h:outputText>
 </p:column>
 
 <!-- new 05/09/2017 cancelHandicap ne fonctionne pas -->
-        <p:column>
+        <p:column width="1%">
             <p:commandButton
                 id="cancelButton"
+                style="color:red;font-weight:bold;"
                 actionListener="#{courseC.cancelHandicap(c)}"
                 value="#{msg['button.delete']} "
                 icon="fa fa-trash"
@@ -152,47 +139,57 @@
                 style="font-weight:bold;color:red" />
 -->
 
-<p:column>
+<p:column width="1%">
    <h:outputText value="#{c.round.roundDate}"
-       >
+                 >
        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+      
+   </h:outputText>
+     (#{c.round.idround})
+</p:column>
+
+<p:column width="1%">
+    <h:outputText value="#{c.inscription.playerhasroundFinalResult}"
+                 >
+   </h:outputText>
+   
+</p:column>
+
+<p:column width="1%">
+    <h:outputText value="#{c.round.roundCompetition}"
+                 >
    </h:outputText>
 </p:column>
 
-<p:column>
-   #{c.inscription.playerhasroundFinalResult}
-</p:column>
-
-<p:column>
-   #{c.round.roundCompetition}
-</p:column>
-
-<p:column>
-  #{c.course.courseName}
+<p:column width="1%">
+    <h:outputText value="#{c.course.courseName}"
+                 >
+   </h:outputText>
+    
+  
 </p:column>
     <f:facet name="footer"> 
         Historique Handicap
     </f:facet>  
-
+<!--
 <p:columnGroup type="footer">
-
     <p:row>
-            <p:column footerText="View" style="width:2%"/>
-            <p:column footerText="#"    style="width:2%"/>
+            <p:column footerText="View" width="1%" />
+            <p:column footerText="#"    />
             
-            <p:column footerText="#{msg['handicap.player']}"    style="white-space:pre-line;width:10%" />
-            <p:column footerText="#{msg['handicap.start']}"     style="white-space:pre-line;width:10%" />
-            <p:column footerText="#{msg['handicap.canceled']}"  style="white-space:pre-line;width:50%"/>
+            <p:column footerText="#{msg['handicap.player']}"    style="white-space:pre-line;" width="1%" />
+            <p:column footerText="#{msg['handicap.start']}"     style="white-space:pre-line;" />
+            <p:column footerText="#{msg['handicap.canceled']}"  style="white-space:pre-line;"/>
             
-            <p:column footerText="#{msg['round.date']}"         style="white-space:pre-line;width:10%"/>
-            <p:column footerText="#{msg['playerhasround.result']}" style="width:5%"/>
-            <p:column footerText="#{msg['round.competition']}" style="width:10%" />
-            <p:column footerText="#{msg['course.name']}"       style="width:10%" />
+            <p:column footerText="#{msg['round.date']}"         style="white-space:pre-line;"/>
+            <p:column footerText="#{msg['playerhasround.result']}" />
+            <p:column footerText="#{msg['round.competition']}"  />
+            <p:column footerText="#{msg['course.name']}"       />
     </p:row>
 </p:columnGroup>
-
+-->
 </p:dataTable>
-<p:log id="log" />
+<!--<p:log id="log" />-->
     <p:commandButton id="btn"
                      value="#{msg['button.print']}"
                      type="button"

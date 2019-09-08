@@ -72,7 +72,6 @@
      <h:outputText value="#{msg['subscription.enddate']} : "  style="font-weight:bold" />
      <h:outputText id = "sub_endDate"
           value="#{courseC.subscription.endDate}"
-         
            >
          <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
      </h:outputText>
@@ -85,7 +84,6 @@
   <h:link id="link02"
             title="#{msg['player.title.modify']}"
             outcome="player_modify.xhtml"
-            
             style="float:right;"
         > 
             <!--  action="#{courseC.to_player_modify_xhtml('modify')}" -->
@@ -103,10 +101,7 @@
         outcome="player_file.xhtml"
         style="float:right;"
         >
-        <h:graphicImage 
-                name="images/uploadPhoto.jpg"
-                alt="image missing :upload_photo.jpg"
-                style="float: left;">
+        <h:graphicImage name="images/uploadPhoto.jpg" alt="image missing :upload_photo.jpg" style="float: left;">
         </h:graphicImage>
     <f:param name="idplayer" value="#{courseC.player.idplayer}" />
     <f:param name="playerFirstName" value="#{courseC.player.playerFirstName}" />
@@ -135,12 +130,8 @@
                          action="password_modify.xhtml"/>
 
 </f:facet>
-
-
-
 </p:panelGrid>
 </h:form>
-
 </ui:define>
 </ui:composition>
 </html>

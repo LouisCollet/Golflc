@@ -56,8 +56,8 @@ public class ActivationMail{
      //           LOG.info(msg);
             String sujet = "Activate Your Account for GolfLC";
             String to = "louis.collet@skynet.be";
-            utils.SendEmail sm = new utils.SendEmail();
-            boolean b = sm.sendHtmlMail(sujet,msg,to,"ACTIVATION");
+       //     utils.SendEmail sm = new utils.SendEmail();
+            boolean b = new utils.SendEmail().sendHtmlMail(sujet,msg,to,"ACTIVATION");
                 LOG.info("HTML Mail status = " + b);
 return b;
 }
@@ -83,8 +83,8 @@ return b;
                      
  // à mofifier             //       <a href=" + href + ">"
                      String to = "louis.collet@skynet.be";
-                     utils.SendEmail sm = new utils.SendEmail();
-                     boolean b = sm.sendHtmlMail(sujet,msg,to,"ACTIVATION");
+                //     utils.SendEmail sm = new utils.SendEmail();
+                     boolean b = new utils.SendEmail().sendHtmlMail(sujet,msg,to,"ACTIVATION");
                         LOG.info("HTML Mail status = " + b);
      return b;
     }

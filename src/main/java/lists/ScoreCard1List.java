@@ -15,22 +15,16 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-/**
- *
- * @author collet
- */
-public class ScoreCard1List implements interfaces.Log
-{
+public class ScoreCard1List implements interfaces.Log{
     private static List<ECourseList> liste = null;
-//    private static BigDecimal HandicapPlayer;
     
 public List<ECourseList> list(final Player player, final Round round,
         final Connection conn) throws SQLException, NullPointerException, LCCustomException{  
-  //  LOG.debug("  ... entering ScoreCard1List !!!");
-    
-if(liste == null)
-{
-     LOG.debug("starting getScoreCardList1 for round : {} with listsc1 = {}", round, liste);
+
+if(liste == null){
+    LOG.debug("... entering ScoreCard1List !!!");
+    LOG.debug(" with player = " + player.toString());
+    LOG.debug(" for round : {} with listsc1 = {}", round, liste);
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -40,9 +34,7 @@ try{
      String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
      String ha = utils.DBMeta.listMetaColumnsLoad(conn, "Handicap");
 String query =
-        "SELECT"
-        + pl + "," + ha + "," + ro
-  //      + "   PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer, idround, playergender, PlayerBirthDate"
+        "SELECT" + pl + "," + ha + "," + ro
         + " FROM player, handicap, round"
         + " WHERE"
         + "   player.idplayer=?"
@@ -57,20 +49,16 @@ String query =
      rs =  ps.executeQuery();
      rs.last(); //on récupère le numéro de la ligne
         LOG.info("ResultSet ScoreCardList1 has " + rs.getRow() + " lines.");
-        if(rs.getRow() == 0)
-            {String msg = "££ Empty Result Table for ScoreCard1List ££";
-             throw new LCCustomException(msg);
+        if(rs.getRow() == 0){
+            String msg = "££ Empty Result Table for ScoreCard1List ££";
+             throw new Exception(msg);
             }    
      rs.beforeFirst(); //on replace le curseur avant la premiÃ¨re ligne
      liste = new ArrayList<>();
   //   ECourseList cc = new ECourseList();
       //LOG.debug(" -- query 4= " );
-	while(rs.next())
-        {
-             ECourseList ecl = new ECourseList();
-     //   	cc = new ECourseList(); // liste pour sÃ©lectionner un scoreCard
-		//cc.setIdclub(rs.getInt("idclub") ); // was idscoreCard : not case sensitive ??
-                
+	while(rs.next()){
+          ECourseList ecl = new ECourseList();
           Player p = new Player();
           p = entite.Player.mapPlayer(rs);
           ecl.setPlayer(p);
@@ -87,31 +75,19 @@ String query =
         
  ///   LOG.info("exiting ScoreCard1List with " + liste.toString());
     return liste;
-    
-    
-}catch (LCCustomException e){
-  //  String msg = " SQL Exception in getScoreCardList1() " + e;
-  //  LOG.error(msg);
-  //  LCUtil.showMessageFatal(msg);
-    return null;    
+
 }catch (SQLException e){
-    String msg = " SQL Exception in getScoreCardList1() " + e;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}catch (NullPointerException npe){
-    String msg = "NullPointerException in getScoreCardList1() " + npe;
+    String msg = " SQL Exception in ScoreCardList1() " + e;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;
 }catch (Exception ex){
-    String msg = "Exception in getScoreCardList1() " + ex;
+    String msg = "Exception in ScoreCardList1() " + ex;
      throw new LCCustomException(msg);
   //  rethrow common technique used to encapsulate exceptions
   //  LCUtil.showMessageFatal(msg);
   //  return null;
 }finally{
-      //  DBConnection.closeQuietly(conn, null, rs, ps);
         DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 }else{
@@ -134,8 +110,7 @@ String query =
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round(); 
-        round.setIdround(300);
-    //    ScoreCard1List sc1l = new ScoreCard1List();
+        round.setIdround(436);
        List<ECourseList> ec = new ScoreCard1List().list(player, round, conn);
         LOG.info("from main, ec = " + ec);
  }catch (Exception e){

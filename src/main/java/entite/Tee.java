@@ -35,7 +35,7 @@ public class Tee implements Serializable, interfaces.Log{
 @NotNull(message="{tee.slope.notnull}")
 //@Size(min=90, max=138, message="{tee.slope.minmax}")
 @Min(value=90,message="{tee.slope.min}")
-@Max(value=138,message="{tee.slope.max}")
+@Max(value=150,message="{tee.slope.max}")
     private Short teeSlope;
 
 @NotNull(message="{tee.rating.notnull}")
@@ -53,11 +53,11 @@ private Integer course_idcourse;
 private Date teeModificationDate;
 private boolean NextTee; // 23/06/2013
 private boolean CreateModify = true; // 12/08/2017
-
+private Integer teeMasterTee;
 @NotNull(message="Bean validation : the TeeStart must be completed")
 // @Size(max = 5,message="Bean validation : the Hcp is maximum 5 characters")
     private String teeHolesPlayed;
-
+   private Short teePar;
     public Tee(){ // connector
         teeGender="M"; // default for radio button
         teeStart="YELLOW";
@@ -153,6 +153,22 @@ private boolean CreateModify = true; // 12/08/2017
     public void setTeeHolesPlayed(String teeHolesPlayed) {
         this.teeHolesPlayed = teeHolesPlayed;
     }
+
+    public Short getTeePar() {
+        return teePar;
+    }
+
+    public void setTeePar(Short teePar) {
+        this.teePar = teePar;
+    }
+
+    public Integer getTeeMasterTee() {
+        return teeMasterTee;
+    }
+
+    public void setTeeMasterTee(Integer teeMasterTee) {
+        this.teeMasterTee = teeMasterTee;
+    }
     
 @Override
 public String toString(){
@@ -167,6 +183,8 @@ public String toString(){
                + " ,Tee Gender : " + this.getTeeGender()
                + " ,idcourse : " + this.getCourse_idcourse()
                + " ,holes played : " + this.getTeeHolesPlayed()
+               + " ,tee par : " + this.getTeePar()
+               + " ,tee Master Tee : " + this.getTeeMasterTee()
         );
         }catch(Exception e){
         String msg = "£££ Exception in Tee.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
@@ -188,7 +206,8 @@ public String toString(){
         t.setTeeClubHandicap(rs.getInt("TeeClubHandicap"));
         t.setCourse_idcourse(rs.getInt("tee.course_idcourse"));
         t.setTeeHolesPlayed(rs.getString("TeeHolesPlayed")); // new 29-03-2019
-                ;
+        t.setTeePar(rs.getShort("TeePar"));
+        t.setTeeMasterTee(rs.getInt("TeeMasterTee"));
         
    return t;
   }catch(Exception e){

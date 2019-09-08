@@ -36,7 +36,7 @@
     <!--	<h1>Score Card for Registered Round list</h1> -->
 
 <p:dataTable id="player_has_played_round"
-             value="#{courseC.listRounds()}"
+             value="#{courseC.listRecentRounds()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredCars}"
@@ -46,7 +46,7 @@
      <h1>#{msg['message.selectround']} #{msg['message.for.scorecard']}</h1>
 </f:facet>
 
-        <p:column headerText="#{msg['round.selected']}" style="width:100px" >
+        <p:column headerText="#{msg['round.selected']}" style="width:20%" >
             <p:commandButton
                 id="selectButton"
                 action="#{courseC.scorecard(c)}"
@@ -56,12 +56,12 @@
 	</p:column>
 
 	<p:column headerText="#{msg['round.date']}"
-                  style="width:70px"
+                  style="width:10%"
                   id="rdate">
                   <h:outputText value="#{c.round.roundDate}"
                                 
                                 > 
-                 <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                 <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
                   </h:outputText>
 	</p:column>
     
@@ -69,13 +69,12 @@
                   footerText="#{msg['tee.start']}"
                   style="width:10%"
                   id="teestart"
-                  >
-                        #{c.tee.teeStart}
+                  > #{c.tee.teeStart} - #{c.tee.teeHolesPlayed} - #{c.tee.idtee} MT=#{c.tee.teeMasterTee} 
         </p:column>
 
 	<p:column   id="colclubname"
                     headerText="#{msg['club.name']}"
-                    style="width:100px"
+                    style="width:10%"
                     filterMatchMode="contains"
                     filterBy="#{c.club.clubName}"
                   >
@@ -84,7 +83,7 @@
 
 	<p:column id="colcoursename"
                   headerText="#{msg['course.name']}"
-                  style="width:100px"
+                  style="width:10%"
                   filterMatchMode="contains"
                   filterBy="#{c.course.courseName}"
                   >
@@ -94,7 +93,7 @@
  style="width:40%; background-color: blue;"
 -->
         <p:column headerText="#{msg['round.competition']}"
-                  style="width:100px"
+                  style="width:10%"
                   styleClass="red"
                   id="compet"
                   >
@@ -110,7 +109,7 @@
         </p:column>
 
 <f:facet name="footer">
-     There are #{fn:length(courseC.listRounds())} rounds. 
+    There are #{fn:length(courseC.listRecentRounds())} rounds. 
 </f:facet>
 
 </p:dataTable>

@@ -20,8 +20,8 @@ public class ErrorHandler implements Serializable{
     
 
 	public String getStatusCode(){
-		String val = String.valueOf((Integer)FacesContext.getCurrentInstance().getExternalContext().
-			getRequestMap().get("javax.servlet.error.status_code"));
+		String val = String.valueOf(FacesContext.getCurrentInstance().getExternalContext().
+                        getRequestMap().get("javax.servlet.error.status_code"));
 		return val;
 	}
 
@@ -48,8 +48,8 @@ try{
 } //end method
         } // 
 	public String getException(){
-		String val = ((Exception)FacesContext.getCurrentInstance().getExternalContext().
-			getRequestMap().get("javax.servlet.error.exception")).toString();
+		String val = FacesContext.getCurrentInstance().getExternalContext().
+                        getRequestMap().get("javax.servlet.error.exception").toString();
 		return val;
 	}
 

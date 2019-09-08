@@ -18,21 +18,17 @@ import utils.LCUtil;
 
 public class FindSlopeRating implements interfaces.Log {
 
-// private static List<StablefordResult> liste = null;
   private static List<ECourseList> liste = null;
 final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
-    
- //   public List<StablefordResult> getSlopeRating(final Player player, final Round round, final Connection conn) throws SQLException // pour un joueur particulier !!!
-    public List<ECourseList> getSlopeRating(final Player player, final Round round, final Connection conn) throws SQLException 
-{
-        if (liste == null) {
-            LOG.debug("starting getSlopeRating(), Player = {}", player.getIdplayer());
-            LOG.debug("starting getSlopeRating(), Round = {}", round.getIdround());
-     //       LOG.debug("starting getSlopeRating(), liste = {}", liste);
 
-            PreparedStatement ps = null;
-            ResultSet rs = null;
-            try {
+  public List<ECourseList> find(final Player player, final Round round, final Connection conn) throws SQLException {
+    if(liste == null){
+            LOG.debug("starting FindSlopeRating(), Player = {}", player.toString());
+            LOG.debug("starting FindSlopeRating(), Round = {}", round.toString());
+
+       PreparedStatement ps = null;
+       ResultSet rs = null;
+       try {
                 LOG.info("starting getSlopeRating.. = ");
                     String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
          //           String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
@@ -43,7 +39,7 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
                     String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
                 String query
                         = // attention faut un espace en fin de ligne avant le " !!!!
-                        " SELECT"
+                         " SELECT"
                            + ph + "," + te + "," + cl + "," + co + "," + ro + "," + pl //+ "," + ha
                         + " FROM round "
                         + " JOIN player "
@@ -54,21 +50,29 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
                         + " JOIN club  "
                         + "	ON club.idclub = course.club_idclub "
                         + " JOIN player_has_round "
-                        + "   ON player_has_round.round_idround = round.idround "
-                        + "   AND player_has_round.player_idplayer = player.idplayer "
+                        + "   ON InscriptionIdRound = round.idround "
+                        + "   AND InscriptionIdPlayer = player.idplayer "
                         + " JOIN tee "
                         + " 	ON tee.course_idcourse = course.idcourse "
-                        + "  	 AND tee.TeeGender = player.PlayerGender  "
-                        + " 	 AND tee.TeeStart = player_has_round.InscriptionTeeStart ";
+                        + "  	  AND player_has_round.InscriptionIdTee = tee.idtee"
+               //         + " 	 AND tee.TeeStart = player_has_round.InscriptionTeeStart "
+                        ;
+              
+         ps = conn.prepareStatement(query);
+         ps.setInt(1, player.getIdplayer());
+         ps.setInt(2, round.getIdround());
+         utils.LCUtil.logps(ps);
+         rs = ps.executeQuery();
+         rs.last(); //on récupère le numéro de la ligne
+            LOG.info("ResultSet FindSlopeRating has " + rs.getRow() + " lines.");
+         if(rs.getRow() == 0){
+            String msg = "-- Empty Result Table for FindSlopeRating !! ";
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+            throw new Exception(msg);
+         }
 
-                ps = conn.prepareStatement(query);
-                ps.setInt(1, player.getIdplayer());
-                ps.setInt(2, round.getIdround());
-                utils.LCUtil.logps(ps);
-                rs = ps.executeQuery();
-                rs.last(); //on récupère le numéro de la ligne
-                LOG.info("ResultSet FindSlopeRating has " + rs.getRow() + " lines.");
-                if (rs.getRow() != 1) {
+          if (rs.getRow() != 1) {
                     String msg = "-- Empty or too much Result(s) in Table for FindSlopeRating !! ";
                     LOG.error(msg);
                     LCUtil.showMessageFatal(msg);
@@ -131,24 +135,20 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
     public static List<ECourseList> getListe() {
         return liste;
     }
-
     public static void setListe(List<ECourseList> liste) {
         FindSlopeRating.liste = liste;
     }
 
-    public static void main(String[] args) throws SQLException, Exception // testing purposes
-    {
+    public static void main(String[] args) throws SQLException, Exception{
+
         Connection conn = new DBConnection().getConnection();
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();
-        round.setIdround(401);
-        List<ECourseList> res = new FindSlopeRating().getSlopeRating(player, round, conn);
-        LOG.info("main - after res = " + res.toString());
-//for (int x: par )
-//        LOG.info(x + ",");
+        round.setIdround(449);
+        List<ECourseList> res = new FindSlopeRating().find(player, round, conn);
+            LOG.info("main - after res = " + res.toString());
         DBConnection.closeQuietly(conn, null, null, null);
 
     }// end main
-
 } //end Class

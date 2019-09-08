@@ -169,7 +169,15 @@
              </p:commandButton>
 	</p:column>
  
- 
+ 	<p:column   id="colClubName"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                  >
+            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
+	</p:column>
  
 	<p:column id="colCourseName"
                   headerText="#{msg['course.name']}"
@@ -182,15 +190,7 @@
 	</p:column>
 <!-- attention : casse de la classe :min et MAJ -->
 
-	<p:column   id="colClubName"
-                    headerText="#{msg['club.name']}"
-                    footerText="#{msg['club.name']}"
-                    style="width:20%"
-                    filterMatchMode="contains"
-                    filterBy="#{c.club.clubName}"
-                  >
-            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
-	</p:column>
+
 
         <p:column  id="courseBegin"
                   headerText="#{msg['course.begin']}"

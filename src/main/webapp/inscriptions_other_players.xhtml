@@ -86,15 +86,15 @@
             <h:outputText value="This is the Drop Zone !!!" 
                           rendered="#{empty courseC.droppedPlayers}"
                           style="font-size:24px;" />
-            <p:dataTable id="selectedCarsTable"
+         <p:dataTable id="selectedCarsTable"
                          value="#{courseC.droppedPlayers}"
                          var="c"
                          rendered="#{not empty courseC.droppedPlayers}">
-                <p:column headerText="#{msg['player.id']}">
+                <p:column headerText="#{msg['player.id']}" >
                     <h:outputText value="#{c.idplayer}" />
                 </p:column>
  
-                <p:column headerText="#{msg['player.last']}">
+                <p:column headerText="#{msg['player.last']}" >
                     <h:outputText value="#{c.playerLastName}" />
                 </p:column>
  
@@ -103,22 +103,21 @@
                 </p:column>
  
                 <p:column headerText="#{msg['player.country']}"
-                          style="width:20%">
+                          style="width:5%">
                     <h:outputText value="#{c.playerCountry}" />
                 </p:column>
                 
-                <p:column headerText="#{msg['tee.start']}">
+                <p:column headerText="#{msg['tee.start']}"
+                          style="width:20%">
                     <p:selectOneMenu id="teestart"
                          value="#{courseC.inscription.inscriptionTeeStart}"
-                         styleClass="menu"
-                         panelStyleClass="panel"
                            >
-                        <f:selectItems value="#{courseC.teeStartListe}" />
+                        <f:selectItems value="#{courseC.teeStartList(c)}" />
                     </p:selectOneMenu>
                 </p:column>
-                
+
                 <p:column headerText="#{msg['button.inscription.delete']}"
-                          style="width:20%" >
+                          style="width:10%" >
                     <p:commandButton
                           id="selectButtonRemove"
                           action="#{courseC.PlayerRemove(c)}"
@@ -126,7 +125,7 @@
                           icon="fa fa-trash-o fa-lg ">
                         <p:confirm header="#{msg['message.confirm']}"
                            message="#{msg['message.cancel']}" 
-                           icon="fa fa-exclamation-triangle"
+                           icon="fas fa-exclamation-triangle"
                            />   
             </p:commandButton>
 	</p:column>

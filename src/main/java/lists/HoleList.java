@@ -13,7 +13,7 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class HoleList implements interfaces.Log{
+public class HoleList {
     private static List<Hole> liste = null;
     
 public List<Hole> list(final Course course, final Tee tee,final Connection conn) throws Exception{
@@ -36,7 +36,7 @@ if(liste == null){
  
      int start = 0;
      int trous = 9;
- //    if(tee.getTeeHolesPlayed().equals("01-09")){
+ //    if(tee.getTeeHolesPlayed().equals("01-09")){ // default
  //        start = 0; trous = 9;
  //    }
      if(tee.getTeeHolesPlayed().equals("10-18")){
@@ -49,10 +49,10 @@ if(liste == null){
      ps.setInt(3, start); // 0 pour 01-09, 9 pour 10-18
      ps.setInt(4, trous); // 0 pour 01-09, 18 pour 10-18
              utils.LCUtil.logps(ps);
-            rs = ps.executeQuery();
-            while (rs.next()){
-                liste.add(entite.Hole.mapHole(rs));
-            }
+     rs = ps.executeQuery();
+     while (rs.next()){
+         liste.add(entite.Hole.mapHole(rs));
+     }
   liste.forEach(item -> LOG.info("Hole list " + item));  // java 8 lambda
 return liste;
 
@@ -94,7 +94,7 @@ return liste;
    course.setIdcourse(135);
    Tee tee = new Tee();
    tee.setIdtee(148);
-   tee.setTeeHolesPlayed("01-18"); // ou 10-18   ou 18-18
+   tee.setTeeHolesPlayed("01-18"); // ou 10-18   ou 01-09
     List<Hole> p1 = new HoleList().list(course, tee, conn);
         LOG.info("Hole list = " + p1.toString());
     DBConnection.closeQuietly(conn, null, null, null);

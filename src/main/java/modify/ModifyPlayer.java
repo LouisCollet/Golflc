@@ -16,15 +16,15 @@ public boolean modify(final Player player, final Connection conn) throws Excepti
         int row = 0;
         boolean b = false;
         try {
-            LOG.info("player   = " + player.toString());
-    String s = utils.DBMeta.listMetaColumnsUpdate(conn, "player");
-        LOG.info("String from listMetaColumns = " + s);
+            LOG.info("player   = " + player);
+    String pl = utils.DBMeta.listMetaColumnsUpdate(conn, "player");
+        LOG.info("String from listMetaColumns = " + pl);
         // encrypted password with SHA2 function of mysql 
  ///   s = s.replace("playerpassword=?" , "playerpassword=sha2(?,256)"); // new 07-08-2018 
-        LOG.info("String modified for encryption password sha2 = " + s);
+        LOG.info("String modified for encryption password sha2 = " + pl);
         
     String query = "UPDATE player"
-            + " SET " + s
+            + " SET " + pl
             + " WHERE player.idplayer=?";
         LOG.info("query Modify Player 1 = " + query);
 
@@ -73,9 +73,10 @@ return true;
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            return false;
-   } catch (NumberFormatException nfe) {
-            String msg = "£££ NumberFormatException in Modify Player = " + nfe.getMessage();
+            throw (new SQLException(msg)); // new 01-09-2019
+        //    return false;
+   } catch (Exception nfe) {
+            String msg = "£££ Exception in Modify Player = " + nfe.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;

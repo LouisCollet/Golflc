@@ -1,4 +1,4 @@
-package find;
+package work;
 
 import entite.Player;
 import entite.Round;
@@ -14,15 +14,15 @@ import java.time.LocalTime;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class FindHandicap implements interfaces.Log, interfaces.GolfInterface{
+// not used !!!!!
+
+public class UpdateTeePar implements interfaces.Log, interfaces.GolfInterface{
     final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
     
-public double find(final Player player, final Round round, final Connection conn) throws SQLException{
-    LOG.info("entering findPlayerHandicap);");
-    LOG.info("starting findPlayerHandicap for player = " + player.toString());
-    LOG.info("starting findPlayerHandicap for game = " + round.toString());
-////if(liste == null)
-////{
+public double update(final Player player, final Round round, final Connection conn) throws SQLException{
+    LOG.info("entering UpdateTeePar.update);");
+    LOG.info("starting findPlayerHandicap for player = " + player);
+    LOG.info("starting findPlayerHandicap for game = " + round);
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -65,23 +65,18 @@ try{
         LCUtil.showMessageFatal(msg);
         return 0;
 }catch (Exception ex){
-    String msg = "Exception in FindHandicapPlayer()" + ex;
+    String msg = "Exception in UpdateTeePar()" + ex;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
      return 0;
 }
-finally
-{
-  //  DBConnection.closeQuietly(conn, null, rs, ps);
+finally{
     DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 
 }//end method
 
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
-  //  LOG.info("Input main = " + s);
- //   DBConnection dbc = new DBConnection();
+public static void main(String[] args) throws SQLException, Exception{
     Connection conn = new DBConnection().getConnection();
     Player player = new Player();
     player.setIdplayer(324713);
@@ -93,11 +88,8 @@ public static void main(String[] args) throws SQLException, Exception // testing
     // alternative pour s'amuser !!
   //  round.setRoundDate(LocalDateTime.of(2019, Month.MARCH, 23, 9,57));
     round.setRoundDate(LocalDateTime.of(d,t));
-    double dd = new FindHandicap ().find(player,round, conn);
-        LOG.info("handicap = " + dd);
+//    double dd = new UpdateTeePar().find(player,round, conn);
+ //       LOG.info("handicap = " + dd);
     DBConnection.closeQuietly(conn, null, null, null);
-
 }// end main
-    
 } // end Class
-

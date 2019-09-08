@@ -14,20 +14,17 @@ import java.time.Month;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class LoadHandicap
-{
+public class LoadHandicap{
 
-public Handicap LoadHandicap(Player player, Round round, Connection conn) throws SQLException
-{
+public Handicap load(Player player, Round round, Connection conn) throws SQLException{
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
    //     LOG.info("entering LoadHandicap");
        LOG.info("player =" + player.toString());
     String ha = utils.DBMeta.listMetaColumnsLoad(conn, "handicap");
-       final String query = "SELECT "
-               + ha +
-             //  + "idhandicap, handicapend, handicapplayer" +
+   final String query = 
+    "SELECT " + ha +
 "   from handicap " +
 "   where handicap.player_idplayer=?" +
 "   and date(?)" +
@@ -59,15 +56,12 @@ try{
     LOG.error("Exception ! " + ex);
   //  LCUtil.showMessageFatal("Exception in LoadClub = " + ex.toString() );
      return null;
-}
-finally
-{
+}finally{
     DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 } //end method
 
-public static void main(String[] args) throws SQLException, Exception // testing purposes
-{
+public static void main(String[] args) throws SQLException, Exception{
     DBConnection dbc = new DBConnection();
     Connection conn = dbc.getConnection();
     Player player = new Player();
@@ -79,7 +73,7 @@ public static void main(String[] args) throws SQLException, Exception // testing
     round.setRoundDate(ldt);
         LOG.info("line 012");
     LoadHandicap lh = new LoadHandicap();
-    Handicap h = lh.LoadHandicap(player, round , conn);
+    Handicap h = lh.load(player, round , conn);
     LOG.info(" handicap = " + h.toString());
 //for (int x: par )
 //        LOG.info(x + ",");

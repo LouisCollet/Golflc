@@ -38,8 +38,8 @@ public class DeleteInscriptionMail {
         LOG.info("fileoutputstrean fos = " + fos.toString());
 
     String to = "louis.collet@skynet.be";
-    utils.SendEmail sm = new utils.SendEmail();
-    boolean b = sm.sendHtmlMail(sujet,mail,to,"INSCRIPTION");
+//    utils.SendEmail sm = new utils.SendEmail();
+    boolean b = new utils.SendEmail().sendHtmlMail(sujet,mail,to,"INSCRIPTION");
        LOG.info("HTML Mail status = " + b);
 return b;
 } //en method

@@ -8,10 +8,9 @@ import java.sql.Types;
 public class CreateResult implements interfaces.Log {
     final private static String []array_return_error = new String [3];
     
-  public String [] setStoredResult (final Connection conn, final int in_player,
+  public String [] create(final Connection conn, final int in_player,
         final int in_round, final int in_result_stableford, final int in_result_zwanzeurs,
-        final int in_result_greenshirt) throws SQLException
-{
+        final int in_result_greenshirt) throws SQLException{
     
   LOG.info(" -- Start of setStoredResult Procedure");
   LOG.info(" -- Result Stableford to be inserted = " + in_result_stableford);

@@ -102,8 +102,7 @@ try{
     return club;
 
 }catch (LCCustomException e){
-  //  String msg = " SQL Exception in getScoreCardList1() " + e;
-  //  LOG.error(msg);
+   //  LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
     return null;    
 }catch (SQLException e){
@@ -127,10 +126,6 @@ finally
 public static void main(String[] args) throws Exception , Exception{
 
     Connection conn = new DBConnection().getConnection();
-  //  Course course = new Course();
-  //  course.setIdcourse(102);
-  
-  // ne fonctionne pas !
     Club club = new Club();
   //  club.setClubAddress("Rua dos Sobreiros da Marinha");
   //  club.setClubCity("2750-005 Cascais");
@@ -149,14 +144,6 @@ public static void main(String[] args) throws Exception , Exception{
     
     Club t1 = new FindClubCoordinates().findClubLatLngTz(club);
      LOG.info("Tarif extracted from database = "  + t1.toString());
-//findPlayerHandicap(player,round, conn);
-//for (int x: par )
-//        LOG.info(x + ",");
 DBConnection.closeQuietly(conn, null, null, null);
-
 }// end main
-
-
-
-
 }  // end class

@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Instant;
@@ -254,8 +255,8 @@ public static LocalDate DatetoLocalDate(java.util.Date date){
         if (date instanceof LocalDateTime)
                //    java.util.Date.from(date.atZone(zone).toInstant());
             return java.util.Date.from(((LocalDateTime) date).atZone(zone).toInstant());
-        if (date instanceof ZonedDateTime)
-            return java.util.Date.from(((ZonedDateTime) date).toInstant());
+   //     if (date instanceof ZonedDateTime) // donne erreur enlevé 21-07-2019
+//            return java.util.Date.from(((ChronoZonedDateTime<LocalDate>) date).toInstant());
         if (date instanceof Instant)
             return java.util.Date.from((Instant) date);
         throw new UnsupportedOperationException("Don't know hot to convert " + date.getClass().getName() + " to java.util.Date");
@@ -403,8 +404,7 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
         }
         return  dim ;
 }
-  public static int generatedKey (Connection conn) throws SQLException
-{
+  public static int generatedKey (Connection conn) throws SQLException{
         Statement st = conn.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY,java.sql.ResultSet.CONCUR_UPDATABLE);
         ResultSet rs = st.executeQuery("SELECT LAST_INSERT_ID()");
         int autoIncrementKey = 0;
@@ -416,11 +416,7 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
             }
         return  autoIncrementKey ;
 }
-  /**
-   *
-   * @param times
-   * @return
-   */
+/*
   public static String generateInsertQuery_old (Connection conn, String table) throws SQLException{
         // utilisé pour gestion des database, SQL requests
 // construct the SQL. Creates: CheckGameEligibility(?, ?, ?)
@@ -445,6 +441,7 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
   //      LOG.info("# of question marks = " + sb2.toString());
     return sb2.toString();
 }
+  */
   public static String generateInsertQuery (Connection conn, String table) throws SQLException{
         // utilisé pour gestion des database, SQL requests
     int times = DBMeta.CountColumns(conn, table);
@@ -774,7 +771,6 @@ try{
             LOG.info("FacesContext.getCurrentInstance() = null");
             return "***not found***";
          }
-
        ResourceBundle text = ResourceBundle.getBundle("/messagesBean", context.getViewRoot().getLocale());
        LOG.info(" text language = " + text.getLocale().getLanguage());
        String someKey = text.getString(message);
@@ -782,7 +778,6 @@ try{
            someKey = "???";
        } 
   //     LOG.info("bean internationalisation key found = " + someKey);
-       
        return someKey;
  }catch (java.util.MissingResourceException mr){
             String msg =  message +  " / Doesn't exists - for language = " + LanguageController.getLanguage() + " / " + mr;
@@ -797,7 +792,46 @@ try{
    }     
 } // end method
 
+public static String prepareMessageBean(String message, Object... params){ // essai used in trial.accepted courseC.manageSubscription()
+//https://murygin.wordpress.com/2010/04/23/parameter-substitution-in-resource-bundles/
+    try{
+       //  https://stackoverflow.com/questions/13655540/read-resource-bundle-properties-in-a-managed-bean
+        FacesContext context = FacesContext.getCurrentInstance();
+        LOG.info("responseComplete has been called : " + context.getResponseComplete());
+        if(context == null){
+            LOG.info("FacesContext.getCurrentInstance() = null");
+            return "***not found***";
+         }
+       ResourceBundle text = ResourceBundle.getBundle("/messagesBean", context.getViewRoot().getLocale());
+            LOG.info(" with parameter text language = " + text.getLocale().getLanguage());
+            LOG.info("first parameter = " + params[0].toString());
+    //   String someKey = text.getString(message);
+    
 
+       String someKey = text.getString(message);// + params[0]);
+    //   MessageFormat.format(text.getString(someKey), params);
+       
+       
+         if(someKey.equals("")){
+           someKey = "???";
+       } 
+  //     LOG.info("bean internationalisation key found = " + someKey);
+    //   return someKey;
+     //  return  MessageFormat.format(text.getString(someKey), params);
+       return  MessageFormat.format(message, params); // mod 08-08-2019
+ }catch (java.util.MissingResourceException mr){
+            String msg =  message +  " / Doesn't exists - for language = " + LanguageController.getLanguage() + " / " + mr
+                    + " / " + params[0];
+            LOG.info(msg);
+            utils.LCUtil.showMessageInfo(msg);
+            return null;
+  }catch (Exception cv){
+            String msg = "£££ Exception in prepare MessageBean = " + cv;
+            LOG.error(msg);
+            utils.LCUtil.showMessageFatal(msg);
+            return null;
+   }     
+} // end method
 public static void showMessageFatal(String summary){
     try{
        FacesContext fc1 = FacesContext.getCurrentInstance();
@@ -807,8 +841,8 @@ public static void showMessageFatal(String summary){
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary," (Application GolfLC)");
             fc1.addMessage(null, facesMsg);
          //   PrimeFaces.current().dialog().showMessageDynamic(facesMsg);
-            showDialogFatal(facesMsg);
-            
+         //   showDialogFatal(facesMsg);
+             PrimeFaces.current().dialog().showMessageDynamic(facesMsg); // new 12-05-2019
        }else{ //fc is null for BATCH sessions
            LOG.info("messageFatal this is a batch execution " + summary);
            PrimeFaces pf = PrimeFaces.current();
@@ -816,7 +850,7 @@ public static void showMessageFatal(String summary){
          //  PrimeFaces.current().executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
        }
   }catch (Exception cv){
-            String msg = "£££ Exception in addMessageFatal = " + cv;
+            String msg = "£££ Exception in showMessageFatal = " + cv;
             LOG.error(msg);
  //           return false;
         }     
@@ -842,8 +876,7 @@ public static void showMessageFatal2(String summary, String summary2){
  //           return false;
         }     
 } // end method
-public static void showMessageInfo(String summary)
-{
+public static void showMessageInfo(String summary){
    // https://stackoverflow.com/questions/13685633/how-to-show-faces-message-in-the-redirected-page
     //FacesContext as an object is tied directly to the JSF request processing lifecycle
     //and as a result is only available during a standard JSF (user-driven) request-response process
@@ -1640,4 +1673,64 @@ public static void main(String[] args) throws Exception{ // throws IOException,E
         return null;
     }
 }
-} // end Class LCUtil
+ // new 13-05-2019 see : https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlexception.html
+ public static void printSQLException(SQLException ex) {
+    for (Throwable e : ex) {
+        if (e instanceof SQLException) {
+            if (ignoreSQLException(((SQLException)e).getSQLState()) == false) {
+                e.printStackTrace(System.err);
+                LOG.error("SQLState: " + ((SQLException)e).getSQLState());
+                LOG.error("Error Code: " + ((SQLException)e).getErrorCode());
+                LOG.error("Message: " + e.getMessage());
+                Throwable t = ex.getCause();
+                while(t != null) {
+                    LOG.error("Cause: " + t);
+                    t = t.getCause();
+                }
+            }
+        }
+    }
+} // end method
+ 
+ public static boolean ignoreSQLException(String sqlState) {
+
+    if (sqlState == null) {
+        LOG.info("The SQL state is not defined!");
+        return false;
+    }
+
+    // X0Y32: Jar file already exists in schema
+    if (sqlState.equalsIgnoreCase("X0Y32"))
+        return true;
+
+    // 42Y55: Table already exists in schema
+    if (sqlState.equalsIgnoreCase("42Y55"))
+        return true;
+
+    return false;
+} // end method
+ public static void getWarningsFromResultSet(ResultSet rs) throws SQLException {
+  //  JDBCTutorialUtilities.printWarnings(rs.getWarnings());
+     printWarnings(rs.getWarnings());
+}
+
+public static void getWarningsFromStatement(Statement stmt)throws SQLException {
+    printWarnings(stmt.getWarnings());
+}
+
+public static void printWarnings(SQLWarning warning) throws SQLException {
+
+    if (warning != null) {
+        LOG.info("\n---Warning---\n");
+
+    while (warning != null) {
+        LOG.info("Message: " + warning.getMessage());
+        LOG.info("SQLState: " + warning.getSQLState());
+        LOG.info("Vendor error code: ");
+        LOG.info(warning.getErrorCode());
+        LOG.info("");
+        warning = warning.getNextWarning();
+    }
+}
+}
+}// end Class LCUtil

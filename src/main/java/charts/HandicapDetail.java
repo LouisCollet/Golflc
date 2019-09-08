@@ -3,6 +3,7 @@ package charts;
 
 import entite.Handicap;
 import entite.Player;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,9 +17,8 @@ import utils.LCUtil;
  *
  * @author collet
  */
-public class HandicapDetail implements interfaces.Log
-{
-    private static List<Handicap> liste = null; // used in CalculateController !!
+public class HandicapDetail {
+    private static List<Handicap> liste = null;
 
 public List<Handicap> getStatHcp(final Connection conn, final Player player) throws SQLException
 {

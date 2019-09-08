@@ -16,13 +16,8 @@ public class ClubDetailList implements interfaces.Log{
 
 public List<ECourseList> list(Club club, final Connection conn) throws SQLException{
 if(liste == null){
-        LOG.info(" ... entering ClubDetailList !! ");
-        LOG.info(" ... entering ClubDetailList with club = " + club);
-  //      if(course.getIdcourse() == null){
-   //          LOG.info("for testing purposes, courseid forced !!!! to 86");
-   //        course.setIdcourse(86);
-  //      }
-       
+      LOG.info(" ... entering ClubDetailList !! ");
+      LOG.info(" ... entering ClubDetailList with club = " + club);
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -34,8 +29,6 @@ try{
 String query =
         "SELECT "
           +  co + "," + cl + "," + te + 
-     //   + " idclub, clubname, idcourse,coursename,tee.idtee,clubcity, clubcountry, clubAddress,  clubLatitude, clubLongitude ,  courseholes," +
-     //   " coursepar,  courseBegin, courseEnd , tee.TeeStart " +
         " FROM club, course, tee " +
         " WHERE club.idclub = course.club_idclub" +
         "	 and tee.course_idcourse = course.idcourse" +
@@ -59,17 +52,17 @@ String query =
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
       //LOG.debug(" -- query 4= " );
-	while(rs.next())
-        {
+	while(rs.next()){
 		ECourseList ecl = new ECourseList();
+                
                 entite.Club c = new Club();
                 c = entite.Club.mapClub(rs);
                 ecl.setClub(c);
-           //             LOG.debug("line 112");
+
                 entite.Course o = new entite.Course();
                 o = entite.Course.mapCourse(rs);
                 ecl.setCourse(o);
-          //              LOG.debug("line 113");
+
                 entite.Tee t = new entite.Tee();
                 t = entite.Tee.mapTee(rs);
                 ecl.setTee(t);

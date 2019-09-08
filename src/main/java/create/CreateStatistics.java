@@ -12,7 +12,7 @@ import utils.LCUtil;
 
 public class CreateStatistics implements interfaces.Log{
     
-    public boolean createStatistics(final Player player, final Round round,
+    public boolean create(final Player player, final Round round,
             final String[][] sc2, final Connection conn) throws SQLException{
   //      Connection conn = null;
         PreparedStatement ps = null;

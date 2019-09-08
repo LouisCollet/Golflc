@@ -30,45 +30,44 @@ public Integer create(final Round round, final Player player, Player invitedBy,
     LOG.info("CreateInscription - player = " + player.toString());
     LOG.info("CreateInscription - club = " + club.toString());
     LOG.info("CreateInscription - course = " + course.toString());
-    LOG.info("entering inscription with inscription = " + inscription.toString());
+    LOG.info("CreateInscription - inscription = " + inscription.toString());
     
        final String query = LCUtil.generateInsertQuery(conn, "player_has_round");
-            LOG.info("generated query = " + query);
+ //           LOG.info("generated query = " + query);
        ps = conn.prepareStatement(query);
-            LOG.info("line 01");
+  //          LOG.info("line 01");
        ps.setInt(1, round.getIdround());
-            
-             LOG.info("line 02");
-            
+  //           LOG.info("line 02");
             ps.setInt(2, player.getIdplayer());
-             LOG.info("line 03");
+  //           LOG.info("line 03");
             ps.setInt(3, 0);  // Final Results : initial value at zero
             ps.setInt(4, 0);  // Final ZwanzeursResults : initial value at zero
             ps.setInt(5, 0);  // Final ZwanzeursGreenshirt : initial value at zero
      //       ps.setString(6, playerhasround.getInscriptionTeam() );  // new 28/09/2014 // deleted 26/06/2017
-      LOG.info("line 04");
             ps.setString(6, inscription.getInscriptionTeeStart());  // new 08/06/2015
-            // à prendre de tee ??
-             LOG.info("line 05");
+   //          LOG.info("line 05");
+            String s = inscription.getInscriptionTeeStart();
+    //    LOG.info("line 06");
+        LOG.info("string s = " + s);
+         // BLUE / L / 01-09 / 154
+            String s3 = s.substring(s.lastIndexOf("/")+2,s.length() ); // 2 pos après dernier / jusque fin de string
+            LOG.info("string s3 = " + s3);
+            inscription.setInscriptionIdTee(Integer.valueOf(s3));
             ps.setInt(7, inscription.getInscriptionIdTee());  // new 31/03/2019
-    // ps.setInt(7, 154);  // pour test
-             LOG.info("line 06");
+   //          LOG.info("line 06");
             ps.setInt(8, invitedBy.getIdplayer());  // new 14/02/2018
-             LOG.info("line 07");
+  //           LOG.info("line 07");
             ps.setTimestamp(9, LCUtil.getCurrentTimeStamp());
- //      entite.PlayerHasRound.setPlayerGender(player.getPlayerGender() ); // new 19/08/2014 for custm validations
-             //    String p = ps.toString();
                 utils.LCUtil.logps(ps);
-                
             int row = ps.executeUpdate(); // write into database
-             LOG.info("line 01");
+  //           LOG.info("line 01");
             if(row == 1) {  // l'inscription est réussie
              String msg =  LCUtil.prepareMessageBean("inscription.ok");
               msg = msg + "for round = " + round.getIdround()
                       + " <br/> player = " + player.getIdplayer()
                       + " <br/> player name = " + player.getPlayerLastName()
                       + " <br/> round date = " + round.getRoundDate().format(ZDF_TIME_HHmm)
-                      + " <br/> idtee = " + player.getPlayerLastName()
+                      + " <br/> idtee = " + inscription.getInscriptionIdTee()
                 ;
                LOG.info(msg);
            //    LCUtil.showMessageInfo(msg);
@@ -112,7 +111,7 @@ public Integer validate(final Round round, final Player player, final Inscriptio
     PreparedStatement ps = null;
    try{
        LOG.info("entering validation before create inscription");
-        List<Player> listPlayers = new lists.RoundPlayersList().listAllParticipants(round, conn);
+        List<Player> listPlayers = new lists.RoundPlayersList().list(round, conn);
         LOG.info("there are already {} players for this round ! ", listPlayers.size());
         LOG.info("here are their names : ", Arrays.toString(listPlayers.toArray()));
         LOG.info("there are RoundPlayers for this round : " + round.getRoundPlayers());

@@ -55,8 +55,8 @@ try{
                     ; 
                 
                 String to = "louis.collet@skynet.be";
-                utils.SendEmail sm = new utils.SendEmail();
-                boolean b = sm.sendHtmlMail(sujet,mail,to,"CREDITCARD");
+          //      utils.SendEmail sm = new utils.SendEmail();
+                boolean b = new utils.SendEmail().sendHtmlMail(sujet,mail,to,"CREDITCARD");
                 
     
     
@@ -105,8 +105,8 @@ try{
                     ; 
                 
                 String to = "louis.collet@skynet.be";
-                utils.SendEmail sm = new utils.SendEmail();
-                boolean b = sm.sendHtmlMail(sujet,mail,to,"CREDITCARD");
+            //    utils.SendEmail sm = new utils.SendEmail();
+                boolean b = new utils.SendEmail().sendHtmlMail(sujet,mail,to,"CREDITCARD");
                     LOG.info("HTML Mail status = " + b);
           return b;
     }catch (Exception ex){
@@ -149,8 +149,8 @@ try{
                 + " <br/> The GolfLC team"
                     ; 
                 String to = "louis.collet@skynet.be";
-                utils.SendEmail sm = new utils.SendEmail();
-                boolean b = sm.sendHtmlMail(sujet,mail,to,"CREDITCARD");
+          //      utils.SendEmail sm = new utils.SendEmail();
+                boolean b = new utils.SendEmail().sendHtmlMail(sujet,mail,to,"CREDITCARD");
                     LOG.info("HTML Mail status = " + b);
           return b;
     }catch (Exception ex){
@@ -193,8 +193,8 @@ try{
                 + " <br/> The GolfLC team"
                     ; 
                 String to = "louis.collet@skynet.be";
-                utils.SendEmail sm = new utils.SendEmail();
-                boolean b = sm.sendHtmlMail(sujet,mail,to,"CREDITCARD");
+          //      utils.SendEmail sm = new utils.SendEmail();
+                boolean b = new utils.SendEmail().sendHtmlMail(sujet,mail,to,"CREDITCARD");
                     LOG.info("HTML Mail status = " + b);
           return b;
     }catch (Exception ex){

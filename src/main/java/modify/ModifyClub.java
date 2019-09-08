@@ -19,17 +19,16 @@ import utils.LCUtil;
  */
 public class ModifyClub implements Serializable, interfaces.Log, interfaces.GolfInterface{
 
-     
 public boolean modify(final Club club, final Connection conn) throws Exception{
         PreparedStatement ps = null;
         boolean b = false;
         try {
             LOG.info("Entering modifyClub with ...");
             LOG.info("club = "+ club.toString());
-    String s = utils.DBMeta.listMetaColumnsUpdate(conn, "club");
-        LOG.info("String from listMetaColumns = " + s);
+    String cl = utils.DBMeta.listMetaColumnsUpdate(conn, "club");
+        LOG.info("String from listMetaColumns = " + cl);
     String query = "UPDATE club SET "
-                   + s
+                   + cl
                    + "  WHERE club.idclub=?"
             ;
             ps = conn.prepareStatement(query);
@@ -46,8 +45,7 @@ public boolean modify(final Club club, final Connection conn) throws Exception{
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
                 LOG.info("row = " + row);
-            if (row != 0) 
-            {
+            if (row != 0){
                 String msg =  LCUtil.prepareMessageBean("club.modify");
                 msg = msg // + "<h1> successful modify Player : "
                             + " <br/>ID = " + club.getIdclub()

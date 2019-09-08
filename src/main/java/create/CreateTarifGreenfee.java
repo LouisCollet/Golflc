@@ -18,9 +18,8 @@ import utils.LCUtil;
 
 @Named
 public class CreateTarifGreenfee {
-    
 //@JsonPropertyOrder({"datesSeason","days","teeTimes","priceEquipments"}) // new 23/01/2019 ajouté, était dans entite TarifGreenfee
-    public boolean create(final TarifGreenfee tarif, final Course course, final Connection conn) throws SQLException {
+    public boolean create(final TarifGreenfee tarif, final Course course, final Connection conn) throws SQLException, Exception {
         PreparedStatement ps = null;
         try{
             LOG.info("starting create Tarif "); 
@@ -109,7 +108,8 @@ public class CreateTarifGreenfee {
             String msg = "£££ Exception in CreateTarifGreenfee = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            return false;
+            throw new Exception(msg);
+     //       return false;
    }finally{
          DBConnection.closeQuietly(null, null, null, ps); 
           }

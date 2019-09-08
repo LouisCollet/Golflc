@@ -20,12 +20,13 @@ public class FindTeeStart implements interfaces.Log{
 public List<String> find(final Course course , final Player player, final Connection conn) throws SQLException{   
 if(liste == null){ 
     LOG.info("starting FindTeeStart for course = " + course.toString());
+    LOG.info("starting FindTeeStart for player = " + player.toString());
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{   
     String t = utils.DBMeta.listMetaColumnsLoad(conn, "tee");  // fields list, comma separated
     String query =
-      " SELECT " + t + // idcourse, idtee, teestart, teeGender" +
+      " SELECT " + t +
       " FROM course, tee" +
       " WHERE course.idcourse = ?" +
       "     AND tee.TeeGender = ?" +
@@ -47,7 +48,6 @@ try{
       }     
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
-      //LOG.debug(" -- query 4= " );
 	while(rs.next()){
 		liste.add(rs.getString("TeeStart") + " / " + rs.getString("TeeGender")
                         + " / "+ rs.getString("TeeHolesPlayed") + " / " + rs.getInt("idtee"));  // liste YELLOW, BLUE, etc.
@@ -55,7 +55,7 @@ try{
         liste.forEach(item -> LOG.info("TeeStart list " + item));  // java 8 lambda
     return liste;
 
-}catch (SQLException e){
+}catch(SQLException e){
     String msg = "SQL Exception in FindTeeStart : " + e;
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
@@ -66,7 +66,6 @@ try{
     LCUtil.showMessageFatal(msg);
     return null;
 }finally{
-      //  DBConnection.closeQuietly(conn, null, rs, ps);
         DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
 }
@@ -90,7 +89,7 @@ else{
         Course course = new Course();
         course.setIdcourse(135);
         Player p = new Player();
-        p.setPlayerGender("L"); 
+        p.setPlayerGender("M"); 
         List<String> b = new FindTeeStart().find(course, p, conn);
         LOG.info("from main, after = " + b);
  } catch (Exception e) {
@@ -99,8 +98,6 @@ else{
       //      LCUtil.showMessageFatal(msg);
    }finally{
          DBConnection.closeQuietly(conn, null, null , null); 
-          }
+   }
    } // end main//
-    
-    
 }  // end class

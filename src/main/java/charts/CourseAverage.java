@@ -4,6 +4,7 @@ package charts;
 import entite.Average;
 import entite.Course;
 import entite.Player;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,17 +18,15 @@ import utils.LCUtil;
  *
  * @author collet
  */
-public class CourseAverage implements interfaces.Log
-{
-    private static List<Average> liste = null; // used in CalculateController !!
+public class CourseAverage {
+    private static List<Average> liste = null;
 
 public List<Average> getStatAvg(final Connection conn, final Player player, final Course course)
          throws SQLException
 {
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
       LOG.info(" ... starting getStatAvg with player = " + player + " //course  = " + course);
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
    " SELECT scorehole, scorepar, scorestrokeindex, scoreextrastroke," +
@@ -58,8 +57,7 @@ try
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
     Average cc = new Average();
-while(rs.next())
-{
+while(rs.next()){
             cc = new Average();
             cc.setAvgHole(rs.getShort("ScoreHole") );
             cc.setAvgPar(rs.getShort("ScorePar") );

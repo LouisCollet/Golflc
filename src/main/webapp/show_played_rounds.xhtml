@@ -87,7 +87,8 @@
 <p:column 
           id="rowSingle"
           selectionMode="single"
-          style="width:3%;text-align:center"
+          width="2%"
+          style="text-align:center"
           headerText="View"
           footerText="View"
           />
@@ -96,10 +97,20 @@
      id="rowColumn"
      headerText="#"
      footerText="#"
-     style="width:2%;text-align:center"
+     width="1%"
+     style="text-align:center"
      >
              #{row+1} 
 </p:column>
+
+<p:column id="RoundIdColumn"
+          headerText="#{msg['round.id']}"
+          footerText="#{msg['round.id']}"
+          width="5%"
+          style="white-space:pre-line;" >
+   #{c.round.idround}
+</p:column>
+
 
 <p:column id="RoundDateColumn"
           headerText="#{msg['round.date']}"
@@ -175,7 +186,7 @@
           id="FinalResultColumn"
           sortBy="#{c.inscription.playerhasroundFinalResult}"
           style="white-space:pre-line;width:50px" >
-   #{c.inscriptionNew.playerhasroundFinalResult} - (#{c.round.idround})
+   #{c.inscriptionNew.playerhasroundFinalResult}
 
 </p:column>
 

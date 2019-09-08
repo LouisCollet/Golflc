@@ -5,6 +5,8 @@ import entite.Course;
 import entite.ECourseList;
 import entite.Player;
 import entite.Round;
+import entite.Tee;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,44 +16,42 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class RecentList implements interfaces.Log, interfaces.GolfInterface
-{
+public class RecentRoundList implements interfaces.Log, interfaces.GolfInterface{
       private static List<ECourseList> liste = null;
 
-public List<ECourseList> getRecentRoundList(final Player player, final Connection conn) throws SQLException
-{
-//    LOG.info("starting get RecentRoundList with list = " + liste);
-if(liste == null)
-{
+public List<ECourseList> list(final Player player, final Connection conn) throws SQLException{
+
+if(liste == null){
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{
+try{
+    LOG.info("starting RecentRoundList ...");
+    LOG.info(" with player = " + player.toString()) ;
      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
      String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
      String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
      String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
-  //   String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
+     String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
-    "SELECT "
-          + cl + "," + co + "," + ro + "," + pl // + "," + ph
-  //        + "idplayer, RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles,"
-  //        + "          idcourse, CourseName, idclub, ClubName, ClubCity, ClubWebsite, ClubLatitude, ClubLongitude"
-          + "  FROM player"
+    "SELECT " + cl + "," + co + "," + ro + "," + pl + "," + te
+           + "  FROM player"
           + "  JOIN player_has_round"
-          + "    	ON player_has_round.player_idplayer = player.idplayer"
+          + "    	ON InscriptionIdPlayer = player.idplayer"
           + "  JOIN round"
-          + "        ON round.idround = player_has_round.round_idround "
+          + "        ON round.idround = player_has_round.InscriptionIdRound "
           + "  JOIN course"
           + "        ON course.idcourse = round.course_idcourse"
+          + "  JOIN tee" // new 04-04-2019
+          + "        ON tee.idtee = player_has_round.InscriptionIdTee" // new 04-04-2019
           + "  JOIN club"
           + "        ON club.idclub = course.club_idclub"
-          + "  WHERE " //player.idplayer = ?"
-          + "	     RoundDate > DATE_SUB(current_date() , INTERVAL 60 month)" // and
-          + "  GROUP BY idround"  // new 04/06/2017
-          + "  ORDER by date(RoundDate) desc"
+          + "  WHERE "
+          + "	     RoundDate > DATE_SUB(current_date() , INTERVAL 60 month)"  // à réduire
+          + "  GROUP BY idround"
+    //      + "  ORDER by date(RoundDate) desc"
+          + "  ORDER by RoundDate desc" // mod 26-05-2019
      ;
-        LOG.info("player = " + player) ;
+     
     ps = conn.prepareStatement(query);
 ///       ps.setInt(1, player.getIdplayer());  // mod 04/06/2017
         utils.LCUtil.logps(ps);
@@ -62,10 +62,9 @@ try
         rs.beforeFirst(); //on replace le curseur avant la première ligne
         liste = new ArrayList<>();
           //LOG.info("just before while ! ");
-	while(rs.next())
-        {
+	while(rs.next()){
 		//LOG.info("just after while ! ");
-           ECourseList ecl = new ECourseList();
+          ECourseList ecl = new ECourseList();
           Club c = new Club();
           c = entite.Club.mapClub(rs);
           ecl.setClub(c);
@@ -81,6 +80,12 @@ try
           Player p = new Player();
           p = entite.Player.mapPlayer(rs);  
           ecl.setPlayer(p);
+          
+          Tee t = new Tee();
+          t = entite.Tee.mapTee(rs);  
+          ecl.setTee(t);
+          
+          
 	liste.add(ecl);
 	} // end while
     return liste;
@@ -90,19 +95,13 @@ try
 	LOG.error(msg);
         LCUtil.showMessageFatal(msg);
         return null;
-}catch (NullPointerException npe){   
-    String msg = "NullPointerException in getRecentRoundList()" + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return null;
 }catch (Exception ex){
     String msg = "Exception in getRecentRoundList()" + ex;
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
      return null;
 }finally{
-  //  DBConnection.closeQuietly(conn, null, rs, ps);
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
+    DBConnection.closeQuietly(null, null, rs, ps);
 }
 }else{
      //    LOG.debug("escaped to getRecentRoundList repetition thanks to lazy loading");
@@ -113,9 +112,21 @@ try
     public static List<ECourseList> getListe() {
         return liste;
     }
-
     public static void setListe(List<ECourseList> liste) {
-        RecentList.liste = liste;
+        RecentRoundList.liste = liste;
     }
-
+ public static void main(String[] args) throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+  try{
+        Player player = new Player();
+        player.setIdplayer(324713);
+        List<ECourseList> ec = new RecentRoundList().list(player,conn);
+        LOG.info("from main, ec = " + ec);
+ }catch (Exception e){
+            String msg = "££ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
 } // end Class

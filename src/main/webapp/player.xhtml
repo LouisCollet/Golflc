@@ -72,8 +72,8 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                               size="45"
                               title="#{msg['tooltip.player.lastname']}"
 			      value="#{courseC.player.playerLastName}" 
-                              />
-                
+                  />
+
                <h:panelGroup id="panelGender" layout="block" >
                  <h:outputText value="#{msg['player.gender']}" style="font-weight:bold"  />
                  <span class="ui-inputgroup-addon"><i class="fa fa-male"></i></span>
@@ -85,9 +85,8 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                     <f:selectItem itemLabel="#{msg['player.gent']}" itemValue="M"/>
                     <f:selectItem itemLabel="#{msg['player.lady']}" itemValue="L" />
                 </p:selectOneButton> 
-                     
-  
-                <h:panelGroup id="panelBirth" layout="block" >
+
+                 <h:panelGroup id="panelBirth" layout="block" >
                  <h:outputText value="#{msg['player.birth']}"  />
                  <span class="ui-inputgroup-addon"><i class="fa fa-child"></i></span>
                  <span class="ui-inputgroup-addon"><i class="fa fa-calendar"></i></span>
@@ -104,25 +103,20 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                     pattern="dd-MM-yyyy"
                     navigator="true"
                     readonlyInput="false">
-                
                 </p:calendar>
-                
-                     
-                
    <!--  yearRange="c-50:"  <f:convertDateTime pattern="dd/MM/yyyy" /> -->             
    
                 <h:panelGroup id="panelG3" layout="block" >
                   <h:outputText value="#{msg['player.email']}" />
                   <span class="ui-inputgroup-addon"><i class="fa fa-envelope"></i></span>
                 </h:panelGroup>
-                 
+
 		<p:inputText  label="email"
                               id="email"
                               size="45"
                               title="#{msg['tooltip.player.email']}"
 			      value="#{courseC.player.playerEmail}" />
 
-                
       <h:outputText value="#{msg['player.handicap']}" />
       <h:panelGroup id="panelG1" layout="block" >
                 <p:inputMask  label="Handicap"
@@ -154,7 +148,6 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                          value="#{msg['button.player.identify']}"
                          id="buttonPlayerIdentify"
                          ajax="false"
-                
                          update="growl-msg"
                          immediate="false"
                          icon="fa fa-user"
@@ -166,7 +159,7 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
 
 
 <p:panelGrid 
-    id="panel2" 
+    id="panel2"
     columns="2"
     rendered="#{courseC.nextPanelPlayer}"
     styleClass="alignmentLeft"
@@ -221,7 +214,6 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                        style="margin-right: 10px;"
                        mask="?9999"
                     />
-
                 <p:commandButton 
                          id="ButtonHomeClub"
                          value="#{msg['button.player.homeclub']}"
@@ -242,7 +234,6 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                               value=" #{courseC.player.playerHomeClub}"
                               style="font-weight:bold;font-size: 2em;font-style:italic;color: red"
                               />  
-                
             </h:panelGroup>
  
     <h:outputText value="#{msg['player.zoneid']}" />    
@@ -268,7 +259,6 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                          immediate="false"
                          icon="ui-icon-disk"
                          action="#{courseC.createPlayer}"/>
-        <!--  rendered="#{not courseC.connected}"    -->
         <p:commandButton
                          value="#{msg['button.player.image']}"
                          id="button02"
@@ -284,7 +274,6 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
 </p:panelGrid>
 
 </h:form>
-
 
 </ui:define>
 </ui:composition>

@@ -9,12 +9,7 @@ import java.util.Date;
 import javax.inject.Named;
 import javax.validation.constraints.*;
 import utils.LCUtil;
-//import javax.validation.constraints.Pattern;
-//import javax.validation.constraints.Size;
-/**
- *
- * @author collet
- */
+
 @Named
 public class Course implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
@@ -35,8 +30,8 @@ public class Course implements Serializable, interfaces.Log{
     private short courseHoles;
 
 @NotNull(message="{course.par.notnull}")
-@Min(value=69,message="{tee.slope.min}")
-@Max(value=73,message="{tee.slope.max}")
+@Min(value=69,message="{tee.slope.min}") // still used ??
+@Max(value=74,message="{tee.slope.max}") // still used ??
     private Short coursePar;
 
     private Integer club_idclub;

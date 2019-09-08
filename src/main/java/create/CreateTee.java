@@ -1,25 +1,26 @@
-
 package create;
 
 import entite.Club;
 import entite.Course;
 import entite.Tee;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
+public class CreateTee{
 
-public class CreateTee implements interfaces.Log{
-    
     public boolean create(final Club club, final Course course, final Tee tee,
             final Connection conn) throws SQLException    {
-  //      Connection conn = null;
         PreparedStatement ps = null;
    try {
                 LOG.info("starting createTee() ... = ");
                 LOG.info("with tee = " + tee.toString());
+                LOG.info("with club = " + club.toString());
+                LOG.info("with course = " + course.toString());
+                
             final String query = LCUtil.generateInsertQuery(conn, "tee");
             //String query = "INSERT INTO tee VALUES (?,?,?,?,?,?,?)";
             ps = conn.prepareStatement(query);
@@ -31,11 +32,28 @@ public class CreateTee implements interfaces.Log{
             ps.setBigDecimal(5, tee.getTeeRating());
             ps.setInt(6, tee.getTeeClubHandicap());
             ps.setString(7, tee.getTeeHolesPlayed()); // new 29-03-2019
-            ps.setInt(8, course.getIdcourse());
-            ps.setTimestamp(9, LCUtil.getCurrentTimeStamp());
-            utils.LCUtil.logps(ps); 
+            ps.setShort(8,tee.getTeePar());// new 03-04-2019
+            /// ou calculated field by find.findMasterTee
+            int masterTee = 0;
+            if(tee.getTeeHolesPlayed().equals("01-18")){
+                masterTee = 7890; // error code
+            }else{
+                masterTee = new find.FindMasterTee().find(conn, course, tee);
+                if(masterTee == 00){   //error not found
+                    String msg = "-- Fatal error : Master tee not found !! ";
+                    LOG.error(msg);
+                    LCUtil.showMessageFatal(msg);
+                    throw new Exception(msg);
+                }
+            }
+                LOG.info("masterTee found = " + masterTee);
+            ps.setInt(9, masterTee);// new 03-04-2019
+            ps.setInt(10, course.getIdcourse());
+            ps.setTimestamp(11, LCUtil.getCurrentTimeStamp());
+   //             LOG.info("line 01");
+            utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
-            if (row != 0) {
+            if(row != 0) {
                 int key = LCUtil.generatedKey(conn);
                 LOG.info("Tee created = {}" ,key);
                 tee.setIdtee(key);
@@ -48,11 +66,21 @@ public class CreateTee implements interfaces.Log{
                         + " <br/> Slope = " + tee.getTeeSlope()
                         + " <br/> Rating = " + tee.getTeeRating()
                         + " <br/> HolesPlayed = " + tee.getTeeHolesPlayed()
-                                ;
+                        + " <br/> Master Tee = " + masterTee
+                        ;
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
+             //   if(tee.getTeeMasterTee().equals(7890)){
+                  if(tee.getTeeHolesPlayed().equals("01-18")){
+                    Tee t = new load.LoadTee().load(tee, conn);
+                        LOG.info("tee t = " + t);
+                    t.setTeeMasterTee(t.getIdtee()); // teemaster = teeid
+                    boolean b = new modify.ModifyTee().modify(t, conn);
+                        LOG.info("tee modified = " + b);
+                }
                 return true;
-            } else {
+            } else {  // à vérifier
+                LOG.info("line 02");
                 String msg = "<br/><br/>Succesful insert for tee = " + tee.getIdtee()
                         + " <br/> name club = " + club.getClubName()
                         + " <br/> name course = " + course.getCourseName()
@@ -64,13 +92,7 @@ public class CreateTee implements interfaces.Log{
                 LCUtil.showMessageInfo(msg);
                 return false;
             }
-//        } catch (MySQLIntegrityConstraintViolationException cv) {
-//            String msg = "£££ MySQLIntegrityConstraintViolationException in insert Tee = " + cv.getMessage();
-//            LOG.error(msg);
-//            LCUtil.showMessageFatal(msg);
-//            return false;
         } catch (SQLException sqle) {
-            //LOG.error("-- £££ exception in Insert tee " + sqle.toString());
             String msg = "£££ SQLexception in Insert Tee = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);

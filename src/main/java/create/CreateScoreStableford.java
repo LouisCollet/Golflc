@@ -154,7 +154,7 @@ public class CreateScoreStableford implements interfaces.Log{
                         CourseController.setShowButtonCreateStatistics(true);  // affiche le bouton bas ecran
                         score.setScoreCardOK(true); // new 17/7/2017 pour permettre affichage scorecard dans ??
                         LOG.info(msg);
-               //         LCUtil.showMessageInfo(msg);
+                        LCUtil.showMessageInfo(msg);
 
            return true;
 //ici ??
