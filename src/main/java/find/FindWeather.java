@@ -56,174 +56,23 @@ private Map<String, Object> sessionMapJSF23;
     try{
   //  see   https://openweathermap.org/
 
-    String owmApiKey = "e33f7134856ab9fbbe79a544cc23bc39"; /* YOUR OWM API KEY HERE */ //key LC
-  //    String owmApiKey ="9229fc57d217e84684dfb717867b67f5"; // found internet
+ //   String owmApiKey = "e33f7134856ab9fbbe79a544cc23bc39"; /* YOUR OWM API KEY HERE */ //key LC
+ //65b6810c7fb377fb322b6a7486bfb87a
+ //String owmApiKey = "ddbb487d7785b2dc6f9069b418732ee6";
+ 
+      String owmApiKey ="9229fc57d217e84684dfb717867b67f5"; // found internet
        // key found https://github.com/tiabaldu/weather/blob/master/WeatherStore/src/main/java/com/tia/weatherStorePack/WeatherRetreiver.java
         // declaring object of "OWM" class
+        // https://www.programcreek.com/java-api-examples/?class=net.aksingh.owmjapis.OpenWeatherMap&method=currentWeatherByCityName
         owm = new OWMPro(owmApiKey);
     //    owm = new OWM(owmApiKey);
     LOG.info("starting currentWeatherByCityName");
     LOG.info("starting currentWeatherByCityName with club = " + club);
-  //  LOG.info("starting currentWeatherByCityName with club latitude = " + club.getClubLatitude());
-  //  LOG.info("starting currentWeatherByCityName with club longitude = " + club.getClubLongitude());
- //   LOG.info("just before owm");
 
-//		Channel result = service.getForecast("670807", DegreeUnit.CELSIUS);
-	//	System.out.println(result.getDescription());
-//System.out.println(result.getTitle());
-// https://piunikaweb.com/2019/01/07/query-yahooapis-com-and-weather-yahooapis-com-not-working-heres-why/
-// function stops on 03/02/2019  what a pity !!!
-/*
-    String url = "https://query.yahooapis.com/v1/public/yql?q=select%20woeid%20from%20geo.places%20where%20text%3D%22("
-            + club.getClubLatitude()// 43.95
-            + "," 
-            + club.getClubLongitude() //-79.88
-            + ")%22%20limit%201&diagnostics=false";
-// A WOEID (Where On Earth IDentifier) is a unique 32-bit reference identifier, 
-//originally defined by GeoPlanet and now assigned by Yahoo!, that identifies any feature on Earth.
-// In 2009, Yahoo! released GeoPlanet's WOEID data to the public,[3]				
-    Document yahooApiResponse = Jsoup.connect(url).timeout(10 * 1000).get();
-    String xmlString = yahooApiResponse.html();
-    Document doc = Jsoup.parse(xmlString, "", Parser.xmlParser());
- //   String JSOUP = "";
- //       LOG.info("from JSOUP = " + doc.select("woeid").first().text());
-    String woeid = doc.select("woeid").first().text();
-        LOG.info("JSOUP woeid = " + woeid);
-
-    YahooWeatherService service = new YahooWeatherService();
-    
- //   Channel result = service.getForecast(JSOUP, DegreeUnit.CELSIUS);
- //   LOG.info("YahooWeathereService Description = " + result.getDescription());
- //   LOG.info("YahooWeathereService Title = " + result.getTitle());
- //   LOG.info("YahooWeathereService Wind = " + result.getWind());
-  //         LOG.info("before session old tyle test");
-  //  FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerid", "test");
-  //   LOG.info("after session old tyle test");
-     
-  //  List<Channel> channels = service.getForecastForLocation("1060 Brussels, Belgium", DegreeUnit.CELSIUS).first(3);   // was 3 - later
-  // List<Channel> channels = service.getForecastForLocation(city + country, DegreeUnit.CELSIUS).first(3); 
-    Channel channel = service.getForecast(woeid, DegreeUnit.CELSIUS); //.first(3));
-   // StringBuilder sb = new StringBuilder ();
-    StringJoiner sj = new StringJoiner("");
-          Map<String,String> condition = new HashMap<>();
-        condition.put("0","Tornado");
-        condition.put("1","Tropical storm");
-        condition.put("2","Hurricane");
-        condition.put("3","Severe thunderstorms");
-        condition.put("12","Showers");
-        condition.put("23","Blustery");
-        condition.put("26","Cloudy");
-        condition.put("28","Mostly cloudy (day)");
-        condition.put("30","Partly cloudy(day)");
-        condition.put("34","Fair(day)");
-        condition.put("39","Scattered thunderstorms");
-    sj.add("<h1> Weather Information</h1>");
-  //  for (Channel channel:channels){
-            LOG.info("Yahoo channel = " + channel.getTitle());
-        sj.add("<ul><li>");
-        sj.add("<b>Localisation : </b>").add(channel.getTitle());
-            LOG.info("Yahoo sunrise = " + channel.getAstronomy().getSunrise());
-        String sunrise = utils.LCUtil.extractHHmm(channel.getAstronomy().getSunrise().toString());
-        sj.add("</li><li><b>Sunrise : </b>").add(sunrise);
-            LOG.info("Yahoo Sunset: " + channel.getAstronomy().getSunset());
-        String sunset = utils.LCUtil.extractHHmm(channel.getAstronomy().getSunset().toString());    
-        sj.add("</li><li><b>Sunset : </b>").add(sunset);
-            LOG.info("Yahoo Atmosphere: " + channel.getAtmosphere());
-        sj.add("</li><li><b>Relative Humidity : </b>").add(channel.getAtmosphere().getHumidity().toString()).add(" %");
-            LOG.info("Yahoo Humidity: " + channel.getAtmosphere().getHumidity());
-            LOG.info("Yahoo Wind: " + channel.getWind());
-        sj.add("</li><li><b>Wind Speed : </b>").add(channel.getWind().getSpeed().toString()).add(" KM/H");
-        sj.add("</li><li><b>Wind Direction : </b>").add(channel.getWind().getDirection().toString());
-        String wd = WIND_DIRECTION[(int)Math.floor((channel.getWind().getDirection() % 360) / 22.5)];
-            LOG.info(" Wind Direction wd = " + wd);
-        sj.add(" - ").add(wd);
-        sj.add("</li><li><b>Atmospheric Pressure : </b>").add(channel.getAtmosphere().getPressure().toString()).add(" MB");
-        sj.add("</li><li><b>Visibility : </b>").add(channel.getAtmosphere().getVisibility().toString()).add(" KM");
-        sj.add("</li><li><b>Rising : </b>").add(channel.getAtmosphere().getRising().toString());
-    //   sj.add("<img src=\"http://l.yimg.com/a/i/us/we/52/26.gif\"/>");  // working !!
-        String item = channel.getItem().toString(); 
-        String url2 = item.substring(item.indexOf("<img src="),item.indexOf(".gif")+8);  // on prend .gif\"/> donc 8 car
-        LOG.info("extracted image url = " + url2);
-        sj.add(url2);
-        sj.add("</li>");
-
-            LOG.info("Yahoo Language: " + channel.getLanguage());
-            LOG.info("Yahoo Link: " + channel.getLink());
-              LOG.info("Yahoo Units: " + channel.getUnits());
-            LOG.info("Yahoo Ttl : " + channel.getTtl()); 
-            LOG.info("Yahoo Image : " + channel.getImage()); 
-          LOG.info("Yahoo Item : " + channel.getItem()); 
-          
-  myList = new ArrayList<>(9);
-  int start = 0;
-  
-     LOG.info("pattern = " + pattern);
- 
-  while (true) {
-    start = item.indexOf("[day=",start);
- //   LOG.info("start 2 = " + start);
-    String str1 = "], Forecast";
-    int end2 = item.indexOf(str1,start);
- //   LOG.info("end 2 = " + end2);
-    if(end2 == -1) break;
-    String result = item.substring(start+1, end2);
-        LOG.info("result 1 = " + result); 
-    int comma =  result.indexOf(",", result.indexOf(",") + 1);  // cherche 2e virgule
-        LOG.info("comma = " + comma);  
-    String Datestr = result.substring(14,comma);  // commence char 18
-        LOG.info("dateWeather = " + Datestr);
-    LocalDateTime ldt = LocalDateTime.parse(Datestr, DTF);
-        LOG.info(" success !! local date time = " + ldt); 
-    result = ldt + " " + result;
-       LOG.info("result 2 = " + result); 
-       
-           DayOfWeek dayOfWeek = ldt.getDayOfWeek();
-           LOG.info("day of week  = " + dayOfWeek); 
-           LOG.info("dayOfWeek Name = " + dayOfWeek.name());
-       
-    result = result.replaceAll("00.00.00", "").replaceAll("text=", "").replaceAll("day=", "").replaceAll("date=", "");
-     LOG.info("result 3 = " + result); 
-    myList.add(result);
-  /////// for next iteration  
-    start = end2 + str1.length()+1;
- }
-    LOG.info("ending with myList = " + myList.toString());
-  //  myList.forEach(System.out::println);
- sj.add("<h1> Forecast</h1>");
-      for(int i = 0; i < myList.size(); i++) {
-            String code = myList.get(i).substring(myList.get(i).length()-2);
-                LOG.info("code = " + code);
-            String value = condition.get(code);
-                LOG.info("classic printing : <BR />" + myList.get(i) + " / " + value);
-            sj.add("<li>").add(myList.get(i)).add(" / ").add(value).add("</li>");
-      }
-
-  //    LOG.info("before sessionMAPJSF23 test");
-  //     sessionMapJSF23.put("testr", "test");
- 
- //   } // end while sur array
-     sj.add("</ul>");
-            LOG.info("before sessionMAP ");
-        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("weather", sj.toString()); // used in dialogWeather.xhtml
-   //         LOG.info("after sessionMAP old style 2channel");
-                    LOG.info("printing sessonMapJSF23 = ");
-      utils.LCUtil.logMap(FacesContext.getCurrentInstance().getExternalContext().getSessionMap());
-     //   sessionMapJSF23.put("weather", channel.getItem().toString());
-  //      LOG.info("after sessionMAPJSF23");
-    
-          LOG.info("ending with sj = " + sj);
-      return sj.toString();   // fake
-    
-*/
-    // declaring object of "OWM" class 
-  //    OWM owm = new OWM(OWM_KEY_LC);
-  //  LOG.info("end of Yahoo");
-  //  LOG.info("");
-        
-    
     if (null == owm) {
 //	owm = new OWMPro(OWM_KEY_LC); // changed 23/07/2019
-        owm = new OWMPro("1dcd0e1749fbf3af2f6ce66495886d14");
+    //    owm = new OWMPro("1dcd0e1749fbf3af2f6ce66495886d14"); // 9229fc57d217e84684dfb717867b67f5
+      owm = new OWMPro("65b6810c7fb377fb322b6a7486bfb87a"); // 9229fc57d217e84684dfb717867b67f5
         LOG.info("owm was null, new created");
     }
 

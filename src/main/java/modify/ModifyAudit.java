@@ -1,7 +1,6 @@
 package modify;
 
 import entite.Audit;
-import entite.Player;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -15,17 +14,13 @@ import utils.LCUtil;
 public class ModifyAudit implements Serializable, interfaces.Log, interfaces.GolfInterface{
 
 public boolean stop(Audit audit, Connection conn) throws SQLException{
-        LOG.info("starting ModifyAudit.stop - audit = " + audit.toString() );
+        LOG.info("starting ModifyAudit.stop - audit = " + audit);
     PreparedStatement ps = null;
-  //  ResultSet rs = null;
- //   Connection conn = null;
 try{
-      //   LOG.info(" -- getLastAuditLogin - query = " + query);
-      Player p = new Player();
-      p.setIdplayer(audit.getAuditPlayerId());
-   //   int lastAuditId = new find.FindLastAudit().find(p, conn);
-      Audit a =  new find.FindLastAudit().find(audit, conn);
-  //     LOG.info(" -- LastAuditId = " + lastAuditId);
+  //    Player p = new Player();
+  //    p.setIdplayer(audit.getAuditPlayerId());
+    //  Audit a =  new find.FindLastAudit().find(audit, conn);
+   //      LOG.info(" -- after FindLastAudit, IdAudit = " + a.getIdaudit());
       
  //   String query = " UPDATE audit"
  //                + " SET AuditEndDate =? "
@@ -40,7 +35,8 @@ try{
                    + "  WHERE AuditId=?"
    ;
     ps = conn.prepareStatement(query);
-    ps.setInt(1,p.getIdplayer());
+  //  ps.setInt(1,p.getIdplayer());
+    ps.setInt(1,audit.getAuditPlayerId()); // mod 2-12-2019
  //   Timestamp ts = Timestamp.valueOf(audit.getAuditStartDate());
  //   ps.setTimestamp(2,ts);
     Timestamp ts = Timestamp.valueOf(audit.getAuditEndDate());
@@ -49,7 +45,7 @@ try{
       //  LOG.info("there where attempts = " + audit.getAuditAttempts());
     if(audit.getAuditAttempts() == 3){
             LOG.info("there are 3 attempts = ");
-        audit.setAuditRetryTime(audit.getAuditRetryTime().plusMinutes(15)); // blocahe connection pendant 15 minutes
+        audit.setAuditRetryTime(audit.getAuditRetryTime().plusMinutes(15)); // blocage connection pendant 15 minutes
             LOG.info("connection for this user is blocked until  " + audit.getAuditRetryTime());
             
     }
@@ -59,7 +55,8 @@ try{
   //  ps.setTimestamp(5,java.sql.Timestamp.valueOf("2019-06-01 00:00:00") ); // AuditRetryTimeDate : date fictive);
     
    // ps.setInt(5,lastAuditId);
-    ps.setInt(5,a.getIdaudit());
+//    ps.setInt(5,a.getIdaudit());
+      ps.setInt(5,audit.getIdaudit());  // mod 29-12-2019
         utils.LCUtil.logps(ps); 
 // call executeUpdate to execute our sql update statement
    int row = ps.executeUpdate(); // write into database

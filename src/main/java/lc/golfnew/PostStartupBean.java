@@ -12,7 +12,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.faces.annotation.FacesConfig;
 import javax.security.enterprise.authentication.mechanism.http.CustomFormAuthenticationMechanismDefinition;
 import javax.security.enterprise.authentication.mechanism.http.LoginToContinue;
-import utils.DBConnection;
 @Startup
 @Singleton
 @DependsOn("StartupBean")
@@ -68,13 +67,16 @@ public class PostStartupBean {
 ////    conn = dbc.getConnection();
 //        LOG.info("classic connection 1 = " + conn);
 
-
-
-
 // configure UNE fois la datasource    !!!!!
-   utils.DBConnection.setDataSource();
-   connPool = DBConnection.getPooledConnection(); // utilisée pour listAllSystemProperties !! contraire au principe de datasource !!!
- //       LOG.info("pooled connection 2 = " + connPool);
+  // utils.DBConnection.setDataSource();
+  
+  
+ ///  DataSource datasource = utils.DBConnection.setDataSource();
+ ///       LOG.info("Datasource is now = " + datasource);
+ ///  connPool = DBConnection.getPooledConnection(); // utilisée pour listAllSystemProperties !! contraire au principe de datasource !!!
+
+   
+//       LOG.info("pooled connection 2 = " + connPool);
    /// LOG.info("line 02");
    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Brussels"));
    // enlevé provisoirement 

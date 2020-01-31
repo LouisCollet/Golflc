@@ -1,6 +1,5 @@
 package find;
 
-
 import entite.Player;
 import entite.Subscription;
 import java.sql.Connection;
@@ -12,27 +11,20 @@ import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
 
-/**
- *
- * @author collet
- */
-public class FindSubscription implements interfaces.Log
-{
+public class FindSubscription implements interfaces.Log{
    private static List<Subscription> liste = null;
    final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
    
-public List<Subscription> subscriptionDetail (final Player player , Connection conn) throws SQLException, Exception{   
+public List<Subscription> subscriptionPayments (final Player player , Connection conn) throws SQLException, Exception{   
 ///if(liste == null)
    LOG.debug("starting subscriptionDetail.for player  = "  + player.getIdplayer());
     PreparedStatement ps = null;
     ResultSet rs = null;
     Subscription subscription;
- //   conn = DBConnection.getPooledConnection();
 try{
      String s= utils.DBMeta.listMetaColumnsLoad(conn, "payments_subscription");
     String query =
-     " SELECT "
-        + s +
+     " SELECT " + s +
      " FROM payments_subscription" +
      " WHERE subscriptionIdPlayer=?"
     ;
@@ -52,8 +44,7 @@ try{
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
       //LOG.debug(" -- query 4= " );
-		while(rs.next())
-                {
+		while(rs.next()){
                  //  modifié le 21-01-2019 mais non testé !!
                     subscription = entite.Subscription.mapSubscription(rs);
 			liste.add(subscription);
@@ -70,9 +61,7 @@ try{
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;
-}
-finally
-{
+}finally{
       //  DBConnection.closeQuietly(conn, null, rs, ps);
         DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
@@ -96,10 +85,9 @@ finally
     Connection conn = new DBConnection().getConnection();
     Player player = new Player();
     player.setIdplayer(324713);
-    List<Subscription> p1 = new FindSubscription().subscriptionDetail(player, conn);
-        LOG.info("player found = " + p1.toString());
+    List<Subscription> p1 = new FindSubscription().subscriptionPayments(player, conn);
+        LOG.info("Subscription found = " + p1.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
-    
 }  // end class

@@ -79,8 +79,7 @@ try{
     utils.LCUtil.showMessageFatal("Exception in LoadCotisation = " + ex.toString() );
     return null;
 }
-finally
-{
+finally{
        // DBConnection.closeQuietly(conn, null, rs, ps);
   //  DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }

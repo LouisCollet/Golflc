@@ -59,6 +59,7 @@
             <p:panelGrid columns="2">
                 <h:outputText value="Username"/>
                 <p:inputText id="userName"
+                             
                              value="#{loginBacking.username}"
                              />
 
@@ -86,7 +87,7 @@
                          icon="fa fa-key"
                          action="#{loginBacking.submit}"
                          />
-<!-- ajax="false"  -->
+<!-- ajax="false"  -->update="growl-msg"
  </h:form>
 </ui:define>
 </ui:composition>

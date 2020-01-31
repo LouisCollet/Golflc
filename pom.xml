@@ -18,11 +18,12 @@
     <artifactId>GolfWfly</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
+
     <name>GolfWfly</name>
 <!-- http://maven.apache.org/guides/introduction/introduction-to-the-pom.html  -->
 <description>
-    GolfLC application based on JSF 2.3 and Primefaces 6.2 by lc
-    
+    GolfLC application based on JSF 2.3 and Primefaces 7.0 by lc
+    11-2019 netbeans is still JSF 2.3 non compliant !!!
 </description>
 <inceptionYear>2012</inceptionYear>
     <licenses>
@@ -38,45 +39,44 @@
 <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> <!-- new 11/05/2014 -->
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
-        <mysql.connectorJ.version>8.0.16</mysql.connectorJ.version> <!-- mod 07-05-2019 was 8.0.14 -->
-        <primefaces.version>7.0</primefaces.version> <!-- 22/3/2019 : was 6.2-->
+        <mysql.connectorJ.version>8.0.19</mysql.connectorJ.version>  <!-- used by RUN FILE mod 03-11-2019 was 8.0.16 -->
+        <primefaces.version>7.0</primefaces.version> <!-- 22/3/2019 : was 7.0-->
         <primefaces.extension.version>7.0</primefaces.extension.version> <!-- mod 22-03-2019 was 7.0.RC1 -->
         <primefaces.theme.version>1.0.10</primefaces.theme.version><!-- was 1.0.9 -->
         <omnifaces.version>3.3</omnifaces.version> <!-- 14/06/2019 was 3.2 -->
         <junit.version>5.0.0-ALPHA</junit.version> <!-- not used was 4.7 mod 4/6/2016 -->
         <java.version>12</java.version> <!-- for compiler and only used via MyPOM properties -->
-        <maven.compiler.source>1.8</maven.compiler.source> <!-- used before JDK11 -->
-        <maven.compiler.target>1.8</maven.compiler.target><!-- used before jdk 11 -->
+       <!--<maven.compiler.source>1.8</maven.compiler.source>  used before JDK9 -->
+       <!--<maven.compiler.target>1.8</maven.compiler.target> used before jdk 9 -->
         <javaee.version>8.0</javaee.version> <!-- was 7.0 mod 26-04-2014 -->
         <java.mail.version>1.6.1</java.mail.version> <!-- was 7.0 mod 26-04-2014 -->
         <javax.activation.version>1.2.0</javax.activation.version>
-        <log4j2.version>2.12.0</log4j2.version> <!-- new 22/07/2019  was 2.11.2 mod  -->
+        <log4j2.version>2.12.1</log4j2.version> <!-- new 01/11/2019  was 2.12.0 mod  -->
         <!--<glassfish.version>4.1.1</glassfish.version>  was 4.1 on 17/10/2015 -->
         <!--<wildfly.version>Wildfly-10.1.0.Final</wildfly.version> not used meme plus pour via MyPOM properties -->
         <hibernate.version>3.5.3.Final</hibernate.version> <!-- only used via MyPOM properties -->
-        <maven.version>3.6.1</maven.version> <!-- only used via MyPOM properties -->
+        <maven.version>3.6.2</maven.version> <!-- only used via MyPOM properties -->
   <!--  Maven plugins -->       
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version><!-- was 3.8.0 mod 25-05-2019 -->
         <maven.dependency.plugin.version>3.1.1</maven.dependency.plugin.version> <!-- was 3.0.0 mod 14/07/2018 -->
         <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
         <maven.resources.plugin.version>3.1.0</maven.resources.plugin.version>
-        <maven.war.plugin.version>3.2.2</maven.war.plugin.version> <!-- new 14/07/2018  was 3.2.1 -->
-        <maven.install.plugin.version>3.0.0-M1</maven.install.plugin.version><!-- was 2.5.2 mod 25/05/2019 -->
-        <maven.wildfly.plugin.version>2.0.1.Final</maven.wildfly.plugin.version> <!--  mod 07-03-2019 was 2.0.0.Final -->
+        <maven.war.plugin.version>3.2.3</maven.war.plugin.version> <!-- new 01-11-2019  was 3.2.2 -->
+        <!--<maven.install.plugin.version>3.0.0-M1</maven.install.plugin.version> was 2.5.2 mod 25/05/2019 enlevé 05-01-2020 -->
+        <maven.wildfly.plugin.version>2.0.2.Final</maven.wildfly.plugin.version> <!--  mod 29-12-2019 was 2.0.1.Final -->
         <maven.properties.plugin.version> </maven.properties.plugin.version>
         <maven.surefire.plugin.version> </maven.surefire.plugin.version>
         
         <netbeans.compile.on.save>all</netbeans.compile.on.save> <!-- new 27/11/2013 -->
         <!--<mojarra.version>2.2.13.SP4</mojarra.version>  not used only used via MyPOM properties 2.2.13.SP4-->
-        <netbeans.version>11.1</netbeans.version> <!-- only used via MyPOM properties 
+        <netbeans.version>11.2</netbeans.version> <!-- only used via MyPOM properties 
 voir plus bas <artifactId>properties-maven-plugin</artifactId>-->
         
         <timestamp>${maven.build.timestamp}</timestamp> <!-- see https://dzone.com/articles/stamping-version-number-and -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
-        <jackson.version>2.9.8</jackson.version> <!-- mod 04/01/2019  was 2.9.7 google maps AddressConverter.java  -->
+        <jackson.version>2.10.1</jackson.version> <!--mod 223-122019 was 2.9.8 mod 04/01/2019  was 2.9.7 google maps AddressConverter.java  -->
         <version.jboss.bom>10.0.0.Final</version.jboss.bom>
         <apache.shiro.version>1.3.2</apache.shiro.version> <!-- new 24-12-2017 1.4.0 gives errors -->
         <itext.version>2.1.7</itext.version>
@@ -140,14 +140,6 @@ voir plus bas <artifactId>properties-maven-plugin</artifactId>-->
   <version>${primefaces.extension.version}</version>
 </dependency>
 
- <!-- <exclusions>
-  <exclusion>
-   <groupId>com.google.code.gson</groupId>
-   <artifactId>gson</artifactId>
-  </exclusion>
- </exclusions>
-     -->
-
 <!-- https://mvnrepository.com/artifact/org.primefaces/primefaces -->
 <dependency>
     <groupId>org.primefaces</groupId>
@@ -169,12 +161,6 @@ Les dépendances du scope runtime sont des dépendances nécessaires à l'exécu
  mais qui sont inutiles à la compilation. Par exemple, vous pouvez avoir besoin d'un JAR pour l'API JDBC à la compilation
  et uniquement de l'implémentation du driver JDBC à l'exécution.
 -->
-<dependency>
-     <groupId>mysql</groupId>
-     <artifactId>mysql-connector-java</artifactId>
-     <version>${mysql.connectorJ.version}</version> <!-- 5.1.22 voir variable dans   <properties> -->
-    <type>jar</type>
-</dependency>
 <!-- new 27/08/2014  <scope>runtime</scope>
      <type>jar</type>
 http://logging.apache.org/log4j/2.x/maven-artifacts.html 
@@ -233,10 +219,25 @@ Provided means that you need the JAR for compiling, but at run time there is alr
  by the environment so you don't need it packaged with your app. For a web app, this means that
  the JAR file will not be placed into the WEB-INF/lib directory. 
 
-For a web app, if the app server already provides the JAR (or its functionality), then use "provided" otherwise use "compile".
+For a web app, if the app server already provides the JAR (or its functionality), then use "provided" 
+otherwise use "compile".
 
 à installer manuellement (ne se trouve plus dans maven)
 Dependencies, right clic on jEidlib-1.1.jar > Manually install artifact > browse artifact to install
+
+
+        compile
+
+        This is the default scope, used if none is specified. Compile dependencies are available in all classpaths 
+of a project. Furthermore, those dependencies are propagated to dependent projects.
+
+        provided
+
+        This is much like compile, but indicates you expect the JDK or a container to provide the dependency at runtime.
+ For example, when building a web application for the Java Enterprise Edition, you would set the dependency 
+on the Servlet API and related Java EE APIs to scope provided because the web container provides those classes.
+ This scope is only available on the compilation and test classpath, and is not transitive.
+
 
 <dependency> deleted 19/11/2017
 	<groupId>commons-io</groupId>
@@ -247,8 +248,45 @@ Dependencies, right clic on jEidlib-1.1.jar > Manually install artifact > browse
 <dependency> <!-- new 24/12/2014  -->
 	<groupId>commons-fileupload</groupId>
 	<artifactId>commons-fileupload</artifactId>
-	<version>1.3.3</version> <!-- mod 02/08/2017  was 1.3.2 -->
+	<version>1.4</version> <!-- mod 03/01/2019  was 1.3.3 -->
 </dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.tika/tika-java7 new 03-01-2020
+ava-7 reliant components, including FileTypeDetector implementations
+                    https://stackoverflow.com/questions/54078118/managed-bean-with-a-parameterized-bean-class-must-be-dependent-class-org-apach/55210108
+                            Exclude otherwise the following error is thrown:
+                                    WELD-000071: Managed bean with a parameterized bean class 
+                                    must be @Dependent: class org.apache.cxf.jaxrs.provider.XPathProvider 
+-->
+<dependency>
+    <groupId>org.apache.tika</groupId>
+    <artifactId>tika-java7</artifactId>
+    <version>1.23</version>
+    <exclusions>
+                    <exclusion>
+                            <artifactId>cxf-rt-rs-client</artifactId>
+                            <groupId>org.apache.cxf</groupId>
+                    </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+    <groupId>org.apache.tika</groupId>
+    <artifactId>tika-parsers</artifactId>
+    <version>1.23</version>
+    <exclusions>
+                    <exclusion>
+                            <artifactId>cxf-rt-rs-client</artifactId>
+                            <groupId>org.apache.cxf</groupId>
+                    </exclusion>
+    </exclusions>
+</dependency>
+<dependency>
+    <groupId>org.apache.pdfbox</groupId>
+    <artifactId>jbig2-imageio</artifactId>
+    <version>3.0.0</version>
+</dependency>
+
 
 <dependency>
             <groupId>com.lowagie</groupId>
@@ -427,7 +465,7 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-nop</artifactId>
-    <version>1.7.26</version><!-- was 1.7.25 mod 22-03-2019 -->
+    <version>1.7.29</version><!-- was 1.7.26 mod 10-11-2019 -->
 </dependency>
 
 <dependency>
@@ -448,8 +486,8 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 <dependency>
     <groupId>com.google.code.gson</groupId>
     <artifactId>gson</artifactId>
-    <version>2.8.5</version>
-   
+    <version>2.8.6</version> <!-- mod 10/11/2019 was 2.8.5 -->
+    <scope>compile</scope><!-- mod 31/01/2020 was compile -->
 </dependency>
 
 <!-- https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit 
@@ -494,7 +532,7 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
 <dependency>
     <groupId>org.mnode.ical4j</groupId>
     <artifactId>ical4j</artifactId>
-    <version>3.0.6</version> <!-- was 3.0.1 mod 22-03-2019 -->
+    <version>3.0.11</version> <!-- was 3.0.6 mod 01-12-2019 -->
 </dependency>
 <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin  new 05-11-2018-->
 <dependency>
@@ -537,7 +575,7 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
     <type>pom</type>
 </dependency>
 -->
-<!-- les 2 qui suivent nécessaire pour jdk11 -->
+<!-- les 2 qui suivent nécessaire pour jdk11 api sortie de Java-->
 <dependency>
     <groupId>javax.annotation</groupId>
     <artifactId>javax.annotation-api</artifactId>
@@ -566,6 +604,20 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
     <artifactId>json</artifactId>
     <version>20180813</version>
 </dependency>
+
+<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-naming-client 11-12-2019-->
+<dependency>
+    <groupId>org.wildfly</groupId>
+    <artifactId>wildfly-naming-client</artifactId>
+    <version>1.0.11.Final</version>
+</dependency>
+
+<dependency> <!-- added 19-12-2019 necessary for run file !!! -->
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>${mysql.connectorJ.version}</version>
+</dependency>
+
 
 
 </dependencies>
@@ -620,21 +672,23 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
                     <fork>true</fork>
                     <meminitial>128m</meminitial><!-- was 128 -->
                     <maxmem>2048m</maxmem> <!-- was 1024-->
-                    <source>11</source>
-                    <target>11</target>
-       <!--   -->         <release>${java.version}</release>
-                  <encoding>${project.build.sourceEncoding}</encoding> <!-- new 01-11-2018
+             <!--       <source>11</source>
+                    <target>11</target> -->
+                    <release>${java.version}</release><!--  23-12-2019 replace source and target -->
+                    <encoding>${project.build.sourceEncoding}</encoding> <!-- new 01-11-2018
       https://docs.oracle.com/javase/10/tools/javac.htm#JSWOR627
 https://www.baeldung.com/javac
 https://github.com/spring-projects/spring-boot/issues/6421  for -processing
 Supplies warnings to enable or disable, separated by comma. 
 Precede a key by a hyphen (-) to disable the specified warning.
-
 -->
                     <compilerArgs> <!-- new 01-11-2018  --> 
                         <arg>-Xlint:all,-rawtypes,-serial,-processing</arg>
+                          --enable-preview <!-- new 10-01-2019 activer nouvelle version switch https://mkyong.com/java/java-how-to-enable-the-preview-language-features/--> 
                         <!-- new 01/09/2019 https://cwiki.apache.org/confluence/display/NETBEANS/Apache+NetBeans+11.1-->
                     </compilerArgs>
+                   <!-- <compilerArgs> deux tirest ici enable-preview</compilerArgs>  new 23-12-2019 fait disparaitre lignes jaunes  -->
+
                     <showDeprecation>true</showDeprecation> <!--  mod 08-02-2018 was true -->
                     <showWarnings>true</showWarnings> <!-- new 20/01/2013 -->
                     <verbose>false</verbose>   <!--new 20/01/2013 'true' donne liste de toutes les sources -->
@@ -739,13 +793,13 @@ Precede a key by a hyphen (-) to disable the specified warning.
               <failOnMissingWebXml>false</failOnMissingWebXml>
           </configuration>
 </plugin>
-<!-- new 27/05/2014 yes yes : c'est pour forcer la version à utiliser ! ! ! ! !-->
+<!-- new 27/05/2014 yes yes : c'est pour forcer la version à utiliser enlevé 05-01-2020
 <plugin>
      <groupId>org.apache.maven.plugins</groupId>
      <artifactId>maven-install-plugin</artifactId>
-     <version>${maven.install.plugin.version}</version>  <!-- was 2.5.2 -->
+     <version>${maven.install.plugin.version}</version>  was 2.5.2
 </plugin>
-
+-->
 <!-- https://mvnrepository.com/artifact/org.wildfly.plugins/wildfly-maven-plugin
 https://docs.jboss.org/wildfly/plugins/maven/latest/examples/deployment-example.html
 https://javalibs.com/plugin/org.wildfly.plugins/wildfly-maven-plugin
@@ -762,12 +816,12 @@ https://javalibs.com/plugin/org.wildfly.plugins/wildfly-maven-plugin
                     <execution>
                         <phase>install</phase>
                         <goals>
-                            <goal>deploy</goal>
+                           <goal>deploy</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-
+<!-- <goal>deploy</goal>  déplacé de line 755-->
 <plugin>
     <groupId>org.jvnet.jax-ws-commons</groupId>
     <artifactId>jaxws-maven-plugin</artifactId>
@@ -859,7 +913,7 @@ http://stackoverflow.com/questions/11500533/in-java-code-how-to-access-maven-pro
 </build>
     
 <repositories>
-    
+<!--    
     <repository>
         <id>sonatype-oss-public</id>
         <url>https://oss.sonatype.org/content/groups/public/</url>
@@ -867,7 +921,7 @@ http://stackoverflow.com/questions/11500533/in-java-code-how-to-access-maven-pro
             <enabled>true</enabled>
         </snapshots>
   </repository>
-
+-->
     
     
  <!-- new 1/3/2016 http://doduck.fr/maven-ajouter-local-jar/ 

@@ -6,6 +6,7 @@ import entite.ECourseList;
 import entite.Inscription;
 import entite.Player;
 import entite.Round;
+import entite.Tee;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,9 +36,11 @@ try{
      String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
      String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
      
+     String te = utils.DBMeta.listMetaColumnsLoad(conn, "tee");
+     
   String query =     // attention faut un espace en fin de ligne avant le " !!!!
      "SELECT "
-           + cl + "," + co + "," + ro + "," + pl + "," + ph
+           + cl + "," + co + "," + ro + "," + pl + "," + ph + "," + te
    + "   FROM tee" 
    + "   JOIN player"
    + "      ON player.idplayer = ?"
@@ -67,7 +70,7 @@ try{
         liste = new ArrayList<>();
 	while(rs.next()){
   //LOG.info("line 01");
-          ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
+          ECourseList ecl = new ECourseList();
           Club c = new Club();
           c = entite.Club.mapClub(rs);
           ecl.setClub(c);
@@ -79,16 +82,20 @@ try{
           Round r = new Round();
           r = entite.Round.mapRound(rs);
           ecl.setRound(r);
+   //// new 20-12-2019       
+          Tee t = new Tee();
+          t = entite.Tee.mapTee(rs);
+          ecl.setTee(t);
+          
 //LOG.info("line 04");
           Inscription i = new Inscription();
           i = entite.Inscription.mapInscription(rs);  
-       //        phr.setPlayerhasroundFinalResult(rs.getShort("InscriptionFinalResult"));
           ecl.setInscriptionNew(i);//.setInscriptionNew(i);
  //LOG.info("line 05");
 	liste.add(ecl);
 	} //end while
-        LOG.info("line 07");
-        LOG.info("line 06 there are elements in liste = " + liste.size()); 
+  //      LOG.info("line 07");
+      LOG.info(" elements in liste = " + liste.size()); 
      //     liste.forEach(item -> LOG.info("PlayedList " + item));  // java 8 lambda
     return liste;
     
@@ -121,13 +128,14 @@ try{
     }
     
     public static void main(String[] args) throws SQLException, Exception {
-     Connection conn = new DBConnection().getConnection();
+      Connection conn = new DBConnection().getConnection(); 
   try{
+    
     Player player = new Player();
     player.setIdplayer(324713);
     List<ECourseList> lp = new PlayedList().list(player, conn);
         LOG.info("from main, after lp = " + lp);
- } catch (Exception e) {
+   }catch (Exception e){
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
    }finally{

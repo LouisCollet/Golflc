@@ -54,6 +54,7 @@ import org.primefaces.model.map.DefaultMapModel;
 import org.primefaces.model.map.MapModel;
 import org.primefaces.model.map.Marker;
 import org.primefaces.model.map.Overlay;
+import utils.DBConnection;
 import utils.LCUtil;
 import static utils.LCUtil.DatetoLocalDateTime;
 import static utils.LCUtil.intArraytoStringArray;
@@ -92,6 +93,7 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
      @Inject private Greenfee greenfee;
      @Inject private Unavailable unavailable;
      @Inject private Audit audit;
+     @Inject private Blocking blocking;
      private final static List<Integer> STROKEINDEX = new ArrayList<>();
     private final static List<Integer> NUMBERS = new ArrayList<>();
     
@@ -114,6 +116,9 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
     private List<ScoreScramble> listscr;  // new 30/09/2014
     private List<Subscription> subscr;
     private List<String> teeStartListe = null;
+  //  @Inject
+  //  @ApplicationMap 
+  //  public static Map<String, Object> applicationMap;
 //    private final static String PHOTOFILE = "nophoto.jpeg";
 //                              private boolean NextCourse; // 13/01/2013
     private boolean NextStep; // 15/01/2013
@@ -193,7 +198,7 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
     private List<Player> selectedOtherPlayers = null; // new 11/07/2017
     private List<Player> droppedPlayers = new ArrayList<>();
  // new 11/07/2017
-  
+ // public static javax.sql.DataSource datasource;
     public CourseController()  // constructor
     {
         this.listavg = null;
@@ -203,107 +208,32 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
 
  @PostConstruct
  public void init(){ // attention !! ne peut absolument pas avoir : throws SQLException
-
+  //  javax.sql.DataSource datasource;
     try{
-    //        LOG.info("new");
-            conn = utils.DBConnection.getConn();
-             LOG.info("cette connection database sera utilisée pendant toute la session = "+ conn);
-            
-           connPool = utils.DBConnection.getPooledConnection();
-             LOG.info("cette connection pooled database sera réutilisée = "+ connPool);
-           
-             conn = connPool;
-             
+          LOG.info("entering init");
+    // old system, without connection pool
+    LOG.info("entering init install only - no deploy mod 16-12-2019 mod1");
+         //   conn = utils.DBConnection.getConn();
+             conn = new DBConnection().getConnection();
+//  enleve 01/12/2019 
+         if(conn != null){
+              LOG.info("cette connection database sera utilisée pour les RUN (main) = "+ conn);
+          }else{
+             LOG.info("Connection database is null = "+ conn);
+          }
+       // new 01-12-2019     
+
+      javax.sql.DataSource datasource = new utils.DBConnection().setDataSource();
+            LOG.info("Datasource is now = " + datasource.toString());
+        connPool = new DBConnection().getPooledConnection(datasource);
+        conn = connPool;
+          LOG.info("cette connection pooled database sera réutilisée pour toute la session = "+ conn);
+
+     // mettre dans une variable ??        
+     // oui voir line 4752
+     
        LOG.info("** Webbrowser url = " + utils.LCUtil.firstPartUrl());
- /*         
-          
-  LOG.info("starting shiro ...");         
-          IniRealm iniRealm = new IniRealm(USER_DIR + "/src/main/webapp/WEB-INF/shiro.ini");
-          DefaultSecurityManager securityManager = new DefaultSecurityManager(iniRealm);
-          SecurityUtils.setSecurityManager(securityManager);
-          Subject currentUser = SecurityUtils.getSubject();
-LOG.info(" shiro 01");    
-//print their identifying principal (in this case, a username): 
-        LOG.info( "Shiro User [" + currentUser.getPrincipal() + "] logged in successfully." );
 
-          if (!currentUser.isAuthenticated()) {
-              LOG.info("not authenticated");
-            UsernamePasswordToken token = new UsernamePasswordToken("user", "password");
-            token.setRememberMe(true);
-            try {
-                currentUser.login(token);
-            }catch (UnknownAccountException uae) {
-                    LOG.error("Username Not Found!", uae);
-            }catch (IncorrectCredentialsException ice) {
-                 LOG.error("Invalid Credentials!", ice);
-            }catch (LockedAccountException lae) {
-                 LOG.error("Your Account is Locked!", lae);
-            }catch (AuthenticationException ae) {
-                 LOG.error("Unexpected Error!", ae); 
-            } 
-        }  //end if
-  LOG.info("end of shiro 1");
-  
-  if (currentUser.hasRole("admin")) {
-        LOG.info("Welcome Admin");
-  }else if(currentUser.hasRole("editor")) {
-        LOG.info("Welcome, Editor!");
-  }else if(currentUser.hasRole("author")) {
-        LOG.info("Welcome, Author");
-  }else { 
-        LOG.info("Welcome, Guest");
-}
-
-  if(currentUser.isPermitted("articles:compose")) {
-    LOG.info("You can compose an article");
-} else { 
-    LOG.info("You are NOT permitted to compose an article!");
-} 
- 
-if(currentUser.isPermitted("articles:save")) {
-    LOG.info("You can save articles");
-} else { 
-    LOG.info("You can NOT save articles");
-}
-
-if(currentUser.isPermitted("articles:publish")) {
-    LOG.info("You can publish articles");
-} else { 
-    LOG.info("You can NOT publish articles");
-}
-*/
- /*
- 
-   // new apache shiro 24-12-2017
-   //     String s = utils.GetPath.getpath();
-  //      LOG.info("before shiro, path = " + s);
-        Subject currentUser = SecurityUtils.getSubject();
-            LOG.info("subject current user =  = " + currentUser);
-  //      Session session = currentUser.getSession();
-  //      session.setAttribute( "someKey", "aValue" );
-    if ( !currentUser.isAuthenticated() ) {
-        LOG.info(" current user is  n ot authenticated =  = " + currentUser);
-    //collect user principals and credentials in a gui specific manner
-    //such as username/password html form, X509 certificate, OpenID, etc.
-    //We'll use the username/password example here since it is the most common.
-    //(do you know what movie this is from? ;)
-        
-         UsernamePasswordToken token = new UsernamePasswordToken("lonestarr", "vespa");
-    //this is all you have to do to support 'remember me' (no config - built in!):
-        token.setRememberMe(true);
-        currentUser.login(token);
-}
-
-        Factory<SecurityManager> factory = new IniSecurityManagerFactory(USER_DIR + "/src/main/webapp/WEB-INF/shiro.ini");
-            LOG.info("factory =  = " + factory);
-        SecurityManager securityManager = factory.getInstance();
-            LOG.info("security manager =  = " + securityManager);
-        SecurityUtils.setSecurityManager(securityManager);
-        UsernamePasswordToken token = new UsernamePasswordToken("admin","test123");
-        token.setRememberMe(true);
-        
-        LOG.info("after shiro");
-  */        
           
  // https://github.com/vdurmont/emoji-java
 //  String str = "An :grinning:awesome :smiley:string &#128516;with a few :wink:emojis! man= :man: - woman = :woman:";
@@ -321,9 +251,7 @@ if(currentUser.isPermitted("articles:publish")) {
  //             "Semainier", 2100,
  //             "Monday", 1400
  //     );
-   
 
-      
       members = new LinkedHashMap<>();
       members.put("Full Member", "2500");
       members.put("Semainier", "2100");
@@ -332,8 +260,7 @@ if(currentUser.isPermitted("articles:publish")) {
   //      LOG.info("members info : " + entry.getKey() + ":" + entry.getValue().toString());
   //    }
       members.forEach((key, value) -> LOG.info("Members information = " + key + ":" + value));
-      
-      
+
     availableQualifying = new LinkedHashMap<String, String>();
     availableQualifying.put("Non Qualifying", "N");
     availableQualifying.put("Qualifying", "Y");
@@ -341,8 +268,7 @@ if(currentUser.isPermitted("articles:publish")) {
 
     LOG.info("availableQualyfying initialized ");
 
-        if (LANGUAGES.isEmpty())
-        {
+        if (LANGUAGES.isEmpty()){
             LANGUAGES.add(new SelectItem("en", "English"));  //first field = itemValue, stocke dans DB
             LANGUAGES.add(new SelectItem("de", "German"));
             LANGUAGES.add(new SelectItem("fr", "Français"));
@@ -352,7 +278,7 @@ if(currentUser.isPermitted("articles:publish")) {
              //   LOG.info("LANGUAGES initialized" + LANGUAGES.toString() );//Arrays.toString(games)/
               //  LOG.info("LANGUAGES initialized" + Arrays.toString(LANGUAGES.toArray()));
  // est en production !!            
-        if (GAMES.isEmpty()) {
+        if (GAMES.isEmpty()){
             GAMES.add(new SelectItem("STABLEFORD", "Stableford"));  //first field = itemValue, stockÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©e dans DB
             GAMES.add(new SelectItem("SCRAMBLE", "Scramble"));
             GAMES.add(new SelectItem("CHAPMAN", "Chapman"));
@@ -744,6 +670,14 @@ if (!(toValidate instanceof UIInput))
            CourseController.parArray = parArray;
       }
 
+ //   public static DataSource getDatasource() {
+ //       return datasource;
+ //   }
+
+ //   public void setDatasource(DataSource datasource) {
+ //       this.datasource = datasource;
+ //   }
+
    public Inscription getInscription() {
       return inscription;
     }
@@ -1030,11 +964,21 @@ public boolean isShowButtonCreateCourse() {
     }
     
     public String getLastSession() throws SQLException, Exception {
-    //    LOG.info("before last session");
+    //    LOG.info("before last session"); from welcome.xhtml sourceC.lastSession
         Audit a = new Audit();
         a.setAuditPlayerId(player.getIdplayer());
+         LOG.info("entering getLastSession with audit = " + a);
         a = new find.FindLastAudit().find(a, conn);
-          LOG.info("entering getLastSession with audit = " + a);
+        if(a == null){
+              LOG.info("this is the first login for this player ! ");
+          //  boolean b = new create.CreateAudit().create(player, conn);
+                return "First Login";
+       //       LOG.info("audit created ? " + b);
+        }else{
+            LOG.info("there was already an audit");
+        }
+        
+        
           LOG.info("date FindLastAudit = " + a.getAuditEndDate().format(ZDF_TIME_HHmm)); 
       // tester ici sur now() et retry_time
          if(LocalDateTime.now().isBefore(a.getAuditRetryTime())){
@@ -1739,7 +1683,6 @@ public void roundWorkDate(ValueChangeEvent e) throws ParseException, SQLExceptio
 
     public void uploadListener(FileUploadEvent e) throws Exception{    
          LOG.info(" entering uploadListener = ");
-      //   FileUploadController fu = new FileUploadController();
          new FileUploadController().uploadListener(e, player, conn);
          LOG.info(" after FileUploadController");
       // forcer refresh de listplayers !!
@@ -2874,7 +2817,7 @@ public String selectRecentInscription(ECourseList ecl) throws SQLException {
            
         String msg = "Select RecentInscription EcourseList Successful "
                 + " <br/> Club name = " + club.getClubName()
-                + " <br/> last name = " + course.getCourseName()
+                + " <br/> course name = " + course.getCourseName()
                 + " <br/> round = " + round.getIdround();
         LOG.info(msg);
    //     showMessageInfo(msg);
@@ -2915,7 +2858,7 @@ public String scoreStableford(ECourseList ecl) throws SQLException {
         } // end loading
         String msg = "Select ECourseList Successful "
                 + " <br/> Club name = " + club.getClubName()
-                + " <br/> last name = " + course.getCourseName()
+                + " <br/> course name = " + course.getCourseName()
                 + " <br/> round = " + round.getIdround();
         LOG.info(msg);
         showMessageInfo(msg);
@@ -3613,11 +3556,17 @@ public String show_scorecard_empty(ECourseList ecl) throws SQLException{
 
 public List<Flight> listFlights(){
  try {
- //    LOG.info("from CourseController : entering listFlights ... " );
+     LOG.info("from CourseController : entering listFlights .for date = .. " + round.getWorkDate());
+     LOG.info("from CourseController : entering listFlights .for date = .. " + round);
+     LOG.info("from CourseController : entering listFlights .for course = .. " + course);
+     LOG.info("from CourseController : entering listFlights .for club = .. " + club);
   cptFlight++;
+  
 //  LOG.info("cptFlight = " + cptFlight);
 if(cptFlight == 1){   /// éviter iteration !!!
     LOG.info("starting cptFlight loop");
+    // new 10-12-2019
+    unavailable = new find.FindUnavailable().find(course, round, conn);
      LOG.info("unavailable = " + unavailable.toString());
  // LOG.info("getCause = " + unavailable.getCause());
     //  if(unavailable.getCause().equals("")){
@@ -3626,9 +3575,9 @@ if(cptFlight == 1){   /// éviter iteration !!!
          LOG.info(msg);
        // on continue
       }else{
-          String msg = " listFlights : unavailable.getCause()not = null and = " + unavailable.getCause();
+        String msg = LCUtil.prepareMessageBean("unavailable.cause") + unavailable.getCause();
          LOG.info(msg);
-       //  showMessageFatal(msg);
+         showMessageFatal(msg);
           LOG.info("line 01");
             cptFlight = 2;
           //  List<Flight> lf = null;
@@ -3644,29 +3593,21 @@ if(cptFlight == 1){   /// éviter iteration !!!
          }else{
      ///                LOG.info("round workdate = " + round.getWorkDate());
          }
- //               LOG.info("line 222 = ");
- //LOG.info("club = " + club.toString());
      if(club.getClubLatitude().compareTo(BigDecimal.ZERO) == 0){
             String msgerr = "La Latitude du club n'est pas connue ! stop de l'opération en cours !! "; // + club.getClubLatitude();
             LOG.error(msgerr);
             showMessageFatal(msgerr);
             throw new Exception(msgerr);
       }
-
- //       cptFlight++;
-    //    LOG.info("cptFlight = " + cptFlight);
- //if(cptFlight == 1){   /// éviter iteration !!!
-          LOG.info("we do it");
-      String tz = "Europe/Brussels";
+      LOG.info("we do it");
  //  1  ---------------- cherche sunrise et sunset 
-    //  find.SunriseSunset fss = new find.SunriseSunset();
-   //   Flight f = new find.SunriseSunset().findSunriseSunset(round.getWorkDate(),club.getClubLatitude(),club.getClubLongitude(),tz,conn);
       Flight f = new find.SunriseSunset().find(round,club,conn);
-      LOG.info("1-Flight f = " + f.toString());
+      LOG.info("step 1-Flight f = " + f.toString());
  // 2 ------------------  creation tableFlights : 1 record toutes les 12 min en partant de sunrise jusque sunset
-   //   create.CreateAllFlights caf = new create.CreateAllFlights();
-     //  fl = new create.CreateAllFlights().createTableFlights(f.getSunrise(), f.getSunset(), tz, course.getIdcourse(), conn);
-      fl = new create.CreateAllFlights().createTableFlights(f, tz, conn);
+  // String tz = "Europe/Brussels";
+  LOG.info("timeZone tz = " + club.getClubZoneId());
+  
+      fl = new create.CreateAllFlights().createTableFlights(f, club.getClubZoneId(), conn); // was tz always "Europe/Brussels"
        LOG.info("2-table created !");
       // new 28/11/2018 déplacé de CreateAllFlights
 //3      
@@ -3992,7 +3933,7 @@ public String scorecard(ECourseList ecl) {
            LOG.info("Tee is now = " + tee.toString());
         String msg = "Select EcourseList Successful "
                 + " <br/> Club name = " + club.getClubName()
-                + " <br/> last name = " + course.getCourseName()
+                + " <br/> course name = " + course.getCourseName()
                 + " <br/> round = " + round.getIdround();
         LOG.info(msg);
   //      showMessageInfo(msg);
@@ -4219,12 +4160,8 @@ public void createLocalAdministrator() throws SQLException, Exception{
   }
 } //end method create player
 
-
-
 public String createClub() throws SQLException, IOException{
         LOG.info("entering CreateClub");
-  //  create.CreateClub cc = new create.CreateClub();
-  //  boolean ok = cc.createClub(club, conn);
   LOG.info("entering createclub");
  // LOG.info("with club = " + club.toString());
     if(new create.CreateClub().create(club, conn)){
@@ -4254,7 +4191,7 @@ public String addTee(ECourseList ecl) throws SQLException, Exception{
  try{
       LOG.info("entering addTeee");
          club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
-         course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse());
+         course = new load.LoadCourse().load(conn, ecl.Ecourse.getIdcourse());
             LOG.info("idclub forced at " + ecl.Eclub.getIdclub() + club.getClubName());
          tee.setCreateModify(true); // gestion button dans tee.xhtml
          tee = new Tee();  // new 2018-11-08  nettoyer les data d'une prédédente modification
@@ -4353,7 +4290,7 @@ public String loadCourse(ECourseList ecl) throws SQLException, Exception{
        LOG.info("entering loadCourse");
        LOG.info("with ecl = " + ecl.toString());
        LOG.info("idcourse in loadCourse = " + ecl.Ecourse.getIdcourse() );
-     course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() );
+     course = new load.LoadCourse().load(conn, ecl.Ecourse.getIdcourse() );
      club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
         LOG.info("idclub after loadCourse= " + club.getIdclub());  // si est null faut complémenter
      if(club.getIdclub() == null){
@@ -4394,7 +4331,7 @@ public String loadTee(ECourseList ecl) throws SQLException, Exception{
         LOG.info("entering loadTee");
         LOG.info("loadTee entering ecl = " + ecl.toString());
      tee = new load.LoadTee().load(ecl.Etee,conn);
-     course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
+     course = new load.LoadCourse().load(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
      club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
         LOG.info("idcourse after loadCourse= " + course.getIdcourse());  // si est null faut coplémter
         LOG.info("idtee after loadCourse= " + tee.getIdtee());  // si est null faut coplémter
@@ -4424,7 +4361,7 @@ public String loadHoles(ECourseList ecl) throws SQLException, Exception{  // mul
         LOG.info("entering loadHoles - multiple");
      tee = new load.LoadTee().load(ecl.Etee,conn);
      holesGlobal = new load.LoadHoles().LoadHolesArray(conn, tee.getIdtee());
-     course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
+     course = new load.LoadCourse().load(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
      club = new load.LoadClub().load(ecl.Eclub, conn );  // pour avoir clubname, etc...
         LOG.info("course after loadHoles = " + course.toString()); 
         LOG.info("tee after loadHoles = " + tee.toString());
@@ -4489,7 +4426,7 @@ public String loadHole(ECourseList ecl) throws SQLException, Exception{
  try{
         LOG.info("entering loadTeee");
      tee = new load.LoadTee().load(ecl.Etee,conn);
-     course = new load.LoadCourse().LoadCourse(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
+     course = new load.LoadCourse().load(conn, ecl.Ecourse.getIdcourse() ); // pour avoir coursename, etc...
      club = new load.LoadClub().load(ecl.Eclub, conn);  // pour avoir clubname, etc...
         LOG.info("idcourse after loadCourse= " + course.getIdcourse());  // si est null faut coplémter
         LOG.info("idtee after loadCourse= " + tee.getIdtee());  // si est null faut coplémter
@@ -4776,6 +4713,8 @@ public void modifyPlayer() throws SQLException, Exception{
     return "show_handicap.xhtml?faces-redirect=true";  // refresh view without message !
   }
   */
+  
+  
   public String cancelRound(ECourseList ecl) throws Exception{
         LOG.info(" starting cancelRound ");
         LOG.info(" with ecl = " + ecl.toString());
@@ -4785,6 +4724,14 @@ public void modifyPlayer() throws SQLException, Exception{
       listInscriptions();  // refresh list without the deleted item
     return "selectInscription.xhtml?faces-redirect=true";  // refresh view without message !
   }
+
+    public Map<String, Object> getApplicationMap() {
+        return applicationMap;
+    }
+
+ //   public void setApplicationMap(Map<String, Object> applicationMap) {
+ //       this.applicationMap = applicationMap;
+ //   }
     
   //https://dzone.com/articles/javaserver-faces-23-1
 @Inject
@@ -4813,25 +4760,45 @@ try{
  LOG.info("1. verifying if there is a password");
         LOG.info("player password = " + player.getPlayerPassword());
         if(player.getPlayerPassword() == null){
-            msg = "The player has no password yet !! ";
-            LOG.info(msg);
-            showMessageInfo(msg);
+            String err = LCUtil.prepareMessageBean("password.empty",player.getPlayerPassword()); 
+            LOG.info(err);
+            showMessageInfo(err);
             return "password_create.xhtml?faces-redirect=true";
         }
           // new 27-08-2018 https://stackoverflow.com/questions/7644968/httpsession-how-to-get-the-session-setattribute
+          
+// new 26-01-2020
+
+          if(passwordBlocking()){
+             String err = LCUtil.prepareMessageBean("password.blocked") + blocking.getBlockingRetryTime().format(ZDF_TIME); // ,player.getPlayerPassword()); 
+        //     err = err + blocking.getBlockingRetryTime().format(ZDF_TIME);
+             LOG.info(err);
+             showMessageInfo(err);
+             return "welcome.xhtml?faces-redirect=true";
+          }
+          
           
         // donne le même résultat !! ancienne façon et nouvelle façon   
 ////       FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("playerid", player.getIdplayer());
        sessionMapJSF23.put("playerid", player.getIdplayer());
        sessionMapJSF23.put("playerlastname", player.getPlayerLastName());
        sessionMapJSF23.put("playerage", yourAge);
-            LOG.info("printing sessonMapJSF23 = ");
-       utils.LCUtil.logMap(sessionMapJSF23);
+ ///           LOG.info("printing sessonMapJSF23 = ");
+ ///      utils.LCUtil.logMap(sessionMapJSF23);
        setConnected(true); // affiche le bouton Logout dans header.xhtml
 
+        LOG.info("just before applicationMap");
+        LOG.info("at this moment connection = " + conn);
+        applicationMap.put("Connection",conn);
+  //      LOG.info("applicationMap is now = ");
+  //      utils.LCUtil.logMap(applicationMap);
+  
+  
+  
+  
  LOG.info("2. verifying if there is a valid subscription");
  
-        if(new find.FindSubscriptionStatus().subscriptionStatus(subscription, player, conn)){  //true
+        if(new find.FindSubscriptionStatus().find(subscription, player, conn)){  //true
             LOG.info("subscription found = " + subscription);
             LOG.info("subscription end date = " + subscription.getEndDate());
             if(subscription.getEndDate() == null){
@@ -4859,6 +4826,119 @@ try{
         }  
 } // end method
 
+public String passwordVerification(String OK_KO){ //throws SQLException{ //throws SQLException{
+try{ // coming from welcome.xhtml provisoirement
+    LOG.info(" starting passwordVerification with = " + OK_KO);
+    LOG.info("for player player= " + player);
+    // non nil faut vérifier si blocage !!
+    if("OK".equals(OK_KO)){
+        LOG.info("password correct");
+        return null;
+    }
+    if("KO".equals(OK_KO)){
+        String msg = "wrong password for this connection";
+        LOG.info(msg);
+        showMessageInfo(msg);
+        blocking = new find.FindBlocking().find(player,conn);
+        LOG.info("returned blocking = " + blocking);
+        if(blocking == null){
+           LOG.info("existe pas de record blocage");
+           // faut en créeer un !
+            boolean b = new create.CreateBlocking().create(player,conn);
+                LOG.info("record bloking written ? = " + blocking);
+        // pas de blocage
+     //   return null;
+           return "selectPlayer.xhtml?faces-redirect=true";
+        }
+          if(blocking != null){ // blocking not null
+            if(blocking.getBlockingAttempts() > 2){
+                
+            }else{// si blocking < 2, rien faire
+            // modify
+            // ajouter 1 au compteur
+             short s = blocking.getBlockingAttempts();
+        //     s+=1;
+   //          s = (short) (s + 1);
+        //    int un = short(1);
+            blocking.setBlockingAttempts(s+=1);
+            boolean b = new modify.ModifyBlocking().modify(blocking, conn);
+            return "selectPlayer.xhtml?faces-redirect=true";
+            }
+        }
+    }
+    
+    return null;
+    // find
+    // si OK delete record si existe (find=true)
+    // si KO
+        // cree record si existe pas (find=false)
+        // modifie record si existe (find=true)
+    
+    
+
+  //  return null;
+  } catch (Exception e) {
+            String msg = "££ Exception in passwordVerification = " + e.getMessage() + " for player = " + player.getPlayerLastName();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null; // indicates that the same view should be redisplayed
+        } finally {
+
+        }  
+} // end method passwordVerification
+
+public boolean passwordBlocking (){//  throws SQLException{
+try{ // coming from selectPlayer 4742
+    LOG.info(" starting passwordBlocking ? ");
+    LOG.info("for player = " + player);
+    // find
+    blocking = new find.FindBlocking().find(player,conn);
+        LOG.info("blocking at this moment = " + blocking);
+    if(blocking == null){
+        LOG.info("pas de blocage");
+        LOG.info("blocking = " + blocking);
+        // pas de blocage
+        return false;
+    }
+    if(blocking != null){
+        // comparer 
+        LOG.info("blocking is not nul = " + blocking);
+        if(blocking.getBlockingAttempts() < 3){
+            LOG.info("attemps < 3 = " + blocking.getBlockingAttempts());
+            return false; // pas de blocage
+        }
+        LOG.info("now = " + LocalDateTime.now().format(ZDF_TIME) + " Retrytime = " 
+                + blocking.getBlockingRetryTime().format(ZDF_TIME) );
+      //  LOG.info(TAB);
+        if(LocalDateTime.now().isBefore(blocking.getBlockingRetryTime())){
+            LOG.info("il y blocage");
+            return true;
+        }else{
+             LOG.info("temps de blocage dépassé - delete record");
+             boolean b = new delete.DeleteBlocking().delete(player,conn);
+             LOG.info("result delete = " + b);
+             return false;
+             }
+        }
+  //  }
+    // find = false, on continue donc boolean : true 
+    // find = true
+    //  blocking si drun < dretry
+    // si drun > dretry
+        // delete record
+        // et on continue
+    
+    return true;
+  } catch (Exception e) {
+            String msg = "££ Exception in passwordVerification = " + e.getMessage() + " for player = " + player.getPlayerLastName();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return true; // indicates that the same view should be redisplayed
+        } finally {
+
+        }  
+} // end method passwordBlocking
+
 public String findSun() throws SQLException, IOException
 {
     // ajouter boolean = correct insert !!!
@@ -4879,10 +4959,8 @@ public boolean createCotisation() throws SQLException{  // à adapter ??
      // la cotisation est payée : il faut l'enregistrer en DB
       LOG.info("entering CourseC.createCotisation");
       LOG.info("with cotisation = " + cotisation);
-      
-   //   create.CreateCotisation cc = new create.CreateCotisation();
-  //    boolean OK = new create.CreateCotisation().create(player, conn);
-      if(new create.CreateCotisation().create(cotisation, conn)){
+
+      if(new create.CreateCotisation().create(cotisation, conn)){ //true
         LOG.info("after createCotisation : we are OK");
         String msg = LCUtil.prepareMessageBean("cotisation.success");
         msg = msg + cotisation.getStartDate().format(ZDF_DAY) + " - " 
@@ -4898,11 +4976,7 @@ public boolean createCotisation() throws SQLException{  // à adapter ??
         showMessageInfo(msg);
         return false; // retourne d'ou il vient : où ??
     }
- //}catch (SQLException ex){
- //           String msg = "SQLException in handleSubscription " + ex;
- //           LOG.error(msg);
- //           showMessageFatal(msg);
- //           return null;
+
   }catch (Exception ex){
             String msg = "Exception in createCotisation " + ex;
             LOG.error(msg);
@@ -4933,8 +5007,8 @@ try{
         
         
         
-      if(new create.CreateGreenfee().create(player,greenfee, conn)){
-        LOG.info("after createGreenfee : we are OK");
+      if(new create.CreateGreenfee().create(player,greenfee, conn)){ // true
+          LOG.info("after createGreenfee : we are OK");
         String msg = LCUtil.prepareMessageBean("greenfee.success");
         msg = msg + greenfee.getRoundDate().format(ZDF_DAY) + " - " 
               //    + greenfee.getEndDate().format(ZDF_DAY)
@@ -4960,8 +5034,7 @@ try{
             showMessageFatal(msg);
             return false;
   }
- } //end method modify subscription
- // }
+ } //end method createGreenfee
 
 
 public String modifySubscription() throws Exception{ 
@@ -4994,8 +5067,8 @@ public String modifySubscription() throws Exception{
             showMessageFatal(msg);
             return null;
   }
- } //end method modify subscription
- // }
+ } //end method modifySubscription
+ 
  public String manageCotisation() throws Exception{ // called from subscription.xhtml
  try{
       LOG.info("entering manageCotisation ");
@@ -5041,7 +5114,7 @@ public String modifySubscription() throws Exception{
             return null;
   }
          return null;
- } //end method manageSubscripti 
+ } //end method manageCotisation
   
 public String manageGreenfee() throws Exception{ // called from subscription.xhtml
  try{
@@ -5108,7 +5181,7 @@ public String manageGreenfee() throws Exception{ // called from subscription.xht
    //      utils.LCUtil.logMap(sessionMapJSF23);
             String sub = subscription.getSubCode();
             LOG.info("sub = " + sub);
-            List<Subscription> ls = new find.FindSubscription().subscriptionDetail(player ,conn);
+            List<Subscription> ls = new find.FindSubscription().subscriptionPayments(player ,conn);
       //       if(new find.FindSubscriptionStatus().subscriptionStatus(subscription, player, conn)){  //true
             subscription = ls.get(0);
             LOG.info("Subscription ls.get(0) = " + subscription);
@@ -5239,36 +5312,46 @@ public String logout(String lgt) throws IOException, SQLException, Exception {
  //    if(player.getIdplayer() != null){
         
     // new 13-06-2019
-    /*
+    
         Audit a = new Audit();
         a.setAuditPlayerId(player.getIdplayer());
-        a =  new find.FindLastAudit().find(audit, conn);
-          LOG.info("entering logging with audit = " + a);
+        a = new find.FindLastAudit().find(a, conn);
+          LOG.info("entering logout with lastaudit = " + a);
+        a.setAuditEndDate(LocalDateTime.now());
+        boolean ok = new modify.ModifyAudit().stop(a, conn);
+        
       // tester ici sur now() et retry_time
-         if(LocalDateTime.now().isBefore(a.getAuditRetryTime())){
-             String msg = "loggin blocked because of 3 wrong attempts ";
-             LOG.error(msg);
-             showMessageFatal(msg);
-             return null;
-         }
-         audit.setAuditPlayerId(player.getIdplayer());
+ //        if(LocalDateTime.now().isBefore(a.getAuditRetryTime())){
+ //            String msg = "loggin blocked because of 3 wrong attempts ";
+ //            LOG.error(msg);
+ /////            showMessageFatal(msg);
+  //           return null;
+  //       }
+  //       audit.setAuditPlayerId(player.getIdplayer());
        //  audit.setAuditEndDate(LocalDateTime.parse("2019-06-01T12:31:31")); // date fictive
-         audit.setAuditEndDate(LocalDateTime.now());
-         audit.setAuditAttempts((short)0);
-         audit.setAuditRetryTime(LocalDateTime.now()); //.minusMinutes(1)); 
+        
+    //     ait.setAuditAttempts((short)0);
+    //     audit.setAuditRetryTime(LocalDateTime.now()); //.minusMinutes(1)); 
          
     //    boolean ok = new modify.ModifyAudit().stop(player, conn);
-        boolean ok = new modify.ModifyAudit().stop(audit, conn);
+        
   //   }
-    */
+
           LOG.info("line 00");
         reset("from logout"); // new 28/09/2014
                   LOG.info("line 01");
         player = new Player(); // new 28/09/2014
             LOG.info("exiting logout() !!!");
    //         LOG.info("ec to string = " + ec.getContext().toString());
-        ec.invalidateSession();
-            LOG.info("session invalidated !! " );
+   ExternalContext ec1 = FacesContext.getCurrentInstance().getExternalContext();
+    ec1.invalidateSession();
+ //   ec1.redirect(ec1.getRequestContextPath() + "/login.xhtml");
+ //  String msg = "You asked a logout from the Logout button";
+ //         LOG.info(msg);
+ //         showMessageInfo(msg);
+  ///      ec.invalidateSession();
+ // (Connected)
+    //  LOG.info("session invalidated !! " + ec1.getSession()..getSessionId());
 // à faire : si 
     if(lgt.equals("from button Logout")){
           String msg = "You asked a logout from the Logout button";

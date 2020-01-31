@@ -2,7 +2,7 @@ package lc.golfnew;
 
 import java.io.IOException;
 import java.io.Serializable;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -28,17 +28,16 @@ import javax.validation.constraints.*;
 
 //https://rieckpil.de/howto-simple-form-based-authentication-for-jsf-2-3-with-java-ee-8-security-api/
 @Named("loginBacking")
-@RequestScoped
+@SessionScoped
 //@SessionScoped
-public class Login implements Serializable, interfaces.Log
-{
+public class Login implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
 
 @NotNull(message="user name cannot be null louis")
 @Size(min=3, max= 5, message = "Username must be between {min} and {max} characters")
     private String username;
 
-@NotNull(message="{password.notnull}")
+//@NotNull(message="{password.notnull}")
 @Size(min=5, max=50, message = "Password must be between {min} and {max} characters")
     private String password;
 

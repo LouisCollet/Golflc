@@ -22,7 +22,7 @@ import static utils.LCUtil.showMessageFatal;
 @Named
 @JsonPropertyOrder({"datesSeason","days","teeTimes","priceEquipments"}) // new 22/01/2019 not working ?
 public class TarifGreenfee implements Serializable{
-@JsonIgnore
+@JsonIgnore // ne sera pas chargé en database
    @NotNull(message="{tarifMember.startdate.notnull}")
     private Date startDate;
 

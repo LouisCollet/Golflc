@@ -129,6 +129,27 @@
                          style="float: right;"
                          action="password_modify.xhtml"/>
 
+         <p:commandButton
+                         value="Password Correct"
+                         id="buttonPasswordCorrect"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-question-circle"
+                         style="float: left;"
+                         action="#{courseC.passwordVerification('OK')}"
+                         />
+          <p:commandButton
+                         value="Password Wrong"
+                         id="buttonPasswordWrong"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="fa fa-question-circle"
+                         style="float: left;"
+                         action="#{courseC.passwordVerification('KO')}"
+                         />
+        
 </f:facet>
 </p:panelGrid>
 </h:form>

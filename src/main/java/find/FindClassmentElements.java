@@ -7,8 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import utils.LCUtil;
 
-public class FindClassmentElements implements interfaces.Log, interfaces.GolfInterface
-{
+public class FindClassmentElements implements interfaces.Log, interfaces.GolfInterface{
     private static Classment liste = null;
     final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
     

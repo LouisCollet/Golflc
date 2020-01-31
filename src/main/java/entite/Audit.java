@@ -75,9 +75,9 @@ public class Audit implements Serializable, interfaces.Log, interfaces.GolfInter
 public String toString(){ 
 LOG.info("starting toString for Audit!");
  try{
-    LOG.info("idaudit : "   + this.getIdaudit());
-    LOG.info("AuditStartDate no format: "   + this.getAuditStartDate());
-    LOG.info("AuditStartDate format LocalDateTime: "   + this.getAuditStartDate().format(ZDF_TIME));
+//    LOG.info("idaudit : "   + this.getIdaudit());
+//    LOG.info("AuditStartDate no format: "   + this.getAuditStartDate());
+//    LOG.info("AuditStartDate format LocalDateTime: "   + this.getAuditStartDate().format(ZDF_TIME));
    if(this.getIdaudit() != null){
        return 
         (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 
@@ -113,7 +113,7 @@ public static Audit mapAudit(ResultSet rs) throws SQLException{
            
    return a;
   }catch(Exception e){
-   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage();
    LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;

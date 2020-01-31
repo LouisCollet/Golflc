@@ -92,11 +92,9 @@ String query =
     public static void setListe(List<ECourseList> liste) {
         CourseList.liste = liste;
     }
-    public static void main(String[] args) throws SQLException, Exception{
+ public static void main(String[] args) throws SQLException, Exception{
      Connection conn = new DBConnection().getConnection();
   try{
- //   Player player = new Player();
- //*   player.setIdplayer(324713);
     List<ECourseList> lp = new ClubList().list(conn);
         LOG.info("from main, after lp = " + lp);
  } catch (Exception e) {

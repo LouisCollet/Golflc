@@ -9,7 +9,5 @@ Description :  JBoss Web deployment descriptor. This can be use to override sett
 -->  
 <!DOCTYPE jboss-web PUBLIC "http://www.jboss.org/j2ee/dtd" "http://www.jboss.org/j2ee/dtd/jboss-web_5_0.dtd">
 <jboss-web>
-<!--<context-root>test</context-root> context-root 
-Root context of the web-app. It defaults to the filename of the deployememt without the .war suffix
- -->
+ <!--  <security-domain>jaspitest</security-domain> -->
 </jboss-web>

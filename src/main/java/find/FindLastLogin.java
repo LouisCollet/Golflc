@@ -61,7 +61,6 @@ try{
     Connection conn = new DBConnection().getConnection();
     Player player = new Player();
     player.setIdplayer(324713);
-    
     Audit i = new FindLastLogin().find(player, conn);
         LOG.info("last audit login = " + i);
     DBConnection.closeQuietly(conn, null, null, null);

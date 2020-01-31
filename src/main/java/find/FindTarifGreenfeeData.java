@@ -17,8 +17,8 @@ public class FindTarifGreenfeeData implements interfaces.GolfInterface{
 final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
 public TarifGreenfee find(final Course course, final Round round, final Connection conn) throws SQLException{
-        LOG.info("entering findTarif ...");
-        LOG.info("starting findTarif for course = " + course.toString());
+        LOG.info("entering FindTarifGreenfeeData.find ...");
+        LOG.info("starting findTarif for course = " + course);
         
         final String METHODNAME = Thread.currentThread().getStackTrace()[1].getMethodName(); 
     PreparedStatement ps = null;
@@ -36,8 +36,8 @@ try{
         rs =  ps.executeQuery();
         rs.last(); //on récupère le numéro de la ligne
             LOG.info("ResultSet FindTarif has " + rs.getRow() + " lines.");
-        if(rs.getRow() == 0)
-            { //  String msg = " -- No tarif found for this course = ";
+        if(rs.getRow() == 0){
+            //  String msg = " -- No tarif found for this course = ";
                 String err =  LCUtil.prepareMessageBean("tarif.notfound");
                 err = err + course.getCourseName() + " / " + course.getIdcourse();
                 LOG.error(err);
@@ -47,15 +47,24 @@ try{
             //    throw new Exception(msg);
             }
         if(rs.getRow() > 1){ 
-            throw new Exception(" -- More than 1 tarif = " + rs.getRow() );  }
+            throw new Exception(" -- There is more than 1 tarif = " + rs.getRow() );  }
         rs.beforeFirst(); //on replace le curseur avant la première ligne
         String s = null;
-	while(rs.next())
-        {
+	while(rs.next()){
              s = rs.getString("TarifJson");
 	}
    //     LOG.info("line 01");
         ObjectMapper om = new ObjectMapper();
+   //     om.enable(SerializationFeature.INDENT_OUTPUT);
+        String formattedData = om.writeValueAsString(s);
+        LOG.info("formatted json = " + formattedData);
+        
+ // String jsonCarArray = "[{ \"color\" : \"Black\", \"type\" : \"BMW\" }, { \"color\" : \"Red\", \"type\" : \"FIAT\" }]";
+ // List<Car2> listCar = om.readValue(jsonCarArray, new TypeReference<List<Car2>>(){});
+ // LOG.info("starting print listCar");
+ // listCar.forEach(item -> LOG.info("TeeStart list " + item));  // java 8 lambda
+      
+        
   //  	om.enable(SerializationFeature.INDENT_OUTPUT);//Set pretty printing of json
  //       om.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // fields private accepted in class tarif 
         TarifGreenfee t = om.readValue(s,TarifGreenfee.class);
@@ -79,17 +88,15 @@ try{
 }//end method
 
 public static void main(String[] args) throws Exception , Exception{
-
     Connection conn = new DBConnection().getConnection();
-    Course course = new Course();
-    course.setIdcourse(102);
+    Course course = new load.LoadCourse().load(conn,102);
     Round round = new Round();
     round.setIdround(102);
+    round = new load.LoadRound().load(round, conn);
 
    TarifGreenfee t1 = new FindTarifGreenfeeData().find(course, round, conn);
      LOG.info("TarifGreenfee extracted from database = "  + t1.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
-    
 } // end Class

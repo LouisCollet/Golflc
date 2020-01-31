@@ -31,12 +31,12 @@ public class ParticipantsStableford implements Serializable, interfaces.Log{
     public List<ECourseList> listAllParticipants(final Round round ,final Connection conn) throws SQLException        
 {   
     LOG.info(" ... entering ParticipantsStableford !! with Round = " + round.getIdround() );
-if(liste == null)
-{   
+    LOG.info("Connection = " + conn);
+if(liste == null){   
     PreparedStatement ps = null;
     ResultSet rs = null;
-try
-{        LOG.debug("starting getParticipantsStableford ...for round  = "  + round.getIdround() );
+try{
+    LOG.debug("starting getParticipantsStableford ...for round  = "  + round.getIdround() );
      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
      String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
      String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
@@ -174,25 +174,22 @@ try
         ParticipantsStableford.liste = liste;
     }
 
-    
-      public static void main(String[] args) throws SQLException, Exception {// testing purposes
+    public static void main(String[] args) throws SQLException, Exception {// testing purposes
+       LOG.info("entering Main");
     Connection conn = new DBConnection().getConnection();
+   
+   LOG.info("line 11");
+
   //  Player player = new Player();
   //  player.setIdplayer(324713);
    Round round = new Round(); 
    round.setIdround(414);
   //  Club club = new Club();
   //  club.setIdclub(1006);
-    List<ECourseList> p1 = new ParticipantsStableford().listAllParticipants(round, conn);
-        LOG.info("Inscription list = " + p1.toString());
-    DBConnection.closeQuietly(conn, null, null, null);
+  List<ECourseList> p1 = new ParticipantsStableford().listAllParticipants(round, conn);
+      LOG.info("Inscription list = " + p1.toString());
+   DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main
-    
-    
-    
-    
-    
-    
-    
+
 } //end class

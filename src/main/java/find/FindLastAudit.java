@@ -30,42 +30,33 @@ try{
         utils.LCUtil.logps(ps); 
       rs = ps.executeQuery();
       rs.last(); //on récupère le numéro de la ligne
-            LOG.info("ResultSet FindPlayer has " + rs.getRow() + " lines.");
+            LOG.info("ResultSet FindLastAudit has " + rs.getRow() + " lines.");
         if(rs.getRow() > 1)
-            {   throw new Exception(" -- More than 1 player = " + rs.getRow() );  }
+            {   throw new Exception(" -- More than one LastAudit = " + rs.getRow() );  }
         rs.beforeFirst(); //on replace le curseur avant la première ligne
           //LOG.info("just before while ! ");
-        Audit a = null; // = 0.0;
+        Audit a = null;
 	while(rs.next()){
              a = entite.Audit.mapAudit(rs);
 	}
-      
-   //   int auditId = 0;
-    //  while (rs.next() ){        // ne devrait en avoir qu'un !!!
-   //         auditId = rs.getInt("AuditId");
-   //             LOG.info(" -- AuditId in method = " + auditId);
-    //    } // end while
-return a;
+   return a;
 }catch(Exception ex){
-    String msg = "-- exception in ! " + CLASSNAME + " / " + ex.toString() + "/";
-    LOG.error(msg);
-    throw ex;
+    String err = "-- Exception in ! " + CLASSNAME + " / " + ex.toString() + "/";
+    LOG.error(err);
+    return null;
 } // end catch
 finally{
     DBConnection.closeQuietly(null, null, rs, ps);
 }
-} // end method getLastAuditId
+} // end method find
     
  public static void main(String[] args) throws Exception , Exception{
-
     Connection conn = new DBConnection().getConnection();
- //   Player player = new Player();
- //   player.setIdplayer(324713);
     Audit audit = new Audit();
     audit.setAuditPlayerId(324713);
-    Audit a = new FindLastAudit().find(audit, conn);
-        LOG.info("last audit found = " + a);
+    audit = new FindLastAudit().find(audit, conn);
+        LOG.info("last audit found = " + audit);
     DBConnection.closeQuietly(conn, null, null, null);
-
 }// end main
+ 
 } // end class

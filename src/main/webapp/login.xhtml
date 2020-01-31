@@ -8,12 +8,9 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:o="http://omnifaces.org/ui"
-      xmlns:of="http://omnifaces.org/functions"
 >
 
 <ui:composition template="templates/loginTemplate.xhtml">
- 
     <!--  new 27-08-2018  -->
 <ui:define name="metadata">
     <f:metadata>
@@ -21,12 +18,10 @@
     </f:metadata>
 </ui:define>
     
-    
 <ui:define name="title">Login</ui:define>
 <ui:define name="help">
     <ui:include src="/help/help_login.xhtml"/>
 </ui:define>
-
 
 <ui:define name="content">
 <!--  value="#{msg['login.user.old']}"  -->    
@@ -36,12 +31,7 @@
         outcome="selectPlayer.xhtml"
         style="float:left;"
         >
-        <h:graphicImage 
-                    rendered="true"
-                    name="images/login.jpg"
-                    alt="image missing : login.jpg"
-                    style="float:left;">
-        </h:graphicImage>
+        <h:graphicImage rendered="true" name="images/login.jpg" alt="image missing : login.jpg" style="float:left;"> </h:graphicImage>
 </h:link>
 
 <h:link id="link02"
@@ -49,23 +39,8 @@
         outcome="register.xhtml"
         style="float:right;"
         > 
-        <h:graphicImage 
-                rendered="true"
-                name="images/register.jpg"
-                alt="image missing :golf_register.jpg"
-                style="float:right;">
-        </h:graphicImage>
+        <h:graphicImage rendered="true" name="images/register.jpg" alt="image missing :golf_register.jpg" style="float:right;"> </h:graphicImage>
 </h:link>
-<!--    
-<o:onloadScript>alert('Welcome user - omnifaces msg!');</o:onloadScript>
--->
-<!--
-<h:head>
-    <title>Login page</title>
-    <h:outputScript library="js" name="fa-weather-icon.js"/>    
-</h:head>
--->
-
 
 <h:form id="login" enctype="application/x-www-form-urlencoded" >
   <!--icon weather =  <i class="fawi fa-cloudy"></i>
@@ -87,9 +62,7 @@
         outcome="selectPlayer.xhtml"
         style="float:right;"
         > 
-        <h:graphicImage
-            name="images/arrow-left-3D.jpg" 
-            style="float:left;" />
+        <h:graphicImage name="images/arrow-left-3D.jpg"  style="float:left;" />
     </h:link>  
      
        <h:link id="link04"
@@ -97,12 +70,9 @@
         outcome="player.xhtml"
         style="float:right;"
         > 
-         <h:graphicImage
-             name="images/arrow-right-3D.jpg" 
-             style="float:right;" />
+         <h:graphicImage name="images/arrow-right-3D.jpg" style="float:right;" />
     </h:link>  
-     
-    
+
 </p:panelGrid>
 <h:graphicImage name="images/welcome3.jpg"  style="float: inside;" />
 </h:form>

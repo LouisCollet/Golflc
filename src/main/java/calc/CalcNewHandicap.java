@@ -63,7 +63,7 @@ try {
           }//end for 
     }
 //outerloop:
-LOG.info("Operation ont the hcp = " + add_substract);
+LOG.info("Operation on the hcp = " + add_substract);
  for(int j = 0; j < loops; j++){ 
       for(double[] BUFFER1 : BUFFER) {
           if(hcp >= BUFFER1[1] && hcp <= BUFFER1[2]) {

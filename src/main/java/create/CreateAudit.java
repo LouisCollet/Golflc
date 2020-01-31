@@ -12,7 +12,7 @@ import utils.LCUtil;
 public class CreateAudit implements Serializable,interfaces.Log{
 
 public boolean create(Player player, Connection conn) throws SQLException {
-        LOG.info("starting CreateAudit.create for player = " + player.getIdplayer());
+        LOG.info("starting CreateAudit.create for player = " + player);
     PreparedStatement ps = null;
  //   ResultSet rs = null;
 try{
@@ -24,13 +24,18 @@ try{
     ps.setTimestamp(3,LCUtil.getCurrentTimeStamp()); // AuditStartDate
     ps.setTimestamp(4,java.sql.Timestamp.valueOf("2019-06-01 00:00:00") ); // AuditEndDate : date fictive
     ps.setInt(5, 0); // AuditAttempts init = 0
-  //  java.sql.Timestamp ts = Timestamp.valueOf(round.getRoundDate());
     ps.setTimestamp(6,LCUtil.getCurrentTimeStamp()); // AuditRetryTimeDate : date fictive);
     ps.setTimestamp(7,LCUtil.getCurrentTimeStamp()); // ModificationDate
     utils.LCUtil.logps(ps);
+    
     int rows = ps.executeUpdate(); // write into database
       if (rows!=0){
-          LOG.info("-- successful INSERT Audit rows = " + rows);
+            LOG.info("-- successful INSERT Audit rows = " + rows);
+          int key = LCUtil.generatedKey(conn);
+            LOG.info("Audit generatedKey created = " + key);
+          
+          
+          
           return true;
       }else{
           LOG.info("-- UNsuccessful insert Audit !!! ");
@@ -42,8 +47,7 @@ try{
     LCUtil.showMessageFatal(msg);
     return false;
 }finally{
-      //  DBConnection.closeQuietly(conn, null, rs, ps);
-        DBConnection.closeQuietly(null, null, null, ps);
+    DBConnection.closeQuietly(null, null, null, ps);
 }
 } // end method 
 

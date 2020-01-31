@@ -60,13 +60,13 @@
  <p:separator/>
 
     <p:fileUpload
-
         fileUploadListener="#{courseC.uploadListener}"
         mode="advanced"
-        dragDropSupport="true"
+        dragDropSupport="false"
         allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
-        sizeLimit="61440"
-        invalidSizeMessage="GolfLC: Invalid Size : File Size should not exceed 60 MB"
+        sizeLimit="71680"
+        fileLimit="1"
+        invalidSizeMessage="GolfLC: Invalid Size : File Size should not exceed 70 MB"
         invalidFileMessage="GolfLC: Invalid File Type : only .jpg, .jpeg or.png types images are allowed !"
         fileLimitMessage="GolfLC: Invalid File Limit"
         label="#{msg['button.fileupload.browse']}"
@@ -78,7 +78,6 @@
  <p:separator/>
 
      <h:panelGrid columns="1">
-      
         <p:commandButton
              id="button01"
              value="#{msg['button.player.restart']}"
@@ -94,8 +93,7 @@
              immediate="true"
              icon="fa fa-remove"
              action="login.xthml"
- 
-                />
+           />
      </h:panelGrid>
 </h:form>
 

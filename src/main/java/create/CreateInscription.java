@@ -172,8 +172,12 @@ public Integer validate(final Round round, final Player player, final Inscriptio
 
 } // end method validate
 
-    public static void main(String[] args) throws SQLException, Exception{
-     Connection conn = new DBConnection().getConnection();
+
+    public static void main(String[] args) throws SQLException, Exception{ //enlevé static
+        LOG.info("line 01");
+
+    LOG.info("line 03, map = "); // + get);
+      Connection conn = new DBConnection().getConnection();
   try{
    Player player = new Player();
    player.setIdplayer(324714);

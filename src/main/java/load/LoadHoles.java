@@ -8,16 +8,14 @@ import java.sql.SQLException;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class LoadHoles implements interfaces.Log
-{
+public class LoadHoles implements interfaces.Log{
 
-public HolesGlobal LoadHolesArray(Connection conn, int idtee) throws SQLException // throws SQLException
-{ 
+public HolesGlobal LoadHolesArray(Connection conn, int idtee) throws SQLException{ 
         ResultSet rs = null;
         PreparedStatement ps = null;
         HolesGlobal hg = new HolesGlobal();
-try
-{    LOG.info("entering LoadHoles ...");
+try{ 
+    LOG.info("entering LoadHoles ...");
     LOG.info("starting LoadHolesArray with idtee = = " + idtee) ;
   String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
   String query =  

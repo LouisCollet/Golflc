@@ -6,8 +6,7 @@ import exceptions.LCCustomException;
 import googlemaps.GoogleResult;
 import googlemaps.GoogleTimeZone;
 import static interfaces.Log.LOG;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import lc.golfnew.GoogleGeoApiController;
@@ -16,14 +15,13 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 
-public class FindPlayerCoordinates implements interfaces.Log
-{
+public class FindPlayerCoordinates implements interfaces.Log{
+
    final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
- //  final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
-public Player findPlayerLatLngTz (final Player player) //throws SQLException
-{   
+
+public Player findPlayerLatLngTz (final Player player){
 LOG.info("entering findPlayerLatLngTz " );
-   try{     
+   try{
         LOG.info("player city = " + player.getPlayerCity() );  // a été complété par playerCityListener, 
         LOG.info("player country = " + player.getPlayerCountry() ); // a été complété par playerCountryListener, 
         //ici on peut chipoter avc GoogleGeoApiController enfin enfin !!!!
@@ -65,8 +63,8 @@ LOG.info("entering findPlayerLatLngTz " );
                 LOG.info("tz.getTimeZoneId() = " + tz.getTimeZoneId());
              player.setPlayerZoneId(tz.getTimeZoneId());
              // new fonctionne ?
-             byte ptext[] = tz.getTimeZoneName().getBytes(ISO_8859_1); 
-             String value = new String(ptext, UTF_8); 
+             byte ptext[] = tz.getTimeZoneName().getBytes(StandardCharsets.ISO_8859_1); 
+             String value = new String(ptext, StandardCharsets.UTF_8); 
              player.setPlayerZoneName(value);
              // old
              player.setPlayerZoneName(tz.getTimeZoneName());
@@ -98,11 +96,10 @@ LOG.info("entering findPlayerLatLngTz " );
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return null;
-}
-finally
-{
+}finally{
 }
 } //end method
+
 public static void main(String[] args) throws Exception , Exception{
 
         LOG.info("starting main of FindPlyerCoordinates");

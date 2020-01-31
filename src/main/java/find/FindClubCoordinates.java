@@ -6,8 +6,7 @@ import exceptions.LCCustomException;
 import googlemaps.GoogleResult;
 import googlemaps.GoogleTimeZone;
 import static interfaces.Log.LOG;
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import lc.golfnew.GoogleGeoApiController;
@@ -15,8 +14,8 @@ import lc.golfnew.ListCountry;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class FindClubCoordinates implements interfaces.Log
-{
+public class FindClubCoordinates implements interfaces.Log{
+    
    final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
    
 public Club findClubLatLngTz (final Club club){
@@ -92,8 +91,8 @@ try{
              club.setClubTimeZone(tz);  // move global de 3 fields 
                 LOG.info("club timezone = " + club.getClubTimeZone());
              club.setClubFormattedAddress(gr.getFormatted_address());
-             byte ptext[] = tz.getTimeZoneName().getBytes(ISO_8859_1); 
-             String value = new String(ptext, UTF_8); 
+             byte ptext[] = tz.getTimeZoneName().getBytes(StandardCharsets.ISO_8859_1); 
+             String value = new String(ptext, StandardCharsets.UTF_8); 
               LOG.info("value UTF8 = " + value);
         }
             LOG.info("Club ZoneId      = " + club.getClubTimeZone().getTimeZoneId());

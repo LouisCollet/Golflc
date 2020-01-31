@@ -1,4 +1,3 @@
-
 package find;
 
 import create.CreateSubscription;
@@ -14,16 +13,17 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 public class FindSubscriptionStatus {
-        private static List<Subscription> subscr;
+     private static List<Subscription> subscr;
         
-  public Boolean subscriptionStatus (Subscription subscription, Player player, Connection conn) throws Exception
-     {
-     try{
+  public Boolean find (Subscription subscription, Player player, Connection conn) throws Exception{
+   try{
          LOG.info("entering subcriptionStatus");
-         subscr = new find.FindSubscription().subscriptionDetail(player, conn);
-         if(subscr == null){  // il n'existe pas de record Subscription pour ce player
+         LOG.info("entering with subcription = " + subscription);
+         
+      subscr = new find.FindSubscription().subscriptionPayments(player, conn);
+      if(subscr == null){  // il n'existe pas de record Subscription pour ce player
           //   String msg = "No subscription known : we start creating a subscription record for player = " + player.getIdplayer();
-            String msg = LCUtil.prepareMessageBean("subscription.notfound");
+         String msg = LCUtil.prepareMessageBean("subscription.notfound");
              LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
              if(new CreateSubscription().create(player, conn)){ // resultat = ok
@@ -92,12 +92,8 @@ public class FindSubscriptionStatus {
     player.setIdplayer(324713);
     Subscription subscription = new Subscription();
     // compléter ic certains éléments
-    Boolean p1 = new FindSubscriptionStatus().subscriptionStatus(subscription, player, conn);
-        LOG.info("player found = " + p1.toString());
-//for (int x: par )
-//        LOG.info(x + ",");
+    Boolean p1 = new FindSubscriptionStatus().find(subscription, player, conn);
+        LOG.info("subcription found ? = " + p1.toString());
     DBConnection.closeQuietly(conn, null, null, null);
-
 }// end main
-  
 } // end Class

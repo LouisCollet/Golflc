@@ -15,7 +15,7 @@ public class LoadGreenfee implements Serializable{
 
 public Greenfee load(TarifGreenfee tarifGreenfee, Greenfee greenfee, Club club, Round round) throws Exception{
 try{
-        LOG.info("entering LoadGreenfee - load");
+        LOG.info("entering LoadGreenfee.load");
      double d = new calc.CalcPrixGreenfee().calc(tarifGreenfee);
         LOG.info("le prix du greenfee est " + d);
      greenfee.setPrice(d);

@@ -2,12 +2,14 @@ package modify;
 
 //import create.*;
 //import entite.Handicap;
+import entite.Club;
 import entite.Course;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import load.LoadClub;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -80,4 +82,29 @@ catch (SQLException sqle) {
         }
 //         return false;
     } //end ModifyCourse
+
+  public static void main(String[] args) throws SQLException, Exception{
+      //à adapter !
+     Connection conn = new DBConnection().getConnection();
+  try{
+     //   Player player = new Player();
+     //   player.setIdplayer(324713);
+     //   Round round = new Round(); 
+     //   round.setIdround(300);
+     Club club = new Club();
+     club.setIdclub(1104);
+  //   load.LoadClub(club,conn);
+     Club c = new LoadClub().load(club, conn);
+     c.setClubName(club.getIdclub() + "modified");
+     boolean b = new ModifyClub().modify(c,conn);
+         LOG.info("from main, resultat = " + b);
+ }catch (Exception e){
+            String msg = "££ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+      //      LCUtil.showMessageFatal(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
+
 } //end Class

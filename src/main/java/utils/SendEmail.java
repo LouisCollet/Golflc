@@ -12,16 +12,12 @@ import javax.mail.internet.InternetAddress;
 import lc.golfnew.Constants;
 
 public class SendEmail implements interfaces.Log{
-    
-    
-  //  final private String subject; //= msgSubject;
     private String text; // = msgText;
- //   private static String password;
     private static String fromEmail;
     private File attachment;
 
-public boolean sendHtmlMail(final String sujet, String texte, final String to, String type) throws UnsupportedDataTypeException, MessagingException, Exception
-{
+public boolean sendHtmlMail(final String sujet, String texte, final String to, String type) throws UnsupportedDataTypeException, Exception{
+
         LOG.info(" starting SendEmail sendHtmlMail ");
         LOG.info("entering SendEmail with type = " + type);
     final String mailserver = "relay.proximus.be";
@@ -34,7 +30,7 @@ public boolean sendHtmlMail(final String sujet, String texte, final String to, S
     final String port = "587"; // authentification required
     final String username = "louis.collet@skynet.be";
     final String displayName = "GolfLC";
-    final String password = "9tygru4m";
+    final String password = "Lm58Spa2"; // new 12/2019 was 9tygru4m";
   //  String password = "lc1lc2lc"; // mod 26/12/2016 was "d"
 try{
     Properties props = System.getProperties();
@@ -147,8 +143,11 @@ try{
     tra.close();
 
     return true;
+}catch (MessagingException e){
+    LOG.error("MessagingException in sendHtmlMail = " + e.getMessage(), e);
+    throw e;
 }catch (Exception e){
-    LOG.error("Error SendEmail = " + e.getMessage(), e);
+    LOG.error("Exception in sendHtmlMail = " + e.getMessage(), e);
     throw e;
 }
 } // end method

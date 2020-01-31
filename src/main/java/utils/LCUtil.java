@@ -408,12 +408,11 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
         Statement st = conn.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY,java.sql.ResultSet.CONCUR_UPDATABLE);
         ResultSet rs = st.executeQuery("SELECT LAST_INSERT_ID()");
         int autoIncrementKey = 0;
-        if (rs.next())
-            {
+        if (rs.next()){
                 autoIncrementKey = rs.getInt(1);
-            }else{
+        }else{
            LOG.error("error in Key returned from getGeneratedKeys():" + autoIncrementKey);
-            }
+        }
         return  autoIncrementKey ;
 }
 /*
@@ -1093,17 +1092,16 @@ for (File file : files)
 } // end method
 
 
-public static void logps(PreparedStatement ps) 
-{
-  try{
+public static void logps(PreparedStatement ps){
+try{
  ///       LOG.info("entering logps");     
         //avec connection pool p = org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8@10b61e60
 //        org.jboss.jca.adapters.jdbc.jdk8.WrappedPreparedStatementJDK8.
         //connection classique p = com.mysql.cj.jdbc.ClientPreparedStatement: SELECT idplayer, PlayerFirstName, PlayerLastName, PlayerCity, Play
     String p = ps.toString();
  ///   LOG.info("p toString = " + p);
-    if(p.contains("WrappedPreparedStatement")){
-//        LOG.info("pooled connection");
+    if(p.contains("WrappedPreparedStatement")){ // connector-j 8xxx
+//        LOG.info("pooled connection for ");
     }else{
       //  LOG.info("p 0 = " + p.substring(0));
         LOG.debug("Prepared Statement after bind variables set= " + p.substring(p.indexOf(":"), p.length() ));
@@ -1168,7 +1166,7 @@ try{
     
    // DBMeta.listMetaData(conn);
    // DBMeta.listMetaData(PostStartupBean.getConn());
-   DBConnection.getPooledConnection();
+ ////  DBConnection.getPooledConnection(); enlevé 01/121/2019
    ListAllSystemProperties();
    
  //  DBConnection.closeQuietly(conn, null, null, null);

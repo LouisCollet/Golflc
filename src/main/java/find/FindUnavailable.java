@@ -12,8 +12,8 @@ import utils.DBConnection;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 
-public class FindUnavailable implements interfaces.Log, interfaces.GolfInterface
-{
+public class FindUnavailable implements interfaces.Log, interfaces.GolfInterface{
+
     final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
     
 public Unavailable find(final Course course, final Round round, final Connection conn) throws SQLException{

@@ -17,8 +17,7 @@ import utils.DBConnection;
 public class CalcStablefordPlayingHandicap implements interfaces.Log{
 
  public int calc(final Connection conn, final Player player, final Round round) throws SQLException, Exception{
-// was String[]
-  //  String[] array_return_error = new String [3];  
+
 try{
     LOG.info("entering CalcStablefordPlayingHandicap.calc !");
     LOG.info("with player = " + player.toString());
@@ -136,12 +135,16 @@ finally{}
     }
   //  LOG.info("clubhandicap = " + clubhandicap);
   if(category == 15 ){ // catégories de 1 à 5
+      LOG.info("calculating playing hcp for categories 1 to 5 = "); // + playing_hcp);
+      
     if(nholes == 18){
         playing_hcp = (int) Math.round( (exact_hcp * (slope/113.0) ) + (rating-par) );
+        LOG.info("calculated new playing hcp for categories 1 to 5, 18 holes = "); // + playing_hcp);
     }else{ // 9 holes
         playing_hcp = (int) Math.round( (exact_hcp*(slope/113.0))/2 + ((rating/2) - par) );
+        LOG.info("calculated new playing hcp for categories 1 to 5, 18 holes = "); // + playing_hcp);
     }
-        LOG.info("calculated new playing hcp for categories 1 to 5 = " + playing_hcp);
+        
     return playing_hcp;
   } // end category 1-5
 

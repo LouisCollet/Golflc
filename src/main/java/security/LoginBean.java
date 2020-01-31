@@ -116,8 +116,10 @@ public class LoginBean {
         try {
             // Logout current request
             request.logout();
+            LOG.info("request.logout was called");
             // Invalidate session so user becomes anonymous.
             request.getSession().invalidate();
+             LOG.info("request.getSession was invalidated");
         } catch (ServletException e) {
             addError(context, e.getMessage());
         }

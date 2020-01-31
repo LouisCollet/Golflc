@@ -5,13 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.SessionScoped;
 //import javax.faces.bean.ApplicationScoped;
 //import javax.faces.bean.ManagedBean;
 import javax.inject.Named;
 
 //@Named
-//@ManagedBean(name = "carService")
 //@ApplicationScoped
 
 @Named("carService")

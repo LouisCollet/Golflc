@@ -7,6 +7,7 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 public class DeleteClub implements interfaces.Log, interfaces.GolfInterface{
+    
   public boolean delete(final int idclub, final Connection conn) throws Exception {
     PreparedStatement ps = null;
 try{ 
@@ -41,8 +42,7 @@ try{
 }
 } //end method
    
- public static void main(String[] args) throws SQLException, Exception 
- {
+ public static void main(String[] args) throws SQLException, Exception{
      Connection conn = new DBConnection().getConnection();
  try{
     int idclub = 113;

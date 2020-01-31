@@ -23,7 +23,7 @@ private static ResultSet rs = null;
 private static ArrayList<Flight> liste = null;
 
 //public ArrayList<Flight> createTableFlights (ZonedDateTime sunrise, ZonedDateTime sunset,
-//                                             String tz, int courseid, Connection conn) throws ParseException{
+//             String tz, int courseid, Connection conn) throws ParseException{
     public ArrayList<Flight> createTableFlights (Flight flight, String tz, Connection conn) throws ParseException{
     
 //   LOG.info("entering createTableFlights ");

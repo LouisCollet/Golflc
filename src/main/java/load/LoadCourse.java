@@ -12,12 +12,11 @@ import utils.LCUtil;
 public class LoadCourse
 {
 // à adapter
-public Course LoadCourse(Connection conn, int idcourse) throws SQLException
-{
+public Course load(Connection conn, int idcourse) throws SQLException{
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
-        LOG.info("entering LoadCourse");
+        LOG.info("entering LoadCourse.load");
     final String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
 
     final String query = "SELECT "
@@ -49,8 +48,7 @@ try{
   //  LCUtil.showMessageFatal("Exception in LoadClub = " + ex.toString() );
      return null;
 }
-finally
-{
+finally{
        // DBConnection.closeQuietly(conn, null, rs, ps);
     DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
@@ -65,7 +63,7 @@ public static void main(String[] args) throws SQLException, Exception // testing
 //    club.setIdclub(104);
 //round.setIdround(206);
    LoadCourse lc = new LoadCourse();
-   Course course = lc.LoadCourse(conn, 104);
+   Course course = lc.load(conn, 104);
       LOG.info(" club = " + course.toString());
 //for (int x: par )
 //        LOG.info(x + ",");
