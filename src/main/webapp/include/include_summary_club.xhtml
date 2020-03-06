@@ -34,6 +34,11 @@
             id="coursesummary" 
             value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
       
+      <h:outputText value="#{msg['club.zoneid']} :"   />
+	<h:outputText
+            id="clubszoneId" 
+            value="#{courseC.club.clubTimeZone.timeZoneId}" />
+
       <h:outputText value="#{msg['tee.id']} :" 
                     rendered="#{courseC.tee.idtee != null}"/>
       <h:outputText

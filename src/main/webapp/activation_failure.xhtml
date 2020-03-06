@@ -17,16 +17,8 @@
     <ui:include src="/help/help_activation_check.xhtml"/>
 </ui:define>
 <ui:define name="content">
-<h:graphicImage 
-                name="images/thumbDown.png"
-                alt="image missing :golf_register.jpg"
-                style="float:left;">
-</h:graphicImage>
-<h:graphicImage 
-                name="images/thumbDown.png"
-                alt="image missing :golf_register.jpg"
-                style="float:right;">
-</h:graphicImage>    
+<h:graphicImage name="images/thumbDown.png" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
+<h:graphicImage name="images/thumbDown.png" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>    
     <!-- -->
 <h:form id="activation_failure" enctype="application/x-www-form-urlencoded" >
 <ui:include src="include/include_messages.xhtml"/>
@@ -51,7 +43,7 @@
                          update="growl-msg"
                          immediate="true"
                          icon="ui-icon-pencil"
-                         action="#{courseC.logout()}"
+                         action="#{courseC.logout("from activation_failure.xhtml")}"
            />
 </f:facet>
 </p:panelGrid>

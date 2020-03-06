@@ -18,29 +18,25 @@
         <f:viewParam
             required="true"
             name="uuid"
-            value="#{activationC.uuid}"
+            value="#{courseC.activation.activationKey}"
             requiredMessage="You did not specify a cmd. (The - uuid - parameter is missing)"
             converterMessage="Invalid cmd. (The - uuid - parameter is not a number)"
             validatorMessage="Invalid cmd. (The - uuid - parameter is not a positive number, minimum 3 length)">
             <f:validateLength minimum="3" />
         </f:viewParam>
-    </f:metadata>    
+        <f:viewAction action="#{languageC.setLanguage(param.language)}"/>
+        <f:viewAction action="#{courseC.findActivation(param.uuid)}"/>
+   
+     </f:metadata>    
+
 </ui:define>
 <ui:define name="title">Activation check </ui:define>
 <ui:define name="help">
     <ui:include src="/help/help_activation_check.xhtml"/>
 </ui:define>
 <ui:define name="content">
-<h:graphicImage 
-                name="images/activate1.jpg"
-                alt="image missing :golf_register.jpg"
-                style="float:left;">
-</h:graphicImage>
-<h:graphicImage 
-                name="images/activate2.jpg"
-                alt="image missing :golf_register.jpg"
-                style="float:right;">
-</h:graphicImage>    
+<h:graphicImage name="images/activate1.jpg" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
+<h:graphicImage name="images/activate2.jpg" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>    
     <!-- -->
 <h:form id="activation_check" enctype="application/x-www-form-urlencoded" >
 <ui:include src="include/include_messages.xhtml"/>
@@ -55,18 +51,20 @@
 </f:facet>
 
    <h:outputText value="#{msg['player.first']}" />
-   <h:outputText value="#{request.getParameter('firstname')}" 
-                        style="font-style:italic"/>
+   <h:outputText value="#{param.firstname}" />
+
    <h:outputText value="#{msg['player.last']}"   />
-   <h:outputText value="#{param['lastname']}"
-                 style="font-style:italic" />
+   <h:outputText value="#{param.lastname}" /> 
+
+   <h:outputText value="#{msg['player.language']}"   />
+   <h:outputText value="#{param.language}" /> 
 
 <f:facet name="footer">
         <p:commandButton value="#{msg['button.activate']}"
                          update="growl-msg"
                          immediate="true"
                          icon="ui-icon-pencil"
-                         action="#{activationC.checkActivation()}"/>
+                         action="#{courseC.newPlayer()}"/>
 </f:facet>
 </p:panelGrid>
 </h:form>

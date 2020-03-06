@@ -12,23 +12,15 @@
       xmlns:o="http://omnifaces.org/ui"
       xmlns:of="http://omnifaces.org/functions"
         >
-<ui:composition template="templates/loginTemplate.xhtml">
+<ui:composition template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Activation success </ui:define>
 <ui:define name="help">
     <ui:include src="/help/help_activation_check.xhtml"/>
 </ui:define>
 <ui:define name="content">
-<h:graphicImage 
-                name="images/thumbUp.png"
-                alt="image missing :golf_register.jpg"
-                style="float:left;">
-</h:graphicImage>
-<h:graphicImage 
-                name="images/thumbUp.png"
-                alt="image missing :golf_register.jpg"
-                style="float:right;">
-</h:graphicImage>    
+<h:graphicImage name="images/thumbUp.png" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
+<h:graphicImage name="images/thumbUp.png" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>    
     <!-- -->
 <h:form id="activation_success" enctype="application/x-www-form-urlencoded" >
 <ui:include src="include/include_messages.xhtml"/>

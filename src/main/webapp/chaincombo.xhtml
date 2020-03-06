@@ -7,29 +7,107 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       >
+    <!-- https://www.geeksforgeeks.org/create-countdown-timer-using-javascript/
+    -->
     <h:head>
         <title>Chain combo</title>
     </h:head>
     <h:body>
         <h:form id="form1">
+            <h3>   <h:outputText value="essai de countdown " />   : <span id="countdown">10</span> </h3>
+            <h:outputText value="countdown 2 " />  
+            <p id="demo"></p> 
             <p:panel header="Chain Combo Example" style="width: 500px;">
                 <h:panelGrid columns="2">  
-                    <h:outputText value="Select Category: " />  
+                    <h:outputText value="Select Club: " />  
                     <p:selectOneMenu value="#{category.catname}"
                                      id="cat"
                                      valueChangeListener="#{category.processScat}">  
-                        <f:selectItem itemLabel="Select Category" itemValue="" />
+                        <f:selectItem itemLabel="Select Club" itemValue="" />
                         <f:selectItems value="#{category.categoryName}"/> 
                         <p:ajax update="scat" event="change" />
                     </p:selectOneMenu>
-                    <h:outputText value="Select Sub-Category: " />  
+                    <h:outputText value="Select Sub-Category course : " />  
                     <p:selectOneMenu value="#{category.subcatname}"
                                      id="scat"> 
-                        <f:selectItem itemLabel="Select Sub-Category" itemValue="" />
+                        <f:selectItem itemLabel="Select Course" itemValue="" />
                         <f:selectItems value="#{category.subCategoryName}"/>
                     </p:selectOneMenu>
                 </h:panelGrid>
             </p:panel>
+            
+  <script type="text/javascript">
+       "use strict";    
+      // essayer ensuite avec form object as parameter call function(this.form) dans .xhtml
+      
+      var seconds = 0;
+      var time = "";
+ //     var time2 = "";
+      var message = "";
+      var now = "";
+  try{
+ //  console.log("title = " + window.document.title);
+ //  console.log("visible = " + window.locationbar.visible);
+  //  console.log("URL = " + document.URL);
+    alert("entering javascript");
+    time = document.getElementById('form1:time').value;
+        alert("time = " + time);
+        console.log("time = " + time);
+ //   time = document.getElementById('password_check:time').value; //.value;//.value;
+  //      alert("time = " + time);
+    var seconds = 10;  // Total seconds to wait  // change it for real world !
+        console.log("seconds to wait = " + seconds);
+  // get today's date ans time
+    now = new Date().getTime();
+    console.log("now = " + now);
+  // find distance between now and the count down date   
+  
+    function countdown() {
+         seconds = seconds - 1;
+        if (seconds &lt; 0) { // &lt; stands for the less-than sign
+            // Change your redirection link here
+        //    document.getElementById("password_check:countdown").innerHTML +=  
+         //     "<h3>This Too LATE going to login.xhtml!</h3>"; 
+            alert("we redirect to login.xhtml");
+            window.location = "login.xhtml"; //https://duckdev.com
+            javascript_abort();
+        } else {
+            console.log("seconds > 0 " + seconds);
+            var myForm = document.getElementById("form1");
+            console.log("myForm =  " + myForm.toString()); 
+    //Extract Each Element Value
+    for (var i = 0; i &lt; myForm.elements.length; i++) { // // &lt; stands for the less-than sign
+    console.log("elements = " + yForm.elements[i].value);
+    }
+            //var messageElement = document.getElementById("message"); 
+    //  messageElement.innerHTML = "This is how we access an HTML DOM element using its id value."; 
+            
+            
+            // Update remaining minutes and seconds // display the result in tha element with id="countdown"
+            var s = Math.floor(seconds/60) + " minute(s) " + Math.floor(seconds%60) + " seconds"; 
+            console.log("var  s = " + s);
+            document.getElementById("countdown").innerHTML = s; 
+            window.setTimeout("countdown()", 1000);      // Count down using javascript
+        }
+    }  //end function countdown
+function javascript_abort()
+{
+    console.log("from function user abort js");
+   throw new Error('This is not an error. This is just to abort javascript');
+} 
+    // Run countdown function
+ //   window.onload = countdown();
+   // document.onload = countdown();
+    countdown();
+   }catch(exception){
+    // http://www.sitepoint.com/exceptional-exception-handling-in-javascript/
+ //   var message = exception.message;
+  // handle the exception
+        console.info("LC Exception = " + exception.message);
+    //    console.error("LC Exception initial variable definition = " + exception);
+}  
+</script>
+
         </h:form>
     </h:body>
 </html>

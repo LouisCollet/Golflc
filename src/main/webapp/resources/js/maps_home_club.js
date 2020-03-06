@@ -10,11 +10,6 @@ window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
 var google, source, destination, directionsService, directionsDisplay, amazone, mapOptions, map, request;
 var timeout = 600;
 
-
-
-
-
-
 function GetRoute() {
 try{
    "use strict"; // new 30/07/2017

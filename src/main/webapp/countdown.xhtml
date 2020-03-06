@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      >
+    <!-- https://www.geeksforgeeks.org/create-countdown-timer-using-javascript/
+    -->
+    <h:head>
+        <title>Chain combo</title>
+    </h:head>
+    <h:body>
+    <h:outputScript library="js" name="forms.js" target="body"/>    
+        <h:form id="form_countdown">
+            <h3>   <h:outputText value="essai de countdown " />   : 
+                <span id="fcountdown">10</span> 
+            </h3>
+            <h:outputText value="countdown 2 " />  
+            <p id="demo"></p> 
+    <!--        <p:panel header="Chain Combo Example" style="width: 500px;">
+                <h:panelGrid columns="2">  
+                    <h:outputText value="Select Club: " />  
+                    <p:selectOneMenu value="#{category.catname}"
+                                     id="cat"
+                                     valueChangeListener="#{category.processScat}">  
+                        <f:selectItem itemLabel="Select Club" itemValue="" />
+                        <f:selectItems value="#{category.categoryName}"/> 
+                        <p:ajax update="scat" event="change" />
+                    </p:selectOneMenu>
+                    <h:outputText value="Select Sub-Category course : " />  
+                    <p:selectOneMenu value="#{category.subcatname}"
+                                     id="scat"> 
+                        <f:selectItem itemLabel="Select Course" itemValue="" />
+                        <f:selectItems value="#{category.subCategoryName}"/>
+                    </p:selectOneMenu>
+                </h:panelGrid>
+            </p:panel>
+      -->      
+  <script type="text/javascript">
+      "use strict";
+    alert("entering javascript in countdow.xhtml");
+   var time = document.getElementById('form_countdown:time').value;
+        alert("password_check:time" + " = " + time);
+        console.log("password_check:time = " + time);
+    var seconds = 10;  // Total seconds to wait
+    function countdown() {
+        seconds = seconds - 1;
+ //          alert("remaining seconds = " + seconds);
+        if (seconds &lt; 0) { // &lt; stands for the less-than sign
+            // Change your redirection link here
+            alert("we redirect to login.xhtml");
+            window.location = "login.xhtml"; //https://duckdev.com
+            javascript_abort(); // in forms.js
+        } else {
+            // Update remaining minutes and seconds
+            document.getElementById("form_countdown:fcountdown").innerHTML = Math.floor(seconds/60) + " minutes "
+                                                           + Math.floor(seconds%60) + " seconds"; 
+            // Count down using javascript
+            window.setTimeout("countdown()", 1000);
+        }
+    } // end function countdown
+//  function javascript_abort(){
+//    console.log("from function javascript_abort in current script");
+//    alert("from function javascript_abort in current script");
+//   throw new Error('This is not an error. This is just to abort javascript');
+//} 
+    // Run countdown function
+    window.onload = countdown(); //c'est la function
+</script>
+
+        </h:form>
+    </h:body>
+</html>
+

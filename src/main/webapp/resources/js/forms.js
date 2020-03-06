@@ -1,4 +1,11 @@
 "use strict"; // new 21/11/2014 héhé
+function javascript_abort(){
+    console.log("from function javascript_abort in form.js");
+    alert("from function javascript_abort in form.js");
+   throw new Error('This is not an error. This is just to abort javascript');
+} 
+
+/*
 function convertYardtoMeter(frm) // used in hole.xhtml, id="hole"
 {
     alert("from function!!");
@@ -6,15 +13,11 @@ function convertYardtoMeter(frm) // used in hole.xhtml, id="hole"
     var labelElement = document.getElementById('holeDistance');
 
     alert("from function : element = " + labelElement.value);
-    // alert("from function : element = " + frm.value);
-    // alert(" holeDistance to convert = " + frm.holeDistance.value);// option Modify
-    //frm.courseId.value = "125" ;
-    //var oldValue = element.value;
-    //  var newValue = oldValue.charAt(0).toUpperCase() + oldValue.substring(1);
-    //  element.value = newValue;
     frm.holeDistance.value = Math.round(frm.holeDistance.value * 0.9144);
 
 } //end function
+ * 
+ */
 function init()
 {
     console.info("from init javascript function");
@@ -174,4 +177,7 @@ function __reset() {
             elements[ii].value = "";
         }
     }
-} // end functin reset
+} // end function reset
+ function handleMsg(msg){
+        alert(msg);
+    }

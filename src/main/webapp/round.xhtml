@@ -25,15 +25,7 @@
     <ui:include src="/help/help_round.xhtml"/>
 </ui:define>
 <ui:define name="content">
-    <!--Target Attribute
-In addition, you can use �target� attribute to control where to output the js file.
-1.target="head" � Display within the top of HTML head tag.
-2.target="body" � Display at the end of the body tag.
-3.no target � Display at where the tag is placed.
 
-<h:head> </h:head>
-    -->
-    
 <h:graphicImage name="images/golf_round.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
 <h:graphicImage name="images/golf_round.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
   <!--  <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;"/>-->
@@ -56,7 +48,7 @@ In addition, you can use �target� attribute to control where to output the j
 	<p:inputText  label="Competition"
             id="compet"
             size="45"
-            title="#{msg['title.round.roundcompetition']}"
+            title="#{msg['tooltip.round.roundcompetition']}"
 	    value="#{courseC.round.roundCompetition}" />
         
         <h:outputText value="#{msg['round.date']} *"/>
@@ -71,7 +63,7 @@ In addition, you can use �target� attribute to control where to output the j
             locale="#{languageC.locale}"
             navigator="true"
             yearRange="c-1:c+1"
-            title="#{msg['title.round.rounddate']}"
+            title="#{msg['tooltip.round.rounddate']}"
             readonlyInput="true"
             minHour="08"
             maxHour="18"
@@ -101,9 +93,16 @@ In addition, you can use �target� attribute to control where to output the j
             />
       </h:panelGroup>
 
+      
+       <h:outputText value="#{msg['round.date']} "   />
+       <h:outputText value="#{c.round.roundDateTrf}" > 
+             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+       </h:outputText>
+      
+      
 <!-- http://stackoverflow.com/questions/32456951/primefaces-dialog-framework-dialog-not-opening  -->
 
- </p:panelGrid>       
+ </p:panelGrid> 
 
 <p:panelGrid
     id="panelGrid2" 
@@ -196,7 +195,7 @@ In addition, you can use �target� attribute to control where to output the j
 
 </f:facet>
 </p:panelGrid>
-<pe:tooltip global="true" myPosition="left center" atPosition="right center"/>
+
 </h:form>
 </ui:define>
 </ui:composition> 

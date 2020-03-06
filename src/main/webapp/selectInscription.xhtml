@@ -74,11 +74,11 @@
 
 	<p:column headerText="#{msg['round.date']}"
                   footerText="#{msg['round.date']}"
-                  style="width:15%"
+                  width="12%"
                   id="rdate">
                   <h:outputText value="#{c.round.roundDate}"
                                 > 
-                      <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
+                      <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
                   </h:outputText>
 	</p:column>
 <!-- enlevé 18/02/2019
@@ -96,7 +96,8 @@
 <!-- new 13/11/2017-->
         <p:column headerText="#{msg['round.canceled']}"
                   footerText="#{msg['round.canceled']}"
-                  style="width:15%;color:red"
+                  width="18%"
+                  style="color:red"
                   id="cancelround">
             <p:commandButton
                 id="cancelButton"
@@ -158,47 +159,52 @@
 <p:rowExpansion>
             <h:panelGrid id="display"
                          columns="2"
-            >
+                         style="width:600px"
+                         columnClasses="col1,col2"
+                         >
 
                 <f:facet name="header">
                     #{msg['inscription.detail']}
                 </f:facet>
 
-                <h:outputText value="Round:"
-                      style="font-weight:bold"
-                              />
+                <h:outputText value="Round:" />
                 <h:outputText
                       id="reround"
-                      style="font-style:italic"
                       value="#{c.round.idround}" />
 
-                <h:outputText value="Game:"
-                              style="font-weight:bold"/>
+                <h:outputText value="Game:"/>
                 <h:outputText
                       id="regame"
-                      style="font-style:italic"
                       value="#{c.round.roundGame}" />
 
-                <h:outputText value="Holes:"
-                              style="font-weight:bold"/>
+                <h:outputText value="Holes:"/>
                 <h:outputText
                       id="reholes"
-                      style="font-style:italic"
                       value="#{c.round.roundHoles}" />
 
-                <h:outputText value="Start:"
-                              style="font-weight:bold" />
+                <h:outputText value="Start:"/>
                 <h:outputText
                       id="restart"
-                      style="font-style:italic"
                       value="#{c.round.roundStart}" />
                 
-                <h:outputText value="Competition:"
-                              style="font-weight:bold" />
+                <h:outputText value="Competition:" />
                 <h:outputText
                       id="recompetition"
-                      style="font-style:italic"
                       value="#{c.round.roundCompetition}" />
+                
+                <h:outputText value="Zoned Date 1:"/>
+                <h:outputText
+                      id="zonedDate1"
+                      value="#{c.round.roundDateZoned}" >
+                       <f:convertDateTime type="zonedDateTime" pattern="dd/MM/yyyy HH:mm" />
+                 </h:outputText>
+                
+                <h:outputText value="Zoned Date 2:" />
+                <h:outputText
+                      id="zonedDate2"
+                      value="#{c.round.roundDateZoned}" >
+                       <f:convertDateTime type="zonedDateTime"/>
+                </h:outputText> 
             </h:panelGrid>
   </p:rowExpansion>
 
