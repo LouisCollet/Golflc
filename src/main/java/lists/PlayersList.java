@@ -1,6 +1,6 @@
 package lists;
 
-import entite.Player;
+import entite.EPlayerPassword;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,16 +12,16 @@ import utils.DBConnection;
 import utils.LCUtil;
 
 public class PlayersList implements interfaces.Log{
-    private static List<Player> liste = null;
+    private static List<EPlayerPassword> liste = null;
     
-public List<Player> getListAllPlayers(final Connection conn) throws Exception{
+public List<EPlayerPassword> list(final Connection conn) throws Exception{
     
 if(liste == null){
   //  LOG.debug("starting listAllPlayers() with conn = " + conn );
         PreparedStatement ps = null;
         ResultSet rs = null;
  try{
-        liste = new ArrayList<>();
+     //   liste = new ArrayList<>();
         String p = utils.DBMeta.listMetaColumnsLoad(conn, "player");  // fields list, comma separated
         final String query =
             "SELECT " + p 
@@ -32,10 +32,14 @@ if(liste == null){
             ps = conn.prepareStatement(query);
              utils.LCUtil.logps(ps);
             rs = ps.executeQuery();
-            while (rs.next()){
-                liste.add(entite.Player.mapPlayer(rs));
-            }
-  //   liste.forEach(item -> LOG.info("Players list " + item));  // java 8 lambda
+            liste = new ArrayList<>();
+                	while(rs.next()){
+                     EPlayerPassword epp = new EPlayerPassword(); // liste pour sélectionner un round player = entite.Player.mapPlayer(rs);
+                     epp.setPlayer(entite.Player.mapPlayer(rs));
+                     epp.setPassword(entite.Password.mapPassword(rs));
+                     liste.add(epp);
+                 } // end while
+  // liste.forEach(item -> LOG.info("Players list with Players and passwords " + item));  // java 8 lambda
 return liste;
 
 } catch(SQLException sqle){
@@ -62,11 +66,11 @@ return liste;
 } //end method
     
 
-    public static List<Player> getListe() {
+    public static List<EPlayerPassword> getListe() {
         return liste;
     }
 
-    public static void setListe(List<Player> liste) {
+    public static void setListe(List<EPlayerPassword> liste) {
         PlayersList.liste = liste;
     }
     
@@ -78,7 +82,7 @@ return liste;
   // round.setIdround(414);
   //  Club club = new Club();
   //  club.setIdclub(1006);
-    List<Player> p1 = new PlayersList().getListAllPlayers(conn);
+    List<EPlayerPassword> p1 = new PlayersList().list(conn);
         LOG.info("Inscription list = " + p1.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 }// end main

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
-//@Named("ItemReaderInscription")
+
 @Named("jSONListConverter")
 @SessionScoped
 public class JSONListConverter implements Serializable, interfaces.GolfInterface
@@ -39,9 +39,21 @@ public class JSONListConverter implements Serializable, interfaces.GolfInterface
         //Convert Array of String into JSON
         // Configure gson
         //http://www.baeldung.com/jackson-annotations
-  public static void testTarif() throws SQLException     //  throws SQLException, Exception
-    {       
+  public static void testTarif() throws SQLException{     //  throws SQLException, Exception
  try{
+     
+
+     
+
+     List<String> list2 = Arrays.asList(new String[]{"foo2", "bar2"});
+     LOG.info("list 2 = " + list2);
+     List<String> list3 = Stream.of("foo3", "bar3")
+      .collect(Collectors.toList());
+     LOG.info("list 3 = " + list3);
+
+     
+     
+     
   /*   
      int[][] multi = new int[][]{
   { 1, 2, 3, 0, 0, 0, 0, 0, 0, 0 },
@@ -224,6 +236,7 @@ public class JSONListConverter implements Serializable, interfaces.GolfInterface
                  LOG.info("Trouvé dans teeTimes for !!= " + tround);
                  LOG.info("elem tdeb = " + tdeb);
                  LOG.info("elem tfin = " + tfin);
+                 
                  switch (season) {
                      case "H":
                          price = Double.valueOf(teeTime[2]);
@@ -240,6 +253,29 @@ public class JSONListConverter implements Serializable, interfaces.GolfInterface
                      default:
                          LOG.info("price not found !!!= ");
                  } //end switch
+  /*               
+                 String monthString = switch (month) {
+            case 1 -> "January";
+            case 2 -> "February";
+            case 3 ->  "March";
+            case 4 ->  "April";
+            case 5 ->  "May";
+            case 6 ->  "June";
+            case 7 ->  "July";
+            case 8 ->  "August";
+            case 9 ->  "September";
+            case 10 -> "October";
+            case 11 -> "November";
+            case 12 -> "December";
+            default -> "Invalid month";
+}   
+     */            
+                 
+                 
+                 
+                 
+                 
+                 
              } // end if
          } // end else
      } // end for

@@ -58,6 +58,19 @@ public class TimeDateExample1 {
   }
     public static void main(String[] args) throws APIException {
    try{
+       LocalDateTime localDateTime = LocalDateTime.of(2018, 10, 25, 12, 00, 00);  //October 25th at 12:00pm
+ZonedDateTime zonedDateTimeInUTC = localDateTime.atZone(ZoneId.of("UTC")); 
+ZonedDateTime zonedDateTimeInEST = zonedDateTimeInUTC.withZoneSameInstant(ZoneId.of("America/New_York")); 
+
+System.out.println(localDateTime.toString()); // 018-10-25T12:00
+System.out.println(zonedDateTimeInUTC.toString()); // 2018-10-25T12:00Z[UTC]
+System.out.println(zonedDateTimeInEST.toString()); // 2018-10-25T08:00-04:00[America/New_York]
+       
+       
+       
+       
+       
+       
        Path path = Files.createTempFile("test", ".txt");
       System.out.println("path  = " + path);
       System.out.println("files exists path " + Files.exists(path));
@@ -109,7 +122,7 @@ int secondOfDay = lt1530.toSecondOfDay(); // 55800
     //   2014, Month.FEBRUARY, 10
        LocalDate a = LocalDate.of(2018, Month.JANUARY, 14);
        ZoneId brussels = ZoneId.of("Europe/Brussels");
-       LocalDateTime localDateTime = LocalDateTime.now(brussels);
+        localDateTime = LocalDateTime.now(brussels);
        LocalTime lt1 = LocalTime.now(brussels).minusHours(0);
 //LocalTime lt1 = localDateTime.toLocalTime().minusHours(0);
 

@@ -6,6 +6,8 @@ import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -34,7 +36,7 @@ public class CreateCreditcard implements interfaces.Log, interfaces.GolfInterfac
             ps.setString(4,creditcard.getCreditCardNumberNonSecret());  // sans les ****
             ps.setDate(5, LCUtil.getSqlDate(creditcard.getCreditCardExpirationDate()));
             ps.setString(6,creditcard.getCreditCardType());
-            ps.setTimestamp(7, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(7, Timestamp.from(Instant.now()));
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
             if(row != 0){

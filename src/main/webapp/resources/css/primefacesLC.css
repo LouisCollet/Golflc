@@ -129,9 +129,6 @@ li.ui-selectonemenu-item{
  background-color: aquamarine;
 }
 
-
-
-
 /* s'applique d'office à tous les panelgrid */
 .ui-panelgrid td{
     background-color:yellow !important;
@@ -180,7 +177,6 @@ exemple : participants.xhtmlet include_summary.xhtml
      vertical-align: top;
 }
 
-
 /* used in statCourse.xhtml voir également forms.js   */
     table.jqplot-table-legend 
     {
@@ -220,7 +216,7 @@ Specify styleClass for the required p:column
 /*https://searchcode.com/codesearch/view/2686073/*/
 .ui-messages-info-summary, .ui-messages-warn-summary, .ui-messages-error-summary, .ui-messages-fatal-summary{
     font-family: Verdana;
-    font-size: 2.0em;
+    font-size: 1.5em;
     font-weight: bold;
     margin: 0;
     padding: 0;
@@ -233,12 +229,16 @@ Specify styleClass for the required p:column
 }
 
 .ui-messages-info-icon, .ui-messages-warn-icon, .ui-messages-error-icon, .ui-messages-fatal-icon {
-    height:48px;
-    width:48px;
+    height:96px;
+    width:96px;
     margin-top:-4px;
 }
+.ui-messages-warn-icon {
+      background: url('../images/warning_24x24.png');
+    }
 
 .ui-messages-fatal{
+    border-style: solid;
     margin: 1px;
     padding: 5px 0px 5px 0px;
     background-color: black ;

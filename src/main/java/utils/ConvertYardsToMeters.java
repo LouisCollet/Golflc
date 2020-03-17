@@ -18,7 +18,7 @@ public class ConvertYardsToMeters {
                 //double m = (short)s; // convert short to double
                 double d = Double.valueOf(hole.getHoleDistance()); // convert String to double
                     LOG.debug("Double d (yards) = " + d);
-                double meters = d * YARD_TO_METER;  // voir golfInterface
+                double meters = d * YARD_TO_METER;
                     LOG.debug("Meters = " + meters);
                 hole.setHoleDistance((short) meters); // convert double to short
                     LOG.debug("ending conversion Yards to Meters with = " + hole.getHoleDistance().toString());

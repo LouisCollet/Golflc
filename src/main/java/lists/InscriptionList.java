@@ -1,7 +1,6 @@
 package lists;
 
 import entite.Club;
-import entite.Course;
 import entite.ECourseList;
 import entite.Round;
 import static interfaces.Log.LOG;
@@ -17,14 +16,12 @@ import utils.LCUtil;
 public class InscriptionList implements interfaces.Log{
     private static List<ECourseList> liste = null;
     
-public List<ECourseList> getInscriptionList(final Connection conn) throws SQLException{
+public List<ECourseList> list(final Connection conn) throws SQLException{
     LOG.info(" ... entering InscriptionList !!");
-if (liste == null){
-  //  Connection conn = null;
+if(liste == null){
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
-    
      LOG.info("starting getInscriptionList.. = " );
      String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
      String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
@@ -32,10 +29,7 @@ try{
   //   String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
  
 String query =
-        "SELECT "
-        + cl + "," + co + "," + ro + //"," + // pl + "," +
-//" SELECT  RoundDate, idround, RoundQualifying, roundgame, RoundCompetition, RoundHoles, RoundPlayers, RoundStart, " +
-//"         idcourse, CourseName, idclub, ClubName, clubcity, clubcountry, ClubWebsite" +
+        "SELECT "+ cl + "," + co + "," + ro + //"," + // pl + "," +
     "	 FROM round" +
     "	   JOIN course"
         + "	ON round.course_idcourse = course.idcourse" +
@@ -46,7 +40,6 @@ String query =
     "       ORDER by rounddate desc "
 ;
 
-       // LOG.info("player = " + player.getIdplayer() ) ;
      ps = conn.prepareStatement(query);
 ///     ps.setInt(1, player.getIdplayer());
 ///     ps.setString(2, formula.toUpperCase() ); // new 30/6/2015
@@ -59,19 +52,20 @@ String query =
         liste = new ArrayList<>();
           //LOG.info("just before while ! ");
 	while(rs.next()){
-			//LOG.info("just after while ! ");
+		//LOG.info("just after while ! ");
           ECourseList ecl = new ECourseList(); // liste pour sélectionner un round player = entite.Player.mapPlayer(rs);
           Club c = new Club();
           c = entite.Club.mapClub(rs);
           ecl.setClub(c);
           
-          Course o = new Course();
-          o = entite.Course.mapCourse(rs);
-          ecl.setCourse(o);
+     //     Course o = new Course();
+      //    o = entite.Course.mapCourse(rs);
+          ecl.setCourse(entite.Course.mapCourse(rs));
           
           Round r = new Round();
-          r = entite.Round.mapRound(rs);
+          r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 a besoin nde club pour générer ZonedDateTime
           ecl.setRound(r);
+          
 //store all data into a List
 	liste.add(ecl);
 	} //end while
@@ -116,7 +110,7 @@ String query =
   //  round.setIdround(260);
   //  Club club = new Club();
   //  club.setIdclub(1006);
-    List<ECourseList> p1 = new InscriptionList().getInscriptionList(conn);
+    List<ECourseList> p1 = new InscriptionList().list(conn);
         LOG.info("Inscription list = " + p1.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 

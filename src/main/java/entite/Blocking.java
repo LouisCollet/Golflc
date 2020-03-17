@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import javax.inject.Named;
+import org.primefaces.PrimeFaces;
 import utils.LCUtil;
-
 @Named
 public class Blocking implements Serializable, interfaces.Log, interfaces.GolfInterface{
     
@@ -55,13 +55,18 @@ public class Blocking implements Serializable, interfaces.Log, interfaces.GolfIn
     public void setBlockingRetryTime(LocalDateTime blockingRetryTime) {
         this.blockingRetryTime = blockingRetryTime;
     }
+    
+    public void Retry(){
+        LOG.info("from blocking Retry");
+   PrimeFaces.current().ajax().update("selectPlayer:countdown");
+      //  return getBlockingRetryTime();
+    }
+            
+            
 @Override
 public String toString(){ 
 LOG.info("starting toString for Blocking!");
  try{
-//    LOG.info("idaudit : "   + this.getIdaudit());
-//    LOG.info("AuditStartDate no format: "   + this.getAuditStartDate());
-//    LOG.info("AuditStartDate format LocalDateTime: "   + this.getAuditStartDate().format(ZDF_TIME));
    if(this.getBlockingPlayerId() != null){
        return 
         (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEWLINE 

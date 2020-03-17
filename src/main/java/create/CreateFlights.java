@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import utils.DBConnection;
 import utils.LCUtil;
 
-public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
-{
+public class CreateFlights implements interfaces.GolfInterface{
     private static Statement stm = null;
 
   public boolean create(final ArrayList<Flight> flight, final int idcourse, final Connection conn ) throws SQLException{
@@ -37,8 +36,8 @@ public class CreateFlights implements interfaces.Log, interfaces.GolfInterface
 
             LocalDateTime d = n.getFlightStart();
      //           LOG.info("line 2 = ok ");
-            java.sql.Timestamp ts = Timestamp.valueOf(d); 
-            ps.setTimestamp(2, ts);
+        //    java.sql.Timestamp ts = Timestamp.valueOf(d); 
+            ps.setTimestamp(2, Timestamp.valueOf(d));
             ps.setInt(3, idcourse); 
             ps.setString(4,n.getFlightPeriod()); 
             utils.LCUtil.logps(ps);

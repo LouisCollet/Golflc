@@ -1,12 +1,9 @@
 package find;
 
 import entite.Club;
-import entite.Course;
 import entite.ECourseList;
-import entite.Inscription;
 import entite.Player;
 import entite.Round;
-import entite.Tee;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +15,7 @@ import utils.LCUtil;
 
 public class FindSlopeRating implements interfaces.Log {
 
-  private static List<ECourseList> liste = null;
+private static List<ECourseList> liste = null;
 final private static String ClassName = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
   public List<ECourseList> find(final Player player, final Round round, final Connection conn) throws SQLException {
@@ -85,30 +82,33 @@ final private static String ClassName = Thread.currentThread().getStackTrace()[1
      while(rs.next()) {
           ECourseList ecl = new ECourseList();
 
-          Player p = new Player();
-          p = entite.Player.mapPlayer(rs);
-          ecl.setPlayer(p);
+      //    Player p = new Player();
+      //    p = );
+          ecl.setPlayer(entite.Player.mapPlayer(rs));
  
-          Club c = new Club();
-          c = entite.Club.mapClub(rs);
+    //      Club c = new Club();
+       //   c = entite.Club.mapClub(rs);
+          Club c = entite.Club.mapClub(rs);
           ecl.setClub(c);
  
-          Course o = new Course();
-          o = entite.Course.mapCourse(rs);
-          ecl.setCourse(o);
+   //       Course o = new Course();
+    //      o = entite.Course.mapCourse(rs);
+          ecl.setCourse(entite.Course.mapCourse(rs));
  
-          Round r = new Round();
-          r = entite.Round.mapRound(rs);
-          ecl.setRound(r);
+     //     Round r = new Round();
+      //    r = entite.Round.mapRound(rs);
+     //     r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 pour générer ZonedDateTime
+          ecl.setRound(new entite.Round().mapRound(rs,c));
  
-          Inscription i = new Inscription();
-          i = entite.Inscription.mapInscription(rs);  
-          ecl.setInscriptionNew(i);
+     //     Inscription i = new Inscription();
+     //     i = entite.Inscription.mapInscription(rs);  
+          ecl.setInscriptionNew(entite.Inscription.mapInscription(rs));
 
-          Tee t = new Tee();
-          t = entite.Tee.mapTee(rs);
-          ecl.setTee(t);
-          liste.add(ecl);
+     //     Tee t = new Tee();
+     //     t = entite.Tee.mapTee(rs);
+          ecl.setTee(entite.Tee.mapTee(rs));
+          
+      liste.add(ecl);
                 }
       LOG.info("exiting FindSlopeRating with liste = " + liste.toString());
       return liste;

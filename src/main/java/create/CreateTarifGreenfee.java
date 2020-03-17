@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import javax.inject.Named;
@@ -35,7 +36,6 @@ public class CreateTarifGreenfee {
             /// just to verify if working
 ////        Tarif t = om.readValue(json,Tarif.class); //, Criteria.class);
 ////            LOG.info("tarif restored from json format = " + NEW_LINE +t.toString());
-   //     conn = DBConnection.getConnection();
    LOG.info(" tarif : DatesSeason =  " + Arrays.deepToString(tarif.getDatesSeason()));
    LOG.info(" tarif : DatesSeason length =  " + tarif.getDatesSeason().length);
    if(tarif.getDatesSeason().length == 0){
@@ -85,13 +85,13 @@ public class CreateTarifGreenfee {
             ps.setNull(1,java.sql.Types.INTEGER);  //autoincrement
                java.sql.Timestamp ts = Timestamp.valueOf(lddeb);
                LOG.info("ts lddeb = " + ts.toString() );
-            ps.setTimestamp(2,ts);
-               ts = Timestamp.valueOf(ldfin);
-               LOG.info("ts ldfin = " + ts.toString() );
-            ps.setTimestamp(3,ts);
+            ps.setTimestamp(2,Timestamp.valueOf(lddeb));
+       //        ts = Timestamp.valueOf(ldfin);
+       //        LOG.info("ts ldfin = " + ts.toString() );
+            ps.setTimestamp(3,Timestamp.valueOf(ldfin));
             ps.setInt(4,course.getIdcourse()); 
             ps.setString(5,json);
-            ps.setTimestamp(6,LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(6,Timestamp.from(Instant.now()));
 
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database

@@ -6,6 +6,8 @@ import entite.Round;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 /**
@@ -34,7 +36,7 @@ public class ModifyMatchplayResult implements interfaces.Log
             
                     ps = conn.prepareStatement(query);
                     ps.setString(1, result);  //ici scoreStroke 
-                    ps.setTimestamp(2, LCUtil.getCurrentTimeStamp());
+                    ps.setTimestamp(2, Timestamp.from(Instant.now()));
                     ps.setInt(3, player.getIdplayer());
                     ps.setInt(4, round.getIdround());
                      //    String p = ps.toString();

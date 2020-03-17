@@ -17,41 +17,6 @@
 <h:form id="participants_rounds">
     <ui:include src="include/include_summary.xhtml"/>
     
-<!--  supprimé 04-12-2018  double emploi avec include_summary  
-<p:dataTable id="played_rounds_table1"
-             value="#{courseC.listStableford1()}"
-             emptyMessage="#{msg['message.table.empty']}"
-             var="c" >
-<f:facet name="header">
-    <h1>Round Description</h1>
-</f:facet>
-    
-<p:column headerText="#{msg['round.date']}" style="width:100px" >
-   <h:outputText value="#{c.round.roundDate}"
-                 
-                 >
-             <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
-   </h:outputText>
-</p:column>    
-    <p:column headerText="#{msg['round.competition']}"
-              style="width:100px"
-             
-              >
-   #{c.round.roundCompetition} (#{c.round.idround})
-</p:column>
-    
-<p:column headerText="#{msg['round.game']}" style="width:100px" >
-    
-   #{c.round.roundGame}
-</p:column>
-    
-<p:column headerText="#{msg['course.name']}" style="width:100px" >
-    
-   #{c.course.courseName}
-</p:column>
-    
-</p:dataTable>
-    -->                                                       
 <p:dataTable id="played_rounds_table2"
              value="#{courseC.listStableford()}"
              rowIndexVar="rowIndex"
@@ -96,7 +61,6 @@
                 <p:confirm header="#{msg['message.confirm']}"
                      message="#{msg['message.cancel']}" 
                      icon="fa fa-exclamation-triangle"
-                     severity="alert"
                      />
             </p:commandButton>
 
@@ -121,26 +85,6 @@
 
 <ui:include src="include/include_thumbnails_ecourselist.xhtml"/>    
 
-<!--
-<f:facet name="footer"> #{c.inscription.playerhasroundFinalResult}
-        <p:commandButton id="button01"
-                         value="#{msg['button.score.create']} matchplay"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         icon="ui-icon-disk"
-                         action="score_matchplay.xhtml"/>
-
-        <p:commandButton id="button02"
-                         value="#{msg['button.score.create']} scramble"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         icon="ui-icon-disk"
-                         action="score_scramble.xhtml"/>
-
-</f:facet>
--->
 </p:dataTable>
    <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>

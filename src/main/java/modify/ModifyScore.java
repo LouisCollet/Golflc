@@ -6,9 +6,10 @@ import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import utils.DBConnection;
-import utils.LCUtil;
 
 public class ModifyScore implements interfaces.Log, interfaces.GolfInterface{
  
@@ -37,7 +38,7 @@ try{
         ps.setInt(3,points [i][3]); // strokes
         ps.setInt(4,points [i][4]); // extra strokes
         ps.setInt(5,points [i][5]); // points
-        ps.setTimestamp(6,LCUtil.getCurrentTimeStamp());
+        ps.setTimestamp(6,Timestamp.from(Instant.now()));
    // where fields
         ps.setInt(7,points[i][0]); // hole number  was i+1);  error si round start hole 10, mod 14/11/2013]
         ps.setInt(8,in_player);

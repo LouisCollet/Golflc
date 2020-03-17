@@ -7,6 +7,8 @@ import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -49,7 +51,7 @@ public class CreateTee{
                 LOG.info("masterTee found = " + masterTee);
             ps.setInt(9, masterTee);// new 03-04-2019
             ps.setInt(10, course.getIdcourse());
-            ps.setTimestamp(11, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(11, Timestamp.from(Instant.now()));
    //             LOG.info("line 01");
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database

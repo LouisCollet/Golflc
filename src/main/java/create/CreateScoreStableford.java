@@ -7,6 +7,8 @@ import entite.ScoreStableford;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import lc.golfnew.CourseController;
 import utils.DBConnection;
@@ -70,7 +72,7 @@ public class CreateScoreStableford implements interfaces.Log{
                     ps.setInt(12, 0); // ScorePenalty, introduit à zéro
                     ps.setInt(13, player.getIdplayer());
                     ps.setInt(14, round.getIdround());
-                    ps.setTimestamp(15, LCUtil.getCurrentTimeStamp());
+                    ps.setTimestamp(15, Timestamp.from(Instant.now()));
                          //    String p = ps.toString();
                         utils.LCUtil.logps(ps);
                     int row = ps.executeUpdate(); // write into database
@@ -123,7 +125,7 @@ public class CreateScoreStableford implements interfaces.Log{
                     // updated fields
                     ps.setInt(1, Integer.parseInt(sc1[i]));  //ici scoreStroke //
                     LOG.info("Update score : index i = " + i + " strokes updated = " + sc1[i]);
-                    ps.setTimestamp(2, LCUtil.getCurrentTimeStamp());
+                    ps.setTimestamp(2, Timestamp.from(Instant.now()));
    // where fields
                     //  ps.setInt(3,Integer.parseInt(sc1[i+1]) );   // holeNumber, mod 17/11/2013
                     ps.setInt(3, i + 1);   // holeNumber, mod 23/11/2013

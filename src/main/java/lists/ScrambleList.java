@@ -51,16 +51,11 @@ try
         rs.beforeFirst(); //on replace le curseur avant la premiÃ¨re ligne
         liste = new ArrayList<>();
           //LOG.info("just before while ! ");
-	while(rs.next())
-        {
+	while(rs.next()){
 		//LOG.info("just after while ! ");
-           ScoreScramble mp = new ScoreScramble(); // liste pour sÃ©lectionner un round
+           ScoreScramble mp = new ScoreScramble(); // liste pour sélectionner un round
            mp.setIdround(rs.getInt("idround") );
-     //      mp.setRoundDate(rs.getDate("roundDate") );
-     
-//           mp.setRoundDate(rs.getTimestamp("roundDate") ); // mod 01/06/2017
            java.util.Date d = rs.getTimestamp("roundDate");
-       //    LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
           mp.setRoundDate(DatetoLocalDateTime(d));
            
            

@@ -10,38 +10,37 @@
       xmlns:cc="http://xmlns.jcp.org/jsf/composite"
 >
 
-
+<h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
 <f:view contentType="text/html">
 <h:head>
 
 </h:head>
 <h:body>
-<h:form id="upform" enctype="multipart/form-data">
+<h:form id="download_form" enctype="multipart/form-data">
 <p:growl id="msg"
          life="10000"
-         showDetail="false"/>
+         showDetail="true"/>
 
-            <p:fileUpload
-                fileUploadListener="#{fileUploadController.upload}"
-                allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
-                sizeLimit="100000"
-                label="Choose File to Upload"
-                                update="msg"
-                />
-</h:form>
 
-<h:form>
-    <br></br>
-    Download this file, 
-     <a href="file-downloads/testplans.pdf" > Louis, !! </a>
+<p:commandButton value="Download Button 1" 
+                 ajax="false"
+                 icon="pi pi-arrow-down">
 
-<p:commandButton value="Download Button" ajax="false">
-    <p:fileDownload value="#{fileDownloadController.file}" />
+    <p:fileDownload value="#{fileBeanC.FileDownload()}" /> 
 </p:commandButton>
-    <br></br>
-<p:commandLink ajax="false" title="Download">
-    <p:fileDownload value="#{fileDownloadController.file}" />
-</p:commandLink>
+
+
+<p:commandButton id="button2"
+                 update="msg"
+                 value="Download Button 2" 
+                 ajax="false"
+                 icon="pi pi-arrow-down">
+    <p:fileDownload value="#{fileBeanC.getFile()}"
+                    contentDisposition="attachment"/>  
+</p:commandButton>    
+    <!-- value="#{fileBeanC.FileDownload()}"  was file -->
+    
+
 </h:form>
 
 </h:body>

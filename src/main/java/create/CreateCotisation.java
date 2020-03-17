@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -25,15 +26,15 @@ public class CreateCotisation implements interfaces.Log, interfaces.GolfInterfac
      //      followings are java LocalDate and MySQL DATE
         //    ps.setDate(4, java.sql.Date.valueOf(cotisation.getStartDate()));
         //    ps.setDate(5, java.sql.Date.valueOf(cotisation.getEndDate()));
-                Timestamp ts = Timestamp.valueOf(cotisation.getStartDate());
-            ps.setTimestamp(4,ts);
-                ts = Timestamp.valueOf(cotisation.getEndDate());
-            ps.setTimestamp(5,ts);
+       //         Timestamp ts = Timestamp.valueOf(cotisation.getStartDate());
+            ps.setTimestamp(4,Timestamp.valueOf(cotisation.getStartDate()));
+      //          ts = Timestamp.valueOf(cotisation.getEndDate());
+            ps.setTimestamp(5,Timestamp.valueOf(cotisation.getEndDate()));
             ps.setString(6, cotisation.getPaymentReference()); 
             ps.setString(7, cotisation.getCommunication()); 
             ps.setString(8, cotisation.getItems());
             ps.setString(9, cotisation.getStatus());
-            ps.setTimestamp(10, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(10, Timestamp.from(Instant.now()));
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
             if (row != 0){

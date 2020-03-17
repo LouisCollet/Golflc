@@ -5,6 +5,8 @@ import entite.Handicap;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.LCUtil;
 
 public class CreateInitialHandicap implements interfaces.Log, interfaces.GolfInterface{
@@ -26,7 +28,7 @@ public class CreateInitialHandicap implements interfaces.Log, interfaces.GolfInt
                 ps.setInt(4, handicap.getPlayerIdplayer());
                 // astuce : toujours round 1, (joué sur course 33 du club 999 !! fictif)
                 ps.setString(5, "1"); // round
-                ps.setTimestamp(6, LCUtil.getCurrentTimeStamp());
+                ps.setTimestamp(6, Timestamp.from(Instant.now()));
                  utils.LCUtil.logps(ps); 
                 row = ps.executeUpdate(); // write into database
                 if (row != 0) {
@@ -37,9 +39,11 @@ public class CreateInitialHandicap implements interfaces.Log, interfaces.GolfInt
                             + " <br/>date handicap = " + SDF.format(handicap.getHandicapStart() )
                             + " <br/>handicap = " + handicap.getHandicapPlayer();
                     LOG.info(msg);
-                   LCUtil.showMessageInfo(msg);
-                    if (! batch.equals("B"))
-                        {LCUtil.showMessageInfo(msg);}
+         //          LCUtil.showMessageInfo(msg);
+                    if (! batch.equals("B")){
+                        LOG.info("not batch");
+         //               LCUtil.showMessageInfo(msg);
+                    }
                   
                 }else{
                     String msg = "!! NOT NOT successful insert Handicap : "

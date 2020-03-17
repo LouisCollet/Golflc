@@ -14,7 +14,6 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 import javax.validation.constraints.*;
-import utils.LCUtil;
 
 @Named  // new 05-12-2017
 @SessionScoped // new 05-12-2017
@@ -29,7 +28,6 @@ public class Player implements Serializable, interfaces.Log, interfaces.GolfInte
 @NotNull(message="{player.firstname.notnull}")
 @Size(max=45,message="{player.firstname.size}") 
 @Pattern(regexp = "[a-zA-Z0-9éèàê ç]*",message="{player.firstname.regex}")
-
 @Produces
 //@PLAYERFIRSTNAME
 @Named("playerFirstName")
@@ -86,23 +84,11 @@ private String playerStringLatLng;  // utilisé pour afficher dans player.xhtml
 
 private Boolean eID;
 
-@NotNull(message="{player.password.notnull}")
-private String playerPassword; // new 07-08-2018
+//@NotNull(message="{player.password.notnull}")
 
-@NotNull(message="{player.password.notnull}")
-//@Empty(message="{player.password.notnull}")
-@Size(max=15,message="{player.password.size}") 
-//String pattern = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}\\z";
-@Pattern(regexp = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])\\S{8,}\\z",message="{player.password.regex}")
-//@Pattern(regexp="[a-zA-Z0-9éèàê'!â& ç-]*",message="{club.name.characters}")
-private String wrkpassword;
 
-@NotNull(message="{player.confirmpassword.notnull}")
-@Size(max=15,message="{player.confirmpassword.size}") 
-//String pattern = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}\\z";
-@Pattern(regexp = "\\A(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])\\S{8,}\\z",message="{player.confirmpassword.regex}")
-//@Pattern(regexp="[a-zA-Z0-9éèàê'!â& ç-]*",message="{club.name.characters}")
-private String wrkconfirmpassword;
+
+// private Password password;
 
 private boolean NextPanelPassword = false;  // 16/11//2013
 private List<Player> droppedPlayers = null; // new 11/07/2017
@@ -122,17 +108,16 @@ private LocalDate endDate; // mod 30/01/2017
 private GoogleTimeZone playerTimeZone;
 private String playerRole;
 
-public Player()    // constructor
-{
+public Player(){
     playerGender="M"; //set default value to Man in radiobutton
     playerHomeClub=0;
     eID = false;
 //    droppedPlayers = new ArrayList<>();
-    wrkpassword = "";
 }
+
 @PostConstruct
     public void init(){
-
+        // sert à quoi?
 }
     public Integer getIdplayer(){
        // LOG.info("getIdplayer = " + idplayer);
@@ -282,6 +267,10 @@ public String getPlayerEmail() {
     public void setPlayerStringLatLng(String playerStringLatLng) {
         this.playerStringLatLng = playerStringLatLng;
     }
+
+
+
+
  
 /*DstOffset:    Offset for daylight-savings time in seconds. This will be zero if the time zone is not in Daylight Savings Time during the specified timestamp.
 	RawOffset:    Offset from UTC (in seconds) for the given location. This does not take into effect daylight savings.
@@ -333,30 +322,6 @@ public Date getPlayerModificationDate()
  //       this.selectedOtherPlayers = selectedOtherPlayers;
  //   }
 
-    public String getPlayerPassword() {
-        return playerPassword;
-    }
-
-    public void setPlayerPassword(String playerPassword) {
-        this.playerPassword = playerPassword;
-    }
-
-    public String getWrkpassword() {
-        return wrkpassword;
-    }
-
-    public void setWrkpassword(String wrkpassword) {
-        this.wrkpassword = wrkpassword;
-    }
-
-    public String getWrkconfirmpassword() {
-        return wrkconfirmpassword;
-    }
-
-    public void setWrkconfirmpassword(String wrkconfirmpassword) {
-        this.wrkconfirmpassword = wrkconfirmpassword;
-    }
-
    public List<Player> getDroppedPlayers() {      return droppedPlayers;
     }
 
@@ -380,6 +345,15 @@ public Date getPlayerModificationDate()
     public void setPlayerRole(String playerRole) {
         this.playerRole = playerRole;
     }
+
+
+ //   public Password getPassword() {
+ //       return password;
+ //   }
+
+ //   public void setPassword(Password password) {
+ //       this.password = password;
+ //   }
     
 @Override
 public String toString(){ 
@@ -408,20 +382,22 @@ public String toString(){
                + " ,playerFirstName : " + this.getPlayerFirstName()
                + " ,playerLastName : " + this.getPlayerLastName()
                + " ,playerCity : " + this.getPlayerCity()
+               + NEW_LINE + TAB
                + " ,playerCountry : " + this.getPlayerCountry()
                + " ,playerTimeZoneId : " + this.getPlayerTimeZone().getTimeZoneId()
                + " ,playerLatLng : " + this.getPlayerLatLng()
                + " ,playerGender : " + this.getPlayerGender()
                + " ,playerEmail : " + this.getPlayerEmail()
                + " ,playerLanguage : " + this.getPlayerLanguage()
-               + " ,playerBirthDate : " + this.getPlayerBirthDate()
+               + NEW_LINE + TAB +
+               " ,playerBirthDate : " + this.getPlayerBirthDate()
                + " ,BirthDate SDFformat= " + SDF.format(this.getPlayerBirthDate())
-               + " ,wrkpassword = " + this.getWrkpassword()
-               + " ,wrkconfirmpassword = " + this.getWrkconfirmpassword()
-               + " ,playerPassword (encrypted) : " + this.getPlayerPassword()
+      
                + " ,player Home Club : " + this.getPlayerHomeClub()
                + " ,playerPhoto : " + this.getPlayerPhotoLocation()
                + " ,playerRole : " + this.getPlayerRole()
+   //            + ", Entité Password : " + password.toString()
+    //            + " ,previousPasswords : " + this.getPreviouspasswords();
      //          + " ,playersList : " + Arrays.toString(this.getlistPlayers.toArray())
              ;
     return str;
@@ -439,8 +415,9 @@ public String toString(){
  //return null;
 } // end method toString
   public static Player mapPlayer(ResultSet rs) throws SQLException{
-  try{
         Player p = new Player();
+  try{
+      
         p.setIdplayer(rs.getInt("idplayer"));
         p.setPlayerFirstName(rs.getString("playerfirstname"));
         p.setPlayerLastName(rs.getString("playerlastname"));
@@ -451,7 +428,7 @@ public String toString(){
         p.setPlayerHomeClub(rs.getInt("playerhomeclub"));
         p.setPlayerLanguage(rs.getString("playerLanguage"));
         p.setPlayerEmail(rs.getString("PlayerEmail"));
-
+        
       GoogleTimeZone tz = new GoogleTimeZone();
       tz.setTimeZoneId(rs.getString("PlayerZoneId"));
       if(tz.getTimeZoneId() == null){
@@ -470,22 +447,15 @@ public String toString(){
         double longitude = Double.parseDouble(latlng[1]);
         LatLng location = new LatLng(latitude, longitude);
         p.setPlayerLatLng(location);
-  ////       LOG.info("PlayerLatLng = " + p.getPlayerLatLng());
- //       LOG.info("step 6");
-//  }catch(ClassCastException e){
-//    String msg = "£££ ClassCastException in rs " + e.getMessage()+ " for player = " + p.getPlayerLastName();
-//    LOG.error(msg);
-//    LCUtil.showMessageFatal(msg);
-
         p.setPlayerPhotoLocation(rs.getString("PlayerPhotoLocation"));
-        p.setPlayerPassword(rs.getString("PlayerPassword"));
         p.setPlayerRole(rs.getString("PlayerRole"));
         p.setPlayerModificationDate(rs.getTimestamp("playerModificationDate"));
+  //      LOG.info("end of mapPlayer with player = " + p);
    return p;
   }catch(Exception e){
-   String msg = "£££ Exception in rs = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
+   String msg = "£££ Exception mapPlayer = " + e.getMessage() + " for player = " + p.idplayer; //+ " for player = " + p.getPlayerLastName();
    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
+ //   LCUtil.showMessageFatal(msg);
     return null;
   }
 } //end method

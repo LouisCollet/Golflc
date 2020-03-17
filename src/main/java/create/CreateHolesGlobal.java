@@ -7,6 +7,8 @@ import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -40,7 +42,7 @@ try
           ps.setShort(5, (short) hg.getDataHoles()[i][2]); // stroke index
           ps.setInt(6,tee.getIdtee());
     ps.setInt(7, course.getIdcourse());
-          ps.setTimestamp(8, LCUtil.getCurrentTimeStamp());
+          ps.setTimestamp(8, Timestamp.from(Instant.now()));
            utils.LCUtil.logps(ps);
           
         int row = ps.executeUpdate(); // write into database

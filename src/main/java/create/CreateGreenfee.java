@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -30,14 +31,14 @@ public class CreateGreenfee implements interfaces.Log, interfaces.GolfInterface{
        //     ps.setInt(3, greenfee.getIdplayer());
             ps.setInt(3, player.getIdplayer());
             ps.setInt(4, greenfee.getIdround());
-                Timestamp ts = Timestamp.valueOf(greenfee.getRoundDate());
-            ps.setTimestamp(5,ts);
+   //             Timestamp ts = Timestamp.valueOf(greenfee.getRoundDate());
+            ps.setTimestamp(5,Timestamp.valueOf(greenfee.getRoundDate()));
             ps.setString(6, greenfee.getPaymentReference()); 
             ps.setString(7, greenfee.getCommunication()); 
             ps.setString(8, greenfee.getItems());
             ps.setString(9, greenfee.getStatus());
             ps.setDouble(10, greenfee.getPrice());  // new 19/02/2019
-            ps.setTimestamp(11, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(11, Timestamp.from(Instant.now()));
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
             if (row != 0){

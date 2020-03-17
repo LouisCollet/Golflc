@@ -38,9 +38,9 @@ public Unavailable find(final Course course, final Round round, final Connection
     
     ps = conn.prepareStatement(query);
     ps.setInt(1, course.getIdcourse());
-        java.sql.Timestamp ts = Timestamp.valueOf(round.getRoundDate());
-    ps.setTimestamp(2,ts);
-    ps.setTimestamp(3,ts);
+ //       java.sql.Timestamp ts = Timestamp.valueOf(round.getRoundDate());
+    ps.setTimestamp(2,Timestamp.valueOf(round.getRoundDate()));
+    ps.setTimestamp(3,Timestamp.valueOf(round.getRoundDate()));
         utils.LCUtil.logps(ps);
     rs =  ps.executeQuery();
     rs.last(); //on récupère le numéro de la ligne

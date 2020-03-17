@@ -3,13 +3,13 @@ package create;
 
 //import entite.Player;
 import entite.Round;
-//import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 import entite.ScoreMatchplay;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
-//import utils.GolfMySQL;
 import utils.LCUtil;
 /**
  *
@@ -43,7 +43,7 @@ public class CreateScoreMatchplay implements interfaces.Log{
             // v"rifier s'il y a un résultat !
  //       score.setMatchplayResult(result);
         ps.setString(2, score.getMatchplayResult() );
-        ps.setTimestamp(3, LCUtil.getCurrentTimeStamp());
+        ps.setTimestamp(3, Timestamp.from(Instant.now()));
    // where fields
         ps.setInt(4, round.getIdround());
              //    String p = ps.toString();

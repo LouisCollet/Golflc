@@ -146,8 +146,8 @@ public class DialogController implements Serializable, interfaces.Log
 }  
 
   
-  public static void viewRound()
-  {
+  public static void viewRound(){
+      
     Map<String,Object> options = new HashMap<>();
     options.put("modal", true);
     options.put("draggable", false);

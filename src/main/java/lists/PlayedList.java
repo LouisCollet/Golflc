@@ -80,7 +80,8 @@ try{
           ecl.setCourse(o);
   //LOG.info("line 03");
           Round r = new Round();
-          r = entite.Round.mapRound(rs);
+     //     r = entite.Round.mapRound(rs);
+          r = new entite.Round().mapRound(rs,c); // mod 19-02-2020
           ecl.setRound(r);
    //// new 20-12-2019       
           Tee t = new Tee();

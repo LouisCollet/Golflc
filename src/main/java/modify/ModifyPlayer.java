@@ -19,8 +19,6 @@ public boolean modify(final Player player, final Connection conn) throws Excepti
             LOG.info("player   = " + player);
     String pl = utils.DBMeta.listMetaColumnsUpdate(conn, "player");
         LOG.info("String from listMetaColumns = " + pl);
-        // encrypted password with SHA2 function of mysql 
- ///   s = s.replace("playerpassword=?" , "playerpassword=sha2(?,256)"); // new 07-08-2018 
         LOG.info("String modified for encryption password sha2 = " + pl);
         
     String query = "UPDATE player"

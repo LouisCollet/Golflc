@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import utils.DBConnection;
 import utils.LCUtil;
@@ -30,7 +31,7 @@ public class CreateSubscription implements interfaces.Log, interfaces.GolfInterf
             ps.setInt(5, 0);  // trial count
             ps.setString(6,""); // new 14-10-2018 paymentReference
             ps.setString(7,""); // new 14-10-2018 paymentReference
-            ps.setTimestamp(8, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(8, Timestamp.from(Instant.now()));
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
             if (row != 0){

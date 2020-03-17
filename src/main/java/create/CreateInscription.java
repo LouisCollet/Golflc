@@ -10,6 +10,8 @@ import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import utils.DBConnection;
@@ -57,7 +59,7 @@ public Integer create(final Round round, final Player player, Player invitedBy,
    //          LOG.info("line 06");
             ps.setInt(8, invitedBy.getIdplayer());  // new 14/02/2018
   //           LOG.info("line 07");
-            ps.setTimestamp(9, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(9, Timestamp.from(Instant.now()));
                 utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
   //           LOG.info("line 01");

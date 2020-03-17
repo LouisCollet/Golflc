@@ -1,11 +1,10 @@
 package lists;
 
+import entite.Club;
 import entite.ECourseList;
-import entite.Hole;
 import entite.Inscription;
 import entite.Player;
 import entite.Round;
-import entite.ScoreStableford;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,24 +84,32 @@ try{
     liste = new ArrayList<>(); // new 02/06/2013
   //  ECourseList cc = new ECourseList(); mod
 
+     Club c = new Club();
+     c = null;
 while(rs.next()){
           ECourseList ecl = new ECourseList(); // est réi, donc total = 0
 
-          Hole h = new Hole();
-          h = entite.Hole.mapHole(rs);
-          ecl.setHole(h);
-
-          Round r = new Round();
-          r = entite.Round.mapRound(rs);
-          ecl.setRound(r);
+     // besoin de la zoneId pour générer RoundDate Zoned
+   //       Club c = new Club();
+   //       c = null;
+   //       ecl.setClub(c);
           
-          Inscription i = new Inscription();
-          i = entite.Inscription.mapInscription(rs);  
-          ecl.setInscriptionNew(i);
+     //     Hole h = new Hole();
+     //     h = entite.Hole.mapHole(rs);
+          ecl.setHole(entite.Hole.mapHole(rs));
 
-          ScoreStableford s = new ScoreStableford();
-          s = entite.ScoreStableford.mapScoreStableford(rs);  
-          ecl.setScoreStableford(s);
+   //       Round r = new Round();
+      //    r = entite.Round.mapRound(rs); // à modifier !!
+   //       r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 pour générer ZonedDateTime
+          ecl.setRound(new entite.Round().mapRound(rs,c));
+          
+   //       Inscription i = new Inscription();
+   //       i = entite.Inscription.mapInscription(rs);  
+          ecl.setInscriptionNew(entite.Inscription.mapInscription(rs));
+
+    //      ScoreStableford s = new ScoreStableford();
+     //     s = entite.ScoreStableford.mapScoreStableford(rs);  
+          ecl.setScoreStableford(entite.ScoreStableford.mapScoreStableford(rs));
       liste.add(ecl );//store all data into a List
             //    LOG.info("just after add to listsc3");
 } //end while

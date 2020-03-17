@@ -49,20 +49,7 @@
                 alt="no photo image missing :#{courseC.player.playerLastName}"
                 style="float:right;">
         </h:graphicImage>
-<!--
-  <p:panelGrid columns="2" style="width:100%;" columnClasses="clockCloumn,clockCloumn">  
-    <h:outputText value="Client"/>  
-    <h:outputText value="Server"/>  
-    <pe:analogClock/>  
-    <pe:analogClock mode="server" startTime="#{courseC.now}"/>  
-</p:panelGrid>  
-<style>  
-    .clockCloumn{  
-        width: 50%;  
-    }  
-</style>  
-      
--->  
+
 <h:panelGroup layout="block" id="container">
 
      <h:outputText value="#{msg['message.last.session']} :"  style="font-weight:bold"/>
@@ -81,7 +68,7 @@
            >
      </h:outputText>
 
-</h:panelGroup>
+
      
      
   <h:link id="link02"
@@ -89,7 +76,6 @@
             outcome="player_modify.xhtml"
             style="float:right;"
         > 
-            <!--  action="#{courseC.to_player_modify_xhtml('modify')}" -->
         <h:graphicImage 
                 rendered="true"
                 name="images/modify.png"
@@ -110,7 +96,7 @@
     <f:param name="playerFirstName" value="#{courseC.player.playerFirstName}" />
     <f:param name="playerLastName"  value="#{courseC.player.playerLastName}" />
 </h:link>
-
+</h:panelGroup>
 <f:facet name="footer">
          <p:commandButton
                          value="#{msg['button.password.forget']}"
@@ -118,7 +104,7 @@
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         icon="fa fa-question-circle"
+                         icon="pi pi-question-circle"
                          style="float: left;"
                          action="#{courseC.forgetPassword}"
                          />
@@ -152,7 +138,14 @@
                          style="float: left;"
                          action="#{courseC.passwordVerification('KO')}"
                          />
-        
+        <p:commandButton id="button2"
+                 value="Download"
+                 ajax="false"
+                 update="growl-msg"
+                 icon="pi pi-download">
+    <p:fileDownload value="#{fileBeanC.getFile()}"
+                    contentDisposition="attachment"/>  
+</p:commandButton> 
 </f:facet>
 </p:panelGrid>
 </h:form>

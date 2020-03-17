@@ -1,5 +1,6 @@
 package lists;
 
+import entite.Club;
 import entite.Course;
 import entite.ECourseList;
 import entite.Handicap;
@@ -61,16 +62,18 @@ String query =
         
     rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
+    Club c = new Club();
+    c = null;
       //LOG.debug(" -- query 4= " );
-		while(rs.next())
-                {
+		while(rs.next()){
 		ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
                 Handicap h = new Handicap();
                 h = entite.Handicap.mapHandicap(rs);
                 ecl.setHandicap(h);
                 
                 Round r = new Round();
-                r = entite.Round.mapRound(rs);
+              //  r = entite.Round.mapRound(rs);
+                r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 pour générer ZonedDateTime
                 ecl.setRound(r);
                 
                 Course o = new Course();

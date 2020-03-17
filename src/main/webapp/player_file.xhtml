@@ -12,10 +12,7 @@
       
 >
 <ui:composition template="templates/masterTemplate.xhtml">
-   <ui:define name="metadata">
-   
-</ui:define>
-    
+   <ui:define name="metadata"> </ui:define>
     
 <ui:define name="title">Player Page </ui:define>
 <ui:define name="help">
@@ -58,12 +55,12 @@
 
 </p:panelGrid>
  <p:separator/>
-
+<!--  fileUploadListener="#{courseC.uploadListener}"  -->
     <p:fileUpload
-        fileUploadListener="#{courseC.uploadListener}"
+        listener="#{courseC.uploadListener}"
         mode="advanced"
         dragDropSupport="false"
-        allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+        allowTypes="/(\.|\/)(gif|jpe?g|png|pdf)$/"
         sizeLimit="71680"
         fileLimit="1"
         invalidSizeMessage="GolfLC: Invalid Size : File Size should not exceed 70 MB"
@@ -74,7 +71,13 @@
         cancelLabel="#{msg['button.fileupload.cancel']}"
         update="growl-msg"
         style="margin-left: 15em; max-width:60em;"
-                />
+        
+       />
+    
+    <!-- fonctionne pas on 09-03-2020 accept="application/pdf, application/vnd.ms-excel,image/png, image/jpeg, image/*
+                application/vnd.ms-excel.sheet.macroEnabled.12,
+                application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        validateContentType="true"  -->
  <p:separator/>
 
      <h:panelGrid columns="1">

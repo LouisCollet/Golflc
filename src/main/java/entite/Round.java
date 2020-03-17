@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,14 +20,16 @@ import utils.LCUtil;
 @Named
 public class Round implements Serializable, interfaces.Log, interfaces.GolfInterface{
     private static final long serialVersionUID = 1L;
+    final DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 //@NotNull(message="Bean validation : the Round ID must be completed")
     private Integer idround;
 
 @NotNull(message="{round.date.notnull}")
-  //  private Date roundDate;
     private LocalDateTime roundDate;  // change also ScoreCard.java and StablefordResult !!!!!!
-private LocalDateTime roundDateTrf;
+    private ZonedDateTime roundDateZoned;
+
+    private LocalDateTime roundDateTrf;
     private Date workDate;
     private String workHour;
 
@@ -118,6 +123,14 @@ private String RoundScoreString;
  //       LOG.info(" from setRoundDate 3 - roundDate = " + roundDate.format(ZDF_TIME_HHmm));
  //       
         this.roundDate = roundDate;
+    }
+
+    public ZonedDateTime getRoundDateZoned() {
+        return roundDateZoned;
+    }
+
+    public void setRoundDateZoned(ZonedDateTime roundDateZoned) {
+        this.roundDateZoned = roundDateZoned;
     }
 
     public Date getWorkDate() {
@@ -258,8 +271,9 @@ LOG.info("starting toString for Round!");
                + " ,Round Players : "   + this.getRoundPlayers()
      //          + " ,Work Date format Date : "   + this.getWorkDate()
      //          + " ,Work Hours : "   + this.getWorkHour()
-          + " ,RoundDate format LocalDateTime: "   + this.getRoundDate().format(ZDF_TIME)
-     //          + " ,Round Date Trf : "   + this.getRoundDateTrf().format(ZDF_TIME)
+               + " ,RoundDate format LocalDateTime: "   + this.getRoundDate()// .format(ZDF_TIME_HHmm)
+               + " ,RoundDate format ZonedDateTime: "   + this.getRoundDateZoned()//.format(ZDF_TIME_HHmm) //.getRoundDate().format(ZDF_TIME)
+               + " ,Round Date Trf : "   + this.getRoundDateTrf().format(ZDF)
      //          + " ,Round Date HHmm : "   + this.getRoundDate().format(ZDF_TIME_HHmm)
            //    + " ,Round Date/Time: "   + Round.SDF_TIME.format(getRoundDate() )
                
@@ -285,26 +299,43 @@ LOG.info("starting toString for Round!");
         return msg;
   }
 }
-public static Round mapRound(ResultSet rs) throws SQLException{
+//public static Round mapRound(ResultSet rs,Club club) throws SQLException{
+    public Round mapRound(ResultSet rs,Club club) throws SQLException{
       String METHODNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
   try{
         Round r = new Round();
+ //       LOG.info("entering mapRound with club = " + club);
             r.setIdround(rs.getInt("idround") );
-  //               java.util.Date d = rs.getTimestamp("roundDate");
-   //         r.setRoundDate(DatetoLocalDateTime(d));
+   //         LOG.info("idround = " + r.getIdround());
      // new solution 21/01/2019       
-            r.setRoundDate(rs.getTimestamp("roundDate").toLocalDateTime());
+ //           r.setRoundDate(rs.getTimestamp("roundDate").toLocalDateTime()); // outdated (?) solution 18-02-2020
+  // new solution 18-02-2020
+            r.setRoundDate(rs.getObject("roundDate", LocalDateTime.class)); // en DB est TIMESTAMP
+  //               LOG.info("LocalDateTime RoundDate() = " + r.getRoundDate());
+    //             LOG.info("culbidclub = " + club.getIdclub());
+           ZonedDateTime z = null;
+           if(club != null){
+    //           LOG.info("idclub not null");
+                  z = r.getRoundDate()
+                              .atZone(ZoneId.systemDefault())
+                              .withZoneSameInstant(ZoneId.of(club.getClubTimeZone().getTimeZoneId()));
+           }else{
+    //          LOG.info("club est null = " );
+              z = r.getRoundDate()
+                              .atZone(ZoneId.systemDefault());
+                         //     .withZoneSameInstant(ZoneId.of(club.getClubTimeZone().getTimeZoneId()));
+           }
+            r.setRoundDateZoned(z);
+   //           LOG.info("RoundDateZoned = " + r.getRoundDateZoned());
             r.setRoundGame(rs.getString("roundgame") );
             r.setRoundCBA(rs.getShort("RoundCSA") );
             r.setRoundCompetition(rs.getString("RoundCompetition") );
             r.setRoundQualifying(rs.getString("RoundQualifying") );
             r.setRoundHoles(rs.getShort("RoundHoles") );
-            r.setRoundStart(rs.getShort("RoundStart") );// start
-            r.setRoundPlayers(rs.getShort("RoundPlayers") ); // new 20/06/2017
+            r.setRoundStart(rs.getShort("RoundStart") );
+            r.setRoundPlayers(rs.getShort("RoundPlayers"));
             r.setRoundTeam(rs.getString("roundTeam"));
             r.setCourseIdcourse(rs.getInt("course_idcourse"));
-      //      r.setCourse_idcourse(rs.getInt("course_idcourse"));
-           
    return r;
   }catch(Exception e){
    String msg = "£££ Exception in rs = " + METHODNAME + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
@@ -313,5 +344,4 @@ public static Round mapRound(ResultSet rs) throws SQLException{
     return null;
   }
 } //end method map
-
 } //end class

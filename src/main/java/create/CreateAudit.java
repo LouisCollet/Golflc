@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 
@@ -21,11 +23,12 @@ try{
     ps = conn.prepareStatement(query);
     ps.setNull(1,java.sql.Types.INTEGER); // auto-increment
     ps.setInt(2,player.getIdplayer());
-    ps.setTimestamp(3,LCUtil.getCurrentTimeStamp()); // AuditStartDate
-    ps.setTimestamp(4,java.sql.Timestamp.valueOf("2019-06-01 00:00:00") ); // AuditEndDate : date fictive
+    ps.setTimestamp(3,Timestamp.from(Instant.now())); // AuditStartDate
+    ps.setTimestamp(4,Timestamp.valueOf("2019-06-01 00:00:00") ); // AuditEndDate : date fictive
     ps.setInt(5, 0); // AuditAttempts init = 0
-    ps.setTimestamp(6,LCUtil.getCurrentTimeStamp()); // AuditRetryTimeDate : date fictive);
-    ps.setTimestamp(7,LCUtil.getCurrentTimeStamp()); // ModificationDate
+ // old   ps.setTimestamp(6,LCUtil.getCurrentTimeStamp()); // AuditRetryTimeDate : LocalDateTime
+    ps.setTimestamp(6,Timestamp.from(Instant.now()));
+    ps.setTimestamp(7,Timestamp.from(Instant.now())); // ModificationDate
     utils.LCUtil.logps(ps);
     
     int rows = ps.executeUpdate(); // write into database

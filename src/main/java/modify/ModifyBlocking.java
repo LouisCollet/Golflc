@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import utils.DBConnection;
 import utils.LCUtil;
@@ -21,7 +22,7 @@ try{
                    + "  WHERE BlockingPlayerId=?";
 
     ps = conn.prepareStatement(query);
-    ps.setTimestamp(1,LCUtil.getCurrentTimeStamp()); // BlockingLastAttempt
+    ps.setTimestamp(1,Timestamp.from(Instant.now())); // BlockingLastAttempt
         LOG.info("there where attempts = " + blocking.getBlockingAttempts());
     ps.setShort(2, blocking.getBlockingAttempts());
     //
@@ -32,7 +33,7 @@ try{
         ps.setTimestamp(3,Timestamp.valueOf(blocking.getBlockingRetryTime()));
     }else{
  //       blocking.setBlockingRetryTime(LocalDateTime.now());
-        ps.setTimestamp(3,LCUtil.getCurrentTimeStamp());
+        ps.setTimestamp(3,Timestamp.from(Instant.now()));
           LOG.info("there are attempts = " + blocking.getBlockingAttempts());
     }
    // ps.setTimestamp(3,Timestamp.valueOf(blocking.getBlockingRetryTime()));

@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -82,13 +83,13 @@ public class CreateTarifMember {
             ps.setNull(1,java.sql.Types.INTEGER);  //autoincrement
         //    ps.setDate(2,LCUtil.getSqlDate(tarifMember.getMemberStartDate()));
         //    ps.setDate(3,LCUtil.getSqlDate(tarifMember.getMemberEndDate()));
-            java.sql.Timestamp ts = Timestamp.valueOf(tarifMember.getMemberStartDate());
-            ps.setTimestamp(2,ts);
-            ts = Timestamp.valueOf(tarifMember.getMemberEndDate());
-            ps.setTimestamp(3,ts);
+  //          java.sql.Timestamp ts = Timestamp.valueOf(tarifMember.getMemberStartDate());
+            ps.setTimestamp(2,Timestamp.valueOf(tarifMember.getMemberStartDate()));
+     //       ts = Timestamp.valueOf(tarifMember.getMemberEndDate());
+            ps.setTimestamp(3,Timestamp.valueOf(tarifMember.getMemberEndDate()));
             ps.setInt(4,club.getIdclub()); 
             ps.setString(5,json);
-            ps.setTimestamp(6,LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(6,Timestamp.from(Instant.now()));
 
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database

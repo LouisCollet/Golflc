@@ -1,11 +1,7 @@
 package lists;
 
 import entite.Classment;
-import entite.Club;
-import entite.Course;
 import entite.ECourseList;
-import entite.Inscription;
-import entite.Player;
 import entite.Round;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
@@ -76,34 +72,17 @@ try{
         LOG.info("ParticipantsStableford has {} players ", rs.getRow() );
        rs.beforeFirst(); //on replace le curseur avant la première ligne
     liste = new ArrayList<>();
- //   int rowNum = 0; //The method getRow lets you check the number of the row
-        //              rowNum = rs.getRow() - 1;
-	while(rs.next())
-        {
-         ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
-          Club c = new Club();
-          c = entite.Club.mapClub(rs);
-          ecl.setClub(c);
-
-          Course o = new Course();
-          o = entite.Course.mapCourse(rs);
-          ecl.setCourse(o);
-
-          Round r = new Round();
-          r = entite.Round.mapRound(rs);
-          ecl.setRound(r);
+	while(rs.next()){
+          ECourseList ecl = new ECourseList(); // liste pour sélectionner un round
+          ecl.setClub(entite.Club.mapClub(rs));
+          ecl.setCourse(entite.Course.mapCourse(rs));
+          ecl.setRound(new entite.Round().mapRound(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
+          ecl.setInscriptionNew(entite.Inscription.mapInscription(rs));
+          ecl.setPlayer(entite.Player.mapPlayer(rs));
+   //       Classment cla = new Classment();  mod 16-03-2020 
           
-          Inscription i = new Inscription();
-          i = entite.Inscription.mapInscription(rs);  
-          ecl.setInscriptionNew(i);//.setInscriptionNew(i);
-
-          Player p = new Player();
-          p = entite.Player.mapPlayer(rs);  
-          ecl.setPlayer(p);
-          
-          Classment cla = new Classment();
           find.FindClassmentElements fcel = new find.FindClassmentElements();
-          cla = fcel.findClassment(ecl.Eplayer.getIdplayer(), ecl.Eround.getIdround(), conn);
+          Classment cla = fcel.findClassment(ecl.getPlayer().getIdplayer(), ecl.getRound().getIdround(), conn);
           ecl.setClassment(cla);
 			//store all data into a List
 	liste.add(ecl);

@@ -12,7 +12,7 @@ public class FindPlayer implements interfaces.Log, interfaces.GolfInterface{
     final private static String CLASSNAME = Thread.currentThread().getStackTrace()[1].getClassName(); 
 
 //public Player findPlayer(final int in_idplayer, final Connection conn) throws SQLException{
- public Player findPlayer(final Player player, final Connection conn) throws SQLException{   
+ public Player find(final Player player, final Connection conn) throws SQLException{   
     String CLASSNAME2 = Thread.currentThread().getStackTrace()[1].getClassName(); 
         LOG.info("entering : " + CLASSNAME2); 
         LOG.info("starting findPlayer for player = " + player);
@@ -61,7 +61,7 @@ public static void main(String[] args) throws SQLException, Exception{ // testin
     Connection conn = new DBConnection().getConnection();
     Player player = new Player();
     player.setIdplayer(324713);
-    Player p1 = new FindPlayer().findPlayer(player, conn);
+    Player p1 = new FindPlayer().find(player, conn);
        LOG.info("player found = " + p1.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 }// end main

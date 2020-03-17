@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import utils.DBConnection;
 import utils.LCUtil;
@@ -52,7 +54,8 @@ public class CreateHole implements Serializable,interfaces.Log{
             ps.setShort(5, hole.getHoleStrokeIndex());
             ps.setInt(6, tee.getIdtee());
             ps.setInt(7, course.getIdcourse());
-            ps.setTimestamp(8, LCUtil.getCurrentTimeStamp());
+        //    ps.setTimestamp(8, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(8,Timestamp.from(Instant.now())); // mod 18-02-2020
              //    String p = ps.toString();
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database

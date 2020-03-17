@@ -2,12 +2,11 @@
 package test_instruction;
 import static interfaces.Log.LOG;
 import javax.enterprise.context.ApplicationScoped;
-import org.eclipse.microprofile.health.Health;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 
-@Health
+//@Health
 @ApplicationScoped
 public class ServiceHealthCheck implements HealthCheck {
 
@@ -36,6 +35,6 @@ public class ServiceHealthCheck implements HealthCheck {
         //    DBConnection.closeQuietly(conn, null, null, null);
     }
     } // end main//
-    */
+ 
 } //end class
 

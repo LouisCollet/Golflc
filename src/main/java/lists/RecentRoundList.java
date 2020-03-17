@@ -74,7 +74,8 @@ try{
           ecl.setCourse(o);
 
           Round r = new Round();
-          r = entite.Round.mapRound(rs);
+      //    r = entite.Round.mapRound(rs);
+          r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 pour générer ZonedDateTime
           ecl.setRound(r);
           
           Player p = new Player();

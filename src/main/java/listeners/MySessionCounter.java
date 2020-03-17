@@ -22,6 +22,7 @@ public class MySessionCounter implements HttpSessionListener {
   public static final String COUNTER = "session-counter";
   private List<String> sessions = new ArrayList<>();
 
+  @Override
   public void sessionCreated(HttpSessionEvent se){
       HttpSession session = se.getSession();
       sessions.add(session.getId());
@@ -30,22 +31,21 @@ public class MySessionCounter implements HttpSessionListener {
         LOG.info(" MaxInactiveInterval = " + session.getMaxInactiveInterval());
    //     LOG.info(" (session) Created at = " + session.getCreationTime());  // long
         Date result = new Date(session.getCreationTime()); 
-        LOG.info("session created at readable Date : " + SDF_TIME.format(result)); 
+        LOG.info("session created at : " + SDF_TIME.format(result)); 
         LOG.info(" after add sessions are now : " + Arrays.deepToString(sessions.toArray()));
     activeSessions++;
     LOG.info("session created, number of activeSessions = " + activeSessions); 
   }
 
+  @Override
   public void sessionDestroyed(HttpSessionEvent se) {
       HttpSession session = se.getSession();
-      LOG.info("sessionDestroyed:Id:" + se.getSession().getId());
-      LOG.info("destroy time = " + LocalDateTime.now());
+      Date result = new Date(session.getCreationTime()); 
+        LOG.info("session created at : " + SDF_TIME.format(result)); 
+        LOG.info("sessionDestroyed:Id:" + se.getSession().getId());
+        LOG.info("destroy time = " + LocalDateTime.now());
       sessions.remove(session.getId());
       session.setAttribute(MySessionCounter.COUNTER, this);
-  //    LOG.info(" (session) Destroyed:ID = " + session.getId());
-      Date result = new Date(session.getCreationTime()); 
-      LOG.info("session created at readable Date : " + SDF_TIME.format(result)); 
-  //     LOG.info(" (session) Destroyed, was created at = " + session.getCreationTime());
       LOG.info(" after remove sessions are now : " + Arrays.deepToString(sessions.toArray()));
     if(activeSessions > 0){
       activeSessions--;}
@@ -53,11 +53,11 @@ public class MySessionCounter implements HttpSessionListener {
   }
 
   public void sessionInvalidate(HttpSessionEvent se) {
-    LOG.info("session invalidated = " + se.toString());//+ activeSessions); 
+    LOG.info("HttpSessionEvent session invalidated = " + se.toString());//+ activeSessions); 
   }
   public int getActiveSessions() {
    LOG.info("number of active sessions = " + activeSessions);
 ///   LOG.info("number of active sessions 2 = " + sessions.size());
    return activeSessions;
   }
-}
+} // end class

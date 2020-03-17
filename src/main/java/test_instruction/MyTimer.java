@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package test_instruction;
 import static interfaces.Log.LOG;
 import javax.annotation.Resource;
@@ -21,8 +17,7 @@ public class MyTimer {
     public void initTimer(String message) throws NamingException{
    //     InitialContext ic = new InitialContext();
    InitialContext ic = new InitialContext();
-      SessionContext sctxLookup =
-             (SessionContext) ic.lookup("java:comp/env/sessionContext");
+      SessionContext sctxLookup = (SessionContext) ic.lookup("java:comp/env/sessionContext");
        System.out.println("look up injected sctx: " + sctxLookup);
         LOG.info("entering initTimer");
   //     context.getBusinessObject();

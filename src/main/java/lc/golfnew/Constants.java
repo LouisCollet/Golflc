@@ -5,8 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 
-public class Constants
-{
+public class Constants{
     private Constants()
     {
         // 

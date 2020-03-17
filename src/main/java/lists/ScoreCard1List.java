@@ -1,8 +1,8 @@
 
 package lists;
 
+import entite.Club;
 import entite.ECourseList;
-import entite.Handicap;
 import entite.Player;
 import entite.Round;
 import exceptions.LCCustomException;
@@ -55,21 +55,23 @@ String query =
             }    
      rs.beforeFirst(); //on replace le curseur avant la premiÃ¨re ligne
      liste = new ArrayList<>();
-  //   ECourseList cc = new ECourseList();
-      //LOG.debug(" -- query 4= " );
+//     Club c = new Club();
+ //    c = null;
+
 	while(rs.next()){
           ECourseList ecl = new ECourseList();
-          Player p = new Player();
-          p = entite.Player.mapPlayer(rs);
-          ecl.setPlayer(p);
+      //    Player p = new Player();
+      //    p = entite.Player.mapPlayer(rs);
+          ecl.setPlayer(entite.Player.mapPlayer(rs));
 
-          Round r = new Round();
-          r = entite.Round.mapRound(rs);
-          ecl.setRound(r);
+      //    Round r = new Round();
+      //    r = entite.Round.mapRound(rs);
+      ///    r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 pour générer ZonedDateTime
+          ecl.setRound(new entite.Round().mapRound(rs,new Club()));
           
-          Handicap h = new Handicap();
-          h = entite.Handicap.mapHandicap(rs);  
-          ecl.setHandicap(h);
+     //     Handicap h = new Handicap();
+     //     h = entite.Handicap.mapHandicap(rs);  
+          ecl.setHandicap(entite.Handicap.mapHandicap(rs));
 	liste.add(ecl);
 	} //end while
         

@@ -31,15 +31,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.context.Flash;
 import javax.faces.event.PhaseId;
-import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import lc.golfnew.LanguageController;
 import static org.apache.commons.lang3.StringUtils.repeat;
@@ -55,9 +55,15 @@ public class LCUtil implements interfaces.GolfInterface, interfaces.Log    // co
   private static long startTime;
   private static long stopTime;
  // @Inject private static FacesContext fc;
-  @Inject private static Flash flash;
-  @Inject private static ExternalContext ec;
+//  @Inject private static Flash flash;
+//  @Inject private static ExternalContext ec;
 
+  // pas utilisé
+  public static void executeQuery(String sql) throws SQLException{
+      throw new SQLException("Syntax Error discovered by LC");
+  }
+  
+  
 public static Object getSessionMapValue(String key)
 {
    return FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get(key);
@@ -68,10 +74,11 @@ public static void setSessionMapValue(String key, Object value)
    FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().put(key, value);
 }
 
-public static java.sql.Timestamp getCurrentTimeStamp(){
-	java.util.Date today = new java.util.Date();
-	return new java.sql.Timestamp(today.getTime());
-}
+//public static java.sql.Timestamp getCurrentTimeStamp(){
+//	// java.util.Date today = new java.util.Date();
+//	return new java.sql.Timestamp(new java.util.Date().getTime()); // mod 18-02-2020
+//}
+
 public static String getCurrentTimeWithZoneOffset(String lzt)
 {
         LOG.info("start with " + lzt);
@@ -132,7 +139,7 @@ public static void delayLC() {// throws InterruptedException, ExecutionException
     task = new schedule.SubscriptionRenewal();
     int initialDelay = 10;
     period = 3;
-    executor.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.MINUTES);;
+    executor.scheduleAtFixedRate(task, initialDelay, period, TimeUnit.MINUTES);
 /*
     executor = Executors.newScheduledThreadPool(1);
     task = () -> {
@@ -179,7 +186,6 @@ try{
  }catch(Exception e){
    String msg = "£££ Exception in DatetoLocalDateTime = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
     return null;
   }
 }
@@ -193,7 +199,6 @@ try{
  }catch(Exception e){
    String msg = "£££ Exception in LocalDateTimetoSqlDate = " + e.getMessage();
    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
     return null;
   }
 }
@@ -207,7 +212,6 @@ try{
  }catch(Exception e){
    String msg = "£££ Exception in LocalDateTimetoLocalDate = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
     return null;
   }
 }
@@ -225,7 +229,6 @@ public static LocalDate DatetoLocalDate(java.util.Date date){
    }catch(Exception e){
    String msg = "£££ Exception in DatetoLocalDate = " + e.getMessage();
     LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
     return null;
   }
 }
@@ -836,16 +839,24 @@ public static void showMessageFatal(String summary){
        FacesContext fc1 = FacesContext.getCurrentInstance();
        if(fc1 != null){ //JSF session, 
             fc1.getExternalContext().getFlash().setKeepMessages(true);
-            summary = "<h3>" + summary + "</h3>";  // new 18-02-2019
+         summary = "<h3>" + summary + "</h3>";  // new 18-02-2019 // enlevé 04-02-2020
+    /* transfér dans primefacesLC.css 
+    .ui-messages-fatal {
+    margin: 1px;
+    padding: 5px 0px 5px 0px;
+    background-color: black !important;
+    font-size: 1.5em;  
+    color: red;
+    font-weight: bold;
+}
+    */
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary," (Application GolfLC)");
             fc1.addMessage(null, facesMsg);
-         //   PrimeFaces.current().dialog().showMessageDynamic(facesMsg);
-         //   showDialogFatal(facesMsg);
-             PrimeFaces.current().dialog().showMessageDynamic(facesMsg); // new 12-05-2019
+   //          PrimeFaces.current().dialog().showMessageDynamic(facesMsg); // new 12-05-2019 enlevé 12-02-2020
        }else{ //fc is null for BATCH sessions
            LOG.info("messageFatal this is a batch execution " + summary);
-           PrimeFaces pf = PrimeFaces.current();
-           pf.executeScript("{alert('Welcome user - showMessageFatal error!')}");
+      //     PrimeFaces pf = PrimeFaces.current();
+           PrimeFaces.current().executeScript("{alert('Welcome user - showMessageFatal error!')}");
          //  PrimeFaces.current().executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
        }
   }catch (Exception cv){
@@ -865,8 +876,8 @@ public static void showMessageFatal2(String summary, String summary2){
             showDialogFatal(facesMsg);
        }else{ //fc is null for BATCH sessions
            LOG.info("messageFatal this is a batch execution " + summary);
-           PrimeFaces pf = PrimeFaces.current();
-            pf.executeScript("{alert('Welcome user - showMessageFatal error!')}");
+       //    PrimeFaces pf = PrimeFaces.current();
+            PrimeFaces.current().executeScript("{alert('Welcome user - showMessageFatal error!')}");
          //  PrimeFaces.current().executeScript("Welcome user - showMessageFatal error!"); // fonctionne ?
        }
   }catch (Exception cv){
@@ -1142,24 +1153,14 @@ public static void logMap(Map<String, Object> map){
         LOG.error("logps Exception " + e);
       }
 }
-public static void LCstartup() throws Exception //throws SQLException //throws SQLException
-{
-//   Connection conn = null;
+ 
+
+public static void LCstartup() throws Exception{ //throws SQLException //throws SQLException
 try{   
         LOG.info("we are starting LCstartup !!");
     ServletContext sc = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
  //       LOG.debug("Startup with ServletContext = " + sc);
         LOG.debug("server Info = " + sc.getServerInfo());
-        
- //   FacesContext fc = FacesContext.getCurrentInstance();
- //       LOG.info("facescontext Application = " + fc.getApplication());
-                
- //       conn = PostStartupBean.getConn(); // new 20/04/2018
-        
-        
- /// conn = utils.DBConnection.getConnection();
- 
- 
     }catch (Exception e){
         LOG.error("There is maybe no database available ??? " + e);
       }
@@ -1168,54 +1169,14 @@ try{
    // DBMeta.listMetaData(PostStartupBean.getConn());
  ////  DBConnection.getPooledConnection(); enlevé 01/121/2019
    ListAllSystemProperties();
-   
- //  DBConnection.closeQuietly(conn, null, null, null);
-   
- //  InputStream in = null;
- /*   
-   try{
-       LOG.info("starting properties files");
-    File confDir = new File(System.getProperty("jboss.server.config.dir"));
-    File fileProp = new File(confDir, "myLC.properties");
-    //teste fileProp.exists etc.
-    in = new FileInputStream(fileProp);
-    Properties prop = new Properties();
-    // load a properties file
-    prop.load(in);
-    // get the property value and print it out
-        LOG.info("database = " + prop.getProperty("database"));
-        LOG.info("dbuser = " + prop.getProperty("dbuser"));
-        LOG.info("dbpassword = " + prop.getProperty("dbpassword"));
-        Enumeration<?> e = prop.propertyNames();
-	while (e.hasMoreElements()) {
-		String key = (String) e.nextElement();
-		String value = prop.getProperty(key);
-		LOG.info("Key : " + key + ", Value : " + value);
-	}
-    }catch (FileNotFoundException e){
-        LOG.error("File not found file myLC.properties : " + e);
-   }catch (Exception e){
-        LOG.error("Unable to load properties file my.properties : " + e);
-        
-   }finally{
-        in.close();
-   }
-    */
-//}catch (SQLException e){
-//	LOG.error("error SQL in DBMeta first step : " + e);
-    //    throw e;
-// } finally {
-           // DBConnection.closeQuietly(conn, null, null, ps); // new 10/12/2011
-       //     DBConnection.closeQuietly(conn, null, null, null); // new 14/8/2014
-//}
-
 } //end method
-
+//@Inject
+//private ExternalContext ec;
 public static String firstPartUrl(){
- //   String href = "####";
 try{   
-        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
-     //    **uri = /GolfNew-1.0-SNAPSHOT 
+   // LOG.info("*** before ExternalContext = " );   
+     ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+            LOG.info("** ExternalContext = " + ec.toString());   
         String host = ec.getRequestServerName();
    //       LOG.info("** application host = " + host);   
         int port = ec.getRequestServerPort();
@@ -1680,9 +1641,12 @@ public static void main(String[] args) throws Exception{ // throws IOException,E
                 LOG.error("SQLState: " + ((SQLException)e).getSQLState());
                 LOG.error("Error Code: " + ((SQLException)e).getErrorCode());
                 LOG.error("Message: " + e.getMessage());
+    //            showMessageInfo("Message: " + e.getMessage());
                 Throwable t = ex.getCause();
                 while(t != null) {
                     LOG.error("Cause: " + t);
+                    showMessageInfo(t.getMessage());
+                    showMessageInfo(t.getCause().getLocalizedMessage());
                     t = t.getCause();
                 }
             }
@@ -1731,4 +1695,39 @@ public static void printWarnings(SQLWarning warning) throws SQLException {
     }
 }
 }
+
+    public static void printManifestAttributes(Manifest manifest) {
+   try {
+    Attributes attrs = manifest.getMainAttributes();
+    Iterator it = attrs.keySet().iterator();
+    while (it.hasNext()) {
+       String key = it.next().toString();
+       String value = attrs.getValue(key);
+        LOG.info("manifest attribute = " + key + " / " + value);
+    }
+   } catch (Exception ex) {
+       LOG.info("error printattibutes" + ex);
+   }
+ //  return h;
+ }
+
+     /*
+  private static Hashtable<String, String> getManifestAttributes(Manifest manifest) {
+   Hashtable<String, String> h = new Hashtable<String, String>();
+   try {
+     Attributes attrs = manifest.getMainAttributes();
+     Iterator it = attrs.keySet().iterator();
+     while (it.hasNext()) {
+       String key = it.next().toString();
+       h.put(key, attrs.getValue(key));
+     }
+   } catch (Exception ignore) {
+   }
+   return h;
+ }
+    */
+    
+    
+    
+    
 }// end Class LCUtil

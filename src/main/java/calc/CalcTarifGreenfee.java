@@ -260,8 +260,7 @@ if(tarif.getDays().length > 0){
     LOG.info(" the index is = " + i);
     
 
-    switch(typeplayer)
-    {
+    switch(typeplayer){
       case "A":   // Adult
            price = Double.valueOf(tarif.getDays()[i][0]);
            break;
@@ -314,11 +313,11 @@ double price = 0.0;
     
     
     
-public static void main(String[] args) throws ParseException, Exception //throws SQLException // testing purposes
-{ LOG.info("starting main");
+public static void main(String[] args) throws ParseException, Exception{
+    LOG.info("starting main");
 
-    DBConnection dbc = new DBConnection();
-    Connection conn = dbc.getConnection();
+ //   DBConnection dbc = 
+    Connection conn = new DBConnection().getConnection();
     try{
     Course course = new Course();
     course.setIdcourse(1); // 102=santana  1=americain Tournette

@@ -12,11 +12,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.jar.Manifest;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
@@ -31,7 +33,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.faces.validator.ValidatorException;
@@ -39,6 +40,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.maven.archiver.MavenArchiver;
+import org.apache.maven.project.MavenProject;
+import static org.omnifaces.util.Faces.getServletContext;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.DragDropEvent;
 import org.primefaces.event.FileUploadEvent;
@@ -60,6 +64,7 @@ import static utils.LCUtil.DatetoLocalDateTime;
 import static utils.LCUtil.intArraytoStringArray;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
+
 @Named("courseC") // this qualifier  makes a bean EL-injectable (Expression Language)
 @SessionScoped
 public class CourseController implements Serializable, interfaces.GolfInterface, interfaces.Log{
@@ -94,6 +99,8 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
      @Inject private Unavailable unavailable;
      @Inject private Audit audit;
      @Inject private Blocking blocking;
+     @Inject private Activation activation;
+     @Inject private Password password;
      private final static List<Integer> STROKEINDEX = new ArrayList<>();
     private final static List<Integer> NUMBERS = new ArrayList<>();
     
@@ -232,7 +239,7 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
      // mettre dans une variable ??        
      // oui voir line 4752
      
-       LOG.info("** Webbrowser url = " + utils.LCUtil.firstPartUrl());
+       LOG.info("** Webbrowser url = " + utils.LCUtil.firstPartUrl()); //LCUtil().firstPartUrl());
 
           
  // https://github.com/vdurmont/emoji-java
@@ -395,12 +402,34 @@ public class CourseController implements Serializable, interfaces.GolfInterface,
   reset("from init in CourseController");
  //  LOG.info("leaving " + this.getClass().getSimpleName() + " Postconstruct init()");
    LOG.info("NEW session just started !! " + NEW_LINE);
+// current manifest   créé dans pom.xml <maven-war-plugin> <archive>
+  InputStream in = getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"); // sous /src/main/resources
+  if(in != null){
+    Manifest manifest = new Manifest(in);
+    LOG.info("Implementation VERSION = " + manifest.getMainAttributes().getValue("Implementation-Version"));
+    LOG.info("Created By = " + manifest.getMainAttributes().getValue("Created-By"));
+    LOG.info("Implementation Title = " + manifest.getMainAttributes().getValue("Implementation-Title"));
+    LOG.info("Build-Jdk = " + manifest.getMainAttributes().getValue("Build-Jdk-Spec"));
+    LOG.info("Build-Tool = " + manifest.getMainAttributes().getValue("Build-Tool"));
+    LOG.info("Build-Os = " + manifest.getMainAttributes().getValue("Build-Os"));
+    //http://www.java2s.com/Tutorial/Java/0180__File/ListingtheMainAttributesinaJARFileManifest.htm
+    
+    utils.LCUtil.printManifestAttributes(manifest);
+  }
+   MavenArchiver ma = new MavenArchiver();
+   LOG.info("line arch 01 + " );
+   MavenProject mp = new MavenProject();
+   LOG.info("artifact = " + mp.toString());//.getArtifact());
+   LOG.info("line arch 02");
+   // à continuer ??
+ //  ma.getManifest(project, config);
+
  //  utils.MySessionCounter msc = new utils.MySessionCounter();
  //  LOG.info("The are activeSessions = : " + msc.getActiveSessions()); 
 // HttpServletRequest req = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
 // HttpServletResponse res = (HttpServletResponse)FacesContext.getCurrentInstance().getExternalContext().getResponse();
 
- } catch (Exception e){
+ }catch (Exception e){
             String msg = "££ Exception in creating Connection or init in courseC = " + e.getMessage();
             LOG.error(msg);
             showMessageFatal(msg);
@@ -416,6 +445,22 @@ public Map<Integer, String> getData() {
         data.put(1, "java ee 8");
         data.put(2, "jsf 2.3");
         return data;
+    }
+
+    public Activation getActivation() {
+        return activation;
+    }
+
+    public Password getPassword() {
+        return password;
+    }
+
+    public void setPassword(Password password) {
+        this.password = password;
+    }
+
+    public void setActivation(Activation activation) {
+        this.activation = activation;
     }
 
     public TarifMember getTarifMember() {
@@ -475,6 +520,14 @@ public Map<Integer, String> getData() {
     
     public void setGreenfee(Greenfee greenfee) {
         this.greenfee = greenfee;
+    }
+
+    public Blocking getBlocking() {
+        return blocking;
+    }
+
+    public void setBlocking(Blocking blocking) {
+        this.blocking = blocking;
     }
 
     public Player getPlayer2() {
@@ -1488,9 +1541,23 @@ public void playerPasswordListener(ValueChangeEvent e) {
    //     LOG.info("playerCountryListener ");
         LOG.info("playerPassword OldValue = " + e.getOldValue());
         LOG.info("playerPassword NewValue = " + e.getNewValue());
-    player.setPlayerPassword(e.getNewValue().toString() );
+     //   Password pa = new Password();
+        password.setPlayerPassword(e.getNewValue().toString() );
+     //   player.setPassword(pa);
 }
 
+public void playerConfirmPasswordListener(ValueChangeEvent e) {
+   //     LOG.info("playerCountryListener ");
+        LOG.info("playerPassword OldValue = " + e.getOldValue());
+        LOG.info("playerPassword NewValue = " + e.getNewValue());
+        
+     //      Password pa = new Password();
+      //     pa.setWrkconfirmpassword(e.getNewValue().toString() );
+      //     player.setPassword(pa);
+           password.setWrkconfirmpassword(e.getNewValue().toString() );
+        
+  //  player.password.setWrkconfirmpassword(e.getNewValue().toString() );
+}
 
 
 public void playerCountryListener(ValueChangeEvent e) {
@@ -1681,14 +1748,12 @@ public void roundWorkDate(ValueChangeEvent e) throws ParseException, SQLExceptio
         this.inputPlayingHcp = inputPlayingHcp;
     }
 
-    public void uploadListener(FileUploadEvent e) throws Exception{    
+  public void uploadListener(FileUploadEvent e) throws Exception{    
          LOG.info(" entering uploadListener = ");
-         new FileUploadController().uploadListener(e, player, conn);
+      new FileUploadController().uploadListener(e, player, conn);
          LOG.info(" after FileUploadController");
-      // forcer refresh de listplayers !!
-       lists.PlayersList.setListe(null);
-   //    lists.PlayersList pl = new lists.PlayersList();
-       new lists.PlayersList().getListAllPlayers(conn);
+       lists.PlayersList.setListe(null); // forcer refresh de listplayers !!
+       new lists.PlayersList().list(conn);
   //     return "welcome.xhtml?faces-redirect=true"; retourne quand même player_file.xhtml
     }
     
@@ -2032,6 +2097,7 @@ public String reset(String ini){
     audit = new Audit(); // new 13-06-2019
     login = new Login();
     localAdmin = new Player(); // new 26-03-2019
+    password = new Password();
     cptFlight = 0;  // iterations sur 
  //      LOG.info("ending initialize entites , param = " + ini);
     return "reset OK "; // on retourne d'où on vient
@@ -2324,14 +2390,27 @@ try{
 return null;  
 }   //end method CreateInscription
 
+public void findActivation(String UUID) throws Throwable{
+    //used in activation_check.xhtml dans View Action donc exécuté AVANT affichage écran
+    LOG.info("entering findActivation with : " + UUID);
+    uuid = UUID;
+ /*    Activation activation = new find.FindActivation().find(conn, UUID); // was uuid
+        LOG.info("Activation findActivation new player = " + activation); // on a le id du player
+    
+    player.setIdplayer(activation.getActivationPlayerId());
+    player = new find.FindPlayer().find(player, conn);
+        LOG.info("new player found from activation = " + player); // c'est OK
+  */      
+ //   player = new find.FindActivationPlayer().find(conn, UUID);
+// vérifie si uuid est en attente dans table activation
+}
+  
 public String forgetPassword() throws SQLException, Exception{
 try{
     LOG.info("entering forgetPassword");
 // inset into table Activation
-  //  create.CreateActivationPassword cap = new create.CreateActivationPassword();
     new create.CreateActivationPassword().create(conn, player); // y compris envoi du mail
  //   LOG.info("line 02");
-  //  LOG.info("line03");
    return null;
   }catch(Exception ex){
     String msg = "forget password Exception ! " + ex;
@@ -2342,6 +2421,7 @@ try{
 }    
 
     public String getUuid() { // from password_check.xhtml
+        LOG.info("uuid transfered from password_check = " + uuid);
         return uuid;
     }
 
@@ -2349,20 +2429,125 @@ try{
         this.uuid = uuid;
     }
 
-public String resetPassword() throws SQLException, Exception, Throwable{ 
-    // called from password.check.xhtml
+    /*
+    public void listenerTogetAttribute(ActionEvent ae){
+        String statusVar = (String)ae.getComponent().getAttributes().get("status");
+        LOG.info("statusVar is = " + statusVar);
+    }
+    */
+    
+//public String resetPassword(String uuid) throws SQLException, Exception, Throwable{ 
+    public String resetPassword() throws SQLException, Exception, Throwable{ 
+    // called from password_check.xhtml
+    // créer une nouvelle session ?
+    // mail envoyé par user pour réinitialiser son password
+  try{
+      LOG.info("entering resetPassword with activation = " + activation.getActivationKey());  // à mon avis c'est pas bon ???
+      LOG.info("current player = " + player);
+      
+       player = new Player(); // new 23-02-2020
+       
+            LOG.info("this session will be invalidated : "
+                    + FacesContext.getCurrentInstance().getExternalContext().getSessionId(true));
+       FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+     //   LOG.info("session is invalidated");
+       String msg = "session invalidated !!";
+           LOG.info(msg);
+           LCUtil.showMessageInfo(msg);
+           
+         LOG.info("after new session activationkey = " + activation.getActivationKey() );
+  // on récupère activation à partir de sa key
+        activation = new find.FindActivation().find(conn, activation);
+        LOG.info("Activation resetPassword = " + activation); // on a le id du player
+  // controle sur la durée
+       Duration difference = Duration.between(activation.getActivationCreationDate(),LocalDateTime.now());
+        long differenceInMinutes = difference.toMinutes();
+                LOG.info("difference in minutes = " + differenceInMinutes);
+         if(differenceInMinutes < 10){
+                msg = LCUtil.prepareMessageBean("password.reset.ok") + (10 - differenceInMinutes) + " minutes";
+                LOG.info(msg);
+                LCUtil.showMessageInfo(msg);
+           }else{
+             LOG.info("too late for reinitialisation password");
+                player.setIdplayer(null);
+                 msg = "You are " + differenceInMinutes + " minutes too late for the reset of your Password " 
+                        + activation.getActivationPlayerId();
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                return "login.xhtml?faces-redirect=true";
+           }  
+         
+   // on récupère le playerid dans activation
+    player.setIdplayer(activation.getActivationPlayerId()); // récupéré le playerid
+   EPlayerPassword epp = new EPlayerPassword();
+   epp.setPlayer(player);
+   epp = new load.LoadPlayer().load(epp, conn); // 2e version, la première reste valable output = player only
+    player= epp.getPlayer();
+    password = epp.getPassword();
+   epp  = new PasswordController().checkPassword(epp, activation, conn); // deleta activation row, update password
+    player = epp.getPlayer();
+  
+    if(player != null) { 
+         msg = ("The password reset was asked by " + player.getIdplayer());
+        LOG.info(msg);
+        showMessageInfo(msg);
+        return "login.xhtml?faces-redirect=true"; //&language=" + language + "&id=" + playerid;
+    }else{ // false
+        msg = "Activation record not found : you already had done this work in a recent past ! " ;
+        LOG.error(msg);
+        showMessageFatal(msg);
+     return null;  
+    //     return "activation_failure.xhtml?faces-redirect=true"; // mod 03-12-2018
+     }
+   }catch(Exception ex){
+        String msg = "Course controller : resetPassword Exception ! " + ex;
+        System.err.print(msg);
+        LOG.error(msg);
+        System.err.print("system error LC" + ex);
+  //      showMessageFatal(msg);
+        return null;
+}    
+}
+public String newPlayer() throws SQLException, Exception, Throwable{ 
+    // called from activation_check.xhtml
     // créer une nouvelle session ?
   try{
-       LOG.info("entering resetPassword with uuid = " + uuid);  // à mon avis c'est pas bon ???
-  //  PasswordController pc = new PasswordController();
-//    LOG.info("line 01");
- //   boolean ok = new PasswordController().checkPassword(uuid, conn);
- //   LOG.info("back  to courseC with b = " + ok);
-    if(new PasswordController().checkPassword(uuid, conn)){  //true
-        String msg = ("checkPassword success");
+      LOG.info("entering newPlayer");
+ // modifié, à vériier !!
+      activation = new find.FindActivation().find(conn, activation); // à vérifier si OK !!
+    //  uuid vient de       <f:viewAction action="#{courseC.findActivation(param.uuid)}"/>
+        LOG.info("Activation new Player = " + activation); // on a le id du player
+        
+       Duration difference = Duration.between(activation.getActivationCreationDate(),LocalDateTime.now());
+        long differenceInMinutes = difference.toMinutes();
+                LOG.info("difference in minutes = " + differenceInMinutes);
+         if(differenceInMinutes < 10){
+                String msg = "Respect of the dead line of 10 minutes :" 
+                        + " remaining = " + (10 - differenceInMinutes);
+                LOG.info(msg);
+                LCUtil.showMessageInfo(msg);
+           }else{
+                player.setIdplayer(null);
+                String msg = "You are " + differenceInMinutes + " minutes too late for the reset of your Password " 
+                        + activation.getActivationPlayerId();
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                return "login.xhtml?faces-redirect=true";
+           }  
+
+    player.setIdplayer(activation.getActivationPlayerId());
+       LOG.info("searching playerid = " + player.getIdplayer());
+    player = new find.FindPlayer().find(player, conn);
+        LOG.info("player found from activation new Player = " + player); // c'est OK
+ 
+   String s = new ActivationController().check(player, activation, conn);
+   LOG.info("string s = " + s);
+  //  if(new PasswordController().checkPassword(uuid, conn)){  //true
+    if(player != null) { 
+        String msg = ("The activation is a success -  Welcome new  player : " + player.getIdplayer());
         LOG.info(msg);
-    //    showMessageInfo(msg);
-         return "login.xhtml?faces-redirect=true"; //&language=" + language + "&id=" + playerid;
+        showMessageInfo(msg);
+        return "login.xhtml?faces-redirect=true"; //&language=" + language + "&id=" + playerid;
     }else{ // false
         String msg = "Activation record not found : you already had done this work in a recent past ! " ;
         LOG.error(msg);
@@ -2380,51 +2565,77 @@ public String resetPassword() throws SQLException, Exception, Throwable{
 }    
 }
 
-public String createPassword() throws SQLException, Exception{
+public String createPassword() throws Exception{
+    // used in password_create.xhtml
  try{
      LOG.info("entering createPassword");
-    if(new modify.ModifyPassword().modifypassword(player, conn)){  // true
+     LOG.info("player for password = " + player);
+     EPlayerPassword epp = new EPlayerPassword();
+     epp.setPlayer(player);
+     epp.setPassword(password);
+     if(new modify.ModifyPassword().modify(epp, conn)){  // true
                   LOG.info("boolean returned from modifyPassword is 'true' ");
-                  String msg = "<br> <br> <h1>Password Created 2179 !! ";
-                   LOG.info(msg + player.getWrkpassword());
+                  String msg = "<br> <br> <h1>Password created/modified 2493 !! ";
+                   LOG.info(msg + password.getWrkpassword());
            //       showMessageInfo(msg);
-                  player.setWrkpassword("***********");
-                  player.setWrkconfirmpassword("***********");
+     
+             //       Password pa = new Password();
+                    password.setWrkpassword("***********");
+                    password.setWrkconfirmpassword("***********");
+              //      player.setPassword(pa);
+           
+     ///             player.setWrkpassword("***********");
+     ///             player.password.setWrkconfirmpassword("***********");
              //     return "welcome.xhtml?faces-redirect=true";
                   return "login.xhtml?faces-redirect=true";
       }else{ 
-                  String msg = "boolean returned from modifyPassword is 'false' ";
-                  LOG.error(msg);
-            //     showMessageFatal(msg);
-                  return null;
+                 String msg = "The password is not modified !!";
+                 LOG.error(msg);
+                 showMessageFatal(msg);
+                 return null;
       } 
   }catch(Exception ex){
-    String msg = "icreate password Exception ! " + ex;
+    String msg = "create password Exception ! " + ex;
             LOG.error(msg);
             showMessageFatal(msg);
             return null;
 }    
 }// end method    
 
-  public String validateExistingPassword() throws SQLException { // used in modify_password_.xhtml pour afficher 2e panelGrid
+  public String validateExistingPassword() throws SQLException {
+      // used in modify_password_.xhtml pour afficher 2e panelGrid
 try{
         LOG.info("entering validateExistingPassword");
-         LOG.info("password Wrk= " + player.getWrkpassword()); 
-        LOG.info("password Player = " + player.getPlayerPassword());
-        if(new find.FindPassword().passwordMatch(player, conn)){   // is true
+        LOG.info("player = " + player);
+        LOG.info("password = " + password);
+        Password passwordtrf = password;
+     //   LOG.info("password Player = " + player.getPlayerPassword());
+      EPlayerPassword epp = new EPlayerPassword();
+      epp.setPlayer(player);
+      epp.setPassword(password);
+      LOG.info("password transfered = " + epp.getPassword());
+      epp = new load.LoadPlayer().load(epp, conn); // 2e version, la première reste valable output = player only
+      password = epp.getPassword();
+      password.setCurrentPassword(passwordtrf.getCurrentPassword());
+      epp.setPassword(password);
+        if(new find.FindPassword().passwordMatch(epp, conn)){   // is true
                 String msg = "existing password correct ! ";
                   LOG.info(msg);
           //        utils.LCUtil.showDialogInfo(msg);
                   player.setNextPanelPassword(true);  //affiche le 2e panelGrid
+//                  player.setWrkpassword(""); //fonctionne mais inutile
+                  passwordVerification("OK");
+                  
                   return null;
         }else{
-                  String msg = "Existing password not correct ! ";
+                  String msg = "validateExistingPassword : old password NOT correct ! ";
                   LOG.error(msg);
-                  LCUtil.showMessageFatal(msg);
+           //       LCUtil.showMessageFatal(msg);
+                  passwordVerification("KO");  // blocage 15 min après 3 erreurs
                   return null;
              } 
    }catch(Exception ex){
-    String msg = "validate existing password Exception ! " + ex;
+    String msg = "validateExistingPassword Exception ! " + ex;
             LOG.error(msg);
             showMessageFatal(msg);
             return null;
@@ -2434,30 +2645,25 @@ try{
 public String modifyPassword() throws SQLException, Exception{
  try{
     LOG.info("entering modifyPassword");
-    // à développer
-     LOG.info("password Wrk= " + player.getWrkpassword());
-     LOG.info("password Player = " + player.getPlayerPassword());
- //    find.FindPassword fp = new find.FindPassword();
-     boolean ok = new find.FindPassword().passwordMatch(player, conn);
-  // tester ici si passwrd match ...
+      LOG.info("with entite Password = " + password);
      player.setNextPanelPassword(false);  //affiche pas le 2e panelGrid pour prochaine utlisation dans la même session ?
-     LOG.info("password match = " + ok); //msg + player.getWrkpassword());
-     
-    if(new modify.ModifyPassword().modifypassword(player, conn)){ // true
+    EPlayerPassword epp = new EPlayerPassword();
+    epp.setPassword(password);
+    epp.setPlayer(player);
+    if(new modify.ModifyPassword().modify(epp, conn)){ // true
         LOG.info("boolean returned from modifyPassword is 'true' ");
-        player.setWrkpassword("**********");
-        player.setWrkconfirmpassword("**********");
-            LOG.info("passwordwrk set to  = " + "**********");
-        String msg = "<br> <h1>Password Modified 2287 !! ";
-        LOG.info(msg + player.getWrkpassword());
-     //nextPanelPassword   showMessageInfo(msg);
-  ////                find.FindSubscriptionStatus fss = new find.FindSubscriptionStatus();
-   ////               return fss.subscriptionStatus(subscription, player, conn); //, subscription);
+   //     player.setWrkpassword("**********");
+   //     player.setWrkconfirmpassword("**********");
+   //         LOG.info("passwordwrk set to  = " + "**********");
+   //     String msg = "<br> <h1>Password Modified 2557 !! ";
+   //         LOG.info(msg + player.getWrkpassword());
+        return "welcome.xhtml?faces-redirect=true";
     }else{
         LOG.info("boolean returned from modifyPassword is 'false' ");
+         player.setNextPanelPassword(true);  //affiche le deuxième panelGrid
         return null;
     } 
-  return null;
+ // return null;
   }catch(Exception ex){
     String msg = "modify Password Exception ! " + ex;
             LOG.error(msg);
@@ -3773,6 +3979,7 @@ public String to_selectMatchplayRounds_xhtml(String s) {
 
 public String to_selectPlayer_xhtml(String s) {
             LOG.info("entering to selectPlayer_xhtml... with string = " + s);
+             
             reset(s);
        return "selectPlayer.xhtml?faces-redirect=true";
    }
@@ -4019,11 +4226,10 @@ public List<ECourseList> ScoreCardList3() throws SQLException {
   return total;
 }
 
-public List<Player> listPlayers() throws SQLException {
+public List<EPlayerPassword> listPlayers() throws SQLException {
 //            LOG.info("... entering listPlayers with conn = " + conn);
    try {
-     //  lists.PlayersList pl = new lists.PlayersList();
-       return new lists.PlayersList().getListAllPlayers(conn);
+       return new lists.PlayersList().list(conn);
    } catch (Exception ex) {
             String msg = "Exception in CourseController.listPlayers() " + ex;
             LOG.error(msg);
@@ -4546,7 +4752,6 @@ public void modifyPlayer() throws SQLException, Exception{
           round = ecl.getRound(); // mod 25-11-2018
           club = ecl.Eclub;
           course = ecl.Ecourse;
-  //        lists.ParticipantsStableford ps = new lists.ParticipantsStableford();
           listStableford = new lists.ParticipantsStableford().listAllParticipants(round, conn);
              LOG.debug(" -- exiting listParticipants_stableford = ");
              LOG.debug("liste participants stableford = " + Arrays.deepToString(listStableford.toArray()) );
@@ -4628,7 +4833,7 @@ public void modifyPlayer() throws SQLException, Exception{
    try {
             LOG.debug(" -- entering listInscriptions with inputInscription = " + getInputInscription());
  //       lists.InscriptionList il = new lists.InscriptionList();
-        return new lists.InscriptionList().getInscriptionList(conn);
+        return new lists.InscriptionList().list(conn);
         
          } catch (Exception ex) {
             String msg = "Exception in getInscriptionList() " + ex;
@@ -4664,7 +4869,6 @@ public void modifyPlayer() throws SQLException, Exception{
       
       lists.ParticipantsStableford.setListe(null);  // reset
       
-  //    lists.ParticipantsStableford ps = new lists.ParticipantsStableford();
       listStableford = new lists.ParticipantsStableford().listAllParticipants(round, conn); // refresh list without the deleted item
        //new 01-12-2018/
        String s1 = utils.LCUtil.fillRoundPlayersStringEcl(listStableford);
@@ -4740,16 +4944,22 @@ private Map<String, Object> sessionMapJSF23;
 @Inject
 @ApplicationMap 
 private Map<String, Object> applicationMap;
-public String selectPlayer(Player in_player) throws SQLException{
+//public String selectPlayer(Player in_player) throws SQLException{
+    public String selectPlayer(EPlayerPassword epp) throws SQLException{
 try{
     LOG.info(" starting selectPlayer ");
  //   deux origines : cas normal player sélectionné
  // autre cas : localAdmin : comment le savoir ?
-        this.player =  in_player;
+
+       player = epp.getPlayer();
+     //   this.player =  in_player;
         // change language according to the user database language 
         LanguageController.setLanguage(player.getPlayerLanguage());
+        
+        PrimeFaces.current().executeScript("alert('Execute js from managed bean');"); // new 09-02-2020
+        PrimeFaces.current().executeScript("{handleMsg('invoked from bean listener');}");
             LOG.info("Language Player = " + player.getPlayerLanguage());
-        String msg="selected Player = " + player.toString();
+        String msg="selected Player = " + player;
         localAdmin = new Player();
             LOG.info(msg);
   //         LOG.info("playerbirthdate = " + player.getPlayerBirthDate());
@@ -4757,13 +4967,18 @@ try{
         LOG.info("Your age at first january current year = " + yourAge);
   // mod 07-08-2018     
         
- LOG.info("1. verifying if there is a password");
-        LOG.info("player password = " + player.getPlayerPassword());
-        if(player.getPlayerPassword() == null){
-            String err = LCUtil.prepareMessageBean("password.empty",player.getPlayerPassword()); 
+  
+  // ici récupérer le password   !!!
+    password = epp.getPassword();
+  LOG.info("entite password = " + password);
+     LOG.info("1. verifying if there is a password");
+        LOG.info("player password = " + password.getPlayerPassword());
+        if(password.getPlayerPassword() == null){
+            String err = LCUtil.prepareMessageBean("password.empty") + " = " + password.getPlayerPassword(); 
             LOG.info(err);
-            showMessageInfo(err);
+            showMessageFatal(err);
             return "password_create.xhtml?faces-redirect=true";
+          //  return null;
         }
           // new 27-08-2018 https://stackoverflow.com/questions/7644968/httpsession-how-to-get-the-session-setattribute
           
@@ -4773,8 +4988,8 @@ try{
              String err = LCUtil.prepareMessageBean("password.blocked") + blocking.getBlockingRetryTime().format(ZDF_TIME); // ,player.getPlayerPassword()); 
         //     err = err + blocking.getBlockingRetryTime().format(ZDF_TIME);
              LOG.info(err);
-             showMessageInfo(err);
-             return "welcome.xhtml?faces-redirect=true";
+             showMessageFatal(err);
+             return "selectPlayer.xhtml?faces-redirect=true";
           }
           
           
@@ -4832,17 +5047,20 @@ try{ // coming from welcome.xhtml provisoirement
     LOG.info("for player player= " + player);
     // non nil faut vérifier si blocage !!
     if("OK".equals(OK_KO)){
-        LOG.info("password correct");
+        String msg = "Password Correct";
+        LOG.info(msg);
+ //       showMessageInfo(msg);
         return null;
     }
     if("KO".equals(OK_KO)){
-        String msg = "wrong password for this connection";
+        String msg = LCUtil.prepareMessageBean("connection.failed");
+    //    String msg = "wrong password for this connection";
         LOG.info(msg);
         showMessageInfo(msg);
         blocking = new find.FindBlocking().find(player,conn);
         LOG.info("returned blocking = " + blocking);
         if(blocking == null){
-           LOG.info("existe pas de record blocage");
+           LOG.info("il n'existe pas de record blocage");
            // faut en créeer un !
             boolean b = new create.CreateBlocking().create(player,conn);
                 LOG.info("record bloking written ? = " + blocking);
@@ -4852,7 +5070,10 @@ try{ // coming from welcome.xhtml provisoirement
         }
           if(blocking != null){ // blocking not null
             if(blocking.getBlockingAttempts() > 2){
-                
+                 msg = LCUtil.prepareMessageBean("connection.blocked");
+    //    String msg = "wrong password for this connection";
+                 LOG.info(msg);
+                 showMessageInfo(msg);
             }else{// si blocking < 2, rien faire
             // modify
             // ajouter 1 au compteur
@@ -4978,7 +5199,7 @@ public boolean createCotisation() throws SQLException{  // à adapter ??
     }
 
   }catch (Exception ex){
-            String msg = "Exception in createCotisation " + ex;
+            String msg = "Exception in createCotisation " + ex.getLocalizedMessage();
             LOG.error(msg);
             showMessageFatal(msg);
             return false;
@@ -5303,56 +5524,25 @@ public String login() throws IOException, SQLException {
      return null;
   //      return "login.xhtml?faces-redirect=true";  // old - doesn't work
     } // end method
-//@Inject
-//private ExternalContext ec;
+
 public String logout(String lgt) throws IOException, SQLException, Exception {
         LOG.info("entering logout() for player = " + player);
         LOG.info("entering logout with parameter = " + lgt);
- 
- //    if(player.getIdplayer() != null){
-        
-    // new 13-06-2019
-    
-        Audit a = new Audit();
-        a.setAuditPlayerId(player.getIdplayer());
-        a = new find.FindLastAudit().find(a, conn);
-          LOG.info("entering logout with lastaudit = " + a);
-        a.setAuditEndDate(LocalDateTime.now());
-        boolean ok = new modify.ModifyAudit().stop(a, conn);
-        
-      // tester ici sur now() et retry_time
- //        if(LocalDateTime.now().isBefore(a.getAuditRetryTime())){
- //            String msg = "loggin blocked because of 3 wrong attempts ";
- //            LOG.error(msg);
- /////            showMessageFatal(msg);
-  //           return null;
-  //       }
-  //       audit.setAuditPlayerId(player.getIdplayer());
-       //  audit.setAuditEndDate(LocalDateTime.parse("2019-06-01T12:31:31")); // date fictive
-        
-    //     ait.setAuditAttempts((short)0);
-    //     audit.setAuditRetryTime(LocalDateTime.now()); //.minusMinutes(1)); 
-         
-    //    boolean ok = new modify.ModifyAudit().stop(player, conn);
-        
-  //   }
-
-          LOG.info("line 00");
-        reset("from logout"); // new 28/09/2014
-                  LOG.info("line 01");
-        player = new Player(); // new 28/09/2014
-            LOG.info("exiting logout() !!!");
-   //         LOG.info("ec to string = " + ec.getContext().toString());
-   ExternalContext ec1 = FacesContext.getCurrentInstance().getExternalContext();
-    ec1.invalidateSession();
- //   ec1.redirect(ec1.getRequestContextPath() + "/login.xhtml");
- //  String msg = "You asked a logout from the Logout button";
- //         LOG.info(msg);
- //         showMessageInfo(msg);
-  ///      ec.invalidateSession();
- // (Connected)
-    //  LOG.info("session invalidated !! " + ec1.getSession()..getSessionId());
-// à faire : si 
+        if(player.getIdplayer()!= null){
+            Audit a = new Audit();
+            a.setAuditPlayerId(player.getIdplayer());
+            a = new find.FindLastAudit().find(a, conn);
+                LOG.info("entering logout with lastaudit = " + a);
+            a.setAuditEndDate(LocalDateTime.now());
+            boolean ok = new modify.ModifyAudit().stop(a, conn);
+          }//        LOG.info("line 00");
+        reset("from logout");
+                  LOG.info("new player started !");
+  // enlevé 16-03-2020      player = new Player(); // new 28/09/2014
+            LOG.info("this session will be invalidated : "
+                    + FacesContext.getCurrentInstance().getExternalContext().getSessionId(true));
+     
+     FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
     if(lgt.equals("from button Logout")){
           String msg = "You asked a logout from the Logout button";
           LOG.info(msg);
@@ -5365,11 +5555,10 @@ public String logout(String lgt) throws IOException, SQLException, Exception {
          return null; //"sessionExpired.xhtml?faces-redirect=true";
       //    return "login.xhtml?faces-redirect=true";
     }else{
-        LOG.info("unknown login message");
+        LOG.info("unknown logout message : " + lgt);
         return null;
     }
     
-
     } // end method
 
 public String onFlowProcess(FlowEvent event) {
@@ -5405,8 +5594,9 @@ public void savePlayer(ActionEvent actionEvent) {
     public void preRenderClub() throws InstantiationException, SQLException, ClassNotFoundException, IllegalAccessException {
         LOG.info("preRenderClub called");
         LOG.info("preRenderView  : idclub = " + club.getIdclub());
-        PhaseId currentPhaseId = FacesContext.getCurrentInstance().getCurrentPhaseId();
-        LOG.info("currentPhaseId 1 = " + currentPhaseId);
+    //    PhaseId currentPhaseId = FacesContext.getCurrentInstance().getCurrentPhaseId();
+    //    LOG.info("currentPhaseId 1 = " + currentPhaseId);
+        LOG.info("currentPhaseId 1 = " + FacesContext.getCurrentInstance().getCurrentPhaseId());
         LOG.info("isPostBack ? = " + isPostback());
         //    if(club.getIdclub()!= null)
         if ((!isPostback()) && (club.getIdclub() != null))

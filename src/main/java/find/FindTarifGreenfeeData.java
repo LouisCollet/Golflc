@@ -58,15 +58,7 @@ try{
    //     om.enable(SerializationFeature.INDENT_OUTPUT);
         String formattedData = om.writeValueAsString(s);
         LOG.info("formatted json = " + formattedData);
-        
- // String jsonCarArray = "[{ \"color\" : \"Black\", \"type\" : \"BMW\" }, { \"color\" : \"Red\", \"type\" : \"FIAT\" }]";
- // List<Car2> listCar = om.readValue(jsonCarArray, new TypeReference<List<Car2>>(){});
- // LOG.info("starting print listCar");
- // listCar.forEach(item -> LOG.info("TeeStart list " + item));  // java 8 lambda
-      
-        
-  //  	om.enable(SerializationFeature.INDENT_OUTPUT);//Set pretty printing of json
- //       om.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY); // fields private accepted in class tarif 
+
         TarifGreenfee t = om.readValue(s,TarifGreenfee.class);
             LOG.info("Tarif Greenfee extracted from database = "  + t.toString());
         return t;

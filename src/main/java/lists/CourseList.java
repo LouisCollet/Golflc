@@ -1,9 +1,6 @@
 package lists;
 
-import entite.Club;
-import entite.Course;
 import entite.ECourseList;
-import entite.Tee;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -54,17 +51,17 @@ String query =
     liste = new ArrayList<>();
 	while(rs.next()){
 		ECourseList ecl = new ECourseList();
-                Club c = new Club();
-                c = entite.Club.mapClub(rs);
-                ecl.setClub(c);
+           //     Club c = new Club();
+           //     c = entite.Club.mapClub(rs);
+                ecl.setClub(entite.Club.mapClub(rs));
 
-                Course o = new Course();
-                o = entite.Course.mapCourse(rs);
-                ecl.setCourse(o);
+           //     Course o = new Course();
+           //     o = entite.Course.mapCourse(rs);
+                ecl.setCourse(entite.Course.mapCourse(rs));
 
-                Tee t = new Tee();
-                t = entite.Tee.mapTee(rs);
-                ecl.setTee(t);
+          //      Tee t = new Tee();
+          //      t = entite.Tee.mapTee(rs);
+                ecl.setTee(entite.Tee.mapTee(rs));
 	 liste.add(ecl);
 	} // end while
   //     LOG.debug(" -- before forEach " );

@@ -29,6 +29,7 @@ try{
       ps.setInt(1, player.getIdplayer());
         utils.LCUtil.logps(ps); 
       rs = ps.executeQuery();
+            
       rs.last(); //on récupère le numéro de la ligne
             LOG.info("ResultSet FindBlocking has " + rs.getRow() + " lines.");
         if(rs.getRow() > 1)

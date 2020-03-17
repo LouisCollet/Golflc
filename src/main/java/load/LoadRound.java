@@ -1,5 +1,6 @@
 package load;
 
+import entite.Club;
 import entite.Round;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
@@ -30,8 +31,11 @@ final String query = "SELECT " + ro
      rs =  ps.executeQuery();
      rs.beforeFirst();
      Round r = new Round(); 
+     Club c = new Club();
+     c = null;
      while(rs.next()){
-           r = entite.Round.mapRound(rs);
+         //  r = entite.Round.mapRound(rs);
+           r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 pour générer ZonedDateTime
       }  //end while
     return r;
 }catch (SQLException e){

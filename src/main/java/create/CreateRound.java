@@ -3,10 +3,13 @@ package create;
 import entite.Course;
 import entite.Round;
 import entite.Unavailable;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import utils.DBConnection;
 import utils.LCUtil;
@@ -52,15 +55,19 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface{
                 return false;
            }
 */
-  //     LOG.info("line 03");
+  
             final String query = LCUtil.generateInsertQuery(conn, "round"); // new 15/11/2012
             ps = conn.prepareStatement(query);
             ps.setNull(1, java.sql.Types.INTEGER);
-       //     ps.setTimestamp(2, LCUtil.getSqlTimestamp(round.getRoundDate())); // fixed 09/05/2013 bug : perdait les minutes !!!
-     //           LOG.info("line 2 = ok ");java.sql.Timestamp.valueOf(date.atStartOfDay());
-            java.sql.Timestamp ts = Timestamp.valueOf(round.getRoundDate());
-            ps.setTimestamp(2,ts);
-            ps.setString(3, round.getRoundGame());
+            
+     //       java.sql.Timestamp ts = Timestamp.valueOf(round.getRoundDate());
+ //  old solution      //   ps.setTimestamp(2,Timestamp.valueOf(round.getRoundDate())); // roundDate format LocalDateTime
+                LOG.info("line 03");
+   //https://stackoverflow.com/questions/29773390/getting-the-date-from-a-resultset-for-use-with-java-time-classes
+            ps.setObject(2, round.getRoundDate(), JDBCType.TIMESTAMP); // new 18-02-2020
+             LOG.info("line 04");
+
+             ps.setString(3, round.getRoundGame());
             if(Round.GameType.STABLEFORD.toString().equals(round.getRoundGame()) )
                 {LOG.info("gameType is STABLEFORD");}
             ps.setInt(4, round.getRoundCBA());
@@ -77,7 +84,7 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface{
             ps.setInt(11, 0); // new 20/06/2017 - field RoundPlayers - nombre de joueurs de la partie
             ps.setString(12, round.getRoundTeam() );  // new 26/06/2017
             ps.setInt(13, course.getIdcourse());
-            ps.setTimestamp(14, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(14, Timestamp.from(Instant.now()));
             
             utils.LCUtil.logps(ps);
             int x = ps.executeUpdate(); // write into database
@@ -186,7 +193,7 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface{
            }
       return true;  // no errors   
          } catch (Exception e) {
-            String msg = "£££ Exception in validate Inscription = " + e.getMessage();
+            String msg = "£££ Exception in validate Round = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
@@ -196,5 +203,37 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface{
         }     
 // return false;
 } // end method validate
+    
+        public static void main(String[] args) throws SQLException, Exception{ //enlevé static
+        LOG.info("line 01");
+
+    LOG.info("line 03, map = "); // + get);
+      Connection conn = new DBConnection().getConnection();
+  try{
+   Round round = new Round(); 
+  //  LocalDateTime dt1 = LocalDateTime.parse("2018-11-03T12:45:30"); 
+   round.setRoundDate(LocalDateTime.parse("2018-11-03T12:45:30"));
+   Course course = new Course();
+ //  Date date = SDF.parse("2009/12/31" );
+   course.setIdcourse(135);
+   course.setCourseBegin(SDF.parse("31/12/2019"));
+   course.setCourseEnd(SDF.parse("31/12/2021"));
+   Unavailable unavailable = new Unavailable();
+   unavailable.setCause(null);
+ //  inscription.setInscriptionIdTee(154);
+ 
+    boolean lp = new CreateRound().create(round, course, unavailable, conn);
+        LOG.info("from main, after lp = " + lp);
+ } catch (Exception e) {
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+   }
+   } // end main
+    
+    
+    
+    
     
 } //end class

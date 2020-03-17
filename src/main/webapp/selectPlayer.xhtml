@@ -38,8 +38,10 @@
                    
                      />
    <h:outputText escape="false" value="#{msg['message.playerslist']}" />
-   <p:columnToggler datasource="table_players"
-                   trigger="toggler" />
+   <p:columnToggler 
+       id="id001"
+       datasource="table_players"
+       trigger="toggler" />
 
 </f:facet>
 
@@ -60,47 +62,52 @@
                 ajax="true"
                 id="selectButton"
                 action="#{courseC.selectPlayer(c)}"
-                value="#{msg['button.select']} - #{c.idplayer}"
+                value="#{msg['button.select']} - #{c.player.idplayer}"
                 icon="fa fa-user">
             </p:commandButton>
 	</p:column>
 
-	<p:column toggleable="false"
+	<p:column id="col001"
+                  toggleable="false"
                   headerText="#{msg['player.first']}"
                   footerText="#{msg['player.first']}"
                   style="width:20%" >
-                    <h:outputText value="#{c.playerFirstName}" />
+                    <h:outputText value="#{c.player.playerFirstName}" />
 	</p:column>
 
-	<p:column toggleable="false"
+	<p:column id="col002"
+                  toggleable="false"
                   headerText="#{msg['player.last']}"
                   footerText="#{msg['player.last']}"
                   style="width:20%"
                   filterMatchMode="contains"
-                  filterBy="#{c.playerLastName}"
+                  filterBy="#{c.player.playerLastName}"
                   >
-                  <h:outputText value="#{c.playerLastName}" />
+                  <h:outputText value="#{c.player.playerLastName}" />
 	</p:column>
 
     <!--  new 29/12/2014     -->
    <ui:include src="include/include_thumbnails.xhtml"/>    
         
-	<p:column headerText="#{msg['player.city']}"
+	<p:column id="col003"
+            headerText="#{msg['player.city']}"
                   footerText="#{msg['player.city']}"
                   style="width:20%" >
-		<h:outputText value="#{c.playerCity}" />
+		<h:outputText value="#{c.player.playerCity}" />
 	</p:column>
 
-	<p:column headerText="#{msg['player.country']}"
+	<p:column id="col004"
+                  headerText="#{msg['player.country']}"
                   footerText="#{msg['player.country']}"
                   style="width:20%" >
-            <h:outputText value="#{c.playerCountry}" />   <!-- à corriger -->
+            <h:outputText value="#{c.player.playerCountry}" />   <!-- à corriger -->
 	</p:column>
 
-        <p:column headerText="#{msg['message.modification']}"
+        <p:column id="col005"
+                  headerText="#{msg['message.modification']}"
                   footerText="#{msg['message.modification']}"
                   style="width:20%" >
-                        <h:outputText value="#{c.playerModificationDate}">
+                        <h:outputText value="#{c.player.playerModificationDate}">
                             <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
                         </h:outputText>
         </p:column>
@@ -110,7 +117,6 @@
 </f:facet>
 </p:dataTable>
 </h:form>
-
 
 </ui:define>
 </ui:composition>

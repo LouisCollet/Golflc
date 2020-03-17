@@ -5,6 +5,8 @@ import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.LCUtil;
 
 public class CreateClub implements interfaces.Log{
@@ -39,7 +41,7 @@ public class CreateClub implements interfaces.Log{
      //       ps.setInt(11,club.getClubLocalAdmin());  // new 14-02-2019
             ps.setInt(10,324713);  // mod 29-03-2019
               LOG.info("line 06");
-            ps.setTimestamp(11, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(11, Timestamp.from(Instant.now()));
 
               
              //    String p = ps.toString();

@@ -110,8 +110,7 @@ public TarifGreenfee(){ // constructor 1
         quantity = new String[10];
     } // end constructor
 
-public TarifGreenfee(String[][] datesSeason, String [][]teeTimes) // constructor test
-    {
+public TarifGreenfee(String[][] datesSeason, String [][]teeTimes){ // constructor test
 this.datesSeason = datesSeason;
 this.teeTimes = teeTimes;
 }

@@ -6,6 +6,8 @@ import entite.Round;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import utils.DBConnection;
 import utils.LCUtil;
@@ -54,7 +56,7 @@ public class CreateStatistics implements interfaces.Log{
                     ps.setInt(4, Integer.parseInt(sc2[i][3]));  //scoreBunker
                     ps.setInt(5, Integer.parseInt(sc2[i][4]));  //scorePenalty
                     //  LOG.info("score Fairway updated = " + sc2[i][0]);
-                    ps.setTimestamp(6, LCUtil.getCurrentTimeStamp());
+                    ps.setTimestamp(6, Timestamp.from(Instant.now()));
                     // where fields
                     ps.setInt(7, i + 1);   // holeNumber, = 0 , ou i + 1
                     ps.setInt(8, player.getIdplayer());

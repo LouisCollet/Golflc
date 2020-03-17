@@ -9,29 +9,35 @@
       >
 <h:body>
 <ui:composition>
-<!--   aussi growl dans mastertemplate -->
+<!--   aussi growl dans mastertemplate 
+https://primefaces.github.io/primefaces/8_0/#/components/growl?id=getting-started-with-growl-->
 <p:growl
      id="growl-msg"
      escape="false"
      sticky="true"
      showDetail="true"
-     severity=""
+     severity="error"
+     skipDetailIfEqualsSummary="true"
      >
 </p:growl>
+<!-- growl : erreurs de validation only -->
 
 <p:messages
      id="messages"
      escape="false"
      showDetail="true"
      globalOnly ="true"
-    
      closable="true"
      severity="info,warn,error,fatal">
    <p:autoUpdate />
 </p:messages>
  
   
-   <!-- modifié le 04-02-2020 erro et fatal transféré de growl vers messages -->
+   <!-- modifié le 04-02-2020 erro et fatal transféré de growl vers messages
+   <context-param>
+        <param-name>javax.faces.PROJECT_STAGE</param-name>
+        <param-value>Production</param-value>
+</context-param>-->
 
  
  

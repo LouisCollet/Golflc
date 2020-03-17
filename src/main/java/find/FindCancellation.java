@@ -60,10 +60,10 @@ public List<ECourseList> find(final Unavailable unavailable, final Round round, 
    ;
     
    ps = conn.prepareStatement(query);
-        java.sql.Timestamp ts = Timestamp.valueOf(unavailable.getStartDate());
-      ps.setTimestamp(1,ts);
-        ts = Timestamp.valueOf(unavailable.getEndDate());
-      ps.setTimestamp(2,ts);
+ //       java.sql.Timestamp ts = Timestamp.valueOf(unavailable.getStartDate());
+      ps.setTimestamp(1,Timestamp.valueOf(unavailable.getStartDate()));
+  //      ts = Timestamp.valueOf(unavailable.getEndDate());
+      ps.setTimestamp(2,Timestamp.valueOf(unavailable.getEndDate()));
   //  ps.setDate(2, utils.LCUtil.LocalDateTimetoSqlDate(round.getRoundDate()));
         utils.LCUtil.logps(ps);
     rs =  ps.executeQuery();
@@ -106,7 +106,8 @@ while(rs.next()){
           ecl.setCourse(o);
           
           Round r = new Round();
-          r = entite.Round.mapRound(rs);
+      //    r = entite.Round.mapRound(rs);
+          r = new entite.Round().mapRound(rs,c); // mod 19-02-2020 pour générer ZonedDateTime
           ecl.setRound(r);
 
           Inscription i = new Inscription();

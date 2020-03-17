@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package lc.golfnew;
 
@@ -41,13 +36,13 @@ public class Category implements Serializable {
     public List<SelectItem> getCategoryName() {
         List<SelectItem> cat = new ArrayList<SelectItem>();
         try {
-            utils.DBConnection dbc = new utils.DBConnection();
-            Connection conn = dbc.getConnection() ;
+     //       utils.DBConnection dbc = new utils.DBConnection();
+            Connection conn = new utils.DBConnection().getConnection() ;
             Statement st = conn.createStatement();
-            ResultSet rs = null;
+     //        rs = null;
             String myQuery = "select idclub, clubname from club ORDER BY clubname";
  
-            rs = st.executeQuery(myQuery);
+            ResultSet rs = st.executeQuery(myQuery);
             while (rs.next()) {
                 cat.add(new SelectItem(rs.getString("clubname")));
             }

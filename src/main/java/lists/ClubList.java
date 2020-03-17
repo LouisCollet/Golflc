@@ -1,6 +1,5 @@
 package lists;
 
-import entite.Club;
 import entite.ECourseList;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
@@ -50,17 +49,9 @@ String query =
     liste = new ArrayList<>();
 	while(rs.next()){
 		ECourseList ecl = new ECourseList();
-                Club c = new Club();
-                c = entite.Club.mapClub(rs);
-                ecl.setClub(c);
-
-  //              Course o = new Course();
-  //              o = entite.Course.mapCourse(rs);
-   //             ecl.setCourse(o);
-
-  //              Tee t = new Tee();
-   //             t = entite.Tee.mapTee(rs);
-   //             ecl.setTee(t);
+          //      Club c = new Club();
+          //      c = entite.Club.mapClub(rs);
+                ecl.setClub(entite.Club.mapClub(rs));
 	 liste.add(ecl);
 	} // end while
   //     LOG.debug(" -- before forEach " );

@@ -140,7 +140,7 @@ public String toString(){
     return 
         (NEWLINE 
             + "from entite " + getClass().getSimpleName() + " : "
-       +  Eclub.toString()
+       +  getClub().toString()
     //        LOG.info("after club");
        +  Ecourse.toString()
        +  Etee.toString()

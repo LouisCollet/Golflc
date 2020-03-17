@@ -318,8 +318,7 @@ public static String datetime(String c) {
            .append("LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();");
     //    .append()
      //   sb9.append(sb9).append(NEWLINE).append
-  //    java.util.Date d = rs.getTimestamp("roundDate");
-  //  LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+   //  LocalDateTime date = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
   //    sr.setRoundDate(date);
     return sb9.toString();
 }
@@ -580,7 +579,7 @@ rs.first();  // grosse astuce ! ne pas prendre la première field : idplayer, id
 StringBuilder sb = new StringBuilder();
 
  // http://mysql-0v34c10ck.blogspot.com/2011/05/better-way-to-get-primary-key-columns.html
-// les colonnes suivantes ne doivent pas être MAJ en update car ce sont des clés ou des zones protégées
+// les colonnes suivantes ne doivent PAS être MAJ en update car ce sont des clés ou des zones protégées
 List<String> blacklist = Arrays.asList(  // attention tout en minuscules !!
         "playerphotolocation", "playeractivation", "playermodificationdate" , "playerpassword", // "playerrole",  // TOUT EN MINUSCULES !!!!
         "clubmodificationdate","club_idclub",

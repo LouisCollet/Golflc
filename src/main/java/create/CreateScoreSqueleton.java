@@ -10,6 +10,8 @@ package create;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import utils.LCUtil;
 
@@ -55,7 +57,7 @@ try
 
     ps.setInt(13,in_player);
     ps.setInt(14,in_round);
-    ps.setTimestamp(15,LCUtil.getCurrentTimeStamp());
+    ps.setTimestamp(15,Timestamp.from(Instant.now()));
          //    String p = ps.toString();
          utils.LCUtil.logps(ps);
     int row = ps.executeUpdate(); // write into database

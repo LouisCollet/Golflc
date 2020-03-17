@@ -33,7 +33,7 @@ http://middlewaremagic.com/jboss/?p=1050
               use-ccm="true">
                     <connection-url>jdbc:mysql://localhost:3307/golflc?AllowMultiQueries=true&amp;AllowUserVariables=true&amp;useSSL=false&amp;nullNamePatternMatchesAll=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>
                     <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
-                    <driver>mysql-connector-java-8.0.18.jar</driver>
+                    <driver>mysql-connector-java-8.0.19.jar</driver>
                     <pool>
                         <min-pool-size>10</min-pool-size>
                         <max-pool-size>20</max-pool-size>

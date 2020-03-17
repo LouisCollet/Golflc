@@ -4,14 +4,12 @@ import entite.Course;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
-/**
- *
- * @author collet
- */
+
 public class CreateCourse implements interfaces.Log, interfaces.GolfInterface{
-    
     
     public boolean create(final Club club, final Course course, final Connection conn) throws SQLException    {
         PreparedStatement ps = null;
@@ -37,7 +35,7 @@ public class CreateCourse implements interfaces.Log, interfaces.GolfInterface{
     // provisoirement, changer ensuite les dates réelles via HeidiSQL
             ps.setString(6, DATE_BEGIN_COURSE); // date de début fictive pour tous les parcours
             ps.setString(7, DATE_END_COURSE); // date de fin fictive pour tous les parcours
-            ps.setTimestamp(8, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(8, Timestamp.from(Instant.now()));
              //    String p = ps.toString();
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database

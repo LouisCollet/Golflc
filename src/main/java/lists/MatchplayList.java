@@ -58,7 +58,6 @@ try
 		//LOG.info("just after while ! ");
            Old_Matchplay mp = new Old_Matchplay(); // liste pour sélectionner un round
            mp.setIdround(rs.getInt("idround") );
-     //      mp.setRoundDate(rs.getDate("roundDate") );
            mp.setRoundDate(rs.getTimestamp("roundDate") ); // mod 10/11/2014 avec minutes
    //        mp.setIdplayer(rs.getInt("idplayer") );
    //        mp.setPlayerLastName(rs.getString("playerlastname") );

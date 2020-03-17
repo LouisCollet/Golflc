@@ -12,8 +12,7 @@ import utils.LCUtil;
 import static utils.LCUtil.DatetoLocalDateTime;
 
 @Named
-public class Flight implements Serializable, interfaces.Log
-{
+public class Flight implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
     private Integer idflight;
     private LocalDateTime flightStart;
@@ -24,8 +23,7 @@ public class Flight implements Serializable, interfaces.Log
     private ZonedDateTime firstFlight;
     private ZonedDateTime lastFlight;
     
- public Flight()
-    {
+ public Flight(){
        
     }
 

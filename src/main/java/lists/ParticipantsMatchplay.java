@@ -78,7 +78,6 @@ try
             cc.setPlayerFirstName(rs.getString("playerFirstName") );
                         cc.setPlayerLastName(rs.getString("playerLastName") );
 //                        cc.setPlayerPhotoLocation(rs.getString("playerPhotoLocation") );
-                    //    cc.setRoundDate(rs.getDate("RoundDate") );
                          cc.setRoundDate(rs.getTimestamp("roundDate") ); // mod 002/08/2015 avec minutes
                         cc.setRoundCompetition(rs.getString("RoundCompetition") );
                         cc.setRoundGame(rs.getString("RoundGame") ); // new 7/12/2014

@@ -10,13 +10,13 @@ import utils.LCUtil;
 
 public class ModifyPlayerActivation implements interfaces.Log, interfaces.GolfInterface{
     
- public String updateRecordFromPlayer(Player player) throws SQLException{
-    Connection conn = null;
+ public String modify(Player player, Connection conn) throws SQLException{
+  //  Connection conn = null;
     PreparedStatement ps = null;
 try{
-    DBConnection dbc = new DBConnection();
-    conn = dbc.getConnection();
-        LOG.info("starting update activation table Player.. = " );
+  //  DBConnection dbc = new DBConnection();
+ //   conn = dbc.getConnection();
+        LOG.info("starting update activation table Player.. = " + player);
     String query = "UPDATE player "
             + " SET PlayerActivation = 1 "
             + " WHERE idplayer = ?";
@@ -26,7 +26,7 @@ try{
          utils.LCUtil.logps(ps);
    int row = ps.executeUpdate();
       if (row!=0){
-          LOG.info("-- successful UPDATE player ");
+          LOG.info("-- successful UPDATE player - PlayerActivation is now = 1");
           return "updated" + row ;
         }else{
              String msg = "-- UNsuccessful result in UPDATE for player : " + player.getIdplayer();
@@ -46,7 +46,7 @@ try{
     LCUtil.showMessageFatal(msg);
     return null;
 }finally{
-        DBConnection.closeQuietly(conn, null, null, ps);
+        DBConnection.closeQuietly(null, null, null, ps);
 }
 } //end method
 } //end class

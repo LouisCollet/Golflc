@@ -15,19 +15,19 @@
                 headerText="Thumbnail"
                 footerText="Thumbnail"
                 style="width:10%;text-align:center" >
-	<c:set var="th_photo" value="#{c.playerPhotoLocation}"/>
+	<c:set var="th_photo" value="#{c.player.playerPhotoLocation}"/>
 <!--             &nbsp;  photoLocation =  #{th_photo} -->
             <h:graphicImage 
                 id="image_thumbnail"
                 name="images/thumbnails/thumbnail.#{th_photo}"
                 rendered="#{th_photo ne 'nophoto.jpeg'}"
-                alt="Photo missing for : #{c.playerLastName}"/>
+                alt="Photo missing for : #{c.player.playerLastName}"/>
             <h:graphicImage 
                 id="image_thumbnail_unknown"
                 title="this is the thumbnail !!"
                 name="images/thumbnails/thumbnail.unknown.jpg"
                 rendered="#{th_photo eq 'nophoto.jpeg'}"
-                alt="image missing for : #{c.playerLastName}"/>
+                alt="image missing for : #{c.player.playerLastName}"/>
 	</p:column>
 </ui:composition>
 

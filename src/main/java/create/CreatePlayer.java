@@ -7,9 +7,12 @@ import googlemaps.GoogleTimeZone;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import utils.DBConnection;
 import utils.LCUtil;
 import static utils.LCUtil.printSQLException;
+import static utils.LCUtil.showMessageInfo;
 
 public class CreatePlayer implements java.io.Serializable, interfaces.Log, interfaces.GolfInterface{
   //  private static String photo;
@@ -59,7 +62,7 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
             // new 07/08/2018  attention password est null à la création !!
             ps.setString(15, null); 
             ps.setString(16, "PLAYER"); // PlayerRole = default
-            ps.setTimestamp(17, LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(17, Timestamp.from(Instant.now()));
             utils.LCUtil.logps(ps);
             row = ps.executeUpdate(); // write into database
                 LOG.info("row = " + row);
@@ -69,7 +72,7 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
                             + " <br/>first = " + player.getPlayerFirstName()
                             + " <br/>last = " + player.getPlayerLastName();
                 LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
+      //          LCUtil.showMessageInfo(msg);
             }else{
                     String msg = "Fatal Error Player ! ";
                     LOG.info(msg);
@@ -83,7 +86,7 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
                 if(new CreateInitialHandicap().create(conn, handicap, batch)){  // new 12-05-2019
                     String msg = "Initial Handicap created !!";
                     LOG.info(msg);
-                    LCUtil.showMessageInfo(msg);
+             //       LCUtil.showMessageInfo(msg);
                 }else{
                     String msg = "create Handicap is false  ==> rollback of CreatePlayer";
                     LOG.info(msg);
@@ -97,7 +100,7 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
                 if(new CreateSubscription().create(player, conn)){
                     String msg = "Initial Subscription created !!";
                     LOG.info(msg);
-                    LCUtil.showMessageInfo(msg);
+            //        LCUtil.showMessageInfo(msg);
                 }else{
                     String msg = " create Subscription is false ==> rollback of CreatePlayer , initialHandicap";
                     LOG.info(msg);
@@ -114,11 +117,10 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
             if ((row != 0) && (! batch.equals("B"))){ // && (b == true)){ // insert initial Activation , si successfull insert player and handicap
                                                     // pas d'activation en batch mode
                 LOG.info("not batch activation");
-              if(new CreateActivation().create(conn, player, handicap)){
-         //   if(new CreateSubscription().create(player, conn)){
-                    String msg = "Initial Activation created !!";
+              if(new CreateActivationPlayer().create(conn, player, handicap)){
+                    String msg = "Connection Commit and Activation created for !!" + player;
                     LOG.info(msg);
-                    LCUtil.showMessageInfo(msg);
+      //              LCUtil.showMessageInfo(msg);
                     conn.commit(); // new 13-05-2019
                 }else{
                     String msg = " create Activation is false ==> rollback of CreatePlayer , initialHandicap, Subscription";
@@ -131,30 +133,49 @@ public class CreatePlayer implements java.io.Serializable, interfaces.Log, inter
 return true;
  }catch(SQLException sqle) {
             printSQLException(sqle); // new 13-05-2019
-     //     if (conn != null) {
+    String msg = "SQLException in createPlayer = " + sqle.getMessage() + " ,SQLState = "
+                    + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
+                 LOG.error(msg);
+                 LCUtil.showMessageFatal(msg);
       //      try {
-                LOG.error("Transaction is being rolled back");
-                conn.rollback();
+               
+               
        //     } catch(SQLException excep) {
        //         printSQLException(excep);
        //     }
+    //   String msg = "";
+             showMessageInfo("Message: " + sqle.getMessage());
+    //         showMessageInfo("Cause: " + sqle.getCause().getLocalizedMessage());
+             if(sqle.getMessage().endsWith("'player.unique_email'")){ // error integrity constraint
+      //           msg = "cette adresse mail est déjà utilisée";
+                 msg = LCUtil.prepareMessageBean("create.player.fail.email") + player.getPlayerEmail();
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                conn.rollback();
+               LOG.error("Transaction is rolled back");
+               return false;
+             }
+              
 
-             String msg = "";
             if(sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062 ){
-                 msg = LCUtil.prepareMessageBean("create.player.fail");
-                 msg = msg + player.getIdplayer();
+                 msg = LCUtil.prepareMessageBean("create.player.fail") + player.getIdplayer();
+      //           player existe déjà
                  LOG.error(msg);
                  LCUtil.showMessageFatal(msg);
+                  conn.rollback();
+               LOG.error("Transaction is rolled back");
                  return false;
             }else{
                  msg = "SQLException in createPlayer = " + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();}
                  LOG.error(msg);
                  LCUtil.showMessageFatal(msg);
+                     conn.rollback();
+               LOG.error("Transaction is rolled back");
                  return false;
   
-   } catch(Exception nfe) {
-            String msg = "£££ Exception in Insert Player = " + nfe.getMessage();
+   } catch(Exception e) {
+            String msg = "£££ Exception in Insert Player = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             return false;
@@ -171,7 +192,7 @@ return true;
   try{
         conn = new DBConnection().getConnection();
         Player player = new Player();
-        player.setIdplayer(528953); // 528951 529952
+        player.setIdplayer(111111); // 528951 529952
         player.setPlayerFirstName("first test");
         player.setPlayerLastName("last test");
         player.setPlayerBirthDate(SDF.parse("01/03/2000"));
@@ -181,8 +202,8 @@ return true;
         player.setPlayerHomeClub(101);
         player.setPlayerCity("Brussels");
         player.setPlayerGender("M");
-        player.setPlayerLanguage("fr");
-        player.setPlayerCountry("BE");
+        player.setPlayerLanguage("es");
+        player.setPlayerCountry("US");
         player.setPlayerLatLng(new LatLng(Double.parseDouble("50.8262271"), Double.parseDouble("4.3571382"))); // amazone 55
 
         Handicap handicap = new Handicap();

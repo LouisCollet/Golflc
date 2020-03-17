@@ -34,8 +34,8 @@ try{
 
      ps = conn.prepareStatement(query);
      ps.setInt(1, player.getIdplayer());
-     java.sql.Timestamp ts = Timestamp.valueOf(round.getRoundDate());
-     ps.setTimestamp(2,ts);
+ //    java.sql.Timestamp ts = Timestamp.valueOf(round.getRoundDate());
+     ps.setTimestamp(2,Timestamp.valueOf(round.getRoundDate()));
      
      LCUtil.logps(ps); 
      rs =  ps.executeQuery();

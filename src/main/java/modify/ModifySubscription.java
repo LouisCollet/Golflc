@@ -29,9 +29,9 @@ public boolean modify(final Subscription subscription, final Connection conn) th
              
             ps = conn.prepareStatement(query);
             //endDate format LocalDate
-            java.sql.Timestamp ts = Timestamp.valueOf(subscription.getEndDate().atStartOfDay());
-              LOG.info("new endDate inserted in DB = " + ts);
-            ps.setTimestamp(1, ts); // new endDate
+      //      java.sql.Timestamp ts = Timestamp.valueOf(subscription.getEndDate().atStartOfDay());
+       //       LOG.info("new endDate inserted in DB = " + ts);
+            ps.setTimestamp(1, Timestamp.valueOf(subscription.getEndDate().atStartOfDay())); // new endDate
     //          LOG.info(" new trial count = " + subscription.getTrialCount());
             if(subscription.getSubCode().equals("TRIAL")){
                 Short s = subscription.getTrialCount();

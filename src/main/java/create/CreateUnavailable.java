@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import javax.inject.Named;
 import utils.DBConnection;
@@ -33,12 +34,12 @@ public class CreateUnavailable {
             ps = conn.prepareStatement(query);
             ps.setNull(1,java.sql.Types.INTEGER);  //autoincrement
             ps.setInt(2,unavailable.getIdcourse()); 
-                java.sql.Timestamp ts = Timestamp.valueOf(unavailable.getStartDate());
-            ps.setTimestamp(3,ts);
-                ts = Timestamp.valueOf(unavailable.getEndDate());
-            ps.setTimestamp(4,ts);
+      //          java.sql.Timestamp ts = Timestamp.valueOf(unavailable.getStartDate());
+            ps.setTimestamp(3,Timestamp.valueOf(unavailable.getStartDate()));
+     //           ts = Timestamp.valueOf(unavailable.getEndDate());
+            ps.setTimestamp(4,Timestamp.valueOf(unavailable.getEndDate()));
             ps.setString(5,unavailable.getCause());
-            ps.setTimestamp(6,LCUtil.getCurrentTimeStamp());
+            ps.setTimestamp(6,Timestamp.from(Instant.now()));
 
             utils.LCUtil.logps(ps); 
             int row = ps.executeUpdate(); // write into database
