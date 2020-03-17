@@ -1,2 +1,0 @@
-2014108;"Patrick";"Reed";"San Antonio, Texas";"US";"05/08/1990";"M";154;"photolocation";"EN";"louis204128.collet@skynet.be";"01/01/2000";0.00
-2014208;"Rory";"McIlroy";"Holywood; Palm Beach Gardens, Florida";"GB";"04/05/1989";"M";154;"photolocation";"EN";"louis2041208.collet@skynet.be";"01/01/2000";0.00
