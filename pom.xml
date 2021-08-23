@@ -573,7 +573,7 @@ https://github.com/googlemaps/google-maps-services-java/tree/master/src/main/jav
     -->
   <groupId>org.jsoup</groupId>
   <artifactId>jsoup</artifactId>
-  <version>1.11.3</version>
+  <version>1.14.2</version>
   <!--  https://www.slf4j.org/codes.html#multiple_bindings -->
       <exclusions>
       <exclusion> 
