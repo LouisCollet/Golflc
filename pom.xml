@@ -53,7 +53,7 @@
         <javaee.version>8.0</javaee.version> <!-- was 7.0 mod 26-04-2014 -->
         <java.mail.version>1.6.1</java.mail.version> <!-- was 7.0 mod 26-04-2014 -->
         <javax.activation.version>1.2.0</javax.activation.version> <!-- was 1.2.0 mod 26-04-2014 -->
-        <log4j2.version>2.13.1</log4j2.version> <!-- new 05/03/2020  was 2.12.1 mod  -->
+        <log4j2.version>2.17.1</log4j2.version> <!-- new 05/03/2020  was 2.12.1 mod  -->
         <!--<glassfish.version>4.1.1</glassfish.version>  was 4.1 on 17/10/2015 -->
         <!--<wildfly.version>Wildfly-10.1.0.Final</wildfly.version> not used meme plus pour via MyPOM properties -->
         <hibernate.version>3.5.3.Final</hibernate.version> <!-- only used via MyPOM properties -->
