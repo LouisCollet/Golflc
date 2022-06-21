@@ -41,7 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> <!-- new 11/05/2014 -->
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
-        <mysql.connectorJ.version>8.0.19</mysql.connectorJ.version>  <!-- used by RUN FILE mod 03-11-2019 was 8.0.16 -->
+        <mysql.connectorJ.version>8.0.28</mysql.connectorJ.version>  <!-- used by RUN FILE mod 03-11-2019 was 8.0.16 -->
         <primefaces.version>8.0</primefaces.version> <!-- 07-03-2020 : was 7.0-->
         <primefaces.extension.version>8.0</primefaces.extension.version> <!-- mod 07-03-2020 was 7.0 -->
         <!--<primefaces.theme.version>1.0.10</primefaces.theme.version>--> <!-- was 1.0.9 -->
