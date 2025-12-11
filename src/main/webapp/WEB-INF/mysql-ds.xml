@@ -34,8 +34,8 @@ port est devenu 3308 à partir version mysql 8.2 le 31-10-2023
         <max-pool-size>20</max-pool-size>
     </pool>
               <!--  enlevé 10-12-2025    <security>
-                        <user-name>LouisCollet${env.MYSQL_USERNAME}</user-name>
-                        <password>lc1lc2</password>
+                        <user-name>****${env.MYSQL_USERNAME}</user-name>
+                        <password>****</password>
                     </security>
                -->
     <validation>

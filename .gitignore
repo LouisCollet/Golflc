@@ -1,2 +1,91 @@
 /target/
 /src/main/webapp/parking/target/
+target/
+
+########################################
+# Maven
+########################################
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+
+########################################
+# WildFly / Jakarta EE deployments
+########################################
+# Fichiers générés lors du déploiement local
+*.war
+*.ear
+*.rar
+
+# Dossier standalone local (ne jamais versionner)
+standalone/
+domain/
+
+# Logs WildFly
+*.log
+*.log.*
+*.gz
+
+########################################
+# Java / Compilation
+########################################
+*.class
+*.jar
+*.war
+*.ear
+*.javadoc
+*.java~
+
+########################################
+# JSF / Facelets / PrimeFaces
+########################################
+# Répertoires générés par le serveur d'application
+jakarta.faces.*
+*.jsf.js
+*.faces.js
+*.xhtml~
+
+# Cache PrimeFaces (temporaire si activé)
+primefaces-cache/
+
+
+########################################
+# IDEs
+########################################
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+.buildpath
+
+# VSCode
+.vscode/
+.history/
+
+########################################
+# OS-specific
+########################################
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+########################################
+# Divers
+########################################
+*.tmp
+*.bak
+*.swp
+*.orig
+*.cache
