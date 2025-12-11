@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+ <ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/dialogTemplate.xhtml">
+<ui:define name="title">
+    DialogFramework View Detailed Handicap
+</ui:define>
+
+<ui:define name="content"> 
+
+<h:form id="view_handicap"
+        style="border:solid 3px" 
+         >
+
+<p:outputPanel id="handicapDetail"
+               deferred="true"
+               style="text-align:center;">
+   <p:panelGrid  columns="2"
+                 layout="tabular"
+                 columnClasses="col1, col2">
+     <f:facet name="header">
+                    this is the header facet
+     </f:facet>
+ <!--  rendered="#{not empty courseC.handicap.selectedHandicap}"   on travaille sur un ECourseList -->
+                <h:outputText id="date_handicap" value="#{msg['handicap.start']}" />
+                <h:outputText id="dathcp2" value="#{courseC.handicap.selectedHandicap.handicap.handicapStart}" />
+ 
+                <h:outputText id="competition" value="#{msg['round.competition']}" />
+                <h:outputText id="compet2" value="#{courseC.handicap.selectedHandicap.round.roundName}" />
+ 
+                <h:outputText id="game" value="#{msg['round.game']}" />
+                <h:outputText id="game2" value="#{courseC.handicap.selectedHandicap.round.roundGame}" 
+                              style="color:silver" />
+ 
+                <h:outputText id="idround" value="#{msg['round.id']}" />
+                <h:outputText id="idround2" value="#{courseC.handicap.selectedHandicap.round.idround}" 
+                              style="color:red"/>
+
+   </p:panelGrid>
+</p:outputPanel>
+</h:form>
+</ui:define>
+</ui:composition>

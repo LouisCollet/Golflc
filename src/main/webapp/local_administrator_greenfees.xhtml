@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Local Administrator Greenfees</ui:define>
+<ui:define name="content">
+
+
+<h:form id="form_local_admin_greenfee"  >
+<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+   <ui:include src="/include/include_summary_player.xhtml"/>
+<!--
+   sessionMap.get("inputSelectCourse")  -->
+   
+ <c:set var="select" value="#{inputSelectPaiement}"/> 
+   <p:dataTable id="TableLocalAdmin"
+                var="c"
+                widgetVar="customersTable"
+                value="#{courseC.listLocalAdminGreenfee(select)}"
+                sortBy="#{c.club.idclub}"
+                filteredValue="#{courseC.filteredCars}" >
+
+ <f:facet name="header">
+    <h1>
+        <h:outputText
+            id="Rnd"
+            rendered="#{inputSelectPaiement eq 'Greenfees'}" 
+            value="#{msg['message.for.paiement.greenfee']}">
+        </h:outputText>
+    </h1>
+ </f:facet>
+       
+      <p:headerRow  field="club.clubName"
+                    expandable="true"
+                    expanded="false">
+                <p:column colspan="6">
+                        <h:outputText value="#{c.club.clubName} - #{c.club.idclub}"/>
+                 </p:column>
+       </p:headerRow>
+<!--
+            <p:column headerText="#{msg['club.name']}"
+                      groupRow="true">
+                <h:outputText value="#{c.club.clubName} -  #{c.club.idclub}" />
+            </p:column>
+-->
+            <p:column headerText="#{msg['player.lastname']}">
+                      <h:outputText value="#{c.player.playerLastName}" />
+              </p:column>
+<!--  field="player.playerLastName"  -->
+            <p:column id="CustomerStartDateColumn"
+                  field="greenfee.roundDate"
+                  headerText="#{msg['start.date']}"
+                  filterMatchMode="between"
+                  width="10%">
+                <h:outputText value="#{c.greenfee.roundDate}" >
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                 </h:outputText>
+                <f:facet name="filter">
+                    <p:datePicker
+                        selectionMode="range"
+                        rangeSeparator=":"
+                        size="20"
+                        onchange="PF('customersTable').filter()"
+                        locale="#{languageC.locale}"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        yearNavigator="true"
+                        monthNavigator="true"
+                        yearRange="#{utilsC.dateYear(-2)}:#{utilsC.dateYear(0)}"
+                        readonlyInput="false">
+                        <f:convertDateTime type="localDateTime"/>
+                    </p:datePicker>
+                </f:facet>
+            </p:column>
+
+            <p:column headerText="#{msg['creditcard.amountpaid']}">
+                <h:outputText value="#{c.greenfee.price}" />
+            </p:column>
+
+            <p:column headerText="#{msg['cotisation.payment']}">
+                <h:outputText value="#{c.greenfee.paymentDate}" >
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="#{msg['creditcard.communication']}"
+                      field="greenfee.communication"
+                      sortable="false"
+                      filterable="false" />
+
+            <p:column headerText="#{msg['cotisation.item']}">
+                <h:outputText value="#{c.greenfee.items}" />
+            </p:column>
+<!--  @Named("LAGreenfee") -->
+    <p:summaryRow>
+                <p:column colspan="2"
+                          style="text-align:right">
+                    <h:outputText value="Total Recettes:"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{LAGreenfee.getListe()
+                              .stream()
+                              .filter(o->o.getClub().getIdclub() == c.club.idclub)
+                              .map(o->o.getGreenfee().getPrice())
+                              .sum()}" >
+                         <f:convertNumber locale="es" type="currency" currencySymbol="€" maxFractionDigits="1"/>
+                         <!--  forcer la locale es car fr donne blanc ipv point suite bug java -->
+                    </h:outputText>
+                </p:column>
+                <p:column colspan="3">
+                    <h:outputText value=""/>
+                </p:column> 
+    </p:summaryRow>
+
+ <f:facet name="footer">
+  <!-- enlevé 24-08-2025 donne deprecation in com.lowagie
+   <p:commandButton icon="pi pi-file-excel"
+                    value="Export as Excel (XLSX)" >
+       <p:dataExporter type="xlsxstream"
+                       postProcessor="#{customizedDocumentsView.postProcessXLS}"
+                       target="TableLocalAdmin"
+                       fileName="GreenfeesPaid" />
+   </p:commandButton>
+   <p:commandButton value="PDF" styleClass="mr-2 mb-2">
+            <p:dataExporter type="pdf"
+                            target="TableLocalAdmin"
+                            fileName="GreenfeesPaid"
+                            preProcessor="#{customizedDocumentsView.preProcessPDF}"/>
+        </p:commandButton>
+    --> 
+</f:facet>
+</p:dataTable>
+</h:form>
+ 
+</ui:define>
+</ui:composition>

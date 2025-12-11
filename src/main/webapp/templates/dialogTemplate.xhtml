@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+       >
+
+<f:view id="view_dialog"
+        contentType="text/html"
+        locale="#{languageC.locale}">
+    
+     <!-- new 04-08-2023 essai correction error FSF1103 The metadata facet must be a direct child of the view in viewId -->
+         <ui:insert name="metadata"> </ui:insert>
+
+<h:head id="head_PrimeFlex_DialogTemplate">
+   <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+   <meta http-equiv="Content-Language" content="#{languageC.locale}" /> 
+   <meta name="sessionTimeout"
+         http-equiv="refresh" 
+         content="#{session.maxInactiveInterval};url=#{request.contextPath}/session_expired.xhtml?cmd=time-out"/>
+     <!-- de rediriger le visiteur vers une autre page au bout de N secondes grâce 
+au mot clé refresh et à la précision URL=chemin-vers-ma-page.-->
+    <title><ui:insert name="title"> Default title </ui:insert></title>
+    <h:outputScript library="js" name="forms.js" target="head"/>
+    <!-- https://printjs.crabbly.com/  -->
+    <h:outputScript library="js" name="print.min.js" target="head"/>
+</h:head>
+
+<h:body id="body_master_template"> <!-- new 13/07/2014-->
+<!-- Just put them in a .css file which you include
+by <h:outputStylesheet> inside the beginning of the <h:body>
+JSF will automatically relocate the stylesheet
+to the end of the generated HTML <head> and this
+will thus ensure that the stylesheet is loaded after the PrimeFaces' default styles.
+-->
+
+<ui:insert name="metadata" />
+<h:outputStylesheet library="styles" name="print.min.css" />
+<h:outputStylesheet library="styles" name="Styles2022.css" />
+ <!--<h:outputStylesheet library="styles" name="primeflex/331/primeflex.min.css" /> 
+ <h:outputStylesheet library="styles" name="primeflex/331/primeone-light.css" /> -->
+
+<div class="card">
+    <div class="grid">
+<!--   North - Header 
+        <div class="p-col-12">
+            
+        </div>
+-->
+<!--   Center - Contenu -->
+        <div class="col-10">
+            <ui:include src="/include/include_messages.xhtml"/>
+            <ui:insert name="content"></ui:insert>
+        </div>
+        
+<!--    East - Help mod 09-08-2023 plus de help dans dialogs !
+        <div class="col-2">
+            <ui:include src="/help_read.xhtml"/>
+        </div>-->
+<!--    South - Footer -->
+        <div class="col-12">
+            <b>View : </b> #{view.viewId}
+            <h:outputText id="fmd" 
+                          escape="false" 
+                          value="#{utilsC.ViewModificationDate()}"></h:outputText>
+        </div>
+    </div> <!-- class p-grid -->
+</div>  <!-- class card -->
+</h:body>
+</f:view>
+</ui:composition>

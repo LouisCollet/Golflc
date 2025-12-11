@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+ <!--
+ next lines : afficher les tee possibles en fonction gender voir TeeStart  
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadTeeStart()}"/>
+    </f:metadata>
+</ui:define>
+ 
+ 
+-->   
+<ui:define name="title">Inscription Competition Page </ui:define>
+<ui:define name="content">
+<h:form id="inscription_competition"  >
+<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
+    
+<ui:include src="include/include_summary_competition.xhtml"/>
+<p:panelGrid id="panel"
+             columns="2"
+             layout="tabular"
+             columnClasses="col1,col2">
+
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['competition.inscription.title']}" />
+    <h2>#{courseC.competition.competitionDescription.competitionName} </h2>
+</f:facet>
+        <h:outputText value="#{msg['inscription.team']} :"   />
+        <h:outputText id="competition" 
+                      value="#{courseC.competition.competitionDescription.competitionId}" />
+         <h:outputText value="#{msg['player.first']}"
+                    style="width:20%" />
+         <h:outputText
+                    value = "#{courseC.player.playerFirstName} - #{courseC.player.playerLastName}"/>
+
+      <h:panelGroup id="panelG2" layout="block" >
+        <h:outputText value="#{msg['competition.gender']} :" />
+                    <span class="ui-inputgroup-addon"><i class="pi pi-user-minus"></i></span>
+      </h:panelGroup>
+
+        <h:outputText id="teegender2" 
+                      value="#{courseC.competition.competitionDescription.competitionGender}" />
+ 
+        <h:outputText value="#{msg['competition.start.asked']} :"  />
+        <p:selectOneMenu id="teestart"
+                         value="#{courseC.competition.competitionData.cmpDataAskedStartTime}"
+                           >
+                    <f:selectItems value="#{courseC.competitionTimeStartList('current_player')}" />
+        </p:selectOneMenu>
+ <!-- test comptage
+ next lines : afficher les tee possibles en fonction gender voir TeeStart  
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.LoadTeeStart()}"/>
+    </f:metadata>
+</ui:define>
+ 
+ 
+-->   
+<f:facet name="footer">
+     <p:commandButton id="buttonCreate"
+                 value="#{msg['button.inscription.create']}"
+                 update="growl-msg"
+                 ajax="false"
+                 immediate="false"
+                 icon="pi pi-pencil"
+                 action="#{courseC.createInscriptionCompetition(courseC.competition)}"
+         />
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

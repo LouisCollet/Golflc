@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml"
+>
+<ui:define name="title">Score Scramble Page </ui:define>
+<ui:define name="content">
+
+<h:graphicImage 
+                name="images/golfcard.png"
+                alt="image missing :golfcard.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/golfcard.png"
+                alt="image missing :golfcard.jpg"
+                style="float: right;">
+</h:graphicImage>
+<h:form id="score_scramble" enctype="application/x-www-form-urlencoded" >
+
+<p:panelGrid
+    id="panelgrid1"
+    layout="tabular"
+    columnClasses="col1,col2"
+    columns="2" >
+
+<f:facet name="header">
+    <h1>#{msg['title.score.results']} scramble</h1>
+    
+         idclub = #{courseC.club.idclub}
+         , cmd = #{param.cmd}
+         , operation = #{param.operation}
+         , inputClubOperation = #{courseC.inputClubOperation}
+         , nextScorecard = #{courseC.nextScorecard}
+    
+</f:facet>
+      <h:outputText value="#{msg['round.id']} :" />
+      <h:outputText
+            id="idround" 
+            value="#{courseC.round.Roundname} (#{courseC.round.idround})"
+            title="This tooltip is displayed when input gets the focus" />
+
+      <h:outputText value="#{msg['player.id']} :" />
+      <h:outputText
+            id="idplayer1" 
+            value="#{courseC.player.playerLastName} (#{courseC.player.idplayer})"
+            title="This tooltip is displayed when input gets the focus" />
+
+      <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText
+            id="clubn" 
+            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+
+      <h:outputText value="#{msg['course.name']} :" />
+      <h:outputText
+            id="idcourse" 
+            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
+
+      <h:outputText value="#{msg['round.date']} :" />
+      <h:outputText
+            id="rounddate" 
+            value="#{courseC.round.roundDate}"
+            
+            >
+              <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+      </h:outputText>
+
+</p:panelGrid>
+<p:divider layout="horizontal" type="solid" />
+<!--
+
+-->
+
+<p:panelGrid id="panelgrid2"
+             columns="10"
+             layout="tabular"
+             style="text-align:center;"
+             columnClasses="className"
+             rendered="#{courseC.round.roundHoles eq 18 or courseC.round.roundStart eq 1}"
+             >
+<!-- first line : hole  style="font-size: 3em;" -->    
+    <h:outputText value="  #{msg['score.aller']}"
+              style="background-color: lightskyblue;" />
+   <c:forEach var="i" begin="01" end="09" step="1">
+      <h:outputText value="${i}"
+              style="font-size:1.5em;" />
+   </c:forEach>
+
+<!-- second line : par -->    
+    <h:outputText value="  #{msg['par.par']}"
+              style="background-color: lightskyblue;"
+              />
+   <c:forEach var="i" begin="01" end="09" step="1">
+       <h:outputText value="#{courseC.parArray[i-1]}"
+                     style="font-style: italic" />
+   </c:forEach>
+
+<!-- third line :score -->    
+    <h:outputText value="#{msg['score.gross']}"   />
+ <!-- on enregistre les résultats dans une table style="font-style:italic"
+ on doit utiliser les validations locales car autres validations ne fonctionnent que
+ avec String et non avec une table !! -->
+    <c:forEach var="i" begin="01" end="09" step="1">
+        <h:inputText  id="score01-09${i}"
+                label="ScoreLC"
+                value="#{courseC.scoreStableford.holes[i-1]}"
+                size="2"
+                onchange="repl(this);"
+                required="true"
+                requiredMessage="#{msg['score.hole.notnull']} : #{i}"
+                validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="12" />
+        </h:inputText>
+    </c:forEach>
+
+</p:panelGrid >
+
+<p/>
+<p:panelGrid id="panelgrid3"
+             columns="10"
+             layout="tabular"
+             columnClasses="className"
+             style="text-align:center;"
+             rendered="#{courseC.round.roundHoles eq 18 or courseC.round.roundStart eq 10}"
+             >
+    <h:outputText value="#{msg['score.return']}"   />
+    <c:forEach var="i" begin="10" end="18" step="1">
+         <h:outputText value="${i}"
+                       style="font-size:1.5em;" />
+    </c:forEach>
+<!-- second line : par new 18/06/2014 -->    
+<h:outputText value="  #{msg['par.par']}"
+              style="background-color: lightskyblue;"
+              />
+   <c:forEach var="i" begin="10" end="18" step="1">
+       <h:outputText value="${courseC.parArray[i-1]}"
+                     style="font-style: italic"/>
+   </c:forEach>
+
+<h:outputText value="#{msg['score.gross']}" />
+    <c:forEach var="i" begin="10" end="18" step="1">
+            <h:inputText  id="score10-18${i}"
+                    label="ScoreLC"
+                    value="#{courseC.scoreStableford.holes[i-1]}"
+                    size="2"
+                    onchange="repl(this);"
+                    required="true"
+                    requiredMessage="#{msg['score.hole.notnull']} : #{i}"
+                    validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="12" />
+      </h:inputText>
+    </c:forEach>
+
+</p:panelGrid>
+
+<p:panelGrid 
+    id="panelgrid4" 
+    layout="tabular"
+    columnClasses="className"
+    columns="2">
+<f:facet name="footer">
+        <p:commandButton 
+                         id="button01"
+                         value="#{msg['button.score.create']}"
+                         update="growl-msg"
+                         ajax="false"
+ 
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.createScoreScramble}"/>
+        
+        <!--   rendered="#{courseC.showButtonCreateScore}"  -->
+        <p:commandButton 
+                         id="button02"
+                         value="#{msg['button.score.statistics']}"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         rendered="#{courseC.showButtonCreateStatistics}"
+                        icon="pi pi-pencil"
+                         style="float: right;"
+                         action="score_statistics.xhtml?faces-redirect=true"/>
+</f:facet>
+
+    <!-- 
+     rendered="#{courseC.showButtonCreateStatistics}"
+    rendered="#{not courseC.nextScorecard}"
+                          rendered="#{courseC.nextScorecard}"   --> 
+    
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

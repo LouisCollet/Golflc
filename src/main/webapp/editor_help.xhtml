@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+    <!--  https://stackoverflow.com/questions/41489491/button-codes-for-primefaces-text-editor/48820473  -->
+ 
+<ui:define name="title">textEditor Help Files </ui:define>
+<ui:define name="head"> </ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/editor1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/quilljs.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="editor_help" >
+
+    <p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="1">
+
+     <f:facet name="header">
+         <h:outputText escape="false" value="#{courseC.treeBean.fileName}" />
+    </f:facet> 
+<!--   style="width:800px;background-color: whitesmoke;font-weight: normal;" -->
+    <p:textEditor id="help_editor"
+                  secure="false"
+                  widgetVar="editor"
+                  value="#{courseC.treeBean.content}"
+                  height="250px" 
+                  style="width:800px;font-weight: normal;background-color: whitesmoke;"
+                  placeholder="Enter here your content" />
+
+    <!--  valueChangeListener="#{courseC.treeBean.onValueChange()}"  -->
+    
+ <f:facet name="footer">
+         <p:commandButton value="Save to File"
+                         id="buttonModify"
+                         ajax="true"
+                         update="help_editor, growl-msg"
+                      
+                         icon="pi pi-database"
+                         style="float:left;"
+                         action="#{courseC.treeBean.writeToHelpFile()}" />
+         <p:commandButton id="ButtonClear"
+                         value="Clear"
+                       
+                         onclick="PF('editor').clear();"
+                         icon="pi pi-times" />
+         <p:commandButton value="Back Node"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                     
+                         icon="pi pi-undo"
+                         action="treenode.xhtml?faces-redirect=true" />
+ </f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

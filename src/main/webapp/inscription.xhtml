@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      xmlns:fn="jakarta.tags.functions"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Inscription Page </ui:define>
+<ui:define name="content">
+<h:outputStylesheet library="styles" name="meteo.css"/>
+<h:form id="inscription"  >
+ <!--  https://colibriwp.com/blog/scrolling-text/
+https://codepen.io/jreaux62/pen/vzoJNN  
+ -->
+  <h:outputScript library="js" name="teecolor.js" target="head"/>
+
+<h:graphicImage name="images/OK.png" alt="image missing :OK.png" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/OK.png" alt="image missing :OK.png" style="float: right;"></h:graphicImage>
+<!-- <ui:include src="/include/include_summary_player.xhtml"/> -->
+<ui:include src="include/include_summary_round.xhtml"/>
+<!-- copié de : https://codepen.io/jreaux62/pen/vzoJNN
+ -->
+<h:panelGroup id="panelGroup1"
+              layout="block" 
+              class="marquee-rtl"
+              rendered="#{courseC.inscription.showWeather}">
+ <div>
+     <h:outputText value="#{courseC.inscription.weather}"
+                   escape="false"/>
+ </div>
+</h:panelGroup>
+ 
+<p:panelGrid id="panel"
+             layout="tabular"
+             columns="2"
+             columnClasses="col1,col2"
+             style="width:70%">
+    
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['inscription.data']}" />
+</f:facet>
+    
+    <c:set var="max" value="#{courseC.round.roundGame eq 'MP_SINGLE'? 2 : 4}"/>
+    <c:set var="abb" value="${fn:substring(courseC.round.roundGame, 0, 3)}"/>
+
+        <p:outputLabel for="@next" value="#{msg['inscription.team']} :"   />
+        <p:inputText id="inscription"
+                     size="35"
+                     value="#{courseC.round.roundTeam}" />
+
+        <p:outputLabel for="@next" value="#{msg['inscription.matchplay.team']}"
+                      rendered="#{abb eq 'MP_'}" />
+        <p:inputText id="matchplay"
+                     size="3" 
+                     rendered="#{abb eq 'MP_'}"
+                     value="#{courseC.inscription.inscriptionMatchplayTeam}" />
+<!--
+https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
+<c:set var="type" value="#{courseC.teeStartList(player)}"/>  onchange="setSelectionColor();" -->
+
+ <c:set var="player" value="#{courseC.player}"/>
+        <p:outputLabel for="@next" value="#{msg['tee.start']} :"  />
+        <p:selectOneMenu id="teeStartSelect"
+                       
+                         value="#{courseC.inscription.inscriptionTeeStart}" >
+            <f:selectItem  itemLabel="#{msg['inscription.tee.select']}"
+                           itemValue=""
+                           noSelectionOption="true"/>
+            <f:selectItems id="teeStartList" class="classItem"
+                  value="#{courseC.teeStartList(player)}"  />
+        </p:selectOneMenu>
+        
+        <p:outputLabel for="@next" value="#{msg['club.web']} :"  />
+        <h:outputLink value="https://#{courseC.club.clubWebsite}/"
+                      title="Club WebPage">
+            <h:outputText value="https://#{courseC.club.clubWebsite}"/>
+        </h:outputLink>
+<f:facet name="footer">
+<p:panelGrid columns="3"
+             layout="tabular"
+             style="width:100%">
+    <p:commandButton     id="buttonCreate"
+                         value="#{msg['button.inscription.create']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="pi pi-pencil"
+                         action="#{courseC.createInscription()}" />
+    <p:commandButton 
+                         id="buttonWeather"
+                         value="#{msg['button.weather']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="true"
+                         icon="pi pi-sun"
+                         action="#{courseC.findWeather()}" />
+    <c:set var="idcourse" value="#{courseC.course.idcourse}"/>
+    <p:commandButton     id="buttonTarif"
+                         value="#{msg['button.inscription.findtarif']} Greenfee"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="po pi-euro"
+                         action="#{courseC.showTarifGreenfee(idcourse)}" />
+    <p:commandButton     id="OtherPlayers"
+                         value="#{msg['button.inscription.otherplayers']} / #{courseC.roundPlayersList().size()}"
+                         update="growl-msg"
+                         ajax="false"
+                         disabled="#{(!courseC.inscription.inscriptionOK) or (courseC.roundPlayersList().size() gt max)}"
+                         immediate="false"
+                         icon="pi pi-user-plus"
+                         action="select_other_players.xhtml?faces-redirect=true" />
+    <p:commandButton     value="Visualisation"
+                         id="commandButtonVisual"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false" 
+                         icon="pi pi-info-circle"
+                         action="#{courseC.showUnavailablePeriod()}"/>
+          <h:outputText value=""/>
+ </p:panelGrid>
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Local Administrator Cotisations</ui:define>
+<ui:define name="content">
+
+<div class="card">
+<h:form id="form_local_admin_cotisations" enctype="application/x-www-form-urlencoded" >
+<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+   <ui:include src="/include/include_summary_player.xhtml"/>
+<!--
+   sessionMap.get("inputSelectCourse")  -->
+   
+<c:set var="select" value="#{inputSelectPaiement}"/> 
+ 
+   <p:dataTable id="TableLocalAdmin"
+                var="c"
+                widgetVar="customersTable"
+                value="#{courseC.listLocalAdminCotisation(select)}"
+                sortBy="#{c.club.clubName}"
+                filteredValue="#{courseC.filteredCars}"
+                multiViewState="true"
+                >
+       <!--   -->
+       
+ <f:facet name="header">
+    <h1>
+        <h:outputText
+            id="Rnd"
+            rendered="#{inputSelectPaiement eq 'Greenfees'}" 
+            value="#{msg['message.for.paiement.greenfee']}">
+        </h:outputText>
+        <h:outputText
+            id="tarif"
+            rendered="#{inputSelectPaiement eq 'Members'}" 
+            value="#{msg['message.for.paiement.cotisation']}">
+        </h:outputText>
+    </h1>
+ </f:facet>
+       
+      <p:headerRow  field="club.clubName"
+                    expandable="true"
+                    expanded="false">
+                <p:column colspan="7">
+                        <h:outputText value="#{c.club.clubName} - #{c.club.idclub}"/>
+                 </p:column>
+       </p:headerRow>
+<!--
+            <p:column headerText="#{msg['club.name']}">
+                <h:outputText value="#{c.club.clubName} -  #{c.club.idclub}" />
+            </p:column>
+-->
+            <p:column headerText="#{msg['player.lastname']}"
+                      field="player.playerLastName" />
+
+            <p:column id="CustomerStartDateColumn"
+                  field="cotisation.cotisationStartDate"
+                  headerText="#{msg['start.date']}"
+                  filterMatchMode="between"
+                  width="10%">
+                 <h:outputText value="#{c.cotisation.cotisationStartDate}" >
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                 </h:outputText>
+                <f:facet name="filter">
+                    <p:datePicker
+                        selectionMode="range"
+                        hideOnRangeSelection="true"
+                        rangeSeparator=":"
+                        size="20"
+                        onchange="PF('customersTable').filter()"
+                        locale="#{languageC.locale}"
+                        lang="#{languageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        yearNavigator="true"
+                        monthNavigator="true"
+                        yearRange="#{utilsC.dateYear(-2)}:#{utilsC.dateYear(0)}"
+                        readonlyInput="false">
+                       <f:convertDateTime type="localDateTime"/>
+                    </p:datePicker>
+<!-- hideOnRangeSelection new PF14 07-06-2024  -->
+                </f:facet>
+            </p:column>
+
+            <p:column id="CustomerEndDateColumn"
+                  field="cotisation.cotisationEndDate"
+                  headerText="#{msg['end.date']}"
+                  filterMatchMode="between"
+                  width="10%">
+                 <h:outputText value="#{c.cotisation.cotisationEndDate}" >
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                 </h:outputText>
+                <f:facet name="filter">
+                    <p:datePicker 
+                        selectionMode="range"
+                        rangeSeparator=":"
+                        size="20"
+                        onchange="PF('customersTable').filter()"
+                        locale="#{languageC.locale}"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        yearNavigator="true"
+                        monthNavigator="true"
+                        yearRange="#{utilsC.dateYear(-2)}:#{utilsC.dateYear(0)}"
+                        readonlyInput="false">
+                        <f:convertDateTime type="localDateTime"/>
+                    </p:datePicker>
+                </f:facet>
+            </p:column>
+
+            <p:column headerText="#{msg['creditcard.amountpaid']}">
+                <h:outputText value="#{c.cotisation.price}" />
+            </p:column>
+
+            <p:column headerText="#{msg['cotisation.payment']}">
+                <h:outputText value="#{c.cotisation.paymentDate}" >
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                </h:outputText>
+            </p:column>
+            
+            <p:column headerText="#{msg['creditcard.communication']}"
+                      field="cotisation.communication"
+                      sortable="false"
+                      filterable="false" />
+
+            <p:column headerText="#{msg['cotisation.item']}">
+                <h:outputText value="#{c.cotisation.items}" />
+            </p:column>
+
+  <p:summaryRow>
+                <p:column colspan="3" style="text-align:right">
+                    <h:outputText value="Total Recettes:"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{LACotisation.getListe()
+                              .stream()
+                              .filter(o->o.getClub().getIdclub() == c.club.idclub)
+                              .map(o->o.getCotisation().getPrice())
+                              .sum()}" >
+                         <f:convertNumber locale="es" type="currency" currencySymbol="€" maxFractionDigits="1"/>
+                         <!--  forcer la locale es car fr donne blanc ipv point suite bug java -->
+                         
+                    </h:outputText>
+                    
+                </p:column>
+                <p:column colspan="3">
+                    <h:outputText value=""/>
+                </p:column> 
+  </p:summaryRow>
+
+ <f:facet name="footer">
+   <p:commandButton icon="pi pi-file-excel"
+                    value="Export as Excel (XLSX)" >
+ <!-- for XLS exporting Apache POI libraries are required in the classpath.   -->
+       <p:dataExporter type="xlsx"
+                       
+                       target="TableLocalAdmin"
+                       fileName="Cotisations"
+                      />
+   </p:commandButton>
+     
+        
+</f:facet>
+</p:dataTable>
+</h:form>
+  </div>  
+</ui:define>
+</ui:composition>

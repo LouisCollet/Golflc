@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Delete One Club </ui:define>
+<ui:define name="content">
+<h:form id="form_selectClubDelete"
+        enctype="application/x-www-form-urlencoded" >
+     <p:focus for="inputClub" />
+<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+
+<p:panelGrid 
+    id="panel2"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+    <f:facet name="header">
+        <h:outputText escape="false" value="#{msg['message.selectclub.delete']}" />
+    </f:facet>
+
+         <h:outputText value="#{msg['club.name']}" />
+         <h:panelGroup layout="block" id="container2">
+                <p:inputNumber
+                       id="inputClub"
+                       value="#{courseC.club.idclub}"
+                       size="5"
+                       style="margin-right: 10px;"
+                       decimalPlaces="0"
+                       minValue="1"
+                       emptyValue="0" />
+                <p:commandButton 
+                         id="ButtonClub"
+                         immediate="true"
+                         value="#{msg['button.player.homeclub']}"
+                         actionListener="#{dialogC.showSelectClub('club_modify')}"
+                         style="margin-right: 10px;"
+                         icon="pi pi-search" >
+                    <p:ajax event="dialogReturn"
+                         update="inputClub,clubName,playerClub" />
+                </p:commandButton>
+
+                <h:outputText id="clubName"
+                              value=" #{courseC.club.clubName}" 
+                              style="font-style:italic"/>  
+
+                <h:outputText id="playerClub"
+                              value=" #{courseC.club.idclub}"
+                              style="font-weight:bold;font-size: 2rem;font-style:italic;color: blue" />  
+          </h:panelGroup>
+
+<f:facet name="footer">
+    <p:commandButton
+                         value="#{msg['button.club.delete']}"
+                         id="createPlayer"
+                         ajax="false"
+                         style="font-weight:normal "
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="deleteClubCourseTee.xhtml?faces-redirect=true"/>
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

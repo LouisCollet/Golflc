@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces" >
+    <!-- template="/templates/masterTemplate.xhtml" attention doit commencer par / car on est dans /include !!style="margin: 0 auto;width:50%"-->
+<h:body>
+<p:panelGrid
+    id="panelGridSummaryPlayer"
+    layout="flex"
+    columns="12"
+    columnClasses="col1Flex,col2Flex,col1Flex,col2Flex,col1Flex,col2Flex,col1Flex,col2Flex,col1Flex,col2Flex,col1Flex,col2Flex"
+    style="width:90%;font-size:0.8rem;"
+    >
+<!--  style="border:solid 1px;border-color: red"columnClasses="col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4, col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4"  -->
+<f:facet name="header">
+ <!--   <h1>#{msg['title.summary.player']}</h1> replaced by next line with html <h1> included-->
+    <h:outputText value="#{msg['title.summary.player']}" escape="false"/>
+</f:facet>
+    
+<!--    <div class="flex flex-wrap align-items-center justify-content-center card-container yellow-container">
+        <div class="border-round bg-yellow-100 w-20rem p-3 m-3">
+            <div class="min-w-min md:min-w-max border-round bg-yellow-500 text-gray-900 font-bold p-3 flex align-items-center justify-content-center">responsive min-width</div>
+        </div>
+    </div>
+ 
+ <div class="card">
+    <div class="flex flex-wrap align-items-center justify-content-center card-container purple-container">
+        <div class="border-round bg-purple-100 w-20rem p-3 m-3">
+            <div class="w-min md:w-max border-round bg-purple-500 text-white font-bold p-3 flex align-items-center justify-content-center">w-min on small screen</div>
+        </div>
+    </div>
+</div>style="font-size: 1.5rem;font-style:italic;color:blue;font-weight:bold;background-color: yellow;"/>
+  -->   
+        <h:outputText value="#{msg['player.id']}" /> 
+	<h:outputText value="#{courseC.player.idplayer}" />
+      
+        <h:outputText value="#{msg['player.first']}" />
+        <h:outputText value="#{courseC.player.playerFirstName}"/>
+ 
+        <h:outputText value="#{msg['player.lastname']}"   />
+        <h:outputText value="#{courseC.player.playerLastName}"/>
+        
+        <h:outputText value="#{msg['player.language']}"   />
+        <h:outputText value="#{courseC.player.playerLanguage}"/>
+        
+        <h:outputText value="Role : " />
+        <h:outputText value="#{courseC.player.playerRole}"/>
+     
+        <h:outputText value="ZoneId Time Zone : "/>
+        <h:outputText value="#{courseC.player.address.zoneId}" />
+</p:panelGrid>
+<p:divider layout="horizontal" type="solid" />
+</h:body>
+</ui:composition>

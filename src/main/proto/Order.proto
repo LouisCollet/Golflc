@@ -1,0 +1,23 @@
+syntax = "proto3";
+// this is a comment or /*   */
+// https://bitbucket.org/uniqdev/protobuf-netbeans/src/master/
+//Syntax highlighting and error checking
+//Code folding
+//Provides bread crumbs in the editor
+
+option java_multiple_files = true;
+option java_package = "protobuf.order";
+
+service OrderService {
+    rpc ExecuteOrder(OrderRequest) returns (OrderResponse) {};
+}
+
+message OrderRequest {
+    string email = 1;
+    string product = 2;
+    int32 amount = 3;
+}
+
+message OrderResponse {
+    string info = 1;
+}

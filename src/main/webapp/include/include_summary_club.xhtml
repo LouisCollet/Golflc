@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces" >
+
+<p:panelGrid
+    id="panelgridSummaryClub"
+    layout="tabular"
+    columnClasses="col1,col2,col3,col4"
+    columns="4" >
+
+<f:facet name="header">
+    <h1>#{msg['title.summary.club']}</h1>
+</f:facet>
+      
+
+      <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText
+            id="clubsummary" 
+            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+
+      <h:outputText value="#{msg['course.name']} :"
+            rendered="#{courseC.course.courseName ne null}"/>
+      <h:outputText
+            id="coursesummary"
+            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" 
+            rendered="#{courseC.course.courseName ne null}"/>
+
+      <h:outputText value="#{msg['club.zoneid']} :"   />
+	<h:outputText
+            id="clubszoneId" 
+            value="#{courseC.club.address.zoneId}" />
+        
+        <h:outputText value="#{msg['address.city']} :"   />
+	<h:outputText
+            id="clubsCity" 
+            value="#{courseC.club.address.city} - #{courseC.club.address.country.code}" />  
+       
+        <h:outputText value="#{msg['club.id']} :"   />
+	<h:outputText
+            id="clubId" 
+            value="#{courseC.club.idclub}" />
+        
+      <h:outputText value="#{msg['tee.id']} :" 
+                    rendered="#{courseC.tee.idtee != null}"/>
+      <h:outputText
+            id="teesummary"
+            value="(#{courseC.tee.idtee}) S=#{courseC.tee.teeGender} ,START=#{courseC.tee.teeStart} ,HP=#{courseC.tee.teeHolesPlayed} ,MT=#{courseC.tee.teeMasterTee} 
+                    ,DT=#{courseC.tee.teeDistanceTee} "
+            title="#{msg['title.hole.holenumber']}"
+            rendered="#{courseC.tee.idtee != null}"/>
+                     
+</p:panelGrid>
+<p:divider layout="horizontal" type="solid" />
+</ui:composition>

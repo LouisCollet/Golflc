@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml" >
+ 
+<ui:define name="title">Select Pro Payment </ui:define>
+<ui:define name="content">
+
+<!-- <p:panel style="width: 60%;margin: 0 auto;" >-->
+<h:form id="form_price_pro">
+<ui:include src="include/include_summary_pro.xhtml"/>
+
+<!--
+next line listLessons = get donc sans les () ou on pourrait aussi getListLessons()/>
+-->
+<p:dataTable id="listLessons"
+             value="#{courseC.listLessons}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             style="width: 60%;margin: 0 auto;"
+             >
+<f:facet name="header" >
+    <h2>#{msg['title.payment.lesson']}</h2>
+    
+</f:facet>
+<p:column
+     headerText="#"
+    
+     width="5%"
+     id="colRow">
+             #{row+1}
+</p:column>
+       	<p:column headerText="#{msg['lesson.startdate']}"
+                 
+                  style="width:20%" >
+            <h:outputText value=" #{c.eventStartDate}" >
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+            </h:outputText>
+	</p:column>
+    
+       	<p:column headerText="#{msg['lesson.description']}"
+                  style="width:20%" >
+            #{c.eventDescription}
+	</p:column>
+    
+       	<p:column headerText="#{msg['lesson.title']}"
+                  style="width:20%" >
+            #{c.eventTitle}
+	</p:column>
+    
+       	<p:column headerText="#{msg['lesson.allday']}"
+                  style="width:20%" >
+            #{c.eventAllDay}
+	</p:column>
+
+        <p:column headerText="#{msg['lesson.enddate']}"
+                 
+                  style="width:20%" >
+            <h:outputText  value=" #{c.eventEndDate}" >
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+            </h:outputText>
+	</p:column>
+
+        <p:column headerText="#{msg['lesson.amount']}"
+                 
+                  style="width:20%" >
+            #{c.lessonAmount}
+	</p:column>
+
+            <p:column headerText="#{msg['lesson.cancel']}"
+                    
+                      style="width:20%">
+                <p:commandButton class="ui-button-warning rounded-button"
+                                 value="#{msg['button.delete']} - #{c.eventStartDate}"
+                                 icon="pi pi-trash"
+                                 process="@this"
+                                 style="color:red;font-weight:bold;"
+                                 oncomplete="PF('deleteProductDialog').show()">
+                    <f:setPropertyActionListener value="#{c}"
+                                                 target="#{courseC.selectedLesson}" />
+                </p:commandButton>
+            </p:column>
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['payment.selected']}"
+            id="commandButtonPayment"
+            ajax="false"
+            update="growl-msg"
+            immediate="false"
+            style="float: right;"
+            icon="pi pi-credit-card"
+            action="creditcard.xhtml?faces-redirect=true" >
+        </p:commandButton>
+</f:facet>
+
+</p:dataTable>
+
+    <p:confirmDialog widgetVar="deleteProductDialog"
+                         showEffect="fade"
+                         width="300"
+                         message="Delete the lesson ?" 
+                         header="Confirm"
+                         severity="warn">
+            <p:commandButton value="Yes"
+                             icon="pi pi-check"
+                             actionListener="#{courseC.deleteLesson}"
+                             process="@this"
+                             
+                             oncomplete="PF('deleteProductDialog').hide()" />
+            
+           
+            <p:commandButton value="No"
+                             type="button"
+                             styleClass="ui-button-secondary"
+                             icon="pi pi-times"
+                             onclick="PF('deleteProductDialog').hide()" />
+    </p:confirmDialog>
+    <ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+<!-- </p:panel>-->
+</ui:define>
+</ui:composition>

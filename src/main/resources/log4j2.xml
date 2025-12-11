@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- used with NB 12.0 beta 2
+https://logging.apache.org/log4j/2.x/manual/appenders.html
+-->
+<Configuration status="WARN"
+               name="XMLConfigLC"
+          > 
+ <Properties>
+      <Property name="basePath">C:/log</Property>
+      <Property name="logfileName">C:/log/golflc.log</Property>
+ </Properties>
+ <Appenders> <!--  was true -->
+   <File name="LogFile"
+         fileName="${logfileName}"
+         append="false" 
+         bufferedIO="true"
+         bufferSize="8192"
+         immediateFlush="true"
+        >
+ <PatternLayout
+     charset="UTF-8"
+     header="This is the log4j2 logging file of GolfLC hé àà\n\n"
+     pattern="%sequenceNumber %date{ISO8601} %-6relative  %level{length=6} %class{5} . %method %line : %message %n"
+ >
+ </PatternLayout>
+               <!-- %location= %X{remoteAddress} = %X{ipAddress} -     charset="UTF-8" remotreAddress et remotehost : voir UserIdentificationFilter
+               http://logging.apache.org/log4j/2.x/manual/layouts.html
+                pattern="%d{ISO8601} %-4r %-5p %x %l = %X{remoteAddress} - %m %n"           -->
+   </File>
+   <Console name="STDOUT" target="SYSTEM_OUT">
+       <PatternLayout pattern="%d{ISO8601} %-4r %level{length=5} %C %M %F - %m%n"/>
+   </Console>
+<!--
+<Console name="Console" target="SYSTEM_OUT">
+    <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] 
+      %highlight{%level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green, DEBUG=blue} - %msg%n" />
+</Console>
+-->
+
+
+
+   </Appenders>
+   <Loggers>
+        <Logger name="org.apache.logging.log4j.xml"
+                level="debug">
+        </Logger>
+  <!--                                 /> -->
+        <Root level="debug">
+            <AppenderRef ref="LogFile" level="debug" /> 
+            <AppenderRef ref="STDOUT"  level="debug"/>
+        </Root>
+   </Loggers>
+</Configuration>

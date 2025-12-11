@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Select Round Page </ui:define>
+<ui:define name="content">
+ 
+<h:form id="select_round">
+
+<p:divider layout="horizontal" type="solid" />
+<p:panelGrid
+    id="panelGrid1"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1,col2"
+    style="width:70%" >
+
+<f:facet name="header">
+     <f:facet name="header">
+    <h1>#{msg['message.selectcourse']}
+        <h:outputText
+            id="Rnd"
+            rendered="#{inputSelectRound eq 'INSCRIPTION'}" 
+            value="#{msg['message.for.round']}">
+        </h:outputText>
+        <h:outputText
+            id="tarif"
+            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+            value="#{msg['message.for.tarif']}">
+        </h:outputText>
+        <h:outputText
+            id="tarifMembers"
+            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+            value="#{msg['message.for.tarif.members']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableS"
+            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+            value="#{msg['message.for.unavailable']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableP"
+            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+            value="#{msg['message.for.unavailable']}">
+        </h:outputText>
+        <h:outputText
+            id="Det"
+            rendered="#{inputSelectCourse eq 'ChartRound'}" 
+            value="#{msg['message.for.detail']}">
+        </h:outputText>
+        <h:outputText
+            id="Avg"
+            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+            value="#{msg['message.for.average']}">
+        </h:outputText>
+        </h1>
+        parameter from sessionMap = #{inputSelectRound}
+    
+</f:facet>
+</f:facet>
+
+         <p:outputLabel for="inputRound" value="#{msg['round.id']}" />
+            <h:panelGroup layout="block" id="containerRound">
+                <p:inputNumber
+                       id="inputRound"
+                       styleClass="mystyle"
+                       value="#{courseC.round.idround}"
+                       size="5"
+                       decimalPlaces="0"
+                       emptyValue="0"
+                       style="margin-left:1.5em; margin-right:1.5em;" />
+                <p:commandButton 
+                         id="ButtonRound"
+                         ajax="true"
+                         immediate="true"
+                         value="#{msg['button.round.list']}"
+                         actionListener="#{dialogC.showSelectRound('round')}"
+                         style="float:left;"
+                         icon="pi pi-search" >
+    <!--  dialogReturn gets triggered when the dialog is being closed. by dialogClose in courseC !! essentiel  -->
+                    <p:ajax event="dialogReturn"
+                         update="inputRound,roundName,IdRound" />
+                 </p:commandButton>
+      
+                <h:outputText id="roundName"
+                              value="#{courseC.round.roundName}"
+                              style="font-style:italic"/>
+                <h:outputText id="IdRound"
+                              value=" #{courseC.round.idround}"
+                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
+            </h:panelGroup>
+         
+        <f:facet name="footer">
+         <p:commandButton value="Choix Round"
+                         id="selectButtonRound"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="pi pi-question"
+                         style="width:140px"
+                         action="#{courseC.selectRound()}" > 
+         </p:commandButton>
+             <!--  c enleve entre paranthèses
+              -->
+ </f:facet> 
+         
+         
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

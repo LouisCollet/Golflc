@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <actionName>run</actionName>
+        <preAction>build-with-dependencies</preAction>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
+        </goals>
+        <properties>
+            <exec.args>--enable-preview %classpath --module ${project.groupId}/${mainClass}</exec.args>
+            <exec.executable>java</exec.executable>
+            <Env.MAVEN_OPTS>-Djansi.passthrough=true --enable_preview</Env.MAVEN_OPTS>
+        </properties>
+    </action>
+    <action>
+            <actionName>run.single.main</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
+                
+            </goals>
+            <properties>
+                
+                <exec.executable>java</exec.executable>
+                
+                
+                
+                <Env.JAVA_HOME>C:\Program Files\Java\jdk-24</Env.JAVA_HOME>
+                <Env.MAVEN_OPTS>-Djansi.passthrough=true --enable-preview</Env.MAVEN_OPTS>
+                
+            </properties>
+        </action>
+    <action>
+            <actionName>rebuild</actionName>
+            <preAction>build-with-dependencies</preAction>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+                
+            </goals>
+            <properties>
+                <Env.MAVEN_OPTS>--enable-preview --enable-native-access=ALL-UNNAMED -Djansi.passthrough=false -Xmx1024m -Xms128m -Xss10m</Env.MAVEN_OPTS>
+                
+                <exec.args>-Xmx2048m</exec.args>
+                
+                
+            </properties>
+        </action>
+    <action>
+            <actionName>profile.single.main</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.5.1:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>--enable-preview -classpath %classpath ${packageClassName}</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.classpathScope>${classPathScope}</exec.classpathScope>
+            </properties>
+        </action>
+    <action>
+            <actionName>debug.test.single</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>test-compile</goal>
+                <goal>surefire:test</goal>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.5.1:exec</goal>
+            </goals>
+            <properties>
+                <test>${packageClassName}</test>
+                <forkMode>once</forkMode>
+                <maven.surefire.debug>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
+                <jpda.listen>true</jpda.listen>
+                <exec.args>-Xmx1024m</exec.args>
+                <argLine>--enable-preview</argLine>
+            </properties>
+        </action>
+    <action>
+            <actionName>debug.single.main</actionName>
+            <preAction>build-with-dependencies</preAction>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>--enable-preview -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath ${packageClassName}</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.classpathScope>${classPathScope}</exec.classpathScope>
+                <jpda.listen>true</jpda.listen>
+            </properties>
+        </action>
+    <action>
+            <actionName>test.single</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>test-compile</goal>
+                <goal>surefire:test</goal>
+            </goals>
+            <properties>
+                <test>${packageClassName}</test>
+                <exec.args>-Xmx1024m</exec.args>
+                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
+                <argLine>--enable-preview</argLine>
+            </properties>
+        </action>
+    <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>war</packaging>
+            </packagings>
+            <properties>
+                <exec.args>--enable-preview -Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</exec.args>
+                <jpda.listen>true</jpda.listen>
+                <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
+            </properties>
+        </action>
+        
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>war</packaging>
+            </packagings>
+            <properties>
+                <exec.args>--enable-preview</exec.args>
+                <exec.executable>java</exec.executable>
+                <netbeans.deploy.profilemode>true</netbeans.deploy.profilemode>
+            </properties>
+        </action>
+        
+        <action>
+            <actionName>CUSTOM-CustomActionbyLC</actionName>
+            <displayName>Custom Action by LC</displayName>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath ${packageClassName}</exec.args>
+                <Env.MAVEN_OPTS>--enable-preview</Env.MAVEN_OPTS>
+                
+                <exec.classpathScope>${classPathScope}</exec.classpathScope>
+                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
+            </properties>
+        </action>
+        
+        <action>
+            <actionName>CUSTOM-CustomRunByLC</actionName>
+            <displayName>Custom Run By LC</displayName>
+            <preAction>build-with-dependencies</preAction>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.2:java</goal>
+                
+            </goals>
+            <properties>
+                
+                <Env.MAVEN_OPTS>--enable-preview</Env.MAVEN_OPTS>
+                
+                <exec.executable>java</exec.executable>
+                
+                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
+                
+            </properties>
+        </action>
+        
+        <action>
+            <actionName>CUSTOM-RyderCalculate</actionName>
+            <displayName>RyderCalculate</displayName>
+            <goals>
+                <goal>exec:java</goal>
+                
+                
+            </goals>
+        </action>
+        
+        <action>
+            <actionName>build</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <exec.args>--enable-preview</exec.args>
+            </properties>
+        </action>
+        
+        <action>
+            <actionName>clean</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>clean</goal>
+            </goals>
+            <properties>
+                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
+            </properties>
+        </action>
+        
+        <action>
+            <actionName>test</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>test</goal>
+            </goals>
+            <properties>
+                <argLine>--enable-preview</argLine>
+            </properties>
+        </action>
+        
+        <action>
+            <actionName>profile.test.single</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>process-test-classes</goal>
+                <goal>surefire:test</goal>
+            </goals>
+            <properties>
+                <test>${packageClassName}</test>
+                <forkMode>once</forkMode>
+                <maven.surefire.debug>${exec.vmArgs}</maven.surefire.debug>
+                <exec.vmArgs></exec.vmArgs>
+                <exec.args></exec.args>
+                <argLine>--enable-preview</argLine>
+            </properties>
+        </action>
+</actions>

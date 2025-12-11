@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:of="omnifaces"
+      xmlns:p="primefaces">
+
+    <h:form id="form_footer"  >
+ <div class="header-footer">
+<!-- voir la description de la classe header-footer dans /css/Styles2022.css"http://omnifaces.org/ui" xmlns:of="omnifaces"  xmlns:o="omnifaces"
+ -->
+
+<b>View : </b> #{view.viewId} 
+<h:outputText style="margin-left:20px;" escape="false" value="#{utilsC.ViewModificationDate()}"></h:outputText>
+<h:outputText style="margin-left:1.5em;margin-right:2.5rem;" escape="false" value="#{infoC.DeployVersion()}"></h:outputText>
+<h:outputText style="font-weight:bold;margin-left:1.5rem;" value="Copyright &#169;2012-#{of:formatDate(now, 'yyyy')}" escape="false" />
+<b><h:outputText style="font-weight:bold;margin-left:1.5rem;" value="Application:"/> </b>
+         #{infoC.getApplicationVersion()}
+<b><h:outputText style="margin-left:1.5rem;" value = "Browser:" /></b>
+         #{header['user-agent']}"
+<b><h:outputText style="margin-left:1.5rem;" value = "Server Info:" /></b>
+         #{faces.serverInfo}
+<b><h:outputText style="font-weight:bold;margin-left:1.5rem;" value="Primefaces Version:" /></b>
+         #{infoC.primefacesVersion}
+
+<!-- Encodage Html Entité Décimal 	&#169; | © context path = #{request.contextPath}
+port = #{request.localPort}
+name = #{request.localName} -->
+base url = #{faces.requestBaseURL}
+#{faces.requestURLWithQueryString}
+
+ </div>
+ </h:form>
+</ui:composition>

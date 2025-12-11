@@ -1,0 +1,287 @@
+@charset "UTF-8";
+/* https://www.w3schools.com/css/default.asp */
+
+
+/*  The universal selector (*) selects all HTML elements on the page.  
+https://www.w3schools.com/css/css_rwd_grid.asp*/
+* {
+     box-sizing: border-box;
+}
+/*  HTML element new 20-06-2023
+https://refine.dev/blog/rem-vs-em/#what-is-css-rem*/
+/* Root font-size on the document level 
+Do note that it is often considered a bad idea to explicitly set the root font-size to a px value.
+This is because it overrides the user’s browser setting.
+A recommended method is to use % unit or avoid setting the root font-size explicitly.
+This sets the font-size to 100% of the browser’s default font-size, which is 16px for most browsers.*/
+html{
+    font-size: 100%;
+ }
+
+
+body {
+    font-size: 1.1rem;
+    color: black;
+    font-family: Verdana, sans-serif;
+}
+
+/* The element selector selects HTML elements based on the element name.  */
+/*  HTML element déplacé 17-04-2022 */
+h1{
+    font-size: 2.0rem;   /* 40px/16=2.5em */
+    color: green;
+    font-weight: bold;
+    font-family: Georgia, sans-serif;
+    text-align: center;
+}
+h2{
+    font-size: 1.5rem;   /* 40px/16=2.5em */
+    color: blue;
+    font-weight: bold;
+    font-family: Georgia, serif;
+}
+h3{
+    font-size: 1.5rem;   /* 40px/16=2.5em */
+    color: red;
+    font-weight: bold;
+    font-family: Georgia, serif;
+}
+h4{
+    font-size: 0.5rem;   /* 40px/16=2.5em */
+    color: yellow;
+    font-weight: bold;
+    font-family: Georgia, serif;
+}
+th, td {
+  padding: 15px;
+}
+table{
+   margin-left: auto;
+   margin-right: auto; /* center the table */
+   border-collapse:collapse;  /* table borders should be collapsed into a single border:  */
+   border: 1px;
+   background-color: springgreen;
+}
+/*  To select an element with a specific id, write a hash (#) character, followed by the id of the element. */
+/* To select elements with a specific class, write a period (.) character, followed by the class name.  */
+
+/* dans selectPlayer.xhtml and show_scorecard_whs.xhtml*/
+.highlight {
+    background-color: skyblue !important;
+    background-image: none !important;
+    color: #ffffff !important;
+}
+
+
+/*https://dzone.com/articles/how-customize-growl-primefaces
+ message positionné à gauche (default = droite)  left: 37%;   */
+.ui-growl {
+    left: 5%;
+    position:fixed;
+    top: 5%;
+}
+.ui-growl-title {
+    font: "Lucida Console", Monaco, monospace;
+    font-size: 1.5em;
+    text-align: center;
+    overflow-wrap: break-word;
+}
+.ui-growl-message p {
+    font: "Lucida Console", Monaco, monospace;
+    font-size: 1.0em;
+    letter-spacing: -1px;
+}
+/*https://searchcode.com/codesearch/view/2686073/*/
+.ui-messages-info-summary, .ui-messages-warn-summary, .ui-messages-error-summary, .ui-messages-fatal-summary{
+    text-align:left;
+    font-family: Verdana;
+    font-size: 1.0em;
+    font-weight: normal;
+    font-style: italic;
+    margin: 0;
+    padding: 0;
+}
+/*   gouping selector */*
+.ui-messages-info,.ui-messages-warn,.ui-messages-error{
+        text-align:left;
+        min-height: 20px;
+        border-style: solid;
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
+        border-left-width: 5px;
+            }
+.ui-messages-fatal{
+    border-style: solid;
+    margin: 1px;
+    padding: 5px 0px 5px 0px;
+    background-color: black ;
+    font-size: 2rem;   /* 40px/16=2.5em */
+    color: red; 
+    font-weight: bold;
+    font-style: italic;
+    font-family: serif;
+    border-color: yellow;
+    border : 3px;
+}
+/*  17-04-2022 footer et help overlay  */
+
+.header-footer {
+  font-size:13px;
+  color:graytext; /* mod 25-11-2025  */
+  border: 1px solid #333;
+  box-shadow: 8px 8px 5px #444;
+  padding: 8px 12px;
+  background-image: linear-gradient(180deg, #fff, #ddd 40%, #ccc);
+}
+
+/* The grouping selector selects all the HTML elements with the same style definitions.
+It will be better to group the selectors, to minimize the code.
+To group selectors, separate each selector with a comma.
+dans html = columnClasses="col1,col2"
+fonctionne pour layout="tabular"
+*/
+/* mod 19-10-2023 compatibilité arya 
+mod 10-12-2024 pour compatibilité PF15*/
+td.ui-panelgrid-cell.col1, td.ui-panelgrid-cell.col3{
+    font-style:normal;
+    font-weight: bold;
+    color:dodgerblue;
+    background-color:yellow; /* !important */
+}
+td.ui-panelgrid-cell.col2, td.ui-panelgrid-cell.col4{
+    font-style: italic;
+    font-weight: normal;
+    color:gray;
+    background-color:whitesmoke; /*  */
+}
+td.ui-panelgrid-cell.col1Flex{
+    font-style:normal;
+    font-weight: bold;
+    color: dodgerblue;
+    background-color:yellowgreen
+}
+td.ui-panelgrid-cell.col2Flex{
+    font-style: italic;
+    background-color:darkolivegreen;
+    font-weight: normal;
+    color:gray;
+}
+
+ui.fieldset.legend{  /* non !inscription_other_players.xhtml  */
+    font-style:normal;
+    font-weight: bold;
+    color: blue !important;
+    background-color:greenyellow !important;
+}
+
+
+/*  background color texte menu */
+span.ui-menuitem-text {   
+  /*  background-color: red; */
+}
+
+/*  background color texte menu */
+.ui-menuitem-text{
+    background-color:green;
+    color:yellow;/* was white  */
+}
+.ui-panelmenu-header{
+    color:yellow;
+}
+
+/* 17-04-2022 used by schedule_pro.xhtml  */
+.ui-custompanelgrid, .ui-custompanelgrid td {
+   font-weight:bold;
+   background-color:whitesmoke;
+   font-size: 1.25em;
+ 
+   /*  22-12-2022 ne fonctionne pas   border : 3px;*/
+}
+
+/* pour le menu principal  */
+.ui-menuitem-link{
+     font-size: 0.9rem;
+     font-style: italic;
+}
+
+/* pour le menu principal ??*/
+.ui-menuitem-text{
+     font-size: 0.8rem;
+     font-style: italic;
+     color:whitesmoke
+}
+.columnborder1{
+    border-right-width:5px;color:red
+}
+/*  22-12-2022 ne fonctionne pas */
+.flag {
+	background: url("\#{resource['styles:flags/flags_responsive.png']}") no-repeat;
+	background-size: 100%;
+	vertical-align: middle;
+}
+/*  02-01-2023  */
+.ui-datatable-empty-message {
+   font-size: 1.5rem;
+   font-weight: bold;
+   color: red; 
+   font-style: italic;
+}
+/* 
+("\#{resource['styles/flags/flags_responsive.png']}")
+/*  12-06-2023  */
+.outputLabel{
+    color:skyblue;
+}
+
+/* new 20-06-2023 centrer et size ALL panelgrids !!  */
+.ui-panelgrid{
+    margin: 0 auto;
+    width: 50%;
+    background-color:gray ; /* was whitesmoke  */
+}
+/* new 22-06-2023 PF 13 panelgrid avec layout="flex" change la couleur !!  */
+.ui-panelgrid-cell{
+    border:1px;
+    color:black /*  new 11-12-2024 */
+}   
+
+/* 21-10-2023 schedule_pro.xhtml 
+removed 15-12-2024 fin enlevé */
+
+.fc-timegrid-slot {
+    height: 40px; 
+}
+
+.fc-timegrid-slot-label {
+    height: 30px; 
+    color:black; 
+}
+
+.fc-timegrid-axis-cushion {
+    height: 100px; 
+    color:blue; 
+    font-size: 1rem;
+}
+
+/* 24-10-2023 datepicker  */
+.ui-datepicker-calendar{
+    background-color:activeborder;
+    color:black;
+    font-weight: bold;
+}
+
+/*https://www.w3schools.com/css/css_table.asp 
+By default, the content of <th> elements are center-aligned and the content of <td> elements are left-aligned.
+By default, the vertical alignment of the content in a table is middle (for both <th> and <td> elements)*/
+
+/* s'applique d'office à tous les panelgrid */
+.ui-panelgrid-cell th{
+    background-color:yellow !important;
+    font-weight: bold;
+    border: none;
+}
+
+.ui-panelgrid tr{
+    border: none;
+}

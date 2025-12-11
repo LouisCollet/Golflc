@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Club Page </ui:define>
+
+<ui:define name="content">
+<h:graphicImage library="images" name="golf_club.jpg" alt="image missing :golf_club.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage library="images" name="golf_club.jpg" alt="image missing :golf_club.jpg" style="float: right;"></h:graphicImage>
+
+  <h:outputStylesheet library="styles" name="flags/flags.css" />  
+
+<h:form id="form_club"
+        style="border:solid 3px" >
+
+ <p:focus for="ClubName" />
+
+<p:panelGrid id="panel"
+             columns="2"
+             style="width:70%"
+             layout="tabular"
+             columnClasses="col1, col2" >
+<f:facet name="header">
+    <h1>#{msg['club.data']} #{request.getParameter('operation')}</h1>
+</f:facet>
+                <p:outputLabel for="@next" value="#{msg['club.name']} :" />
+		<p:inputText  id="ClubName"
+                              label="clubname"
+                              size="45"
+                              immediate="true"
+                              valueChangeListener="#{courseC.club.nameListener}"
+                              title="#{msg['tooltip.club.clubname']}"
+			      value="#{courseC.club.clubName}" />
+<!-- 02/07/2014 ajouté valuechangelistner et onchange (vont ensemble onclick="printHiddenValue();
+The immediate attribute is set to true, causing the ValueChangeEvent to fire in the Apply Request Values phase
+instead of in the Process Validations phase. 
+This means that we can handle the event without causing any validation error messages to be displayed.
+The onchange attribute contains JavaScript that submits the form the checkbox belongs to when its value is changed,
+so that the user doesn't have to click on any button for the change to take effect.
+                              onchange="submit()"
+                              immediate="false"
+-->
+                <p:outputLabel for="@next" value="#{msg['address.street']} :" />
+                <p:inputText  label="adress"
+                              id="ClubAddress"
+                              value="#{courseC.club.address.street}"
+                              title="#{msg['tooltip.club.clubaddress']}"
+                              size="45" 
+                              immediate="true"
+                              valueChangeListener="#{courseC.club.addressListener}" />
+
+                <p:outputLabel for="@next" value="#{msg['address.city']}"  />
+                <p:inputText  label="city"
+                              id="ClubCity"
+                              value="#{courseC.club.address.city}"
+                              title="#{msg['tooltip.club.clubcity']}"
+                              size="45" 
+                              immediate="true"
+                              valueChangeListener="#{courseC.club.cityListener}" />
+    <!--              
+        voir fichier Country flags.docx pour explications value="#{courseC.club.clubCountry}"
+    enlevé 21-02-2024 inutile ? valueChangeListener="#{courseC.club.countryListener}"
+    15-10-2024 
+   value="#{courseC.club.address.country.name}" was value="#{courseC.club.address.country.code}" -->
+   <p:outputLabel value="#{msg['address.country.code']}" />
+                <p:autoComplete id="ClubCountry"
+                                label="CountryLabel"
+                                value="#{courseC.club.address.country.name}"
+                                completeMethod="#{courseC.completeCountry}"
+                                required="true"
+                                var="country"
+                                itemLabel="#{country}" 
+                                itemValue="#{country.code}"
+                                forceSelection="false"
+                                dropdown="true"
+                                dropdownMode="current"
+                                scrollHeight="150"
+                                showEmptyMessage="false"
+                                title="#{msg['tooltip.club.clubcountry']}" >
+                    <p:column>
+                        <span class="flag flag-#{country.code}"
+                              style="width: 30px; height: 20px"/>
+                        <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                      value="#{country.name} - #{country.code} - #{country.locale}" />
+                    </p:column>
+          <!--  new on 24.02.2024  new 24-06-2025 :showEmptyMessage="false"-->
+                    <p:ajax event="itemSelect"
+                            listener="#{courseC.onCountrySelect}"
+                            update="growl-msg"/>
+                </p:autoComplete>
+                
+                <p:outputLabel for="ClubWebsite" value="#{msg['club.web']} :"   />
+                   <h:panelGroup>
+                      <p:inputText  label="web"
+                        id="ClubWebsite"
+                        value="#{courseC.club.clubWebsite}"
+                        title="#{msg['tooltip.club.clubwebsite']}"
+                        size="45"
+                        immediate="true"
+                        valueChangeListener="#{courseC.club.websiteListener}" />
+                      <p:commandButton 
+                         value="#{msg['button.club.testwebsite']}"
+                         id="ButtonClubWebsite"
+                         ajax="false"
+                         immediate="true"
+                         style="margin-left:1.5em;"
+                         icon="pi pi-external-link"
+                         iconPos="right"
+                         action="#{courseC.findClubWebsite()}"
+                         update="growl-msg"  />
+                    </h:panelGroup>
+  
+      <h:outputText value="#{msg['club.coordinates']} :" /> 
+                 <p:commandButton 
+                         value="#{msg['button.club.findlatlng']}"
+                         action="#{courseC.findClubCoordinates()}"
+                         id="ButtonGPSCoordinates"
+                         update="panelGridCoordinates:ClubLatitude,ClubLongitude,growl-msg"
+                         ajax="false"
+                         immediate="true"
+                         style="margin-right: 10px;"
+                         icon="pi pi-search"
+                         title="Find Latitute Longitude" /> 
+
+   <h:outputText value="#{msg['player.zoneid']}" 
+                 rendered="#{courseC.club.address.zoneId ne null}"/>    
+   <h:outputText id="ClubZoneId"
+                 style="margin-right: 20px;"
+                 value="#{courseC.club.address.zoneId}"
+                 rendered="#{courseC.club.showCoordinatesManual eq true}"/>
+   <!--
+   <h:outputText value="#{msg['player.latlng']}"
+                 rendered="#{courseC.club.showCoordinatesManual eq true}"/>
+   <h:outputText id="ClubLatLng"
+                 value="#{courseC.club.address.latLng.lat}, #{courseC.club.address.latLng.lng}"
+                 rendered="#{courseC.club.showCoordinatesManual eq true}"/> 
+-->
+<!-- value="#{courseC.club.clubLatitude}, #{courseC.club.clubLongitude}"/> 
+https://github.com/primefaces/primefaces/issues/8238  -->
+
+ <h:outputText value="#{msg['club.coordinates.manual']} :"
+               rendered="#{courseC.club.showCoordinatesManual eq true}"/> 
+<p:panelGrid id="panelGridCoordinates"
+             columns="2" 
+             layout="flex"
+             columnClasses="col1Flex, col2Flex"
+             rendered="#{courseC.club.showCoordinatesManual eq true}">
+                <p:outputLabel for="@next" value="#{msg['club.latitude']} :"/>
+                <p:inputNumber  label="latitude"
+                       id="ClubLatitude"
+                       value="#{courseC.club.address.latLng.lat}"
+                       size="10"
+                       lang="#{languageC.locale}"
+                       minValue="-90.000000" 
+                       maxValue="+90.000000"
+                       decimalSeparator="."
+                       decimalPlaces="6"
+                       title="#{msg['tooltip.club.clublatitude']}"
+                       placeholder="99.999999"  >
+                </p:inputNumber>
+                <p:outputLabel for="@next" value="#{msg['club.longitude']} :"   />
+                <p:inputNumber
+                        label="longitude"
+			id="ClubLongitude"
+                        value="#{courseC.club.address.latLng.lng}" 
+			minValue="-180.000000" 
+			maxValue="+180.000000"
+                        decimalSeparator="."
+                        decimalPlaces="6"
+                        size="10"
+                        title="#{msg['tooltip.club.clublongitude']}"
+                        lang="#{languageC.locale}"
+                        placeholder="999.999999"  >
+                </p:inputNumber>
+</p:panelGrid>
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['club.create']}"
+                         id="ButtonCreateClub"
+                         update="growl-msg ClubLatitude ClubLongitude"
+                         ajax="false"
+                         rendered="#{courseC.club.createModify eq true and courseC.course.nextCourse eq false}"
+                         immediate="false"
+                         icon="pi pi-database"
+                         style="width:140px"
+                         pt:data-tooltip="Update components"
+                         action="#{courseC.createClub}"  />
+        <p:commandButton value="#{msg['button.club.modify']}"
+                         id="cb3"
+                         update="growl-msg"
+                         ajax="false"
+                         rendered="#{courseC.club.createModify eq false}"
+                         immediate="false"
+                         icon="pi pi-database"
+                         style="width:140px"
+                         action="#{courseC.modifyClub()}" />
+         <p:commandButton
+                          value="#{msg['club.next']}"
+                          id="cb2"
+                          ajax="false"
+                          rendered="#{courseC.course.nextCourse eq true}"
+                          update="growl-msg"
+                          immediate="true"
+                          style="float: right;"
+                          action="course.xhtml?faces-redirect=true" />
+</f:facet>
+</p:panelGrid>
+ 
+  <h:outputText id="ClubId"
+                value="#{courseC.club.idclub}" />
+ 
+</h:form>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:h="jakarta.faces.html"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="head" />
+<ui:define name="title">Player Page </ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/subscribe1.jpg" alt="image missing :subscribe1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/subscribe2.jpg" alt="image missing :subscribe2.jpg" style="float: right;"></h:graphicImage>
+
+<h:form id="subscription" >
+<ui:include src="include/include_subscription.xhtml"/>
+
+<p:panelGrid 
+    id="panelsub1" 
+    columns="2"
+    layout="tabular"
+    columnClasses="col1, col2">
+
+<f:facet name="header" >
+    <h1>#{msg['subscription.new']}</h1>
+</f:facet>
+    <h:outputText value="#{msg['subscription.new']}" />
+    <p:selectOneButton id="subscr5"
+              value="#{courseC.subscription.subCode}"
+              rendered="#{courseC.subscription.trialCount le 5 
+                       or courseC.subscription.trialCount eq null}" >
+        <f:selectItem itemLabel="#{msg['subscription.trial']}" itemValue="TRIAL">   </f:selectItem>
+        <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
+        <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
+     </p:selectOneButton>
+                
+    <p:selectOneButton id="subscr6"
+              value="#{courseC.subscription.subCode}"
+              rendered="#{courseC.subscription.trialCount gt 5}" >
+         <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
+         <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
+    </p:selectOneButton>
+                
+<f:facet name="footer">
+    <p:commandButton
+         value="#{msg['button.subscription.create']}"
+         id="button01"
+         ajax="false"
+         update="growl-msg"
+         immediate="false"
+         icon="pi pi-database"
+         action="#{courseC.manageSubscription()}" />
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

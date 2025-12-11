@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+>
+<p:panelGrid
+    id="panelgridSummaryCompetition"
+    layout="tabular"
+    columnClasses="col1,col2,col3,col4"
+    columns="4" >
+
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.summary.competition']}" />
+</f:facet>
+      <h:outputText value="#{msg['competition.date']} :" />
+      <h:outputText
+            id="competitiondatesummary" 
+            value="#{courseC.competition.competitionDescription.competitionDate}"
+            >
+          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+      </h:outputText>
+      
+      <h:outputText value="#{msg['competition.name']} :" />
+      <h:outputText
+            id="idroundsummary" 
+            value="#{courseC.competition.competitionDescription.competitionName} (#{courseC.competition.competitionDescription.competitionId})"
+            /> 
+
+      <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText
+            id="clubsummary" 
+            value="#{courseC.competition.competitionDescription.competitionClubId} (#{courseC.club.idclub})" />
+
+      <h:outputText value="#{msg['course.name']} :" />
+      <h:outputText
+            id="coursesummary" 
+            value="#{courseC.competition.competitionDescription.competitionCourseIdName} - #{courseC.tee.teeHolesPlayed}" />
+
+     <h:outputText value="#{msg['competition.end.inscription']} :" />
+      <h:outputText
+            id="competitionenddatesummary" 
+            value="#{courseC.competition.competitionDescription.endInscriptionDate}"
+            >
+          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+      </h:outputText>
+      
+      <h:outputText value="#{msg['round.game']} :" />
+      <h:outputText
+            id="roundgamesummary" 
+            value="#{courseC.competition.competitionDescription.competitionGame}"
+            />
+<!--
+      <h:outputText value="#{msg['competition.flight']} :" />
+      <h:outputText
+            id="roundgcompetitionummary" 
+            value="#{courseC.competition.competitionData.cmpDataFlightNumber}"
+            />
+
+      <h:outputText value="#{msg['round.players']} :" />
+      <h:outputText
+                      id="roundPlayers" 
+                      value="#{courseC.competition.competitionDescription.flightNumberPlayers} = #{courseC.round.playersString}" />
+-->
+            <h:outputText value="#{msg['player.selected']} :"
+                     rendered="#{courseC.player.getDroppedPlayers().size() gt 0}">
+            </h:outputText>
+            <h:panelGroup id="panelGroupIncludeSummary"
+                    rendered="#{courseC.player.getDroppedPlayers().size() gt 0}" >
+                <h:outputText
+                 id="selectedPlayersSummarySize" 
+                 value="#{courseC.player.getDroppedPlayers().size()} = "/>
+                <h:outputText>
+                    <ui:repeat value="#{courseC.player.getDroppedPlayers()}"
+                               var="p">
+                        <h:outputText
+                             value="#{p.playerLastName} (#{p.idplayer}),">
+                        </h:outputText>
+                    </ui:repeat>
+                </h:outputText>
+            </h:panelGroup>
+
+         <h:outputText value="#{msg['competition.gender']}"/>
+         <h:outputText value="#{courseC.competition.competitionDescription.competitionGender}"/>
+
+         <h:outputText value="#{msg['competition.qualifying']}"/>
+         <h:outputText value="#{courseC.competition.competitionDescription.competitionQualifying}"/>
+
+         <h:outputText value="#{msg['competition.status']}"/>
+         <h:outputText value="#{courseC.competition.competitionDescription.competitionStatus}"/>
+<!--
+         <h:outputText value="#{msg['competition.series']}"/>
+         <h:outputText value="#{courseC.competition.competitionDescription.seriesHandicap}"/>
+  -->       
+         <h:outputText value="#{msg['competition.maxplayers']}"/>
+         <h:outputText value="#{courseC.competition.competitionDescription.competitionMaximumPlayers}"/>
+         
+</p:panelGrid>
+<p:divider layout="horizontal" type="solid" />
+<!-- https://stackoverflow.com/questions/21697024/cforeach-inside-primefacese-g-ppanelgrid-inside-uirepeat  
+https://stackoverflow.com/questions/3342984/jstl-in-jsf2-facelets-makes-sense/
+-->
+</ui:composition>

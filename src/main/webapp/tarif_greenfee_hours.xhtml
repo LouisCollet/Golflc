@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml" >
+<ui:define name="title">Tarif Page for Hours </ui:define>
+<ui:define name="content">
+<h:graphicImage  name="images/hours1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage  name="images/hours2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="tarifGreenfeeHours" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_greenfee.xhtml"/>
+
+<!-- <p:focus for="starttime" /> -->
+<p:panelGrid
+    id="panel1"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+      <h:outputText escape="false" value="#{msg['title.hours.tarif']} HOURS" />
+</f:facet>
+     <h:panelGroup id="panelPrice" layout="block" >    
+     <h:outputText value="#{msg['tarif.season']} " />
+     <i class="pi pi-cloud" ></i>
+     <i class="pi pi-sun"   ></i>
+     #{courseC.tarifGreenfee.teeTimesList.size()}
+    </h:panelGroup>
+
+     <p:selectOneButton id="Season_High-Medium-Low"
+                          required="true"
+                          value="#{courseC.tarifGreenfee.workSeason}" >
+            <f:selectItem itemLabel="#{msg['tarif.all']}"     itemValue="A" />
+            <f:selectItem itemLabel="#{msg['tarif.high']}"   itemValue="H" />
+            <f:selectItem itemLabel="#{msg['tarif.medium']}" itemValue="M" />
+            <f:selectItem itemLabel="#{msg['tarif.low']}"    itemValue="L" />
+       </p:selectOneButton>
+     
+       <h:outputText  value="#{msg['tarif.item']}" />
+       <p:inputText   id="category"
+                        size="20"
+                        required="false"
+                        title="#{msg['tooltip.tarif.item']}"
+	                value="#{courseC.tarifGreenfee.workItem}"
+                        placeholder="Enter item " />
+       
+       <h:panelGroup id="panelGroupComment" layout="block" >       
+          <h:outputText  value="#{msg['tarif.hours.start']} :"/>
+          <i class="pi pi-clock"></i>
+       </h:panelGroup>
+       <p:datePicker id="starttime"
+                         value="#{courseC.tarifGreenfee.startHour}"
+                         timeOnly="true"
+                         pattern="HH:mm"
+                         label="Tarif tranche horaire : startHour"
+                         lang="#{languageC.locale}"
+                         locale="#{languageC.locale}"
+                         showIcon="true"
+                         size="6"
+                         required="false"
+                         mindate="#{utilsC.localTime(07,30)}"
+                         maxdate="#{utilsC.localTime(20,45)}" >
+        </p:datePicker>
+
+         <h:outputText  value="#{msg['tarif.hours.end']} :"/>
+         <p:datePicker id="endtime"
+                        value="#{courseC.tarifGreenfee.endHour}"
+                        timeOnly="true"
+                        pattern="HH:mm"
+                        label="Tarif tranche horaire : endHour"
+                        lang="#{languageC.locale}"
+                        locale="#{languageC.locale}"
+                        showIcon="true"
+                        size="6"
+                        required="false"
+                        mindate="#{utilsC.localTime(07,30)}"
+                        maxdate="#{utilsC.localTime(20,45)}" >  
+         </p:datePicker>
+       <h:outputText  value="#{msg['tarif.members.price']} :"/>
+       <p:inputNumber  id="price"
+                       value="#{courseC.tarifGreenfee.workPrice}"
+                       title="#{msg['tooltip.tarif.price3']}"
+                       size="6"
+                  
+                       lang="#{languageC.locale}"
+                       decimalPlaces="1"
+                       decimalSeparator="."
+                       placeholder="999.9" 
+                       maxValue="300">
+       </p:inputNumber>
+<!-- new 27-05-2022    --> 
+        <h:outputText  value="#{msg['tarif.twilight']} :"/>
+        <p:selectOneButton id="ChoiceTwilight"
+                          required="true"
+                          value="#{courseC.tarifGreenfee.workTwilight}" >
+            <f:selectItem itemLabel="No"  itemValue="N" />
+            <f:selectItem itemLabel="#{msg['tarif.twilight']}" itemValue="Y" />
+            <f:selectItem itemLabel="Previous"  itemValue="P"/>
+        </p:selectOneButton>
+        
+<f:facet name="footer">
+        <p:commandButton value="#{msg['tarif.hours.create']}"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.inputTarifGreenfee('HO')}"/>
+         <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         style="float: right;"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-undo"
+                         action="tarif_greenfee_menu.xhtml?faces-redirect=true" />
+</f:facet>
+
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

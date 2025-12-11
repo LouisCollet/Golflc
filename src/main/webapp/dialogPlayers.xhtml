@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/dialogTemplate.xhtml">
+<ui:define name="title">Dialog Players Page </ui:define>
+<ui:define name="content">
+    <c:set var="select" value="#{param.param_player}"/>
+
+<h:form id="form_select_player">
+<p:dataTable id="rounds"
+             value="#{courseC.listPlayers()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             
+            >
+<!--   rowKey="#{c.player.idplayer}" 
+filteredValue="#{courseC.filteredPlayers} -->
+    
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['message.playerslist']}(for = #{param.param_player})" />
+</f:facet>
+
+    <p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="rrow">
+             #{row+1}
+       <!-- ne fonctionne pas select dans action -->      
+</p:column>
+	<p:column headerText="#{msg['player.selected']}"
+                  footerText="#{msg['player.selected']}"
+                  style="width:20%" >
+            <p:commandButton
+                id="selectButton"
+                value="#{c.player.idplayer} - #{msg['button.select']}"
+                action="#{courseC.selectDialogPlayer(c)}"
+                ajax="true"
+                icon="pi pi-arrow-left">
+             </p:commandButton>
+
+<!--   onclick="PrimeFaces.error('This is an error message not ryder.')"  <f:setPropertyActionListener target="#{ryderC.selectDialogPlayer}" value="#{c.player}" 
+            <p:commandButton action="#{ryder.editAction()}">
+	         <f:param name="action" value="delete" />
+            </p:commandButton>
+           --> 
+	</p:column>
+
+	<p:column toggleable="false"
+                  headerText="#{msg['player.first']}"
+                  footerText="#{msg['player.first']}"
+                  style="width:20%" >
+                    <h:outputText value="#{c.player.playerFirstName}" />
+	</p:column>
+
+	<p:column toggleable="false"
+                  headerText="#{msg['player.lastname']}"
+                  footerText="#{msg['player.lastname']}"
+                  style="width:20%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.player.playerLastName}" >
+                  <h:outputText value="#{c.player.playerLastName}" />
+	</p:column>
+
+	<p:column headerText="#{msg['address.country.code']}"
+                  footerText="#{msg['address.country.code']}"
+                  style="width:10%" >
+            <h:outputText value="#{c.player.address.country.code}" />
+	</p:column>
+
+	<p:column headerText="#{msg['player.role']}"
+                  footerText="#{msg['player.role']}"
+                  style="width:10%" >
+            <h:outputText value="#{c.player.playerRole}" /> 
+	</p:column>
+
+        <p:column headerText="#{msg['message.modification']}"
+                  footerText="#{msg['message.modification']}"
+                  style="width:20%" >
+                        <h:outputText value="#{c.player.playerModificationDate}">
+                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+                        </h:outputText>
+        </p:column>
+
+<f:facet name="footer">
+           <h2>#{msg['message.selectplayer']} for #{select}</h2>
+</f:facet>
+</p:dataTable>
+</h:form>
+</ui:define>
+</ui:composition>

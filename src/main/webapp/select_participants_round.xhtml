@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+     
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml" >
+
+<ui:define name="title">Select Participants Round Page </ui:define>
+<ui:define name="content">
+<h:form id="form_select_participants">
+
+<p:dataTable id="player_has_played_round"
+             value="#{courseC.listRecentRounds()}"
+             var="c"
+             emptyMessage="#{msg['message.table.empty']}"
+             rowKey="#{c.round.idround}"
+             >
+<!-- 30-09-2021 PF11 ajouté rowKey  -->
+<f:facet name="header">
+     <h1>#{msg['message.selectround']} #{msg['message.for.participants']}</h1>
+</f:facet>
+
+        <p:column headerText="#{msg['round.selected']}" style="width:100px" >
+            <p:commandButton
+                id="selectButton"
+                action="#{courseC.listParticipantsStablefordRound(c)}"
+                value="#{c.round.idround} - #{msg['button.select']}"
+                icon="pi pi-pencil">
+            </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['round.date']}"
+                  style="width:70px"
+                  id="rdate">
+                  <h:outputText value="#{c.round.roundDate}"
+                                > 
+               <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                  </h:outputText>
+	</p:column>
+<!-- attention : casse de la classe :min et MAF -->
+        <p:column headerText="#{msg['round.players']}"
+                  footerText="#{msg['round.players']}"
+                  style="width:10%"
+                  id="teestart"
+                  >
+                        #{courseC.roundPlayersList().size()}
+        </p:column>
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    style="width:100px"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                  >
+                        #{c.club.clubName}
+	</p:column>
+
+	<p:column id="colcoursename"
+                  headerText="#{msg['course.name']}"
+                  style="width:100px"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  >
+                        #{c.course.courseName}
+	</p:column>
+<!-- width:50% : prend 50% de largeur écran
+ style="width:40%; background-color: blue;"
+-->
+        <p:column headerText="#{msg['round.competition']}"
+                  style="width:100px"
+                  styleClass="red"
+                  id="compet"
+                  >
+                        #{c.round.roundName}
+        </p:column>
+
+<!-- style="width:50px;text-align:right"   -->
+        <p:column headerText="#{msg['round.game']}"
+                  style="width:50px;text-align:right"
+                  id="game"
+                  >
+                        #{c.round.roundGame}
+        </p:column>
+
+<f:facet name="footer">
+
+</f:facet>
+
+</p:dataTable>
+
+</h:form>
+</ui:define>
+</ui:composition>

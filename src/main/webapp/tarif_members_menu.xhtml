@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Tarif Members Menu Page </ui:define>
+<ui:define name="head"> </ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<div class="card">
+<h:form id="tarif_members_menu" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_cotisation.xhtml"/>
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.equipments.tarif']}" />
+</f:facet>
+
+<p:panelMenu id="panel_menu_members"
+             style="width:400px;margin:auto;">
+    <p:submenu label="Input Data Members Tarif" 
+               expanded="true"
+               icon="pi pi-check"
+               style="font-size: 1.5em;" >
+        <p:menuitem value ="Members Tarif Periods = #{courseC.tarifMember.basicList.size()}"
+                     outcome="tarif_members_cotisation.xhtml"
+                     icon="pi pi-calendar" />
+         <!--  rendered="#{courseC.tarifMember.basicList.size() > 0}  -->
+         <p:menuitem value="Members Equipments = #{courseC.tarifMember.equipmentsList.size()}"
+                     icon="pi pi-cog"
+                     outcome="tarif_members_equipments.xhtml" />
+         <!--   rendered="#{courseC.tarifMember.equipmentsList.size() }" -->
+         <p:menuitem value="Members Discount"
+                     icon="pi pi-dollar">
+                <p:outputLabel for="@next"
+                               value="Discount Uncomplete Year"
+                               style="color:blue;width:350px;"/>
+                <p:selectOneMenu id="option"
+                                 style="font-weight:bold;margin-left:1.5em;">
+                                 value="#{courseC.tarifMember.discount}" />
+                    <f:selectItem itemLabel="Select One" itemValue=""/>
+                    <f:selectItem itemLabel="Option1 - Complete Year"    itemValue="Year"/>
+                    <f:selectItem itemLabel="Option2 - Complete Months"  itemValue="Months"/>
+                    <f:selectItem itemLabel="Option3 - Exact days"       itemValue="Days"/>
+                    <f:facet name="footer">
+                        <h:outputText value="3 options possibles"
+                                      style="font-weight:bold;"/>
+                    </f:facet>
+                </p:selectOneMenu>
+        </p:menuitem>
+         
+
+    </p:submenu>
+
+    <p:submenu label="Create Members Tarif "
+               icon="pi pi-check"
+               expanded="true"
+               rendered="#{courseC.tarifMember.basicList.size() gt 0}"
+               style="font-size: 1.5em;" >
+         <p:menuitem  value="#{msg['tarif.print']}"
+                     icon="pi pi-list"
+                     action="#{courseC.showTarifMembers()}"/>
+         <p:menuitem  value="#{msg['tarif.editor']}"
+                     icon="pi pi-comment"
+                     outcome="tarif_members_editor.xhtml" />
+         <p:menuitem value="#{msg['tarif.create']}"
+                     icon="pi pi-database"
+                     action="#{courseC.createTarifMembers}"/>
+    </p:submenu> 
+  
+     <p:submenu label="Delete Member Cotisation Tarif "
+                icon="pi pi-check"
+                style="font-size: 1.0em"  >
+        <p:menuitem value="Delete tarifs in one shot" 
+                     icon="pi pi-trash" >
+             <p:commandButton
+                id="deleteButton"
+                style="color:red"
+                action="#{courseC.deleteTarifMember()}"
+                value="#{msg['button.delete']} #{courseC.club.clubName} (#{courseC.club.idclub})"
+                icon="pi pi-trash" >
+                <p:confirm icon="pi pi-exclamation-triangle" />
+           </p:commandButton>
+        </p:menuitem>
+    </p:submenu>
+  
+  
+</p:panelMenu>
+<ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+ </div>
+</ui:define>
+</ui:composition>

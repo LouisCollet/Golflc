@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Select Recent Rounds Page </ui:define>
+<ui:define name="content">
+ 
+<h:form id="select_inscription_round">
+
+<p:dataTable id="recent_round"
+             value="#{courseC.listInscriptions()}"
+             rowIndexVar="row"
+             resizableColumns="true"
+             var="c"
+             emptyMessage="#{msg['message.table.empty']}"
+             rowKey="#{c.round.idround}"
+             style="border:solid 5px;overflow-x:scroll;"  >
+
+<p:ajax event="rowToggle" 
+        listener="#{courseC.onRowToggleCompetition}" />
+<!-- update=":select_inscription_round:growl-msg"  -->
+<f:facet name="header">
+    <h1>#{msg['message.selectround']} #{msg['message.for.inscription']}</h1>
+</f:facet>
+
+<p:column
+     headerText="#"
+     footerText="#"
+     width="3%"
+     id="rrow">
+             #{row+1}
+</p:column>
+
+<p:column
+    headerText="T"
+    footerText="T"
+    width="4%">
+    <p:rowToggler />
+</p:column>
+
+    	<p:column headerText="#{msg['round.selected']}"
+                  footerText="#{msg['round.selected']}"
+                  width="20%" >
+            <p:commandButton
+                id="selectButton"
+                action="#{courseC.selectRecentInscription(c)}"
+                value="#{c.round.idround} - Round"
+                icon="pi pi-angle-right">
+             </p:commandButton>
+	</p:column>
+
+    	<p:column headerText="Etat du terrain"
+                  footerText="#{msg['round.selected']}"
+                  width="20%" >
+            <p:commandButton
+                id="selectButton2"
+                action="#{courseC.showUnavailablePeriods(c)}"
+                value="#{c.round.idround} - #{msg['button.select']}"
+                icon="pi pi-forward">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['round.date']}"
+                  footerText="#{msg['round.date']}"
+                  width="20%"
+                  id="rdate">
+                  <h:outputText value="#{c.round.roundDate}"> 
+                      <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                  </h:outputText>
+	</p:column>
+
+        <p:column headerText="#{msg['round.name']}"
+                  width="20%"
+                  id="competitionColumn" >
+                        #{c.round.roundName}
+        </p:column>
+<!--
+        <p:column headerText="#{msg['round.holes']}"
+                  width="10%"
+                  id="RoundHoles" >
+            <h:outputText value= "#{c.round.roundHoles} (start = #{c.round.roundStart})"
+                          rendered="#{c.round.roundHoles eq 9}"/>
+            <h:outputText value= "#{c.round.roundHoles}"
+                          rendered="#{c.round.roundHoles eq 18}"/>
+        </p:column>
+-->
+<!-- new 13/11/2017-->
+        <p:column headerText="#{msg['round.canceled']}"
+                  footerText="#{msg['round.canceled']}"
+                  width="18%"
+                  style="color:red"
+                  rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}"
+                  id="cancelround">
+            <p:commandButton
+                id="cancelButton"
+                action="#{courseC.cancelRound(c)}"
+                value="#{msg['button.delete']} - #{c.round.idround}"
+                icon="pi pi-trash"
+                style="color:red" >
+                <p:confirm header="#{msg['message.confirm.delete.round']}"
+                           escape="false"
+                           message="#{msg['message.cancel']}" 
+                           icon="pi pi-exclamation-triangle"  />
+           </p:commandButton>
+	</p:column>
+<!--
+        <p:column headerText="#{msg['round.players']}"
+                  footerText="#{msg['round.players']}"
+                  style="white-space:pre-line;text-align:right"
+                  id="teestart"
+                  width="5%"  >
+                        #{courseC.roundPlayersList().size()}
+        </p:column>
+-->
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    width="25%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}" >
+            #{c.club.clubName} (#{c.club.idclub})
+	</p:column>
+
+	<p:column id="colcoursename"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  width="25%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}" >
+		#{c.course.courseName} (#{c.course.idcourse})
+	</p:column>
+<!--
+        <p:column headerText="#{msg['round.competition']}"
+                  footerText="#{msg['round.competition']}"
+                  style="width:20%"
+                  id="compet"
+                  >
+                        #{c.round.RoundName}
+        </p:column>
+colonne trop large
+        <p:column headerText="#{msg['round.game']}"
+                  footerText="#{msg['round.game']}"
+                  width="10%"
+                  id="game"
+                  >
+                        #{c.round.roundGame}
+        </p:column>
+-->
+<p:rowExpansion>
+            <p:panelGrid id="display"
+                         columns="2"
+                         layout="tabular"
+                         style="width:60%"
+                         columnClasses="col1,col2" >
+
+                <f:facet name="header">
+                    #{msg['inscription.detail']}
+                </f:facet>
+
+                <h:outputText value="Round:" />
+                <h:outputText
+                      id="reround"
+                      value="#{c.round.idround}" />
+
+                <h:outputText value="Game:"/>
+                <h:outputText
+                      id="regame"
+                      value="#{c.round.roundGame}" />
+
+                <h:outputText value="Holes:"/>
+                <h:outputText
+                      id="reholes"
+                      value="#{c.round.roundHoles}" />
+
+                <h:outputText value="Start:"/>
+                <h:outputText
+                      id="restart"
+                      value="#{c.round.roundStart}" />
+                
+                <h:outputText value="Competition:" />
+                <h:outputText
+                      id="recompetition"
+                      value="#{c.round.roundName}" />
+                
+                <h:outputText value="Nombre de joueurs:"/>
+                <h:outputText
+                      id="zonedDate1"
+                      value="#{courseC.roundPlayersList().size()}" />
+
+                <h:outputText value="Qualifying:" />
+                <h:outputText
+                      id="zonedDate2"
+                      value="#{c.round.roundQualifying}" />
+                      
+
+            </p:panelGrid>
+  </p:rowExpansion>
+
+</p:dataTable>
+   <ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+     
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml" >
+<ui:define name="title">Payments Professional</ui:define>
+<ui:define name="content">
+
+<div class="card">
+<h:form id="form_pro_lessons_paid" enctype="application/x-www-form-urlencoded" >
+<h:graphicImage id="graphic1" name="images/golf lesson1.png" alt="image missing :lesson1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage id="graphic2" name="images/golf lesson2.jpg" alt="image missing :lesson2.jpg" style="float: right;"></h:graphicImage>
+
+   <p:dataTable id="TablePro"
+                var="c"
+                widgetVar="proTable"
+                value="#{courseC.listProfessionalPayments()}"
+                filteredValue="#{courseC.filteredCars}"
+                sortBy="#{c.club.idclub}" >
+ <f:facet name="header">
+    <h1>
+        <h:outputText
+            id="Rnd"
+            rendered="#{inputSelectPaiement eq 'Lessons'}" 
+            value="#{msg['message.for.paiement.lesson']}">
+        </h:outputText>
+    </h1>
+ </f:facet>
+       
+      <p:headerRow  field="club.idclub"
+                    expandable="true"
+                    expanded="false" >
+               <p:column colspan="7">
+                   <h:outputText value="#{c.club.clubName}"/>
+                </p:column>
+       </p:headerRow>
+
+            <p:column headerText="#{msg['club.name']}"
+                      groupRow="true" >
+                <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
+            </p:column>
+
+            <p:column headerText="#{msg['player.lastname']}"
+                      field="student.playerLastName"
+                      sortable="false"
+                      filterable="false"/>
+<!-- field if by default = sort -->
+            
+            
+            <p:column id="ProfessionalStartDateColumn"
+                  field="lessonPayment.paymentStartDate"
+                  headerText="#{msg['start.date']}"
+                  filterMatchMode="between"
+                  width="10%">
+                <h:outputText value="#{c.lessonPayment.paymentStartDate}" >
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                </h:outputText>
+                <f:facet name="filter">
+                    <p:datePicker
+                        selectionMode="range"
+                        rangeSeparator=":"
+                        size="20"
+                        onchange="PF('proTable').filter()"
+                        locale="#{languageC.locale}"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        yearNavigator="true"
+                        monthNavigator="true"
+                        yearRange="#{utilsC.dateYear(-2)}:#{utilsC.dateYear(0)}"
+                        readonlyInput="false">
+                         <f:convertDateTime type="localDateTime"/>
+                    </p:datePicker>
+                </f:facet>
+            </p:column>
+
+            <p:column id="ProfessionalEndDateColumn"
+                  field="lessonPayment.paymentEndDate"
+                  headerText="#{msg['end.date']}"
+                  filterMatchMode="between"
+                  width="10%">
+                <h:outputText value="#{c.lessonPayment.paymentEndDate}" >
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                 </h:outputText>
+                <f:facet name="filter">
+                    <p:datePicker 
+                        selectionMode="range"
+                        rangeSeparator=":"
+                        size="20"
+                        onchange="PF('proTable').filter()"
+                        locale="#{languageC.locale}"
+                        lang="#{LanguageC.locale}"
+                        pattern="dd-MM-yyyy"
+                        yearNavigator="true"
+                        monthNavigator="true"
+                        yearRange="#{utilsC.dateYear(-2)}:#{utilsC.dateYear(0)}"
+                        readonlyInput="false">
+                      <f:convertDateTime type="localDateTime"/>
+                    </p:datePicker>
+                </f:facet>
+            </p:column>
+
+            <p:column headerText="#{msg['creditcard.amountpaid']}">
+                <h:outputText value="#{c.lessonPayment.paymentAmount}" />
+            </p:column>
+
+            <p:column headerText="#{msg['cotisation.payment']}">
+                 <h:outputText value="#{c.lessonPayment.paymentDate}" >
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                </h:outputText>
+            </p:column>
+ 
+ 
+            <p:column headerText="#{msg['creditcard.communication']}"
+                      field="lessonPayment.paymentCommunication"
+                      sortable="false"
+                      filterable="false"
+                      />
+        <p:summaryRow>
+                <p:column colspan="3" style="text-align:right">
+                    <h:outputText value="Total Recettes:"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{ProPayment.getListe()
+                              .stream()
+                              .filter(o->o.getClub().getIdclub() == c.club.idclub)
+                              .map(o->o.getLessonPayment().getPaymentAmount())
+                              .sum()}"  >
+                         <f:convertNumber locale="es" type="currency" currencySymbol="€" maxFractionDigits="1"/>
+                <!--       forcer la locale es car fr donne blanc ipv point suite bug java -->
+                    </h:outputText>
+                </p:column>
+                <p:column colspan="4">
+                    <h:outputText value=""/>
+                </p:column> 
+        </p:summaryRow>
+
+ <f:facet name="footer">
+   <p:commandButton icon="pi pi-file-excel"
+                    value="Export as Excel (XLSX)" >
+ <!-- for XLS exporting Apache POI libraries are required in the classpath.   -->
+       <p:dataExporter type="xlsx"
+                       target="TablePro"
+                       fileName="LessonsPaid" />
+   </p:commandButton>
+</f:facet>
+</p:dataTable>
+</h:form>
+  </div>  
+</ui:define>
+</ui:composition>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Stableford Playing Handicap Page </ui:define>
+
+<ui:define name="content">
+
+<h:form id="stableford_playing_hcp" enctype="application/x-www-form-urlencoded" >
+<h:graphicImage id="graphic1" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage id="graphic2" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
+
+<p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+    <h1>#{msg['playinghcp.stableford.title']}</h1>
+
+</f:facet>
+                <h:outputText value="#{msg['handicap.whs']}" />
+                <p:inputNumber  label="ExactHandicap"
+                       id="hcp"
+                       value="#{courseC.playingHcp.handicapPlayerEGA}"
+                       size="4"
+                       decimalPlaces="1"  />
+                <h:outputText value="#{msg['tee.slope']} :" />
+                <p:inputNumber  label="slope"
+                       id="slope"
+                       value="#{courseC.playingHcp.teeSlope}"
+                       title="#{msg['tooltip.tee.teeslope']}"
+                       size="3"
+                       decimalPlaces="0"
+                       minValue="90"
+                       maxValue="138"
+                       placeholder="999"  />
+
+                <h:outputText value="#{msg['tee.rating']} :"/>
+                <p:inputNumber  label="rating"
+                       id="rating"
+                       value="#{courseC.playingHcp.teeRating}"
+                       title="#{msg['tooltip.tee.teerating']}"
+                       size="4"
+                       decimalPlaces="1"
+                       decimalSeparator="."
+                       placeholder="99.9"
+                       minValue="58.0"
+                       maxValue="750" />
+                <h:outputText value="#{msg['course.par']} :"   />
+                
+                <p:selectOneRadio
+                    id="OneMenuPar"
+                    value="#{courseC.playingHcp.coursePar}">
+                    <f:selectItem itemLabel="Par 70" itemValue="70" />
+                    <f:selectItem itemLabel="Par 71" itemValue="71" />
+                    <f:selectItem itemLabel="Par 72" itemValue="72" />
+                    <f:selectItem itemLabel="Par 73" itemValue="73" />
+                </p:selectOneRadio>
+                
+        <h:outputText value="#{msg['round.holes']} *"   />
+        <p:selectOneButton id="holes"
+                value="#{courseC.playingHcp.roundHoles}"
+                styleClass="oneradio" >
+                <f:selectItem itemLabel="Holes 9 " itemValue="9" />
+                <f:selectItem itemLabel="Holes 18" itemValue="18" />
+        </p:selectOneButton>
+                
+        <h:outputText value="#{msg['round.start']} *"   />
+        <p:selectOneButton id="start"
+                value="#{courseC.playingHcp.roundStart}"
+                styleClass="oneradio" >
+                <f:selectItem itemLabel="Start 1 " itemValue="1" />
+                <f:selectItem itemLabel="Start 10" itemValue="10" />
+        </p:selectOneButton>
+                
+                <h:outputText value="#{msg['handicap.playing']}" />
+                <h:outputText value="#{courseC.playingHcp.playingHandicap}"
+                              style="font-size: 3em;" />
+<f:facet name="footer">
+         <p:commandButton 
+                         id="button01"
+                         value="#{msg['button.hcp.calculate']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.simulateHcpStb}"/>
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

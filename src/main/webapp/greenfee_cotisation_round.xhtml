@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="jakarta.faces.core"
+    xmlns:h="jakarta.faces.html"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:p="primefaces"
+    template="templates/masterTemplate.xhtml">
+<ui:define name="title">Choice between greenfee and Annual Cotisation</ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="tarifRound"  >
+<ui:include src="include/include_summary_round.xhtml"/>
+<p:panelGrid
+    id="panel1"
+    layout="tabular"
+    columns="3"
+    columnClasses="col1,col2">
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.cotisation.choice']}" />
+</f:facet>
+<f:facet name="footer">
+         <p:commandButton value="#{msg['greenfee.pay']}"
+                         id="commandButtonGreenfee"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-credit-card"
+                         action="#{courseC.findTarifGreenfee()}" />
+         <p:commandButton value="#{msg['cotisation.member']}"
+                         id="commandButtonCotisation"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-credit-card"
+                         action="#{courseC.findTarifCotisation()}" />
+         <p:commandButton value="retour Welcome screen"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="welcome.xhtml?faces-redirect=true" />
+         
+         
+         
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

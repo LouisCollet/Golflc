@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<!--   -->
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/dialogTemplate.xhtml" > 
+
+<ui:define name="title">Select Dialog Club Page </ui:define>
+<ui:define name="content">
+
+<h:form id="form_select_club" >
+<c:set var="type" value="#{param.type_club}"/>
+type = #{type}
+param.type_club = #{param.type_club}
+<!-- remplacé type par 'type'  -->
+<p:dataTable id="clubs"
+             value="#{courseC.listClubsDialog()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}" >
+<f:facet name="header">
+    <h2>#{msg['message.selectclub']} (for = #{param.type_club})</h2>
+</f:facet>
+inputSelectClub = #{inputSelectClub}
+<p:column 
+     headerText="#"
+     footerText="#"
+     width="5%"
+     id="rrow">
+             #{row+1}
+</p:column>
+	<p:column headerText="#{msg['club.selected']}"
+                  footerText="#{msg['club.selected']}"
+                  width="15%" >
+            <p:commandButton
+                id="ButtonSelectClub"
+                value="#{c.idclub} - #{msg['button.select']}"
+                ajax="true"
+                action="#{courseC.selectedClub(c)}"
+                icon="pi pi-arrow-left">
+             </p:commandButton>
+	</p:column>
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    width="15%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.clubName}" >
+            #{c.clubName}  (#{c.idclub})
+	</p:column>
+
+        <p:column headerText="#{msg['address.city']}"
+                  footerText="#{msg['address.city']}"
+                   width="15%" >
+            #{c.address.city}
+        </p:column>
+
+        <p:column headerText="#{msg['club.country']}"
+                  footerText="#{msg['club.country']}"
+                   width="15%" >
+            #{c.address.country.code}
+        </p:column>
+
+         <p:column headerText="#{msg['club.localAdmin']}"
+                   footerText="#{msg['club.localAdmin']}"
+                   width="15%" >
+            #{c.clubLocalAdmin}
+        </p:column>
+ <!--   
+<f:facet name="footer">
+           <h2>#{msg['message.selectclub']} #{msg['message.for.home']}</h2>
+</f:facet>
+-->
+</p:dataTable>
+</h:form>
+</ui:define>
+</ui:composition>

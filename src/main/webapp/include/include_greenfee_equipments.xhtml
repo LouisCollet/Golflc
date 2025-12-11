@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:f="jakarta.faces.core">
+    
+    <p:dataTable var="item"
+                 value="#{courseC.tarifGreenfee.equipmentsList}"
+                 style="width:40%;text-align: center;margin-left:auto;margin-right:auto;"
+                 emptyMessage="#{msg['message.table.empty']}" >
+        
+       <f:facet name="header">
+          <h:outputText escape="false" value="#{msg['title.equipments.choice']}" />
+      </f:facet>
+        
+        <p:column headerText="#{msg['tarif.members.item']} "
+                  width="12%" >
+                 <h:outputText value="#{item.item}" />
+        </p:column>
+        
+        <p:column headerText="#{msg['tarif.seasons']} "
+                  width="12%" >
+                <h:outputText value="#{item.season}" />
+        </p:column>
+        
+        <p:column headerText="#{msg['tarif.members.price']} "
+                  width="12%"
+                  >
+                 <h:outputText value="#{item.price}" />
+        </p:column>
+        
+        <p:column headerText="#{msg['tarif.members.currency']} " 
+                  width="12%" >
+                 <h:outputText value="#{courseC.tarifGreenfee.currency}" />
+        </p:column>
+        
+        <p:column headerText="#{msg['tarif.members.choice']}"
+                  width="12%"
+                  id="ChoiceEquipment">
+            <p:inputNumber
+                        value="#{item.quantity}"
+			minValue="0"
+                        maxValue="4"
+                        required="true"
+                        size="1"
+                        emptyValue="0"
+                        title="#{msg['tooltip.tarif.choice']}"
+                        decimalPlaces="0" >
+            </p:inputNumber>
+        </p:column>
+        
+        <f:facet name="footer">
+          <p:commandButton value="#{msg['tarif.print']}"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.showTarifGreenfee(courseId)}"/>
+         <p:commandButton value="#{msg['inscription.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         style="float: left;"
+                         icon="pi pi-undo"
+                         action="inscription.xhtml?faces-redirect=true" />
+         <p:commandButton value="#{msg['payment.selected']}"
+                         id="commandButtonPayment"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         style="float: right;"
+                         icon="pi pi-credit-card"
+                         action="#{courseC.manageGreenfee()}" />
+</f:facet>
+    </p:dataTable>
+</ui:composition>

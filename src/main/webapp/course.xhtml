@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml" >
+
+<ui:define name="title">Course Page </ui:define>
+
+<ui:define name="content">
+<h:graphicImage name="images/golf_course.jpg" alt="image missing : golf_course.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/golf_course.jpg" alt="image missing : golf_course.jpg" style="float: right;"></h:graphicImage>
+<!--    <h:body onload="startupSubmit();">  -->
+<h:body>
+<h:head>
+
+</h:head>
+    
+<h:form id="form_course"  >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<p:focus for="CourseName" />
+<p:panelGrid id="panel"
+             columns="2"
+             layout="tabular"
+             columnClasses="col1,col2">
+
+<f:facet name="header">
+    <h1>#{msg['course.data']} #{request.getParameter('operation')}   </h1>
+</f:facet>
+                <p:outputLabel for="@next" value="#{msg['course.name']} :"   />
+                <p:inputText  label="Coursename"
+                       id="CourseName"
+                       title="#{msg['tooltip.course.coursename']}"
+                       value="#{courseC.course.courseName}"
+                       size="45" />
+    <p:outputLabel for="@next"  value="#{msg['course.enddate']} :"/>
+    <p:datePicker value="#{courseC.course.courseEndDate}"
+                  id="picker_endDate"
+                  locale="#{languageC.locale}"
+                  pattern="dd/MM/yyyy"
+                  showTime="true"
+                  showIcon="true"
+                  size="18"
+                  readonlyInput="false"
+                  showButtonBar="true"
+                  yearRange="#{utilsC.dateYear(-1)}:#{utilsC.dateYear(50)}"
+                  yearNavigator="true"
+                  monthNavigator="true" >
+    </p:datePicker>
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.course.create']}"
+                         id="ButtonCreateCourse"
+                         ajax="false"
+                         rendered="#{courseC.course.createModify eq true and courseC.tee.nextTee eq false}"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         style="float:left;"
+                         action="#{courseC.createCourse()}" />
+         <p:commandButton value="#{msg['button.course.modify']}"
+                         id="buttonModify"
+                         ajax="false"
+                         rendered="#{courseC.course.createModify eq false}" 
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         style="float:left;"
+                         action="#{courseC.modifyCourse()}" />
+         <!--    rendered="#{(not courseC.tee.nextTee) and (param.operation eq 'modify') }"  -->
+        <p:commandButton value="#{msg['course.next']}"
+                         id="buttonNext"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         rendered="#{courseC.tee.nextTee}"
+                         icon="pi pi-arrow-right"
+                         style="float:right;"
+                         action="tee.xhtml?faces-redirect=true"/>
+</f:facet>
+</p:panelGrid>
+
+<br/>
+<!--  
+
+modifié 26/08/2014 voir dans UtilsController
+<p:gmap center="#{courseC.club.clubLatitude},#{courseC.club.clubLongitude}"
+        id="circlemap"
+        zoom="15"
+        type="HYBRID"
+        style="width:800px;
+               height:400px;"
+        model="#{courseC.mapModel}"
+        streetView="true">
+
+</p:gmap>  
+-->
+</h:form>
+
+</h:body>
+</ui:define>
+</ui:composition>

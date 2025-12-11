@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml"
+>
+<ui:define name="title">Show Map for testing purposes </ui:define>
+<ui:define name="content">
+<h:form id="show_map">
+<!--  https://colibriwp.com/blog/scrolling-text/ -->       
+<style type="text/css">
+.example1 {
+ height: 50px;  
+ overflow: hidden;
+ position: relative;
+}
+.example1 h3 {
+ font-size: 3em;
+ color: blue;
+ position: absolute;
+ width: 100%;
+ height: 100%;
+ margin: 0;
+ line-height: 50px;
+ text-align: center;
+ /* Starting position */
+ -moz-transform:translateX(100%);
+ -webkit-transform:translateX(100%);  
+ transform:translateX(100%);
+ /* Apply animation to this element */  
+ -moz-animation: example1 15s linear infinite;
+ -webkit-animation: example1 15s linear infinite;
+ animation: example1 15s linear infinite;
+}
+/* Move it (define the animation) */
+@-moz-keyframes example1 {
+ 0%   { -moz-transform: translateX(100%); }
+ 100% { -moz-transform: translateX(-100%); }
+}
+@-webkit-keyframes example1 {
+ 0%   { -webkit-transform: translateX(100%); }
+ 100% { -webkit-transform: translateX(-100%); }
+}
+@keyframes example1 {
+ 0%   { 
+ -moz-transform: translateX(100%); /* Firefox bug fix */
+ -webkit-transform: translateX(100%); /* Firefox bug fix */
+ transform: translateX(100%);     
+ }
+ 100% { 
+ -moz-transform: translateX(-100%); /* Firefox bug fix */
+ -webkit-transform: translateX(-100%); /* Firefox bug fix */
+ transform: translateX(-100%); 
+ }
+}
+
+/* 2e exemple---------------------------- */
+/* Défilement de droite à gauche */
+.marquee-rtl {
+  overflow: hidden; /* important */
+  width:50%; max-width: 30em; /* A ADAPTER */
+}
+.marquee-rtl > div {
+  display: inline-block; /* important */
+  white-space: nowrap; /* important */
+  animation: defilement-rtl 15s infinite linear; /* défilement */
+  cursor: pointer;
+  padding: 10px 2em 10px 100%;
+}
+.marquee-rtl:hover > div {
+  animation-play-state: paused; /* met en pause le défilement */
+}
+.marquee-rtl > div:first-letter {
+  font-weight: 700;
+  color: #F00;
+}
+@keyframes defilement-rtl {
+  0% {
+    -webkit-transform: translate(0);
+    transform: translate(0);
+  }
+  100% {
+    -webkit-transform: translate(-100%);
+    transform: translate(-100%);
+  }
+}
+/* ---------------------------- */
+/* texte sur plusieurs lignes automatiquement */
+.marquee-multi-lignes > div { 
+  width:90%; 
+  white-space: normal; /* important */
+}
+
+/* ---------------------------- */
+/* déco */
+h2, p { text-align:center; }
+
+.marquee-rtl {
+  margin: 2em auto;
+  border: 10px solid #F0F0FF;
+  box-shadow: 0 .25em .5em #CCC,inset 0 0 1em .25em #CCC;
+}
+.marquee-rtl > div {
+  font-size: 1.5em;
+}
+
+
+
+
+</style>
+
+<!-- HTMLThis is the scrolling text --> 
+
+<h:outputText value="#{msg['player.lastname']}"   />
+
+<div class="example1">
+<h3> 
+<h:outputText value="#{msg['player.lastname']}"   />
+<h:outputText value="  /  #{courseC.player.playerLastName} "
+              escape="false"/>
+bold = <b> this is bold louis</b> not bold anymore"
+</h3>
+</div>
+
+<!-- https://codepen.io/jreaux62/pen/vzoJNN 
+<p>Exemple 1 : Le texte à afficher est <b>plus long</b> que la largeur de la fenêtre de défilement.</p> -->
+      <div class="marquee-rtl">
+        <div>Texte défilant horizontalement <b>plus long</b> que la fenêtre de défilement</div>
+      </div>
+
+<div class="marquee-rtl marquee-multi-lignes">
+        <div><img style="float:left; margin:5px 10px 5px 0;"
+                  src="http://openweathermap.org/img/wn/10d@2x.png" />
+        </div>
+</div>
+
+
+</h:form>
+</ui:define>
+</ui:composition>

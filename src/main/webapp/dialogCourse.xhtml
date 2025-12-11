@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/dialogTemplate.xhtml">
+<ui:define name="title">Select Course Page </ui:define>
+<ui:define name="content">
+<h:form id="form_select_course" >
+<!-- parametre = clubid    #{'#{'}exprB}-->
+ <c:set var="clubid" value="#{param.clubId}"/>
+ param clubid = #{clubid}
+<p:dataTable id="courses"
+             value="#{courseC.listCoursesForClub(clubid)}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredCourses}" >
+
+<f:facet name="header">
+   <!-- <h:outputText escape="false" value="#{msg['message.selectcourse']}" />  -->
+    <h2>#{msg['message.selectcourse']} (for club = #{param.clubId})</h2>
+</f:facet>
+
+<p:column 
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="rrow">
+             #{row+1}
+</p:column>
+	<p:column headerText="#{msg['course.selected']}"
+                  footerText="#{msg['course.selected']}"
+                  style="width:100px" >
+            <p:commandButton
+                id="selectButton"
+                action="#{courseC.selectedCourseForClub(c)}"
+                value="#{c.idcourse} - #{msg['button.select']}"
+                icon="pi pi-arrow-left">
+
+             </p:commandButton>
+	</p:column>
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['course.name']}"
+                    footerText="#{msg['course.name']}"
+                    style="width:100px"
+                    filterMatchMode="contains"
+                    filterBy="#{c.courseName}" >
+            #{c.courseName}  (#{c.idcourse})
+	</p:column>
+
+        <p:column headerText="#{msg['course.par']}"
+                  footerText="#{msg['course.par']}"
+                  style="width:100px" >
+            #{c.coursePar}
+        </p:column>
+
+        <p:column headerText="#{msg['club.id']}"
+                  footerText="#{msg['club.id']}"
+                  style="width:100px" >
+            #{c.club_idclub}
+        </p:column>
+<!--
+<f:facet name="footer">
+           <h2>#{msg['message.selectcourse']} #{msg['message.for.home']}</h2>
+</f:facet>
+-->
+</p:dataTable>
+</h:form>
+</ui:define>
+</ui:composition>

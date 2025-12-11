@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/dialogTemplate.xhtml">
+
+<ui:define name="title">Matchplay Classment Page </ui:define>
+<ui:define name="content">
+
+<h:form id="form_matchplay_classment">
+ <!--   <ui:include src="include/include_summary_round.xhtml"/> -->
+<p:dataTable id="player_has_played_round"
+             rowIndexVar="row"
+             value="#{ryderC.classementMatchplay()}"
+             var="c"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredCars}"
+             rows="20" >
+
+<f:facet name="header">
+            <h1 style="background-color:DodgerBlue;"> Classment of Competition : #{Competition}
+                <br/>/ Points Team A = #{PointsTeamA}  Points Team B= #{PointsTeamB}
+            </h1>
+</f:facet>
+	<p:column headerText="#"
+                  width="3%"
+                  id="rowColumn">
+             #{row+1}
+	</p:column>
+
+	<p:column headerText="#{msg['round.date']}"
+                  width="13%"
+                  id="dateColumn">
+                  <h:outputText value="#{c.roundDate}" > 
+                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
+                  </h:outputText>
+	</p:column>
+
+        <p:column headerText="#{msg['round.name']}"
+                  width="25%"
+                  id="flightColumn"  >
+                        #{c.roundName} (#{c.idround})
+        </p:column>
+
+        <p:column headerText="Team A"
+                  width="8%"
+                  id="gameResultTeamA"
+                  >
+                        #{c.scoreMatchplay.result[0]}
+        </p:column>
+        <p:column headerText="Team B"
+                  width="8%"
+                  id="gameResultTeamB" >
+                        #{c.scoreMatchplay.result[1]}
+        </p:column>
+ <!--
+   <p:column headerText="#{msg['round.game']}"
+                  width="13%"
+                  id="gameColumn"
+                  >
+                        #{c.roundGame}
+   </p:column>
+-->
+<p:column headerText="#{msg['round.game']}"
+          width="13%"
+          id="GameColumn"
+          filterBy="#{c.roundGame}"
+          filterMatchMode="exact"
+            >
+              #{c.roundGame}
+</p:column>
+<!-- filterOptions="#{utilsC.ListGameType()}"  -->
+</p:dataTable>
+
+</h:form>
+</ui:define>
+</ui:composition>

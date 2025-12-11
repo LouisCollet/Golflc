@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+     
+      xmlns:p="primefaces"
+     
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Select Course Page </ui:define>
+
+
+<ui:define name="metadata">
+    <f:metadata>
+        <!--
+        <f:viewParam
+            id="viewParam_cmd"
+            required="false"
+            name="cmd"
+            value="#{inputSelectCourse}"
+            requiredMessage="You did not specify a cmd. (The - cmd - parameter is missing)"
+            >
+            <f:validateLength minimum="3" />
+        </f:viewParam>
+        -->
+    </f:metadata>
+</ui:define>
+
+<ui:define name="content">
+<h:form id="form_select_course">
+    <div class="card">
+<!--
+ input1=   #{courseC.course.inputSelectCourse}
+ input2 =  #{inputSelectCourse} 
+ -->   
+<p:dataTable id="courses"
+             value="#{courseC.listCourses()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredCourses}"
+             
+             >
+<!-- rowHover="true"
+             stickyHeader="true"
+             stickyTopAt=".layout-topbar"  -->
+<f:facet name="header">
+    <h1>#{msg['message.selectcourse']}
+        <h:outputText
+            id="Rnd"
+            rendered="#{inputSelectCourse eq 'CreateRound'}" 
+            value="#{msg['message.for.round']}">
+        </h:outputText>
+        <h:outputText
+            id="tarif"
+            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+            value="#{msg['message.for.tarif']}">
+        </h:outputText>
+        <h:outputText
+            id="tarifMembers"
+            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+            value="#{msg['message.for.tarif.members']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableS"
+            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+            value="#{msg['message.for.unavailable']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableP"
+            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+            value="#{msg['message.for.unavailable']}">
+        </h:outputText>
+        <h:outputText
+            id="Det"
+            rendered="#{inputSelectCourse eq 'ChartRound'}" 
+            value="#{msg['message.for.detail']}">
+        </h:outputText>
+        <h:outputText
+            id="Avg"
+            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+            value="#{msg['message.for.average']}">
+        </h:outputText>
+        </h1>
+        parameter from sessionMap = #{inputSelectCourse}
+    
+</f:facet>
+<!--
+
+              style="width:2%;text-align:center"/>
+ -->   
+<p:column
+     headerText="#"
+     footerText="#"
+     width="2%"
+
+     id="colRow">
+             #{row+1}
+</p:column>
+      	<p:column headerText="#{msg['round.create']}"
+                  footerText="#{msg['round.create']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateRound'}" >
+            <p:commandButton
+                id="selectButtonCreateRound"
+                action="#{courseC.selectCourse(c)}"
+                value="#{c.course.idcourse} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+            
+            
+            
+            
+            
+            
+            
+	</p:column>
+ 
+     	<p:column headerText="#{msg['round.tarif']}"
+                  footerText="#{msg['round.tarif']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" >
+            <p:commandButton
+                id="selectButtonTarif"
+                action="#{courseC.selectCourse(c)}"
+                value="#{c.course.idcourse} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+
+    	<p:column headerText="#{msg['member.tarif']}"
+                  footerText="#{msg['member.tarif']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateTarifMember'}" >
+            <p:commandButton
+                id="selectButtonTarifMembers"
+                action="#{courseC.selectCourse(c)}"
+                value="#{c.club.idclub} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+ 
+     	<p:column headerText="#{msg['member.tarif.payment']}"
+                  footerText="#{msg['member.tarif.payment']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'PaymentTarifMember'}" >
+            <p:commandButton
+                id="selectButtonPaymentTarifMembers"
+                action="#{courseC.selectCourse(c)}"
+                value="#{c.club.idclub} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+ 
+      	<p:column headerText="#{msg['message.for.unavailable']}"
+                  footerText="#{msg['message.for.unavailable']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" >
+            <p:commandButton
+                id="selectButtonUnavailable"
+                action="#{courseC.selectCourse(c)}"
+                value="#{c.course.idcourse} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+ 
+ 
+       	<p:column headerText="#{msg['message.for.unavailable']} Period"
+                  footerText="#{msg['message.for.unavailable']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" >
+            <p:commandButton
+                id="selectButtonUnavailablePeriod"
+                action="#{courseC.selectCourse(c)}"
+                value="#{c.course.idcourse} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+ 
+ 
+ 
+ 
+ 
+ 	<p:column   id="colClubName"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                    sortBy="#{c.club.clubName}"
+                  >
+            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
+	</p:column>
+ 
+	<p:column id="colCourseName"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  style="width:20%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  sortBy="#{c.course.courseName}"
+                  >
+            <h:outputText value="#{c.course.courseName} (#{c.course.idcourse})" />
+	</p:column>
+<!-- attention : casse de la classe :min et MAJ -->
+
+
+
+        <p:column  id="courseBegin"
+                  headerText="#{msg['course.begin']}"
+                  footerText="#{msg['course.begin']}"
+                  style="width:15%" >
+            <h:outputText value="#{c.course.courseBeginDate}">
+                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+            </h:outputText>
+        </p:column>
+<!-- new 14/08/2015-->
+            <h:outputText value=" -> #{c.course.courseEndDate}">
+                <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+            </h:outputText>
+
+        <p:column  id="courseTimeZone"
+                  headerText="#{msg['googletime.timezone']}"
+                  footerText="#{msg['googletime.timezone']}"
+                  style="width:15%" >
+            <h:outputText value="#{c.club.address.zoneId}">
+           
+            </h:outputText>
+        </p:column>
+
+
+        <p:column  id="travel"
+                  headerText="#{msg['course.travel']}"
+                  footerText="#{msg['course.travel']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="selectTravel"
+                action="#{courseC.selectTravel(c)}"
+                value="Car"
+                icon="pi pi-question"
+                >
+             </p:commandButton>
+        </p:column>
+
+        <p:column  id="scorecard"
+                  headerText="#{msg['scorecard.show']}"
+                  footerText="#{msg['scorecard.show']}"
+                  style="width:10%" 
+                  rendered="#{inputSelectCourse eq 'CreateRound'}" 
+                  >
+            <p:commandButton
+                id="selectScorecard"
+                action="#{courseC.show_scorecard_empty(c)}"
+                value="Scorecard"
+                icon="pi pi-map"
+                >
+             </p:commandButton>
+        </p:column>
+
+<!-- new 30/03/2016 -->
+        <p:column  id="chart"
+                  headerText="#{msg['course.chart']}"
+                  footerText="#{msg['course.chart']}"
+                  style="width:10%" >
+            <p:commandButton
+                id="selectChart"
+                action="#{courseC.selectChart(c)}"
+                value="Chart"
+                icon="pi pi-chart-line" >
+             </p:commandButton>
+        </p:column>
+
+<f:facet name="footer">
+
+</f:facet>
+
+</p:dataTable>
+    </div>
+</h:form>
+</ui:define>
+</ui:composition>

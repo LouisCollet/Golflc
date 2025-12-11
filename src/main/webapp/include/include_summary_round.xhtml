@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:f="jakarta.faces.core"
+    xmlns:h="jakarta.faces.html"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:p="primefaces" >
+<p:divider layout="horizontal" type="solid" />     
+<p:panelGrid
+    id="panelGridSummaryRound"
+    layout="flex"
+    columns="12"
+    columnClasses="col1Flex,col2Flex,col1Flex,col2Flex"   
+    style="width:90%;font-size:0.8rem;" >
+<!-- columnClasses="col1,col2,col3,col4"  --><!--,col1Flex,col2Flex,col1Flex,col2Flex,col1Flex,col2Flex,col1Flex,col2Flex"-->
+
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.summary']}" />
+</f:facet>
+      <h:outputText value="#{msg['round.id']} :" />
+      <h:outputText
+            id="idroundsummary" 
+            value="#{courseC.round.idround}" /> 
+
+      <h:outputText value="#{msg['club.name']} :"/>
+	<h:outputText
+            id="clubSummaryRound" 
+            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+
+      <h:outputText value="#{msg['course.name']} :" />
+      <h:outputText
+            id="coursesummaryRound" 
+            value="#{courseC.course.courseName} (#{courseC.course.idcourse})- #{courseC.tee.teeHolesPlayed}" />
+
+      <h:outputText value="#{msg['round.date']} :" />
+      <h:outputText
+            id="rounddatesummary" 
+            value="#{courseC.round.roundDate}"
+            >
+          <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
+      </h:outputText>
+      
+      <h:outputText value="#{msg['round.game']} :" />
+      <h:outputText
+            id="roundgamesummary" 
+            value="#{courseC.round.roundGame}" />
+
+      <h:outputText value="#{msg['round.name']} :" />
+      <h:outputText
+            id="roundNameSummary" 
+            value="#{courseC.round.roundName}" />
+      
+      <h:outputText value="#{msg['competition.name']} :"
+                    rendered="#{courseC.competition.competitionDescription.competitionName ne null}" />
+      <h:outputText
+            id="competitioNameSummary" 
+            value="#{courseC.round.roundName}"
+            rendered="#{courseC.competition.competitionDescription.competitionName ne null}" />
+
+      <h:outputText value="Tee info :" />
+      <h:outputText
+            id="teeSummary" 
+            value="#{courseC.inscription.inscriptionTeeStart} - #{courseC.tee.idtee} ,MT = #{courseC.tee.teeMasterTee} ,DT = #{courseC.tee.teeDistanceTee} " />
+      
+      <h:outputText value="#{msg['round.players']} :" />
+     <!--                    value="#{courseC.roundPlayersList().size()} = #{courseC.round.playersString}" /> -->  
+      <h:outputText  id="roundPlayers" 
+                     value="#{courseC.roundPlayersList().size()} = #{courseC.round.playersString}" />
+            <h:outputText value="#{msg['player.selected']} :"
+                     rendered="#{courseC.player.getDroppedPlayers().size() gt 0}">
+            </h:outputText>
+            <h:panelGroup id="panelGroupIncludeSummary"
+                    rendered="#{courseC.player.getDroppedPlayers().size() gt 0}" >
+                <h:outputText
+                 id="selectedPlayersSummarySize" 
+                 value="#{courseC.player.getDroppedPlayers().size()} = "/>
+                <h:outputText>
+                    <ui:repeat value="#{courseC.player.getDroppedPlayers()}"
+                               var="p">
+                        <h:outputText
+                             value="#{p.playerLastName} (#{p.idplayer}),">
+                        </h:outputText>
+                    </ui:repeat>
+                </h:outputText>
+            </h:panelGroup>
+  
+         <h:outputText value="#{msg['tee.slope']}"/>
+         <h:outputText value="#{courseC.tee.teeSlope}"/>
+
+         <h:outputText value="#{msg['tee.rating']}"/>
+         <h:outputText value="#{courseC.tee.teeRating}"/>
+
+         <h:outputText value="#{msg['round.holes']}"/>
+         <h:outputText value="#{courseC.round.roundHoles}"/>
+
+         <h:outputText value="#{msg['round.start']}"/>
+         <h:outputText value="#{courseC.round.roundStart}"/>
+         
+</p:panelGrid>
+<p:divider layout="horizontal" type="solid" />
+<!-- https://stackoverflow.com/questions/21697024/cforeach-inside-primefacese-g-ppanelgrid-inside-uirepeat  
+https://stackoverflow.com/questions/3342984/jstl-in-jsf2-facelets-makes-sense/-->
+</ui:composition>

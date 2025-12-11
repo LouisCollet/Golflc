@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Activation success </ui:define>
+
+<ui:define name="content">
+<h:graphicImage name="images/thumbUp.png" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
+<h:graphicImage name="images/thumbUp.png" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>    
+    <!-- -->
+<h:form id="gprc_server"  >
+
+<p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+<f:facet name="header">
+    <h1>gRPC server test</h1>
+</f:facet>
+
+   <h:outputText value="Input message" />
+   <p:inputText id="name"
+            value="#{courseC.creditcard.creditCardHolder}"
+            placeholder="Input your message"
+            required="false"/>
+
+<f:facet name="footer">
+        <p:commandButton value="Start gRPC server"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-pencil"
+                         action="#{grpcController.startServer()}" />
+        <p:commandButton value="Send message to server"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-pencil"
+                         action="#{grpcController.sendMessage()}" />
+
+        <p:commandButton value="Stop gRPC server"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-pencil"
+                         action="#{grpcController.stopServer()}" />
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

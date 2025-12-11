@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="jakarta.faces.html"
+
+    xmlns:ui="jakarta.faces.facelets">
+
+<h:form  >
+ <div class="header-footer">
+<!-- voir la description de la classe header-footer dans /css/Styles2022.css -->
+    <h:graphicImage library="images"  name="golf_help.jpg" alt="image missing :help.jpg" >  </h:graphicImage>
+
+    <h:outputText 
+                  escape="false"
+                  value="#{mongoHelpC.ReadHelpFile()}">
+    </h:outputText>
+ </div>
+</h:form>
+</ui:composition>

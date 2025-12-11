@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Unavailable Period</ui:define>
+<ui:define name="content">
+
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="form_unavailable_period" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<p:panelGrid
+    id="panelGrid1"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.unavailable.period']}" />
+</f:facet>
+    <h:outputText  value="#{msg['unavailable.period.start']} :"/>
+    <p:datePicker value="#{courseC.unavailable.period.startDate}"
+                  id="startDateid"
+                  locale="#{languageC.locale}"
+                  pattern="dd/MM/yyyy HH:mm"
+                  size="15"
+                  showTime="true"
+                  showIcon="true"
+                  readonlyInput="true"
+                  showButtonBar="true"
+                  mindate="#{utilsC.localDateWeek(-1)}"
+                  maxdate="#{utilsC.localDateYear(1)}"
+                  yearNavigator="true"
+                  monthNavigator="true" >
+    </p:datePicker>
+
+      <h:outputText value="#{msg['unavailable.period.end']} :"/>
+      <p:datePicker value="#{courseC.unavailable.period.endDate}"
+                  id="endDateid"
+                  locale="#{languageC.locale}"
+                  lang="#{languageC.locale}"
+                  pattern="dd/MM/yyyy HH:mm"
+                  size="15"
+                  showTime="true"
+                  showIcon="true"
+                  readonlyInput="true"
+                  showButtonBar="true"
+                  mindate="#{utilsC.localDateWeek(-1)}"
+                  maxdate="#{utilsC.localDateYear(1)}"
+                  yearNavigator="true"
+                  monthNavigator="true" >
+    </p:datePicker>
+      
+     <h:panelGroup id="panelGroupComment" layout="block" > 
+        <h:outputText value="#{msg['handicap.comment']}" /> 
+        <i class="pi pi-comment"></i>
+     </h:panelGroup>
+
+    <h:outputText id="comment"
+              value="#{courseC.unavailable.period.comment}"
+              escape="false"  />
+</p:panelGrid>  
+
+<p:dataTable id="tablePeriod"
+             value="#{courseC.unavailable.structure.structureList}"
+             var="var"
+             style="margin: 0 auto;width:50%"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.inscriptions.competition.empty']}" >
+    <p:column headerText="#{msg['course.id']}"
+              width="10%">
+        <h:outputText value="#{var.courseId}"/>
+    </p:column>
+    
+    <p:column headerText="#{msg['unavailable.structure.cause']}"
+              width="15%">
+        <h:outputText value="#{var.item}"/>
+    </p:column>
+
+    <p:column headerText="#{msg['unavailable.title']}"
+              width="15%">
+       <p:selectBooleanButton 
+                             id="ButtonChoix_yes_no${i}"
+                             value="#{courseC.unavailable.period.itemPeriod[row]}"
+                             onLabel="Yes"
+                             offLabel="No"
+                             onIcon="pi pi-check"
+                             offIcon="pi pi-times"/>
+    </p:column>
+
+
+
+<f:facet name="footer">
+    <p:panelGrid
+        id="panelGrid2"
+        layout="tabular"
+        columns="2" >
+         <p:commandButton value="#{msg['unavailable.period.create']}"
+                         id="commandButtonCreate"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.createUnavailablePeriod()}"/>
+          <p:commandButton value="#{msg['tarif.editor']}"
+                         id="commandButtonBack"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-comment"
+                         disabled="#{courseC.unavailable.period.itemPeriod[0] eq null}"
+                         action="unavailable_editor.xhtml?faces-redirect=true"
+                         />
+          <p:commandButton value="Visualisation"
+                         id="commandButtonShow"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true" 
+                         icon="pi pi-info"
+                         action="unavailable_show.xhtml?faces-redirect=true"/>
+           <p:commandButton value="Show Structure"
+                         id="commandButtonVisual"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true" 
+                         icon="pi pi-plus"
+                         action="#{courseC.showUnavailableStructure}"/>
+          <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonMenu"
+                         ajax="false"
+                         style="float: right;"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-undo"
+                         action="unavailable_menu.xhtml?faces-redirect=true" />
+
+</p:panelGrid>
+   </f:facet> 
+    </p:dataTable>
+</h:form>
+</ui:define>
+</ui:composition>

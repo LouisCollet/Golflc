@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="jakarta.faces.core"
+    xmlns:h="jakarta.faces.html"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:p="primefaces"
+    template="templates/masterTemplate.xhtml">
+    <ui:define name="title">
+        Login Soteria
+    </ui:define>
+
+    <ui:define name="content">
+        <h:graphicImage 
+            rendered="true"
+            name="images/login.jpg"
+            alt="image missing : login.jpg"
+            style="float:left;">
+        </h:graphicImage>
+
+        <h:graphicImage 
+            rendered="true"
+            name="images/register.jpg"
+            alt="image missing :golf_register.jpg"
+            style="float:right;">
+        </h:graphicImage>
+
+        <h:form id="login_security" >
+            <p:panelGrid columns="2" 
+                         layout="tabular">
+                <h:outputText value="Username"/>
+                <p:inputText id="userName"
+                             value="#{loginBacking.username}"
+                             />
+
+                <h:outputText value="Password"/>
+                <p:password id="password1"
+                            value="#{loginBacking.password}"
+                            />
+            </p:panelGrid>
+            <p:commandButton value="#{msg['login.user.old']}"
+                             update="growl-msg"
+                             immediate="false"
+                             ajax="false"
+                             icon="pi pi-key"
+                             action="#{loginBacking.submit}"
+                             />
+        </h:form>
+    </ui:define>
+</ui:composition>

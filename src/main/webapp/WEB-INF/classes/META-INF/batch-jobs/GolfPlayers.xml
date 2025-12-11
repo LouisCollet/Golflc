@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+     version="1.0"
+
+
+
+ this is the JOB SPECIFICATION LANGUAGE (JSL)
+"https://jakarta.ee/xml/ns/jakartaee" version="2.0">
+http://xmlns.jcp.org/xml/ns/javaee
+mod 25-08-2023
+-->
+<job id="GolfPlayersJob"
+     restartable="true"
+     xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd"
+     version="1.0">
+
+    <properties> 
+        <property name="log_file_name" value="log1.txt"/>
+        <property name="airtime_price" value="0.08"/>
+        <property name="tax_rate" value="0.07"/>
+      </properties>  
+    <listeners>
+        <listener ref="InfoJobListener"/>
+    </listeners>
+   
+
+<step id="StepPlayers">
+   <!--    <step id="bills">  <step id="StepPlayers" > </step>... </step>  <properties>   sert à quoi ? 
+            next="bills"<property name="input_file" value="C:/Users/collet/Documents/NetBeansProjects/GolfWfly/private/importPlayers.txt"/>
+        </properties> examples
+       https://javaee.github.io/tutorial/batch-processing009.html#BCGFCACD
+playerReader = PlayerItemReader Named(playerReader) CDI
+The batch artifact names are not fully qualified class names, so the batch artifacts are CDI beans annotated with @Named.    -->
+
+        <chunk checkpoint-policy="item" item-count="5">
+            <reader ref="PlayerItemReader"> 
+                 <properties>
+                    <property name="{property-name}" value="{name-value}"/>
+                </properties>
+            </reader>
+            <processor ref="PlayerItemProcessor"> </processor>
+            <writer    ref="PlayerItemWriter">    </writer>
+        </chunk>
+ </step>
+</job>

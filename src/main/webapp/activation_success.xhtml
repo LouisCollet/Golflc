@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Activation success </ui:define>
+
+<ui:define name="content">
+<h:graphicImage name="images/thumbUp.png" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
+<h:graphicImage name="images/thumbUp.png" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>    
+    <!-- -->
+<h:form id="activation_success"  >
+
+<p:panelGrid
+    id="panel"
+    columns="2"
+    layout="tabular"
+    
+    columnClasses="col1, col2">
+<f:facet name="header">
+    <h1>#{msg['message.for.activation.success']}</h1>
+</f:facet>
+
+   <h:outputText value="#{msg['player.first']}" />
+   <h:outputText value="#{request.getParameter('firstname')}" style="font-style:italic"/>
+   <h:outputText value="#{msg['player.lastname']}"   />
+   <h:outputText value="#{request.getParameter('lastname')}" style="font-style:italic" />
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.login']}"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-pencil"
+                         action="login.xhtml?faces-redirect=true"/>
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

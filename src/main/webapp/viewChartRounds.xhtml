@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces" >
+    <ui:composition template="templates/dialogTemplate.xhtml">
+<ui:define name="title">
+    Player Chart Rounds View Page
+</ui:define>
+
+<ui:define name="content">    
+<h:form id="view_played_rounds"
+        style="border:solid 3px" 
+        enctype="application/x-www-form-urlencoded" >
+
+<p:outputPanel id="playedroundsDetail"
+               style="text-align:center;">
+ <p:panelGrid  columns="2"
+               columnClasses="col1,col2">
+    <f:facet name="header">
+                    this is the header facet
+    </f:facet>
+
+<!--  mod 05-12-2024  
+<p:chart type="bar"
+         id="newbar"
+         model="#{courseC.BarModel()}" 
+         style="height:400px; width:1250px; margin-top:20px" />
+modification nécessaire pour PF15
+-->
+          <p:chart
+              value="#{chartC.lineModel}"
+              style="width: 100%; height: 500px;margin-top:20px"/>
+         
+       <!--  
+                <h:outputText value="Date Round:" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundDate}"> 
+                              <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                </h:outputText>
+ 
+                <h:outputText value="Competition :" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundName}" />
+ 
+                <h:outputText value="Game :" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.roundGame}" 
+                              style="color:silver" />
+ 
+                <h:outputText value="idround" />
+                <h:outputText value="#{courseC.selectedPlayedRound.round.idround}" />
+                
+                <h:outputText value="idclub" />
+                <h:outputText value="#{courseC.selectedPlayedRound.club.idclub}" />
+                
+                <h:outputText value="idcourse" />
+                <h:outputText value="#{courseC.selectedPlayedRound.course.idcourse}" />
+
+<f:facet name="footer">
+This is the footer facet
+</f:facet>
+-->
+</p:panelGrid>
+</p:outputPanel>
+</h:form>
+</ui:define> <!--  end of "content" -->
+</ui:composition>
+</html>

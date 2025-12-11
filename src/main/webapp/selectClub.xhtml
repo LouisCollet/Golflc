@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Select Club Page </ui:define>
+
+<ui:define name="content">
+<h:form id="form_select_club">
+<div class="card">
+
+ <c:set var="select" value="#{inputSelectCourse}"/>
+ 
+<p:dataTable id="courses"
+             value="#{courseC.listClubsDialog()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             rowKey="#{c.idclub}"
+             rowHover="true"  >
+<!--  filteredValue="#{courseC.filteredCourses}"
+             stickyHeader="true"
+             stickyTopAt=".layout-topbar"  -->
+<f:facet name="header">
+    <h1>#{msg['message.selectclub']}
+        <h:outputText
+            id="Rnd"
+            rendered="#{inputSelectCourse eq 'CreateRound'}" 
+            value="#{msg['message.for.round']}">
+        </h:outputText>
+        <h:outputText
+            id="tarif"
+            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+            value="#{msg['message.for.tarif.greenfee']}">
+        </h:outputText>
+        <h:outputText
+            id="tarifMembers"
+            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+            value="#{msg['message.for.tarif.members']}">
+        </h:outputText>
+        <h:outputText
+            id="createPro"
+            rendered="#{inputSelectCourse eq 'CreatePro'}" 
+            value="#{msg['create.pro']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableS"
+            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+            value="#{msg['message.for.unavailable']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableP"
+            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+            value="#{msg['message.for.cotisation.spontaneous']}">
+        </h:outputText>
+        <h:outputText
+            id="Det"
+            rendered="#{inputSelectCourse eq 'PaymentCotisationSpontaneous'}" 
+            value="#{msg['message.for.cotisation.spontaneous']}">
+        </h:outputText>
+        <h:outputText
+            id="Avg"
+            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+            value="#{msg['message.for.average']}">
+        </h:outputText>
+        </h1>
+        parameter from sessionMap = sessionMap.get("inputSelectCourse"));
+        parameter from sessionMap = sessionMap.get("inputSelectClub"));
+</f:facet>
+  
+<p:column
+     headerText="#"
+     footerText="#"
+     width="2%"
+     id="colRow">
+             #{row+1}
+</p:column>
+
+ 	<p:column   id="colClubName"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.clubName}"
+                    sortBy="#{c.clubName}" >
+            <h:outputText value="#{c.clubName} (#{c.idclub})" />
+	</p:column>
+
+        <p:column  id="courseTimeZone"
+                  headerText="#{msg['googletime.timezone']}"
+                  footerText="#{msg['googletime.timezone']}"
+                  style="width:15%" >
+            <h:outputText value="#{c.address.zoneId}">
+           
+            </h:outputText>
+        </p:column>
+<f:facet name="footer">
+</f:facet>
+</p:dataTable>
+    </div>
+</h:form>
+</ui:define>
+</ui:composition>

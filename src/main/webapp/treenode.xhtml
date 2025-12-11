@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+       xmlns:f="jakarta.faces.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">TreeNode </ui:define>
+<ui:define name="content">
+
+ <h:form id="treenode" enctype="application/x-www-form-urlencoded"> 
+    <div class="card">
+        <h1 style="margin-top:0">Update Help Files</h1>
+        <!--  single va avec selectedNode , checkbox avec selectedNodes au pluriel !! 
+        <p:tree id="idTree"
+                value="#{courseC.courseC.treeBean.root}"
+                var="node"
+                orientation="vertical"
+                selectionMode="checkbox" 
+                selection="#{courseC.courseC.treeBean.checkboxSelectedTreeNodes}"
+                dynamic="true"
+                style="border:solid 4px"
+                  >
+  https://primefaces.github.io/primefaces/12_0_0/#/components/treetable
+ Node selection is a built-in feature of tree and it supports two different modes. Selection should be a TreeNode for single case and an array of TreeNodes for multiple case,
+        tree finds the selected nodes and assign them to your selection model.
+single : Only one at a time can be selected, selection should be a TreeNode reference. multiple or checkbox : Multiple nodes can be selected,
+        selection should be a TreeNode[] reference.
+As checkbox selection have a special hierarchy, use CheckboxTreeNode in checkbox mode.     
+  new 12/08/2022    filterBy="#{node.name}"  --> 
+  <p:tree id="idTree"
+                value="#{courseC.treeBean.root}"
+                var="doc_help"
+                filterBy="#{doc_help}"
+                filterMatchMode="contains"
+               
+                orientation="vertical"
+                selectionMode="single" 
+                selection="#{courseC.treeBean.selectedNode}"
+                dynamic="true"
+                style="border:solid 4px" >
+             <p:ajax event="select"
+                     listener="#{courseC.treeBean.onNodeSelect}"
+                     update="growl-msg"/>
+             <p:ajax event="expand"
+                     update="growl-msg"
+                     listener="#{courseC.treeBean.onNodeExpand}"/>
+             <p:ajax event="collapse"
+                     update="growl-msg" 
+                     listener="#{courseC.treeBean.onNodeCollapse}"/>
+             <p:ajax event="unselect" 
+                     update="growl-msg" 
+                     listener="#{courseC.treeBean.onNodeUnselect}"/>
+<!--  type="document"  icon="pi pi-window-maximize" icon="pi pi-list"
+-->
+            <p:treeNode
+                          expandedIcon="pi pi-folder-open"
+                          collapsedIcon="pi pi-folder"
+                          >
+                <h:outputText value="#{doc_help}"/>  <!-- node = nom de la var de p:tree -->
+            </p:treeNode>
+ </p:tree>
+ <!--    https://www.journaldev.com/3538/primefaces-tree-treenode-treetable-components-example-tutorial   
+<p:treeTable value="#{courseC.treeBean.root}"
+             selectionMode="checkbox" 
+             selection="#{courseC.treeBean.checkboxSelectedTreeNodes}"
+             var="document">
+        <p:column>
+        <f:facet name="header">
+            Name
+        </f:facet>
+        <h:outputText value="#{document.fileName}" />
+    </p:column>
+</p:treeTable>
+  -->      
+     </div>
+    </h:form>
+   </ui:define>
+</ui:composition>

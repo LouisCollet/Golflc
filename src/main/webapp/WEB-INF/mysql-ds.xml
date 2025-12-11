@@ -1,0 +1,53 @@
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema">
+    
+    
+    <!--  http://www.jboss.org/ironjacamar/schema/datasources_1_0.xsd
+      https://access.redhat.com/documentation/en-us/jboss_enterprise_application_platform/6.1/html/migration_guide/chap-tools_and_tips#Use_the_IronJacamar_Tool_to_Migrate_Datasource_and_Resource_Adapter_Configurations
+  définition de la datasource, indépendante de la version wildfly et donc de standalone-full.xml
+à recopier de la version standalone-full !!
+se trouve sous GolfWfly > Web Pages > WEB-INF
+
+http://middlewaremagic.com/jboss/?p=1050
+            <logger category="org.jboss.jca">
+                <level name="TRACE"/>
+            </logger>
+à ajouter à standalone-full.xml pour un logging très détaillé 
+ -->
+
+  <!-- utilisée dans golflc attention &amp; !!!!!
+
+port est devenu 3308 à partir version mysql 8.2 le 31-10-2023  
+    -->
+
+  <datasource jta="true"
+              jndi-name="java:jboss/datasources/golflc" 
+              pool-name="MySqlDS" 
+              enabled="true" 
+              use-java-context="true"
+              spy="true"
+              use-ccm="true">
+    <connection-url>jdbc:mysql://localhost:3308/golflc?AllowMultiQueries=true&amp;AllowUserVariables=true&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;nullNamePatternMatchesAll=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>
+    <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
+    <driver>mysql-connector-j-9.5.0.jar</driver> <!-- name mod 27-07-2025 -->
+    <pool>
+        <min-pool-size>5</min-pool-size>
+        <max-pool-size>20</max-pool-size>
+    </pool>
+              <!--  enlevé 10-12-2025    <security>
+                        <user-name>LouisCollet${env.MYSQL_USERNAME}</user-name>
+                        <password>lc1lc2</password>
+                    </security>
+               -->
+    <validation>
+        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
+        <background-validation>true</background-validation>
+        <validate-on-match>false</validate-on-match>
+        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
+    </validation>
+  </datasource>
+</datasources>
+<!--  
+https://stackoverflow.com/questions/27887392/add-new-datasource-mysql-wildfly
+https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/6.4/html/administration_and_configuration_guide/sect-database_connection_validation
+
+ -->

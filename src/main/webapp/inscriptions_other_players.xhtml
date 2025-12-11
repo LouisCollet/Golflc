@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Inscriptions Other Players Page </ui:define>
+<ui:define name="content">
+    
+<h:graphicImage name="images/draganddrop.png" alt="image missing : draganddrop.png" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/drop zone.png" alt="image missing : draganddrop.jpg" style="float: right;"></h:graphicImage>
+<style type="text/css">
+    .ui-badge {
+        background: var(--primary-color);
+        color: var(--primary-color-text);
+    }
+</style>
+<h:form id="otherPlayers" >
+    <ui:include src="include/include_summary_round.xhtml"/>
+      <c:set var="max" value="#{courseC.round.roundGame eq 'MP_SINGLE'? 2 : 4}"/>
+ 
+    <p:fieldset id="availablePlayers"
+                title="Drop the player in the Drop Zone !"
+                legend="#{msg['players.available']}"
+                style="margin-top:20px;margin-right: 100px"
+                collapsed="#{courseC.roundPlayersList().size() gt max}">
+        
+    <p:dataTable id="availablePlayersTable"
+                 value="#{courseC.player.draggedPlayers}"
+                 var="c"
+                 escapeText="false"
+                 emptyMessage="#{msg['message.table.empty']}" >
+            <p:column width="5%"
+                      headerText="Drag #{msg['player.id']}">
+            <h:panelGroup id="panelG332" layout="block" >
+                 <i class="pi pi-arrow-down" style="font-size: 1.5rem"></i>
+                 <h:outputText id="colPlayerId"
+                               value="#{c.player.idplayer}" />
+                 <i class="pi pi-arrow-down" style="font-size: 1.5rem"></i>
+            </h:panelGroup>
+            <p:draggable for="colPlayerId"
+                             revert="true"
+                             helper="clone"
+                             scope="player"
+                             cursor="copy"
+                             axis="y"
+                             opacity="0.5" />
+            </p:column>
+
+            <p:column width="20%"
+                      headerText="#{msg['player.lastname']}">
+                <h:outputText id="colPlayerName"
+                              value="#{c.player.playerLastName}" />
+                <p:draggable for="colPlayerName"
+                             revert="true"
+                             helper="clone"
+                             scope="player"
+                             cursor="pointer"
+                             axis="y"
+                             opacity="0.3" />
+            </p:column>
+ 
+            <p:column width="20%"
+                      headerText="#{msg['player.first']}">
+                <h:outputText value="#{c.player.playerFirstName}" />
+            </p:column>
+ <!--       
+ <ui:include src="include/include_thumbnails.xhtml"/>
+ -->       
+ <p:column width="5%"
+                      headerText="#{msg['address.country.code']}">
+                <h:outputText value="#{c.player.address.country.code}" />
+            </p:column>
+        </p:dataTable>
+    </p:fieldset>
+ 
+    <p:fieldset id="selectedPlayers"
+                legend="#{msg['players.selected']}"
+                style="margin-top:20px">
+         <p:outputPanel id="dropArea"
+                        styleClass="slot">
+            <h:outputText value="This is the Drop Zone !!!" 
+                          rendered="#{empty courseC.player.droppedPlayers}"
+                          style="font-size:1.5rem;" />  
+               <p:dataTable id="selectedCarsTable"
+                         value="#{courseC.player.droppedPlayers}"
+                         var="c"
+                         rendered="#{not empty courseC.player.droppedPlayers}">
+                <p:column headerText="#{msg['player.id']}" >
+                    <h:outputText value="#{c.idplayer}" />
+                </p:column>
+ 
+                <p:column headerText="#{msg['player.lastname']}" >
+                    <h:outputText value="#{c.playerLastName}" />
+                </p:column>
+ 
+                <p:column headerText="#{msg['player.first']}">
+                    <h:outputText value="#{c.playerFirstName}" />
+                </p:column>
+ <!--                  
+ <ui:include src="include/include_thumbnails.xhtml"/>
+ -->
+                <p:column headerText="#{msg['address.country.code']}"
+                          style="width:5%">
+                    <h:outputText value="#{c.address.country.code}" />
+                </p:column>
+
+                <p:column headerText="#{msg['tee.start']}"
+                          style="width:20%">
+                    <p:selectOneMenu id="teestart"
+                                     value="#{courseC.inscription.inscriptionTeeStart}"  >
+                        <f:selectItem itemLabel="Select One ??" itemValue=""/>
+                        <f:selectItems value="#{courseC.teeStartList(c)}" />
+                    </p:selectOneMenu>
+                </p:column>
+
+                <p:column headerText="#{msg['button.selection.delete']}"
+                          style="width:10%" >
+                    <p:commandButton
+                          id="selectButtonRemove"
+                          action="#{courseC.PlayerRemove(c)}"
+                          value="#{c.playerLastName}"
+                          style="color:red"
+                          icon="pi pi-trash">
+                        <p:confirm header="#{msg['message.confirm.delete']}"
+                           message="#{msg['message.cancel']}" 
+                           icon="pi pi-exclamation-triangle" />   
+            </p:commandButton>
+	</p:column>
+   </p:dataTable>
+<!--  icon = from PF14 -->
+    <p:badge value="#{courseC.player.droppedPlayers.size()}"
+                     icon="pi pi-plus"
+                     size="xlarge"
+                     severity="danger"style="color:lightblue"
+                     style="color:lightblue"
+                     visible="#{not empty courseC.player.droppedPlayers}"
+                     styleClass="ui-button-success" >
+         <p:commandButton value="#{msg['button.inscription.create']}"
+                         id="cb1"
+                         update="messages"
+                         ajax="false"
+                         rendered="#{not empty courseC.player.droppedPlayers}"
+                         immediate="false"
+                         icon="pi pi-database"
+                         style="width:140px"
+                         action="#{courseC.createInscriptionOtherPlayers}"/>
+     </p:badge> 
+
+  </p:outputPanel>
+    </p:fieldset>
+
+    <p:droppable for="selectedPlayers"
+                 tolerance="touch"
+                 scope="player"
+                 activeStyleClass="ui-state-highlight"
+                 hoverStyleClass="ui-state-hover"
+                 datasource="availablePlayersTable" >
+        <p:ajax listener="#{courseC.PlayerDrop}"
+                update="dropArea availablePlayersTable" />
+    </p:droppable>
+ <ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+</ui:define>
+</ui:composition>

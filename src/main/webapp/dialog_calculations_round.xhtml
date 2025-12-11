@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/dialogTemplate.xhtml">
+
+<ui:define name="title">
+    Detailed Calculation Round
+</ui:define>
+<ui:define name="content"> 
+<h:form id="dialog_calculations_round"
+        style="border:solid 3px"  >
+
+ <p:panelGrid
+        layout="tabular"
+        id="panelGrid"
+        columns="1">
+
+     <f:facet name="header">
+         <h:outputText escape="false" value="this is the header !!" />
+    </f:facet> 
+
+    <p:textEditor id="editor"
+                  readonly="true"
+                  secure="false"
+                  widgetVar="editor1"
+                  value="#{courseC.round.calculations}"
+                  style="width:900px;font-weight: normal;"
+                  toolbarVisible="false" >
+    </p:textEditor>
+
+ <f:facet name="footer">
+    <p:commandButton value="Back Dialog Screen"
+                     id="commandButtonback"
+                     ajax="false"
+                     update="growl-msg"
+                     immediate="true"
+                     icon="pi pi-undo"
+                     action="dialog_played_rounds?faces-redirect=true" />
+   <p:commandButton  id="btnPrint"
+                     value="#{msg['button.print']}"
+                     type="button"
+                     icon="pi pi-print" >
+        <p:printer target="editor" 
+                   configuration="title: 'Print Round Calculations', timeout: 1000"/>
+   </p:commandButton>
+
+ </f:facet>
+ </p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml" >
+<ui:define name="title">Cotisation Membre</ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="cotisation"  >
+<ui:include src="include/include_summary_cotisation.xhtml"/>
+
+<!-- maintenant itération sur les periodes -->
+ <p:dataTable var="item" 
+              value="#{courseC.tarifMember.basicList}"
+              rowIndexVar="row"
+              emptyMessage="#{msg['message.table.empty']}"
+              style="width:70%;text-align: center; margin-left:auto; margin-right:auto;"  >
+      <f:facet name="header">
+          <h:outputText escape="false" value="#{msg['title.cotisation.choice']}" />
+      </f:facet>
+ 
+        <p:column headerText="#{msg['tarif.members.item']} "
+                  width="12%" >
+                 <h:outputText value="#{item.item}" />
+        </p:column>
+        <p:column headerText="#{msg['tarif.members.price']} " 
+                  width="12%" >
+                 <h:outputText value="#{item.price}" />
+        </p:column>
+        <p:column headerText="#{msg['tarif.members.rangeage']} " 
+                  width="12%" >
+            <h:outputText value="#{item.range}" />
+                 
+        </p:column>
+        <p:column headerText="#{msg['tarif.members.choice']}"
+                  width="12%"
+                  id="ChoiceBasic">
+         <p:inputNumber
+                        value="#{item.quantity}"
+			minValue="0"
+                        maxValue="4"
+                        required="true"
+                        size="1"
+                        emptyValue="0"
+                        title="#{msg['tooltip.tarif.choice']}"
+                        decimalPlaces="0" >
+         </p:inputNumber>
+        </p:column>
+ </p:dataTable>
+
+<!-- maintenant itération sur les equipements -->
+
+    <p:dataTable var="item"
+                 value="#{courseC.tarifMember.equipmentsList}"
+                 rowIndexVar="row"
+                 style="width:70%;text-align: center;margin-left:auto;margin-right:auto;"
+                 emptyMessage="#{msg['message.table.empty']}" >
+        
+       <f:facet name="header">
+          <h:outputText escape="false" value="#{msg['title.equipments.choice']}" />
+      </f:facet>    
+        
+        <p:column headerText="#{msg['tarif.members.item']} "
+                  width="12%" >
+                 <h:outputText value="#{item.item}" />
+        </p:column>
+        <p:column headerText="#{msg['tarif.members.price']} " 
+                  width="12%" >
+                 <h:outputText value="#{item.price}" />
+        </p:column>
+        <p:column headerText="#{msg['tarif.seasons']} "
+                  width="12%" >
+            <h:outputText value="#{item.season}" />
+        </p:column>
+        <p:column headerText="#{msg['tarif.members.choice']}"
+                  width="12%"
+                  id="ChoiceEquipment">
+            <p:inputNumber
+                        value="#{item.quantity}"
+			minValue="0"
+                        maxValue="4"
+                        required="true"
+                        size="1"
+                        emptyValue="0"
+                        title="#{msg['tooltip.tarif.choice']}"
+                        decimalPlaces="0" >  
+         </p:inputNumber>
+        </p:column>
+        
+    <f:facet name="footer">
+         <p:commandButton value="#{msg['payment.selected']}"
+                         id="commandButtonManage"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-undo"
+                         action="#{courseC.manageCotisation()}"/>
+    </f:facet>    
+    </p:dataTable>
+
+</h:form>
+</ui:define>
+</ui:composition>

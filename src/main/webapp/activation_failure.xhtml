@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Activation failure </ui:define>
+
+<ui:define name="content">
+<h:graphicImage name="images/thumbDown.png" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
+<h:graphicImage name="images/thumbDown.png" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>    
+    <!-- -->
+<h:form id="activation_failure"  >
+
+<p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+<f:facet name="header">
+    <h1>#{msg['message.for.activation.failure']}</h1>
+</f:facet>
+    
+   <h:outputText value="#{msg['player.first']}" />
+   <h:outputText value="#{courseC.player.playerFirstName}" style="font-style:italic"/>
+   <h:outputText value="#{msg['player.lastname']}"   />
+   <h:outputText value="#{courseC.player.playerLastName}" style="font-style:italic" />
+
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.logout']}"
+                         update="growl-msg"
+                         immediate="true"
+                        icon="pi pi-pencil"
+                         action="#{courseC.logout("from activation_failure.xhtml")}"
+           />
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

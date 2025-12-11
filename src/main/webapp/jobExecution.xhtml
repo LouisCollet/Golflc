@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Job Execution</ui:define>
+
+<ui:define name="content">
+<h:graphicImage library="images"  name="file.png" alt="image missing :file.png" style="float: left;"></h:graphicImage>
+<h:graphicImage library="images" name="detail.png" alt="image missing :text file.png" style="float: right;"></h:graphicImage>
+
+<h:form id="jobexecution"  >
+
+<p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+    <h1>Batch Job Execution</h1>
+</f:facet>
+
+<h:outputText value="Last Batch ID" />
+<h:outputText value="#{batchC.execID}" />
+
+<h:outputText value="Last Batch Status"/>
+<h:outputText value="#{batchC.jobStatus}" />
+
+<!-- récupère le execID dans la ListeBatch gérée par l'application et l'utilise pour appeler la method -->
+<c:forEach items="#{batchC.listeBatch}" var="c" varStatus="loop">
+   <h:outputText value="Job Execution Details" />
+   <h:outputText value="#{batchC.getJobExecutionDetails(c.execID)} / #{loop.index+1}" />
+</c:forEach>
+
+<f:facet name="footer">
+        <p:commandButton value="Back to Job Submission" 
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-arrow-left"
+                         action="jobSubmitter.xhtml?faces-redirect=true" />
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

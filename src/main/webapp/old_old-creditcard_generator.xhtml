@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+     >
+    <!--  new 04-1-2023 en template="templates/masterTemplate.xhtml" remplacement du code dans courseC-->
+
+<ui:define name="title">Payment</ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/addtocart.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/online2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+
+<h:form id="creditcard_generator" >
+
+    <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
+         <ui:include src="include/include_summary_round.xhtml"/>
+    </c:if>
+    <c:if test="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}">
+         <ui:include src="include/include_subscription.xhtml"/>
+    </c:if>
+    <c:if test="#{courseC.creditcard.typePayment eq 'COTISATION'}">
+         <ui:include src="include/include_summary_club.xhtml"/>
+    </c:if>
+<p:panelGrid
+    id="panelGrid1"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+     <c:set var="type" value="#{creditcardType}"/>
+ 1= #{courseC.creditcard.typePayment}
+ 2=  creditcardType = #{creditcardType}
+ <!--<b><h:outputText style="margin-left:1.5rem;" value = "Browser:" /></b>
+         #{header['user-agent']}" -->
+  <b><h:outputText style="margin-left:1.5rem;" value = "Cookie Payment Reference :" /></b>
+         #{header['PaymentReference']}
+ <h2>
+    <h:outputText
+            id="subscription"
+            escape="false"
+            rendered="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
+            value="#{msg['title.payment.subscription']}">
+    </h:outputText>
+    <h:outputText
+            id="inscription"
+            escape="false"
+            rendered="#{courseC.creditcard.typePayment = 'GREENFEE'}" 
+            value="#{msg['title.payment.round']}">
+    </h:outputText>
+    <h:outputText
+            id="membership"
+            escape="false"
+            rendered="#{courseC.creditcard.typePayment eq 'COTISATION'}" 
+            value="#{msg['title.payment.cotisation']}">
+    </h:outputText> 
+      </h2>  
+</f:facet>
+ 
+    <h:outputText value="#{msg['creditcard.amounttobepaid']} :" />
+    <h:outputText value="#{courseC.creditcard.totalPrice}"
+                  style="font-size: 3rem;" />
+
+    <h:outputText value="#{msg['tarif.members.currency']} :" />
+    <h:outputText value="#{courseC.creditcard.creditcardCurrency}"
+                  style="font-size: 2em;" />
+
+    <h:outputText value="#{msg['creditcard.communication']} :" />
+    <h:outputText value="#{courseC.creditcard.communication}"
+                  title="#{msg['tooltip.club.clubaddress']}" />
+
+    <h:outputText value="#{msg['creditcard.holder']} :" />
+    <h:outputText value="#{courseC.creditcard.creditcardHolder}" />
+
+    <h:outputText  value="#{msg['creditcard.number']} :"/>
+    <h:outputText  value="#{courseC.creditcard.creditcardNumber}" >
+    </h:outputText>
+
+    <h:outputText value="#{msg['creditcard.type']} :"/>
+    <h:outputText value="#{courseC.creditcard.creditcardType}" >
+     </h:outputText>
+
+    <h:outputText value="#{msg['creditcard.expirationdate']} :" />
+ <!--   
+    <h:outputText value="#{courseC.creditcard.creditCardExpirationDateLdt}" >
+         <f:convertDateTime type="localDateTime" pattern="MM/yy" />
+    </h:outputText> 
+ -->
+    <h:outputText value="#{courseC.creditcard.creditCardExpirationDateString}" >
+       
+    </h:outputText> 
+<!--
+    <h:outputText value="#{msg['creditcard.reference']} : "/>
+    <h:outputText value="#{courseC.creditcard.creditcardPaymentReference}"/>
+-->
+    <h:outputText value="#{msg['creditcard.industry']} :" />
+    <h:outputText value="#{courseC.creditcard.creditCardMajorIndustryIdentifier}" />
+   
+ <f:facet name="footer">
+    <p:commandButton id="startButton"
+                     widgetVar="startButton2" 
+                     value="#{msg['creditcard.payment']} :"
+                     type="button"
+                     icon="pi pi-credit-card"
+                     style="float: left;"
+                     rendered="#{courseC.creditcard.paymentOK eq false}"
+                     update="taskResult,growl-msg"
+                     onclick="PF('pbAjax').start();"
+                     />
+<!-- enlevé 04-01-2023 onclick="PF('startButton').disable();" remplacé par oncomplete de p:ajax -->
+    <p:commandButton id="cmdCancel"
+                     value="#{msg['payment.cancel']}" 
+                     update="growl-msg"
+                     icon="pi pi-undo"
+                     style="float: right;"
+                     action="#{courseC.cancelProgress()}"
+                     immediate="false"
+                     oncomplete="PF('pbAjax').cancel();PF('startButton2').enable()"
+                     styleClass="ui-button-outlined"/>
+
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

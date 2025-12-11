@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:o="omnifaces"
+      template="templates/masterTemplate.xhtml">
+    
+<ui:define name="title">Player List Page </ui:define>
+<ui:define name="content">
+ <div class="card">
+     
+  <h:outputStylesheet library="styles" name="flags/flags.css" />
+<h:form id="selectPlayer_form" >
+
+<p:dataTable id="table_players"
+             value="#{courseC.listPlayers()}"
+             var="c"
+             rowIndexVar="row"
+             rowStyleClass="#{(row mod 5) eq 0 ? 'highlight' : null}"
+             emptyMessage="#{msg['message.table.empty']}"
+             filterBy="#{courseC.filterBy}"
+             lazy="false"
+             rowHover="true"
+             rowKey="#{c.player.idplayer}" 
+             selectionMode="single"
+             selection="#{courseC.selectedPlayerEPP}"
+             >
+<f:facet name="header">
+    <p:commandButton id="toggler" 
+                     type="button"
+                     value="Columns"
+                     style="float:right"
+                     icon="pi pi-table"
+                     global="true"/>
+   <h:outputText escape="false" value="#{msg['message.playerslist']}" />
+ 
+   <p:columnToggler 
+       id="id001"
+       datasource="table_players"
+       trigger="toggler" />
+</f:facet>
+<!-- new 27-12-2024  -->
+<p:ajax event="rowSelect"
+        update=":selectPlayer_form:playerDetail"
+        oncomplete="PF('playerDialog').show()"/>
+    
+<p:column
+     headerText="#"
+     footerText="#"
+     width="3%"
+     id="rrow">
+             #{row+1}
+</p:column>
+
+	<p:column id="colPlayerSelected"
+                  toggleable="false"
+                  headerText="#{msg['player.selected']}"
+                  footerText="#{msg['player.selected']}"
+                  style="width:20%" >
+            <p:commandButton
+                ajax="true"
+                id="selectButton"
+                action="#{courseC.selectPlayer(c)}"
+                value="#{msg['button.select']} - #{c.player.idplayer}"
+                title="Choix du player"
+                icon="pi pi-sign-in" >
+            </p:commandButton>
+	</p:column>
+
+	<p:column id="col001"
+                  toggleable="false"
+                  headerText="#{msg['player.firstname']}"
+                  footerText="#{msg['player.firstname']}"
+                  style="width:20%" >
+            <h:outputText value="#{c.player.playerFirstName}" />
+	</p:column>
+
+	<p:column id="col002"
+                  toggleable="false"
+                  headerText="#{msg['player.lastname']}"
+                  footerText="#{msg['player.lastname']}"
+                  width="20%"
+                  filterMatchMode="contains"
+                  sortBy="#{c.player.playerLastName}"
+                  filterBy="#{c.player.playerLastName}" >
+            <h:outputText value="#{c.player.playerLastName}" />
+	</p:column>
+
+   <ui:include src="include/include_thumbnails.xhtml"/>
+	<p:column id="col004"
+                  headerText="#{msg['address.country.code']}"
+                  footerText="#{msg['address.country.code']}"
+                  style="width:20%" >
+            <h:outputText value="#{c.player.address.country.extendedName}" />   <!-- was code corriger -->
+	</p:column>
+
+</p:dataTable>
+<!-- new 27-12-2024 -->
+        <p:dialog header="Player Info"
+                  widgetVar="playerDialog"
+                  modal="true"
+                  style="width:90%;"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  resizable="false">
+        <p:outputPanel id="playerDetail"
+                       style="text-align:center;">
+            <p:panelGrid columns="2"
+                         layout="tabular"
+                         style="font-size:0.8rem;"
+                         columnClasses="col1,col2">
+                <h:outputText value="First Name:"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.playerFirstName}" />
+                <h:outputText value="Last Name:"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.playerLastName}" />
+           
+                <h:outputText value="Birth date:"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.playerBirthDate}" >
+                      <f:convertDateTime type="localDateTime" pattern="dd-MM-yyyy"/>
+                </h:outputText>
+                
+                <h:outputText value="Email:"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.playerEmail}" />
+                <h:outputText value="Home Club:"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.playerHomeClub}" />
+                <h:outputText value="Player ID:"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.idplayer}" />
+                <h:outputText value="address:"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.address.street},#{courseC.selectedPlayerEPP.player.address.city}" />
+            
+                <h:outputText value="Date last modification"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.playerModificationDate}" >
+                     <f:convertDateTime type="dateDateTime" pattern="dd-MM-yyyy HH:mm:ss"/>
+                </h:outputText>
+            
+                <h:outputText value="Country Flag"/>
+                <span class="flag flag-#{courseC.selectedPlayerEPP.player.address.country.code.toLowerCase()}"
+                      style="width: 30px; height: 20px"/>
+                <h:outputText value="Country"/>
+                <h:outputText value="#{courseC.selectedPlayerEPP.player.address.country.extendedName} 
+                              ( #{courseC.selectedPlayerEPP.player.address.country.code} )" />
+           </p:panelGrid>
+        </p:outputPanel>
+    </p:dialog>
+    <!--style="vertical-align: middle; margin-left: .5rem"<h:outputText value="#{activeLocale.currentLocale}" /> 
+                <h:outputText value="#{activeLocale.currentLocale.displayCountry}" /> 
+                <h:outputText value="#{activeLocale.currentLocale.displayName}" />  -->
+</h:form>
+ </div>
+</ui:define>
+</ui:composition>

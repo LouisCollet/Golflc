@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core">
+
+<p:panelGrid
+    id="panelgridSummaryGreenfee"
+    layout="tabular"
+    columnClasses="col1,col2,col3,col4"
+    columns="4" >
+
+<f:facet name="header">
+    <h1>#{msg['title.summary.greenfee']}</h1>
+</f:facet>
+      
+      <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText
+            id="clubsummaryGreenfee" 
+            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+
+      <h:outputText value="#{msg['course.name']} :" />
+      <h:outputText
+            id="coursesummaryGreenfee" 
+            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
+
+      <h:outputText value="#{msg['tarif.type']} :" 
+                    rendered="#{courseC.tarifGreenfee.greenfeeType ne null}"/>
+      <h:outputText id="GreenfeeInputType" 
+                    value="#{courseC.tarifGreenfee.greenfeeType}"/>
+
+      <h:outputText value="#{msg['tarif.period']} :"
+                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}"/>
+      <ui:repeat var="item" value="#{courseC.tarifGreenfee.datesSeasonsList}"> 
+          <h:outputText value="#{item.startDate}">
+             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+          </h:outputText>
+          <h:outputText value=" - "/>
+          <h:outputText value="#{item.endDate}">
+             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+          </h:outputText>
+          <h:outputText value=" - #{item.season}  " />
+      </ui:repeat> 
+      
+   <!--       
+ <c:forEach var="i"
+            begin="0"
+            end="#{courseC.tarifGreenfee.datesSeasonsList.size()}"
+            step="1">
+      <h:outputText value="#{msg['tarif.period']} :"
+                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}"/>
+      <h:panelGroup id="panelItemSummaryGreenfee" layout="block"
+                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}">
+          
+          texte ici
+         <h:outputText value="#{courseC.tarifGreenfee.datesSeasonsList.startDate[i]}">
+              <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+         </h:outputText>
+         <h:outputText value=" - #{courseC.tarifGreenfee.datesSeasonsList.endDate[var]}"/>
+         <h:outputText value=" - #{courseC.tarifGreenfee.datesSeasonsList.season[var]}"/>
+    </h:panelGroup>
+    </c:forEach>   
+    -->
+
+
+ 
+<!--
+<c:forEach var="i"
+           begin="0"
+           end="#{courseC.tarifGreenfee.teeTimesList.size()}"
+           step="1">
+   <h:outputText value="#{msg['tarif.period.hours']} :"
+                 rendered="#{courseC.tarifGreenfee.teeTimesList.get(i) ne null}"/>
+   <h:panelGroup id="panelItemSummaryGreenfeeHours" layout="block"
+                 rendered="#{courseC.tarifGreenfee.teeTimesList.get(i) ne null}">
+       <h:outputText value="#{courseC.tarifGreenfee.teeTimesList.get(i).startTime}"/>
+       <h:outputText value=" - #{courseC.tarifGreenfee.teeTimesList.get(i).endTime}"/>
+       <h:outputText value=" - #{courseC.tarifGreenfee.teeTimesList.get(i).price}"/>
+   </h:panelGroup>
+</c:forEach>
+    -->  
+
+
+-->      
+ <!-- idem pour les heures 
+      <h:outputText value="#{msg['tarif.type']} :" 
+                    rendered="#{courseC.tarifGreenfee.inputtype ne null}"/>
+      <h:outputText id="GreenfeeInputType" 
+                    value="#{courseC.tarifGreenfee.inputtype} - #{courseC.tarifGreenfee.dayOfWeek}"
+                    rendered="#{courseC.tarifGreenfee.inputtype ne null}"/>
+
+<c:forEach var="i" begin="0" end="#{courseC.tarifGreenfee.days[0].stream().count()}" step="1">
+   <h:outputText value="#{msg['tarif.typeplayer']} :"
+                 rendered="#{courseC.tarifGreenfee.typePlayer ne null}"/>
+    <h:outputText value="#{courseC.tarifGreenfee.days[0][i]}"
+                  rendered="#{courseC.tarifGreenfee.typePlayer ne null}" />
+</c:forEach>
+     -->     
+</p:panelGrid>
+
+    
+<p:divider layout="horizontal" type="solid" />
+
+</ui:composition>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Played Rounds Page </ui:define>
+<ui:define name="content">
+<h:form id="played_rounds">
+   <div class="card">    
+<!--  screen with DIALOG , il faut :
+    - filtered
+    - selection
+    - rowKey (attention pas de valeur null, sinon msg erreur non compréhensible
+    - une colonne avec selectionMode="single"
+-->
+<p:dataTable id="played_rounds_table"
+            value="#{courseC.listPlayedRounds('LCformula')}"
+            filteredValue="#{courseC.filteredPlayedRounds}"
+            widgetVar="customersTable"
+            var="c"
+            selection="#{courseC.selectedPlayedRound}"
+            rowKey="#{c.round.idround}"
+            filterBy="#{courseC.filterBy}"
+            emptyMessage="#{msg['message.table.empty']}"
+            rowIndexVar="row"
+            selectionMode="single" >
+
+<f:facet name="header">
+            <p:commandButton 
+                actionListener="#{dialogC.showRound()}" 
+                icon="pi pi-external-link"
+                value="View Detail"
+                update="growl-msg"
+                style="float:left">
+                    <p:ajax event="dialogReturn"
+                       listener="#{dialogC.onDialogReturn(event)}"/>
+            </p:commandButton>
+            <p:commandButton 
+                actionListener="#{courseC.viewChartPlayedRound}" 
+                icon="pi pi-external-link"
+                value="View Chart"
+                style="float:right">
+            </p:commandButton>
+
+               <div class="p-d-flex p-ai-center p-jc-between">
+                    <span><h1>
+                      #{msg['round.played']} #{courseC.player.playerFirstName} ,
+                      #{courseC.player.playerLastName} (#{courseC.player.idplayer})
+                    </h1></span>
+                    <p:inputText id="globalFilter"
+                                 onkeyup="PF('customersTable').filter()"
+                                 style="width:10em"
+                                 placeholder="Enter keyword"/>
+                </div>
+</f:facet>    
+
+<p:column 
+          id="rowSingle"
+          selectionBox="true"
+          width="3%"
+          style="text-align:center"
+          headerText="View"
+          footerText="View">
+</p:column>
+
+<p:column
+     id="rowColumn"
+     headerText="#"
+     footerText="#"
+     width="3%"
+     style="text-align:center">
+             #{row+1} 
+</p:column>
+
+<p:column id="RoundIdColumn"
+          headerText="#{msg['round.id']}"
+          footerText="#{msg['round.id']}"
+          width="4%"
+          style="white-space:pre-line;" >
+   #{c.round.idround}
+</p:column>
+
+<p:column id="RoundNameColumn"
+          sortBy="#{c.round.roundName}"
+          filterMatchMode="contains"
+          filterBy="#{c.round.roundName}"
+          headerText="#{msg['round.competition']}"
+          footerText="#{msg['round.competition']}"
+          width="10%">
+   #{c.round.roundName}
+</p:column>
+<!-- style="width:90px;text-align:right;margin-left:10px;margin-right:50px;"  -->
+<p:column headerText="#{msg['round.game']}"
+          footerText="#{msg['round.game']}"
+          width="10%"
+          id="GameColumn"
+          filterBy="#{c.round.roundGame}"
+          filterMatchMode="exact" >
+              #{c.round.roundGame}
+</p:column>
+   <!--  PF13 :range donne erreur  Unknown match mode: range   filterMatchMode="range"-->         
+         <p:column  id="RangeRoundDateColumn"
+                       filterBy="#{c.round.roundDate_LocalDate}"
+                       sortBy="#{c.round.roundDate}"
+                       headerText="#{msg['round.date']}"
+                       footerText="#{msg['round.date']}"
+                     
+                       width="15%">
+                <h:outputText value="#{c.round.roundDate_LocalDate}" >
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                   </h:outputText>
+                <f:facet name="filter">
+                    <p:datePicker id="datePickerRoundDate"
+                                  selectionMode="range"
+                                  rangeSeparator=":"
+                                  size="23"
+                                  showButtonBar="true"
+                                  showIcon="true"
+                                  yearRange="#{utilsC.dateYear(-2)}:#{utilsC.dateYear(0)}"
+                                  yearNavigator="true"
+                                  monthNavigator="true"
+                                  locale="#{languageC.locale}"
+                                  lang="#{languageC.locale}"
+                                  onchange="PF('customersTable').filter()"/>
+                </f:facet>
+            </p:column>
+
+ <p:column   id="colClubName2"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                    sortBy="#{c.club.clubName}"
+                    width="10%">
+            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
+</p:column>
+
+<p:column headerText="#{msg['round.result.stableford']}"
+          footerText="#{msg['round.result.stableford']}"
+          id="FinalResultColumn"
+          sortBy="#{c.inscription.inscriptionFinalResult}"
+          style="white-space:pre-line;"
+          width="5%">
+   #{c.inscription.inscriptionFinalResult}
+
+</p:column>
+
+<p:column id="colQualifying"
+          headerText="#{msg['round.qualifying']}"
+          footerText="#{msg['round.qualifying']}"
+          style="white-space:pre-line;text-align:right"
+          width="5%">
+   #{c.round.roundQualifying}
+</p:column>
+
+<p:column  id="scorecard"
+                  headerText="#{msg['scorecard.header']}"
+                  footerText="#{msg['scorecard.header']}"
+                  width="10%"
+                  >
+            <p:commandButton
+                id="selectScorecard"
+                action="#{courseC.scorecard(c)}"
+                value="Scorecard"
+                icon="pi pi-map"
+                >
+             </p:commandButton>
+</p:column>
+
+<p:column  id="chart"
+                  headerText="#{msg['course.chart']}"
+                  footerText="#{msg['course.chart']}"
+                  width="10%"
+                  >
+            <p:commandButton
+                id="selectChart"
+                action="#{courseC.selectChart(c, 'played rounds')}"
+                value="ViewChart"
+                icon="pi pi-chart-line"
+                >
+             </p:commandButton>
+</p:column>
+
+</p:dataTable>
+
+ </div>
+</h:form>
+</ui:define>
+</ui:composition>

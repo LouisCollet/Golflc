@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+     
+      xmlns:p="primefaces"
+     
+>
+
+<h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+<f:view contentType="text/html">
+<h:head>
+
+</h:head>
+<h:body>
+<h:form id="download_form" enctype="multipart/form-data">
+<p:growl id="msg"
+         life="10000"
+         showDetail="true"/>
+
+
+<p:commandButton id="button1"
+                 value="Download Button 1" 
+                 ajax="false"
+                 icon="pi pi-download">
+
+    <p:fileDownload value="#{fileBeanC.FileDownload()}" /> 
+</p:commandButton>
+
+
+<p:commandButton id="button2"
+                 update="msg"
+                 value="Download Button 2" 
+                 ajax="false"
+                 icon="pi pi-download">
+    <p:fileDownload value="#{fileBeanC.getFile()}"
+                    contentDisposition="attachment"/>  
+</p:commandButton>    
+    <!-- value="#{fileBeanC.FileDownload()}"  was file -->
+    
+
+</h:form>
+
+</h:body>
+</f:view>
+</html>

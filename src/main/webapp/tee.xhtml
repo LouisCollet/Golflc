@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Tee Page</ui:define>
+
+<ui:define name="content">
+<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
+
+<h:form id="form_tee" >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<!-- <p:focus for="input_slope" /> -->
+
+<p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+    <h1>#{msg['tee.data']} #{request.getParameter('operation')}</h1>
+</f:facet>
+                <p:outputLabel value="#{msg['tee.gender']} :"   />
+                <p:selectOneButton id="select_gender"
+                                   label="label_tee_gender"
+                                   value="#{courseC.tee.teeGender}" >
+                    <f:selectItem id="select_gent" itemLabel="#{msg['player.gent']}"   itemValue="M" />
+                    <f:selectItem id="select_lady" itemLabel="#{msg['player.lady']}"   itemValue="L" />
+                </p:selectOneButton>
+
+                <p:outputLabel for="@next" value="#{msg['tee.start']} :"   />
+                <p:selectOneButton id="select_start"
+                                   label="label_tee_start Color"
+                                   value="#{courseC.tee.teeStart}">
+                    <f:selectItems value="#{courseC.tee.StartType()}"
+                                   var="v"
+                                   itemLabel="#{v}"
+                                   itemValue="#{v}"/>
+                </p:selectOneButton>
+ 
+                <p:outputLabel for="@next" value="#{msg['tee.holes.played']} :"   />
+                <p:selectOneButton  id="select_holes"
+                                 tabindex="ti"
+                                 value="#{courseC.tee.teeHolesPlayed}"
+                                 styleClass="selectOneRadioColumn" >
+                    <f:selectItems value="#{courseC.availableHoles}" />
+                </p:selectOneButton>
+
+                 <p:outputLabel for="@next" value="#{msg['course.par']} :"  />
+                  <p:selectOneButton
+                                id="select_par"
+                                value="#{courseC.tee.teePar}">
+                   <f:selectItems value="#{courseC.tee.parList}"
+                           var="par" 
+                           itemLabel="#{par}"
+                           itemValue="#{par}" />
+                </p:selectOneButton>
+
+                <p:outputLabel for="@next" value="#{msg['tee.slope']} :"   />
+                <p:inputNumber  
+                       id="input_slope"
+                       value="#{courseC.tee.teeSlope}"
+                       title="#{msg['tooltip.tee.teeslope']}"
+                       size="3"
+                       emptyValue="000"
+                       required="true"
+                       minValue="88"
+                       maxValue="138"
+                       decimalPlaces="0"
+                       placeholder="999" />
+
+                <p:outputLabel for="@next" value="#{msg['tee.rating']} :"   />
+                <p:inputNumber  
+                       id="input_rating"
+                       value="#{courseC.tee.teeRating}"
+                       title="#{msg['tooltip.tee.teerating']}"
+                       size="4"
+                       required="true"
+                       emptyValue="00.0"
+                       minValue="28.0"
+                       maxValue="78.0"
+                       decimalPlaces="1"
+                       decimalSeparator="."
+                       placeholder="99.9" />
+    <!-- test              
+    <div class="ui-inputgroup">
+    <span class="ui-inputgroup-addon"><i class="pi pi-credit-card"></i></span>
+    <span class="ui-inputgroup-addon"><i class="pi pi-cc-visa"></i></span>
+    <p:inputText placeholder="Price" />
+    <span class="ui-inputgroup-addon">$</span>
+    <span class="ui-inputgroup-addon">.00</span>
+</div>
+-->
+<f:facet name="footer">
+         <p:commandButton 
+                         id="ButtonCreateTee"
+                         value="#{msg['button.tee.create']}"
+                         update="growl-msg"
+                         ajax="false"
+                         rendered="#{courseC.tee.createModify eq true and courseC.hole.nextHole eq false}"
+                         immediate="false"
+                         icon="pi pi-database"
+                         style="float:left;"
+                         action="#{courseC.createTee}"  />
+
+         <p:commandButton value="#{msg['button.tee.modify']}"
+                         id="buttonTeeModify"
+                         ajax="false"
+                         rendered="#{courseC.tee.createModify eq false}" 
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         style="float:left;"
+                         action="#{courseC.modifyTee()}" />
+
+  <!--  mod 29-08-2025 non testé     <p:commandButton value="#{msg['button.holes.global']}"  
+                         id="buttonCreateGlobal"
+                         ajax="false"
+                         rendered="#{courseC.tee.createModify eq false}"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-database"
+                         style="float:right;"
+                         action="modify_holes_global?faces-redirect=true" />
+         -->
+<!--rendered="#{courseC.hole.nextHole}" action="#{courseC.createHolesGlobal()}"  -->
+         <p:commandButton 
+                          id="button02"
+                          value="#{msg['tee.next']}"
+                          update="growl-msg"
+                          immediate="true"
+                          ajax="false"
+                          rendered="#{courseC.hole.nextHole}"
+                          icon="pi pi-arrow-right"
+                          style="float: right;"
+                          action="hole.xhtml?faces-redirect=true" />
+</f:facet>
+
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

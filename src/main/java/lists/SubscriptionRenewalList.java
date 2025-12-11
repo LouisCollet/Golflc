@@ -1,0 +1,111 @@
+package lists;
+
+import entite.composite.ECourseList;
+import entite.Player;
+import entite.Subscription;
+import static interfaces.Log.LOG;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import utils.DBConnection;
+import utils.LCUtil;
+
+public class SubscriptionRenewalList implements interfaces.Log{
+    private static List<ECourseList> liste = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    
+public List<ECourseList> list(final Connection conn) throws Exception{
+if(liste == null){
+    try{
+           LOG.debug("starting getListSubscriptions = " );
+       liste = new ArrayList<>();
+       String su = utils.DBMeta.listMetaColumnsLoad(conn, "payments_subscription");
+       String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
+       final String query =
+        "SELECT "
+             + su + "," + pl +
+        " FROM payments_subscription" +
+        " JOIN player" +
+        "   on player.idplayer = subscriptionIdPlayer" +
+        "   and PlayerActivation = '1' " +
+        " WHERE " +
+        "     YEAR(SubscriptionEndDate) = YEAR(CURRENT_DATE())" +
+        "     AND MONTH(SubscriptionEndDate) = MONTH(CURRENT_DATE()) + 1"  // subscriptions à échéance le mois suivant
+        ;
+       ps = conn.prepareStatement(query);
+       rs = ps.executeQuery();
+    liste = new ArrayList<>(); // new 02/06/2013
+    while(rs.next()){
+          ECourseList ecl = new ECourseList(); // est réi, donc total = 0
+          Player p = entite.Player.map(rs);
+          ecl.setPlayer(p);
+          Subscription s = entite.Subscription.map(rs);
+          ecl.setSubscription(s);
+          liste.add(ecl);
+     } // end while
+
+  //  LOG.debug("closing SubscriptionRenevalList with players = " + Arrays.deepToString(liste.toArray()) );
+  liste.forEach(item -> LOG.debug("players candidates to renewal =  " + item));  // java 8 lambda
+  
+  //// partie 2
+   for(ECourseList item : liste){
+        	LOG.debug("Player we send a Subscription Renewal mail = " + item.getPlayer().getPlayerLastName());
+        //     mail.SubscriptionMail sm = new mail.SubscriptionMail();
+             new mail.SubscriptionMail().sendMail(item.getPlayer(),item.getSubscription());
+      } //end for
+return liste;
+
+} catch(SQLException sqle){
+    String msg = "£££ SQL exception in SubscriptionRenewalList = " + sqle.getMessage() + " ,SQLState = " +
+            sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
+    LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+}catch(Exception e){
+    String msg = "£££ Exception in SubscriptionRenewalList = " + e.getMessage();
+    LOG.error(msg);
+    LCUtil.showMessageFatal(msg);
+    return null;
+}finally{
+           DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
+}
+}else{
+   //  LOG.debug("escaped to listallplayers repetition thanks to lazy loading");
+    return liste;  //plusieurs fois ??
+   //then you should introduce lazy loading inside the getter method. I.e. if the property is null,
+    //then load and assign it to the property, else return it.
+}
+    //end if
+} //end method
+
+    public static List<ECourseList> getListe() {
+        return liste;
+    }
+
+    public static void setListe(List<ECourseList> liste) {
+        SubscriptionRenewalList.liste = liste;
+    }
+    
+     void main() throws SQLException, Exception{
+     Connection conn = new DBConnection().getConnection();
+  try{
+     //   Player player = new Player();
+     //   player.setIdplayer(324713);
+     //   Round round = new Round(); 
+     //   round.setIdround(300);
+       List<ECourseList> ec = new SubscriptionRenewalList().list(conn);
+        LOG.debug("from main, ec = " + ec);
+ }catch (Exception e){
+            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+      //      LCUtil.showMessageFatal(msg);
+   }finally{
+         DBConnection.closeQuietly(conn, null, null , null); 
+          }
+   } // end main//
+} //end class
+    

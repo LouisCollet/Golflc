@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Welcome Page Wildfly</ui:define>
+<ui:define name="content">
+<h:form id="welcome"  >
+    <ui:include src="/include/include_summary_player.xhtml"/>
+    
+    <!-- line 28 PF13  -->
+<p:panelGrid 
+    id="panelGrid1"
+    layout="flex"
+    columns="2"
+    columnClasses="col1Flex,col2Flex"
+    style="font-weight:bold;font-size: 1.1rem"  >
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['message.welcome']}" />
+</f:facet>
+        <h:outputText value="#{courseC.player.playerFirstName}"
+                      style="font-weight:bold;" />
+        <h:outputText value="#{courseC.player.playerLastName}"
+                      style="font-weight:bold;font-size: 2rem" />
+      <c:set var="photo"
+             value="#{courseC.player.playerPhotoLocation}"/>
+
+   <p:graphicImage id="image_photo_found"
+                   value="#{imageView.getPhoto(photo)}"
+                   stream="false"
+                   rendered="#{photo ne 'no photo.jpeg'}"
+                   alt="There is no photo : #{courseC.player.playerLastName}"
+                   style="float: right;">
+   </p:graphicImage>
+
+   <h:graphicImage id="image_photo_unknown"
+                   name="images/photos/unknown.jpg"
+                   rendered="#{photo eq 'no photo.jpeg'}"
+                   alt="no photo image missing :#{courseC.player.playerLastName}"
+                   style="float:right;">
+   </h:graphicImage>
+
+<h:panelGroup layout="block" id="container">
+  <!-- line 51 PF13  -->
+<p:panelGrid 
+    id="panelintern1"
+    layout="flex"
+    
+    columnClasses="col1Flex,col2Flex"
+    style="width:70%"
+    columns="2" >
+
+   <c:set var="pid" value="#{courseC.player.idplayer}"/>
+ 
+    <h:outputText value="#{msg['message.last.session']}"  />
+        #{courseC.LastSession(pid)} 
+
+    <h:outputText value="#{msg['subscription.startdate']}" />
+    <h:outputText value="#{courseC.subscription.startDate}">
+         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+    </h:outputText>    
+
+     <h:outputText value="#{msg['subscription.enddate']}" />
+     <h:outputText value="#{courseC.subscription.endDate}">
+         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+     </h:outputText>
+ 
+     <h:outputText value="Home Club" />
+     <h:outputText value="#{courseC.player.playerHomeClub}"/>
+     
+     <h:outputText value="Blocking Attempts" 
+                   rendered="#{courseC.blocking.blockingAttempts > 0}"/>
+     <h:outputText value="#{courseC.blocking.blockingAttempts}"
+                   rendered="#{courseC.blocking.blockingAttempts > 0}"/>
+
+     <h:outputText value="Pro" 
+                   rendered="#{courseC.isProfessional().size() ne 0}"/>
+     <h:outputText value="#{courseC.isProfessional().size()}"
+                   rendered="#{courseC.isProfessional().size() ne 0}"/>
+ </p:panelGrid>
+
+    <p:megaMenu  id="megaMenu"
+                orientation="vertical"
+                autoDisplay="true"
+                 
+                style="width:100%" >
+        <f:facet name="start">
+                    this is the PF14 start facet
+        </f:facet>
+            <p:submenu label="Additional Menu"
+                       icon="pi pi-ellipsis-v"
+                       style="width:100%"
+                       expanded="true">
+                <p:column>
+                    <p:submenu label="Password Management"
+                               style="width:100%">
+                        <p:menuitem value="Password Forgotten"
+                                    icon="pi pi-question"
+                                    update="growl-msg"
+                                    action="#{courseC.forgetPassword}"/>
+                        <p:menuitem value="Password modify"
+                                    icon="pi pi-pencil"
+                                    outcome="password_modify.xhtml?faces-redirect=true"/>
+                    </p:submenu>
+                    <p:submenu label="Update Data"
+                               style="width:100%">
+                        <p:menuitem value="Modify Personal info"
+                                    icon="pi pi-pencil"
+                                    outcome="player_modify.xhtml?faces-redirect=true"/>
+                        <p:menuitem value="Upload Photo"
+                                    icon="pi pi-upload"
+                                    outcome="player_upload_file.xhtml?faces-redirect=true"/>
+                    </p:submenu>
+                </p:column>
+            </p:submenu> 
+         <f:facet name="end">
+                    end facet
+         </f:facet>
+</p:megaMenu>
+
+</h:panelGroup>
+
+<f:facet name="footer">
+         <p:commandButton
+                         value="#{msg['button.password.forget']}"
+                         id="buttonPasswordForget"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi p-fw pi-question"
+                         style="float: left;"
+                         action="#{courseC.forgetPassword}" />
+         <p:commandButton 
+                         value="#{msg['button.password.modify']}"
+                         id="buttonPasswordModify"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-key"
+                         style="float: right;"
+                         action="password_modify.xhtml?faces-redirect=true"/>
+        <p:commandButton
+                         value="#{msg['unavailable.title']}"
+                         id="buttonUnavailable"
+                         ajax="true"
+                         update="growl-msg"
+                         icon="pi pi-sun"
+                         style="margin: 0 auto;"
+                         action="#{dialogC.showUnavailable()}" /> 
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

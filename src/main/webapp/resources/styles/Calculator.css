@@ -1,0 +1,53 @@
+
+/* css pour calculator_css.xhtml*/
+
+.container{
+    padding: 10px;
+    border-radius: 1rem;
+    height: 380px;
+    width: 400px;
+    margin: auto;
+    background-color: #191b28;
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 20px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+}
+
+.display-box {
+    text-align: right;
+    font-family: sans-serif;
+    background-color: #dcdbe1;
+    border: solid black 0.5px;
+    color: black;
+    border-radius: 5px;
+/*    width: 100%;*/
+    height: 70%;
+    font-size: 2rem;
+    overflow: hidden;
+    text-overflow: ellipsis; /* This is where the magic happens
+    padding: 16px 8px;  
+    padding-right: 20px*/
+}
+.button {
+    font-family: sans-serif;
+    background-color: #64278f;
+    color: white;
+    border: solid black 0.5px;
+    width: 100%;
+    border-radius: 5px;
+    height: 70%;
+    outline: none;
+    font-size: 1.5rem;
+}
+.button:hover {
+    background-color: #323330;
+    color: white;
+    transition: 0.5s ease-in-out;
+}
+.button:active {
+    background: #e5e5e5;
+    -webkit-box-shadow: inset 0px 0px 5px #c1c1c1;
+    -moz-box-shadow: inset 0px 0px 5px #c1c1c1;
+    box-shadow: inset 0px 0px 5px #c1c1c1;
+}
+.clearScreen:hover {
+  background-color: #f17377;
+}

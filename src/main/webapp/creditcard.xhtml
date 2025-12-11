@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+ <ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:pe="primefaces.extensions"
+      xmlns:c="jakarta.tags.core" 
+      template="templates/masterTemplate.xhtml">
+     <!-- à essayer : xmlns:pe="primefaces.extensions"  was xmlns:pe="http://primefaces.org/ui/extensions" xmlns:jsf="http://xmlns.jcp.org/jsf/"-->
+<ui:define name="title">Creditcard Page </ui:define>
+<ui:define name="content">
+     <h:form id="creditcard" >  
+<h:graphicImage name="images/credit-card-1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/credit-card-2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+  <!--   creditcardType = #{creditcardType} -->
+   <c:set var="type" value="#{creditcardType}"/>
+     <c:if test="#{type eq 'GREENFEE'}">
+         <ui:include src="include/include_summary_round.xhtml"/>
+    </c:if>
+    <c:if test="#{type eq 'COTISATION'}">
+         
+         <ui:include src="include/include_summary_cotisation.xhtml"/>
+    </c:if>
+    <c:if test="#{type eq 'SUBSCRIPTION'}">
+         <ui:include src="include/include_subscription.xhtml"/>
+    </c:if>
+    <c:if test="#{type eq 'LESSON'}">
+         <ui:include src="include/include_lesson.xhtml"/>
+    </c:if>
+ <p:panelGrid
+    id="panelGrid1"
+    layout="tabular"
+    columns="2"
+    style="width:70%"
+    columnClasses="col1,col2">
+
+<f:facet name="header">
+    <h:outputText
+            id="subscription"
+            escape="false"
+            rendered="#{type eq 'SUBSCRIPTION'}" 
+            value="#{msg['title.payment.subscription']}">
+    </h:outputText>
+    <h:outputText
+            id="greenfee"
+            escape="false"
+            rendered="#{type eq 'GREENFEE'}" 
+            value="#{msg['title.payment.round']}">
+    </h:outputText>
+    <h:outputText
+            id="membership"
+            escape="false"
+            rendered="#{type eq 'COTISATION'}" 
+            value="#{msg['title.payment.cotisation']} ">
+    </h:outputText>
+    <h:outputText
+            id="lesson"
+            escape="false"
+            rendered="#{type eq 'LESSON'}" 
+            value="#{msg['title.payment.lesson']} ">
+    </h:outputText>
+
+</f:facet>
+    <h:outputText  id="Total"
+                value="#{msg['creditcard.amounttobepaid']} :" />
+    <h:outputText  id="TotalPrice"
+                value="#{courseC.creditcard.totalPrice}"
+                style="font-size: 3em;" />
+
+    
+     <h:outputText  
+                value="#{msg['tarif.members.currency']} :" />
+    <h:outputText id="Currency"
+                  value="#{courseC.creditcard.creditcardCurrency}"
+                  style="font-size: 2em;" />
+    
+    <h:outputText value="#{msg['creditcard.communication']} :" />
+    <h:outputText 
+                  id="Communication"
+                  value="#{courseC.creditcard.communication}"
+                  title="#{msg['tooltip.club.clubaddress']}" />
+
+   <h:panelGroup id="panelG2" layout="block" >
+        <h:outputText value="#{msg['creditcard.type']} :"  />
+                    <i class="pi pi-creditcard"></i>
+   </h:panelGroup>
+   <p:selectOneMenu id="TypeCreditcard"
+                    value="#{courseC.creditcard.creditcardType}"
+                    required="true"
+                    valueChangeListener="#{courseC.creditCardTypeListener}"
+                    title="#{msg['tooltip.creditcard.type']}" >
+                <f:selectItems value="#{courseC.creditcard.cards}"/>
+        <!--        <p:ajax event="change" render="@form"/>  -->
+                <p:ajax event="change" update="@form"/>
+   </p:selectOneMenu>
+
+</p:panelGrid>
+</h:form>
+    
+ <h:form prependId="false" >
+<!-- primefaces extensions  -->
+   <p:panelGrid id="pnlCreditCard"
+                columns="4"
+                layout="tabular"
+                style="width:70%"
+                columnClasses="col1,col2,col3,col4">
+	<f:facet name="header">
+	<pe:creditCard id="creditCard" 
+             labelMonthYear="MM/YY"  />
+                <!-- placeholderExpiry="**/**" 
+                               placeholderName="Optimus Prime" -->
+        </f:facet>
+		<p:inputText id="number"
+                             value="#{courseC.creditcard.creditcardNumber}"
+                             placeholder="Card number"
+                             inputmode="numeric"
+                             required="true" />
+		<p:inputText id="name"
+                             value="#{courseC.creditcard.creditcardHolder}"
+                             placeholder="Full name"
+                             required="true"/>
+         <p:outputPanel id="expiration">
+            <p:datePicker id="CreditcardExpirationDate" 
+                          showIcon="true"
+                          required="true"
+                          requiredMessage="Expiration Date must be completed (à traduire)"
+                          placeholder="YY/MM"
+                          size="6"
+                          showButtonBar="true"
+                          widgetVar="monthPicker" 
+                          view="month" 
+                          pattern="MM/yy"
+                          monthNavigator="true"
+                          yearNavigator="true" 
+                          yearRange="#{utilsC.dateMonth(0)}:#{utilsC.dateYear(5)}"
+                          onchange="$('#expiry').val(PF('monthPicker').input.val()); $('#expiry')[0].dispatchEvent(new Event('change'));"/>
+            <!--  Hide Expiration field so we can use PF MonthPicker    inputmode="numeric"-->
+            <p:inputText id="expiry"
+                         value="#{courseC.creditcard.creditCardExpirationDateString}"
+                         placeholder="MM/YY"
+                         inputmode="numeric"
+                         style="display:none"/>
+        </p:outputPanel>
+	    <p:inputText id="cvc"
+                             value="#{courseC.creditcard.creditcardVerificationCode}"
+                             placeholder="CVC"
+                             size="5"
+                             inputmode="numeric"
+                             required="true"/>
+
+   <f:facet name="footer">
+            <p:commandButton value="#{msg['inscription.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-undo"
+                         style="float: left;"
+                         rendered="#{courseC.creditcard.typePayment eq 'GREENFEE'}" 
+                         action="inscription.xhtml?faces-redirect=true"
+                         oncomplete="PF('dlg').show()" />
+           <p:commandButton value="#{msg['payment.selected']}"
+                         id="commandButtonPayment"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         style="float: right;"
+                         icon="pi pi-credit-card"
+                         action="creditcard_accepted.xhtml?faces-redirect=true">
+           </p:commandButton>
+   </f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

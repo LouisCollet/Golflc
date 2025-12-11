@@ -1,0 +1,11 @@
+-Dorg.maven.logger.defaultLogLevel=info
+-Dorg.maven.logger.showDateTime=true
+-Dorg.maven.logger.dateTimeFormat=HH:mm:ss:SSS
+-Dorg.slf4j.simpleLogger.showThreadName=false
+-Dorg.maven.logger.loggershowShortLogName=false
+--show-version
+-Dsun.net.client.defaultConnectTimeout=2000
+-Dsun.net.client.defaultReadTimeout=2000
+-XX:-TieredCompilation
+-XX:TieredStopAtLevel=1
+--enable-native-access=ALL-UNNAMED

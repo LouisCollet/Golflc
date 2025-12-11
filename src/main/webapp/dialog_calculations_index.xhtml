@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/dialogTemplate.xhtml">
+<ui:define name="title">
+   Detailed Calculation Index Title
+</ui:define>
+<ui:define name="content"> 
+<h:form id="dialog_calculations_index"
+        style="border:solid 3px" 
+         >
+ <p:panelGrid
+        id="panelGrid"
+        layout="tabular"
+        columns="1">
+
+     <f:facet name="header">
+    <!--     <h:outputText escape="false" value="Detailed Index Calculations Header !!!" /> globalStyles: true, title: 'Nature Image Header', timeout: 1000" -->
+            <p:commandButton id="btnPrint"
+                     value="#{msg['button.print']}"
+                     type="button"
+                     style="float: right;"
+                     icon="pi pi-print" >
+               <p:printer id="printerPrimefaces"
+                          target="editor"
+                          
+                          configuration="title: 'Print Handicap Calculations', timeout: 1000, globalStyles: true, addGlobalStyles : true, stylesheet : null, rejectWindow : true,
+                            noPrintSelector : '.no-print', iframe : true, 
+                            append : 'Free jQuery Plugins',
+                            prepend : 'jQueryScript.net'
+                            " />
+            </p:commandButton>
+            <p:commandButton value="Back Dialog Window"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         style="float: left;"
+                         immediate="true"
+                         icon="pi pi-undo"
+                         action="dialog_handicap_index.xhtml?faces-redirect=true" />
+    </f:facet> 
+<!--height="550" print de toute la page ! -->
+    <p:textEditor id="editor"
+                  secure="false"
+                  widgetVar="editor1"
+                  value="#{courseC.handicapIndex.calculations}"
+                  style="width:900px;font-weight: normal; color:black; font-size:1.5em;"
+                  readonly="true"
+                  toolbarVisible="false" >
+    </p:textEditor>
+ </p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

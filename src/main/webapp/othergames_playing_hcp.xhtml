@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html>
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Scramble Playing Handicap Page </ui:define>
+
+<ui:define name="content">
+<h:graphicImage library="images"
+                name="golf_tee.jpg"
+                alt="image missing :golf_tee.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage library="images"
+                name="golf_tee.jpg"
+                alt="image missing :golf_tee.jpg"
+                style="float: right;">
+</h:graphicImage>
+    <!-- -->
+    
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.initInputPlayingHcp(0)}"/>
+    </f:metadata>
+</ui:define>
+    
+    
+<h:form id="othergames_playing_hcp"  >
+<!--
+<p:focus for="slope" />
+-->
+<p:panelGrid
+    id="panelG1"
+    columns="2"
+    style="text-align:center;"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+    <h1>#{msg['playinghcp.scramble.title']}</h1>
+</f:facet>
+    <h:outputText value="#{msg['round.id']} :"
+                  style="font-weight:bold"/>
+                   <p:selectOneMenu
+                    id="country"
+                    value="#{courseC.club.address.country.code}"
+                    >
+                    <f:selectItem
+                         itemLabel="??"
+                         itemValue="#{null}" />
+                    <f:selectItems
+                         value="#{listC.countries}"  />
+                </p:selectOneMenu>
+    
+    <h:outputText value="#{msg['round.id']} :"
+                  style="font-weight:bold"/>
+    <p:selectOneMenu value="#{courseC.otherGame}"
+                     id="lCstatus">
+            <f:selectItem itemLabel="??" itemValue="#{null}" />
+            <f:selectItems value="#{dataC.statuses}"
+                           var="status"
+                           itemValue="#{status}"
+                           itemLabel="#{msg['data.status.'.concat(status)]}" />
+    </p:selectOneMenu>
+
+    
+    
+    <c:forEach var="i" begin="1" end="2" step="1">
+      <h:outputText value="Hcp #{msg['player.message']} #{i}" />
+   </c:forEach>
+        
+    <!-- value="#{courseC.playingHcp.hcpScr[i-1]}"  -->
+    
+    <c:forEach var="i" begin="1" end="2" step="1">
+      <p:inputMask  id="LCcpScr1${i}"
+                    label="Hcp"
+                    value="#{courseC.playingHcp.hcpScr[i-1]}"
+                    size="4"
+                    slotChar="_"
+                    mask="99.9"
+                    required="true"
+                    validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
+                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="36" />
+      </p:inputMask>
+    </c:forEach>
+
+    <c:forEach var="i" begin="3" end="4" step="1">
+      <h:outputText value="Hcp #{msg['player.message']} #{i}" />
+   </c:forEach>
+        
+    <c:forEach var="i" begin="3" end="4" step="1">
+      <p:inputMask  id="LCcpScr2${i}"
+                    label="Hcp"
+                    value="#{courseC.playingHcp.hcpScr[i-1]}"
+                    size="4"
+                    slotChar="_"
+                    mask="99.9"
+                    required="true"
+                    validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
+                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}"
+                    >
+            <f:validateLongRange minimum="0" maximum="36" />
+      </p:inputMask>
+    </c:forEach>
+    
+
+    <h:outputText value="#{msg['handicap.playing']}" />
+    <h:outputText value="#{courseC.playingHcp.playingHandicap}"
+                  style="font-size: 3rem;"
+                       />
+
+<f:facet name="footer">
+         <p:commandButton 
+                         id="button01"
+                         value="#{msg['button.hcp.calculate']}"
+                         update="growl-msg"
+                         ajax="false"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.calculateHcpScramble()}"/>
+
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

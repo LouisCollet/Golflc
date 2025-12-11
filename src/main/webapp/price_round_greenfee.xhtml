@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml" >
+
+<ui:define name="title">Tarif Round</ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+
+<h:form id="form_price_round_greenfee" enctype="application/x-www-form-urlencoded" >
+<ui:include src="include/include_summary_round.xhtml"/>
+<ui:include src="include/include_summary_greenfee.xhtml"/>
+
+<c:set var="greenfeeType" value="#{courseC.tarifGreenfee.greenfeeType}"/>
+
+<c:set var="tarif" value="#{courseC.tarifGreenfee}"/>
+<c:set var="courseId" value="#{courseC.course.idcourse}"/>
+      <c:choose>
+         <c:when test="#{greenfeeType eq 'BA'}">
+          <ui:include src="include/include_greenfee_basic.xhtml"/> 
+         </c:when>
+         <c:when test="#{greenfeeType eq 'DA' }">
+             <ui:include src="include/include_greenfee_days.xhtml"/>
+         </c:when>
+         <c:when test="#{greenfeeType eq 'HO' }">
+             <ui:include src="include/include_greenfee_hours.xhtml"/>
+         </c:when>
+         <c:otherwise>
+            No comment sir...There is an error in greenfeeType
+         </c:otherwise>
+      </c:choose>
+
+<ui:include src="include/include_greenfee_equipments.xhtml"/>
+<!-- 04-01-2023
+<p:panelGrid
+    id="panelGrid1"
+    columns="2"
+    style="width:50%">
+
+<f:facet name="footer">
+          <p:commandButton value="#{msg['tarif.print']}"
+                         id="commandButton1"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.showTarifGreenfee(courseId)}"/>
+         <p:commandButton value="#{msg['inscription.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         style="float: left;"
+                         icon="pi pi-undo"
+                         action="inscription.xhtml?faces-redirect=true" />
+         <p:commandButton value="#{msg['payment.selected']}"
+                         id="commandButtonPayment"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="false"
+                         style="float: right;"
+                         icon="pi pi-credit-card"
+                         action="#{courseC.manageGreenfee()}" />
+</f:facet>
+</p:panelGrid>
+-->
+</h:form>
+</ui:define>
+</ui:composition>

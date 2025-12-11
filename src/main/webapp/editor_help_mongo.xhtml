@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+    <!--  https://stackoverflow.com/questions/41489491/button-codes-for-primefaces-text-editor/48820473  -->
+ 
+<ui:define name="title">Editor Help Files </ui:define>
+<ui:define name="head"> </ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/editor1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/quilljs.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="editor_help_mongo" >
+
+ <p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="1">
+
+     <f:facet name="header">
+        <h2>Help File Handled = 
+         <h:outputText escape="false" value="#{mongoHelpC.helpView.id}.xhtml" />
+          <br/>Last modified = 
+         <h:outputText value="#{mongoHelpC.helpView.helpViewModificationDate}"> 
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm:ss" />
+         </h:outputText>
+        </h2>
+    </f:facet> 
+    <p:textEditor id="help_editor"
+                  secure="false"
+                  widgetVar="editor"
+                  value="#{mongoHelpC.helpView.helpViewText}"
+                  height="250px"
+                  style="width:800px;font-weight: normal;background-color: whitesmoke;" />
+<!-- placeholder="Enter here your content" -->
+    <f:facet name="footer">
+         <p:commandButton value="Save to MongoDB"
+                         id="buttonModify"
+                         lang=""
+                         ajax="true"
+                         immediate="false"
+                         update="help_editor, growl-msg"
+                         icon="pi pi-database"
+                         style="float:left;"
+                         action="#{mongoHelpC.SaveHelpFile()}" />
+
+         <p:commandButton id="ButtonClear"
+                         value="Clear"
+                         onclick="PF('editor').clear();"
+                         icon="pi pi-times" />
+
+         <p:commandButton value="Back to Current"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         icon="pi pi-undo"
+                         action="#{mongoHelpC.BackCurrentHelpFile()}" /> 
+    </f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

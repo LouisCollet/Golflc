@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Competition Menu </ui:define>
+<ui:define name="content">
+
+<h:form id="competition_menu" >
+    <ui:include src="include/include_summary_competition.xhtml"/>
+
+<p:panelMenu id="panel_menu"
+             style="font-size: 1.5rem;border:solid 5px">
+    <p:submenu
+            id="submenu"
+            expanded="true"
+            label="Choisissez l'action à exécuter" 
+            icon="pi pi-check"
+            style="font-size: 1.5rem;"
+       >
+         <p:menuitem value ="Competition Status = #{courseC.competition.competitionDescription.competitionStatus}"
+                     icon="pi pi-calendar"
+                     disabled="true"/>
+         <p:menuitem value ="#{msg['competition.inscriptionslist']}"
+                     action="#{courseC.beforeListInscriptionsCompetition(courseC.competition.competitionDescription)}"
+                     style="font-size: 1.0rem;"
+                     title="#{msg['tooltip.inscriptions.on']}"
+                     icon="pi pi-calendar" />
+         <p:menuitem value="#{msg['competition.startinglist.provisional']}"
+                     action="#{courseC.beforeListStartCompetition(courseC.competition.competitionDescription,'PROVISIONAL')}"
+                     style="font-size: 1.0rem;"
+                     title="#{msg['tooltip.inscriptions.provisional']}"
+                     icon="pi pi-sun"/>
+         <p:menuitem value="#{msg['competition.startinglist.final']}"
+                     rendered="#{courseC.competition.competitionDescription.competitionStatus eq '1'}"
+                     action="#{courseC.beforeListStartCompetition(courseC.competition.competitionDescription, 'FINAL')}"
+                     title="#{msg['tooltip.inscriptions.final']}"
+                     icon="pi pi-sun"/>
+         <!--  disabled="#{courseC.competition.competitionDescription.competitionStatus ne '0'}"
+         style="font-size: 1.0em;"
+         -->
+         <p:menuitem value ="#{msg['competition.rounds']}"
+                     rendered="#{courseC.competition.competitionDescription.competitionStatus eq '1'}"
+                     action="#{courseC.createRoundsCompetition(courseC.competition.competitionDescription)}"
+                     style="font-size: 1.0rem;"
+                     title="tooltip.competition.score"
+                     icon="pi pi-clock" />
+         <!-- disabled="#{courseC.competition.competitionDescription.competitionStatus ne '1'}"   -->
+         <p:menuitem value ="#{msg['competition.score']}"
+                     action="#{courseC.beforeListStartCompetition(courseC.competition.competitionDescription,'PROVISIONAL')}"
+                     rendered="#{courseC.competition.competitionDescription.competitionStatus eq '3'}"
+                     title="tooltip.competition.score"
+                     style="font-size: 1.0rem;"
+                     icon="pi pi-clock" />
+         <!-- disabled="#{courseC.competition.competitionDescription.competitionStatus ne '3'}"  -->
+         <p:menuitem value ="#{msg['competition.classment.calculate']}"
+                     action="#{courseC.listParticipantsStablefordCompetition(courseC.competition.competitionDescription)}"
+                     rendered="#{courseC.competition.competitionDescription.competitionStatus eq '4'}"
+                     title="tooltip.competition.score"
+                     style="font-size: 1.0rem;"
+                     icon="pi pi-clock" />
+        </p:submenu>
+    <!--  disabled="#{courseC.competition.competitionDescription.competitionStatus ne '4'}"  -->
+</p:panelMenu>
+<!--
+ outcome="competition_show_participants_stableford.xhtml"
+action="#{courseC.selectedCompetitionScoreStableford(courseC.competition)}"   -->
+</h:form>
+</ui:define>
+</ui:composition>

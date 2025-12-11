@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="TestNG Groups Example">
+    <test name="Sanity Test">
+        <groups>
+            <run>
+                <include name="sanity"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="calc.GroupedTest"/>
+        </classes>
+    </test>
+    <test name="ExampleTest">
+        <classes>
+            <class name="calc.ExampleTest"/>
+        </classes>
+    </test>
+    
+    
+</suite>

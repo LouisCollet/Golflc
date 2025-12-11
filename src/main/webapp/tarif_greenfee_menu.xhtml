@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+    
+<ui:define name="title">Tarif Greenfee Menu Page </ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<div class="card">
+<h:form id="tarif_greenfee_menu" enctype="application/x-www-form-urlencoded" >
+
+<ui:include src="include/include_summary_greenfee.xhtml"/>
+
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['title.equipments.tarif']}" />
+</f:facet>
+<style type="text/css">
+    .speeddial-linear-demo .ui-speeddial-direction-down {
+        left: calc(50% - 2rem);
+        top: 0;
+    }
+ </style>
+<p:panelMenu id="panel_menu"
+             style="font-size: 1.0em; width:400px; margin:auto;"
+             statefulGlobal="true">
+    <p:submenu label="Input Data Greenfee Tarif" 
+               icon="ui-icon-wrench"
+               expanded="true"
+               style="font-size: .8em;font-weight:bold;"  >
+         <p:submenu label="1. Create Periods"
+                    expanded="true"
+                    style="font-size: 1.2em;font-weight:bold;"
+                    rendered="#{courseC.tarifGreenfee.updateReady ne true}">
+              <p:menuitem value ="Periods = #{courseC.tarifGreenfee.datesSeasonsList.size()}"
+                    icon="pi pi-calendar"  
+                    outcome="tarif_greenfee_periods.xhtml" />
+         </p:submenu>
+
+         <p:submenu label="2. Create Equipments"
+                    expanded="true"
+                    style="font-size: 1.2em;"
+                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}">
+              <p:menuitem value="Equipments = #{courseC.tarifGreenfee.equipmentsList.size()}"
+                     rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}"
+                     icon="pi pi-cog"
+                     outcome="tarif_greenfee_equipments.xhtml" />
+         </p:submenu>
+        
+         <p:submenu label="3. Create Greenfee"
+                    expanded="true"
+                    style="font-size: 1.2em;"
+                    rendered="#{courseC.tarifGreenfee.equipmentsReady eq true
+                           and courseC.tarifGreenfee.updateReady eq false}">
+            <p:menuitem value ="Basic = #{courseC.tarifGreenfee.basicList.size()}"
+                     icon="pi pi-check"   
+                     outcome="tarif_greenfee_basic.xhtml" />
+            <p:menuitem value ="Hours = #{courseC.tarifGreenfee.teeTimesList.size()}"
+                     icon="pi pi-clock" 
+                     outcome="tarif_greenfee_hours.xhtml" />
+            <p:menuitem value="Days of Week = #{courseC.tarifGreenfee.daysList.size()}"
+                     icon="pi pi-sun"
+                     outcome="tarif_greenfee_days.xhtml" />
+         </p:submenu>
+
+         <p:submenu label="4. Create Twilight "
+               rendered="#{courseC.tarifGreenfee.twilightReady eq true}"
+               expanded="true"
+               style="font-size: 1.2em;">
+            <p:menuitem value="Twilight" 
+                     icon="pi pi-database"
+                     outcome="tarif_greenfee_twilight.xhtml" />
+         </p:submenu>
+        
+        <!--  rendered="#{courseC.tarifGreenfee.updateReady eq true}"  twilight demande est fait -->
+        
+    <p:submenu label="5. Create Greenfee Tarif "
+               rendered="#{courseC.tarifGreenfee.updateReady eq true
+                        and courseC.tarifGreenfee.twilightDone eq true}"
+               expanded="true"
+               style="font-size: 1.2em;">
+   <!--     
+         <p:menuitem  value="#{msg['tarif.print']}"
+                     icon="fa fa-list"
+                     style="font-size: 1.5em;"
+                     action="#{courseC.printTarifGreenfee}"/>
+  -->       
+            <p:menuitem value="Create all tarifs in one shot" 
+                     icon="pi pi-database"
+                     rendered="#{courseC.tarifGreenfee.updateReady eq true}"
+                     action="#{courseC.createTarifGreenfee}"/>
+    </p:submenu>
+        
+       <p:submenu label="6. Delete Greenfee Tarif"
+                  style="font-size: 1.2em;  margin:auto;color:red" >
+       <p:menuitem value="Delete tarifs in one shot">
+
+    <c:set var="year" value="#{utilsC.dateYear(0)}"/>
+    <p:commandButton
+                id="deleteButton"
+                style="color:red"
+                action="#{courseC.deleteTarifGreenfee(year)}"
+                value="#{msg['button.delete']} #{courseC.course.courseName} (#{courseC.course.idcourse}) - year = #{utilsC.dateYear(0)}"
+                icon="pi pi-trash" >
+                <p:confirm icon="pi pi-exclamation-triangle" />
+    </p:commandButton>
+        </p:menuitem>
+       </p:submenu>
+   </p:submenu>
+
+</p:panelMenu>
+<!--
+<p:speedDial radius="80" direction="down" type="semi-circle">
+                <p:menuitem icon="pi pi-pencil" action="#{speedDialView.add}" update="messages"/>
+                <p:menuitem icon="pi pi-refresh" action="#{speedDialView.update}" update="messages"/>
+                <p:menuitem icon="pi pi-trash" action="#{speedDialView.delete}" update="messages"/>
+                <p:menuitem icon="pi pi-external-link" url="https://www.primefaces.org"/>
+</p:speedDial>
+-->
+<ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+</div>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+<h:body>
+<p:panelGrid
+    id="panelgridSummaryPlayerPro"
+    layout="tabular"
+    columnClasses="col1,col2,col1,col2"
+    columns="4" >
+
+<f:facet name="header">
+    <h1>#{msg['title.summary.player.pro']}</h1>
+</f:facet>
+        <h:outputText value="#{msg['player.id']}" />
+	<h:outputText value="#{courseC.player.idplayer}" />
+      
+        <h:outputText value="#{msg['player.first']}" />
+        <h:outputText value="#{courseC.player.playerFirstName}"/>
+ 
+        <h:outputText value="#{msg['player.lastname']}"   />
+        <h:outputText value="#{courseC.player.playerLastName}"/>
+        
+        <h:outputText value="#{msg['club.name']} :"   />
+	<h:outputText value="#{schedulerC.club.clubName} (#{schedulerC.club.idclub})" />
+        
+        <h:outputText value="ProId : " />
+        <h:outputText value="#{schedulerC.getProfessional().proId}"/> <!-- getProfessional because professional is static !!   -->
+    
+        <h:outputText value="Pro First, Last name : "/>
+        <h:outputText value="#{schedulerC.playerPro.playerFirstName}, #{schedulerC.playerPro.playerLastName}" />
+        
+</p:panelGrid>
+<p:divider layout="horizontal" type="solid" />
+</h:body>
+</ui:composition>

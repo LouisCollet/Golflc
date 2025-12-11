@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      >
+ <!-- used in show_partipants_stableford.xhtml  -->
+>
+    	<p:column 
+                id="thumbnail"
+                headerText="Thumbnail"
+                footerText="Thumbnail"
+                style="width:10%;text-align:center" >
+	<c:set var="th_photo" value="#{c.player.playerPhotoLocation}"/>
+<!--                photoLocation =  #{th_photo} -->
+            <p:graphicImage 
+                id="image_thumbnail"
+                name="images/thumbnails/thumbnail.#{th_photo}"
+                rendered="#{th_photo ne 'nophoto.jpeg'}"
+                alt="Photo missing for : #{c.player.playerLastName}"/>
+            <p:graphicImage 
+                id="image_thumbnail_unknown"
+                title="this is the title !!"
+                name="images/thumbnails/thumbnail.unknown.jpg"
+                rendered="#{th_photo eq 'nophoto.jpeg'}"
+                alt="image missing for : #{c.player.playerLastName}"/>
+	</p:column>
+</ui:composition>

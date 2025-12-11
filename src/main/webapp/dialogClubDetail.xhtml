@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/dialogTemplate.xhtml">
+
+<ui:define name="title">
+    Dialog Club Detail
+</ui:define>
+
+<ui:define name="content">    
+<h:form id="club_detail"
+        style="border:solid 3px" 
+         >
+
+<p:outputPanel id="playedroundsDetail"
+               style="text-align:center;">
+ <p:panelGrid  columns="2"
+               layout="tabular"
+               columnClasses="col1, col2">
+    <f:facet name="header">
+                    ClubDetail for id = #{param.IdClub}
+    </f:facet>
+<p:dataTable id="courses"
+             value="#{courseC.listDetailClub(param.IdClub)}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             rowHover="true"
+             >
+<p:column
+     headerText="#"
+     footerText="#"
+     width="2%"
+     id="colRow">
+             #{row+1}
+</p:column>
+
+    	<p:column   id="colClubName"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+                  >
+            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
+	</p:column>
+    
+	<p:column id="colCourseName" 
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  style="width:20%"
+         >
+              <h:outputText value="#{c.course.courseName} (#{c.course.idcourse})" />
+	</p:column>
+ 
+    	<p:column   id="colTeeGender"
+                    headerText="#{msg['tee.gender']}"
+                    footerText="#{msg['tee.gender']}"
+                    style="width:20%"
+                  >
+            <h:outputText value="#{c.tee.teeGender} (#{c.tee.idtee})" />
+	</p:column>
+    
+	<p:column id="colTeeStart" 
+                  headerText="#{msg['tee.start']}"
+                  footerText="#{msg['tee.start']}"
+                  style="width:20%"
+         >
+              <h:outputText value="#{c.tee.teeStart}" />
+	</p:column>
+
+       	<p:column   id="colTeeSlope"
+                    headerText="#{msg['tee.slope']}"
+                    footerText="#{msg['tee.slope']}"
+                    style="width:20%"
+                  >
+            <h:outputText value="#{c.tee.teeSlope}" />
+	</p:column>
+    
+	<p:column id="colTeeRating" 
+                  headerText="#{msg['tee.rating']}"
+                  footerText="#{msg['tee.rating']}"
+                  style="width:20%"
+         >
+              <h:outputText value="#{c.tee.teeRating}" />
+	</p:column>
+    
+                
+</p:dataTable>
+<f:facet name="footer">
+    This is the footer facet of dialogClubDetail
+</f:facet>
+
+</p:panelGrid>
+</p:outputPanel>
+</h:form>
+</ui:define> <!--  end of "content" -->
+</ui:composition>

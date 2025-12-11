@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+ <ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core" 
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Creditcard To Amazone Payments Inc </ui:define>
+<ui:define name="content">
+     <h:form id="creditcard_to_server" >
+<h:graphicImage name="images/credit-card-1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/credit-card-2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+  <p:commandButton value="Charger produits"
+                         update="table"
+                         action="#{productBean.loadProducts}" />
+
+        <p:dataTable id="table" var="p" value="#{productBean.products}" selectionMode="single"
+                     selection="#{productBean.current}" rowKey="#{p.id}">
+
+            <p:column headerText="ID">
+                #{p.id}
+            </p:column>
+
+            <p:column headerText="Nom">
+                #{p.name}
+            </p:column>
+
+            <p:column headerText="Prix">
+                #{p.price}
+            </p:column>
+
+            <p:column headerText="Action">
+                <p:commandButton value="Modifier"
+                                 action="#{productBean.select(p)}"
+                                 update=":form:dialog" />
+            </p:column>
+        </p:dataTable>
+
+        <p:dialog id="dialog" header="Produit" widgetVar="dlg" modal="true">
+
+            <p:inputText value="#{productBean.current.name}" placeholder="Nom" />
+            <p:inputNumber value="#{productBean.current.price}" placeholder="Prix" />
+
+            <p:commandButton value="Enregistrer"
+                             action="#{productBean.save}"
+                             update="@form" />
+
+        </p:dialog>
+</h:form>
+</ui:define>
+</ui:composition>

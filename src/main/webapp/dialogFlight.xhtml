@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/dialogTemplate.xhtml">
+    
+<ui:define name="title">Select Flight Page </ui:define>
+<ui:define name="content">
+<h:form id="form_select_flight">
+
+<p:outputPanel id="handicapDetail"
+               deferred="true"
+               style="text-align:center;">
+ 
+<p:dataTable id="flights"
+             value="#{courseC.listFlights()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredFlights}"
+             widgetVar="flightsTable"
+             paginator="true"
+             paginatorPosition="top"
+             rows="10"
+             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink}
+                    {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+             rowsPerPageTemplate="5,10,15"
+             >
+<!--  stickyHeader="true"  rowHover="true" -->
+<f:facet name="header">
+    <h1>#{msg['message.selectflight']} 
+        <h:outputText value="#{courseC.flight.flightStart}">
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+        </h:outputText>
+        <h:outputText value="#{courseC.flight.firstFlight}">
+                <f:convertDateTime type="ZonedDateTime" pattern="HH:mm" />
+        </h:outputText>
+        
+    </h1>
+</f:facet>
+
+<p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="colRow">
+             #{row+1}
+</p:column>
+
+	<p:column id="colFlightPeriod"
+                  headerText="#{msg['flight.period']}"
+                  footerText="#{msg['flight.period']}"
+                  style="width:20%"
+                  filterMatchMode="equals"
+                  filterBy="#{c.flightPeriod}"
+                  >
+            <f:facet name="filter">
+                <p:selectOneButton onchange="PF('flightsTable').filter()">
+                    <f:selectItem itemLabel="#{msg['flight.period.morning']}"   itemValue="A" />
+                    <f:selectItem itemLabel="#{msg['flight.period.midday']}"    itemValue="B" />
+                    <f:selectItem itemLabel="#{msg['flight.period.afternoon']}" itemValue="C" />
+                </p:selectOneButton>
+            </f:facet>
+            <h:outputText value="#{c.flightPeriod}" />
+	</p:column>
+
+	<p:column headerText="#{msg['flight.start']}   "
+                  footerText="#{msg['flight.start']}"
+                  style="width:20%"
+                  id="colFlightSelected" 
+         >
+            <p:commandButton
+                id="selectButton"
+                actionListener="#{courseC.selectFlightFromDialog(c)}"
+                value="#{c.flightHourStart}"
+                icon="pi pi-flag"
+                >
+             </p:commandButton>
+ 	</p:column>
+
+</p:dataTable>
+</p:outputPanel>
+</h:form>
+</ui:define>
+</ui:composition>

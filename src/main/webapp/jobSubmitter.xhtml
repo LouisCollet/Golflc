@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Job Submitter</ui:define>
+
+<ui:define name="content">
+<h:graphicImage library="images" name="BB.jpg" alt="image missing :file.png" style="float: left;"></h:graphicImage>
+<h:graphicImage library="images" name="GB.jpg" alt="image missing :text file.png" style="float: right;">
+</h:graphicImage>
+    <!-- -->
+<h:form id="jobsubmitter"  >
+
+<p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+    <h1>Batch Job Submission</h1>
+</f:facet>
+
+<h:outputText value="Batch ID" />
+<h:outputText value="#{batchC.execID}" />
+
+<c:set var="myVar" value="#{batchC.execID}" scope="request" />
+
+<!-- #{myVar} comment sauver le id ??  rendered="#{jsfBean.completed==false}" -->
+<h:outputText value="Batch Status"/>
+<h:outputText value="#{batchC.jobStatus} - #{myVar}" />
+
+<h:outputText value="Job Execution Detail"/>
+<p:commandButton value="Get Details Info"
+                 icon="po pi-check"
+                 update="growl-msg"
+                 action="jobExecution.xhtml?faces-redirect=true" />
+
+<f:facet name="footer">
+        <p:commandButton value="Start Batch Players"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-arrow-right"
+                         action="#{batchC.startBatchJobPlayers()}"/>
+        <p:commandButton value="Start Batch Rounds"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-arrow-right"
+                         action="#{batchC.startBatchJobRounds()}"/>
+        <p:commandButton value="Start Batch Inscriptions"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-arrow-right"
+                         action="#{batchC.startBatchJobInscriptions()}"/>
+        
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

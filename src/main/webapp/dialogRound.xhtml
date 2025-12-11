@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<!--   -->
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/dialogTemplate.xhtml" > 
+
+<ui:define name="title">Select Dialog Round Page </ui:define>
+<ui:define name="content">
+
+<h:form id="form_select_round" >
+<c:set var="type" value="#{param.type_club}"/>
+type = #{type}
+param.type_club = #{param.type_club}
+<!-- remplacé type par 'type'  -->
+<p:dataTable id="select_round"
+             value="#{courseC.listInscriptions()}"
+             rowIndexVar="row"
+             resizableColumns="true"
+             var="c"
+             emptyMessage="#{msg['message.table.empty']}"
+             rowKey="#{c.round.idround}"
+             style="border:solid 5px;overflow-x:scroll;"  >
+<!-- 
+<p:ajax event="rowToggle" 
+        listener="#{courseC.onRowToggleCompetition}" />
+update=":select_inscription_round:growl-msg"  -->
+<f:facet name="header">
+    <h1>#{msg['message.selectround']} #{msg['message.for.inscription']}</h1>
+</f:facet>
+
+    	<p:column headerText="#{msg['round.selected']}"
+                  footerText="#{msg['round.selected']}"
+                  width="20%" >
+            <p:commandButton
+                id="selectButton"
+                action="#{courseC.selectRecentInscription(c)}"
+                value="#{c.round.idround} - #{msg['button.select']}" 
+                icon="pi pi-arrow-left">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['round.date']}"
+                  footerText="#{msg['round.date']}"
+                  width="20%"
+                  id="rdate">
+                  <h:outputText value="#{c.round.roundDate}"> 
+                      <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                  </h:outputText>
+	</p:column>
+
+        <p:column headerText="#{msg['round.name']}"
+                  width="20%"
+                  id="competitionColumn" >
+                        #{c.round.roundName}
+        </p:column>
+
+        <p:column headerText="#{msg['round.holes']}"
+                  width="10%"
+                  id="RoundHoles" >
+            <h:outputText value= "#{c.round.roundHoles} (start = #{c.round.roundStart})"
+                          rendered="#{c.round.roundHoles eq 9}"/>
+            <h:outputText value= "#{c.round.roundHoles}"
+                          rendered="#{c.round.roundHoles eq 18}"/>
+        </p:column>
+
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    width="25%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}" >
+            #{c.club.clubName} (#{c.club.idclub})
+	</p:column>
+
+	<p:column id="colcoursename"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  width="25%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}" >
+		#{c.course.courseName} (#{c.course.idcourse})
+	</p:column>
+<!--
+<p:rowExpansion>
+            <p:panelGrid id="display"
+                         columns="2"
+                         layout="tabular"
+                         style="width:60%"
+                         columnClasses="col1,col2" >
+
+                <f:facet name="header">
+                    #{msg['inscription.detail']}
+                </f:facet>
+
+                <h:outputText value="Round:" />
+                <h:outputText
+                      id="reround"
+                      value="#{c.round.idround}" />
+
+                <h:outputText value="Game:"/>
+                <h:outputText
+                      id="regame"
+                      value="#{c.round.roundGame}" />
+
+                <h:outputText value="Holes:"/>
+                <h:outputText
+                      id="reholes"
+                      value="#{c.round.roundHoles}" />
+
+                <h:outputText value="Start:"/>
+                <h:outputText
+                      id="restart"
+                      value="#{c.round.roundStart}" />
+                
+                <h:outputText value="Competition:" />
+                <h:outputText
+                      id="recompetition"
+                      value="#{c.round.roundName}" />
+                
+                <h:outputText value="Zoned Date 1:"/>
+                <h:outputText
+                      id="zonedDate1"
+                      value="#{c.round.roundDateZoned}" >
+                       <f:convertDateTime type="zonedDateTime" pattern="dd/MM/yyyy HH:mm" />
+                 </h:outputText>
+                
+                <h:outputText value="Zoned Date 2:" />
+                <h:outputText
+                      id="zonedDate2"
+                      value="#{c.round.roundDateZoned}" >
+                       <f:convertDateTime type="zonedDateTime"/>
+                </h:outputText> 
+            </p:panelGrid>
+  </p:rowExpansion>
+-->
+</p:dataTable>
+ <!--   <ui:include src="include/include_confirmDialog.xhtml"/> -->
+</h:form>
+</ui:define>
+</ui:composition>

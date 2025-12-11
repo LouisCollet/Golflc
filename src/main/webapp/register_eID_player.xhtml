@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html>
+<html
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+>
+<ui:composition template="templates/masterTemplate.xhtml">
+<ui:define name="title">Register Page </ui:define>
+
+<ui:define name="content">
+<h:graphicImage 
+                name="images/eIDreader.jpg"
+                alt="image missing :golf_reader_eid.jpg"
+                style="float: left;">
+</h:graphicImage>
+
+<h:graphicImage 
+                name="images/golf_chrono.jpg"
+                alt="image missing :golf_tee.jpg"
+                style="float: right;">
+</h:graphicImage>
+    <!-- -->
+    
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.registereIDPlayer()}" />
+    </f:metadata>
+</ui:define>    
+    
+<h:form id="register" enctype="application/x-www-form-urlencoded" >
+
+<p:panelGrid
+    id="panel"
+    layout="tabular"
+    columns="1"
+    >
+    
+
+<f:facet name="header">
+    <h1>#{msg['player.register']}</h1>
+</f:facet>
+
+<h:outputText value="Please Register ! " style="font-weight:bold"/>
+
+<h:outputText value="Please insert your eID in the Smartcard Reader ...  "/>
+
+<h:outputText id="txt_count" value=" ... wait #{utilsC.count} seconds ..." />
+
+<h:outputText value=" ... and Click the Register button !"/>
+
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.register.register']}"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-database"
+                         action="#{courseC.registereIDPlayer()}"/>
+</f:facet>
+
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job-scheduling-data 
+    version="2.0" 
+    xmlns="http://www.quartz-scheduler.org/xml/JobSchedulingData" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.quartz-scheduler.org/xml/JobSchedulingData
+    http://www.quartz-scheduler.org/xml/job_scheduling_data_2_0.xsd">
+
+    <pre-processing-commands>
+                <delete-jobs-in-group>*</delete-jobs-in-group>  <!-- clear all jobs in scheduler -->
+                <delete-triggers-in-group>*</delete-triggers-in-group> <!-- clear all triggers in scheduler -->
+    </pre-processing-commands>
+
+        <processing-directives>
+           <!--  if there are any jobs/trigger in scheduler of same name (as in this file), overwrite them-->
+                <overwrite-existing-data>true</overwrite-existing-data>
+           <!-- if there are any jobs/trigger in scheduler of same name (as in this
+                        file), and over-write is false, ignore them rather then generating an error -->
+                <ignore-duplicates>false</ignore-duplicates>
+        </processing-directives>
+
+<!-- Ok this is where all the jobs are created:
+     https://github.com/elventear/quartz-scheduler/tree/master/quartz-core/src/test/resources/org/quartz/xml
+-->
+    
+    <schedule>
+        <job>
+            <name>AJob</name>
+            <group>AGroup</group>
+            <description>Print a logging message</description>
+            <job-class>schedule.SchedulerJob</job-class>
+            
+            <durability>true</durability>
+	    <recover>false</recover>
+	    <job-data-map>
+                <entry> 
+                    <key>foo</key>
+                    <value>bar</value>
+                </entry>
+	    </job-data-map>
+        </job>
+
+        <trigger>
+            <cron>
+                <name>my-Trigger Name</name>
+                <job-name>AJob</job-name>
+                <job-group>AGroup</job-group>
+<!-- voir fichier Quartz.docx-->
+                <cron-expression>0 0 */1 * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+</job-scheduling-data>
+<!--
+<cron>
+http://www.quartz-scheduler.org/documentation/quartz-2.3.0/cookbook/JobInitPlugin.html
+                    <name>my-trigger</name>
+                <group>MYTRIGGER_GROUP</group>
+                <job-name>my-very-clever-job</job-name>
+                <job-group>MYJOB_GROUP</job-group>
+
+                <cron-expression>0 30 4 * * ?</cron-expression>
+            </cron>
+-->

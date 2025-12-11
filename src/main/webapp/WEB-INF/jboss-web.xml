@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://docs.jboss.org/jbossweb/7.0.x/appdev/jbossweb.html   -->
+<jboss-web version="10.0"
+           xmlns="http://www.jboss.com/xml/ns/javaee" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee
+           https://www.jboss.org/j2ee/schema/jboss-web_10_0.xsd">
+    <context-root>GolfWfly-1.0-SNAPSHOT</context-root>
+</jboss-web>

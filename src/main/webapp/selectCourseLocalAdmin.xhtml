@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Select Club Page </ui:define>
+<ui:define name="content">
+<h:form id="form_select_club">
+<div class="card">
+
+ <c:set var="select" value="#{inputSelectCourse}"/>
+ <c:set var="admin"  value="#{adminType}"/>
+<p:dataTable id="courses"
+             value="#{courseC.listLocalAdminCoursesList(select, admin)}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredCourses}" >
+
+<f:facet name="header">
+    <h1>
+        <h:outputText
+            id="Rnd"
+            rendered="#{inputSelectCourse eq 'CreateRound'}" 
+            value="#{msg['message.for.round']}">
+        </h:outputText>
+        <h:outputText
+            id="tarif"
+            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+            value="#{msg['message.for.tarif.greenfee']}">
+        </h:outputText>
+        <h:outputText
+            id="tarifMembers"
+            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+            value="#{msg['message.for.tarif.members']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableS"
+            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+            value="#{msg['message.for.unavailable']}">
+        </h:outputText>
+        <h:outputText
+            id="unavailableP"
+            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+            value="#{msg['message.for.unavailable']}">
+        </h:outputText>
+        <h:outputText
+            id="Det"
+            rendered="#{inputSelectCourse eq 'ChartRound'}" 
+            value="#{msg['message.for.detail']}">
+        </h:outputText>
+        <h:outputText
+            id="Avg"
+            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+            value="#{msg['message.for.average']}">
+        </h:outputText>
+     </h1>
+        parameter from sessionMap = #{inputSelectCourse}
+    
+</f:facet>
+  
+<p:column
+     headerText="#"
+     footerText="#"
+     width="2%"
+     id="colRow">
+             #{row+1}
+</p:column>
+ 
+      	<p:column headerText="#{msg['round.create']}"
+                  footerText="#{msg['round.create']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateRound'}" >
+            <p:commandButton
+                id="selectButtonCreateRound"
+                action="#{courseC.selectCourseLA(c, select)}"
+                value="#{c.course.idcourse} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+
+     	<p:column headerText="#{msg['round.tarif']}"
+                  footerText="#{msg['round.tarif']}"
+                  width="20%"
+                  rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" >
+            <p:commandButton
+                id="selectButtonTarifGreenfee"
+                action="#{courseC.selectCourseLA(c, select)}"
+                value="#{c.course.idcourse} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+
+    	<p:column headerText="#{msg['member.tarif']}"
+                  footerText="#{msg['member.tarif']}"
+                  width="20%"
+                  rendered="#{inputSelectCourse eq 'CreateTarifMember'}" >
+            <p:commandButton
+                id="selectButtonTarifMembers"
+                action="#{courseC.selectClub(c, select)}"
+                value="#{c.club.idclub} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+
+      	<p:column headerText="#{msg['message.for.unavailable']}"
+                  footerText="#{msg['message.for.unavailable']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" >
+            <p:commandButton
+                id="selectButtonUnavailable"
+                action="#{courseC.selectClub(c, select)}"
+                value="#{c.club.idclub} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+
+       	<p:column headerText="#{msg['message.for.unavailable']} Period"
+                  footerText="#{msg['message.for.unavailable']}"
+                  style="width:20%"
+                  rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" >
+            <p:commandButton
+                id="selectButtonUnavailablePeriod"
+                action="#{courseC.selectClub(c, select)}"
+                value="#{c.club.idclub} - #{msg['button.select']}"
+                icon="pi pi-check">
+             </p:commandButton>
+	</p:column>
+
+ 	<p:column   id="colClubName"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+                    filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"
+                    sortBy="#{c.club.clubName}" >
+            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
+	</p:column>
+
+	<p:column id="colCourseName"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  style="width:20%"
+                  filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"
+                  sortBy="#{c.course.courseName}" >
+            <h:outputText value="#{c.course.courseName} (#{c.course.idcourse})" />
+	</p:column>
+        <p:column  id="courseTimeZone"
+                  headerText="#{msg['googletime.timezone']}"
+                  footerText="#{msg['googletime.timezone']}"
+                  style="width:15%" >
+            <h:outputText value="#{c.club.address.zoneId}" />
+        </p:column>
+<f:facet name="footer">
+</f:facet>
+</p:dataTable>
+    </div>
+</h:form>
+</ui:define>
+</ui:composition>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+    <!--
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.listClubsCoursesTees('one_club')}"/>
+    </f:metadata>
+</ui:define>
+    -->
+<ui:define name="title">Modify Club,Course,Tee,Holes Page </ui:define>
+<ui:define name="content">
+<h:form id="modifyClubCourseTee">
+
+<p:dataTable id="modifyClubCourseTee"
+             value="#{courseC.listClubsCoursesTees('one_club')}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.filteredCourses}"
+             rowHover="true" >
+     
+<f:facet name="header">
+    <h:outputText escape="false" value="#{msg['message.selectclub.modify']}" />
+</f:facet>
+
+<p:column
+     headerText="#"
+     footerText="#"
+     style="width:2%"
+     id="rrow">
+             #{row+1}
+</p:column>
+	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    width="20%"
+                    
+                    groupRow="true" >
+            #{c.club.clubName}
+            <!-- filterMatchMode="contains"
+                    filterBy="#{c.club.clubName}"  -->
+	</p:column>
+
+	<p:column headerText="#{msg['club.detail']}"
+                  footerText="#{msg['club.detail']}"
+                  groupRow="true"
+                  width="7%" >
+              <p:commandButton
+                id="loadClubDetail"
+                actionListener="#{dialogC.showClubDetail(c.club)}"
+                icon="pi pi-search"
+                value="Show Club #{c.club.idclub}"  >
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['club.modify']}"
+                  footerText="#{msg['club.modify']}"
+                  groupRow="true"
+                  width="7%" >
+            <p:commandButton
+                id="loadClubModify"
+                action="#{courseC.loadClub(c)}"
+                value="Modify Club #{c.club.idclub}"
+                icon="pi pi-pencil">
+              
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['course.add']}"
+                  footerText="#{msg['course.add']}"
+                  groupRow="true"
+                  style="white-space:pre-line"
+                  width="7%" >
+            <p:commandButton
+                id="addCourse"
+                action="#{courseC.addCourse(c)}"
+                value="Add Course"
+                icon="pi pi-plus">
+             </p:commandButton>
+	</p:column>
+<!--  #{c.club.idclub}  -->
+<p:column id="colcoursename"
+                  headerText="#{msg['course.name']}"
+                  footerText="#{msg['course.name']}"
+                  style="width:20%"
+                  
+                  groupRow="true">
+	#{c.course.courseName}
+        <!--filterMatchMode="contains"
+                  filterBy="#{c.course.courseName}"  -->
+	</p:column>
+
+	<p:column headerText="#{msg['course.modify']}"
+                  footerText="#{msg['course.modify']}"
+                  groupRow="true"
+                  width="7%" >
+            <p:commandButton
+                id="loadCourse"
+                action="#{courseC.loadCourse(c)}"
+                value="Modify Course #{c.course.idcourse}"
+                icon="pi pi-pencil">
+             </p:commandButton>
+	</p:column>
+
+	<p:column headerText="#{msg['tee.add']}"
+                  footerText="#{msg['tee.add']}"
+                  groupRow="true"
+                  width="7%" >
+            <p:commandButton
+                id="addTee"
+                action="#{courseC.addTee(c)}"
+                value="Add Tee #{c.course.idcourse}"
+                icon="pi pi-plus">
+             </p:commandButton>
+	</p:column>
+
+    <p:column id="colTeeStart"
+                  headerText="#{msg['tee.start']}"
+                  footerText="#{msg['tee.start']}"
+                  filterMatchMode="contains"
+                  filterBy="#{c.tee.teeStart}"
+                  width="15%"  >
+         <h:outputText value="#{c.tee.teeStart}" style="color:yellow; font-weight:bold; background-color: grey;" rendered="#{c.tee.teeStart eq 'YELLOW'}"/>
+         <h:outputText value="#{c.tee.teeStart}" style="color:red; font-weight:bold" rendered="#{c.tee.teeStart eq 'RED'}"/>
+         <h:outputText value="#{c.tee.teeStart}" style="color:blue; font-weight:bold" rendered="#{c.tee.teeStart eq 'BLUE'}"/>
+         <h:outputText value="#{c.tee.teeStart}" style="color:orange; font-weight:bold" rendered="#{c.tee.teeStart eq 'ORANGE'}"/>
+         <h:outputText value="#{c.tee.teeStart}" style="color:black; font-weight:bold" rendered="#{c.tee.teeStart eq 'BLACK'}"/>
+         <h:outputText value="#{c.tee.teeStart}" style="color:white; font-weight:bold; background-color: grey;" rendered="#{c.tee.teeStart eq 'WHITE'}"/>
+        #{c.tee.teeGender}/#{c.tee.teeHolesPlayed}
+    </p:column>
+
+	<p:column headerText="#{msg['tee.modify']}"
+                  footerText="#{msg['tee.modify']}"
+                  width="10%"  >
+            <p:commandButton
+                id="loadTee"
+                value="Modify Tee #{c.tee.idtee} MT=#{c.tee.teeMasterTee} Gender=#{c.tee.teeGender} "
+                action="#{courseC.loadTee(c)}"
+                icon="pi pi-pencil">
+           </p:commandButton> 
+	</p:column>
+
+	<p:column headerText="#{msg['tee.master.modify']}"
+                  footerText="#{msg['tee.master.modify']}"
+                  width="10%" >
+            <p:commandButton
+                id="loadHoleMaster"
+                value="Modify Holes #{c.tee.teeMasterTee} (MT)"
+                rendered="#{c.tee.idtee eq c.tee.teeMasterTee}"
+                action="#{courseC.loadHoles(c, 'global')}"
+                icon="pi pi-pencil">
+             </p:commandButton>
+	</p:column>
+
+    	<p:column headerText="#{msg['tee.distance.modify']}"
+                  footerText="#{msg['tee.distance.modify']}"
+                  width="10%" >
+            <p:commandButton
+                id="loadHoleDistance"
+                rendered="#{c.tee.teeHolesPlayed eq '01-18' and c.tee.teeGender eq 'M'}"
+                action="#{courseC.loadHoles(c, 'distance')}"
+                value="Modify Holes #{c.tee.teeDistanceTee} (DT)"
+                icon="pi pi-pencil">
+             </p:commandButton>
+	</p:column>
+
+<f:facet name="footer">
+    <p:commandButton value="#{msg['welcome.back']}"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-user"
+                         style="float:right;"
+                         action="welcome.xhtml?faces-redirect=true" >
+    </p:commandButton>
+</f:facet>
+</p:dataTable>
+</h:form>
+</ui:define>
+</ui:composition>

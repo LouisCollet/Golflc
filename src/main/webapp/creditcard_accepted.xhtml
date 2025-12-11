@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.setProgress1(0) }"/>
+     </f:metadata>
+    <!-- https://stackoverflow.com/questions/6377798/what-can-fmetadata-fviewparam-and-fviewaction-be-used-for -->
+</ui:define>
+    
+    
+<ui:define name="title">Payment</ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/addtocart.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/online2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+
+<script>
+    //<![CDATA[
+    function start() {
+        PF('startButton1').disable();
+       window['progress'] = setInterval(function () {
+            var pbClient = PF('pbClient'),
+                oldValue = pbClient.getValue(),
+                newValue = oldValue + 10;
+            pbClient.setValue(pbClient.getValue() + 10);
+            if (newValue === 100) {
+                clearInterval(window['progress']);
+            }
+        }, 1000);
+    }
+
+    function cancel() {
+        clearInterval(window['progress']);
+        PF('pbClient').setValue(0);
+        PF('startButton1').enable();
+    }
+
+    //]]>
+</script>
+
+<h:form id="creditcard_accepted" >
+
+    <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
+         <ui:include src="include/include_summary_round.xhtml"/>
+    </c:if>
+    <c:if test="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}">
+         <ui:include src="include/include_subscription.xhtml"/>
+    </c:if>
+    <c:if test="#{courseC.creditcard.typePayment eq 'COTISATION'}">
+         <ui:include src="include/include_summary_club.xhtml"/>
+    </c:if>
+<p:panelGrid
+    id="panelGrid1"
+    layout="tabular"
+    columns="2"
+    columnClasses="col1, col2">
+
+<f:facet name="header">
+     <c:set var="type" value="#{creditcardType}"/>
+ <h2>
+    <h:outputText
+            id="subscription"
+            escape="false"
+            rendered="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
+            value="#{msg['title.payment.subscription']}">
+    </h:outputText>
+    <h:outputText
+            id="inscription"
+            escape="false"
+            rendered="#{courseC.creditcard.typePayment = 'GREENFEE'}" 
+            value="#{msg['title.payment.round']}">
+    </h:outputText>
+    <h:outputText
+            id="membership"
+            escape="false"
+            rendered="#{courseC.creditcard.typePayment eq 'COTISATION'}" 
+            value="#{msg['title.payment.cotisation']}">
+    </h:outputText> 
+      </h2>  
+</f:facet>
+ 
+    <h:outputText value="#{msg['creditcard.amounttobepaid']} :" />
+    <h:outputText value="#{courseC.creditcard.totalPrice}"
+                  style="font-size: 3rem;" />
+
+    <h:outputText value="#{msg['tarif.members.currency']} :" />
+    <h:outputText value="#{courseC.creditcard.creditcardCurrency}"
+                  style="font-size: 2em;" />
+
+    <h:outputText value="#{msg['creditcard.communication']} :" />
+    <h:outputText value="#{courseC.creditcard.communication}"
+                  title="#{msg['tooltip.club.clubaddress']}" />
+
+    <h:outputText value="#{msg['creditcard.holder']} :" />
+    <h:outputText value="#{courseC.creditcard.creditcardHolder}" />
+
+    <h:outputText value="#{msg['creditcard.number']} :"/>
+    <h:outputText value="#{courseC.creditcard.creditcardNumber}" />
+
+    <h:outputText value="#{msg['creditcard.type']} :"/>
+    <h:outputText value="#{courseC.creditcard.creditcardType}"/>
+
+    <h:outputText value="#{msg['creditcard.expirationdate']} :" />
+
+    <h:outputText value="#{courseC.creditcard.creditCardExpirationDateString}"/>
+
+    <h:outputText value="#{msg['creditcard.industry']} :" />
+    <h:outputText value="#{courseC.creditcard.creditCardMajorIndustryIdentifier}" />
+ <!-- https://www.primefaces.org/showcase/ui/misc/progressBar.xhtml?jfwid=85a80 -->
+    <h:outputText  id="taskResult" value=" "/> 
+    <p:progressBar id="progressBar2"
+                   widgetVar="pbAjax" 
+                   ajax="true"
+                   value="#{courseC.progress1}"
+                   labelTemplate="{value}%"
+                   styleClass="animated"
+                   global="false"
+                   interval="1000"
+                   severity="#{courseC.progress1 eq 100 ? 'success' : 'warning'}"
+                   style="width:100%;height: 25px; font-size: 2em;color:red" >
+  <!-- here is the magic ! -->
+        <p:ajax event="complete" 
+                listener="#{courseC.onCompletePayment()}"
+                update="taskResult,progressBar2"
+                oncomplete="PF('startButton2').disable()"/>
+        <p:ajax event="start" listener="#{courseC.onStart}" update="taskResult,growl-msg" /> 
+  <!--  clignote !!    <p:ajax event="progress" listener="#{courseC.onProgress}" update="growl-msg" />   -->
+   </p:progressBar>
+<f:facet name="footer">
+    <p:commandButton id="startButton"
+                     widgetVar="startButton2" 
+                     value="#{msg['creditcard.payment']} :"
+                     type="button"
+                     icon="pi pi-credit-card"
+                     style="float: left;"
+                     rendered="#{courseC.creditcard.paymentOK eq false}"
+                     update="taskResult,growl-msg"
+                     onclick="PF('pbAjax').start();"
+                     oncomplete="window.scrollTo(0,0); return false;" />
+
+<!-- enlevé 04-01-2023 onclick="PF('startButton').disable();" remplacé par oncomplete de p:ajax -->
+    <p:commandButton id="cmdCancel"
+                     value="#{msg['payment.cancel']}" 
+                     update="growl-msg"
+                     icon="pi pi-undo"
+                     style="float:right;"
+                     action="#{courseC.cancelProgress()}"
+                     immediate="false"
+                     oncomplete="PF('pbAjax').cancel();PF('startButton2').enable()"
+                     styleClass="ui-button-outlined"/>
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

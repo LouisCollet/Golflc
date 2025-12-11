@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+<h:body>
+
+<p:confirmDialog global="true"
+                 showEffect="fade"
+                 hideEffect="fade"
+                 width="250"
+                 height="50"
+                 header="#{msg['message.confirm.delete']}"
+                 message="#{msg['message.cancel']}" >
+        <p:commandButton value="Yes"
+                         style="color:red;font-size: 1.5em;"
+                         type="button" 
+                         styleClass="ui-confirmdialog-yes"
+                         icon="pi pi-times" />
+        <p:commandButton value="No" 
+                         style="color:green;font-size: 1.5rem;"
+                         type="button" 
+                         styleClass="ui-confirmdialog-no ui-button-flat"
+                         icon="pi pi-check" />
+</p:confirmDialog>
+    
+   <!-- new Primefaces X -->
+<p:confirmPopup global="true"
+                showEffect="fade" 
+                hideEffect="fade"
+                message="this is the message"
+                icon="pi pi-power-off"
+                dismissable="true" >
+            <p:commandButton value="No"
+                             type="button" 
+                             styleClass="ui-confirm-popup-no ui-button-flat" />
+            <p:commandButton value="Yes"
+                             type="button"
+                             styleClass="ui-confirm-popup-yes" />
+</p:confirmPopup>
+</h:body>
+</ui:composition>

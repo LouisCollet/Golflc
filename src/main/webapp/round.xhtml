@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+<ui:define name="title">Round Page </ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/golf_round.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage name="images/golf_round.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
+
+<h:form id="form_round" >
+<ui:include src="include/include_summary_club.xhtml"/>
+
+<p:panelGrid
+    id="panelGridRound"
+    layout="tabular"
+    columnClasses="col1,col2"
+    columns="2" >
+
+<f:facet name="header">
+    <h1>#{msg['round.data']}</h1>
+</f:facet>
+        
+        <p:outputLabel id="roundname" for="@next" value="#{msg['round.name']} *"   />
+	<p:inputText
+            id="roundName"
+            size="45"
+            title="#{msg['tooltip.round.RoundName']}"
+	    value="#{courseC.round.roundName}" />
+
+        <p:outputLabel id="roundcompetition" for="@next" value="#{msg['round.competition']} *"/>
+	<p:inputText
+            id="roundCompetition"
+            value="#{courseC.round.roundCompetition}"
+            size="45"
+            title="#{msg['tooltip.round.RoundCompetition']}"
+            placeholder="only for regrouping rounds (see help)" />
+
+        <p:outputLabel id="roundgame" for="@next" value="#{msg['round.game']}" />
+        <p:selectOneMenu id="gameType"
+                         title="title select one game"
+                         value="#{courseC.round.roundGame}"
+                         >
+            <f:selectItem  itemLabel="#{msg['round.game.select']}"
+                           itemValue=""
+                           noSelectionOption="true"/>
+            <f:selectItems value="#{courseC.round.GameType()}"
+                           var="v" 
+                           itemLabel="#{v}"
+                           itemValue="#{v}" />
+        </p:selectOneMenu>
+        <p:outputLabel id="rounddate" for="@next" value="#{msg['round.date']} *"/>
+        <p:datePicker 
+            immediate="true"
+            size="10"
+            valueChangeListener="#{courseC.roundWorkDate}"
+            value="#{courseC.round.roundDate}"
+            id="RoundDate"
+            label="Round Date : startDate"
+            showIcon="true"
+            showTime="false"
+            pattern="dd/MM/yyyy HH:mm"
+            yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(1)}"
+            locale="#{languageC.locale}"
+            lang="#{languageC.locale}"
+            mindate="#{utilsC.localDateWeek(-5)}"
+            maxdate="#{utilsC.localDateYear(1)}"
+            title="#{msg['tooltip.round.rounddate']}"
+            readonlyInput="true"
+        
+            yearNavigator="true"
+            monthNavigator="true" >
+        </p:datePicker> 
+<!--    -->
+      <p:outputLabel id="roundhour" for="@next" value="#{msg['round.hour']}" />
+      <h:panelGroup id="panelG1" layout="block" >
+          <p:commandButton 
+                        id="flightButton"
+                        actionListener="#{dialogC.showFlight()}"
+                        icon="pi pi-sun"
+                        value="#{msg['button.round.start']}"
+                        style="float:left"
+                        update="growl-msg"
+                        title="#{msg['tooltip.round.roundtime']}" >
+                 <p:ajax event="dialogReturn"
+                         update=":form_round:idworkhour :form_round:roundDateComplete" />
+          </p:commandButton>
+          
+          <h:outputText  id="idworkhour"
+                         style="font-weight:bold;font-size: 2em;font-style:normal;color: red"
+                         value="#{courseC.round.roundDate}">
+                     <f:convertDateTime type="localDateTime" pattern="HH:mm" />   
+          </h:outputText>
+      </h:panelGroup>
+
+       <h:outputText value="#{msg['round.date']} "/>
+       <h:outputText id="roundDateComplete"
+                     value="#{courseC.round.roundDateTrf}" 
+                     style="font-size: 1.5em;"> 
+             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+       </h:outputText>
+      
+      
+<!-- http://stackoverflow.com/questions/32456951/primefaces-dialog-framework-dialog-not-opening  
+-->
+
+ <!-- si round.qualifying true il faut un comment sur l'origine du round
+ n'est plus utilisé
+ conservé comme exemple : field apparait si un selectitem est sélectionné
+ valueChangeListener fonctionne !!!
+ -->
+        <p:outputLabel id="roundqualifying" for="@next" value="#{msg['round.qualifying']}"   />
+    <h:panelGroup id="panelGroupQualifying" >
+        <p:selectOneButton id="qualifying"
+                value="#{courseC.round.roundQualifying}"
+                styleClass="oneradio"
+                valueChangeListener="#{courseC.qualifyingListener}" >
+            <f:selectItems value="#{courseC.availableQualifying}" />
+          <p:ajax listener="#{courseC.round.ajaxListener}" /> 
+        </p:selectOneButton>
+	<p:inputText
+            id="commentQualifying"
+            size="25"
+            rendered="#{courseC.round.showQualifying}"
+            title="#{msg['tooltip.round.RoundName']}"
+            value="#{courseC.handicapIndex.handicapComment}" />
+    </h:panelGroup>
+
+        <p:outputLabel id="roundholes" for="@next" value="#{msg['round.holes']} *"   />
+        <p:selectOneButton id="holes"
+                value="#{courseC.round.roundHoles}"
+                styleClass="oneradio"
+                >
+                <f:selectItem itemLabel="Holes 9 " itemValue="9" />
+                <f:selectItem itemLabel="Holes 18" itemValue="18" />
+        </p:selectOneButton>
+
+        <p:outputLabel id="roundstart" for="@next" value="#{msg['round.start']} *"   />
+        <p:selectOneButton id="start"
+                value="#{courseC.round.roundStart}"
+                styleClass="oneradio"
+                >
+                <f:selectItem itemLabel="Start 1 " itemValue="1" />
+                <f:selectItem itemLabel="Start 10" itemValue="10" />
+        </p:selectOneButton>
+
+ <!-- rendered="#{not courseC.nextInscription}" -->
+<f:facet name="footer">
+        <p:commandButton value="#{msg['button.round.create']}"
+                         id="cb1"
+                         update="growl-msg"
+                         ajax="false"
+                         title="Create a round please"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.createRound}"/>
+
+        <p:commandButton value="#{msg['button.inscription']}"
+                         id="cb2"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         rendered="#{courseC.nextInscription}"
+                         icon="pi pi-arrow-right"
+                         style="float: right;"
+                         action="inscription.xhtml?faces-redirect=true"/>
+
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition> 

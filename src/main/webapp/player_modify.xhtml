@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:h="jakarta.faces.html"
+      xmlns:jsf="http://xmlns.jcp.org/jsf/"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="head" /> 
+<ui:define name="title">Player Page </ui:define>
+
+<ui:define name="content">
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction  action="#{courseC.to_player_modify('M')}"/>
+    </f:metadata>
+</ui:define>
+
+<!-- see http://incepttechnologies.blogspot.be/2014/08/how-to-call-method-during-various-jsf.html   -->    
+
+<h:graphicImage name="images/jack_nicklaus.png" alt="image missing :golf_club.jpg" style="float: right;"></h:graphicImage>
+<h:outputStylesheet library="styles" name="flags/flags.css" />    
+<h:form id="form_player_modify"  >
+    
+<p:focus for="idplayer" />
+
+<p:panelGrid 
+    id="panelGrid1"
+    layout="flex"
+    columns="2"
+    style="margin: 0 auto;width:60%"
+    columnClasses="col1Flex, col2Flex">
+
+<f:facet name="header" >
+    <h1>#{msg['player.modify.data']}</h1>
+</f:facet>
+                <h:outputText value="#{msg['player.id']}" />
+                <h:outputText 
+                        id="idplayer"
+			value="#{courseC.player.idplayer}"
+  />
+<!-- The Java EE 7 version of JSF (2.2) enables the definition of any arbitrary attributes,
+which are not going to be processed by the JSF runtime and directly passed to the browser. 
+The first one is the new attribute placeholder used to define a text 
+that is displayed if the input is empty.
+http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
+-->
+                <p:outputLabel for="@next" value="#{msg['player.first']}" />
+		<p:inputText  label="Firstname"
+                              id="firstName"
+                              placeholder="this is a HTML5 placeholder"
+                              size="45"
+                              styleClass="noprocess"
+			      value="#{courseC.player.playerFirstName}" />
+
+		<p:outputLabel for="@next" value="#{msg['player.lastname']}" />
+		<p:inputText  label="Lastname"
+                              id="lastName"
+                              size="45"
+			      value="#{courseC.player.playerLastName}" />
+                
+                <p:outputLabel for="@next" value="#{msg['player.gender']}" style="font-weight:bold"  />
+                <p:selectOneButton id="gender"
+                                  value="#{courseC.player.playerGender}"  >
+                    <f:selectItem itemLabel="#{msg['player.gent']}" itemValue="M"/>
+                    <f:selectItem itemLabel="#{msg['player.lady']}" itemValue="L" />
+                </p:selectOneButton> 
+
+                <p:outputLabel for="@next" value="#{msg['player.birth']}"  />
+                <p:datePicker value="#{courseC.player.playerBirthDate}"
+                    id="birth"
+                    locale="#{languageC.locale}"
+                    label="LC label birth marche pas"
+                    required="true"
+                    yearRange="c-50:c-10"
+                    showTime="false"
+                    pattern="dd/MM/yyyy"
+                    yearNavigator="true"
+                    monthNavigator="true"
+                    readonlyInput="true" />
+                
+                <p:outputLabel for="@next" value="#{msg['player.email']}" />
+		<p:inputText  label="email"
+                              id="email"
+                              size="45"
+			      value="#{courseC.player.playerEmail}" />
+        <p:commandButton
+                         value="#{msg['button.player.identify']}"
+                         id="buttonPlayerIdentify"
+                         ajax="false"
+                         style="font-weight:normal "
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-id-card"
+                         action="#{courseC.validatePlayer}"/>
+        <h:outputText value=" " />
+        
+        <!--  rendered="#{not courseC.connected}"   <p:keyFilter for="email" mask="email" />  -->
+</p:panelGrid>
+
+<p:panelGrid 
+    id="panelGrid2"
+    layout="tabular"
+    columns="2"
+    style="margin: 0 auto;width:60%"
+    rendered="#{courseC.nextPanelPlayer}"
+    columnClasses="col1, col2">
+                <p:outputLabel value="#{msg['address.country.code']}" 
+                               for="@next"/>
+                <p:autoComplete id="countryCustom"
+                                valueChangeListener="#{courseC.player.playerCountryListener}"
+                                value="#{courseC.player.address.country.code}"
+                                completeMethod="#{countryC.completeCountry}"
+                                var="country"
+                                itemLabel="#{country}" 
+                                itemValue="#{country.code}"
+                                forceSelection="true"
+                                dropdown="true"
+                                scrollHeight="250">
+                    <p:column>
+                        
+                        <span class="flag flag-#{country.code}"
+                              style="width: 30px; height: 20px"/>
+                        <h:outputText style="vertical-align: middle; margin-left: .5em"
+                                      value="#{country.name} - #{country.code} - #{country.locale} - #{country.id}" />
+                    </p:column>
+                </p:autoComplete>
+                
+     <!-- new 05-09-2022  -->
+                <p:outputLabel for="@next" value="#{msg['address.street']}" />
+		<p:inputText  id="street"
+                              value="#{courseC.player.address.street}"
+                              size="45"
+                              immediate="true"
+                              valueChangeListener="#{courseC.player.playerStreetListener}"  />
+
+		<p:outputLabel for="@next" value="#{msg['address.city']}" />
+		<p:inputText  
+                              id="city"
+                              value="#{courseC.player.address.city}"
+                              size="45"
+                              immediate="true"
+                              valueChangeListener="#{courseC.player.playerCityListener}" />
+
+                <p:outputLabel for="@next" value="#{msg['player.language']}" />
+                <p:selectOneMenu id="lang"
+                                 value="#{courseC.player.playerLanguage}"
+                                 immediate="true"
+                                 required="true"
+                                 valueChangeListener="#{courseC.player.playerLanguageListener}"  >
+                    <f:selectItem 
+                                  itemLabel="?? Select"
+                                  noSelectionOption="true"
+                                  itemDisabled="true"
+                                  itemValue="#{null}" />
+                       <f:selectItems value="#{courseC.player.LanguageType()}"
+                                   var="v"
+                                   itemValue="#{v.label}"
+                                   itemLabel="#{v}" />
+                </p:selectOneMenu>
+      
+            <p:outputLabel for="@next" value="#{msg['player.homeclub']}" />
+            <h:panelGroup layout="block" id="container2">
+                <p:inputNumber
+                       label="inputHomeClub"
+                       styleClass="mystyle"
+                       id="inputHomeClub"
+                       value="#{courseC.player.playerHomeClub}"
+                       size="5"
+                       style="margin-right: 10px;" />
+                <!--  24-03-2017 with immediate = true on peut l'utiliser sans provoquer d'erreurs de validation ! -->
+           <p:commandButton 
+                id="ButtonHomeClub"
+                value="#{msg['button.player.homeclub']}"
+                actionListener="#{dialogC.showSelectClub('player_modify')}"
+                style="float:left;"
+                icon="pi pi-search"  >
+                    <p:ajax event="dialogReturn"
+                            update=":form_player_modify:inputHomeClub,clubName,playerHomeClub" />
+            </p:commandButton>
+                <h:outputText id="clubName"
+                              value=" #{courseC.club.clubName}" 
+                              style="font-style:italic"/>  
+                <h:outputText id="playerHomeClub"
+                              value=" #{courseC.player.playerHomeClub}"
+                              style="font-weight:bold;font-size: 2rem;font-style:italic;color: red" />  
+            </h:panelGroup>
+ 
+    <h:outputText value="#{msg['player.zoneid']}" />    
+   <h:panelGroup layout="block" id="container3">
+	<h:outputText 
+                      id="zone"
+                      style="margin-right: 20px;"
+                      value="#{courseC.player.address.zoneId}" />
+   </h:panelGroup>
+
+        <h:outputText value="#{msg['player.latlng']}" />
+	<h:outputText value="#{courseC.player.address.latLng.lat} , #{courseC.player.address.latLng.lng}" />
+
+<f:facet name="footer">
+        <p:commandButton
+                         value="#{msg['button.player.modify']}"
+                         id="button01"
+                         ajax="false"
+                         style="font-weight:normal "
+                         update="growl-msg"
+                         immediate="false"
+                         icon="pi pi-database"
+                         action="#{courseC.modifyPlayer}"/>
+        <!--  rendered="#{not courseC.connected}"    -->
+        <p:commandButton
+                         value="#{msg['button.player.image']}"
+                         id="button02"
+                         ajax="false"
+                         rendered="#{courseC.nextPlayer}"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-arrow-right"
+                         style="float: right;"
+                         action="player_upload_file.xhtml"/>
+
+</f:facet>
+</p:panelGrid>
+
+</h:form>
+</ui:define>
+</ui:composition>

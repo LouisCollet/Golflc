@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- this is the JOB SPECIFICATION LANGUAGE (JSL)-->
+<job id="GolfInscriptionsJob"
+     xmlns="https://jakarta.ee/xml/ns/jakartaee"
+     version="2.0">
+  <properties>
+       <property name="input_file" value="C:/Users/collet/Documents/NetBeansProjects/GolfWfly/private/ryder cup rounds.txt"/>
+   </properties>
+<!--             <listener ref="myStepListener"/>
+            <listener ref="myChunkListener"/>
+                    <listener ref="myItemProcessorListener"/>
+            <listener ref="myItemWriteListener"/>
+        -->    
+    <step id="myStep">
+<!--        <listeners>
+            <listener ref="MyItemReadListener"/>
+        </listeners>
+-->
+        <chunk item-count="1">
+            <reader    ref="ItemReaderInscription">    </reader>
+            <processor ref="ItemProcessorInscription"> </processor>
+            <writer    ref="ItemWriterInscription">    </writer>
+        </chunk>
+    </step>
+</job>

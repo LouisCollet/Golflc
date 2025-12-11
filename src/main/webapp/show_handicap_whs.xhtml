@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+
+    <!--        xmlns:h="jakarta.faces.html"  -->
+    
+    
+<ui:define name="title">Handicap WHS List</ui:define>
+<!--<c:set var="idplayer" value="#{courseC.player.idplayer}"/>
+<c:set var="idround" value="#{courseC.round.idround}"/>
+-->
+<ui:define name="content">
+<h:form id="form_handicap_whs">
+    <p:dataTable id="table_handicap"
+             scrollable="true"
+             value="#{courseC.listHandicapsWHS()}"
+             var="c"
+             selection="#{courseC.handicapIndex.selectedHandicap}"
+             rowKey="#{c.handicapIndex.handicapDate}"
+             rowIndexVar="row"
+             resizableColumns="true"
+             emptyMessage="#{msg['message.table.empty']}"
+             filteredValue="#{courseC.handicapIndex.filteredHandicaps}"
+             rows="20"
+             paginator="true"
+             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+             rowsPerPageTemplate="5,10,15"
+             rowHover="true"
+             
+             >
+ <!-- PF13 selectionMode="single" style="overflow:scroll
+    <p:ajax event="rowSelect"           listener="#{courseC.handicap.onrowSelect(c)}"/>
+    <p:ajax event="rowUnselect"         listener="#{c.handicap.onrowUnselect(c)}" />
+    <p:ajax event="rowSelectCheckbox"   listener="#{c.handicap.onrowSelectCheckbox(event)}"/>
+    <p:ajax event="rowUnselectCheckbox" listener="#{c.handicap.onrowUnselectCheckbox(event)}"/>
+-->
+<f:facet name="header">
+            <p:commandButton 
+                        id="handicapButton"
+                        value="Detail WHS"
+                        actionListener="#{dialogC.showHandicapIndex()}"
+                        icon="pi pi-question"
+                        style="float:left" >
+            </p:commandButton>
+                <h1> #{msg['handicap.whs.data']} : #{courseC.player.playerFirstName},
+                                       #{courseC.player.playerLastName} (#{courseC.player.idplayer})</h1>
+</f:facet>
+
+<p:columnGroup  type="header" >
+    <p:row >
+            <p:column colspan="2"
+                      headerText="Detail"
+                      width="10%"
+                      title="comumn detail title"
+                      styleClass="columnborder1" />
+            <p:column colspan="4"
+                      headerText="Handicap"
+                      width="45%"
+                      styleClass="columnborder2" />
+            <p:column colspan="5"
+                      headerText="#{msg['round.result.stableford']}"
+                      width="45%"
+                      styleClass="columnborder1" />
+    </p:row>
+    <p:row>
+            <p:column headerText="Detail"
+                      
+                      selectionBox="true"/>
+            <p:column headerText="#" style="border-right-width:5px" />
+            <p:column headerText="#{msg['handicap.player']}"  style="white-space:pre-line;" />
+            <p:column headerText="#{msg['handicap.sd']}"     style="white-space:pre-line;" />
+            <p:column headerText="#{msg['handicap.low']}" style="border-right-width:5px;white-space:pre-line;" />
+            <p:column headerText="#{msg['handicap.date']}"     style="white-space:pre-line"/>
+            <p:column headerText="#{msg['handicap.canceled']}" style="white-space:pre-line;"/>
+            <p:column headerText="#{msg['round.date']}"            style="white-space:pre-line;"/>
+            <p:column headerText="#{msg['playerhasround.result']}" style="white-space:pre-line"/>
+            <p:column headerText="#{msg['round.name']}"     style="white-space:pre-line;"/>
+    <!--        <p:column headerText="#{msg['course.name']}"           style="white-space:pre-line;"/>  -->
+    </p:row>
+</p:columnGroup>
+
+<!-- data columns colspan 1 selectionMode="single"-->
+<p:column width="1%"
+         id="singlerow"
+         selectionBox="true"
+         style="text-align:center;" />
+<p:column>
+         <h:outputText  id="rrow"
+             value="#{row+1}"
+             style="text-align:center">
+         </h:outputText>
+</p:column>
+
+<p:column width="5%">
+    <b><h:outputText value="#{c.handicapIndex.handicapWHS}"/></b>
+</p:column>
+
+<p:column width="5%" >
+    <h:outputText value="#{c.handicapIndex.handicapScoreDifferential}"/>
+</p:column>
+
+<p:column width="5%">
+    <h:outputText value="#{c.handicapIndex.lowHandicapIndex}"  >
+   </h:outputText>
+</p:column>
+
+<p:column width="12%">
+    <h:outputText value="#{c.handicapIndex.handicapDate}">
+        <f:convertDateTime type="localDate" pattern="dd-MM-yyyy" />
+   </h:outputText>
+</p:column>
+
+<!-- new 05/09/2017 cancelHandicap ne fonctionne pas -->
+<p:column width="12%">
+            <p:commandButton
+                id="cancelButton"
+                style="color:red;font-weight:bold;"
+                actionListener="#{courseC.cancelHandicap(c)}"
+                value="#{msg['button.delete']} "
+                icon="pi pi-trash"
+                update="growl-msg" >
+                <p:confirm header="#{msg['message.confirm.delete']}"
+                           message="#{msg['message.cancel']}" 
+                           icon="pi pi-exclamation-triangle" />
+                <f:facet name="confirmMessage">
+                  fancy content here...
+                </f:facet>
+            </p:commandButton>
+	</p:column>
+
+<p:column width="15%">
+   <h:outputText value="#{c.round.roundDate}" >
+       <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+   </h:outputText>
+     (#{c.round.idround})
+</p:column>
+
+<p:column width="3%">
+    <h:outputText value="#{c.inscription.inscriptionFinalResult}"/>
+</p:column>
+
+<p:column width="15%">
+    <h:outputText value="#{c.round.roundName}" />
+</p:column>
+<!--
+<p:column width="15%">
+    <h:outputText value="#{c.course.courseName}"/>
+</p:column>
+-->
+</p:dataTable>
+
+<ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+<h:form id="form_noprint" enctype="application/x-www-form-urlencoded" >
+     <p:commandButton id="btn"
+                     value="#{msg['button.print']}"
+                     type="button"
+                     icon="pi pi-print" >
+        <p:printer target="form_handicap_whs" />
+    </p:commandButton>
+</h:form>
+</ui:define>
+</ui:composition>

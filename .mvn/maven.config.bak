@@ -1,0 +1,5 @@
+-U
+--show-version
+--threads=1C
+# 1 thread per cpu core
+# --quiet

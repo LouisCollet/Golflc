@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+     
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+     
+      template="templates/dialogTemplate.xhtml">
+<ui:define name="title">Dialog Weather </ui:define>
+
+<ui:define name="content">
+
+<h:form id="form_select_flight">
+
+<div id="openweathermap-widget-31"></div>
+<script src='//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/d3.min.js'></script><script>window.myWidgetParam ? window.myWidgetParam : window.myWidgetParam = [];  window.myWidgetParam.push({id: 31,cityid: '2800866',appid: '65b6810c7fb377fb322b6a7486bfb87a',units: 'metric',containerid: 'openweathermap-widget-31',  });  (function() {var script = document.createElement('script');script.async = true;script.charset = "utf-8";script.src = "//openweathermap.org/themes/openweathermap/assets/vendor/owm/js/weather-widget-generator.js";var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(script, s);  })();</script>
+        <h:outputText id="weatherScope" 
+                      escape="false"
+                      value="#{sessionScope.weather}" />
+        <h:outputText id="weatherList" 
+                      escape="true"
+                      value="#{findWeather.myList}" />
+        <!--
+        <p:dataTable id="rounds"
+             value="#{findWeather.myList()}"
+             var="c"
+             rowIndexVar="row"
+             emptyMessage="#{msg['message.table.empty']}"
+             rowHover="true"
+             >
+            
+  <f:facet name="header">
+    <h1>#{msg['message.selectclub.modify']}</h1>
+</f:facet>
+            
+            	<p:column   id="colclubname"
+                    headerText="#{msg['club.name']}"
+                    footerText="#{msg['club.name']}"
+                    style="width:20%"
+               
+                 
+                  >
+   	</p:column>
+            
+            
+            
+            
+            
+        </p:dataTable>       
+        
+        -->
+</h:form>
+</ui:define>
+</ui:composition>
