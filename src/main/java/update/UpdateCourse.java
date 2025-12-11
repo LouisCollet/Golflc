@@ -39,7 +39,10 @@ public boolean update(final Course course, final Connection conn) throws Excepti
      */
         ps = conn.prepareStatement(query);
             ps.setString(1, course.getCourseName());
-            ps.setShort(2, (short) 18);// mod 12-11-2018 toujour 18 holes  enlevé dans blacklist de columns update
+          //  ps.setShort(2, (short) 18);// mod 12-11-2018 toujour 18 holes  enlevé dans blacklist de columns update
+            Integer intValue = 18;
+            ps.setShort(2, intValue.shortValue());
+            
             ps.setShort(3, course.getCoursePar()); 
        //     ps.setDate(4, LCUtil.getSqlDate(course.getCourseBeginDate())); mod 03-12-2025
        //     ps.setDate(5, LCUtil.getSqlDate(course.getCourseEndDate()));
