@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:c="jakarta.tags.core"
+      xmlns:p="primefaces"
+      xmlns:o="omnifaces"
+      xmlns:of="http://omnifaces.org/functions"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Technical Info Page </ui:define>
+<ui:define name="content">
+
+<h:form id="technical_info"  >
+<h:graphicImage id="graphic1" name="images/technical02.jpg" alt="image missing :golf_club.jpg" style="float: left;"></h:graphicImage>
+<h:graphicImage id="graphic2" name="images/technical04.jpg" alt="image missing :golf_club.jpg" style="float: right;"></h:graphicImage>
+
+<script type="text/javascript">
+  /*  jQuery(document).ready(function(){
+      if (window.jQuery) { // jQuery is available.
+         var v = "jQuery version = " + window.jQuery().jquery;
+      alert(v);
+      
+      //
+   //    document.getElementById("").innerHTML = v;
+      document.getElementById("jQueryVersion").innerText = v;
+  //     document.queryVersion.innerHTML = v;
+      SetMyStrings([{name: "JQueryVersion", value: v}]);
+ //     alert("after SetMyStrings"); 
+    }
+    });
+   */ 
+    function getjQueryVersion(){
+        if (window.jQuery) { // jQuery is available.
+            var v = "jQuery version = " + window.jQuery().jquery;
+        }else{
+            alert("jQuery not available");
+        }
+        alert(v);
+        return v;
+    }
+    
+    
+</script>
+ 
+
+<p:panelGrid id="panel" columns="2"
+             layout="tabular"
+             columnClasses="col1,col2" >
+
+<f:facet name="header">
+    <h1>Technical info</h1>
+    
+</f:facet>
+    <!-- file = /src/main/resources/version_components <h:outputText value="#{ver['message.test1']}"/> 
+<c:forEach items="#{header}" var="header">
+   <tr>
+       <td>#{header.key}</td>
+       <td>#{header.value}</td>
+   </tr>
+</c:forEach>-->
+    
+    <h:outputText value="Application version" />
+    <h:outputText value=" #{infoC.getApplicationVersion()}" />
+
+    <h:outputText value="Date Last Build" />
+    <h:outputText value="#{infoC.buildVersion}"/>
+
+    <h:outputText value="Date Last Deploy" />
+    <h:outputText value="#{infoC.DeployVersion()}" escape="false"/>
+    
+    <h:outputText value="Browser" />
+        #{request.getHeader("user-agent")}
+
+    <h:outputText value="Host" />
+        #{header["host"]} 
+
+    <h:outputText value="Copyright" />
+        <b>&#169;2012-#{of:formatDate(now,'yyyy')} </b> Application GolfLC by Louis Collet v2.0
+
+    <h:outputText value="IPv4 Address" />
+        #{request.getRemoteAddr()}
+        
+    <h:outputText value="IPv6 Address" />
+         #{infoC.clientIPv6Address}
+
+    <h:outputText value="IP Address 3" />
+         #{infoC.globalAddress}
+
+    <h:outputText value="Server Mac Address" />
+        #{infoC.clientMacAddress}
+        
+    <h:outputText value="Server Startup" />
+        #{startup}
+    <!--
+        #{of:formatDate(startup,"yyyy-MM-dd HH:mm:ss")}
+     -->   
+    <h:outputText value="Server Address" />
+        #{infoC.clientIpAddress}
+
+    <h:outputText value="Operating System" />
+        #{infoC.osVersion}
+
+<h:graphicImage 
+                name="images/omnifaces.png"
+                alt="image missing :omnifaces"
+                >
+</h:graphicImage>
+            OmniFaces  #{infoC.omnifacesVersion}
+            
+<h:graphicImage 
+                name="images/maven.png"
+                alt="image missing :maven"
+                >
+</h:graphicImage>
+           #{infoC.mavenVersion}
+            
+<h:graphicImage 
+                name="images/GitHub.jpg"
+                alt="image missing :github"
+                >
+</h:graphicImage>
+                     <!--  https://stackoverflow.com/questions/30683584/what-url-to-use-to-link-navigate-to-other-jsf-pages -->
+           <h:outputLink value="https://github.com/LouisCollet/Golflc.git">Go to GitHub site!</h:outputLink>
+           
+<h:graphicImage name="images/netbeans.png"
+                alt="image missing :netbeans"/>
+        <!--     https://img.shields.io/badge/apache%20netbeans-1B6AC6?style=for-the-badge&logo=apache%20netbeans%20IDE&logoColor=white -->
+ #{infoC.netbeansVersion}
+   
+ <h:graphicImage name="images/primeflex.png"
+                alt="image missing :primeflex"/>
+             #{infoC.primeflexVersion}
+             
+<h:graphicImage name="images/Mojarra.JPG"
+                alt="image missing :jsf.png"/>
+            #{infoC.mojarraVersion}
+
+<h:graphicImage name="images/java.jpg"
+                alt="image missing :java.jpg"/>
+             #{infoC.javaVersion()}
+
+<h:graphicImage name="images/jakartaee.png"
+                alt="image missing :jakartaee.png"/>
+             #{infoC.jakartaEEVersion}
+
+ <h:graphicImage 
+                name="images/wildfly.png"
+                alt="image missing :wildfly.png" >
+</h:graphicImage>
+                #{faces.serverInfo}
+ <h:graphicImage 
+                name="images/primefaces.png"
+                alt="image missing :primefaces" >
+</h:graphicImage>
+            PrimeFaces #{infoC.primefacesVersion} 
+           
+ <h:graphicImage 
+                name="images/primefaces_extensions.png"
+                alt="image missing :primefaces extensions" >
+</h:graphicImage>
+            PrimeFaces Extensions #{infoC.primefacesExtensionVersion}
+
+ <h:graphicImage 
+                name="images/jquery.png"
+                alt="image missing :jQuery" >
+</h:graphicImage>
+           
+           <h:panelGroup id="jQueryPanelGroup" layout="block" >
+         <!--     <h:inputText id="jQueryVersion"
+                  title="will contains the version !"
+                  value=" ">
+              </h:inputText> -->
+              <p:commandButton 
+                         id="ButtonVersion"
+                         ajax="true"
+                         immediate="true"
+                         value="jQuery Version"
+                         style="font-weight:bold;margin-left:1.5rem;"
+                         icon="pi pi-search" >
+                    <p:ajax event="click"
+                            onsuccess="getjQueryVersion();"
+                            process="@this"
+                            update="jQueryVersion,growl-msg" />
+                </p:commandButton>
+            </h:panelGroup>
+
+   <!--  actionListener="#{dialogC.showSelectPlayer('professional')}"  -->         
+            
+            
+<h:graphicImage 
+                name="images/mysql-logo.jpg"
+                alt="image missing :mysql" >
+</h:graphicImage>
+        #{infoC.mySql}
+        
+<h:graphicImage 
+                name="images/MongoDB.png"
+                alt="image missing : mongoDB.png" >
+</h:graphicImage>
+        #{infoC.mongoDB}
+                
+<h:graphicImage 
+                name="images/log4j2.jpg"
+                alt="image missing :log4j2"  >
+</h:graphicImage>
+        Log4j2 #{infoC.log4j2Version}
+
+</p:panelGrid>
+<p:remoteCommand name="SetMyStrings"
+                 action="#{infoC.putMyStrings()}"
+                 autoRun="false"/>
+</h:form>
+</ui:define>
+</ui:composition>

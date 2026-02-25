@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Technical Error</ui:define>
+<ui:define name="content">
+<h:graphicImage name="images/bug.jpg" alt="image missing :bug.jpg" style="float:left;">  </h:graphicImage>
+<h:graphicImage name="images/technical_difficulties.jpg" alt="image missing :technical_difficulties.jpg" style="float:right;">  </h:graphicImage> 
+
+<h:form id="form_error_throw"  >
+    <!--layout 29-05-2023 PF 13 #{msg['login.welcome.back']} 
+       web.xml ==>    <location>/error_throw.xhtml</location> -->
+    <!-- https://primefaces.github.io/primefaces/16_0_0/#/core/errorhandling -->
+<p:panelGrid id="panel"
+             layout="tabular"
+             columns="1" >
+<f:facet name="header">
+    <h1>Primefaces Exception handler</h1>
+</f:facet>
+    <h:outputText value="Exception:#{pfExceptionHandler.exception}" style="font-size: 1.5rem;color:red;background-color: whitesmoke;"/>
+    <h:outputText value="Message:#{pfExceptionHandler.message}" style="font-size: 1.0rem;"/>
+    <h:outputText value="Type :#{pfExceptionHandler.type}" style="font-size: 1.0rem;"/>
+    <h:outputText value="at :#{pfExceptionHandler.stackTrace[0]}" style="font-size: 1.5rem;color:blue" escape="false" />
+    <h:outputText value="Timestamp : #{pfExceptionHandler.formattedTimestamp}"/><br/>
+    <h:outputText value="Formatted StackTrace :#{pfExceptionHandler.formattedStackTrace}" style="font-size: 1.0em;" escape="false" />
+
+<f:facet name="footer">
+    <p:commandButton value="#{msg['login.user.old']}"
+                         update="growl-msg"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-user"
+                         action="welcome.xhtml?faces-redirect=true"/>
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

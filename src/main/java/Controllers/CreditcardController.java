@@ -59,7 +59,7 @@ import java.net.http.HttpHeaders;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
+// import java.sql.Connection; // removed 2026-02-25 — conn was dead code in payment methods
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -78,9 +78,9 @@ import org.apache.http.Header;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+//enlevé 30-12-2025 et aussi dans pom.xml import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+//import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+//import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 @Named("creditcardC")
 @SessionScoped
@@ -88,7 +88,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 //return redirect("http://localhost:8080/GolfWfly-1.0-SNAPSHOT/rest/creditcardController/payment_accepted",code=302)
 // d'où vient le /rest  ??
 // Before deploying your application, you need a JAX-RS class activator, which is a class extending
-// javax.ws.rs.core.Application and declaring the Path where JAX-RS Services will be available:
+//  and declaring the Path where JAX-RS Services will be available:
 // in other words : sets the Web context for the REST Service, 
 // le code se trouve dans dans package rest
 
@@ -136,9 +136,19 @@ public String getCC2(Creditcard cc) throws Exception {
     return v;  // back to CourseController
 }
 
-public CreditcardController() {  
+    @Inject
+    private read.ReadCreditcard readCreditcard;             // migrated 2026-02-24
+    @Inject
+    private update.ModifyCreditcard modifyCreditcard;       // migrated 2026-02-24
+
+    @Inject
+    private create.CreateCreditcard createCreditcard;       // migrated 2026-02-24
+    @Inject
+    private payment.PaymentSubscriptionController paymentSubscriptionController; // migrated 2026-02-25
+
+public CreditcardController() {
 // constructor
-} 
+}
 /*
 @GET
 @Path("payment_accepted") //  from /rest/creditcardController/payment_accepted @app.route("/contact", methods=["GET", "POST"]) de creditcardService.py
@@ -422,7 +432,7 @@ try{
    } 
 }    
 
-public Boolean handlePaymentSubscription(Creditcard c, Subscription subscription, Connection conn) { // new 31-07-2025    
+public Boolean handlePaymentSubscription(Creditcard c, Subscription subscription) { // new 31-07-2025 — conn removed 2026-02-25
 try{
 LOG.debug("handlePayments for subscription = " + subscription);
           LOG.debug("handlePayments Subscription with creditcard common = " + creditcard); // est null
@@ -431,7 +441,8 @@ LOG.debug("handlePayments for subscription = " + subscription);
         subscription.setPaymentReference(c.getCreditcardPaymentReference());
         subscription.setIdplayer(c.getCreditCardIdPlayer());
         
-        if(new Controllers.PaymentsSubscriptionController().createPayment(subscription, conn)){
+        // if(new payment.PaymentSubscriptionController().createPayment(subscription, conn)){
+        if(paymentSubscriptionController.createPayment(subscription)){ // migrated 2026-02-25
                LOG.debug("after Subscription createPayment : we are OK " + subscription);
             String msg = LCUtil.prepareMessageBean("subscription.success")
                 + " start date = " + subscription.getStartDate().format(ZDF_DAY)
@@ -457,16 +468,16 @@ LOG.debug("handlePayments for subscription = " + subscription);
    } 
 }
 
-public boolean needsUpdate(Creditcard c, Player player, Connection conn) {
+public boolean needsUpdate(Creditcard c, Player player) { // conn removed 2026-02-25
 try{
       LOG.debug("entering needsUpdate() ");
       LOG.debug("with creditcard input = " + c);
-    Creditcard creditc = new read.ReadCreditcard().read(player, conn);
+    Creditcard creditc = readCreditcard.read(player);
   //       LOG.debug("creditcard loaded = " + creditcard);
     //  if(creditc.getCreditCardNumber() == null){
       if(creditc == null){    
                 LOG.debug("CREATION : First utilisation of a creditcard for user = " + player.getPlayerLastName());
-          if(new create.CreateCreditcard().create(c, conn)){
+          if(createCreditcard.create(c)){
               LOG.debug("creditcard is created in DB" );
               return true;
           }else{
@@ -489,7 +500,7 @@ try{
        return false;
      }else{
           LOG.debug("a modified creditcard has been introduced !");
-          if(new update.ModifyCreditcard().modify(creditcard,conn)){
+          if(modifyCreditcard.modify(creditcard)){
              String msg = "creditcard is modified in DB";
              LOG.error(msg);
              showMessageInfo(msg);
@@ -508,8 +519,8 @@ try{
 //      return false;
 } //end method
 
-private static Creditcard prefilling(Player player, Connection conn) throws SQLException{
-      Creditcard c = new read.ReadCreditcard().read(player, conn);
+private Creditcard prefilling(Player player) throws SQLException, Exception{ // conn removed 2026-02-25
+      Creditcard c = readCreditcard.read(player);
           LOG.debug("creditcard loaded = " + c);
       if(c.getCreditcardNumber() == null){
                 LOG.debug("First utilisation of a creditcard for user = " + player.getPlayerLastName());
@@ -533,7 +544,7 @@ private static Creditcard prefilling(Player player, Connection conn) throws SQLE
  return c;
  }
  
-public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connection conn) throws SQLException{
+public Creditcard completeWithGreenfee(Greenfee greenfee, Player player) throws SQLException{ // conn removed 2026-02-25
       Creditcard creditcard = null;
  try{
          LOG.debug("starting CompleteCreditcardWithGreenfee with Greenfee" + greenfee);
@@ -541,7 +552,7 @@ public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connect
           LOG.debug("amount ZERO no payment needed !");
           return creditcard;
       }
-      creditcard = prefilling(player, conn);
+      creditcard = prefilling(player);
           LOG.debug("creditcard preffilled with player's data = " + creditcard);
       creditcard.setPaymentOK(false);
       creditcard.setTotalPrice(greenfee.getPrice());
@@ -559,8 +570,7 @@ public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connect
 
 // new 18-01-2023
  public Creditcard completeWithLesson(Professional professional, List<Lesson> lessons,
-         Player player,
-         Connection conn) throws SQLException{
+         Player player) throws SQLException{ // conn removed 2026-02-25
  try{
          LOG.debug("starting CompleteCreditcardWithLesson");
          LOG.debug("with listLessons = " + lessons);
@@ -571,7 +581,7 @@ public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connect
           LOG.debug("Amount ZERO no payment Lesson needed !");
           return creditcard;
       }
-      creditcard = prefilling(player, conn);
+      creditcard = prefilling(player);
          LOG.debug("creditcard after prefilling = " + creditcard);
       creditcard.setPaymentOK(false);
    // à vérifier
@@ -602,7 +612,7 @@ public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connect
 }    
 }  //end method 
  
- public Creditcard completeWithCotisation(Cotisation cotisation, Player player, Connection conn) throws SQLException{
+ public Creditcard completeWithCotisation(Cotisation cotisation, Player player) throws SQLException{ // conn removed 2026-02-25
  try{
          LOG.debug("starting CompleteCreditcardWithCotisation");
          LOG.debug("Cotisation = " + cotisation);
@@ -612,7 +622,7 @@ public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connect
           return creditcard;
       }
    // creditcard = new Controllers.CreditcardController().creditcardPrefilling(player, conn);
-      creditcard = prefilling(player, conn);
+      creditcard = prefilling(player);
           LOG.debug("creditcard preffilled = " + creditcard);
       creditcard.setPaymentOK(false);
       creditcard.setTotalPrice(cotisation.getPrice());
@@ -629,7 +639,7 @@ public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connect
 }  //end method competeWithCotisation
  
 // new 23-01-2023
- public Creditcard completeWithSubscription(Subscription subscription, Player player, Connection conn) throws SQLException{
+ public Creditcard completeWithSubscription(Subscription subscription, Player player) throws SQLException{ // conn removed 2026-02-25
     try{
          LOG.debug("starting completeWithSubscription");
          LOG.debug("subscription = " + subscription);
@@ -640,7 +650,7 @@ public Creditcard completeWithGreenfee(Greenfee greenfee, Player player, Connect
    //   subscription = new PaymentsSubscriptionController().completePriceAndCommunication(subscription);
       
       
-      creditcard = prefilling(player, conn);
+      creditcard = prefilling(player);
  //         LOG.debug("creditcard preffilled = " + creditcard);
       creditcard.setPaymentOK(false);
       creditcard.setTotalPrice(subscription.getSubscriptionAmount()); // mod 22-02-2024

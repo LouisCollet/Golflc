@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:of="omnifaces"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{courseC.logout(param['cmd'])}"/>
+    </f:metadata>
+</ui:define>
+    
+<ui:define name="title">Session Expired </ui:define>
+<ui:define name="content">
+<h:graphicImage 
+                name="images/expired.jpg"
+                alt="image missing :expired.jpg"
+                style="float:left;">
+</h:graphicImage>
+    
+ 
+    
+<h:link value="New Connection : clic on Login Image !"
+        outcome="login.xhtml"
+        style="float:right;" >
+    <h:graphicImage name="images/golf_login.jpg" alt="image golf_login.jpg" style="float:right;"> </h:graphicImage>
+</h:link>
+    
+<h:form id="form_session_expired" >
+    <!-- -->
+<p:panelGrid id="panel"
+             columns="1"
+             layout="tabular"
+             columnClasses="col1" >
+<f:facet name="header">
+    <h1>Session Expired !! <br/>
+         #{msg['login.welcome.back']} <br/>
+         #{param['cmd']}
+    </h1>
+</f:facet>
+
+       <ul>
+     <li>Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}</li>
+     <li>User agent: #{header['user-agent']}</li>
+     <li>User IP: #{request.remoteAddr}</li>
+     <li>Last access time: #{request.session.lastAccessedTime}</li>
+     <li>Max Inactive Interval : #{session.maxInactiveInterval}</li>
+     <li>Session Creation Time: #{session.creationTime}</li>
+     <li>Session Id: #{session.id}</li>
+<!--  LocalDateTime ldt = Instant.ofEpochMilli(session.getCreationTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+  //      LOG.debug("session was created at localdatetime : " + ldt.format(ZDF_TIME)); 
+  //      LOG.debug("destroy time = " + LocalDateTime.now().format(ZDF_TIME));
+   
+     
+       ne donnent rien ==>
+     <li>Ajax partialView request: #{facesContext.partialViewContext.ajaxRequest ? 'Yes' : 'No'}</li>
+     <li>Status code: #{requestScope['jakarta.servlet.error.status_code']}</li>
+     <li>Exception type : #{requestScope['jakarta.servlet.error.exception_type']}</li>
+     <li>Exception message: #{requestScope['jakarta.servlet.error.message']}</li>
+     <li>Stack trace:
+         <pre>#{of:printStackTrace(requestScope['jakarta.servlet.error.exception'])}</pre>
+     </li>  -->
+ </ul>
+
+<f:facet name="footer">
+    <p:commandButton value="#{msg['login.user.old']}"
+                     update="growl-msg"
+                     immediate="true"
+                     ajax="false"
+                     icon="pi pi-user"
+                     action="selectPlayer.xhtml?faces-redirect=true"/>
+</f:facet>
+</p:panelGrid>
+</h:form>
+</ui:define>
+</ui:composition>

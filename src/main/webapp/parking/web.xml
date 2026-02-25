@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app 
+        xmlns = "https://jakarta.ee/xml/ns/jakartaee"
+        xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation = "https://jakarta.ee/xml/ns/jakartaee 
+        https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+        version = "6.0">
+
+<!-- JSF mapping
+https://ocamil.com/index.php/javaee/jsf-javaserver-faces/jsf-facesservlet-et-facescontext
+https://ocamil.com/index.php/javaee/jsf-javaserver-faces/jsf-presentation 
+https://balusc.omnifaces.org/2015/09/what-mojarra-context-parameters-are.html
+jsf4.0.2 que faire avec com.sun ??    -->
+<servlet>
+    <servlet-name>Faces Servlet</servlet-name>
+    <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class> <!--  starts JSF  plus nécessairea avec JSF 4 ?-->
+    <load-on-startup>1</load-on-startup>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>Faces Servlet</servlet-name>
+    <url-pattern>*.xhtml</url-pattern>
+</servlet-mapping>
+
+    <!-- Welcome page 19-04-2020 login peut se faire avec http://localhost:8080/GolfWfly-1.0-SNAPSHOT/  -->
+<welcome-file-list>
+        <welcome-file>/login.xhtml</welcome-file>
+</welcome-file-list>
+
+<!-- sets the default session timeout to 40 minutes. -->
+<session-config>
+        <session-timeout>40</session-timeout> 
+</session-config>
+<!-- ajouté 20-07-2022 -->
+    <error-page>
+        <exception-type>jakarta.faces.application.ViewExpiredException</exception-type>
+        <location>/session_expired.xhtml</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/error_throw.xhtml</location>
+    </error-page>
+
+<!-- new 09-11-2020 https://www.journaldev.com/3229/primefaces-fileupload-component-example-tutorial 
+    https://stackoverflow.com/questions/17339830/overview-of-all-jsf-related-web-xml-context-parameter-names-and-values
+    https://balusc.omnifaces.org/2015/09/what-mojarra-context-parameters-are.html
+    native au lieu de commons le 101-03-2021 pour Primefaces X
+    -->
+    
+    <!-- new 03-08-2023  JSF4 only So with this, when you have e.g. a /foo.xhtml page, then the FacesServlet will automatically
+    be registered to /foo as well and interpret it internally as /foo.xhtml.
+    http://localhost:8080/GolfWfly-1.0-SNAPSHOT/calculator_css sans indiquer suffixe .xhtml 
+<context-param>
+    <param-name>jakarta.faces.AUTOMATIC_EXTENSIONLESS_MAPPING</param-name>
+    <param-value>true</param-value>
+</context-param>
+    -->
+<context-param>
+  <param-name>primefaces.UPLOADER</param-name>
+  <param-value>auto</param-value>
+</context-param>
+
+<context-param>
+        <description>Project Stage</description>
+        <param-name>jakarta.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+</context-param>
+<!-- increase buffer size to avoid JSF1095 errors
+https://stackoverflow.com/questions/17762462/getting-warning-from-jsf-the-response-was-already-committed-by-the-time-we-trie
+https://balusc.omnifaces.org/2015/09/what-mojarra-context-parameters-are.html
+https://stackoverflow.com/questions/17339830/overview-of-all-jsf-related-web-xml-context-parameter-names-and-values
+-->
+<context-param> 
+        <description>Buffer Size</description>
+        <param-name>jakarta.faces.FACELETS_BUFFER_SIZE</param-name>
+        <param-value>131072</param-value> <!-- was 65535 mod 15-12-2021-->
+</context-param>
+<context-param>
+        <description>Parameter ??</description>
+        <param-name>com.sun.faces.enableRestoreView11Compatibility</param-name>
+        <param-value>true</param-value>
+</context-param>
+<context-param>
+        <description>Parameter ??</description>
+        <param-name>com.sun.faces.writeStateAtFormEnd</param-name>
+        <param-value>false</param-value>
+</context-param>
+<context-param>
+    <description>Validate Whole Bean</description>
+    <param-name>jakarta.faces.validator.ENABLE_VALIDATE_WHOLE_BEAN</param-name>
+    <param-value>true</param-value>
+</context-param>
+ <context-param>
+        <description>Parameter ??</description>
+        <param-name>jakarta.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+        <param-value>true</param-value>
+ </context-param>
+<context-param>
+        <description>Parameter The empty String madness BalusC code</description>
+        <param-name>jakarta.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
+        <param-value>true</param-value>
+ </context-param>
+<context-param>
+        <description>Parameter required by Mojarra</description>
+        <param-name>com.sun.faces.allowTextChildren</param-name>
+        <param-value>true</param-value>
+</context-param>
+<context-param>
+        <description>Parameter State Saving Method : server or client</description>
+        <param-name>jakarta.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+</context-param> 
+<context-param>
+        <description>Parameter Skip Comments false/true</description>
+        <param-name>jakarta.faces.FACELETS_SKIP_COMMENTS</param-name>
+        <param-value>true</param-value>
+</context-param> 
+<context-param>
+        <description>Parameter disableUnicodeEscaping</description>
+        <param-name>com.sun.faces.disableUnicodeEscaping</param-name>
+        <param-value>true</param-value>
+</context-param>
+
+<!--  concerne Primefaces aussi pom.xml et masterTemplate-->
+<!-- enlevé 22-10-2021
+<context-param>
+        <description>Primefaces Fonts</description>
+        <param-name>primefaces.FONT_AWESOME</param-name>
+        <param-value>false</param-value>
+</context-param>
+-->
+<!--Bluesky theme for PrimeFaces + dependency in pom.xml
+new PF 11 02-10-2021
+https://primefaces.github.io/primefaces/11_0_0/#/core/themes
+<context-param>
+        
+        <param-name>primefaces.THEME</param-name>
+        <param-value>bluesky</param-value> 
+    </context-param>
+ -->   
+<context-param>
+    <description>Primefaces Theming</description>
+    <param-name>primefaces.THEME</param-name>
+    <param-value>mycooltheme</param-value> <!-- arya  avec primefaces-material-deeppurple-dark-->
+</context-param>
+    
+<!--  https://primefaces.github.io/primefaces/15_0_0/#/core/ajaxPartialsubmit -->
+<context-param>
+        <description>is disabled by default</description>
+        <param-name>primefaces.SUBMIT</param-name>
+        <param-value>partial</param-value>
+</context-param>
+
+<context-param>
+    <param-name>primefaces.CLIENT_SIDE_VALIDATION</param-name>
+    <param-value>true</param-value>
+</context-param>
+
+ <!-- new 16/04/2020 à activer au besoin !!
+ <context-param>
+        <param-name>primefaces.PUBLIC_CAPTCHA_KEY</param-name>
+        <param-value>6LcM2AITAAAAAPtW0gG83lxR13CmoOwSReffr8uo</param-value>
+</context-param>
+<context-param>
+        <param-name>primefaces.PRIVATE_CAPTCHA_KEY</param-name>
+        <param-value>6LcM2AITAAAAAPPAV2vpS5flQYuPIrxPvgo2S0Yz</param-value>
+</context-param>    
+-->        
+ <!-- 20-03-2020 https://www.primefaces.org/showcase/ui/misc/csp.xhtml 
+https://forum.primefaces.org/viewtopic.php?t=61329
+enlevé 16-08-2021
+<context-param>
+    <param-name>primefaces.CSP</param-name>
+    <param-value>true</param-value>
+</context-param>            
+-->
+<!-- 23-12-2020 https://stackoverflow.com/questions/3820111/facelet-was-modified-messages 
+ Time in seconds that facelets should be checked for changes since last request. 
+     A value of -1 disables refresh checking.
+   Time in seconds that facelets should be checked for changes since last request.
+ A value of -1 disables refresh checking.    
+
+-->
+<context-param>
+    <param-name>jakarta.faces.FACELETS_REFRESH_PERIOD</param-name>
+    <param-value>-1</param-value>
+</context-param>
+<context-param>
+    <description>FLEX layout de masterTemplate depuis PF 10</description>
+    <param-name>primefaces.FLEX</param-name>
+    <param-value>true</param-value>
+</context-param>
+<!-- new 12-04-2024 
+16:17:54,196 WARN  [org.jboss.as.jaxrs] (MSC service thread 1-6) WFLYRS0018: Explicit usage of Jackson annotation
+ in a Jakarta RESTful Web Services deployment; the system will disable Jakarta JSON Binding processing for the current deployment.
+Consider setting the 'resteasy.preferJacksonOverJsonB' property to 'false' to restore Jakarta JSON Binding.-->
+<context-param>
+        <param-name>resteasy.preferJacksonOverJsonB</param-name>
+        <param-value>false</param-value> <!-- mod 09-05-2025 was true  -->
+</context-param>
+
+
+<!-- new 19-06-2021 enlevé 24-01-2022
+https://www.quartz-scheduler.org/api/2.1.7/org/quartz/ee/servlet/QuartzInitializerListener.html
+<context-param>
+    <param-name>quartz:config-file</param-name>
+    <param-value>quartz.properties</param-value>
+</context-param>
+
+     <context-param>
+         <param-name>quartz:shutdown-on-unload</param-name>
+         <param-value>true</param-value>
+     </context-param>
+     <context-param>
+         <param-name>quartz:wait-on-shutdown</param-name>
+         <param-value>true</param-value>
+     </context-param>
+     <context-param>
+         <param-name>quartz:start-on-load</param-name>
+         <param-value>true</param-value>
+     </context-param>
+ -->    
+<!-- https://logging.apache.org/log4j/2.x/manual/webapp.html 16-12-2021 
+<context-param>
+        <param-name>isLog4jAutoInitializationDisabled</param-name>
+        <param-value>true</param-value>
+</context-param>
+-->
+
+<!-- 03-05-2020 pour éviter
+JSF1091: No mime type could be found for file images/thumbnails/thumbnail.no photo.
+To resolve this, add a mime-type mapping to the applications web.xml.
+see also https://gist.github.com/IsmailMarmoush/7915310-->
+    <mime-mapping>
+        <extension>png</extension>
+        <mime-type>image/png</mime-type>
+    </mime-mapping> 
+
+    <mime-mapping>
+        <extension>jpeg</extension>
+        <mime-type>image/jpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>jpeg</extension>
+        <mime-type>image/pjpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>jpg</extension>
+        <mime-type>image/jpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>jpg</extension>
+        <mime-type>image/pjpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff</extension>
+        <mime-type>application/font-woff</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>woff2</extension>
+        <mime-type>application/font-woff</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>eot</extension>
+        <mime-type>application/font-eot</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ttf</extension>
+        <mime-type>application/font-ttf</mime-type>
+    </mime-mapping> 
+    <!-- Set Favourites Icon MIME-Type --> 
+<mime-mapping>
+    <extension>ico</extension>
+    <mime-type>image/x-icon</mime-type>
+</mime-mapping>
+<mime-mapping>
+		<!--
+			mod 05-05-2024 copied from showcase Not all application servers are aware of new SVG mime type, so we define it here to be sure.
+		-->
+		<extension>svg</extension>
+		<mime-type>image/svg+xml</mime-type>
+</mime-mapping>
+       
+   <!-- new 18-06-2021 Quartz Scheduler  enlevé 24-01-2022
+  <listener>
+        <listener-class>
+            org.quartz.ee.servlet.QuartzInitializerListener
+        </listener-class>
+    </listener>
+--> 
+ <!-- new 18-06-2021 Sharing Context Data https://howtodoinjava.com/resteasy/share-context-data-with-jax-rs-resteasyproviderfactory/b -->
+<listener>
+  <listener-class>
+    org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
+  </listener-class>
+</listener>
+
+
+</web-app>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:f="jakarta.faces.core">
+ <p:dataTable var="item" 
+              value="#{courseC.tarifGreenfee.basicList}"
+              emptyMessage="#{msg['message.table.empty']}"
+              style="width:40%;text-align: center; margin-left:auto; margin-right:auto;" >
+      <f:facet name="header">
+          <h:outputText escape="false" value="#{msg['title.greenfee.choice']}" />
+      </f:facet>
+ 
+        <p:column headerText="#{msg['tarif.members.item']} "
+                  width="12%" >
+                 <h:outputText value="#{item.item}" />
+        </p:column>
+     
+        <p:column headerText="#{msg['tarif.members.price']} " 
+                  width="12%" >
+                 <h:outputText value="#{item.price}" />
+        </p:column>
+     
+        <p:column headerText="#{msg['tarif.members.currency']}"
+                  width="12%" >
+            <h:outputText value="#{courseC.tarifGreenfee.currency}" />
+        </p:column>
+     
+     
+        <p:column headerText="#{msg['tarif.members.choice']}"
+                  width="12%"
+                  id="ChoiceBasic">
+            <!-- rendered="#{item.season eq courseC.tarifGreenfee.season or item.season eq 'A'}"
+            -->
+            <p:inputNumber
+                        value="#{item.quantity}"
+                        
+			minValue="0"
+                        maxValue="4"
+                        required="true"
+                        size="1"
+                        emptyValue="0"
+                        title="#{msg['tooltip.tarif.choice']}"
+                        decimalPlaces="0" >
+         </p:inputNumber>
+        </p:column>
+    </p:dataTable>
+</ui:composition>
