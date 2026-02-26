@@ -29,7 +29,7 @@
     
        <h:outputText  value="#{msg['tarif.hours.start']} :"/>
        <p:datePicker id="TwilightStartTime"
-                         value="#{courseC.tarifGreenfee.startHour}"
+                         value="#{memC.tarifGreenfee.startHour}"
                          timeOnly="true"
                          pattern="HH:mm"
                          label="Tarif tranche horaire : startHour"
@@ -45,11 +45,11 @@
         <h:outputText value="#{msg['tarif.season']} " />
           <i class="pi pi-cloud" ></i>
           <i class="pi pi-sun"   ></i>
-          #{courseC.tarifGreenfee.twilightList.size()}
+          #{memC.tarifGreenfee.twilightList.size()}
      </h:panelGroup>
      <p:selectOneButton id="Season_High-Medium-Low"
                         required="false"
-                        value="#{courseC.tarifGreenfee.workSeasonTwilight}" >
+                        value="#{memC.tarifGreenfee.workSeasonTwilight}" >
             <f:selectItem itemLabel="#{msg['tarif.all']}"    itemValue="A" />
             <f:selectItem itemLabel="#{msg['tarif.high']}"   itemValue="H" />
             <f:selectItem itemLabel="#{msg['tarif.medium']}" itemValue="M" />
@@ -59,7 +59,7 @@
        <h:outputText value="#{msg['tarif.twilight.months']}" />
        <p:datePicker id="multiselectMonths"
                       selectionMode="multiple"
-                      value="#{courseC.tarifGreenfee.multiTwilight}"
+                      value="#{memC.tarifGreenfee.multiTwilight}"
                       readonlyInput="true"
                       view="month"
                       pattern="MM/d/yyyy"
@@ -77,9 +77,9 @@
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.inputTarifGreenfee('TW')}"/>
+                         action="#{memC.inputTarifGreenfee('TW')}"/>
          <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

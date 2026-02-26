@@ -11,7 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import utils.LCUtil;
 
 // 13-08-2023
@@ -19,10 +19,10 @@ import utils.LCUtil;
 // execution ONE SHOT une seule fois pour la migration!!
 
 public class DistanceTeeMigration2 {
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     
 public void list(final Connection conn) throws Exception{
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+     final String methodName = utils.LCUtil.getCurrentMethodName(); 
        LOG.debug("entering " + methodName);
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -75,7 +75,7 @@ public void list(final Connection conn) throws Exception{
         if (i < 200){ // max 161
           //  Distance d = new find.FindDistances().find(tee, conn);
           //  LOG.debug("distance d = " + d);
-            boolean b = new create.CreateDistances().create(distance, conn);
+            boolean b = new create.CreateDistances().create(distance);
         }
       } // end while
        LOG.debug("ResultSet " + methodName + " has " + i + " lines.");
@@ -99,7 +99,7 @@ public void list(final Connection conn) throws Exception{
 
 /*
     public static void completeDistanceTee (Tee tee, Connection conn){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
     try{
      //   LOG.debug("entering completeDistanceTee");
         Course course = new Course();
@@ -132,11 +132,11 @@ public void list(final Connection conn) throws Exception{
 }// end method
   */  
   void main() throws SQLException, Exception {
-    Connection conn = new utils.DBConnection().getConnection();
+    Connection conn = new connection_package.DBConnection().getConnection();
     LOG.debug("entering main");
     new DistanceTeeMigration2().list(conn);  // method is static
         LOG.debug("main - tee list completed ! ") ; //+ tees.size());
    // tees.forEach(item -> LOG.debug("Tee list migration " + item));
-    utils.DBConnection.closeQuietly(conn, null, null, null);
+    connection_package.DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } //end Class

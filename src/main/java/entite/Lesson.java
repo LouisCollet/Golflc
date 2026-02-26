@@ -6,17 +6,17 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.inject.Named;
+// import jakarta.annotation.PostConstruct;  // migrated 2026-02-26 — POJO, not CDI-managed
+// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import utils.LCUtil;
 
-@Named("scheduleEvent")
-@SessionScoped //@RequestScoped
+// @Named("scheduleEvent")  // migrated 2026-02-24
+// @SessionScoped  // migrated 2026-02-24
 
 public class Lesson implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 //    private Integer proId;
     private LocalDateTime eventStartDate;
     private LocalDateTime eventEndDate;
@@ -31,7 +31,7 @@ public Lesson(){ // constructor
 
     } // end constructor
 
-    @PostConstruct
+    // @PostConstruct  // migrated 2026-02-26 — POJO, not CDI-managed
     public void init(){
             LOG.debug("Postconstruct executed !" );
     }
@@ -102,7 +102,7 @@ public Lesson(){ // constructor
     }
 
     public static Lesson map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+        final String methodName = utils.LCUtil.getCurrentMethodName();
         try{
             Lesson event = new Lesson();
             event.setEventStartDate(rs.getTimestamp("EventStartDate").toLocalDateTime());

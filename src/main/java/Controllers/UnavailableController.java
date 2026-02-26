@@ -5,53 +5,69 @@ import entite.composite.EUnavailable;
 import entite.Round;
 import entite.Structure;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
-import java.sql.SQLException;
-import lists.UnavailableListForDate;
-import utils.DBConnection;
+import java.io.Serializable;
+import jakarta.inject.Named;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import javax.sql.DataSource;
+import static exceptions.LCException.handleGenericException;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
-// used in CourseController, not a Named bean
-public class UnavailableController implements interfaces.Log{
+@Named("unavailableC")
+@ApplicationScoped
+public class UnavailableController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    private lists.UnavailableListForDate unavailableListForDate;
+    @Inject
+    private read.ReadClub readClubService;       // migrated 2026-02-24
+    @Inject
+    private update.UpdateClub updateClubService; // migrated 2026-02-24
+
+    public UnavailableController() { }
 // public TarifGreenfeeController(){  // constructor
 //    }
 // @Inject private EUnavailable unavailable;
-public EUnavailable inputUnvailableStructure(EUnavailable unavailable) throws SQLException, Exception{  // used in unavailable_structure.xhtml
+public EUnavailable inputUnvailableStructure(EUnavailable unavailable) throws Exception{  // used in unavailable_structure.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-        LOG.debug("entering inputUnvailableStructure with unavailable = " + unavailable);
+        LOG.debug("with unavailable = " + unavailable);
  // magic happens here 
     Structure structure = new Structure();
-    structure.setCourseId(Integer.valueOf(unavailable.getStructure().getWorkCourseId()));
-    structure.setItem(unavailable.getStructure().getWorkItem());
+    structure.setCourseId(Integer.valueOf(unavailable.structure().getWorkCourseId()));
+    structure.setItem(unavailable.structure().getWorkItem());
     structure.setStatus(null);  // will be completed later
   // add element to List
-    unavailable.getStructure().getStructureList().add(structure);
+    unavailable.structure().getStructureList().add(structure);
 // house keeping
-    unavailable.getStructure().setWorkItem(null); // init pour le prochain affichage
-    unavailable.getStructure().setWorkCourseId(" "); // mod was null
-    unavailable.getStructure().setItemExists(true); // 19/06/2022 gestion menu
-    String msg = "structureList after add = " +  unavailable.getStructure().getStructureList().toString(); 
+    unavailable.structure().setWorkItem(null); // init pour le prochain affichage
+    unavailable.structure().setWorkCourseId(" "); // mod was null
+    unavailable.structure().setItemExists(true); // 19/06/2022 gestion menu
+    String msg = "structureList after add = " +  unavailable.structure().getStructureList().toString(); 
         LOG.info(msg);
         showMessageInfo(msg);
 //        LOG.debug("end inputUnvailableStructure");
     return unavailable;
-}catch(Exception ex){
-    String msg = "inputUnvailableStructure Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
 }
 } // end method
 
- public boolean updateClub(EUnavailable unavailable, Club club, Connection conn) throws Exception { //modify club from unavailable_structure.xhtml
-   LOG.debug("entering modifyClubUnavailableStructure  for club = " + club);
+ public boolean updateClub(EUnavailable unavailable, Club club) throws Exception { //modify club from unavailable_structure.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName + " for club = " + club);
  try{
-      club = new read.ReadClub().read(club,conn);  // pour avoir clubname, etc...
+      club = readClubService.read(club);   // pour avoir clubname, etc...
             LOG.debug("club for unavailable = " + club);
-      club.setUnavailableStructure(unavailable.getStructure());
+      club.setUnavailableStructure(unavailable.structure());
          LOG.debug("input club for modification structure = " + club);
-      if(new update.UpdateClub().update(club, conn)){
+      if(updateClubService.update(club)){
           String msg = "club UnavailableStructure is Modified !!" + unavailable;
           LOG.info(msg);
           showMessageInfo(msg);
@@ -63,16 +79,15 @@ try{
           return false;
       }
  //return null;
-  }catch (Exception ex){
-            String msg = "Exception in modifyClubUnavailableStructure " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return false;
+  } catch (Exception e) {
+    handleGenericException(e, methodName);
+    return false;
   }
-} // end modifyClub
+} // end method
 
-  public Structure isRoundUnavailable(final Club club, final Round round, final Connection conn) throws Exception { //modify club from unavailable_structure.xhtml
-   LOG.debug("entering isRoundUnavailable");
+  public Structure isRoundUnavailable(final Club club, final Round round) throws Exception { //modify club from unavailable_structure.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
    LOG.debug(" for round = " + round);
    LOG.debug(" for club = " + club);
    LOG.debug(" for CourseId = " + round.getCourseIdcourse());
@@ -80,7 +95,8 @@ try{
  //  LOG.debug(" for startDate Period = " + unavailable.getPeriod().getStartDate());
  //  LOG.debug(" for endDate Period = " + unavailable.getPeriod().getEndDate());
  try{
-      EUnavailable unavailable = new UnavailableListForDate().list(round.getRoundDate(),club,conn);
+      // was: EUnavailable unavailable = new UnavailableListForDate().list(round.getRoundDate(), club, conn);
+     EUnavailable unavailable = unavailableListForDate.list(round.getRoundDate(), club); // migrated 2026-02-24
          LOG.debug("result unavailable for date = " + unavailable);
       
       Structure structure = new Structure();
@@ -94,7 +110,7 @@ try{
         return structure;
       }
       LOG.debug("unavailable is NOT null");
-    var v = unavailable.getStructure().getStructureList();
+    var v = unavailable.structure().getStructureList();
        LOG.debug("v = " + v.toString());
     boolean found = false;
     for(int i=0; i<v.size(); i++){
@@ -102,7 +118,7 @@ try{
            found = true;
            structure.setCourseId(v.get(i).getCourseId());
            structure.setItem(v.get(i).getItem());
-           structure.setStatus(unavailable.getPeriod().getItemPeriod()[i]);  // from index equivalent dans period !!
+           structure.setStatus(unavailable.period().getItemPeriod()[i]);  // from index equivalent dans period !!
               LOG.debug("result str = " + structure);
            return structure;
         } // end if
@@ -115,35 +131,24 @@ try{
            LOG.debug("result str = " + structure);
         return structure;
     }
- }catch (Exception ex){
-            String msg = "Exception in isRoundUnavailable " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
+ } catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
   }
     return null;
-} // end isRoundUnavailable
+} // end method
   
+ /*
  void main() throws SQLException, Exception{
-      Connection conn = new DBConnection().getConnection();
-  try{
       Club club = new Club();
       club.setIdclub(101); // la cala
       Round round = new Round();
       round.setIdround(698);  // 19/05/2022 16:01
-      round = new read.ReadRound().read(round, conn);
    // changing data for testing purpose
-    //  round.setRoundDate(LocalDateTime.parse("2022-06-29T17:11:30"));  // limite 17:10
-     // round.setRoundDate(LocalDateTime.MIN);
       round.setCourseIdcourse(90);  // other course was 101
-      Structure str = new UnavailableController().isRoundUnavailable(club, round, conn);
+      Structure str = new UnavailableController().isRoundUnavailable(club, round, null);
         LOG.debug("from main, after lp = " + str);
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-   }
-   } // end main     
+   } // end main
+ */     
       
 } //end Class

@@ -15,7 +15,7 @@ import jakarta.inject.Named;
 import org.primefaces.component.column.Column;
 import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.RowEditEvent;
-import utils.DBConnection;
+import connection_package.DBConnection;
 
 @Named("editView")
 //@SessionScoped

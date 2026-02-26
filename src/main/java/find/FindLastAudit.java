@@ -1,32 +1,32 @@
 package find;
 
 import entite.Audit;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
 
-public class FindLastAudit{
+@ApplicationScoped
+public class FindLastAudit implements Serializable {
 
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName(); 
+    private static final long serialVersionUID = 1L;
 
-  public Audit find(Audit audit, Connection conn) throws SQLException, Exception{
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-try{
-    LOG.debug("entering " + methodName + " for audit = " + audit);
-//    String au= utils.DBMeta.listMetaColumnsLoad(conn, "audit");
- /*   String query =
-              "SELECT " + au +
-              " from audit"
-              + " where AuditPlayerId = ?"
-              + " ORDE R BY AuditStartDate"
-              + " desc limit 1 ";
-*/
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public FindLastAudit() { }
+
+    public Audit find(Audit audit) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " for audit = " + audit);
+
         final String query = """
               SELECT *
               FROM audit
@@ -34,44 +34,45 @@ try{
               ORDER by AuditStartDate
               DESC limit 1
           """;
-    
-      ps = conn.prepareStatement(query);
-      ps.setInt(1, audit.getAuditPlayerId());
-        utils.LCUtil.logps(ps); 
-      rs = ps.executeQuery();
-      Audit a = null;
-      int i = 0;
-	while(rs.next()){ 
-           i = i + 1;
-           a = entite.Audit.mapAudit(rs);
-	}
-     if(i == 0){
-         String msg = "££ Empty Result Table in " + methodName + " for player = " + audit.getAuditPlayerId();
-         LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
-         a = null;
-   //      return null;
-     }else{
-         LOG.debug("ResultSet FindSubscription has " + i + " lines.");
-     }  
-   return a;
-}catch(Exception ex){
-    String err = "-- Exception in " + methodName + " " + ex.toString() + "/";
-    LOG.error(err);
-    return null;
-} // end catch
-finally{
-    DBConnection.closeQuietly(null, null, rs, ps);
-}
-} // end method find
-    
- void main() throws Exception , Exception{
-    Connection conn = new DBConnection().getConnection();
-    Audit audit = new Audit();
-    audit.setAuditPlayerId(324713);
-    audit = new FindLastAudit().find(audit, conn);
-        LOG.debug("last audit found = " + audit);
-    DBConnection.closeQuietly(conn, null, null, null);
-}// end main
- 
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, audit.getAuditPlayerId());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                Audit a = null;
+                int i = 0;
+                while (rs.next()) {
+                    i++;
+                    a = entite.Audit.mapAudit(rs);
+                }
+                if (i == 0) {
+                    String msg = "Empty Result Table in " + methodName + " for player = " + audit.getAuditPlayerId();
+                    LOG.error(msg);
+                    utils.LCUtil.showMessageFatal(msg);
+                } else {
+                    LOG.debug("ResultSet FindLastAudit has " + i + " lines.");
+                }
+                return a;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return null;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return null;
+        }
+    } // end method
+
+/*
+void main() throws SQLException, Exception {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    // tests locaux
+} // end main
+*/
+
 } // end class

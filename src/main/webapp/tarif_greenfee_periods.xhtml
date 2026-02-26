@@ -30,11 +30,11 @@
         <h:outputText value="#{msg['tarif.season']} " />
         <i class="pi pi-cloud" ></i>
         <i class="pi pi-sun"   ></i>
-        #{courseC.tarifGreenfee.datesSeasonsList.size()}
+        #{memC.tarifGreenfee.datesSeasonsList.size()}
     </h:panelGroup>
     <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{courseC.tarifGreenfee.season}"  >
+                          value="#{memC.tarifGreenfee.season}"  >
             <f:selectItem itemLabel="#{msg['tarif.high']}"   itemValue="H" />
             <f:selectItem itemLabel="#{msg['tarif.medium']}" itemValue="M" />
             <f:selectItem itemLabel="#{msg['tarif.low']}"    itemValue="L" />
@@ -42,7 +42,7 @@
        
        <h:outputText  value="#{msg['tarif.period.start']} :"/>
        <p:datePicker    id="start"
-                        value="#{courseC.tarifGreenfee.startDate}"
+                        value="#{memC.tarifGreenfee.startDate}"
                         size="10"
                         lang="#{languageC.locale}"
                         label="Tarif périodes : startDate"
@@ -58,7 +58,7 @@
        
       <h:outputText  value="#{msg['tarif.period.end']} :"/>
                   <p:datePicker
-                        value="#{courseC.tarifGreenfee.endDate}"
+                        value="#{memC.tarifGreenfee.endDate}"
                         id="end"
                         label="Tarif périodes : endDate"
                         size="10"
@@ -78,10 +78,10 @@
                          id="commandButtoninput1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          style="float: left;"
                          icon="pi pi-database"
-                         action="#{courseC.inputTarifGreenfee('PE')}"/>
+                         action="#{memC.inputTarifGreenfee('PE')}"/>
         <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

@@ -16,11 +16,16 @@ private static final long serialVersionUID = 1L;
 private static Locale locale = null;
 
 @PostConstruct
-public static void init(){
+public void init(){
     FacesContext context = FacesContext.getCurrentInstance();
-    locale = context.getViewRoot().getLocale();
-      LOG.debug("from Postconstruct init() locale = " + locale);
- //     LOG.debug("from Postconstruct current = " 
+    if (context != null && context.getViewRoot() != null) {
+        locale = context.getViewRoot().getLocale();
+        LOG.debug("from Postconstruct init() locale = " + locale);
+    } else {
+        locale = Locale.FRENCH;
+        LOG.debug("from Postconstruct init() - no FacesContext, defaulting to FR");
+    }
+ //     LOG.debug("from Postconstruct current = "
  //                + context.getApplication().getViewHandler().calculateLocale(context).toString());
 }
 // enlevé static

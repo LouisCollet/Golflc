@@ -7,15 +7,15 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import utils.LCUtil;
 
-@Named
-@SessionScoped // absolument nécessaire !!
+// @Named  // migrated 2026-02-24
+// @SessionScoped  // migrated 2026-02-24
 public class HelpView implements Serializable{
     private static final long serialVersionUID = 1L;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private String _id;  // key name mongodb
     private String HelpViewText;
     private String HelpViewLanguage;
@@ -81,7 +81,7 @@ public String toString(){
 }
 // à modifier ultérieurement !!
   public static LoggingUser map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         LoggingUser logging = new LoggingUser();
         logging.setLoggingIdPlayer(rs.getInt("LoggingIdPlayer"));

@@ -19,18 +19,18 @@
     <h1>#{msg['subscription.old']}</h1>
 </f:facet>
 		<h:outputText value="#{msg['address.city']}" />
-		<h:outputText value="#{courseC.player.address.city}" />
+		<h:outputText value="#{playerC.player.address.city}" />
 
                 <h:outputText value="#{msg['address.country.code']}" />
-                <h:outputText value="#{courseC.player.address.country.extendedName}" />
+                <h:outputText value="#{playerC.player.address.country.extendedName}" />
 
                 <h:outputText value="#{msg['subscription.trial']}"
-                              rendered="#{courseC.subscription.trialCount > 0}" />
-                <h:outputText value="#{courseC.subscription.trialCount}"
-                              rendered="#{courseC.subscription.trialCount > 0}" />
+                              rendered="#{memC.subscription.trialCount > 0}" />
+                <h:outputText value="#{memC.subscription.trialCount}"
+                              rendered="#{memC.subscription.trialCount > 0}" />
 
                 <h:outputText value="#{msg['subscription.enddate']}" />
-                <h:outputText value="#{courseC.subscription.endDate}" >
+                <h:outputText value="#{memC.subscription.endDate}" >
                     <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
                 </h:outputText>
 </p:panelGrid>

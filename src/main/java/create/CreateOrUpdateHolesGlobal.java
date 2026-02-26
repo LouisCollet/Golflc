@@ -1,103 +1,93 @@
-
 package create;
 
 import entite.Course;
 import entite.Distance;
 import entite.HolesGlobal;
-import entite.Player;
 import entite.Tee;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Arrays;
 import utils.LCUtil;
 
-public class CreateOrUpdateHolesGlobal implements interfaces.Log{
-  public boolean status(final HolesGlobal holesGlobal, final Tee tee, final Course course, final Player player,
-            final Connection conn) throws SQLException{
- try{
-         LOG.debug(" ... entering CreateOrUpdateHolesGlobal() ...");
-         LOG.debug(" ... for type = ..." + holesGlobal.getType());
-        boolean b = false;  
-    if(holesGlobal.getType().equals("distance")){  // MAJ array distance only
+@ApplicationScoped
+public class CreateOrUpdateHolesGlobal implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    private create.CreateDistances createDistances;
+
+    @Inject
+    private find.FindCountHoles findCountHoles;
+
+    @Inject
+    private create.CreateHolesGlobal createHolesGlobal;
+
+    @Inject
+    private update.UpdateHole updateHole;
+
+    public CreateOrUpdateHolesGlobal() { }
+
+    public boolean status(final HolesGlobal holesGlobal, final Tee tee, final Course course) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("for type = " + holesGlobal.getType());
+
+        try {
+            if (holesGlobal.getType().equals("distance")) {
                 LOG.debug("handling distance");
-                return handleDistance(tee, holesGlobal, conn);
-      /*       Distance distance = new Distance();
-             distance.setIdTee(tee.getIdtee());
-                LOG.debug("input dataHoles for distance = " + Arrays.deepToString(holesGlobal.getDataHoles()));
-             var v = utils.LCUtil.extractFrom2D(holesGlobal.getDataHoles(),3); //// 18 trous, 4 données : number, par, strokeindex, distance
-        // https://stackoverflow.com/questions/7070576/get-one-dimensionial-array-from-a-mutlidimensional-array-in-java/7070683#7070683
-          //    var v = new ArrayList<int[]>(Arrays.asList(holesGlobal.getDataHoles())).get(3);  non il extrait le 4e élément !!
-                LOG.debug("input extracted from dataholes = " + Arrays.toString(v));
-             distance.setDistanceArray(v);
-             return new create.CreateDistances().create(distance, conn);
-          // la modification UpdateDistances est lancée via catch(SQLException...) duplicate entry dans CreateDistances!!
-          */
-    }else{  // type = global MAJ toutes les array
-         handleDistance(tee, holesGlobal, conn);
-       int rows = new find.FindCountHoles().find(tee, conn);
-         LOG.info("numbers of rows = " + rows);
-       if(rows == 0){
-             LOG.info("This is an Insert " + rows);
-             return new create.CreateHolesGlobal().create(holesGlobal, tee, course, conn); // mod 15/04/2022
-          //  return b;
-       }else{
-             LOG.info("This is a Modify " + rows);
-           b = new update.UpdateHolesGlobal().update(holesGlobal, tee, conn);
-           return b;
-       }
-         }
- //   return b;
-} catch (SQLException sqle) {
-            String msg = "£££ SQLException in CreateOrModifyScoreStableford = " + sqle.getMessage() + " , SQLState = "
-                    + sqle.getSQLState() + " , ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+                return handleDistance(tee, holesGlobal);
+            } else {
+                handleDistance(tee, holesGlobal);
+                int rows = findCountHoles.find(tee);
+                LOG.info("numbers of rows = " + rows);
+                if (rows == 0) {
+                    LOG.info("This is an Insert " + rows);
+                    return createHolesGlobal.create(holesGlobal, tee, course);
+                } else {
+                    LOG.info("This is a Modify " + rows);
+                    return updateHole.update(holesGlobal, tee);
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
             return false;
-            
- // } catch(LCException e) {
- //      LOG.error(" -- LC Exception in " + methodName + e.getMessage());
- //   return false;              
-            
- } catch (Exception e) {
-            String msg = "£££ Exception in CreateOrModifyScoreStableford = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
             return false;
- } finally { }
-} //end method
-  
-  private static boolean handleDistance(Tee tee, HolesGlobal holesGlobal, Connection conn){
-   try{
-          Distance distance = new Distance();
-          distance.setIdTee(tee.getIdtee());
-                LOG.debug("input dataHoles for distance = " + Arrays.deepToString(holesGlobal.getDataHoles()));
-             var v = utils.LCUtil.extractFrom2D(holesGlobal.getDataHoles(),3); //// 18 trous, 4 données : number, par, strokeindex, distance
-        // https://stackoverflow.com/questions/7070576/get-one-dimensionial-array-from-a-mutlidimensional-array-in-java/7070683#7070683
-          //    var v = new ArrayList<int[]>(Arrays.asList(holesGlobal.getDataHoles())).get(3);  non il extrait le 4e élément !!
-                LOG.debug("input extracted from dataholes = " + Arrays.toString(v));
-             distance.setDistanceArray(v);
-             return new create.CreateDistances().create(distance, conn);
-          // la modification UpdateDistances est lancée via catch(SQLException...) duplicate entry dans CreateDistances!!
+        }
+    } // end method
 
-   } catch (SQLException sqle) {
-            String msg = "£££ SQLException in handle distance = " + sqle.getMessage() + " , SQLState = "
-                    + sqle.getSQLState() + " , ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+    private boolean handleDistance(final Tee tee, final HolesGlobal holesGlobal) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            Distance distance = new Distance();
+            distance.setIdTee(tee.getIdtee());
+            LOG.debug("input dataHoles for distance = " + Arrays.deepToString(holesGlobal.getDataHoles()));
+            var v = utils.LCUtil.extractFrom2D(holesGlobal.getDataHoles(), 3);
+            LOG.debug("input extracted from dataholes = " + Arrays.toString(v));
+            distance.setDistanceArray(v);
+            return createDistances.create(distance);
+        } catch (SQLException sqle) {
+            handleSQLException(sqle, methodName);
             return false;
-            
- // } catch(LCException e) {
- //      LOG.error(" -- LC Exception in " + methodName + e.getMessage());
- //   return false;              
-            
- } catch (Exception e) {
-            String msg = "£££ Exception in CreateOrModifyScoreStableford = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
             return false;
- } finally { }
-      }
+        }
+    } // end method
 
-  
-} //end class
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
+
+} // end class

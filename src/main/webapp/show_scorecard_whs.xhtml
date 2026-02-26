@@ -16,8 +16,8 @@
 <p:outputPanel id="outputpanelOne"
                deferred="true">
  <p:dataTable id="scorecard1"
-             filteredValue="#{courseC.filteredCars}"
-             value="#{courseC.ScoreCardList1WHS()}"
+             filteredValue="#{roundC.filteredCars}"
+             value="#{roundC.ScoreCardList1WHS()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 
@@ -26,21 +26,21 @@
 </f:facet>
 
 <p:column headerText="#{msg['player.first']}" style="width:20%" >
-    <h:outputText value="#{courseC.player.playerFirstName}"
+    <h:outputText value="#{playerC.player.playerFirstName}"
                   styleClass="classFire"  /> 
 </p:column>
 
 <p:column headerText="#{msg['player.lastname']}" style="width:20%" >
-    <h:outputText value="#{courseC.player.playerLastName} (#{courseC.player.idplayer})"/> 
+    <h:outputText value="#{playerC.player.playerLastName} (#{playerC.player.idplayer})"/> 
 </p:column>
 
 <p:column headerText="#{msg['player.gender']}"
           width="20%">
-    <h:outputText value="#{courseC.player.playerGender}"/> 
+    <h:outputText value="#{playerC.player.playerGender}"/> 
 </p:column>
 
 <p:column headerText="#{msg['player.birth']}" style="width:20%" >
-    <h:outputText value="#{courseC.player.playerBirthDate}"> 
+    <h:outputText value="#{playerC.player.playerBirthDate}"> 
           <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
     </h:outputText>
 </p:column>
@@ -69,7 +69,7 @@
 <p:spacer height="30" />
 
 <p:dataTable id="scorecard2a"
-             value="#{courseC.ScoreCardList2()}"
+             value="#{roundC.ScoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
@@ -104,7 +104,7 @@
 <p:spacer height="30" />
 
 <p:dataTable id="scorecard2b"
-             value="#{courseC.ScoreCardList2()}"
+             value="#{roundC.ScoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <!--<f:facet name="header">
@@ -171,7 +171,7 @@
 
 <p:dataTable id="table4"
              var="c" 
-             value="#{courseC.ScoreCardList4()}"
+             value="#{roundC.ScoreCardList4()}"
              emptyMessage="#{msg['message.table.empty']}"
              rowIndexVar="row"
              rowStyleClass="#{(row+1 == 9 or row+1 == 18) ? 'highlight' : null}"
@@ -188,7 +188,7 @@
 </p:column>
 
 <p:column headerText="#{msg['score.par']}" 
-          footerText="#{msg['score.par']} = #{courseC.ScoreCardList4().stream().map(o->o.getPar()).sum()}"
+          footerText="#{msg['score.par']} = #{roundC.ScoreCardList4().stream().map(o->o.getPar()).sum()}"
           width="3%" >
     <h:outputText value="#{c.par}"
                   style="text-align:center;font-size: 1.5em;font-weight: bold"/>
@@ -202,7 +202,7 @@
 </p:column>
  
 <p:column headerText="#{msg['score.extra']}" 
-          footerText="#{msg['score.extra']} = #{courseC.ScoreCardList4().stream().map(o->o.getExtra()).sum()}"
+          footerText="#{msg['score.extra']} = #{roundC.ScoreCardList4().stream().map(o->o.getExtra()).sum()}"
           style="text-align:center;font-size: 1.5rem;font-weight: bold;"
           width="3%">
       <h:outputText value="*"    rendered="#{c.extra eq 1}"/>
@@ -212,42 +212,42 @@
 </p:column>
 <!--
 <p:column headerText="#{msg['score.fairway']}" 
-          footerText="#{msg['score.fairway']} = #{courseC.ScoreCardList4().stream().map(o->o.getScoreStableford().getScoreFairway()).sum()}"
+          footerText="#{msg['score.fairway']} = #{roundC.ScoreCardList4().stream().map(o->o.getScoreStableford().getScoreFairway()).sum()}"
           style="white-space:pre-line;"
           width="3%" >
        <h:outputText value="#{c.scoreStableford.scoreFairway}"/>
 </p:column>
     
 <p:column headerText="#{msg['score.green']}"
-          footerText="#{msg['score.green']} = #{courseC.ScoreCardList4().stream().map(o->o.getScoreStableford().getScoreGreen()).sum()}"
+          footerText="#{msg['score.green']} = #{roundC.ScoreCardList4().stream().map(o->o.getScoreStableford().getScoreGreen()).sum()}"
           style="white-space:pre-line;"
           width="3%" >
        <h:outputText value="#{c.scoreStableford.scoreGreen}"/>
 </p:column>
     
 <p:column headerText="#{msg['score.putts']}" 
-          footerText="#{msg['score.putts']} = #{courseC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScorePutts()).sum()}"
+          footerText="#{msg['score.putts']} = #{roundC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScorePutts()).sum()}"
           style="white-space:pre-line"
           width="3%" >
        <h:outputText value="#{c.scoreStableford.scorePutts}"/>
 </p:column>
 
 <p:column headerText="#{msg['score.bunker']}"
-          footerText="#{msg['score.bunker']} = #{courseC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScoreBunker()).sum()}"
+          footerText="#{msg['score.bunker']} = #{roundC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScoreBunker()).sum()}"
           style="white-space:pre-line"
           width="3%" >
        <h:outputText value="#{c.scoreStableford.scoreBunker}"/>
 </p:column> 
     
  <p:column headerText="#{msg['score.penalty']}"
-          footerText="#{msg['score.penalty']} = #{courseC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScorePenalty()).sum()}"
+          footerText="#{msg['score.penalty']} = #{roundC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScorePenalty()).sum()}"
           style="white-space:pre-line"
           width="3%" >
        <h:outputText value="#{c.scoreStableford.scorePenalty}"/>
 </p:column> 
  -->
-<c:set var="TotalDistanceOut" value="#{courseC.ScoreCardList4().stream().limit(9).map(o->o.getDistances()).sum()}"/> 
-<c:set var="TotalDistance" value="#{courseC.ScoreCardList4().stream().map(o->o.getDistances()).sum()}"/>
+<c:set var="TotalDistanceOut" value="#{roundC.ScoreCardList4().stream().limit(9).map(o->o.getDistances()).sum()}"/> 
+<c:set var="TotalDistance" value="#{roundC.ScoreCardList4().stream().map(o->o.getDistances()).sum()}"/>
 <c:set var="break" value='&lt;BR/&gt;'/>
 <p:column headerText="#{msg['hole.distance']}"
           width="4%" >
@@ -281,7 +281,7 @@
            rendered="#{row+1 == 9}"/>
  
 <p:column headerText="#{msg['score.gross']}" 
-          footerText="#{msg['score.gross']} = #{courseC.ScoreCardList4().stream().map(o->o.getStrokes()).sum()}"
+          footerText="#{msg['score.gross']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes()).sum()}"
           style="white-space:pre-line;"
           width="5%" >
         <h:outputText
@@ -320,7 +320,7 @@
 </p:column>
 
  <p:column headerText="#{msg['score.net']}" 
-          footerText="#{msg['score.net']} = #{courseC.ScoreCardList4().stream().map(o->o.getStrokes() - o.getExtra()).sum()}"
+          footerText="#{msg['score.net']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes() - o.getExtra()).sum()}"
           width="3%">
 
      <h:outputText value="#{c.strokes - c.extra}"
@@ -333,7 +333,7 @@
 </p:column>
  
  <p:column headerText="#{msg['score.points']}" 
-           footerText="#{msg['score.points']} = #{courseC.ScoreCardList4().stream().map(o->o.getPoints()).sum()} "
+           footerText="#{msg['score.points']} = #{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()} "
            style="white-space:nowrap;"
            width="10%" >
         <h:outputText
@@ -341,14 +341,14 @@
             rendered="#{c.points != 0}"
             style="font-size: 2em; font-weight:bold"/>
 
-   <c:set var="TotalPointsOut" value="#{courseC.ScoreCardList4().stream().limit(9).map(o->o.getPoints()).sum()}"/>
+   <c:set var="TotalPointsOut" value="#{roundC.ScoreCardList4().stream().limit(9).map(o->o.getPoints()).sum()}"/>
         <h:outputText
             escape="false"
             value="#{break} Points OUT = #{TotalPointsOut}"
             rendered="#{row+1 == 9}"
             style="font-size: 1.5rem" />
 
-    <c:set var="TotalPoints" value="#{courseC.ScoreCardList4().stream().map(o->o.getPoints()).sum()}"/> 
+    <c:set var="TotalPoints" value="#{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()}"/> 
         <h:outputText
             value="#{break} Points IN = #{TotalPoints - TotalPointsOut}"
             escape="false"

@@ -11,10 +11,10 @@ import jakarta.validation.constraints.NotNull;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 
-@Named("inscription")
-@RequestScoped
+//@Named("inscription") enlevé 14-02-2026
+//@RequestScoped
 public class Inscription implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
 
     private Integer round_idround; // mod 10/11/2014
@@ -176,8 +176,9 @@ public class Inscription implements Serializable{
             showMessageFatal(msg);
             return msg;
         } }
+  /*
 public static Inscription map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
     Inscription i = new Inscription();
     i.setInscriptionFinalResult(rs.getShort("InscriptionFinalResult"));
@@ -194,4 +195,5 @@ public static Inscription map(ResultSet rs) throws SQLException{
     return null;
   }
 } //end method map
+*/
 } // end class

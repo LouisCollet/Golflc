@@ -3,14 +3,14 @@ package entite;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 public class Classment implements Serializable, interfaces.Log{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
 
     private Integer totalPoints;
@@ -71,8 +71,9 @@ public class Classment implements Serializable, interfaces.Log{
     public void setLast1(Integer last1) {
         this.last1 = last1;
     }
+    /* moved rox mapper 22-01-2026
 public static Classment mapClassment(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
               Classment c = new Classment();
               c.setTotalExtraStrokes(rs.getInt("TotalExtraStrokes"));
@@ -89,6 +90,8 @@ public static Classment mapClassment(ResultSet rs) throws SQLException{
     return null;
   }
 } //end method
+
+*/
  @Override
 public String toString()
 { return 

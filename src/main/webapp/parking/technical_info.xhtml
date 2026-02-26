@@ -17,22 +17,8 @@
 <h:form id="technical_info"  >
 <h:graphicImage id="graphic1" name="images/technical02.jpg" alt="image missing :golf_club.jpg" style="float: left;"></h:graphicImage>
 <h:graphicImage id="graphic2" name="images/technical04.jpg" alt="image missing :golf_club.jpg" style="float: right;"></h:graphicImage>
-
+<!--  
 <script type="text/javascript">
-  /*  jQuery(document).ready(function(){
-      if (window.jQuery) { // jQuery is available.
-         var v = "jQuery version = " + window.jQuery().jquery;
-      alert(v);
-      
-      //
-   //    document.getElementById("").innerHTML = v;
-      document.getElementById("jQueryVersion").innerText = v;
-  //     document.queryVersion.innerHTML = v;
-      SetMyStrings([{name: "JQueryVersion", value: v}]);
- //     alert("after SetMyStrings"); 
-    }
-    });
-   */ 
     function getjQueryVersion(){
         if (window.jQuery) { // jQuery is available.
             var v = "jQuery version = " + window.jQuery().jquery;
@@ -42,11 +28,8 @@
         alert(v);
         return v;
     }
-    
-    
 </script>
- 
-
+-->
 <p:panelGrid id="panel" columns="2"
              layout="tabular"
              columnClasses="col1,col2" >
@@ -63,6 +46,18 @@
    </tr>
 </c:forEach>-->
     
+    <h:outputText value="MySQL" />
+ <!--  <h:outputText value="#{infoController.mysql}" /> attention avec time-out !!-->
+     <h:outputText value="#{infoC2.mySqlInfo}" />
+<h:outputText value="MongoDB" />
+<!--<h:outputText value="#{infoController.mongo}" /> attention avec time-out !!-->
+  <h:outputText value="#{infoC2.mongoInfo}" />
+<h:outputText value="IP" />
+<h:outputText value="#{infoController.ip}" />
+
+<h:outputText value="Ville" />
+<h:outputText value="#{infoController.geo}" />
+        
     <h:outputText value="Application version" />
     <h:outputText value=" #{infoC.getApplicationVersion()}" />
 
@@ -79,7 +74,7 @@
         #{header["host"]} 
 
     <h:outputText value="Copyright" />
-        <b>&#169;2012-#{of:formatDate(now,'yyyy')} </b> Application GolfLC by Louis Collet v2.0
+        <b>&#169;2012-#{of:formatDate(now,'yyyy')} </b> Application GolfLC by Louis Collet v3.0
 
     <h:outputText value="IPv4 Address" />
         #{request.getRemoteAddr()}
@@ -113,8 +108,7 @@
             
 <h:graphicImage 
                 name="images/maven.png"
-                alt="image missing :maven"
-                >
+                alt="image missing :maven" >
 </h:graphicImage>
            #{infoC.mavenVersion}
             
@@ -151,7 +145,9 @@
                 name="images/wildfly.png"
                 alt="image missing :wildfly.png" >
 </h:graphicImage>
-                #{faces.serverInfo}
+          <!--      #{faces.serverInfo}  -->
+               #{infoC.serverVersion}
+                
  <h:graphicImage 
                 name="images/primefaces.png"
                 alt="image missing :primefaces" >
@@ -168,15 +164,18 @@
                 name="images/jquery.png"
                 alt="image missing :jQuery" >
 </h:graphicImage>
-           
+   <h:panelGroup>
+    <span id="jqueryVersion"></span>
+    <h:outputScript>
+        document.getElementById('jqueryVersion').textContent = 
+            'jQuery version: ' + jQuery.fn.jquery;
+    </h:outputScript>
+</h:panelGroup>    
+  <!--           
            <h:panelGroup id="jQueryPanelGroup" layout="block" >
-         <!--     <h:inputText id="jQueryVersion"
-                  title="will contains the version !"
-                  value=" ">
-              </h:inputText> -->
               <p:commandButton 
                          id="ButtonVersion"
-                         ajax="true"
+                          
                          immediate="true"
                          value="jQuery Version"
                          style="font-weight:bold;margin-left:1.5rem;"
@@ -188,7 +187,7 @@
                 </p:commandButton>
             </h:panelGroup>
 
-   <!--  actionListener="#{dialogC.showSelectPlayer('professional')}"  -->         
+   -->         
             
             
 <h:graphicImage 
@@ -209,10 +208,43 @@
 </h:graphicImage>
         Log4j2 #{infoC.log4j2Version}
 
+<h:graphicImage 
+                name="images/weld_logo.png"
+                alt="image missing :weld_logo"  >
+</h:graphicImage>
+         #{infoC.weldVersion}
+
 </p:panelGrid>
+<!--
 <p:remoteCommand name="SetMyStrings"
                  action="#{infoC.putMyStrings()}"
                  autoRun="false"/>
+-->
+
+
+<p:panel header="Technical Information">
+
+    <p:dataTable value="#{infoView.info.entrySet()}"
+                 var="e"
+                 styleClass="ui-datatable-sm">
+
+        <p:column headerText="Property">
+            <h:outputText value="#{e.key}" />
+        </p:column>
+
+        <p:column headerText="Value">
+            <h:outputText value="#{e.value}" />
+        </p:column>
+
+    </p:dataTable>
+
+</p:panel>
+
+<!--  ne fonctionne pas -->
+<ui:repeat value="#{infoService2.clientIpInfo.entrySet()}" var="e">
+    <h:outputText value="#{e.key} : #{e.value}" /><br/>
+</ui:repeat>
+
 </h:form>
 </ui:define>
 </ui:composition>

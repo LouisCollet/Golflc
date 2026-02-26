@@ -3,67 +3,89 @@ package entite.composite;
 import entite.Club;
 import entite.Player;
 import entite.Professional;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named
-@RequestScoped 
+/**
+ * DTO immutable pour regrouper Club, Professional et Player
+ * Représente la relation entre un club et son professionnel
+ * Compatible JSF grâce aux getters explicites
+ */
+public record EClubPro(
+        Club club,
+        Professional professional,
+        Player player
+)  {
 
-public class EClubPro implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-
-@Inject private Club club;
-@Inject private Professional professional;
-@Inject private Player player;
-public EClubPro(){  //constructor
-   
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EClubPro {
+        // Validation selon vos règles métier
     }
 
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+    public EClubPro withClub(Club newClub) {
+        return new EClubPro(newClub, this.professional, this.player);
+    }
+
+    public EClubPro withProfessional(Professional newProfessional) {
+        return new EClubPro(this.club, newProfessional, this.player);
+    }
+
+    public EClubPro withPlayer(Player newPlayer) {
+        return new EClubPro(this.club, this.professional, newPlayer);
+    }
+
+    /* =======================
+       Getters explicites pour JSF
+       ======================= */
     public Club getClub() {
-        return club;
-    }
-
-    public void setClub(Club club) {
-        this.club = club;
+        return club != null ? club : new Club();
     }
 
     public Professional getProfessional() {
-        return professional;
-    }
-
-    public void setProfessional(Professional professional) {
-        this.professional = professional;
+        return professional != null ? professional : new Professional();
     }
 
     public Player getPlayer() {
-        return player;
+        return player != null ? player : new Player();
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    /**
+     * Formatage pour affichage/debug
+     */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : ECLUBPRO
+            %s %s %s
+            """.formatted(
+                club != null ? club : "",
+                professional != null ? professional : "",
+                player != null ? player : ""
+        ).replaceAll("(?m)^\\s*$\n", "");
     }
 
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
-        + NEW_LINE + TAB + " ,vers Club : " + club
-        + NEW_LINE + TAB + " ,vers Professional : " + professional
-        + NEW_LINE + TAB + " ,vers Player Pro: " + player
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in EClubPro.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    /**
+     * Vérifie si toutes les données sont présentes
+     */
+    public boolean isComplete() {
+        return club != null && professional != null && player != null;
+    }
+
+    /**
+     * Vérifie si au moins une donnée est présente
+     */
+    public boolean hasAnyData() {
+        return club != null || professional != null || player != null;
+    }
+
+    @Override
+    public String toString() {
+        return "EClubPro{" +
+                "club=" + club +
+                ", professional=" + professional +
+                ", player=" + player +
+                '}';
+    }
+}

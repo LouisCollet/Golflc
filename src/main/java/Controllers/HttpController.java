@@ -15,14 +15,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriInfo;
 import java.io.Serializable;
 import static java.lang.System.out;
 import java.net.ConnectException;
-import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.CookieStore;
@@ -36,31 +31,13 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import static utils.LCUtil.showMessageFatal;
 import io.mikael.urlbuilder.UrlBuilder;
-import jakarta.faces.context.FacesContext;
-import jakarta.servlet.http.HttpServletRequest;
-import java.net.URL;
-import com.google.common.net.HttpHeaders;
 import static interfaces.ConsoleColors.RED_BOLD;
 import static interfaces.ConsoleColors.RESET;
-import static interfaces.GolfInterface.ZDF_TIME2;
 import static interfaces.GolfInterface.ZDF_YEAR_MONTH_DAY;
-import jakarta.faces.context.ExternalContext;
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.time.format.DateTimeFormatter;
-import org.apache.hc.client5.http.utils.Base64;
-//import org.codehaus.plexus.util.Base64;
-//import java.util.Base64;
 
 @Named("httpC") // utile ?
 @SessionScoped   // utile ?
@@ -70,7 +47,7 @@ import org.apache.hc.client5.http.utils.Base64;
 //return redirect("http://localhost:8080/GolfWfly-1.0-SNAPSHOT/rest/creditcardController/payment_accepted",code=302)
 // d'où vient le /rest  ??
 // Before deploying your application, you need a JAX-RS class activator, which is a class extending
-// javax.ws.rs.core.Application and declaring the Path where JAX-RS Services will be available:
+//  and declaring the Path where JAX-RS Services will be available:
 // in other words : sets the Web context for the REST Service, 
 // le code se trouve dans dans package rest
 
@@ -84,7 +61,8 @@ public class HttpController implements Serializable{
     private CookieManager cookieManager = null;
     private CookieStore   cookieStore = null;
     private HttpClient httpClient = null;
-    @Inject private Creditcard creditcard;
+  //  @Inject  // enlevé LC 24-02-2026
+    private Creditcard creditcard;
 
     public Creditcard getCreditcard() {
         return creditcard;
@@ -599,49 +577,11 @@ private boolean loadKeyStore() throws FileNotFoundException, KeyStoreException, 
          Date date = keyStore.getCreationDate("GolfLCCreditcardCertificate");
       LOG.debug("creation date = " + date);
 */
-public static void main(String args[])throws SQLException, Exception{     
-   //  Connection conn = new DBConnection().getConnection();
-  try{
- //  var v = new CreditcardController().loadKeyStore(); ionvalidé provisoirement
-  // LOG.debug("result loadKeysStore = " + v);
-    Creditcard c = new Creditcard();
-    c.setCreditcardHolder("LOUIS_COLLET");
-    c.setCreditCardIdPlayer(324713); // mod 31-01-2023
-    c.setCommunication("main HttpController using Java11HttpClient");
-    //  LOG.debug("testLC = " + ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT)); 
-  //   String ldString = LocalDate.now().plusMonths(2).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")); // toujours valide !!
-    c.setCreditCardExpirationDateLdt(LocalDateTime.now().plusMonths(2));
-  //     LOG.debug("contenu CreditCardExpirationDate = " + c.getCreditCardExpirationDate());
-    c.setCreditcardNumber("6011000180331112");
-    c.setTotalPrice(145.0);
-    c.setTypePayment("LESSON");
-    c.setCreditcardType("DISCOVER"); 
-    c.setCreditcardCurrency("EUR");
- //    LOG.debug("contenu CreditCardCUrrency = " + c.getCreditCardCurrency());
-    c.setCreditcardVerificationCode((short)567);
- //      LOG.debug("with creditcard = " + c);
-    String s = new HttpController().sendPaymentServer(c);
-  //  LOG.debug("from main, after execution errormessage = " + s);//.getErrorMessage());
-        LOG.debug("from main, after execution = " + s);
-/*    Map<String, String> currencies = newCC.getAvailableCurrencies();
-        for (String country : currencies.keySet()) {
-            String currencyCode = currencies.get(country);
-            LOG.debug(country + " => " + currencyCode);
-        }
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
 
-        Locale locale = Locale.getDefault();  //US
-        locale = Locale.of("fr","BE");
-        LOG.debug("locale currency = " + Currency.getInstance(locale)); // USD
-        LOG.debug("locale symbol = " + Currency.getInstance(locale).getSymbol()); // USD
-        LOG.debug("currency code = " + Currency.getInstance(locale).getCurrencyCode()); // USD
-        LOG.debug("display name = " + Currency.getInstance(locale).getDisplayName()); // USD
-        LOG.debug("display name locale = " + Currency.getInstance(locale).getDisplayName(locale)); // USD
-*/        
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-   }finally{
-      //   DBConnection.closeQuietly(conn, null, null , null); 
-          }
-   } // end main//
-}  //end class
+} // end class

@@ -1,6 +1,10 @@
 package lists;
 
+import entite.Player;
+import entite.Subscription;
 import entite.composite.ESubscription;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
@@ -11,22 +15,34 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import utils.DBConnection;
+import rowmappers.PlayerRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.SubscriptionRowMapper;
+import connection_package.DBConnection;
+import entite.Club;
+import java.util.Collections;
+import rowmappers.ClubRowMapper;
 import utils.LCUtil;
 
 @Named("SASubscription")
 @ViewScoped // nécessaire !! pour faire le total dans local_administrator_cotisations.xhtml
 
 public class SystemAdminSubscriptionList implements Serializable{
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
     private static List<ESubscription> liste = null;
-public List<ESubscription> list(final Connection conn) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-if(liste == null){
-        LOG.debug(" ... entering " + methodName);
+public List<ESubscription> list(final Connection conn) throws SQLException, Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+//if(liste == null){
+    LOG.debug(" ... entering " + methodName);
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
+    if (liste != null) {
+        return liste;
+    }
+    liste = new ArrayList<>();
+    
+    
      String query = """
             SELECT *
             FROM payments_subscription, player
@@ -35,43 +51,45 @@ try{
             """;
      ps = conn.prepareStatement(query);
    //  ps.setInt(1, localAdmin.getIdplayer());, idplayer;
-     utils.LCUtil.logps(ps);
-     rs =  ps.executeQuery();
-     liste = new ArrayList<>();
+    utils.LCUtil.logps(ps);
+    rs =  ps.executeQuery();
+    liste = new ArrayList<>();
+    RowMapper<Player> playerMapper = new PlayerRowMapper();
+    RowMapper<Subscription> subscriptionMapper = new SubscriptionRowMapper();
+    RowMapper<Club> clubMapper = new ClubRowMapper();
 	while(rs.next()){
-           ESubscription ec = new ESubscription();
-           ec.setPlayer(entite.Player.map(rs));
-           ec.setSubscription(entite.Subscription.map(rs)); // mod 26/09/2022
-            liste.add(ec);
+           Subscription subscription = subscriptionMapper.map(rs);
+           Player player = playerMapper.map(rs);
+           Club club = null;
+           ESubscription esub = new ESubscription(subscription,player, club); // via constructor
+      //     ec.setPlayer(playerMapper.map(rs));
+      //     ec.setSubscription(subscriptionMapper.map(rs)); // mod 26/09/2022
+            liste.add(esub);
 	} // end while
   //     LOG.debug(" -- before forEach " );
  //      liste.forEach(item -> LOG.debug("Course list " + item + "/"));  // java 8 lambda
       if(liste.isEmpty()){
-         String msg = "££ Empty Result List in " + methodName;
-         LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
-   //      return null;
+        String msg = "££ Empty Result List in " + methodName;
+           LOG.error(msg);
+        LCUtil.showMessageFatal(msg);
+        return Collections.emptyList();
      }else{
          LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
      }
  return liste;
 }catch (SQLException e){ 
-        String error = "SQL Exception in SystemAdminSubscriptionList = " + e.toString() + ", SQLState = " + e.getSQLState() + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(error);
-        LCUtil.showMessageFatal(error);
-        return null;
-}catch (Exception ex){
-    String error = "Exception in " + methodName + " / " + ex;
-    LOG.error(error);
-    LCUtil.showMessageFatal(error);
+    handleSQLException(e, methodName);
+    return null;
+}catch (Exception e){
+    handleGenericException(e, methodName);
     return null;
 }finally{
         DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
 }
-}else{
+//}else{
  //   LOG.debug("escaped to " + methodName + "repetition thanks to lazy loading");
-    return liste;  //plusieurs fois ??
-}
+//    return liste;  //plusieurs fois ??
+//}
 } //end method
 
     public static List<ESubscription> getListe() {

@@ -17,7 +17,7 @@
                style="text-align:center;">
  
 <p:dataTable id="flights"
-             value="#{courseC.listFlights()}"
+             value="#{clubC.listFlights()}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
@@ -28,15 +28,14 @@
              rows="10"
              paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink}
                     {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-             rowsPerPageTemplate="5,10,15"
-             >
+             rowsPerPageTemplate="5,10,15" >
 <!--  stickyHeader="true"  rowHover="true" -->
 <f:facet name="header">
     <h1>#{msg['message.selectflight']} 
-        <h:outputText value="#{courseC.flight.flightStart}">
+        <h:outputText value="#{roundC.flight.flightStart}">
                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
         </h:outputText>
-        <h:outputText value="#{courseC.flight.firstFlight}">
+        <h:outputText value="#{roundC.flight.firstFlight}">
                 <f:convertDateTime type="ZonedDateTime" pattern="HH:mm" />
         </h:outputText>
         
@@ -56,8 +55,7 @@
                   footerText="#{msg['flight.period']}"
                   style="width:20%"
                   filterMatchMode="equals"
-                  filterBy="#{c.flightPeriod}"
-                  >
+                  filterBy="#{c.flightPeriod}" >
             <f:facet name="filter">
                 <p:selectOneButton onchange="PF('flightsTable').filter()">
                     <f:selectItem itemLabel="#{msg['flight.period.morning']}"   itemValue="A" />
@@ -71,14 +69,12 @@
 	<p:column headerText="#{msg['flight.start']}   "
                   footerText="#{msg['flight.start']}"
                   style="width:20%"
-                  id="colFlightSelected" 
-         >
+                  id="colFlightSelected" >
             <p:commandButton
                 id="selectButton"
-                actionListener="#{courseC.selectFlightFromDialog(c)}"
+                actionListener="#{roundC.selectFlightFromDialog(c)}"
                 value="#{c.flightHourStart}"
-                icon="pi pi-flag"
-                >
+                icon="pi pi-flag"  >
              </p:commandButton>
  	</p:column>
 

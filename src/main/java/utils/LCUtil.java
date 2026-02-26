@@ -1,6 +1,7 @@
 package utils;
 
 import Controllers.LanguageController;
+import static com.google.api.client.util.Strings.isNullOrEmpty;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.*;
@@ -34,16 +36,19 @@ import java.time.Year;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.lang3.StringUtils;
+import static org.omnifaces.util.Faces.getResourceAsStream;
 //import org.apache.maven.shared.utils.StringUtils;
 import org.primefaces.PrimeFaces;
 
 
-@Named("LCUtil") //enlevé 16/05/2022
+@Named("utilC") //enlevé 16/05/2022
 @RequestScoped
 
  public class LCUtil implements interfaces.GolfInterface{   
@@ -52,10 +57,28 @@ import org.primefaces.PrimeFaces;
  private static long stopTime;
  private static Locale locale = null;
  private static FacesContext context = null;
-  
-private LCUtil(){
-    // empty
-};
+  // TODOhttps://blog.stackademic.com/99-of-java-utility-classes-are-wrong-heres-the-right-way-7871fee6b8c4
+//DateUtils → Date/time formatting & parsing.
+//CollectionUtils → List/Map/Set helpers.
+//ValidationUtils → Input validations. 
+
+
+//private LCUtil(){  //enlevé 30-12-2025 pout chrcher erreur
+    // Private constructor prevents instantiation new 19-12-2025
+  // String msg = "Private constructor prevents instanciation - LCUtil Utility class should not be instantiated ! ";
+  //  LOG.debug(msg);
+  //      throw new UnsupportedOperationException("LCUtil Utility class should not be instantiated ! for : msg");
+  // }
+
+
+
+public static String capitalize(String input) {
+        if (isNullOrEmpty(input)) { //google
+            return "";
+        }
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
+    }
+
 
   // pas utilisé
   public static void executeQuery(String sql) throws SQLException{
@@ -205,11 +228,11 @@ public static java.util.Date LocalDateTimeToDate(LocalDateTime ldt){
         throw new UnsupportedOperationException("Don't know hot to convert " + date.getClass().getName() + " to java.util.Date");
     }
 
-public static java.sql.Date getSqlDate(java.util.Date dat){
-  return new java.sql.Date(dat.getTime());
+public static java.sql.Date getSqlDate(java.util.Date date){
+  return new java.sql.Date(date.getTime());
 }
   //Then the conversion from java.util.Date to java.sql.Date is quite simple:
-public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat){
+public static java.sql.Timestamp getSqlTimestamp(java.util.Date date){
 
     /*The biggest difference between java.sql.Date and java.sql.Timestamp
     is that the java.sql.Date only keeps the date, not the time,
@@ -218,7 +241,7 @@ public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat){
     then the time (23:20) would be cut off.
     If you use a java.sql.Timestamp then the time is kept.
     */
-  return new java.sql.Timestamp(dat.getTime());
+  return new java.sql.Timestamp(date.getTime());
 }
 
   public static java.sql.Date toSqlDate(java.util.Date date) {
@@ -238,8 +261,13 @@ public static java.sql.Timestamp getSqlTimestamp(java.util.Date dat){
    return bytes /1048576;
 }
 */
-
-public static String secondsToString(int time){
+public static String secondsToString(int time) {
+    return String.format("%02d:%02d:%02d",
+            time / 3600,
+            (time % 3600) / 60,
+            time % 60);
+}
+public static String secondsToString2(int time){
    int seconds = (time % 60);
    int minutes = ((time/60) % 60);
    int hours   = ((time/60*60) % 24);
@@ -288,6 +316,14 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
 //   LOG.debug("Double Array = " + Arrays.deepToString(dDouble));
    return dDouble;
 }
+// vezrsion généré chatgpt
+public static Double[] toObjectArray(double[] input) {
+    if (input == null || input.length != 4) {
+        throw new IllegalArgumentException("Input array must contain exactly 4 elements.");
+    }
+    return Arrays.stream(input).boxed().toArray(Double[]::new);
+}
+
 
   public static Double myDoubleRound(Double value, int decimalPlaces){
       try{
@@ -339,11 +375,17 @@ public static Double[] doubleArrayToDoubleArray(double [] ddouble)
     int times = DBMeta.CountColumns(conn, table);
         //LOG.debug("times = " + times);
     StringBuilder sb = new StringBuilder();
-    sb.append("INSERT INTO ").append(table).append(NEW_LINE).append(" VALUES (");
+    sb.append("INSERT INTO ")
+        .append(table)
+        .append(NEW_LINE)
+        .append(" VALUES (");
     for(int i=0; i<times; i++){
-        sb.append(TAB).append("?,").append(NEW_LINE); // = parameters placeholders, one par field
+        sb.append(TAB)
+            .append("?,")
+            .append(NEW_LINE); // = parameters placeholders, one par field
     }
-    sb.deleteCharAt(sb.lastIndexOf(",")).append(");"); // delete dernière virgule
+    sb.deleteCharAt(sb.lastIndexOf(","))
+            .append(");"); // delete dernière virgule
     //   LOG.debug("generated sb = " + sb);
     return sb.toString();
 }
@@ -571,6 +613,54 @@ try{
 }
 
 
+public static String prepareMessageBean_new(String message) {
+    try {
+        // files under WEB-INF/classes 
+        // commencent par "messagesBean" par ex: messagesBean_fr.properties  fr = locale
+        
+        FacesContext context = null;
+        try {
+            context = FacesContext.getCurrentInstance();
+        } catch (NoClassDefFoundError e) {
+            // Appel depuis batch / run
+            String msg = "Called from non-JSF execution with message = " + message;
+            LOG.warn(msg);
+            return msg;
+        }
+
+        Locale locale = new LanguageController().getLocale();
+        if (locale == null) {
+            locale = Locale.getDefault(); // fallback US
+        }
+
+        ResourceBundle bundle;
+        try {
+            bundle = ResourceBundle.getBundle("bundles.messagesBean", locale);
+        } catch (MissingResourceException e) {
+            LOG.warn("Resource bundle not found for locale " + locale + ", message=" + message, e);
+            return "message not translated: " + message;
+        }
+
+        String translated;
+        try {
+            translated = bundle.getString(message);
+            if (translated == null || translated.isBlank()) {
+                translated = "???";
+            }
+        } catch (MissingResourceException e) {
+            translated = "???";
+        }
+
+        return translated;
+
+    } catch (Exception ex) {
+        String msg = "Exception in prepareMessageBean: " + ex.getMessage();
+        LOG.error(msg, ex);
+        return null;
+    }
+}
+
+
 public static String prepareMessageBean(String message){
 try{
  //   LOG.debug("entering prepareMessageBean with message = " + message);
@@ -588,7 +678,7 @@ try{
    if(locale == null){
      locale = Locale.getDefault();  //US
    }
-       ResourceBundle text = ResourceBundle.getBundle("/messagesBean", locale);
+       ResourceBundle text = ResourceBundle.getBundle("/bundles/messagesBean", locale);
        if(text == null){
            return "message not translated" + message;
        }
@@ -611,7 +701,7 @@ try{
 } // end method
    //     }
         
-public static String prepareMessageBean(String message, Object[] arguments){ 
+public static String prepareMessageBean1(String message, Object[] arguments){ 
 // essai used in createCompetitionDescription()
 //https://murygin.wordpress.com/2010/04/23/parameter-substitution-in-resource-bundles/
     try{
@@ -699,11 +789,13 @@ public static void showMessageFatal(String message){
        }
   
      if(context != null){ //JSF session, 
-         context.getExternalContext().getFlash().setKeepMessages(true);
+         context.getExternalContext()
+                .getFlash()
+                .setKeepMessages(true);
          message = "<h2>" + message + "</h2>";  // new 18-02-2019 // enlevé 04-02-2020
     /* transféré dans Styles2022.css 
     .ui-messages-fatal {
-    */
+    */// utiliser manière lc
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,message," (Application GolfLC)");
             context.addMessage(null, facesMsg);
        }
@@ -765,14 +857,15 @@ try{
       //      utils.LCUtil.showMessageFatal(msg);
             return false;
     }
-  if(context != null){
-            message = "<h2 style='text-align:left;'>" + message + "</h2>";  // mod 27-02-2022
-            FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_INFO,message," (Application GolfLC)");
-            context.getExternalContext().getFlash().setKeepMessages(true); 
-            context.addMessage(null, facesMsg); // new 25-05-2021 voir include/messages
+    if(context != null){
+        PrimeFaces.current().executeScript("window.scrollTo(0,0);"); // scroll top remonte la page après la fin de l’envoi. new 01-01-2026
+        message = "<h2 style='text-align:left;'>" + message + "</h2>";  // mod 27-02-2022
+        FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_INFO,message," (Application GolfLC)");
+        context.getExternalContext().getFlash().setKeepMessages(true); 
+        context.addMessage(null, facesMsg); // new 25-05-2021 voir include/messages
             //https://stackoverflow.com/questions/15061019/primefaces-messages-not-displayed
            // https://github.com/primefaces/primefaces/blob/master/src/main/java/org/primefaces/context/RequestContext.java
-       }else{   // fc is null for  BATCH sessions alert('Welcome user - omnifaces msg!'
+    }else{   // fc is null for  BATCH sessions alert('Welcome user - omnifaces msg!'
        }
   return true;
 }catch(Exception cv){
@@ -798,11 +891,11 @@ try{
             LOG.error(msg);
   }
 } //end method
-    public void onIdleMonitor() {
+    public static void onIdleMonitor() {
         showMessageWarn("No activity.", "What are you doing over there?");
     }
 
-    public void onActiveMonitor() {
+    public static void onActiveMonitor() {
          showMessageWarn("Welcome Back", "Well, that's a long coffee break!");
     }
 
@@ -1116,9 +1209,70 @@ try{
    // DBMeta.listMetaData(conn);
    // DBMeta.listMetaData(PostStartupBean.getConn());
  ////  DBConnection.getPooledConnection(); enlevé 01/121/2019
-   Controllers.InfoController.ListAllSystemProperties();
+   ListAllSystemProperties();
 } //end method
 
+
+public static void ListAllSystemProperties() {
+    //https://docs.oracle.com/javase/tutorial/essential/environment/env.html
+try{
+   System.getenv().forEach((k, v) -> {
+       LOG.debug("Environment Variable = " + k + TAB + v);
+    });
+ 
+   System.getProperties().entrySet().stream()
+            .map(e -> e.getKey() + ": " + e.getValue())
+            .forEach(e -> LOG.debug("System Property " + TAB + e));
+// liste.forEach(item -> LOG.debug("Flight list " + item));  // java 8 lambda
+
+}catch (Exception e){
+    String msg = "error listallasystemproperties = " + e ;
+        LOG.error("error = " + msg );
+        }
+} // end listallsytemproperti
+
+ public static void printManifestAttributes() {
+   try {
+       Manifest manifest;
+       try (  InputStream in = getResourceAsStream("/META-INF/MANIFEST.MF")) { // sous /src/main/resources
+           manifest = new Manifest(in);
+       }
+    Attributes attributes = manifest.getMainAttributes();
+    
+    Iterator<Object> it = attributes.keySet().iterator();
+    while(it.hasNext()) {
+       String key = it.next().toString();
+       String value = attributes.getValue(key);
+        LOG.debug("manifest attribute = " + key + " / " + value);
+    }
+    /// version 2
+    try {
+    Enumeration<URL> resources = Thread.currentThread()
+        .getContextClassLoader()
+        .getResources("META-INF/MANIFEST.MF");
+    
+    while (resources.hasMoreElements()) {
+        Manifest manifest2 = new Manifest(resources.nextElement().openStream());
+        Attributes attrs = manifest2.getMainAttributes();
+        String specVersion = attrs.getValue("Specification-Version");
+        String implVersion = attrs.getValue("Implementation-Version");
+      //  String name = attrs.entrySet();
+        
+        if (specVersion != null) {
+            LOG.debug("Spec Version: " + specVersion + "Impl Version: " + implVersion);
+        }
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+    
+    
+    
+    
+   } catch (Exception ex) {
+       LOG.debug("error printattributes" + ex);
+   }
+ } //end method
 public static String firstPartUrl(){
 try{   
   try{
@@ -1352,7 +1506,16 @@ try{
         LOG.debug(msg );
     return null;}
 }  //end rmethod
-  
+
+  public static int[] stringArrayToIntArray2(String[] input) {
+    if (input == null) {
+        throw new IllegalArgumentException("Input array cannot be null.");
+    }
+
+    return Arrays.stream(input)
+                 .mapToInt(Integer::parseInt)
+                 .toArray();
+}
 
   public static String[] stringToArray1D(String input){
   try{      // one delimiter = ","
@@ -1511,15 +1674,15 @@ return ld;
   }
   
     public static void printProperties(String settings) throws IOException {
-       ClassLoader clo = Thread.currentThread().getContextClassLoader();
+    //   ClassLoader clo = Thread.currentThread().getContextClassLoader();
        LOG.debug("Printing Properties = " + settings);
-      try (InputStream is = clo.getResourceAsStream(settings)) { // close included
-          Properties p = new Properties();
-          p.load(is);
-          Enumeration<Object> keys = p.keys();
+      try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(settings)) { // close included
+          Properties properties = new Properties();
+          properties.load(inputStream);
+          Enumeration<Object> keys = properties.keys();
           while (keys.hasMoreElements()) {
               String key = (String)keys.nextElement();
-              String value = (String)p.get(key);
+              String value = (String)properties.get(key);
               LOG.debug(settings + " = " + key + ": " + value);
           }
       }
@@ -1838,17 +2001,60 @@ public static void printWarnings(SQLWarning warning) throws SQLException {
     */
  // 27-08-2020 more efficient !! 
  //https://www.logicbig.com/how-to/code-snippets/jcode-java-stack-walking-get-current-method.html
- public static String getCurrentMethodName(String classe) {
-    StackWalker stackWalker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-    StackWalker.StackFrame frame = 
-            stackWalker.walk(stream1 -> stream1.skip(1)
-                                       .findFirst()
-                                       .orElse(null));
-    return frame == null ? "caller: null" : classe + "." + frame.getMethodName() + " - ";
-    }
-//StackWalker walker = StackWalker.getInstance();
-//walker.forEach(frame -> System.out.println(frame.getMethodName()));
+ //public static String getCurrentMethodName(String classe) {
+ //   StackWalker stackWalker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+ //   StackWalker.StackFrame frame = 
+ //           stackWalker.walk(stream1 -> stream1.skip(1)
+  //                                     .findFirst()
+  //                                     .orElse(null));
+  //  return frame == null ? "caller: null" : classe + "." + frame.getMethodName() + " - ";
+  //  }
  
+     // ✅ Instance statique réutilisable (thread-safe)
+    private static final StackWalker STACK_WALKER = 
+        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+    
+    /**
+     * Récupère le nom de la méthode appelante (classe.méthode)
+     * Optimisé avec StackWalker réutilisable
+     */
+    public static String getCurrentMethodName() {
+        return STACK_WALKER.walk(frames -> 
+            frames.skip(1)  // Skip getCurrentMethodName()
+                  .findFirst()
+                  .map(frame -> frame.getClassName() + "." + frame.getMethodName())
+                  .orElse("unknown.method")
+        );
+    }
+ 
+     /**
+     * Version avec classe fournie (pour compatibilité)
+     * @deprecated Utilisez getCurrentMethodName() sans paramètre
+     */
+    @Deprecated
+    public static String getCurrentMethodName(String classe) {
+        return STACK_WALKER.walk(frames -> 
+            frames.skip(1)
+                  .findFirst()
+                  .map(frame -> classe + "." + frame.getMethodName())
+                  .orElse(classe + ".unknown")
+        );
+    }
+ /**
+     * Récupère nom complet avec infos de ligne (debug)
+     */
+    public static String getCurrentMethodNameDetailed() {
+        return STACK_WALKER.walk(frames -> 
+            frames.skip(1)
+                  .findFirst()
+                  .map(frame -> String.format("%s.%s():%d",
+                      frame.getClassName(),
+                      frame.getMethodName(),
+                      frame.getLineNumber()
+                  ))
+                  .orElse("unknown")
+        );
+    }
  
  public static String getCurrentClassName() {
    return StackWalker.getInstance(java.lang.StackWalker.
@@ -1894,7 +2100,7 @@ public static boolean isArrayAllZeroes(int[] arr){
     }
       return true;
 } // end method 
-
+/*
 public static boolean isArrayOneZero(int[] arr){
     for(int i=0;i<arr.length;i++){
  //       LOG.debug("array one zero ? " + arr[i] );
@@ -1905,6 +2111,21 @@ public static boolean isArrayOneZero(int[] arr){
     }
  return false;
 } // end
+*/
+public static boolean containsZero(int[] arr) {
+    if (arr == null || arr.length == 0) {
+        return false;
+    }
+    for (int value : arr) {
+        if (value == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 
 //Convert int[] to Integer[]
 public static Integer[] intToInteger(int[] intArray) {
@@ -1954,7 +2175,7 @@ public static String mask(String input, int visible) {
 // -------------------------
     // CONTEXT-PARAMS (web.xml)
     // -------------------------
-    public Map<String, String> getContextParams() {
+    public static Map<String, String> getContextParams() {
         ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, String> params = new TreeMap<>();
         for (String name : ec.getInitParameterMap().keySet()) {
@@ -1966,13 +2187,19 @@ public static String mask(String input, int visible) {
     // -------------------------
     // CLASSPATH ANALYSIS
     // -------------------------
-    public List<String> getClassPath() {
+    public static List<String> getClassPath() {
         return System.getProperty("java.class.path")
                 .lines().sorted()
                 .collect(Collectors.toList());
     }
 
-
+public void listAllProperties() {
+    System.getProperties().forEach((key, value) -> {
+        if (key.toString().contains("jboss") || key.toString().contains("wildfly")) {
+            System.out.println(key + " = " + value);
+        }
+    });
+}
 
 }// end Class LCUtil
 

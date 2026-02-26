@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Holidays {
+ // old solution remplacée par JollyDay le 12-12-2025
  // vérifier si la date est un jour férié
      
   public boolean CountryHolidays(LocalDate ld, String country) {
@@ -34,6 +35,7 @@ public class Holidays {
         if(country.equals("US")){
             b = CountryUSA(ld);
         }
+ // TODO pays non supportés !!
         return b;
     }
 

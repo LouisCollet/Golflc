@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<arquillian xmlns="http://jboss.org/schema/arquillian"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian 
+                                http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+<!-- <property name="jbossHome">C:\ProgramData\wildfly-37.0.0.Beta1\wildfly-37.0.0.Beta1\bin</property>
+  <container qualifier="wildfly-managed" default="true">    -->
+    
+ <!--   <defaultProtocol type="Servlet 6.0" /> 
+   <container qualifier="wildfly" default="true">-->
+        <container qualifier="wildfly-remote" default="true">
+        <configuration>
+            <!-- Mode Managed -->
+       <!--     <property name="jbossHome">${env.JBOSS_HOME}</property>  
+            <property name="jbossHome">${jboss.home}</property> 
+            <property name="javaVmArguments">-Xmx512m</property>
+            <property name="managementAddress">127.0.0.1</property>
+            <property name="managementPort">9990</property>
+
+            <property name="enableManualStart">false</property>
+            <property name="outputToConsole">true</property>-->
+            
+            <property name="managementAddress">127.0.0.1</property>
+            <property name="managementPort">9990</property>
+            <property name="username">LouisCollet</property>
+            <property name="password">Lc1lc2%lc3</property>
+            
+            <property name="managementProtocol">http-remoting</property>
+            <property name="javaVmArguments">-Dfile.encoding=UTF-8</property>
+      <!--      <property name="allowConnectingToRunningServer">true</property> -->
+            
+        </configuration>
+    </container>
+
+</arquillian>

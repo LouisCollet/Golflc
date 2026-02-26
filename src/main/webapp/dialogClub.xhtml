@@ -10,23 +10,32 @@
       xmlns:c="jakarta.tags.core"
       template="templates/dialogTemplate.xhtml" > 
 
-<ui:define name="title">Select Dialog Club Page </ui:define>
+<ui:define name="title">Dialog Club Page</ui:define>
+
 <ui:define name="content">
 
-<h:form id="form_select_club" >
+<h:form id="form_dialogClub" >
+    
+    <ui:define name="description">
+        PanelMenu is a hybrid of accordion-tree components.
+        inputSelectClub = #{inputSelectClub}
+    </ui:define>
+    
 <c:set var="type" value="#{param.type_club}"/>
 type = #{type}
 param.type_club = #{param.type_club}
 <!-- remplacé type par 'type'  -->
 <p:dataTable id="clubs"
-             value="#{courseC.listClubsDialog()}"
+             value="#{clubC.listClubsDialog(type)}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}" >
 <f:facet name="header">
-    <h2>#{msg['message.selectclub']} (for = #{param.type_club})</h2>
+    <div class="bg-warning">
+        <h2>#{msg['message.selectclub']} (for = #{param.type_club})</h2>
+    </div>
 </f:facet>
-inputSelectClub = #{inputSelectClub}
+
 <p:column 
      headerText="#"
      footerText="#"
@@ -40,8 +49,8 @@ inputSelectClub = #{inputSelectClub}
             <p:commandButton
                 id="ButtonSelectClub"
                 value="#{c.idclub} - #{msg['button.select']}"
-                ajax="true"
-                action="#{courseC.selectedClub(c)}"
+                 
+                action="#{clubC.selectedClubFromDialog(c)}"
                 icon="pi pi-arrow-left">
              </p:commandButton>
 	</p:column>

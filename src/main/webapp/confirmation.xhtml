@@ -23,14 +23,14 @@
 <f:facet name="header">
     <h1>#{msg['message.confirmation']}</h1>
 </f:facet>
-        <h:outputText value="#{courseC.player.playerFirstName}" style="font-weight:bold" />
-        <h:outputText value="#{courseC.player.playerLastName}" style="font-weight:bold" />
+        <h:outputText value="#{playerC.player.playerFirstName}" style="font-weight:bold" />
+        <h:outputText value="#{playerC.player.playerLastName}" style="font-weight:bold" />
         <h:graphicImage library="images"
-                name="#{courseC.player.playerPhotoLocation}"
+                name="#{playerC.player.playerPhotoLocation}"
                 style="float: right;">
-<!--  alt="image missing :#{courseC.player.playerLastName}" -->
+<!--  alt="image missing :#{playerC.player.playerLastName}" -->
         </h:graphicImage>
-        <b>A confirmation mail has been sent to #{courseC.player.playerEmail}"... </b> 
+        <b>A confirmation mail has been sent to #{playerC.player.playerEmail}"... </b> 
        <br/>
        Click on the confirmation link in this  email to activate your account !!!!!!
 <f:facet name="footer">

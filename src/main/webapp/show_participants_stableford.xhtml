@@ -14,7 +14,7 @@
     <ui:include src="include/include_summary_round.xhtml"/>
 <!--   mod 28/08/2022   was listStableford() vers une method  -->
 <p:dataTable id="stableford_table"
-             value="#{courseC.listStableford}"
+             value="#{roundC.listStableford}"
              rowIndexVar="rowIndex"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
@@ -58,7 +58,7 @@
             <p:commandButton
                 id="cancelButton"
                 rendered="#{c.classment.totalPoints eq 0}"
-                action="#{courseC.cancelInscription(c)}"
+                action="#{roundC.cancelInscription(c)}"
                 value="#{msg['button.delete']} - #{c.player.idplayer} - #{c.round.idround}"
                 icon="pi pi-trash"
                 style="color:red;font-weight:bold;">

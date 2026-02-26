@@ -1,6 +1,11 @@
 package lists;
 
+import entite.Club;
+import entite.Course;
+import entite.Round;
 import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,15 +13,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import utils.DBConnection;
+import rowmappers.ClubRowMapper;
+import rowmappers.CourseRowMapper;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.RowMapperRound;
+import connection_package.DBConnection;
 import utils.LCUtil;
-
-public class InscriptionList implements interfaces.Log{
+import static interfaces.Log.LOG;
+public class InscriptionList {
     private static List<ECourseList> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
     
-public List<ECourseList> list(final Connection conn) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    
+public List<ECourseList> list(final Connection conn) throws SQLException, Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
     
     LOG.debug(" ... entering InscriptionList !!");
 if(liste == null){
@@ -54,11 +64,15 @@ try{
         utils.LCUtil.logps(ps);
 	rs =  ps.executeQuery();
         liste = new ArrayList<>();
+        RowMapper<Club> clubMapper = new ClubRowMapper();
+        RowMapper<Course> courseMapper = new CourseRowMapper();
+        RowMapperRound<Round> roundMapper = new RoundRowMapper(); // accepte rs et 
 	while(rs.next()){
             ECourseList ecl = new ECourseList(); // liste pour sélectionner un round player = entite.Player.mapPlayer(rs);
-            ecl.setClub(entite.Club.dtoMapper(rs));
-            ecl.setCourse(entite.Course.dtoMapper(rs));
-            ecl.setRound(new entite.Round().dtoMapper(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
+            ecl.setClub(clubMapper.map(rs));
+            ecl.setCourse(courseMapper.map(rs));
+          //  ecl.setRound(new entite.Round().dtoMapper(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
+            ecl.setRound(roundMapper.map(rs, ecl.getClub()));
 	liste.add(ecl);
 	} //end while
      
@@ -74,14 +88,10 @@ try{
   // LOG.debug("Inscription liste = " + liste.toString());
     return liste;
 }catch (SQLException e){
-    String error = "SQL Exception in " + methodName + " / " + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(error);
-        LCUtil.showMessageFatal(error);
-        return null;
-}catch (Exception ex){
-    LOG.error("Exception in " + methodName + " / " + ex);
-    LCUtil.showMessageFatal("Exception = " + ex.toString() );
+    handleSQLException(e, methodName);
+    return null;
+}catch (Exception e){
+     handleGenericException(e, methodName);
      return null;
 }finally{
         DBConnection.closeQuietly(null, null, rs, ps);

@@ -33,12 +33,12 @@
             <h:outputText value="#{msg['tarif.season']} " />
                 <i class="pi pi-cloud"></i>
                 <i class="pi pi-sun"></i>
-                #{courseC.tarifGreenfee.equipmentsList.size()}
+                #{memC.tarifGreenfee.equipmentsList.size()}
             </h:panelGroup>
             
             <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{courseC.tarifGreenfee.workSeason}" >
+                          value="#{memC.tarifGreenfee.workSeason}" >
                 <f:selectItem itemLabel="#{msg['tarif.all']}"     itemValue="A" />
                 <f:selectItem itemLabel="#{msg['tarif.high']}"    itemValue="H" />
                 <f:selectItem itemLabel="#{msg['tarif.medium']}"  itemValue="M" />
@@ -55,7 +55,7 @@
    <p:inputText   id="EquipmentsText"
                   size="20"
                   title="#{msg['tooltip.tarif.item']}"
-	          value="#{courseC.tarifGreenfee.workItem}" 
+	          value="#{memC.tarifGreenfee.workItem}" 
                         placeholder="Enter equipment "/>
   
   <h:panelGroup id="EquipmentsPrice" layout="block" >
@@ -64,7 +64,7 @@
  </h:panelGroup>
 
     <p:inputNumber   id="EquipAmount"
-                       value="#{courseC.tarifGreenfee.workPrice}"
+                       value="#{memC.tarifGreenfee.workPrice}"
                        title="#{msg['tooltip.tarif.price2']}"
                        size="6"
                        lang="#{languageC.locale}"
@@ -78,9 +78,9 @@
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.inputTarifGreenfee('EQ')}"/>
+                         action="#{memC.inputTarifGreenfee('EQ')}"/>
          <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

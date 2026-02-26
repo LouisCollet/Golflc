@@ -13,18 +13,18 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.annotation.PostConstruct;  // migrated 2026-02-26 — POJO, not CDI-managed
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import utils.LCUtil;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 // @JsonInclude(Include.NON_NULL)  // ne fonctionne pas dans table multidimentional intéressant ?
-@Named("distance") // nécessaire ??
-@RequestScoped
+// @Named("distance")  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 
 public class Distance implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 //@JsonInclude(Include.NON_NULL)
 @JsonIgnore
     private int idTee;
@@ -50,7 +50,7 @@ public Distance(){ // constructor
         this.distanceArray = distanceArray;
     }
 
-    @PostConstruct
+    // @PostConstruct  // migrated 2026-02-26 — POJO, not CDI-managed
     public void init(){
  //        sanitizer = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS);
  //        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
@@ -59,7 +59,7 @@ public Distance(){ // constructor
     }
 
 public static Distance map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Distance tm = new Distance();
         ObjectMapper om = new ObjectMapper();

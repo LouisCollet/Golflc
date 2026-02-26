@@ -1,51 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
-      xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces"
-      xmlns:f="jakarta.faces.core">
- <p:dataTable var="item" 
-              value="#{courseC.tarifGreenfee.basicList}"
-              emptyMessage="#{msg['message.table.empty']}"
-              style="width:40%;text-align: center; margin-left:auto; margin-right:auto;" >
-      <f:facet name="header">
-          <h:outputText escape="false" value="#{msg['title.greenfee.choice']}" />
-      </f:facet>
- 
-        <p:column headerText="#{msg['tarif.members.item']} "
-                  width="12%" >
-                 <h:outputText value="#{item.item}" />
-        </p:column>
-     
-        <p:column headerText="#{msg['tarif.members.price']} " 
-                  width="12%" >
-                 <h:outputText value="#{item.price}" />
-        </p:column>
-     
-        <p:column headerText="#{msg['tarif.members.currency']}"
-                  width="12%" >
-            <h:outputText value="#{courseC.tarifGreenfee.currency}" />
-        </p:column>
-     
-     
-        <p:column headerText="#{msg['tarif.members.choice']}"
-                  width="12%"
-                  id="ChoiceBasic">
-            <!-- rendered="#{item.season eq courseC.tarifGreenfee.season or item.season eq 'A'}"
-            -->
-            <p:inputNumber
-                        value="#{item.quantity}"
-                        
-			minValue="0"
-                        maxValue="4"
-                        required="true"
-                        size="1"
-                        emptyValue="0"
-                        title="#{msg['tooltip.tarif.choice']}"
-                        decimalPlaces="0" >
-         </p:inputNumber>
-        </p:column>
-    </p:dataTable>
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:p="primefaces"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core">
+    
+            <p:outputLabel for="@next" value="#{msg['club.id']}" />
+            <h:panelGroup layout="block" 
+                          style="display:flex; align-items:center; gap:0.5rem;"
+                          id="containerClub">
+         <!--       <p:inputNumber
+                       id="inputClubId"
+                       label="inputClub"
+                       value="#{clubC.club.idclub}"
+                       size="5"
+                       decimalPlaces="0"
+                       emptyValue="0"
+                       style="margin-left:1.5em; margin-right:1.5em;" />
+                -->
+            <p:inputNumber id="inputClubId"
+               label="inputClub"
+               value="#{clubC.club.idclub}"
+               size="5"
+               lang="#{languageC.locale}"
+               decimalPlaces="0"
+               emptyValue="0"
+               required="true"
+               requiredMessage="#{msg['club.id.notnull']} - required"
+               validatorMessage="#{msg['club.id.notnull']}"
+               style="margin-left:1.5em; margin-right:1.5em;">
+                    <f:validateLongRange minimum="1"/> 
+            </p:inputNumber>
+                  <!-- ✅ 0 invalide -->
+                
+                <p:commandButton 
+                         id="ButtonHomeClub"
+                         immediate="true"
+                         value="#{msg['button.player.homeclub']}"
+                         actionListener="#{dialogC.showSelectClub('general')}"
+                         icon="pi pi-search" >
+                    <p:ajax event="dialogReturn"
+                            update="inputClubId,clubName,clubId">
+                    </p:ajax>
+                 </p:commandButton>
+      <!--  , growl-msg,inputCourseId, courseName,courseId"  -->
+                <h:outputText id="clubName"
+                              value="#{clubC.club.clubName}"
+                              style="font-style:italic;color:black"/>
+                <h:outputText id="clubId"
+                              value=" #{clubC.club.idclub}"
+                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
+            </h:panelGroup>
 </ui:composition>

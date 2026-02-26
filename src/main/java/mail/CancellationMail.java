@@ -1,58 +1,65 @@
-
 package mail;
 
 import entite.Club;
 import entite.Course;
-import entite.composite.ECourseList;
 import entite.Player;
 import entite.Round;
-import static interfaces.GolfInterface.SDF_TIME;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.GolfInterface.ZDF_TIME_HHmm;
 import static interfaces.Log.LOG;
-import java.nio.file.Path;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.mail.MessagingException;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import jakarta.mail.MessagingException;
 import utils.LCUtil;
 
-public class CancellationMail {
-    final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
- public Boolean dispatch(List<ECourseList> ecl) throws MessagingException, Exception {
-         
- try{
-     LOG.debug("entering ... " + CLASSNAME );
-     // boucler sur une liste
-     LOG.debug("nombe de cancellations = " + ecl.size());
-         for(int i = 0; i < ecl.size(); i++) {
+@ApplicationScoped
+public class CancellationMail implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject private MailSender mailSender;
+    @Inject private ical.IcalService icalService;
+
+    public CancellationMail() { }
+
+    public Boolean dispatch(List<ECourseList> ecl) throws MessagingException, Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("nombre de cancellations = " + ecl.size());
+            for (int i = 0; i < ecl.size(); i++) {
                 LOG.debug("i = " + i);
-            String clubName = ecl.get(i).getClub().getClubName();
-                LOG.debug("courseName  = " + clubName);    
-            String courseName = ecl.get(i).getCourse().getCourseName();
+                String clubName = ecl.get(i).club().getClubName();
+                LOG.debug("clubName  = " + clubName);
+                String courseName = ecl.get(i).course().getCourseName();
                 LOG.debug("courseName  = " + courseName);
-            String roundDate = ecl.get(i).getRound().getRoundDate().toString();
+                String roundDate = ecl.get(i).round().getRoundDate().toString();
                 LOG.debug("roundDate  = " + roundDate);
-            String playerName = ecl.get(i).getPlayer().getPlayerLastName();
+                String playerName = ecl.get(i).player().getPlayerLastName();
                 LOG.debug("playerName  = " + playerName);
-            // à compléter invitedby (second usage of player)
-            sendMail(ecl.get(i).getPlayer(), ecl.get(i).getPlayer(), ecl.get(i).getRound(),
-                    ecl.get(i).getClub(),ecl.get(i).getCourse());
+                sendMail(ecl.get(i).player(), ecl.get(i).player(), ecl.get(i).round(),
+                        ecl.get(i).club(), ecl.get(i).course());
+            }
+            return true;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
         }
-                  return true;       
-}catch (Exception ex){
-    String msg = "Exception in " + CLASSNAME + " / "  + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return false;
-}
-} //end method
-    public Boolean sendMail(Player player, Player invitedBy, Round round, Club club,Course course ) throws MessagingException, Exception {
-{
-        LOG.debug("entering sendMail in CancellattionMail");
-        String sujet = "Your Round Cancellation via GolfLC";
-                String Smail = 
+    } // end method
+
+    public Boolean sendMail(Player player, Player invitedBy, Round round, Club club, Course course)
+            throws MessagingException, Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            String sujet = "Your Round Cancellation via GolfLC";
+            String Smail =
                   " <br/>Cancellation notification - GolfLC!"
-            
                 + " <br/> Round Game   = " + round.getRoundGame()
                 + " <br/> Round Date   = " + round.getRoundDate().format(ZDF_TIME_HHmm)
                 + " <br/> Autres participants connus  : " + round.getPlayersString()
@@ -66,22 +73,21 @@ public class CancellationMail {
                 + " <br/><b>City       = </b>" + player.getAddress().getCity()
                 + " <br/><b>Email      = </b>" + player.getPlayerEmail()
                 + " <br/><b>Invited by     = </b>" + invitedBy.getPlayerLastName() + ", " + invitedBy.getPlayerFirstName()
- + " <br/>En utilisant le fichier .ics attaché à ce message, vous pouvez ajouter ce rendez-vous à votre agenda"
+                + " <br/>En utilisant le fichier .ics attache a ce message, vous pouvez ajouter ce rendez-vous a votre agenda"
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team"
-                + " <br/>" + LocalDateTime.now().format(ZDF_TIME)
-                    ; 
-                String to = "louis.collet@skynet.be";
-         // insérer ici le ics
-                  Path pathICS = new utils.IcalGenerator().create(player, invitedBy, round, club, course, true);
-                    LOG.debug("fileoutputstrean fos = " + pathICS);
-         // a faire tester si pas null ??
-                Path pathQRC = null;
-                boolean b = new mail.SendEmail().sendHtmlMail(sujet,Smail,to,
-                        pathICS, pathQRC,
-                        player.getPlayerLanguage());
-                    LOG.debug("HTML Mail status = " + b);
-return b;
-}
-    }
+                + " <br/>" + LocalDateTime.now().format(ZDF_TIME);
+
+            String to = "louis.collet@skynet.be";
+            byte[] pathICS = icalService.generateIcs(player, invitedBy, round, club, course, true);
+            LOG.debug("pathICS = " + pathICS);
+            boolean b = mailSender.sendHtmlMail(sujet, Smail, to, pathICS, player.getPlayerLanguage());
+            LOG.debug("HTML Mail status = " + b);
+            return b;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
 } // end class

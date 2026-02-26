@@ -68,15 +68,14 @@
             <h:panelGroup layout="block" id="containerRound">
                 <p:inputNumber
                        id="inputRound"
-                       styleClass="mystyle"
-                       value="#{courseC.round.idround}"
+                       value="#{roundC.round.idround}"
                        size="5"
                        decimalPlaces="0"
                        emptyValue="0"
                        style="margin-left:1.5em; margin-right:1.5em;" />
                 <p:commandButton 
                          id="ButtonRound"
-                         ajax="true"
+                          
                          immediate="true"
                          value="#{msg['button.round.list']}"
                          actionListener="#{dialogC.showSelectRound('round')}"
@@ -88,10 +87,10 @@
                  </p:commandButton>
       
                 <h:outputText id="roundName"
-                              value="#{courseC.round.roundName}"
+                              value="#{roundC.round.roundName}"
                               style="font-style:italic"/>
                 <h:outputText id="IdRound"
-                              value=" #{courseC.round.idround}"
+                              value=" #{roundC.round.idround}"
                               style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
             </h:panelGroup>
          
@@ -100,10 +99,10 @@
                          id="selectButtonRound"
                          update="growl-msg"
                          ajax="false"
-                         immediate="false"
+                          
                          icon="pi pi-question"
                          style="width:140px"
-                         action="#{courseC.selectRound()}" > 
+                         action="#{roundC.selectRound()}" > 
          </p:commandButton>
              <!--  c enleve entre paranthèses
               -->

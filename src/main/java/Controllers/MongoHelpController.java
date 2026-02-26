@@ -39,7 +39,7 @@ public class MongoHelpController implements Serializable{
    final static private MongoClient mongoClient = MongoClients.create();  // Creates a new client with the default connection string "mongodb://localhost:".
    final static private MongoCollection<Document> collection = mongoClient.getDatabase(DATABASE_NAME).getCollection(COLLECTION_NAME);
  //  private static @Inject ; 
-   private static entite.HelpView helpView;
+   private entite.HelpView helpView;
    public MongoHelpController() {   // constructor
   }
       
@@ -48,7 +48,7 @@ public class MongoHelpController implements Serializable{
     }
 
     public void setHelpView(HelpView helpView) {
-        MongoHelpController.helpView = helpView;
+        this.helpView = helpView;
     }
 
 public long deleteOne(HelpView helpView) {
@@ -104,7 +104,7 @@ public static boolean insertOne(HelpView helpV) { // called from SaveHelpFile(),
 //   }// end try resources
 } // end method
 
-public static boolean create(HelpView helpV) {
+public boolean create(HelpView helpV) {
   try{
          LOG.debug("entering create for = " + helpV);
    //      LOG.debug("helpV = " + helpV);
@@ -211,7 +211,7 @@ public static HelpView read(HelpView helpView) {
  }
 } // end method
   
- public static String BackCurrentHelpFile(){
+ public String BackCurrentHelpFile(){
  try{  // file.xhtml sur laquelle on était positionné avant WriteHelp
           LOG.debug("back to helpView " + helpView);
        // work around : changement vers 'en' se fait dans le process : pas trouvé pourquoi 
@@ -225,7 +225,7 @@ public static HelpView read(HelpView helpView) {
  }
 } // end method
  
-public static String showHelpFile(){  // coming from header.xhtml pour HelpWrite (afficher le contenu actuel)
+public String showHelpFile(){  // coming from header.xhtml pour HelpWrite (afficher le contenu actuel)
  try{  
        // HelpView helpV = currentHelpFile();
       //  helpView = Controllers.MongoHelpController.read(helpV);
@@ -283,6 +283,7 @@ public static HelpView currentHelpFile(){
 
 } // end method
   
+/*
     void main() {
        LOG.debug("starting main");
      HelpView helpview = new HelpView();
@@ -306,5 +307,6 @@ public static HelpView currentHelpFile(){
 ///     LOG.debug("\n\nread result = " + s);
    //   new MongoHelpController().utilities();
    //   LOG.debug("result main = " + b);
-} // end method
+} // end main
+*/
 } // end class

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static interfaces.Log.LOG;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -14,11 +16,12 @@ import java.util.Arrays;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 
-// @Named // enlevé 10/06/2022
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 //@JsonPropertyOrder({"startDate", "endDate", "itemPeriod", "nowDate"})
 @JsonInclude(JsonInclude.Include.NON_NULL) //  ignore all null fields
 public class UnavailablePeriod implements Serializable, interfaces.Log, interfaces.GolfInterface{
- private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+ 
  @JsonIgnore private static final long serialVersionUID = 1L;
  
  //  going to json 
@@ -111,9 +114,9 @@ public String getComment(){
         return msg;
         }
   } //end method
-        
+/* vers row mapper        
 public static UnavailablePeriod map(ResultSet rs) throws SQLException{
-  final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+  final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         ObjectMapper om = new ObjectMapper();
         UnavailablePeriod period = om.readValue(rs.getString("UnavailableItems"), UnavailablePeriod.class);
@@ -130,10 +133,10 @@ public static UnavailablePeriod map(ResultSet rs) throws SQLException{
       return null;
   }
 } //end method
-
+*/
 // new 26-03-2020 experimental !!
 public static PreparedStatement psUnavailablePeriodCreate(PreparedStatement ps, Club club){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
       // voir aussi http://www.javased.com/index.php?source_dir=archaius/archaius-core/src/main/java/com/netflix/config/sources/JDBCConfigurationSource.java
       int index = 0;

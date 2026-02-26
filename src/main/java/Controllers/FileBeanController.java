@@ -107,22 +107,11 @@ LOG.debug("entering getDownloadValue");
     }
 } // end method
 */
-  void main() throws ParseException {
-  try{
-     StreamedContent sc = new FileBeanController().FileDownload();
-       LOG.debug("after call on download");
-        LOG.debug("StreamedContent name = " + sc.getName());
-        LOG.debug("StreamedContent type = " + sc.getContentType());
-   //     LOG.debug("StreamedContent length = " + sc.getContentLength());
-        LOG.debug("StreamedContent stream = " + sc.getStream().toString());
-        
-       new FileBeanController().getFile();
-        LOG.debug("after call on file");
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-   }
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
 
-   } // end main//
-} // end Class
+} // end class

@@ -2,8 +2,8 @@ package entite;
 
 import static interfaces.GolfInterface.ZDF_HOURS;
 import static interfaces.Log.LOG;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 public class Flight implements Serializable, interfaces.Log{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
     private Integer idflight;
     private LocalDateTime flightStart;
@@ -118,7 +118,7 @@ public String toString(){
   }
 }
 public static Flight mapFlight(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
           Flight flight = new Flight();
           flight.setIdflight(rs.getInt("idflight") );

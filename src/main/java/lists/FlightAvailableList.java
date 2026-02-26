@@ -1,40 +1,42 @@
 package lists;
 
 import entite.Flight;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import utils.LCUtil;
+import javax.sql.DataSource;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import utils.DBConnection;
-import utils.LCUtil;
 
-// ce programme élimine les flights déjà réservés !
-public class FlightAvailableList implements interfaces.Log{
-    private static ArrayList<Flight> liste = null;
+import static interfaces.Log.LOG;
 
-public ArrayList<Flight> listAllFlights(final Connection conn) throws Exception{
-    
-if(liste == null){ 
-    LOG.debug("liste == null; then starting listAllFlights()," );
-        PreparedStatement ps = null;
-        ResultSet rs = null;
- try{
-        liste = new ArrayList<>();
- //       String fl = utils.DBMeta.listMetaColumnsLoad(conn, "flight");
- /*       final String query =
-            "SELECT *" +
-            " FROM flight" +
-            " WHERE DATE_FORMAT(flight.FlightStart, '%Y-%m-%d %H:%i')" +   // élimine les secondes
-            "     NOT IN" +
-            "     (" +
-            "     SELECT DATE_FORMAT(round.RoundDate, '%Y-%m-%d %H:%i')" +
-            "     FROM round" +
-            "     WHERE round.course_idcourse = flight.course_idcourse" +
-            "     )" +
-            " ORDER BY flight.FlightStart";
-*/
-          final String query = """
+/**
+ * Liste les flights disponibles (non encore réservés)
+ * ✅ Migré vers CDI (@ApplicationScoped)
+ * ✅ Connection supprimée — gérée via DataSource injecté
+ * ✅ try-with-resources (plus de finally/closeQuietly)
+ * ✅ return null remplacé par new ArrayList<>()
+ * ✅ main() commentée
+ */
+@ApplicationScoped
+public class FlightAvailableList implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    // ✅ Injection DataSource WildFly
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    private ArrayList<Flight> liste = null;
+
+    private static final String QUERY = """
             SELECT *
             FROM flight
             WHERE DATE_FORMAT(flight.FlightStart, '%Y-%m-%d %H:%i')
@@ -44,62 +46,93 @@ if(liste == null){
                  FROM round
                  WHERE round.course_idcourse = flight.course_idcourse
                  )
-             ORDER BY flight.FlightStart
-         """;
-   ps = conn.prepareStatement(query);
-   rs = ps.executeQuery();
-  liste = new ArrayList<>();
-  while(rs.next()){
-      Flight f = entite.Flight.mapFlight(rs);
-      liste.add(f);
-   } // end while
-//  liste.forEach(item -> LOG.debug("Flight list " + item));
-return liste;
+            ORDER BY flight.FlightStart
+            """;
 
-} catch(SQLException sqle){
-    String msg = "£££ SQL exception in ListAllFlight = " + sqle.getMessage() + " ,SQLState = " +
-            sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}catch(Exception e){
-    String msg = "£££ Exception in ListAllFlights = " + e.getMessage();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}finally{
-           DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
-     LOG.debug("escaped to listAllFlights repetition thanks to lazy loading");
-     return liste;  //plusieurs fois ??
-}
+    // ========================================
+    // MÉTHODE PRINCIPALE
+    // ✅ Connection supprimée — gérée en interne via DataSource
+    // ========================================
 
-} //end method
+    /**
+     * Liste tous les flights disponibles (non réservés par un round).
+     *
+     * @return liste des flights disponibles, jamais null
+     */
+    public ArrayList<Flight> listAllFlights() throws SQLException {
+        final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
 
-    public static ArrayList<Flight> getListe() {
-        return liste;
-    }
+        if (liste != null) {
+            LOG.debug("{} - returning cached list ({} entries)", methodName, liste.size());
+            return liste;
+        }
 
-    public static void setListe(ArrayList<Flight> liste) {
-        FlightAvailableList.liste = liste;
-    }
- void main() throws SQLException {
-       Connection conn1 = null;
- try{
-        DBConnection dbc = new DBConnection();
-        conn1 = dbc.getConnection();
-        FlightAvailableList fl = new FlightAvailableList();
-        fl.listAllFlights(conn1);
-        LOG.debug("main- after list");
-        
- } catch (Exception e) {
+        LOG.debug("{} - liste is null, querying database", methodName);
+
+        // ✅ try-with-resources : Connection, PreparedStatement, ResultSet fermés automatiquement
+        try (Connection conn       = dataSource.getConnection();
+             PreparedStatement ps  = conn.prepareStatement(QUERY);
+             ResultSet rs          = ps.executeQuery()) {
+
+            ArrayList<Flight> result = new ArrayList<>();
+
+            while (rs.next()) {
+                Flight flight = entite.Flight.mapFlight(rs);
+                result.add(flight);
+            }
+
+            LOG.debug("{} - found {} available flights", methodName, result.size());
+
+            liste = result;                                             // ✅ mise en cache
+            return liste;
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return new ArrayList<>();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return new ArrayList<>();
+        }
+    } // end method
+
+    // ========================================
+    // CACHE - Getters / Setters statiques
+    // ========================================
+
+    // ✅ Getters/setters d'instance
+    public ArrayList<Flight> getListe()                  { return liste; }
+    public void setListe(ArrayList<Flight> liste)        { this.liste = liste; }
+
+    // ✅ Invalidation explicite
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    // ========================================
+    // MAIN DE TEST - conservé commenté
+    // ========================================
+
+    /*
+    void main() throws SQLException {
+        Connection conn1 = null;
+        try {
+            DBConnection dbc = new DBConnection();
+            conn1 = dbc.getConnection();
+            FlightAvailableList fl = new FlightAvailableList();
+            fl.listAllFlights(conn1);
+            LOG.debug("main - after list");
+        } catch (Exception e) {
             String msg = "££ Exception in main = " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn1, null, null,null); 
-          }
-  
-   } // end main//
-} //end Class
+        } finally {
+            DBConnection.closeQuietly(conn1, null, null, null);
+        }
+    } // end main
+    */
+
+} // end class

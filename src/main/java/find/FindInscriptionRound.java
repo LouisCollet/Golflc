@@ -2,70 +2,82 @@ package find;
 
 import entite.Player;
 import entite.Round;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
 
-public class FindInscriptionRound implements interfaces.Log, interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+@ApplicationScoped
+public class FindInscriptionRound implements Serializable {
 
- public boolean find(final Round round, final Player player, final Connection conn) throws SQLException{   
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-        LOG.debug("entering : " + methodName); 
-        LOG.debug("starting findInscription for rond = " + round);
-        LOG.debug("starting findInscription for player = " + player);
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{ 
-    final String query = """
-      SELECT COUNT(*)
-      FROM  player_has_round
-      WHERE player_has_round.InscriptionIdRound = ?
-         AND player_has_round.InscriptionIdPlayer = ?
-    """ ;
-    ps = conn.prepareStatement(query);
-    ps.setInt(1, round.getIdround());
-    ps.setInt(2, player.getIdplayer());
-    utils.LCUtil.logps(ps);
-    rs =  ps.executeQuery();
-    int count = 0;
-    while(rs.next()){ 
-       count = rs.getInt(1);
-    }
-    
-    if(count == 0){
-        return false;
-    }else{
-        return true;
-    }
-}catch (SQLException e){
-    String msg = "SQL Exception in = " + methodName + " / " + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return false;
-}catch (Exception ex){
-    String msg = "Exception in " + methodName + " / "  + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return false;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps);
-}
-}//end method
+    private static final long serialVersionUID = 1L;
 
-void main() throws SQLException, Exception{
-    Connection conn = new DBConnection().getConnection();
-    Round round = new Round();
-    round.setIdround(633);
- //   round = new load.LoadRound().load(round, conn);
-    Player player = new Player();
-    player.setIdplayer(324715);
-    boolean b = new FindInscriptionRound().find(round, player, conn);
-       LOG.debug("inscription found = " + b);
-    DBConnection.closeQuietly(conn, null, null, null);
-}// end main
-} // end Class
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public FindInscriptionRound() { }
+
+    public boolean find(final Round round, final Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("for round = " + round);
+        LOG.debug("for player = " + player);
+
+        final String query = """
+            SELECT COUNT(*)
+            FROM  player_has_round
+            WHERE player_has_round.InscriptionIdRound = ?
+               AND player_has_round.InscriptionIdPlayer = ?
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, round.getIdround());
+            ps.setInt(2, player.getIdplayer());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    count = rs.getInt(1);
+                }
+                LOG.debug(methodName + " - count = " + count);
+                return count > 0;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    // ===========================================================================================
+    // BRIDGE — @Deprecated — pour les appelants legacy (new FindInscriptionRound().find(round, player, conn))
+    // À supprimer quand tous les appelants seront migrés en CDI
+    // ===========================================================================================
+    /** @deprecated Utiliser {@link #find(Round, Player)} via injection CDI */
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Round round = new Round();
+        round.setIdround(633);
+        Player player = new Player();
+        player.setIdplayer(324715);
+        boolean b = find(round, player);
+        LOG.debug("inscription found = " + b);
+    } // end main
+    */
+
+} // end class

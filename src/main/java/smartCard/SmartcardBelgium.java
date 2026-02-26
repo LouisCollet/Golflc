@@ -41,7 +41,8 @@ public class SmartcardBelgium{
 // .register(MyProvider.class)
 // .register(MyFeature.class);
     
-   @Inject private entite.CardBelgium cardBelgium;
+  // @Inject enlevé LC 24-02-226
+   private entite.CardBelgium cardBelgium;
 //   @Inject Config config;
 /*   
 @GET

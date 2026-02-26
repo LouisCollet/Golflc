@@ -1,11 +1,12 @@
 package events;
 
+import static interfaces.Log.LOG;
+
 /**
  *
  * @author Collet
  */
-public class HelloEvent implements interfaces.Log
-{
+public class HelloEvent {
     public final String message;
 
     public HelloEvent(String message) {

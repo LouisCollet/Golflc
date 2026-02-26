@@ -35,11 +35,11 @@
             <h:outputText value="#{msg['tarif.season']} " />
                 <i class="pi pi-cloud"></i>
                 <i class="pi pi-sun"></i>
-                #{courseC.tarifGreenfee.basicList.size()}
+                #{memC.tarifGreenfee.basicList.size()}
             </h:panelGroup>
             <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{courseC.tarifGreenfee.workSeason}" >
+                          value="#{memC.tarifGreenfee.workSeason}" >
                 <f:selectItem itemLabel="#{msg['tarif.all']}"     itemValue="A" />
                 <f:selectItem itemLabel="#{msg['tarif.high']}"    itemValue="H" />
                 <f:selectItem itemLabel="#{msg['tarif.medium']}"  itemValue="M" />
@@ -50,12 +50,12 @@
          <h:outputText value="#{msg['tarif.members.item']} " />
          <i class="pi pi-list"   ></i>
          <i class="pi pi-pencil" ></i>
-         #{courseC.tarifGreenfee.basicList.size()}
+         #{memC.tarifGreenfee.basicList.size()}
       </h:panelGroup>
      <p:inputText  id="BasicText"
                    size="20"
                    title="#{msg['tarif.item']}"
-	           value="#{courseC.tarifGreenfee.workItem}" 
+	           value="#{memC.tarifGreenfee.workItem}" 
                    placeholder="Enter basic item "/>
      
         <h:panelGroup id="BasicPriceGroup" layout="block" >
@@ -63,7 +63,7 @@
            <i class="pi pi-euro" ></i>
         </h:panelGroup>
         <p:inputNumber id="BasicPrice"
-                       value="#{courseC.tarifGreenfee.workPrice}"
+                       value="#{memC.tarifGreenfee.workPrice}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="6"
                        lang="#{languageC.locale}"
@@ -78,9 +78,9 @@
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.inputTarifGreenfee('BA')}"/>
+                         action="#{memC.inputTarifGreenfee('BA')}"/>
          <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

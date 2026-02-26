@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  http://www.mastertheboss.com/jboss-frameworks/cdi/configuring-beans-xml-file/ -->
-
-<beans xmlns="http://jakarta.ee/xml/ns/javaee"
+<beans xmlns="https://jakarta.ee/xml/ns/jakartaee"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-         http://jakarta.ee/xml/ns/jakartaee/beans_4_0.xsd"
+       xsi:schemaLocation="
+         https://jakarta.ee/xml/ns/jakartaee
+         https://jakarta.ee/xml/ns/jakartaee/beans_4_1.xsd"
        bean-discovery-mode="annotated">
+ <!--   <interceptors>
+        <class>cache.CachedInterceptor</class>
+        <class>cache.InvalidateCacheInterceptor</class>
+    </interceptors> -->
 </beans>

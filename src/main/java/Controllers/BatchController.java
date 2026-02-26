@@ -1,7 +1,6 @@
 package Controllers;
 
 import entite.Batch;
-import entite.Settings;
 import static interfaces.GolfInterface.sdf_timeHHmmss;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
@@ -26,6 +25,7 @@ import java.nio.file.Path;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.name.Rename;
 import utils.LCUtil;
+import static exceptions.LCException.handleGenericException;
 import static utils.LCUtil.showMessageFatal;
 
 @Named("batchC")
@@ -37,6 +37,8 @@ public class BatchController implements Serializable{
     private long executionId;
     private List<Batch> listeBatch;// = new ArrayList<>();
     @Inject private Batch batch;
+    @Inject private entite.Settings settings;        // ✅ injection CDI
+    @Inject private create.CreatePlayer createPlayer;  // migrated 2026-02-24
     private static int recordWritten;
     private static int recordReaded;
 
@@ -50,16 +52,17 @@ public class BatchController implements Serializable{
        LOG.debug("init executed");
     }
 // 16-11-2023 copied from Ryder
-public static void thumbs(String s){// throws IOException{
-    // all files from a directory
-    //https://github.com/coobird/thumbnailator/wiki/Examples
+// public static void thumbs(String s){// throws IOException{
+    public void thumbs(String s){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
     String msg = "starting thumbs ...";
     LOG.info( msg);
     LCUtil.showMessageInfo(msg);
-    File source = new File(Settings.getProperty("PHOTOS_LIBRARY"));
+    File source = new File(settings.getProperty("PHOTOS_LIBRARY"));
         LOG.debug("source directory = " + source);
-    File destinationDir = new File(Settings.getProperty("THUMBNAILS_LIBRARY"));
+    File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));
     Path path = destinationDir.toPath();
 //        LOG.debug("destination directory = " + destinationDir + " length = " + destinationDir.length());  // size in bytes
         LOG.debug("destination directory = " + destinationDir + " contains files = " + destinationDir.list().length); // number of files
@@ -75,16 +78,15 @@ try{
     msg = "finishing thumbs ...number of thumbnails generated 2 = " + destinationDir.list().length;
     LOG.info( msg);
     LCUtil.showMessageInfo(msg);
-}catch(Exception ex){
-    String msg = "Exception in thumbs() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-} finally {    }
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+}
 } //end method
 
 public void startBatchJobPlayers(){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
  try{
-    LOG.debug("starting startBatchJobPlayers ...");
     
     //JobOperator jo = BatchRuntime.getJobOperator();
    // long id = jo.start("GolfPlayers", null);
@@ -95,7 +97,7 @@ public void startBatchJobPlayers(){
   jobOperator = BatchRuntime.getJobOperator();
     LOG.debug("jobOperator = " + jobOperator);
   Properties props = new Properties();
-  String fileName = Settings.getProperty("BATCH") + "importPlayers.csv";
+  String fileName = settings.getProperty("BATCH") + "importPlayers.csv";
       LOG.debug("using file  = " + fileName);
   props.setProperty("input_file", fileName);
   // start 
@@ -126,11 +128,8 @@ public void startBatchJobPlayers(){
  //  return null;  // next page ici = retour a la page de depart
    //  return "jobstarted"; //mod 15-09-2021
  */
- }catch (Exception ex){
-     String msg = "Fatal Exception in startBatchJobPlayers() " + ex;
-     LOG.debug(msg);
-     showMessageFatal(msg);
-    // return 0;
+ } catch (Exception e) {
+     handleGenericException(e, methodName);
  }
 } // end method
 
@@ -167,14 +166,15 @@ public void startBatchJobPlayers(){
     }
 
 public String startBatchJobRounds(){ // throws Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
   try{
-    LOG.debug("starting startBatchJobRounds ...");
         String JOB_NAME = "GolfRounds"; // The jobname is nothing but the job JSL XML file name (minus the .xml extension)       
         jobOperator = BatchRuntime.getJobOperator();
         Properties props = new Properties();
      //   props.setProperty("input_file", "C:/Users/collet/Documents/NetBeansProjects/GolfNew/importPlayers.txt");
  //       props.setProperty("input_file", Settings.getBATCH() + "importPlayers.csv");
-        props.setProperty("input_file", Settings.getProperty("BATCH") + "importPlayers.csv");
+        props.setProperty("input_file", settings.getProperty("BATCH") + "importPlayers.csv");
      //   props.setProperty("payrollInputDataFileName", payrollInputDataFileName);
  //       String s = Settings.getBATCH() + "importPlayers.txt";
         executionId = jobOperator.start(JOB_NAME, props);
@@ -184,21 +184,20 @@ public String startBatchJobRounds(){ // throws Exception{
           LOG.debug("exiting startBatchJobRounds with execID = " + executionId);
           LOG.debug("liste execID = " + Arrays.toString(listeBatch.toArray()));
         return null;  // next page ici = retour a la page de depart
-  }catch (Exception ex){
-            String msg = "Exception in startBatchJobRounds " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}   
+  } catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
+}
 } //end method
 public String startBatchJobInscriptions(){ // throws Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
  try{
-    LOG.debug("starting startBatchJobInscriptions ...");
         String JOB_NAME = "GolfInscriptions"; // The jobname is nothing but the job JSL XML file name (minus the .xml extension)       
         jobOperator = BatchRuntime.getJobOperator();
         Properties props = new Properties();
    //     props.setProperty("input_file", Settings.getBATCH() + "importPlayers.txt");
-        props.setProperty("input_file", Settings.getProperty("BATCH") + "importPlayers.txt");
+        props.setProperty("input_file", settings.getProperty("BATCH") + "importPlayers.txt");
      //   props.setProperty("payrollInputDataFileName", payrollInputDataFileName);
         executionId = jobOperator.start(JOB_NAME, props);
         
@@ -208,12 +207,10 @@ public String startBatchJobInscriptions(){ // throws Exception{
          LOG.debug("liste executionId = " + Arrays.toString(listeBatch.toArray()));
          LOG.debug("exiting startBatchJobInscriptions with execID = " + executionId);
         return null;  // next page ici = retour a la page de depart
-   }catch (Exception ex){
-            String msg = "Exception in startBatchJobInscriptions " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}   
+   } catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
+}
 } //end method
 
 
@@ -227,8 +224,9 @@ public String getJobStatus(){ // used in jobSubmitter.xhtml
 
 /* Get the status of the job from the batch runtime */
 public String getJobStatus(JobOperator jobOp){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName + " with executionId = " + executionId);
   try{
-    LOG.debug("entering getJobStatus with executionId = " + executionId);
     //if(executionId = 0){
     //    return "execID = 0 - No batch Status available at the moment !!";
    // }
@@ -250,19 +248,15 @@ public String getJobStatus(JobOperator jobOp){
  //   }else{ // execID = 0
         
  //   }
-    }catch (Exception ex){
-     String msg = "Fatal Exception in importPlayers" + ex;
-     LOG.debug(msg);
-     showMessageFatal(msg);
+    } catch (Exception e) {
+     handleGenericException(e, methodName);
      return "nothing exception";
-     
 }
-}
+} // end method
 
 public String getJobExecutionDetails(long executionId){
-//https://docs.oracle.com/javaee/7/api/javax/batch/operations/JobOperator.html
-//  
-
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
     long duration = 0;
     try{
         //jobOperator = BatchRuntime.getJobOperator();  25-08-2023
@@ -308,10 +302,10 @@ public String getJobExecutionDetails(long executionId){
                 + sdf_timeHHmmss.format(je.getCreateTime()) + " / " + duration + " millisec "
                 ;
     }
- catch(Exception ex){
-    LOG.debug("Exception in getJobExecutionDetails= " + ex);
-    return null; 
-}    
+ catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
+}
     } // end method
 
  private BatchStatus waitForJobComplete(JobOperator jobOperator, long executionId) {  // not in use
@@ -433,7 +427,7 @@ public long getExecID() {
    //   ePlayerHandicap.setPlayer(player);
    //   ePlayerHandicap.setHandicapIndex(handicapIndex);
      LOG.debug("parsed player = player");
-     if(new create.CreatePlayer().create(player, handicapIndex, conn, "B")){   // B= creation Batch
+     if(createPlayer.create(player, handicapIndex, "B")){   // B= creation Batch
         String msg = "player created !!";
         LOG.info(msg);
         showMessageInfo(msg);

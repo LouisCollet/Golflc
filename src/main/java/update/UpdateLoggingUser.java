@@ -1,68 +1,81 @@
 package update;
 
 import entite.LoggingUser;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import static interfaces.Log.NEW_LINE;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import static utils.LCUtil.showMessageFatal;
+import static utils.LCUtil.showMessageInfo;
 
-public class UpdateLoggingUser implements interfaces.Log, interfaces.GolfInterface{
-     private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-     
- public boolean update(final LoggingUser logging, final Connection conn) throws SQLException{
-  final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-    PreparedStatement ps = null;
-try{
-        LOG.debug("...starting " + methodName);
-        LOG.debug("...for logging " + logging);
-    final String query = """
-            UPDATE logging_user
-            SET LoggingCalculations = ?
-            WHERE LoggingIdPlayer = ?
-            AND LoggingIdRound = ?
-        """ ;
-    ps = conn.prepareStatement(query);
-    ps.setString(1, logging.getLoggingCalculations());
-    ps.setInt(2, logging.getLoggingIdPlayer());
-    ps.setInt(3, logging.getLoggingIdRound());
+/**
+ * Service de mise à jour des calculs de handicap (logging_user)
+ * ✅ @ApplicationScoped - Stateless, partagé
+ */
+@ApplicationScoped
+public class UpdateLoggingUser implements Serializable {
 
-    utils.LCUtil.logps(ps);
-    int row = ps.executeUpdate();
-    if(row != 0){
-          String msg = "successful UPDATE LoggingUser = " + NEW_LINE + logging;
-          LOG.info(msg);
-          LCUtil.showMessageInfo(msg);
-          return true;
-     }else{
-          String msg = "-- UNsuccessful UPDATE LoggingUser = " + methodName + NEW_LINE + logging;
-          LOG.error(msg);
-          LCUtil.showMessageFatal(msg);
-          return false;
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public UpdateLoggingUser() { }
+
+    public boolean update(final LoggingUser logging) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(" for logging = " + logging);
+
+        final String query = """
+                UPDATE logging_user
+                SET LoggingCalculations = ?
+                WHERE LoggingIdPlayer = ?
+                AND LoggingIdRound = ?
+                """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, logging.getLoggingCalculations());
+            ps.setInt(2, logging.getLoggingIdPlayer());
+            ps.setInt(3, logging.getLoggingIdRound());
+            utils.LCUtil.logps(ps);
+
+            int row = ps.executeUpdate();
+            if (row != 0) {
+                String msg = "successful UPDATE LoggingUser = " + NEW_LINE + logging;
+                LOG.info(msg);
+                showMessageInfo(msg);
+                return true;
+            } else {
+                String msg = "UNsuccessful UPDATE LoggingUser = " + methodName + NEW_LINE + logging;
+                LOG.error(msg);
+                showMessageFatal(msg);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
         }
-}catch(SQLException e){
-    String msg = "SQL Exception in " + methodName + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return false;
-}catch(Exception ex){
-    String msg = "Exception in " + methodName + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return false;
-}finally{
-        DBConnection.closeQuietly(null, null, null, ps);
-}
-} //end method
- 
- void main() throws Exception, SQLException{
-    Connection conn = new DBConnection().getConnection();
-  
+    } // end method
 
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
 
-//     LOG.debug(" Voici le résultat : = " + b);
-     DBConnection.closeQuietly(conn, null, null, null); 
-}// end main
-} //end class
+} // end class

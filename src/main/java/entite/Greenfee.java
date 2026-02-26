@@ -2,17 +2,22 @@ package entite;
 
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
+import jakarta.enterprise.context.RequestScoped;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import jakarta.enterprise.inject.Model;
+import jakarta.inject.Named;
 import utils.LCUtil;
 
 //@Named
-@Model
+//@Model enlevé 21-01-2026
+//@Named("greenfee") 14-02-2026
+//@RequestScoped
+
 public class Greenfee implements Serializable, interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
     private Integer idplayer;
     private LocalDateTime roundDate;
@@ -153,9 +158,9 @@ public String toString(){
         return msg;
   }
 }
-
+/*
 public static Greenfee map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Greenfee greenfee = new Greenfee();
         greenfee.setIdclub(rs.getInt("GreenfeeIdClub"));
@@ -176,5 +181,6 @@ public static Greenfee map(ResultSet rs) throws SQLException{
     LCUtil.showMessageFatal(msg);
     return null;
   }
-} //end method
+} //end method map
+*/
 } // end class

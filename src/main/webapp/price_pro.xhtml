@@ -19,7 +19,7 @@
 next line listLessons = get donc sans les () ou on pourrait aussi getListLessons()/>
 -->
 <p:dataTable id="listLessons"
-             value="#{courseC.listLessons}"
+             value="#{payC.listLessons}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
@@ -83,7 +83,7 @@ next line listLessons = get donc sans les () ou on pourrait aussi getListLessons
                                  style="color:red;font-weight:bold;"
                                  oncomplete="PF('deleteProductDialog').show()">
                     <f:setPropertyActionListener value="#{c}"
-                                                 target="#{courseC.selectedLesson}" />
+                                                 target="#{payC.selectedLesson}" />
                 </p:commandButton>
             </p:column>
 
@@ -92,7 +92,7 @@ next line listLessons = get donc sans les () ou on pourrait aussi getListLessons
             id="commandButtonPayment"
             ajax="false"
             update="growl-msg"
-            immediate="false"
+             
             style="float: right;"
             icon="pi pi-credit-card"
             action="creditcard.xhtml?faces-redirect=true" >
@@ -109,7 +109,7 @@ next line listLessons = get donc sans les () ou on pourrait aussi getListLessons
                          severity="warn">
             <p:commandButton value="Yes"
                              icon="pi pi-check"
-                             actionListener="#{courseC.deleteLesson}"
+                             actionListener="#{payC.deleteLesson}"
                              process="@this"
                              
                              oncomplete="PF('deleteProductDialog').hide()" />

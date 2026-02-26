@@ -2,59 +2,81 @@ package entite.composite;
 
 import entite.CompetitionData;
 import entite.CompetitionDescription;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named
-@RequestScoped
-//@ViewScoped // new 13-02-2021
-public class ECompetition implements Serializable{
-   private CompetitionDescription competitionDescription;
-   private CompetitionData competitionData;
- // https://docs.jboss.org/weld/reference/1.1.0.Final/en-US/html/injection.html ???
- 
- public ECompetition(){  // init dans constructor
-        competitionDescription = new CompetitionDescription();
-        competitionData = new CompetitionData();
+/**
+ * DTO immutable pour regrouper CompetitionDescription et CompetitionData
+ * Représente les informations complètes d'une compétition
+ * Compatible JSF grâce aux getters explicites
+ */
+public record ECompetition(
+        CompetitionDescription competitionDescription,
+        CompetitionData competitionData
+) {
+
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public ECompetition {
+        // Validation selon vos règles métier si nécessaire
     }
+
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+
+    public ECompetition withCompetitionDescription(CompetitionDescription competitionDescription) {
+        return new ECompetition(competitionDescription, this.competitionData);
+    }
+
+    public ECompetition withCompetitionData(CompetitionData competitionData) {
+        return new ECompetition(this.competitionDescription, competitionData);
+    }
+
+    /* =======================
+       Getters explicites pour JSF
+       ======================= */
 
     public CompetitionDescription getCompetitionDescription() {
-        return competitionDescription;
-    }
-
-    public void setCompetitionDescription(CompetitionDescription competitionDescription) {
-        this.competitionDescription = competitionDescription;
+        // Si null, retourne un objet vide pour éviter NullPointerException en JSF
+        return competitionDescription != null ? competitionDescription : new CompetitionDescription();
     }
 
     public CompetitionData getCompetitionData() {
-        return competitionData;
+        return competitionData != null ? competitionData : new CompetitionData();
     }
 
-    public void setCompetitionData(CompetitionData competitionData) {
-        this.competitionData = competitionData;
+    /**
+     * Formatage pour affichage/debug
+     */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : ECOMPETITION
+            %s %s
+            """.formatted(
+                competitionDescription != null ? competitionDescription : "",
+                competitionData != null ? competitionData : ""
+        ).replaceAll("(?m)^\\s*$\n", "");
     }
 
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
-        + NEW_LINE + TAB
-               + " ,vers Competition Description : " + getCompetitionDescription()
-        + NEW_LINE + TAB
-               + " ,vers Competition Data : " + getCompetitionData()
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in ECompetition.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    /**
+     * Vérifie si toutes les données sont présentes
+     */
+    public boolean isComplete() {
+        return competitionDescription != null && competitionData != null;
+    }
+
+    /**
+     * Vérifie si au moins une donnée est présente
+     */
+    public boolean hasAnyData() {
+        return competitionDescription != null || competitionData != null;
+    }
+
+    @Override
+    public String toString() {
+        return "ECompetition{" +
+                "competitionDescription=" + competitionDescription +
+                ", competitionData=" + competitionData +
+                '}';
+    }
+}

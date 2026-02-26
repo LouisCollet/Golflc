@@ -26,7 +26,7 @@
                     ClubDetail for id = #{param.IdClub}
     </f:facet>
 <p:dataTable id="courses"
-             value="#{courseC.listDetailClub(param.IdClub)}"
+             value="#{clubC.listDetailClub(param.IdClub)}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"

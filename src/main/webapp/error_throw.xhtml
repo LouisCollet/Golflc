@@ -6,7 +6,7 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      template="templates/masterTemplate.xhtml">
+      template="templates/errorTemplate.xhtml">
 
 <ui:define name="title">Technical Error</ui:define>
 <ui:define name="content">
@@ -17,12 +17,64 @@
     <!--layout 29-05-2023 PF 13 #{msg['login.welcome.back']} 
        web.xml ==>    <location>/error_throw.xhtml</location> -->
     <!-- https://primefaces.github.io/primefaces/16_0_0/#/core/errorhandling -->
-<p:panelGrid id="panel"
+<p:panelGrid id="panelGrid1"
              layout="tabular"
              columns="1" >
 <f:facet name="header">
     <h1>Primefaces Exception handler</h1>
 </f:facet>
+    
+    <p:panelGrid id="panelGrid2" layout="tabular" columns="2" 
+             styleClass="ui-panelgrid-blank">
+
+    
+    <!-- Colonne 1: Label | Colonne 2: Valeur -->
+    
+    <h:outputText value="🔴 View:" style="font-weight:bold;"/>
+    <h:outputText value="#{view.viewId}" 
+                  style="color:orange;font-family:monospace;"/>
+    
+    <h:outputText value="⚠️ Exception:" style="font-weight:bold;"/>
+    <h:outputText value="#{pfExceptionHandler.exception}" 
+                  style="color:red;"/>
+    
+    <h:outputText value="💬 Message:" style="font-weight:bold;"/>
+    <h:outputText value="#{pfExceptionHandler.message}"/>
+    
+    <h:outputText value="📍 Type:" style="font-weight:bold;"/>
+    <h:outputText value="#{pfExceptionHandler.type}"/>
+    
+    <h:outputText value="📅 Timestamp:" style="font-weight:bold;"/>
+    <h:outputText value="#{pfExceptionHandler.formattedTimestamp}"/>
+    
+    <h:outputText value="📚 Stack Trace:" style="font-weight:bold;"/>
+    <h:outputText value="#{pfExceptionHandler.formattedStackTrace}" 
+                  escape="false" 
+                  style="font-family:monospace;font-size:0.9em;"/>
+    
+    <f:facet name="footer">
+        <p:commandButton value="Back to Welcome"
+                         immediate="true"
+                         ajax="false"
+                         icon="pi pi-home"
+                         action="welcome.xhtml?faces-redirect=true"/>
+    </f:facet>
+</p:panelGrid>
+```
+
+<!--
+
+## ✅ **Résultat attendu**
+
+Maintenant, quand une erreur se produit, vous verrez :
+```
+View ID: /login.xhtml
+Exception: jakarta.el.PropertyNotFoundException
+Message: Property 'idplayer' not found on type entite.Player
+    -->
+    
+    
+    
     <h:outputText value="Exception:#{pfExceptionHandler.exception}" style="font-size: 1.5rem;color:red;background-color: whitesmoke;"/>
     <h:outputText value="Message:#{pfExceptionHandler.message}" style="font-size: 1.0rem;"/>
     <h:outputText value="Type :#{pfExceptionHandler.type}" style="font-size: 1.0rem;"/>
@@ -30,6 +82,7 @@
     <h:outputText value="Timestamp : #{pfExceptionHandler.formattedTimestamp}"/><br/>
     <h:outputText value="Formatted StackTrace :#{pfExceptionHandler.formattedStackTrace}" style="font-size: 1.0em;" escape="false" />
 
+    
 <f:facet name="footer">
     <p:commandButton value="#{msg['login.user.old']}"
                          update="growl-msg"

@@ -2,8 +2,8 @@ package entite;
 
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -11,11 +11,11 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import utils.LCUtil;
 
-@Named("pro")
-@RequestScoped
+// @Named("pro")  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 
 public class Professional implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 
 @NotNull(message="{unavailable.startdate.notnull}")
     private LocalDateTime proStartDate;
@@ -88,9 +88,9 @@ public Professional(){ // constructor
     public void setProAmount(Double proAmount) {
         this.proAmount = proAmount;
     }
-
+/* migré 25-01-2026
     public static Professional map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+        final String methodName = utils.LCUtil.getCurrentMethodName();
         try{
             Professional pro = new Professional();
             // besoin proid ?
@@ -108,6 +108,8 @@ public Professional(){ // constructor
             LCUtil.showMessageFatal(msg);
             return null;
         } } //end method
+    
+    */
  @Override
 public String toString(){
  try {

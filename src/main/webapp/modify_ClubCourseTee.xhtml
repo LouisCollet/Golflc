@@ -7,23 +7,17 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-    <!--
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewAction action="#{courseC.listClubsCoursesTees('one_club')}"/>
-    </f:metadata>
-</ui:define>
-    -->
+
 <ui:define name="title">Modify Club,Course,Tee,Holes Page </ui:define>
 <ui:define name="content">
 <h:form id="modifyClubCourseTee">
 
 <p:dataTable id="modifyClubCourseTee"
-             value="#{courseC.listClubsCoursesTees('one_club')}"
+             value="#{clubC.listClubsCoursesTees('one_club')}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCourses}"
+             filteredValue="#{clubC.filteredCourses}"
              rowHover="true" >
      
 <f:facet name="header">
@@ -66,7 +60,7 @@
                   width="7%" >
             <p:commandButton
                 id="loadClubModify"
-                action="#{courseC.loadClub(c)}"
+                action="#{clubC.loadClub(c)}"
                 value="Modify Club #{c.club.idclub}"
                 icon="pi pi-pencil">
               
@@ -80,7 +74,7 @@
                   width="7%" >
             <p:commandButton
                 id="addCourse"
-                action="#{courseC.addCourse(c)}"
+                action="#{clubC.addCourse(c)}"
                 value="Add Course"
                 icon="pi pi-plus">
              </p:commandButton>
@@ -103,7 +97,7 @@
                   width="7%" >
             <p:commandButton
                 id="loadCourse"
-                action="#{courseC.loadCourse(c)}"
+                action="#{clubC.loadCourse(c)}"
                 value="Modify Course #{c.course.idcourse}"
                 icon="pi pi-pencil">
              </p:commandButton>
@@ -115,7 +109,7 @@
                   width="7%" >
             <p:commandButton
                 id="addTee"
-                action="#{courseC.addTee(c)}"
+                action="#{clubC.addTee(c)}"
                 value="Add Tee #{c.course.idcourse}"
                 icon="pi pi-plus">
              </p:commandButton>
@@ -142,7 +136,7 @@
             <p:commandButton
                 id="loadTee"
                 value="Modify Tee #{c.tee.idtee} MT=#{c.tee.teeMasterTee} Gender=#{c.tee.teeGender} "
-                action="#{courseC.loadTee(c)}"
+                action="#{clubC.loadTee(c)}"
                 icon="pi pi-pencil">
            </p:commandButton> 
 	</p:column>
@@ -154,7 +148,7 @@
                 id="loadHoleMaster"
                 value="Modify Holes #{c.tee.teeMasterTee} (MT)"
                 rendered="#{c.tee.idtee eq c.tee.teeMasterTee}"
-                action="#{courseC.loadHoles(c, 'global')}"
+                action="#{clubC.loadHoles(c, 'global')}"
                 icon="pi pi-pencil">
              </p:commandButton>
 	</p:column>
@@ -165,7 +159,7 @@
             <p:commandButton
                 id="loadHoleDistance"
                 rendered="#{c.tee.teeHolesPlayed eq '01-18' and c.tee.teeGender eq 'M'}"
-                action="#{courseC.loadHoles(c, 'distance')}"
+                action="#{clubC.loadHoles(c, 'distance')}"
                 value="Modify Holes #{c.tee.teeDistanceTee} (DT)"
                 icon="pi pi-pencil">
              </p:commandButton>

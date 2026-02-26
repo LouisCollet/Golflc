@@ -21,21 +21,21 @@
       <h:outputText value="#{msg['club.name']} :"   />
 	<h:outputText
             id="clubsummaryGreenfee" 
-            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+            value="#{clubC.club.clubName} (#{clubC.club.idclub})" />
 
       <h:outputText value="#{msg['course.name']} :" />
       <h:outputText
             id="coursesummaryGreenfee" 
-            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
+            value="#{clubC.course.courseName} (#{clubC.course.idcourse})" />
 
       <h:outputText value="#{msg['tarif.type']} :" 
-                    rendered="#{courseC.tarifGreenfee.greenfeeType ne null}"/>
+                    rendered="#{clubC.tarifGreenfee.greenfeeType ne null}"/>
       <h:outputText id="GreenfeeInputType" 
-                    value="#{courseC.tarifGreenfee.greenfeeType}"/>
+                    value="#{memC.tarifGreenfee.greenfeeType}"/>
 
       <h:outputText value="#{msg['tarif.period']} :"
-                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}"/>
-      <ui:repeat var="item" value="#{courseC.tarifGreenfee.datesSeasonsList}"> 
+                    rendered="#{memC.tarifGreenfee.datesSeasonsList.size() gt 0}"/>
+      <ui:repeat var="item" value="#{memC.tarifGreenfee.datesSeasonsList}"> 
           <h:outputText value="#{item.startDate}">
              <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
           </h:outputText>
@@ -46,63 +46,6 @@
           <h:outputText value=" - #{item.season}  " />
       </ui:repeat> 
       
-   <!--       
- <c:forEach var="i"
-            begin="0"
-            end="#{courseC.tarifGreenfee.datesSeasonsList.size()}"
-            step="1">
-      <h:outputText value="#{msg['tarif.period']} :"
-                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}"/>
-      <h:panelGroup id="panelItemSummaryGreenfee" layout="block"
-                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}">
-          
-          texte ici
-         <h:outputText value="#{courseC.tarifGreenfee.datesSeasonsList.startDate[i]}">
-              <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-         </h:outputText>
-         <h:outputText value=" - #{courseC.tarifGreenfee.datesSeasonsList.endDate[var]}"/>
-         <h:outputText value=" - #{courseC.tarifGreenfee.datesSeasonsList.season[var]}"/>
-    </h:panelGroup>
-    </c:forEach>   
-    -->
-
-
- 
-<!--
-<c:forEach var="i"
-           begin="0"
-           end="#{courseC.tarifGreenfee.teeTimesList.size()}"
-           step="1">
-   <h:outputText value="#{msg['tarif.period.hours']} :"
-                 rendered="#{courseC.tarifGreenfee.teeTimesList.get(i) ne null}"/>
-   <h:panelGroup id="panelItemSummaryGreenfeeHours" layout="block"
-                 rendered="#{courseC.tarifGreenfee.teeTimesList.get(i) ne null}">
-       <h:outputText value="#{courseC.tarifGreenfee.teeTimesList.get(i).startTime}"/>
-       <h:outputText value=" - #{courseC.tarifGreenfee.teeTimesList.get(i).endTime}"/>
-       <h:outputText value=" - #{courseC.tarifGreenfee.teeTimesList.get(i).price}"/>
-   </h:panelGroup>
-</c:forEach>
-    -->  
-
-
--->      
- <!-- idem pour les heures 
-      <h:outputText value="#{msg['tarif.type']} :" 
-                    rendered="#{courseC.tarifGreenfee.inputtype ne null}"/>
-      <h:outputText id="GreenfeeInputType" 
-                    value="#{courseC.tarifGreenfee.inputtype} - #{courseC.tarifGreenfee.dayOfWeek}"
-                    rendered="#{courseC.tarifGreenfee.inputtype ne null}"/>
-
-<c:forEach var="i" begin="0" end="#{courseC.tarifGreenfee.days[0].stream().count()}" step="1">
-   <h:outputText value="#{msg['tarif.typeplayer']} :"
-                 rendered="#{courseC.tarifGreenfee.typePlayer ne null}"/>
-    <h:outputText value="#{courseC.tarifGreenfee.days[0][i]}"
-                  rendered="#{courseC.tarifGreenfee.typePlayer ne null}" />
-</c:forEach>
-     -->     
 </p:panelGrid>
-
-    
 <p:divider layout="horizontal" type="solid" />
-
 </ui:composition>

@@ -3,10 +3,10 @@ package entite;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import jakarta.enterprise.context.SessionScoped;
+// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.model.SelectItem;
-import jakarta.inject.Named;
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -22,12 +22,12 @@ import static utils.LCUtil.showMessageFatal;
 
 // 05-04-2021 à essayer !! https://github.com/sualeh/creditcardnumber
 
-@Named
-@SessionScoped       //@RequestScoped
+// @Named  // migrated 2026-02-24
+// @SessionScoped  // migrated 2026-02-24
 
 public class Creditcard implements Serializable{
 @JsonIgnore private final  static  List<SelectItem> CARDS = new ArrayList<>();
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
     private Double totalPrice;
     private Integer creditCardIdPlayer;
   @NotNull(message="{creditcard.holder.notnull}")
@@ -168,7 +168,7 @@ public YearMonth expirationDate(final int year, final int month) {
         setCreditCardMajorIndustryIdentifier(lc.golfnew.MajorIndustryIdentifier.MIIfrom(creditCardNumber).toString()); //from(creditCardNumber);
      //     LOG.debug("issuer detected = " + enums.CardType.detect(creditCardNumber));
 // mod 22-08-2025        setCreditcardIssuer(enums.CardType.detect(creditcardNumber).toString());
-        setCreditcardIssuer(enums.CardBrand.from(creditCardNumber).toString()); // mod 22-08-2025
+        setCreditcardIssuer(enumeration.CardBrand.from(creditCardNumber).toString()); // mod 22-08-2025
            LOG.debug("issuer CardBrand detected = " + getCreditcardIssuer());
     }
 @JsonIgnore
@@ -339,9 +339,9 @@ public void setMyStrings(){
     }
      */
  
-
+/*
     public static Creditcard map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+        final String methodName = utils.LCUtil.getCurrentMethodName();
         try{
             Creditcard c = new Creditcard();
             c.setCreditCardIdPlayer(rs.getInt("CreditcardIdPlayer"));
@@ -374,15 +374,16 @@ public void setMyStrings(){
             LOG.error(msg);
             showMessageFatal(msg);
             return null;
-        } } //end method
-
+  }
+    } //end method
+*/
  @Override
 public String toString(){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
  try { 
-      if(this.getClass() == null){
-         return (CLASSNAME + "is null, no print : ");
-      } 
+    //  if(this.getClass() == null){
+    //     return (CLASSNAME + "is null, no print : ");
+    //  } 
 //     LOG.debug("entering creditcard toString()");
      LOG.debug(NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName().toUpperCase());
     return

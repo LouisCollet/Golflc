@@ -6,10 +6,10 @@ import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import entite.InscriptionCSV;
-import entite.Settings;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import jakarta.batch.api.chunk.AbstractItemReader;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.BufferedReader;
@@ -22,10 +22,12 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 @Named("ItemReaderInscription") // pas updaté !!
-//@ItemReader
+@ApplicationScoped // mod 11/01
 public class ItemReaderInscription extends AbstractItemReader implements interfaces.GolfInterface{
   //  @Inject private JobContext jobContext;
-    @Inject private InscriptionCSV inscription;
+  //  @Inject // enlevé LC 24-02-2026
+    private InscriptionCSV inscription; //  ??
+    @Inject private entite.Settings settings;        // ✅ injection CDI
    // @Inject private StepContext stepContext;
   //  private static BufferedReader br = null;
  //   private static final Charset CS = Charset.forName("UTF-8");
@@ -63,7 +65,7 @@ public void open(final Serializable checkpoint) throws Exception{
         br = new BufferedReader(new InputStreamReader(new FileInputStream(f),decoder));
     */    
   //     String fileName = Settings.getBATCH() + "ryder cup inscriptions.txt";
-       String fileName = Settings.getProperty("BATCH") + "ryder cup inscriptions.txt";
+       String fileName = settings.getProperty("BATCH") + "ryder cup inscriptions.txt";
           LOG.debug("file to handle = " + fileName);
           
        String readString = Files.readString(Path.of(fileName), StandardCharsets.UTF_8);

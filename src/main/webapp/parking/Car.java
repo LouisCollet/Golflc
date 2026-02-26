@@ -12,8 +12,8 @@ package entite;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 
-@Named("car")
-@SessionScoped
+//@Named("car") 14-02-2026
+//@SessionScoped
 
 public class Car implements java.io.Serializable {
     

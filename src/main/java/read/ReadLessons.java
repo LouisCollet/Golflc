@@ -1,77 +1,78 @@
 package read;
 
-import entite.Professional;
 import entite.Lesson;
+import entite.Professional;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
-import java.util.ArrayList;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.List;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleModel;
-import utils.DBConnection;
-import static utils.LCUtil.showMessageFatal;
 
-public class ReadLessons{
-   private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-   private ScheduleModel scheduleModel;
-   private org.primefaces.model.ScheduleEvent<?> scheduleEvent = new DefaultScheduleEvent<>();
-   private List<Lesson> listLessons = new ArrayList<>();
-   
-   // completes ScheduleModel from DB
-   
-public ScheduleModel read(Professional professional, Connection conn){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-try{  
-        LOG.debug("entering read " + methodName);
-        LOG.debug(" with Professional = " + professional);
-     scheduleModel = new DefaultScheduleModel();
-        LOG.debug(" starting creating listeEvent ... ");
-  // calendrier des lessons pour un pro   
-    listLessons  = new lists.LessonProList().list(professional,conn); // DB extract
-    LOG.debug("number of lessons = "+ listLessons.size());
- //     LOG.debug(" number of events in listeEvent = " + listLessons.size());
- //  Initializes the PrimeFaces's Schedule Component with the list of the events
-           for(Lesson lesson : listLessons){
-             scheduleEvent = DefaultScheduleEvent.builder()
-		.title(lesson.getEventTitle() + " pro = " + lesson.getEventProId())
-                .startDate(lesson.getEventStartDate()) 
-                .endDate(lesson.getEventEndDate()) 
-		.description("PAID - " + lesson.getEventDescription())
-                .dynamicProperty("key-id", lesson.getEventPlayerId()) // new 06-02-2023  we create a dynamic property  
-                .allDay(lesson.isEventAllDay())
-                .textColor("blue")
-                .backgroundColor("yellow")
-                .styleClass("ui-custompanelgrid")   // 02-06-2021ui-custompanelgrid
-	//	.draggable(true) // default
-		.borderColor("orange")
-                .overlapAllowed(false)
-                
-		.resizable(false) // sinon le resize provoque la modification de l'heure de fin et il faut alors modify ...
-                .build();
-             scheduleModel.addEvent(scheduleEvent);
-          } // end for
-     LOG.debug(" number of events in model = " + scheduleModel.getEventCount());
- return scheduleModel;
-   }catch (Exception ex){
-            String msg = "Exception in " + methodName + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }finally{
- //   DBConnection.closeQuietly(null, null, rs, ps);
-  }
+@ApplicationScoped
+public class ReadLessons implements Serializable {
 
-} // end read
-    
- void main() throws Exception , Exception{
-    Connection conn = new DBConnection().getConnection();
-    Professional professional = new Professional();
-    professional.setProId(1);
-    professional.setProPlayerId(324713);
-    ScheduleModel blocking = new ReadLessons().read(professional, conn);
-        LOG.debug("Blocking found = " + blocking);
-    DBConnection.closeQuietly(conn, null, null, null);
-}// end main
- 
+    private static final long serialVersionUID = 1L;
+
+    @Inject private lists.LessonProList lessonProList; // migrated 2026-02-23
+
+    public ReadLessons() { }
+
+    public ScheduleModel read(Professional professional) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("with Professional = " + professional);
+
+        try {
+            ScheduleModel scheduleModel = new DefaultScheduleModel();
+            List<Lesson> listLessons = lessonProList.list(professional);
+            LOG.debug(methodName + " - number of lessons = " + listLessons.size());
+
+            for (Lesson lesson : listLessons) {
+                org.primefaces.model.ScheduleEvent<?> scheduleEvent = DefaultScheduleEvent.builder()
+                        .title(lesson.getEventTitle() + " pro = " + lesson.getEventProId())
+                        .startDate(lesson.getEventStartDate())
+                        .endDate(lesson.getEventEndDate())
+                        .description("PAID - " + lesson.getEventDescription())
+                        .dynamicProperty("key-id", lesson.getEventPlayerId())
+                        .allDay(lesson.isEventAllDay())
+                        .textColor("blue")
+                        .backgroundColor("yellow")
+                        .styleClass("ui-custompanelgrid")
+                        .borderColor("orange")
+                        .overlapAllowed(false)
+                        .resizable(false)
+                        .build();
+                scheduleModel.addEvent(scheduleEvent);
+            } // end for
+
+            LOG.debug(methodName + " - number of events in model = " + scheduleModel.getEventCount());
+            return scheduleModel;
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return new DefaultScheduleModel();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return new DefaultScheduleModel();
+        }
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Professional professional = new Professional();
+        professional.setProId(1);
+        professional.setProPlayerId(324713);
+        ScheduleModel model = read(professional);
+        LOG.debug("model events count = " + model.getEventCount());
+    } // end main
+    */
+
 } // end class

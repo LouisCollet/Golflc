@@ -19,7 +19,7 @@ type = #{type}
 param.type_club = #{param.type_club}
 <!-- remplacé type par 'type'  -->
 <p:dataTable id="select_round"
-             value="#{courseC.listInscriptions()}"
+             value="#{roundC.listInscriptions()}"
              rowIndexVar="row"
              resizableColumns="true"
              var="c"
@@ -28,7 +28,7 @@ param.type_club = #{param.type_club}
              style="border:solid 5px;overflow-x:scroll;"  >
 <!-- 
 <p:ajax event="rowToggle" 
-        listener="#{courseC.onRowToggleCompetition}" />
+        listener="#{roundC.onRowToggleCompetition}" />
 update=":select_inscription_round:growl-msg"  -->
 <f:facet name="header">
     <h1>#{msg['message.selectround']} #{msg['message.for.inscription']}</h1>
@@ -39,7 +39,7 @@ update=":select_inscription_round:growl-msg"  -->
                   width="20%" >
             <p:commandButton
                 id="selectButton"
-                action="#{courseC.selectRecentInscription(c)}"
+                action="#{roundC.selectRecentInscription(c)}"
                 value="#{c.round.idround} - #{msg['button.select']}" 
                 icon="pi pi-arrow-left">
              </p:commandButton>

@@ -14,8 +14,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-public class CreateZipFile implements interfaces.Log{
+import 
+        static interfaces.Log.LOG;
+public class CreateZipFile {
   //  enum enu {}
     
     public static String ZipFile(String sourceDirectory, String zipFile) {

@@ -1,102 +1,111 @@
 package update;
 
 import entite.Subscription;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.GolfInterface.ZDF_DAY;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import utils.DBConnection;
+import javax.sql.DataSource;
 import utils.LCUtil;
 
-public class UpdateSubscription{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-public boolean modify(final Subscription subscription, final Connection conn) throws SQLException {
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-   PreparedStatement ps = null;
-  try {
-            LOG.debug(" ... entering " + methodName);
-            LOG.debug("with Subscription =  " + subscription);
-          final String query = """
-              UPDATE payments_subscription
-                  SET SubscriptionEndDate = ? ,
-                      SubscriptionTrialCount = ?,
-                      SubscriptionPaymentReference = ?,
-                      SubscriptionCommunication = ?,
-                      SubscriptionAmount = ?
-                  WHERE
-                      SubscriptionIdPlayer=?
-             """;
-            ps = conn.prepareStatement(query);
-            if(subscription.getSubCode().equals("TRIAL")){    // new endDate
+/**
+ * Service de modification d'abonnement (renouvellement, essai)
+ * ✅ @ApplicationScoped - Stateless, partagé
+ */
+@ApplicationScoped
+public class UpdateSubscription implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public UpdateSubscription() { }
+
+    public boolean modify(final Subscription subscription) throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(" with Subscription = " + subscription);
+
+        final String query = """
+                UPDATE payments_subscription
+                    SET SubscriptionEndDate = ? ,
+                        SubscriptionTrialCount = ?,
+                        SubscriptionPaymentReference = ?,
+                        SubscriptionCommunication = ?,
+                        SubscriptionAmount = ?
+                    WHERE
+                        SubscriptionIdPlayer=?
+                """;
+
+        if (subscription.getSubCode().equals("TRIAL")) {
+            Short s = subscription.getTrialCount();
+            subscription.setTrialCount(++s);
+            LOG.debug("This is a TRIAL, new count = " + subscription.getTrialCount());
+        } else {
+            subscription.setTrialCount((short) 0);
+            LOG.debug("This is a MONTH/YEAR, donc TRIAL = " + subscription.getTrialCount());
+        }
+
+        if (subscription.getTrialCount() > 5 && LocalDateTime.now().isAfter(subscription.getEndDate())) {
+            String msg = LCUtil.prepareMessageBean("subscription.create.toomuchtrials")
+                    + " player = " + subscription.getIdplayer()
+                    + " , trial  = <h1>" + subscription.getTrialCount() + "</h1>";
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+            throw new Exception(msg);
+        }
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            if (subscription.getSubCode().equals("TRIAL")) {
                 ps.setTimestamp(1, Timestamp.valueOf(subscription.getEndDate().plusDays(1)));
-            }else{
-                ps.setTimestamp(1, Timestamp.valueOf(subscription.getEndDate())); 
+            } else {
+                ps.setTimestamp(1, Timestamp.valueOf(subscription.getEndDate()));
             }
-    //          LOG.debug(" new trial count = " + subscription.getTrialCount());
-    
-            if(subscription.getSubCode().equals("TRIAL")){
-                Short s = subscription.getTrialCount();
-     //           LOG.debug("String s trialcount = " + s);
-                subscription.setTrialCount(++s);  // attention ++ doit se trouver avant !!!
-                   LOG.debug("This is a TRIAL, new count = " + subscription.getTrialCount());
-  //                 subscription.setCommunication(utils.LCUtil.prepareMessageBean("subscription.trial"));
-             }else{               // monthly or yearly
-                subscription.setTrialCount((short)0);
-                   LOG.debug("This is a MONTH/YEAR, donc TRIAL = " + subscription.getTrialCount());
-            }
-            
-          if(subscription.getTrialCount() > 5 && LocalDateTime.now().isAfter(subscription.getEndDate())){  // new 22-02-2019 
-             String msg = LCUtil.prepareMessageBean("subscription.create.toomuchtrials")
-        //    String msg = "subscription Trial > 5 - Use Subscription Month of Year instead !!! "
-                  + " player = " + subscription.getIdplayer()
-                  + " , trial  = <h1>" + subscription.getTrialCount() + "</h1>"
-                  ;
-             LOG.error(msg);
-             LCUtil.showMessageFatal(msg);
-             LOG.debug("returned to subscription.xhtml");
-             throw new Exception(msg);
-      //       return false;
-          }
-            ps.setInt(2, subscription.getTrialCount()); // trial count
+            ps.setInt(2, subscription.getTrialCount());
             ps.setString(3, subscription.getPaymentReference());
             ps.setString(4, subscription.getCommunication());
-            ps.setDouble(5, subscription.getSubscriptionAmount()); // new 22-02-2024
+            ps.setDouble(5, subscription.getSubscriptionAmount());
             ps.setInt(6, subscription.getIdplayer());
-            utils.LCUtil.logps(ps); 
+            utils.LCUtil.logps(ps);
+
             int row = ps.executeUpdate();
- //               LOG.debug("rows = " + row);
             if (row != 0) {
- //                 LOG.debug("before subscription success msg");
-                 String msg =  LCUtil.prepareMessageBean("subscription.success") + subscription.getEndDate().format(ZDF_DAY);
-                    LOG.debug(msg);
-                    LCUtil.showMessageInfo(msg);
-                    return true;
-             }else{
-                   String msg = "NOT NOT Successful update, row = 0 "
-                           + " player = " + subscription.getIdplayer();
-                   LOG.debug(msg);
-                   LCUtil.showMessageFatal(msg);
-                   throw new Exception(msg);
-             //      return false;
-                 } //end if
-  }catch (SQLException sqle) {
-            String msg = "££££ SQLException in " + methodName + sqle.getMessage() + " , SQLState = "
-                    + sqle.getSQLState() + " , ErrorCode = " + sqle.getErrorCode()
-                    + " player = " + subscription.getIdplayer();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+                String msg = LCUtil.prepareMessageBean("subscription.success") + subscription.getEndDate().format(ZDF_DAY);
+                LOG.debug(msg);
+                LCUtil.showMessageInfo(msg);
+                return true;
+            } else {
+                String msg = "NOT NOT Successful update, row = 0 player = " + subscription.getIdplayer();
+                LOG.debug(msg);
+                LCUtil.showMessageFatal(msg);
+                throw new Exception(msg);
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
             return false;
-   } catch (Exception e) {
-            String msg = "£££ Exception in " + methodName + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
             return false;
-        } finally {
-          //  DBConnection.closeQuietly(conn, null, null, ps);
-            DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
         }
- } //end method
-} //end class
+    } // end method
+
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
+
+} // end class

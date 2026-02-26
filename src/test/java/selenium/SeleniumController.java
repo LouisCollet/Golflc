@@ -1,5 +1,5 @@
 
-package Controllers;
+package selenium;
 
 import static interfaces.GolfInterface.ZDF_FILE;
 import static interfaces.Log.LOG;

@@ -8,7 +8,7 @@
  
 <ui:composition>
      <p:dataTable var="item" 
-                  value="#{courseC.tarifGreenfee.dayChoosen}"
+                  value="#{memC.tarifGreenfee.dayChoosen}"
                   
                   emptyMessage="#{msg['message.table.empty']}"
                   style="width:40%;text-align: center;margin-left:auto;margin-right:auto;" >
@@ -42,7 +42,7 @@
         <p:column headerText="#{msg['tarif.members.choice']}"
                   width="12%"
                   id="ChoiceHours">
-            <!--   rendered="#{item.season eq courseC.tarifGreenfee.season or item.season eq 'A'}" 
+            <!--   rendered="#{item.season eq memC.tarifGreenfee.season or item.season eq 'A'}" 
            -->
         <p:inputNumber 
                         value="#{item.quantity}"

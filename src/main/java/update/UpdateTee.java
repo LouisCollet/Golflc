@@ -1,19 +1,181 @@
 package update;
 
 import entite.Tee;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.annotation.Resource;
+import javax.sql.DataSource;
+
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static interfaces.Log.LOG;
+import sql.SqlFactory;
+import utils.LCUtil;
+
+/**
+ * Service de mise à jour de Tee
+ * ✅ @ApplicationScoped - Stateless, partagé
+ * ✅ @Resource DataSource - Connection pooling
+ * ✅ Gestion transactionnelle avec commit/rollback
+ */
+@ApplicationScoped
+public class UpdateTee implements Serializable, interfaces.GolfInterface {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * DataSource injecté par WildFly (connection pooling)
+     */
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    /**
+     * Met à jour un Tee dans la base de données
+     * 
+     * @param tee Le tee à mettre à jour
+     * @return true si succès, false sinon
+     * @throws Exception en cas d'erreur
+     */
+    public boolean update(final Tee tee) throws Exception {
+        
+        final String methodName = LCUtil.getCurrentMethodName();
+        String msg;
+        
+        LOG.debug("dataSource = {}", dataSource);
+        
+        try (Connection conn = dataSource.getConnection()) {
+            
+            // ========================================
+            // Configuration transaction
+            // ========================================
+            conn.setAutoCommit(false);
+            msg = "AutoCommit set to false";
+            LOG.info(msg);
+            
+            // ✅ PARTIE NON MODIFIÉE - DÉBUT
+            
+            // ========================================
+            // Validation
+            // ========================================
+            if (tee == null) {
+                msg = "Tee cannot be null";
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            if (tee.getIdtee() == null || tee.getIdtee() == 0) {
+                msg = "Tee ID is required for update";
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            // Validation et normalisation des données
+            if (tee.getTeeDistanceTee() == null) {
+                tee.setTeeDistanceTee(0);
+            }
+            
+            LOG.debug("Updating tee: {} (ID: {})", tee.getIdtee());
+            
+            // ========================================
+            // Update Tee
+            // ========================================
+            String query = new SqlFactory().generateQueryUpdate(conn, "tee");
+            LOG.debug("Update query: {}", query);
+            
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                
+                // Mapper les données
+                sql.preparedstatement.psCreateUpdateTee.mapUpdate(ps, tee);
+                LCUtil.logps(ps);
+                
+                // Exécuter l'update
+                int rowsAffected = ps.executeUpdate();
+                LOG.debug("Rows affected: {}", rowsAffected);
+                
+                if (rowsAffected == 0) {
+                    msg = "No rows updated - Tee may not exist: ID " + tee.getIdtee();
+                    LOG.error(msg);
+                    LCUtil.showMessageFatal(msg);
+                    throw new SQLException(msg);
+                }
+            }
+            
+            msg = String.format("Tee updated: %s (ID: %d, Gender: %s, Slope: %d)", 
+                             //  tee.getTeeName(),
+                               tee.getIdtee(),
+                               tee.getTeeGender(),
+                               tee.getTeeSlope());
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
+            
+            // ========================================
+            // Commit transaction
+            // ========================================
+            conn.commit();
+            msg = "Tee update committed successfully";
+            LOG.debug(msg);
+            
+            // ✅ PARTIE NON MODIFIÉE - FIN
+            
+            return true;
+            
+        } catch (SQLException sqle) {
+            LCUtil.printSQLException(sqle);
+            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
+                               methodName,
+                               sqle.getMessage(),
+                               sqle.getSQLState(),
+                               sqle.getErrorCode());
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+            throw sqle;
+            
+        } catch (Exception e) {
+            msg = "Exception in " + methodName + ": " + e.getMessage();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+            throw e;
+        }
+    }
+
+    /**
+     * Main pour tests hors JSF
+     * Note: Non fonctionnel sans container CDI
+     */
+    public static void main(String[] args) {
+        try {
+            Tee tee = new Tee();
+            tee.setIdtee(140);
+         //   tee.setTeeName("Test Tee Updated");
+            
+            LOG.debug("Main ready (CDI required for execution)");
+            LOG.debug("Test tee: {}", tee);
+            
+        } catch (Exception e) {
+            LOG.error("Exception in main: " + e.getMessage(), e);
+            LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
+        }
+    }
+}
+/*
+import entite.Tee;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import utils.LCUtil;
 
 public class UpdateTee implements Serializable, interfaces.Log, interfaces.GolfInterface {
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     
  public boolean update(final Tee tee, final Connection conn) throws Exception {
-  final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);   
+  final String methodName = utils.LCUtil.getCurrentMethodName();   
         PreparedStatement ps = null;
   try {
                 LOG.debug("entering " + methodName);
@@ -100,3 +262,4 @@ public class UpdateTee implements Serializable, interfaces.Log, interfaces.GolfI
         }
     } // end main//
 } //end Class
+*/

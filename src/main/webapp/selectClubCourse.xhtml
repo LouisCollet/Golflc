@@ -6,151 +6,91 @@
     xmlns:ui="jakarta.faces.facelets"
     xmlns:f="jakarta.faces.core"
     xmlns:h="jakarta.faces.html"
-    xmlns:pt="jakarta.faces.passthrough"
-    xmlns:cc="jakarta.faces.composite"
-    xmlns:my="jakarta.faces.component"
-    xmlns:c="jakarta.tags.core"
-    xmlns:fn="jakarta.tags.functions"
-    template="templates/masterTemplate.xhtml" >
-<ui:define name="title">Select Club and Course</ui:define>
-
-<ui:define name="content">
-<h:graphicImage name="images/site unavailable.jpg" alt="image missing :site unavailable.jpg" style="float: left;"> </h:graphicImage>
-<h:graphicImage name="images/temporarily unavailable.jpg" alt="image missing :temporarily unavailable.jpg" style="float: right;"> </h:graphicImage>
-<h:form id="club_course"  >
-
-<!-- <ui:include src="include/include_summary_club.xhtml"/> -->
-<p:divider layout="horizontal" type="solid" />
-<p:panelGrid
-    id="panel1"
-    layout="tabular"
-    columns="2"
-    columnClasses="col1, col2"
-    style="width:70%" >
-
-<f:facet name="header">
-     <f:facet name="header">
-    <h1>#{msg['message.selectcourse']}
-        <h:outputText
-            id="Rnd"
-            rendered="#{inputSelectCourse eq 'CreateRound'}" 
-            value="#{msg['message.for.round']}">
-        </h:outputText>
-        <h:outputText
-            id="tarif"
-            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
-            value="#{msg['message.for.tarif']}">
-        </h:outputText>
-        <h:outputText
-            id="tarifMembers"
-            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
-            value="#{msg['message.for.tarif.members']}">
-        </h:outputText>
-        <h:outputText
-            id="unavailableS"
-            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
-            value="#{msg['message.for.unavailable']}">
-        </h:outputText>
-        <h:outputText
-            id="unavailableP"
-            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
-            value="#{msg['message.for.unavailable']}">
-        </h:outputText>
-        <h:outputText
-            id="Det"
-            rendered="#{inputSelectCourse eq 'ChartRound'}" 
-            value="#{msg['message.for.detail']}">
-        </h:outputText>
-        <h:outputText
-            id="Avg"
-            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
-            value="#{msg['message.for.average']}">
-        </h:outputText>
-        </h1>
-        parameter from sessionMap = #{inputSelectCourse}
+    template="templates/masterTemplate.xhtml">
     
-</f:facet>
-</f:facet>
+    <ui:define name="title">Select Club and Course</ui:define>
 
-         <p:outputLabel for="inputClub" value="#{msg['club.id']}" />
-            <h:panelGroup layout="block" id="containerClub">
-                <p:inputNumber
-                       id="inputClub"
-                       label="HomeClub"
-                       styleClass="mystyle"
-                       value="#{courseC.club.idclub}"
-                       size="5"
-                       decimalPlaces="0"
-                       emptyValue="0"
-                       style="margin-left:1.5em; margin-right:1.5em;" />
-                <p:commandButton 
-                         id="ButtonHomeClub"
-                         ajax="true"
-                         immediate="true"
-                         value="#{msg['button.player.homeclub']}"
-                         actionListener="#{dialogC.showSelectClub('general')}"
-                         style="float:left;"
-                         icon="pi pi-search" >
-    <!--  dialogReturn gets triggered when the dialog is being closed. by dialogClose in courseC !! essentiel  -->
-                    <p:ajax event="dialogReturn"
-                         update="inputClub,clubName,ClubId" />
-                 </p:commandButton>
-      
-                <h:outputText id="clubName"
-                              value="#{courseC.club.clubName}"
-                              style="font-style:italic;color:black"/>
-                <h:outputText id="ClubId"
-                              value=" #{courseC.club.idclub}"
-                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
-            </h:panelGroup>
-  <!-- new 02/10/2024  LFS          -->
-          <p:outputLabel for="inputCourseId" value="#{msg['course.id']} :" />
-          <h:panelGroup layout="block" id="containerCourse">
-           <p:inputNumber
-               id="inputCourseId"
-               label="inputCourse"
-               value="#{courseC.course.idcourse}"
-               size="5"
-               decimalPlaces="0"
-               emptyValue="0"
-               style="margin-left:1.5em;margin-right:1.5em;" />
-           <p:commandButton 
-                id="ButtonCourse"
-                ajax="true"
-                immediate="true"
-                value="#{msg['button.course.list']}"
-                actionListener="#{dialogC.showSelectCourse('competition',courseC.club.idclub)}"
-                style="float:left;"
-                icon="pi pi-search" >
-                    <p:ajax event="dialogReturn"
-                            listener="#{dialogC.handleReturnCourse}"
-                            update="inputCourseId, courseName,courseId" />
-           </p:commandButton>
-
-           <h:outputText id="courseName"
-                          value=" #{courseC.course.courseName}"
-                          style="font-style:italic;color:black"/>
-            <h:outputText id="courseId"
-                          value=" #{courseC.course.idcourse}"
-                          style="font-weight:bold;font-size: 2em;font-style:italic;color: red"/>
-       </h:panelGroup>
-
-<f:facet name="footer">
-         <p:commandButton value="Choix Club et Parcours"
-                         id="selectButtonCreateRound"
-                         update="growl-msg"
-                         ajax="false"
-                         immediate="false"
-                         icon="pi pi-question"
-                         style="width:140px"
-                         action="#{courseC.selectCourse()}" >
-         </p:commandButton>
-             <!--  c enleve entre paranthèses
-              -->
- </f:facet>
-
-</p:panelGrid>
-
-</h:form>
-</ui:define>
+    <ui:define name="content">
+        
+        <!-- Images décoratives -->
+        <h:graphicImage 
+            name="images/site unavailable.jpg" 
+            alt="image missing: site unavailable.jpg" 
+            style="float: left;" />
+        <h:graphicImage 
+            name="images/temporarily unavailable.jpg" 
+            alt="image missing: temporarily unavailable.jpg" 
+            style="float: right;" />
+        
+    <h:form id="club_course">
+            
+            <!-- Divider -->
+            <p:divider layout="horizontal" type="solid" />
+            
+            <p:panelGrid
+                id="panel1"
+                layout="tabular"
+                columns="2"
+                columnClasses="col1, col2"
+                style="width:70%">
+                
+                <!-- =================== HEADER =================== -->
+                <f:facet name="header">
+                    <h1>
+                        #{msg['message.selectcourse']}
+                        
+                        <!-- Texte conditionnel selon le contexte -->
+                        <h:outputText
+                            rendered="#{inputSelectCourse eq 'CreateRound'}" 
+                            value=" #{msg['message.for.round']}" />
+                        <h:outputText
+                            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+                            value=" #{msg['message.for.tarif']}" />
+                        <h:outputText
+                            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+                            value=" #{msg['message.for.tarif.members']}" />
+                        <h:outputText
+                            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+                            value=" #{msg['message.for.unavailable']}" />
+                        <h:outputText
+                            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+                            value=" #{msg['message.for.unavailable']}" />
+                        <h:outputText
+                            rendered="#{inputSelectCourse eq 'ChartRound'}" 
+                            value=" #{msg['message.for.detail']}" />
+                        <h:outputText
+                            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+                            value=" #{msg['message.for.average']}" />
+                    </h1>
+                    
+                    <!-- Debug info (à retirer en production) -->
+                    <p style="font-size: 0.9em; color: #666;">
+                        Parameter from sessionMap = #{inputSelectCourse}
+                    </p>
+                </f:facet>
+                
+                <!-- =================== INCLUDE CLUB SELECTOR =================== -->
+                <ui:include src="/include/include_club_selector.xhtml" >
+                    <ui:param name="clubLabel" value="Club 1" />
+                </ui:include>
+                <!-- =================== INCLUDE COURSE SELECTOR =================== -->
+                <ui:include src="/include/include_course_selector.xhtml" />
+                
+                <!-- =================== FOOTER =================== -->
+                <f:facet name="footer">
+                    <p:commandButton 
+                        value="Choix Club et Parcours"
+                        id="selectButtonCreateRound"
+                        update="growl-msg"
+                        ajax="false"
+                        icon="pi pi-question"
+                        style="width:240px;"
+                        action="#{clubC.clubAndCourseAction()}" />
+                </f:facet>
+           <!--     action="#{courseC.selectedCourse()}" /> -->     
+            </p:panelGrid>
+            
+        </h:form>
+        
+    </ui:define>
 </ui:composition>

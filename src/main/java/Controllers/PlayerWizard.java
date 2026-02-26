@@ -16,14 +16,14 @@ import org.primefaces.event.FlowEvent;
 public class PlayerWizard implements Serializable {
 
       private boolean skip;
-      private static String step;
+      private String step;
 
-    public static String getStep() {
+    public String getStep() {
         return step;
     }
 
-    public static void setStep(String step) {
-        PlayerWizard.step = step;
+    public void setStep(String step) {
+        this.step = step;
     }
 
     public boolean isSkip() {

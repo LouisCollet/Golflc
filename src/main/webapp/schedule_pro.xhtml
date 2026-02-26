@@ -25,7 +25,7 @@
     <f:facet name="header">
         <h1>#{msg['message.lesson']} </h1>
     </f:facet>
-    <c:set var="idplayer" value="#{courseC.player.idplayer}"/>
+    <c:set var="idplayer" value="#{playerC.player.idplayer}"/>
     <p:outputPanel id="schedulePanel"
                    
                    style="font-size:0.8rem;">
@@ -146,7 +146,7 @@ function initSchedule() {
                                  process="@form"
                                  action="#{schedulerC.createLesson()}"
                                  update="panelId,growl-msg,messages"
-                                 immediate="false"
+                                  
                                  ajax="false"
                                  style="float: left;"
                                  oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
@@ -175,10 +175,10 @@ function initSchedule() {
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          style="float: right;"
                          icon="pi pi-credit-card"
-                         action="#{courseC.manageLesson()}" >
+                         action="#{payC.manageLesson()}" >
            </p:commandButton>
     </f:facet>
   </p:panel>

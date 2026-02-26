@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import utils.LCUtil;
 
 public class MatchplayPlayerResult{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
 
     private Integer playerId;
@@ -57,7 +57,7 @@ public class MatchplayPlayerResult{
     }
 
 public static MatchplayPlayerResult map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
               MatchplayPlayerResult result = new MatchplayPlayerResult();
               result.setPlayerId(rs.getInt("idplayer"));

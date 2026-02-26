@@ -1,7 +1,12 @@
 package create;
 
 import entite.Player;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -11,93 +16,91 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
-import utils.DBConnection;
+import jakarta.inject.Inject;
+import javax.sql.DataSource;
 import utils.LCUtil;
 
-public class CreateActivationPassword implements interfaces.GolfInterface{
-    public  boolean create(final Connection conn, final Player player) throws Exception     {
-         PreparedStatement ps = null;
-     //    int row = 0;
-  try {
-        final String query = LCUtil.generateInsertQuery(conn, "activation");
-        ps = conn.prepareStatement(query);
-        String uuid = UUID.randomUUID().toString();
-    //       LOG.debug("Universally Unique Identifier = " + uuid.toString());
-        ps.setString(1, uuid); // ActivationKey
-        ps.setInt(2, player.getIdplayer());
-        ps.setString(3, player.getPlayerLanguage() );
-        ps.setTimestamp(4, Timestamp.from(Instant.now()));
-        utils.LCUtil.logps(ps);
-        int row = ps.executeUpdate(); // write into database
-        if (row != 0){
-            LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(10);
-            Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-            LOG.debug("date plus 10 = " +  date);
-            LOG.debug("date in milli ? = " + date.getTime());
-            String href = utils.LCUtil.firstPartUrl() + "/password_check.xhtml" 
-                    + "?uuid=" + uuid
-                    + "&firstname=" + player.getPlayerFirstName()
-                    + "&lastname=" + player.getPlayerLastName()
-                    + "&language=" + player.getPlayerLanguage()
-                    + "&time=" + date // à formater ?
-                    + "&millis=" + date.getTime() // à formater ?
-                    ;
-            href = href.replaceAll(" ","%20"); // prénom séparé par des blancs !
-                LOG.debug("** href for activation password = " + href);
-            if(new mail.ResetPasswordMail().send(player, href)){ // mail send
-                 String msg = LCUtil.prepareMessageBean("create.reset.mail"); 
-                 LOG.debug(msg);
-                 utils.LCUtil.showMessageInfo(msg);
-            }
-     //           LOG.debug("Status resetpasswordmail = " + b);
-             String msg = "!! successful insert Activation for Password : "
-                  + " <br/>ID = " + player.getIdplayer()
-                  + " <br/>first = " + player.getPlayerFirstName()
-                  + " <br/>last = " + player.getPlayerLastName();
-                LOG.debug(msg);
-          //   LCUtil.showMessageInfo(msg);
-            return true;
-         } else {
-               String msg = "!! NOT  NOT successful insert Activation for Password : "
-                 + " <br/>ID = " + player.getIdplayer()
-                 + " <br/>first = " + player.getPlayerFirstName()
-                 + " <br/>last = " + player.getPlayerLastName();
+@ApplicationScoped
+public class CreateActivationPassword implements Serializable, interfaces.GolfInterface {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    @Inject private mail.ResetPasswordMail resetPasswordMail;  // migrated 2026-02-26
+
+    public CreateActivationPassword() { }
+
+    public boolean create(final Player player) throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        try (Connection conn = dataSource.getConnection()) {
+            final String query = LCUtil.generateInsertQuery(conn, "activation");
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                String uuid = UUID.randomUUID().toString();
+                ps.setString(1, uuid); // ActivationKey
+                ps.setInt(2, player.getIdplayer());
+                ps.setString(3, player.getPlayerLanguage());
+                ps.setTimestamp(4, Timestamp.from(Instant.now()));
+                utils.LCUtil.logps(ps);
+                int row = ps.executeUpdate();
+                if (row != 0) {
+                    LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(10);
+                    Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+                    LOG.debug("date plus 10 = " + date);
+                    String href = utils.LCUtil.firstPartUrl() + "/password_check.xhtml"
+                            + "?uuid=" + uuid
+                            + "&firstname=" + player.getPlayerFirstName()
+                            + "&lastname=" + player.getPlayerLastName()
+                            + "&language=" + player.getPlayerLanguage()
+                            + "&time=" + date
+                            + "&millis=" + date.getTime();
+                    href = href.replaceAll(" ", "%20");
+                    LOG.debug("** href for activation password = " + href);
+                    // new mail.ResetPasswordMail().send(...)
+                    if (resetPasswordMail.send(player, href)) { // migrated 2026-02-26
+                        String msg = LCUtil.prepareMessageBean("create.reset.mail");
+                        LOG.debug(msg);
+                        utils.LCUtil.showMessageInfo(msg);
+                    }
+                    String msg = "!! successful insert Activation for Password : "
+                            + " <br/>ID = " + player.getIdplayer()
+                            + " <br/>first = " + player.getPlayerFirstName()
+                            + " <br/>last = " + player.getPlayerLastName();
+                    LOG.debug(msg);
+                    return true;
+                } else {
+                    String msg = "!! NOT NOT successful insert Activation for Password : "
+                            + " <br/>ID = " + player.getIdplayer()
+                            + " <br/>first = " + player.getPlayerFirstName()
+                            + " <br/>last = " + player.getPlayerLastName();
                     LOG.error(msg);
                     LCUtil.showMessageFatal(msg);
                     return false;
-                } // end if
-        } catch (SQLException sqle) {
-            String msg = "£££ SQLException in create ActivationPassword = " + sqle.getMessage() + " ,SQLState = "
-                    + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
             return false;
         } catch (Exception e) {
-            String msg = "£££ Exception in createActivationPassword = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+            handleGenericException(e, methodName);
             return false;
-        } finally {
-           utils.DBConnection.closeQuietly(null, null, null, ps);
-         } 
-} // end method
-    
-     void main() throws SQLException, Exception {
-   Connection conn = new DBConnection().getConnection();
-   try{
-            Player player = new Player();
-            player.setIdplayer(324713);
-            player.setPlayerFirstName("Jon");
-            player.setPlayerLastName("Rahm");
-            boolean b = new create.CreateActivationPassword().create(conn, player);
-            LOG.debug("from main, CreateActivationPassword = " + b);
-    }catch (Exception e){
-            String msg = "££ Exception in main CreateActivationPassword = " + e.getMessage();
-            LOG.error(msg);
-            //      LCUtil.showMessageFatal(msg);
-    }finally{
-            DBConnection.closeQuietly(conn, null, null, null);
-    }
-    } // end main//
-    
-} // end Class
+        }
+    } // end method
+
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Player player = new Player();
+        player.setIdplayer(324713);
+        player.setPlayerFirstName("Jon");
+        player.setPlayerLastName("Rahm");
+        boolean b = new create.CreateActivationPassword().create(player);
+        LOG.debug("from main, CreateActivationPassword = " + b);
+    } // end main
+    */
+
+} // end class

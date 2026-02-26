@@ -13,7 +13,7 @@
 <h:form id="form_select_participants">
 
 <p:dataTable id="player_has_played_round"
-             value="#{courseC.listRecentRounds()}"
+             value="#{roundC.listRecentRounds()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
              rowKey="#{c.round.idround}"
@@ -26,7 +26,7 @@
         <p:column headerText="#{msg['round.selected']}" style="width:100px" >
             <p:commandButton
                 id="selectButton"
-                action="#{courseC.listParticipantsStablefordRound(c)}"
+                action="#{roundC.listParticipantsStablefordRound(c)}"
                 value="#{c.round.idround} - #{msg['button.select']}"
                 icon="pi pi-pencil">
             </p:commandButton>
@@ -46,7 +46,7 @@
                   style="width:10%"
                   id="teestart"
                   >
-                        #{courseC.roundPlayersList().size()}
+                        #{roundC.roundPlayersList().size()}
         </p:column>
 	<p:column   id="colclubname"
                     headerText="#{msg['club.name']}"

@@ -19,7 +19,7 @@
       <h:outputText value="#{msg['competition.date']} :" />
       <h:outputText
             id="competitiondatesummary" 
-            value="#{courseC.competition.competitionDescription.competitionDate}"
+            value="#{roundC.competition.competitionDescription.competitionDate}"
             >
           <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
       </h:outputText>
@@ -27,54 +27,41 @@
       <h:outputText value="#{msg['competition.name']} :" />
       <h:outputText
             id="idroundsummary" 
-            value="#{courseC.competition.competitionDescription.competitionName} (#{courseC.competition.competitionDescription.competitionId})"
+            value="#{roundC.competition.competitionDescription.competitionName} (#{roundC.competition.competitionDescription.competitionId})"
             /> 
 
       <h:outputText value="#{msg['club.name']} :"   />
 	<h:outputText
             id="clubsummary" 
-            value="#{courseC.competition.competitionDescription.competitionClubId} (#{courseC.club.idclub})" />
+            value="#{roundC.competition.competitionDescription.competitionClubId} (#{clubC.club.idclub})" />
 
       <h:outputText value="#{msg['course.name']} :" />
       <h:outputText
             id="coursesummary" 
-            value="#{courseC.competition.competitionDescription.competitionCourseIdName} - #{courseC.tee.teeHolesPlayed}" />
+            value="#{roundC.competition.competitionDescription.competitionCourseIdName} - #{clubC.tee.teeHolesPlayed}" />
 
      <h:outputText value="#{msg['competition.end.inscription']} :" />
       <h:outputText
             id="competitionenddatesummary" 
-            value="#{courseC.competition.competitionDescription.endInscriptionDate}"
-            >
+            value="#{roundC.competition.competitionDescription.endInscriptionDate}" >
           <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
       </h:outputText>
       
       <h:outputText value="#{msg['round.game']} :" />
       <h:outputText
             id="roundgamesummary" 
-            value="#{courseC.competition.competitionDescription.competitionGame}"
+            value="#{roundC.competition.competitionDescription.competitionGame}"
             />
-<!--
-      <h:outputText value="#{msg['competition.flight']} :" />
-      <h:outputText
-            id="roundgcompetitionummary" 
-            value="#{courseC.competition.competitionData.cmpDataFlightNumber}"
-            />
-
-      <h:outputText value="#{msg['round.players']} :" />
-      <h:outputText
-                      id="roundPlayers" 
-                      value="#{courseC.competition.competitionDescription.flightNumberPlayers} = #{courseC.round.playersString}" />
--->
             <h:outputText value="#{msg['player.selected']} :"
-                     rendered="#{courseC.player.getDroppedPlayers().size() gt 0}">
+                     rendered="#{playerC.player.getDroppedPlayers().size() gt 0}">
             </h:outputText>
             <h:panelGroup id="panelGroupIncludeSummary"
-                    rendered="#{courseC.player.getDroppedPlayers().size() gt 0}" >
+                    rendered="#{playerC.player.getDroppedPlayers().size() gt 0}" >
                 <h:outputText
                  id="selectedPlayersSummarySize" 
-                 value="#{courseC.player.getDroppedPlayers().size()} = "/>
+                 value="#{playerC.player.getDroppedPlayers().size()} = "/>
                 <h:outputText>
-                    <ui:repeat value="#{courseC.player.getDroppedPlayers()}"
+                    <ui:repeat value="#{playerC.player.getDroppedPlayers()}"
                                var="p">
                         <h:outputText
                              value="#{p.playerLastName} (#{p.idplayer}),">
@@ -84,19 +71,19 @@
             </h:panelGroup>
 
          <h:outputText value="#{msg['competition.gender']}"/>
-         <h:outputText value="#{courseC.competition.competitionDescription.competitionGender}"/>
+         <h:outputText value="#{roundC.competition.competitionDescription.competitionGender}"/>
 
          <h:outputText value="#{msg['competition.qualifying']}"/>
-         <h:outputText value="#{courseC.competition.competitionDescription.competitionQualifying}"/>
+         <h:outputText value="#{roundC.competition.competitionDescription.competitionQualifying}"/>
 
          <h:outputText value="#{msg['competition.status']}"/>
-         <h:outputText value="#{courseC.competition.competitionDescription.competitionStatus}"/>
+         <h:outputText value="#{roundC.competition.competitionDescription.competitionStatus}"/>
 <!--
          <h:outputText value="#{msg['competition.series']}"/>
-         <h:outputText value="#{courseC.competition.competitionDescription.seriesHandicap}"/>
+         <h:outputText value="#{roundC.competition.competitionDescription.seriesHandicap}"/>
   -->       
          <h:outputText value="#{msg['competition.maxplayers']}"/>
-         <h:outputText value="#{courseC.competition.competitionDescription.competitionMaximumPlayers}"/>
+         <h:outputText value="#{roundC.competition.competitionDescription.competitionMaximumPlayers}"/>
          
 </p:panelGrid>
 <p:divider layout="horizontal" type="solid" />

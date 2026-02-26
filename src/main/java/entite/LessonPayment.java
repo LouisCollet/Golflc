@@ -7,18 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.inject.Named;
-import jakarta.validation.constraints.NotNull;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+
+// import jakarta.inject.Named;  // migrated 2026-02-24
+
 import utils.LCUtil;
 
-@Named("lessonPayment")
-//@SessionScoped 
-@RequestScoped
+// @Named("lessonPayment")  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 
 public class LessonPayment implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 //    private Integer proId;
     private LocalDateTime paymentStartDate;
     private LocalDateTime paymentEndDate;
@@ -35,14 +34,12 @@ public class LessonPayment implements Serializable{
   //  private String eventTitle;
    // private String eventDescription;
    
-public LessonPayment(){ // constructor
+// public LessonPayment(){ }// constructor
 
-    } // end constructor
-
-    @PostConstruct
-    public void init(){
-            LOG.debug("Postconstruct executed !" );
-    }
+  //  @PostConstruct
+  //  public void init(){
+  //          LOG.debug("Postconstruct executed !" );
+  //  }
 
     public LocalDateTime getPaymentStartDate() {
         return paymentStartDate;
@@ -99,9 +96,9 @@ public LessonPayment(){ // constructor
     public void setPaymentIdClub(Integer paymentIdClub) {
         this.paymentIdClub = paymentIdClub;
     }
-
+/*
     public static LessonPayment map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+        final String methodName = utils.LCUtil.getCurrentMethodName();
         try{
             LessonPayment lp = new LessonPayment();
                 LOG.debug("starting LessonPayment");
@@ -129,6 +126,7 @@ public LessonPayment(){ // constructor
             LCUtil.showMessageFatal(msg);
             return null;
         } } //end method
+    */
  @Override
 public String toString(){
  try {

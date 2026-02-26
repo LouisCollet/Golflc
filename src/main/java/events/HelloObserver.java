@@ -6,14 +6,14 @@
 package events;
 
 //mport events.HelloEvent;
+import static interfaces.Log.LOG;
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.event.TransactionPhase;
 
 
 //@Stateless
 //@LocalBean 
-public class HelloObserver implements interfaces.Log
-{
+public class HelloObserver {
     //The default is @Observer(during = TransactionPhase.IN_PROGRESS)
     //which causes the method to run immediately after the event has fired during the transaction.
     

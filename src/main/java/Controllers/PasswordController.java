@@ -13,12 +13,11 @@ import static interfaces.Log.LOG;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import java.io.*;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import update.UpdatePassword;
-import utils.DBConnection;
-import utils.LCUtil;
+import jakarta.inject.Inject;
+import manager.PlayerManager;
+import static exceptions.LCException.handleGenericException;
+import static utils.LCUtil.prepareMessageBean;
 import static utils.LCUtil.showMessageFatal;
 
 @Named("passwordC")
@@ -29,16 +28,31 @@ public class PasswordController implements Serializable, interfaces.Log{
 public PasswordController() {
     //
 }
+// Injection ou récupération du PlayerManager (CDI recommandé)
+    @Inject
+    private PlayerManager playerManager;
+    @Inject
+    private read.LoadBlocking loadBlocking;                 // migrated 2026-02-24
+    @Inject
+    private delete.DeleteActivation deleteActivation;       // migrated 2026-02-24
+    @Inject
+    private delete.DeleteBlocking deleteBlocking;           // migrated 2026-02-24
+    @Inject
+    private update.UpdatePassword updatePassword;           // migrated 2026-02-24
+    @Inject
+    private mail.ResetPasswordMail resetPasswordMail;       // migrated 2026-02-26
 // new 02-03-2024
-public Password isExists(EPlayerPassword epp, Connection conn) throws SQLException{ 
-//public EPlayerPassword resetPassword(EPlayerPassword epp, Activation activation, final Connection conn) throws SQLException, Throwable { 
+public Password isExists(EPlayerPassword epp){
+//public EPlayerPassword resetPassword(EPlayerPassword epp, Activation activation, final Connection conn) throws SQLException, Throwable {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
     try{
 LOG.debug("1. verifying if there is an existing password");
-     Password password = epp.getPassword();
+     Password password = epp.password();
  //       LOG.debug("entite password = " + password);
  //       LOG.debug("player password = " + password.getPlayerPassword());
      if(password.getPlayerPassword() == null){
-          String err = LCUtil.prepareMessageBean("password.empty"); // + " = " + password.getPlayerPassword(); 
+          String err = utils.LCUtil.prepareMessageBean("password.empty"); // + " = " + password.getPlayerPassword(); 
           LOG.debug(err);
           showMessageFatal(err);
           password = null;
@@ -50,16 +64,16 @@ LOG.debug("1. verifying if there is an existing password");
       }
      return password;
    } catch (Exception e) {
-            String msg = "£££ Exception in isValid  = " + e.getMessage(); // + " ,SQLState = "
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+            handleGenericException(e, methodName);
             return null;
    }
 }
-public boolean isBlocking(Player player, Connection conn) throws SQLException{ 
+public boolean isBlocking(Player player){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
     try{
-        if(passwordBlocking(player, conn)){   //dans CourseController
-             String err = LCUtil.prepareMessageBean("password.blocked"); // + blocking.getBlockingRetryTime().format(ZDF_TIME); // ,player.getPlayerPassword()); 
+        if(passwordBlocking(player)){
+             String err = prepareMessageBean("password.blocked"); // + blocking.getBlockingRetryTime().format(ZDF_TIME); // ,player.getPlayerPassword()); 
              LOG.error(err);
              showMessageFatal(err);
              return true; //"selectPlayer.xhtml?faces-redirect=true";
@@ -67,19 +81,19 @@ public boolean isBlocking(Player player, Connection conn) throws SQLException{
             return false;
           }
   } catch (Exception e) {
-            String msg = "£££ Exception in isBlocking  = " + e.getMessage(); // + " ,SQLState = "
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+            handleGenericException(e, methodName);
             return false;
    }
 }
 
- public boolean passwordBlocking (Player player, Connection conn){
+ public boolean passwordBlocking (Player player){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{ // coming from selectPlayer 5926
 //    LOG.debug(" starting passwordBlocking ? ");
  //   LOG.debug("for player = " + player);
     // find
-    Blocking blocking = new read.LoadBlocking().load(player,conn);
+    Blocking blocking = loadBlocking.load(player);
  //       LOG.debug("blocking after LoadBlocking = " + blocking);
     if(blocking == null){
         LOG.debug("pas de blocage pour ce player");
@@ -106,7 +120,7 @@ try{ // coming from selectPlayer 5926
              String msg = "temps de blocage dépassé - delete record"+ " now = " + LocalDateTime.now().format(ZDF_TIME) + " Retrytime = " 
                + blocking.getBlockingRetryTime().format(ZDF_TIME);
              LOG.debug(msg);
-             boolean b = new delete.DeleteBlocking().delete(player,conn);
+             boolean b = deleteBlocking.delete(player);
        // new 29-06-2020  // a faire : tester sur le résultat
              Short s = 0;
              blocking.setBlockingAttempts(s);
@@ -116,30 +130,35 @@ try{ // coming from selectPlayer 5926
         }
     return true;
   } catch (Exception e) {
-            String msg = "££ Exception in passwordVerification = " + e.getMessage() + " for player = " + player.getPlayerLastName();
-            LOG.error(msg);
-            showMessageFatal(msg);
+            handleGenericException(e, methodName);
             return true; // indicates that the same view should be redisplayed
-        } finally {        }  
+        }
 } // end method passwordBlocking
 
 
 
 
-public EPlayerPassword resetPassword(Activation activation, Connection conn) throws SQLException, Throwable { 
-//public EPlayerPassword resetPassword(EPlayerPassword epp, Activation activation, final Connection conn) throws SQLException, Throwable { 
+public EPlayerPassword resetPassword(Activation activation) throws Exception{
+//public EPlayerPassword resetPassword(EPlayerPassword epp, Activation activation, final Connection conn) throws SQLException, Throwable {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
     try{
     //    LOG.debug("entering resetPassword for player = " + player);
         LOG.debug("entering resetPassword for activation = " + activation);
         Player player = new Player();
         player.setIdplayer(activation.getActivationPlayerId());
-        EPlayerPassword epp = new EPlayerPassword();
-        epp.setPlayer(player);
-        epp = new read.ReadPlayer().read(epp, conn); // 2e version, la première reste valable output = player only
-        player= epp.getPlayer(); // partial
+        Password password = null; // ?? record 2026
+        EPlayerPassword epp = new EPlayerPassword(player, password);
+
+
+    // Lecture du Player + password en une seule ligne
+    epp = playerManager.readPlayerWithPassword(epp.player().getIdplayer());
+       // epp = new read.ReadPlayer().read(epp, conn); // 2e version, la première reste valable output = player only
+        player= epp.player(); // partial
 //        password = epp.getPassword();
 //        Player player = epp.getPlayer();
-        Password password = epp.getPassword();
+        password = epp.password();
+        
         
  //   LOG.debug("starting checkPassword with epp = " + epp);
  //   LOG.debug("activation = " + activation);
@@ -147,10 +166,10 @@ public EPlayerPassword resetPassword(Activation activation, Connection conn) thr
     if(player.getIdplayer() != null){ // trouvé dans table Activation et < 10 minutes
         LOG.debug("OK : idplayer ready for delete activation  = " + player.getIdplayer() );
     //    boolean b = new DeleteActivation().delete(conn, activation.getActivationKey());// delete record dans table Activation
-        if(! new DeleteActivation().delete(conn, activation.getActivationKey())){
+        if(! deleteActivation.delete(activation.getActivationKey())){
             String msg = "Failure delete record in Table activation !!!";
             LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+            showMessageFatal(msg);
             return null;
             //throw new Exception(msg);
         }else{  // delete OK else 1
@@ -159,20 +178,23 @@ public EPlayerPassword resetPassword(Activation activation, Connection conn) thr
             password.setWrkpassword("RESET PASSWORD");
                LOG.debug("Wrkpassword =   = " + password.getWrkpassword());
       //       LOG.debug("player = " + player);
-            epp.setPassword(password);
+         //   epp.setPassword(password);
+            epp.withPassword(password); // migration record 2026
+            
     // 2e action          
       //    b = new UpdatePassword().update(epp, conn);
-          if(! new UpdatePassword().update(epp, conn)){
+          if(! updatePassword.update(epp)){
                 String msg = "Failure ModifyPassword/RESET in Table player !!!";
                 LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
+                showMessageFatal(msg);
                 return null;
           }else{
                  String msg = "Sucessfull ModifyPassword/RESET  in Table player = ";
                     LOG.debug(msg);
             //        LCUtil.showMessageInfo(msg);
                 // send mail to user
-                new mail.ResetPasswordMail().sendMailResetOK(epp.getPlayer());
+                // new mail.ResetPasswordMail().sendMailResetOK(...)
+                resetPasswordMail.sendMailResetOK(epp.player()); // migrated 2026-02-26
                 return epp;
             } //end else 1
         } //end else 2
@@ -183,36 +205,23 @@ public EPlayerPassword resetPassword(Activation activation, Connection conn) thr
     String msg = " %%TimeLimitException in PasswordController.checkpassword = " + e.toString(); // + ", SQLState = " + e.getSQLState()
         //    + ", ErrorCode = " + e.getErrorCode();
 	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
+        showMessageFatal(msg);
         throw new Exception("time limit for the second time : getCause = " + e.getCause());
    } catch (Exception e) {
-            String msg = "£££ Exception in activation controller  = " + e.getMessage(); // + " ,SQLState = "
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;        
-}finally{
-    //     DBConnection.closeQuietly(null, null, null,null); 
-          }
-} // end checkPassword
-
- public void main(String[] args) throws Exception, TimeLimitException, Throwable {
-      Connection conn = new DBConnection().getConnection();
-  try{
-   //   Player player= new Player();
-   //   player.setIdplayer(324720);
-      Activation activation = new Activation();
-    //  EPlayerPassword epp = new EPlayerPassword();
-    //  epp.setPlayer(player);
-      activation.setActivationPlayerId(324720);
-      activation.setActivationKey("fcb35e1e-970d-46fc-88f0-929a8555d0d8");
-      EPlayerPassword epp = new PasswordController().resetPassword(activation,conn);
-            LOG.debug("from main, after !! = " + epp);
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
+            handleGenericException(e, methodName);
+            return null;
    }
-   } // end main//
+} // end resetPassword
+
+/*
+    void main() throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Activation activation = new Activation();
+        activation.setActivationPlayerId(324720);
+        activation.setActivationKey("fcb35e1e-970d-46fc-88f0-929a8555d0d8");
+        EPlayerPassword epp = new PasswordController().resetPassword(activation);
+        LOG.debug("from main, after !! = " + epp);
+    } // end main
+*/
 } // end class

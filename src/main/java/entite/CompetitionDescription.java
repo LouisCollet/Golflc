@@ -15,10 +15,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.inject.Named;
+// import jakarta.annotation.PostConstruct;  // migrated 2026-02-26 — POJO, not CDI-managed
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.GroupSequence;
 import jakarta.validation.constraints.*;
 import utils.LCUtil;
@@ -28,15 +28,15 @@ import validator.FirstUpperConstraint;
 
 @ClubValidation
 @GroupSequence({CompetitionDescription.class, FirstUpperConstraint.class})
-@Named("competitionDescription")
-@RequestScoped
+// @Named("competitionDescription")  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY) // private or public !
 // https://www.baeldung.com/jackson-jsonmappingexception 
 // By default, Jackson 2 will only work with with fields that are either public, or have a public getter methods
 // – serializing an entity that has all fields private or package private will fail:
 
 public class CompetitionDescription implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
     private StatusExecution status = StatusExecution.PROVISIONAL; // Default priority
 @JsonIgnore private Integer competitionId;
@@ -44,7 +44,8 @@ public class CompetitionDescription implements Serializable{
 @Pattern(regexp="[a-zA-Z0-9éèàê'!â& ç-]*",message="{club.name.characters}")
 @NotEmpty(message="{club.name.notnull}")
 @Size(min=3, max=45,message="{club.name.size}")
-@FirstUpperConstraint(max=7) // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
+//@FirstUpperConstraint(max=7) // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
+@FirstUpperConstraint() // new 10/05/2013 custom validation !!! mod 1/11/2016  param max non utilisé
 @JsonIgnore   private String competitionName;
 
  @NotNull(message="{competition.startdate.notnull}")
@@ -144,7 +145,7 @@ public enum StatusExecution {
  //  LOG.debug("after init, series handicap = " + Arrays.deepToString(seriesHandicap));
    
     } // end c
-@PostConstruct
+// @PostConstruct  // migrated 2026-02-26 — POJO, not CDI-managed
     public void init() {
 
     }
@@ -363,7 +364,7 @@ public enum StatusExecution {
     }
 
     public static PreparedStatement psCompetitionDescriptionModify(PreparedStatement ps, CompetitionDescription cd){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
       LOG.debug("entering psCompetitionDescription");
       // voir aussi http://www.javased.com/index.php?source_dir=archaius/archaius-core/src/main/java/com/netflix/config/sources/JDBCConfigurationSource.java
@@ -412,7 +413,7 @@ return ps;
     
  @Override
 public String toString(){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
  try{ 
 //   LOG.debug("starting toString Competition");
  
@@ -460,7 +461,7 @@ public String toString(){
 }
 
 public static CompetitionDescription map(ResultSet rs) throws Exception, SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
   try{
         CompetitionDescription c = new CompetitionDescription();
         c.setCompetitionId(rs.getInt("CompetitionId") );

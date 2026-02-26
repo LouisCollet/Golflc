@@ -78,8 +78,11 @@ try{
       handicapIndex.setHandicapWHS(BigDecimal.valueOf(0.0));
          LOG.debug("handicap to be inserted = " + handicapIndex);
  //        LOG.debug("just before create player");
-      ePlayerHandicap.setPlayer(player);
-      ePlayerHandicap.setHandicapIndex(handicapIndex);
+ 
+  //    ePlayerHandicap.setPlayer(player);
+      ePlayerHandicap.withPlayer(player); // passage à record withplayer à créer manuellement !!
+    //  ePlayerHandicap.setHandicapIndex(handicapIndex);
+      ePlayerHandicap.withHandicapIndex(handicapIndex);
    return ePlayerHandicap;
 }catch(Exception e){
           LOG.debug("PlayerItemprocessor Exception :" + e);

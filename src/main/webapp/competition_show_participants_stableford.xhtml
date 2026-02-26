@@ -18,14 +18,14 @@
     <ui:include src="include/include_summary_competition.xhtml"/>
     
 <p:dataTable id="played_rounds_table2"
-             value="#{courseC.listParticipantsStablefordCompetition(courseC.competition)}"
+             value="#{roundC.listParticipantsStablefordCompetition(roundC.competition)}"
              rowIndexVar="rowIndex"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
      <h1>#{msg['competition.ranking']}</h1>
-     <h2>#{courseC.competition.competitionDescription.competitionName}
-         (id=#{courseC.competition.competitionDescription.competitionId})</h2>
+     <h2>#{roundC.competition.competitionDescription.competitionName}
+         (id=#{roundC.competition.competitionDescription.competitionId})</h2>
 </f:facet>
 <!-- Html5 Either by changing your   to &#160; -->
 <p:column

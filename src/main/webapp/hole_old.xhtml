@@ -12,13 +12,13 @@
 
 <ui:define name="content">
 <h:graphicImage 
-                name="images/hole#{courseC.hole.holeNumber}.png"
+                name="images/hole#{clubC.hole.holeNumber}.png"
                 alt="image missing :golf_hole.png"
                 style="float: left;">
 </h:graphicImage>
 
 <h:graphicImage 
-                name="images/hole#{courseC.hole.holeNumber}.jpg"
+                name="images/hole#{clubC.hole.holeNumber}.jpg"
                 alt="image missing :golf_hole.jpg"
                 style="float: right;">
 </h:graphicImage>
@@ -41,7 +41,7 @@
        <p:outputLabel for="@next" value="#{msg['hole.number']} :"   />
        <p:inputNumber  label="Hole Number"
                        id="holenumb"
-                       value="#{courseC.hole.holeNumber}"
+                       value="#{clubC.hole.holeNumber}"
                        title="#{msg['tooltip.hole.holenumber']}"
                        size="2"
                        decimalPlaces="0"
@@ -50,7 +50,7 @@
 
        <p:outputLabel for="@next" value="#{msg['hole.par']} :"   />
        <p:selectOneButton id="par"
-                         value="#{courseC.hole.holePar}" >
+                         value="#{clubC.hole.holePar}" >
             <f:selectItem itemLabel="Par 3"  itemValue="3" />
             <f:selectItem itemLabel="Par 4"  itemValue="4" />
             <f:selectItem itemLabel="Par 5"  itemValue="5" />
@@ -60,10 +60,10 @@
                       title="#{msg['tooltip.hole.holeindex']}"
                       style="font-weight:bold"  />
            <p:selectOneMenu id="index"
-                            value="#{courseC.hole.holeStrokeIndex}">
+                            value="#{clubC.hole.holeStrokeIndex}">
                <f:selectItem itemLabel="??"
                              itemValue="#{null}" />
-               <f:selectItems value="#{courseC.indexNumbers(18)}"/>
+               <f:selectItems value="#{clubC.indexNumbers(18)}"/>
            </p:selectOneMenu>
        <h:outputText
                        id="distance"
@@ -72,24 +72,23 @@
                 <p:inputNumber
                        label="Hole Distance"
                        id="holeDistance"
-                       value="#{courseC.hole.holeDistance}"
+                       value="#{clubC.hole.holeDistance}"
                        title="#{msg['tooltip.hole.holedistance']}"
                        size="4"
                   
                        minValue="90"
                        maxValue="550"
                        emptyValue="0"
-                       decimalPlaces="0"
-                       />
+                       decimalPlaces="0"   />
        <p:commandButton
                          value="#{msg['button.hole.convert']}"
                          id="commandButtonDistance"
                          update="holeDistance"
                          ajax="false"
                          style="margin-left:1.5em;"
-                         immediate="false"
+                          
                          icon="pi pi-chevron-right"
-                         action="#{courseC.convertYtoM}">
+                         action="#{clubC.convertYtoM()}">
                  </p:commandButton>
      </h:panelGroup>
        
@@ -98,15 +97,11 @@
                          id="commandButtonCreate"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.createHole}"/>
-<!--  rendered="#{not courseC.nextStep}" 
-        -->
+                         action="#{clubC.createHole}"/>
 </f:facet>
-
 </p:panelGrid>
-
 </h:form>
 </ui:define>
 </ui:composition>

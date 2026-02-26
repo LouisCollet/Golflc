@@ -1,177 +1,131 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces">
 
- <h:form id="form_header"  >
-  <div class="header-footer">
-   <p:panelGrid id="panelGridStartHeader"
-              layout="tabular"
-              rendered="#{courseC.player.idplayer != null}"
-              style="width:70%">
-        <f:facet name="header">
-       <!--    <h:outputText value="header facet" /> columns="4" columnClasses="col1,col2,col1,col2" -->
-             <p:commandButton
-                         id="buttonLogout"
-                         title="Power OFF"
-                         ajax="true"
-                         value="Logout"
-                         immediate="true"
-                         update="growl-msg"
-                         icon="pi pi-power-off"
-                         action="#{courseC.logout('from button Logout')}"
-                         rendered="#{courseC.connected}"
-                         style="margin-left:2.5rem;" />
-<!--  onclick="window.location.reload();"  -->
-     <p:idleMonitor id="idleMonitor_timeout" timeout="500000">
-       <p:ajax event="idle"   listener="#{LCUtil.onIdleMonitor()}"   update="growl-msg" />
-       <p:ajax event="active" listener="#{LCUtil.onActiveMonitor()}" update="growl-msg" />
-    </p:idleMonitor> 
-            
- <p:selectOneMenu value="#{activeLocale.languageTag}"
-                  title="Choose Language"
-                  style="margin-left:2.5rem;">
-    <f:selectItems
-        value="#{activeLocale.availableLocales}" 
-        var="language"
-        itemValue="#{language.toLanguageTag()}"
-        itemLabel="#{activeLocale.getDisplayLanguage(language)}">
-    </f:selectItems>
-       <p:ajax listener="#{activeLocale.reload()}" />
-    <!--      itemLabel="#{language.getDisplayLanguage(language)}"> 
-    attention !! f:ajax use p:ajax !!!donne des erreurs CSP !!! cherché très longtemps ! 
-    primefaces.CSP activé dans web.xml -->
-   </p:selectOneMenu>
+<h:form id="form_header">
 
-<p:commandButton value="HelpRead"
-                 icon="pi pi-arrow-left"
-                 title="Read help"
-                 type="button"
-                 style="float: right;margin-left:2.5em;"
-                 update="growl-msg"
-                 onclick="PF('sidebarRight').show()" />
+    <div class="p-3 border-bottom-1 surface-border"
+        
+         rendered="#{playerC != null and playerC.player != null and playerC.player.idplayer != null}">
+        <!-- ===================== -->
+        <!-- 1️⃣ ACTION BAR -->
+        <!-- ===================== rendered="#{playerC.player != null and playerC.player.idplayer != null}"> -->
+        <div class="grid align-items-center">
 
-<p:commandButton value="HelpWrite"
-                 icon="pi pi-pencil"
-                 title="Write help (Admin only)"
-                 rendered="#{courseC.player.playerRole eq 'ADMIN'}"
-                 style="float: right;margin-left:2.5em;"
-                 update="growl-msg"
-                 ajax="false"
-                 immediate="false"
-                 action="#{mongoHelpC.showHelpFile()}" />
-<!-- problème ici ??  -->
-<p:commandButton value="Footer"
-                 icon="pi pi-arrow-down"
-                 title="Show the footer"
-                 type="button"
-                 style="float: right;margin-left:2.5em;"
-                 update="growl-msg"
-                 onclick="PF('sidebarDown').show()" />
-   <p:commandButton value="Take a screenshot"
-                 id="buttonModify"
-                 title="Take a shot for analysis"
-                 ajax="false"
-                 update="growl-msg"
-                 immediate="false"
-                 icon="pi pi-camera"
-                 style="float:right;margin-left:2.5em;"
-                 action="#{courseC.screenShot(view.viewId)}" />
-   </f:facet>
-</p:panelGrid>
-<!--<f:facet name="error">
-        <h:outputText value="ajaxStatus : Error" />
-    </f:facet> columns="8" PanelGrid "form_header:panelGridHeader" columns must be a number that factors into 12. For example: 1,2,3,4,6,12-->
- <p:panelGrid id="panelGridHeader"
-              layout="tabular"
-              rendered="#{courseC.player.idplayer != null}"
-              columns="8"
-              style="width:90%;font-size:0.8rem;"
-              columnClasses="col1,col2,col1,col2,col1,col2,col1,col2"
-               >
-<!--   -->
-    <h:outputText value="Current Player"
-                  style="margin-left:1.5em;" />
-     <h:outputText value=" #{courseC.player.idplayer}
-                    , first name = #{courseC.player.playerFirstName}
-                    , last name =  #{courseC.player.playerLastName}
-                    , role =  #{courseC.player.playerRole}"
-                    escape="false" />
-     <h:outputText value="View"/>
-     <h:outputText value="#{view.viewId}" /> 
+            <!-- LEFT -->
+            <div class="col-12 md:col-6 flex align-items-center gap-3">
 
-     <h:outputText value="Session"/>
-     <h:outputText value="#{session}" /> 
- 
-     <h:outputText value=" Language" />
-     <h:outputText value=" #{languageC.locale}" />
-     
-     <h:outputText value=" Active Locale" />
-     <h:outputText value=" #{activeLocale.currentLocale}" />
-     
-     <h:outputText value="Subscription End Date : " />
-     <h:outputText value=" #{courseC.subscription.endDate}" />
-    
-     <h:outputText value="Subscription Trial : " />
-     <h:outputText value=" #{courseC.subscription.trialCount}" />
+                <p:commandButton id="buttonLogout"
+                                 value="Logout"
+                                 icon="pi pi-power-off"
+                                 immediate="true"
+                                 action="#{courseC.logout('from button Logout')}"
+                                 rendered="#{courseC.connected}" />
 
-     <h:outputText value="ZoneId Time Zone : " />
-     <h:outputText value=" #{courseC.player.address.zoneId}" />
-    
-     <h:outputText value="Execution : " />
-     <h:outputText value="#{settings.getProperty('EXECUTION')}" />
-  </p:panelGrid>
-<!--    
-    <b> <h:outputText  value="/Sessions :  " /> </b>
-     #{implHttpSessionListener.getActiveSessions()}
-    
-    <h:outputText rendered="#{not empty playerid}">
-        Welcome #{playerid}, #{playerlastname} you have been logged in!  
-    </h:outputText>
--->
+                <p:selectOneMenu value="#{activeLocale.languageTag}">
+                    <f:selectItems value="#{activeLocale.availableLocales}"
+                                   var="language"
+                                   itemValue="#{language.toLanguageTag()}"
+                                   itemLabel="#{activeLocale.getDisplayLanguage(language)}"/>
+                    <p:ajax listener="#{activeLocale.reload()}" />
+                </p:selectOneMenu>
 
- <!--  sidebar voir masterTemplate -->
- 
- <p:panelGrid id="panelGridStartFooter"
-              layout="tabular"
-              rendered="#{courseC.player.idplayer != null}" >
-<f:facet name="footer">
-    <p:ajaxStatus style="width:200px;height:20px;" 
-               onstart="PF('statusDialog').show()"
-               onsuccess="PF('statusDialog').hide()">
-    <f:facet name="error">
-        <h:outputText value="ajaxStatus : Error" />
-         <i class="pi pi-times-circle" style="color:red"></i>
-    </f:facet>
-    <f:facet name="success">
-        <h:outputText value="ajaxStatus : Success" />
-    </f:facet>
-    <f:facet name="default">
-        <h:outputText value="ajaxStatus : Default Idle" />
-    </f:facet>
-    <f:facet name="start">
-        <h:outputText value="ajaxStatus : Start Sending" />
-      
-         <i class="pi pi-spin pi-spinner" style="font-size:2em;color:blue"></i>
-    </f:facet>
-    <f:facet name="complete">
-        <h:outputText value="ajax Status: Completed" />
-    </f:facet>
-    
-    
-    </p:ajaxStatus>
-<p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-        <div class="text-center">
-            <i class="pi pi-spin pi-spinner loading-icon" aria-hidden="true"></i>
+                <p:idleMonitor timeout="500000">
+                    <p:ajax event="idle"   listener="#{utilC.onIdleMonitor()}" />
+                    <p:ajax event="active" listener="#{utilC.onActiveMonitor()}" />
+                </p:idleMonitor>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="col-12 md:col-6 flex justify-content-end gap-3">
+
+                <p:commandButton value="HelpRead"
+                                 icon="pi pi-book"
+                                 type="button"
+                                 onclick="PF('sidebarRight').show()" />
+
+                <p:commandButton value="HelpWrite"
+                                 icon="pi pi-pencil"
+                                 rendered="#{playerC.isAdmin()}"
+                                 ajax="false"
+                                 action="#{mongoHelpC.showHelpFile()}" />
+
+                <p:commandButton value="Footer"
+                                 icon="pi pi-arrow-down"
+                                 type="button"
+                                 onclick="PF('sidebarDown').show()" />
+
+                <p:commandButton value="Screenshot"
+                                 icon="pi pi-camera"
+                                 ajax="false"
+                                 action="#{courseC.screenShot(view.viewId)}" />
+
+            </div>
         </div>
-    </p:dialog>
-</f:facet>
-     
- </p:panelGrid>
-</div>
+
+        <!-- ===================== -->
+        <!-- 2️⃣ DEBUG / RUNTIME INFO -->
+        <!-- Visible only ADMIN -->
+        <!-- ===================== -->
+        <div class="mt-3 text-sm text-600"
+
+             rendered="#{playerC != null and playerC.player != null and playerC.isAdmin()}">
+            <div class="grid">
+                new
+<h:outputText value="#{playerC.player}" />
+  <!--              end
+   <h:outputText value="DEBUG playerC = #{playerC}" /><br/>
+<h:outputText value="DEBUG player = #{playerC.player}" /><br/>
+<h:outputText value="DEBUG id = #{playerC.player.idplayer()}" />             
+                -->
+                <div class="col-12 md:col-6">
+                    <strong>Player:</strong>
+                    #{playerC.player.idplayer}
+                    #{playerC.player.playerFirstName}
+                    #{playerC.player.playerLastName}
+                    (#{playerC.player.playerRole})
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <strong>View:</strong> #{view.viewId}
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <strong>Locale:</strong> #{languageC.locale}
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <strong>Execution:</strong> #{settings.getProperty('EXECUTION')}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================== -->
+        <!-- 3️⃣ AJAX STATUS -->
+        <!-- ===================== -->
+        <div class="mt-3">
+
+            <p:ajaxStatus onstart="PF('statusDialog').show()"
+                          onsuccess="PF('statusDialog').hide()"/>
+
+            <p:dialog widgetVar="statusDialog"
+                      modal="true"
+                      draggable="false"
+                      closable="false"
+                      resizable="false"
+                      showHeader="false">
+                <div class="text-center">
+                    <i class="pi pi-spin pi-spinner" style="font-size:2rem"></i>
+                </div>
+            </p:dialog>
+
+        </div>
+
+    </div>
+
 </h:form>
 </ui:composition>

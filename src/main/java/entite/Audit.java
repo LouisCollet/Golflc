@@ -6,12 +6,12 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 public class Audit implements Serializable, interfaces.Log, interfaces.GolfInterface{
     private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
     private static final long serialVersionUID = 1L;
@@ -108,19 +108,17 @@ LOG.debug("starting toString for Audit!");
   }
 }
 public static Audit mapAudit(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-  try{
-      LOG.debug("entering mapAudit");
-        Audit a = new Audit();
-            a.setIdaudit(rs.getInt("AuditId") );
-            a.setAuditPlayerId(rs.getInt("AuditPlayerId") );
-            a.setAuditStartDate(rs.getTimestamp("auditStartDate").toLocalDateTime());
-            a.setAuditEndDate(rs.getTimestamp("auditEndDate").toLocalDateTime());
-  //          a.setAuditAttempts(rs.getShort("AuditAttempts") );
-  //          a.setAuditRetryTime(rs.getTimestamp("auditRetryTime").toLocalDateTime());
-           LOG.debug ("audit returned = " + a);
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
+ try{
+        LOG.debug("entering mapAudit");
+    Audit a = new Audit();
+    a.setIdaudit(rs.getInt("AuditId") );
+    a.setAuditPlayerId(rs.getInt("AuditPlayerId") );
+    a.setAuditStartDate(rs.getTimestamp("auditStartDate").toLocalDateTime());
+    a.setAuditEndDate(rs.getTimestamp("auditEndDate").toLocalDateTime());
+        LOG.debug ("audit returned = " + a);
    return a;
-  }catch(Exception e){
+ }catch(Exception e){
    String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
    LOG.error(msg);
     LCUtil.showMessageFatal(msg);

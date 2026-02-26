@@ -79,7 +79,7 @@ import org.primefaces.model.file.UploadedFile;
 import org.primefaces.model.map.Overlay;
 import security.LoginBeanSecurity;
 import service.CountryService;
-import connection_package.DBConnection;
+// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import context.ApplicationContext;
 import dialog.DialogResult;
 import entite.composite.ECourseList;
@@ -221,6 +221,12 @@ public class CourseController implements Serializable{
     @Inject private create.CreateTarifMember                       createTarifMember;                        // migrated 2026-02-24
     @Inject private create.CreateTarifGreenfee                     createTarifGreenfee;                      // migrated 2026-02-24
     @Inject private create.CreateProfessional                      createProfessional;                       // migrated 2026-02-24
+    @Inject private find.FindOpenWeather                             findOpenWeather;                          // migrated 2026-02-25
+    @Inject private Controllers.StablefordController                 stablefordController;                     // migrated 2026-02-25
+    @Inject private read.ReadStatisticsList                          readStatisticsListService;                // migrated 2026-02-25
+    @Inject private find.FindHandicapIndexAtDate                     findHandicapIndexAtDate;                  // migrated 2026-02-25
+    @Inject private read.ReadScoreList                               readScoreListService;                     // migrated 2026-02-25
+    @Inject private calc.CalcCompetitionTimeStartList                calcCompetitionTimeStartList;             // migrated 2026-02-25
     @Inject private create.CreateOrUpdateHolesGlobal               createOrUpdateHolesGlobal;                // migrated 2026-02-24
     @Inject private create.CreateAudit                             createAudit;                              // migrated 2026-02-24
     @Inject private create.CreateBlocking                          createBlocking;                           // migrated 2026-02-24
@@ -238,6 +244,10 @@ public class CourseController implements Serializable{
     @Inject private find.FindTarifGreenfeeData                     findTarifGreenfeeData;                    // migrated 2026-02-25
     @Inject private delete.DeleteTarifGreenfee                     deleteTarifGreenfee;                      // migrated 2026-02-25
     @Inject private delete.DeleteTarifMember                       deleteTarifMember;                        // migrated 2026-02-25
+    @Inject private cache.CacheInvalidator                         cacheInvalidator;                         // migrated 2026-02-25
+    @Inject private Controllers.MongoCalculationsController        mongoCalculationsController;               // migrated 2026-02-26
+    @Inject private create.CreateTableFlights                    createTableFlights;                        // migrated 2026-02-26
+    @Inject private find.FindLastAudit                           findLastAudit;                             // migrated 2026-02-26
 
 
     private Player playerPro;
@@ -245,10 +255,10 @@ public class CourseController implements Serializable{
        
     // ✅ ENTITÉS - sans @Inject
    // debut enlever les Inject des entités qui suivent le 14-02-2026  
-      private Club club; // enlever club pour voir ce qui reste à migrer oui mais faut régler les init !!
-      private Course course;
-      private Tee tee; 
-      private Hole hole;
+      // private Club club; — removed 2026-02-25 (delegates to appContext)
+      // private Course course; — removed 2026-02-25 (delegates to appContext)
+      // private Tee tee; — removed 2026-02-25 (migrated to ClubController)
+      // private Hole hole; — removed 2026-02-25 (migrated to ClubController)
       
       private Round round; 
 
@@ -263,7 +273,7 @@ public class CourseController implements Serializable{
       private Matchplay matchplay;
       private Subscription subscription;
       private Cotisation cotisation;
-      private HolesGlobal holesGlobal;
+      // private HolesGlobal holesGlobal; — removed 2026-02-25 (migrated to ClubController)
       private Flight flight;
       private TarifGreenfee tarifGreenfee;
       private Creditcard creditcard;
@@ -279,8 +289,8 @@ public class CourseController implements Serializable{
       private Professional professional; // new 25/05/2021 
 // fin de enlever @Inject 14-02-2026
      private EUnavailable unavailable;
-     private ECompetition competition; // initialisé dans reset()
-     private Lesson selectedLesson;
+     // private ECompetition competition; — removed 2026-02-25 (now in appContext, bridge via getCompetition/setCompetition)
+     // private Lesson selectedLesson; // migrated 2026-02-25 to PaymentController
    
  // new 15/01/2026   refactoring CDI
     //@Inject
@@ -356,8 +366,8 @@ public class CourseController implements Serializable{
     private Overlay<Object> overlay; // mod 05-05-2024
     private List<Player> lp = null;
 //private static BeID eID = null;
-    private Connection conn = null;
-    private Connection connPool = null;
+    // private Connection conn = null; // removed 2026-02-26 — CDI migration
+    // private Connection connPool = null; // removed 2026-02-26 — CDI migration
     private String radioButtonJSF;
     private String createModifyPlayer = "C";  // utilisé pour choisir player.xhtml ou player_modify.xhtml
     private String SunRiseSet; // = null; 
@@ -374,7 +384,7 @@ public class CourseController implements Serializable{
   //  private Map<String, String> availableHoles; // +getter (no setter necessary)
     private Map<String, String> members;
     private Map<Integer, String> data = new HashMap<>();
-    private Integer progress1 = 0;  // mod 30-07-2025 was null
+    // private Integer progress1 = 0;  // migrated 2026-02-25 to PaymentController
     
     private UploadedFile uploadedFile;
  //   private List<FilterMeta> filterBy;
@@ -382,9 +392,9 @@ public class CourseController implements Serializable{
  //@Inject org.primefaces.model.ScheduleEvent<?> eventSelected; // new 03/06/2021 
     private List<Professional> listProfessional  = new ArrayList<>();
     private Professional selectedPro = null;
-    private List<Lesson> listLessons = new ArrayList<>(); // new 27-01-2023
+    // private List<Lesson> listLessons = new ArrayList<>(); // migrated 2026-02-25 to PaymentController
     //private Integer cpt = 0; 
-    private String savedType;
+    // private String savedType; // migrated 2026-02-25 to PaymentController
     private static final boolean MIGRATION_PLAYER = true;
     
     
@@ -420,19 +430,9 @@ public class CourseController implements Serializable{
     */
         //  LOG.debug("playerController.setPlayer(null)");
   //    ???    LOG.debug("entering init without org.wilfly.plugin !" );
-// 1. WITHOUT connection pool
-        conn = new DBConnection().getConnection();
-        if(conn != null){
-              LOG.debug("cette connection database sera utilisée pour les RUN (main) = " + conn);
-        }else{
-             LOG.error("Connection database is null = " + conn);
-        }
-// 2. WITH Datasource and connection pool
-      javax.sql.DataSource datasource = new connection_package.DBConnection().setDataSource();
-          //  LOG.debug("Datasource is now = " + datasource.toString());
-        connPool = new DBConnection().getPooledConnection(datasource);
-        conn = connPool;
-          LOG.debug("cette connection pooled database sera réutilisée pour toute la session = "+ conn);
+// 1. WITHOUT connection pool — removed 2026-02-26 (CDI migration — all services now use @Resource DataSource)
+// 2. WITH Datasource and connection pool — removed 2026-02-26
+        LOG.debug("CDI migration complete — Connection/DBConnection removed from CourseController");
 // 3. Settings
      //  LOG.debug("** Webbrowser url = " + utils.LCUtil.firstPartUrl());
 // 4. loading 
@@ -563,16 +563,18 @@ private void logLegacyAccess(String method) {
  //new 02/02/2026 utilisé dans selectClubCourse.xhtml
 public void resetCourseSelection() {
     // Réinitialiser le parcours quand le club change
-    
+
     LOG.debug("=== RESET COURSE CALLED ===");
+    Club club = appContext.getClub(); // migrated 2026-02-25
     LOG.debug("Club ID: " + (club != null ? club.getIdclub() : "null"));
+    Course course = appContext.getCourse(); // migrated 2026-02-25
     if (course != null) {
         course.setIdcourse(0);
         course.setCourseName("");
     }
-    
+
     // Log pour debug
-    LOG.debug("Club changed, course reset. New Club ID: " + 
+    LOG.debug("Club changed, course reset. New Club ID: " +
         (club != null ? club.getIdclub() : "null"));
 }
 
@@ -585,13 +587,10 @@ public void resetCourseSelection() {
    // }
 
 
-    public String getSavedType() {
-        return savedType;
-    }
-
-    public void setSavedType(String savedType) {
-        this.savedType = savedType;
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+    public String getSavedType() { ... }
+    public void setSavedType(String savedType) { ... }
+*/
 
     public String getLineModelCourse() {
       //  LOG.debug("getLineModelCourse reached");
@@ -604,40 +603,15 @@ public void resetCourseSelection() {
     }
 
  
-public void qualifyingListener(ValueChangeEvent e) {
-        LOG.debug("qualifyingListener OldValue = " + e.getOldValue());
-        LOG.debug("qualifying NewValue = " + e.getNewValue());
-        if(e.getNewValue().equals("Y")){
-            round.setShowQualifying(true);
-      //      LOG.debug("showQualifying is true = " + round.isShowQualifying());
-        }else{
-            round.setShowQualifying(false);
-        }
-            LOG.debug("showQualifying is " + round.isShowQualifying());
-        PrimeFaces.current().executeScript("window.location.reload(true);"); 
-}
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public void qualifyingListener(ValueChangeEvent e) { ... }
+*/
   
-    public Lesson getSelectedLesson() {
-        return selectedLesson;
-    }
-
-    public void setSelectedLesson(Lesson selectedLesson) {
-        this.selectedLesson = selectedLesson;
-    }
-    public void deleteLesson() { /// used in price_pro.xhtml
-        this.listLessons.remove(this.selectedLesson);
- //       this.selectedProducts.remove(this.selectedProduct);
-    //    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Product Removed"));
-        String msg = "Lesson removed = = " + this.selectedLesson;
-        this.selectedLesson = null;
-        LOG.info(msg);
-        showMessageInfo(msg);
-       creditcard.setTotalPrice(listLessons.size() * professional.getProAmount());
-       msg = "recalculated totalPrice is now " + creditcard.getTotalPrice();
-       LOG.info(msg);
-        showMessageInfo(msg);
-        PrimeFaces.current().ajax().update("form_price_pro:growl-msg", "form_price_pro:listLessons","form_price_pro:messages");
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public Lesson getSelectedLesson() { ... }
+   public void setSelectedLesson(Lesson selectedLesson) { ... }
+   public void deleteLesson() { ... }
+*/
     
     public List<ECourseList> getListStableford() {
         return listStableford;
@@ -784,12 +758,14 @@ public Map<Integer, String> getData() {
         this.password = password;
     }
 
+    /** Bridge → appContext.getCompetition() — Phase 3A migration 2026-02-25 */
     public ECompetition getCompetition() {
-        return competition;
+        return appContext.getCompetition();
     }
 
+    /** Bridge → appContext.setCompetition() — Phase 3A migration 2026-02-25 */
     public void setCompetition(ECompetition competition) {
-        this.competition = competition;
+        appContext.setCompetition(competition);
     }
 
     public void setActivation(Activation activation) {
@@ -814,13 +790,10 @@ public Map<Integer, String> getData() {
  //       this.professional = professional;
  //   }
 
-    public Map<String, String> getAvailableQualifying() {
-        return availableQualifying;
-    }
-
-  public List<String> getGameList() {
-       return gameList;
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+    public Map<String, String> getAvailableQualifying() { ... }
+    public List<String> getGameList() { ... }
+*/
 /*
     public List<String> getParList() {
         return parList;
@@ -839,13 +812,10 @@ public Map<Integer, String> getData() {
         this.greenfee = greenfee;
     }
 
-    public Blocking getBlocking() {
-        return blocking;
-    }
-
-    public void setBlocking(Blocking blocking) {
-        this.blocking = blocking;
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+    public Blocking getBlocking() { ... }
+    public void setBlocking(Blocking blocking) { ... }
+*/
 
  //   public Player getPlayer2() {
  //       return player2;
@@ -974,7 +944,7 @@ if (!(toValidate instanceof UIInput))
 
      public String getParArrayString() throws SQLException {
     //     load.LoadParArray lpa = ;
-         parArray =  readParArray.read(appContext.getPlayer(), course);  //mod 31/07/2014
+         parArray =  readParArray.read(appContext.getPlayer(), appContext.getCourse());  // migrated 2026-02-25
  //           LOG.debug("parArray  = " + parArray);
      parArrayString = Arrays.toString(parArray); // it will return String like [1, 2, 3, 4, 5]
  //    LOG.debug("parArrayString = " + parArrayString);
@@ -1003,13 +973,7 @@ if (!(toValidate instanceof UIInput))
         this.NextPanelPlayer = NextPanelPlayer;
     }
 
-    public HolesGlobal getHolesGlobal() {
-        return holesGlobal;
-    }
-
-    public void setHolesGlobal(HolesGlobal holesGlobal) {
-        this.holesGlobal = holesGlobal;
-    }
+    // getHolesGlobal() / setHolesGlobal() — removed 2026-02-25 (migrated to ClubController)
 
     public int[] getParArray() {
         return parArray;
@@ -1032,11 +996,12 @@ if (!(toValidate instanceof UIInput))
    }
 
     public EUnavailable getUnavailable() {
-        return unavailable;
+        return appContext.getUnavailable();
     }
 
     public void setUnavailable(EUnavailable unavailable) {
         this.unavailable = unavailable;
+        appContext.setUnavailable(unavailable); // sync appContext — migrated 2026-02-25
     }
 
  //   public Inscription getInscriptionNew() {
@@ -1237,17 +1202,9 @@ public boolean isShowButtonCreateCourse() {
         this.inputCourseOperation = inputCourseOperation;
     }
 
-    public void setInputClub(String inputClub){
-        LOG.debug("setInput (new club !) = " + inputClub);
-        this.inputClub = inputClub;
-        if(inputClub.equals("ini")) {
-            club = new Club();
-            //        setNextCourse(false);
-            course = new Course();
-            tee = new Tee();
-            hole = new Hole();
-        }
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public void setInputClub(String inputClub) { ... }
+*/
 
     public List<Average> getListavg() {
         return listavg;
@@ -1265,9 +1222,9 @@ public boolean isShowButtonCreateCourse() {
         LOG.debug("setInput (new course !) = " + inputCourse);
         this.inputCourse = inputCourse;
         if (inputCourse.equals("ini")) {
-            course = new Course();
-            tee = new Tee();
-            hole = new Hole();
+            appContext.setCourse(new Course());
+            // tee = new Tee(); — removed 2026-02-25 (migrated to ClubController)
+            // hole = new Hole(); — removed 2026-02-25
         }
     }
 
@@ -1344,11 +1301,12 @@ public boolean isShowButtonCreateCourse() {
     }
 
     public boolean isConnected() {
-        return Connected;
+        return appContext.isConnected(); // migrated 2026-02-25 — delegates to appContext
     }
 
     public void setConnected(boolean Connected) {
         this.Connected = Connected;
+        appContext.setConnected(Connected); // migrated 2026-02-25 — sync with appContext
     }
 
   //  public TreeBeanController getTreeBean() {
@@ -1455,14 +1413,10 @@ public boolean isShowButtonCreateCourse() {
     public Player getSelectedPlayer() {
         return selectedPlayer;
     }
-// new 27-12-2024 for p:dialog in selectPlayer.xhtml
- public EPlayerPassword getSelectedPlayerEPP() {
-     return selectedPlayerEPP;
-  }
-
- public void setSelectedPlayerEPP(EPlayerPassword selectedPlayerEPP) {
-      this.selectedPlayerEPP = selectedPlayerEPP;
- }
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+ public EPlayerPassword getSelectedPlayerEPP() { ... }
+ public void setSelectedPlayerEPP(EPlayerPassword selectedPlayerEPP) { ... }
+*/
 
     public void setSelectedPlayer(Player selectedPlayer) {
         this.selectedPlayer = selectedPlayer;
@@ -1491,13 +1445,11 @@ public boolean isShowButtonCreateCourse() {
         
     }
 
-    public ECourseList getSelectedPlayedRound() {
-        return selectedPlayedRound;
-    }
-
-    public void setSelectedPlayedRound(ECourseList selectedPlayedRound) {
-        this.selectedPlayedRound = selectedPlayedRound;
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   getSelectedPlayedRound/setSelectedPlayedRound — delegates to appContext
+    public ECourseList getSelectedPlayedRound() { ... }
+    public void setSelectedPlayedRound(ECourseList selectedPlayedRound) { ... }
+*/
 
     public void setFilteredCars(List<?> filteredCars) {
         LOG.debug("from setFilteredCars = " + filteredCars);
@@ -1513,11 +1465,12 @@ public boolean isShowButtonCreateCourse() {
     }
 
     public boolean isNextPlayer() {
-        return NextPlayer;
+        return appContext.isNextPlayer(); // migrated 2026-02-25 — delegates to appContext
     }
 
     public void setNextPlayer(boolean NextPlayer) {
         this.NextPlayer = NextPlayer;
+        appContext.setNextPlayer(NextPlayer); // migrated 2026-02-25 — sync with appContext
     }
 
  //   public Player getPlayer() {
@@ -1586,24 +1539,22 @@ public boolean isShowButtonCreateCourse() {
 }
 
     public Course getCourse() {
-        return course;
+        return appContext.getCourse(); // migrated 2026-02-25 — delegates to appContext
     }
 
     public void setCourse(Course course) {
-        this.course = course;
+        appContext.setCourse(course); // migrated 2026-02-25 — delegates to appContext
     }
 
     public Club getClub() {
-        return club;
+        return appContext.getClub(); // migrated 2026-02-25 — delegates to appContext
     }
 
     public void setClub(Club club) {
-        this.club = club;
+        appContext.setClub(club); // migrated 2026-02-25 — delegates to appContext
     }
 
-    public Tee getTee() {
-        return tee;
-    }
+    // getTee() — removed 2026-02-25 (migrated to ClubController)
 
     public Cotisation getCotisation() {
         return cotisation;
@@ -1613,17 +1564,9 @@ public boolean isShowButtonCreateCourse() {
         this.cotisation = cotisation;
     }
 
-    public void setTee(Tee tee) {
-        this.tee = tee;
-    }
+    // setTee() — removed 2026-02-25 (migrated to ClubController)
 
-    public Hole getHole() {
-        return hole;
-    }
-
-    public void setHole(Hole hole) {
-        this.hole = hole;
-    }
+    // getHole() / setHole() — removed 2026-02-25 (migrated to ClubController)
 
     public ScoreMatchplay getScoreMatchplay() {
         return scoreMatchplay;
@@ -1656,12 +1599,10 @@ public boolean isShowButtonCreateCourse() {
         this.radioButtonJSF = radioButtonJSF;
     }
 
-    public Connection getConn() {
-        return conn;
-    }
+    // public Connection getConn() { return conn; } // removed 2026-02-26 — CDI migration
 
     public int louis() {
-        return course.getIdcourse();
+        return appContext.getCourse().getIdcourse(); // migrated 2026-02-25
     }
 
 public static String fileUpload() throws SQLException{
@@ -1705,8 +1646,8 @@ public String findClubCoordinates() { //used in club.xhtml
 
     public String findClubCoordinates() {
         try {
-            club = coordinatesService.updateCoordinates(club);
-            showMessageInfo("Coordinates found for club " + club.getClubName());
+            appContext.setClub(coordinatesService.updateCoordinates(appContext.getClub())); // migrated 2026-02-25
+            showMessageInfo("Coordinates found for club " + appContext.getClub().getClubName());
         } catch (Exception e) {
             showMessageFatal("Error find club coordinates: " + e.getMessage());
         }
@@ -1767,25 +1708,10 @@ public void playerConfirmPasswordListener(ValueChangeEvent e) {
 }
 */ // end ✅ MIGRÉ - playerPasswordListener + playerConfirmPasswordListener
 
-public void creditCardNumberListener(ValueChangeEvent e) {
-        LOG.debug("creditcardNumber OldValue = " + e.getOldValue());
-    //    LOG.debug("creditcardNumber newvaluee = " + e.getOldValue());
-       LOG.debug("creditcardNumber NewValue = " + e.getNewValue());
-    creditcard.setCreditcardNumber(e.getNewValue().toString() );
-}
-
-public void creditCardTypeListener(ValueChangeEvent e) {
-       LOG.debug("creditcardType OldValue = " + e.getOldValue());
-       LOG.debug("creditcardType NewValue = " + e.getNewValue());
-    creditcard.setCreditcardType(e.getNewValue().toString() );
-    if( !creditcard.getCreditcardIssuer().equals(creditcard.getCreditcardType())){   // issuer = calculated  cardType = input data
-        String msg = "WARNING !!! "
-                + " <br/> Issuer detected = " + creditcard.getCreditcardIssuer()
-                + " <br/> Card Type data in = " + creditcard.getCreditcardType();
-        LOG.debug(msg);
-        showMessageInfo(msg);
-    }
-}
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public void creditCardNumberListener(ValueChangeEvent e) { ... }
+   public void creditCardTypeListener(ValueChangeEvent e) { ... }
+*/
 /*
 public void roundWorkDate(ValueChangeEvent e) throws ParseException, SQLException{
     try{
@@ -1802,90 +1728,27 @@ public void roundWorkDate(ValueChangeEvent e) throws ParseException, SQLExceptio
    //  return "round.xhtml?faces-redirect=true";
 } // end method
 */
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
 public void roundWorkDate(ValueChangeEvent e) {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
-    try {
-        LOG.debug("course is = " + course.toString());
-        LOG.debug("roundDate format LocalDateTime = " + round.getRoundDate());
-        cptFlight = 0;
-        appContext.setRound(round);   // ✅ new synchronise ApplicationContext
-    } catch (Exception ex) {
-        handleGenericException(ex, methodName);
-    }
+    cptFlight = 0;
+    appContext.setRound(round);
 } // end method
+*/ // end ✅ MIGRÉ - roundWorkDate
 
 
 
 
- public String otherPlayers() throws SQLException, Exception {  //mod 30-11-2018
-  try{
-          LOG.debug("entering otherPlayers ... ");
-          LOG.debug("otherPlayers round = ... " + round);
-          LOG.debug("otherPlayers course = ... " + course);
-          
-       tarifGreenfee = findTarifGreenfeeData.find(round); // migrated 2026-02-25
-       if(tarifGreenfee == null){
-           String err = "Tarif returned from findTarifdata is null ";
-            LOG.debug(err);
-           showMessageFatal(err);
-           return "inscriptions_other_players.xhtml?faces-redirect=true";
-        }
-            LOG.debug("greenfee = " + greenfee);
-            LOG.debug("Tarif greenfee = " + tarifGreenfee);
-     //  LOG.debug("new inscriptions = " + getSelectedOtherPlayers().size());
-
-            LOG.debug("nombre déjà inscrits à ce round = " + roundPlayersList().size());
-            LOG.debug("number new inscriptions = " + appContext.getPlayer().getDraggedPlayers().size());
-            LOG.debug("roundGame = " + round.getRoundGame());
-            int max = 0;
-            if(round.getRoundGame().equals(Round.GameType.MP_SINGLE.toString())){
-                max = 2;
-            }else{
-                max = 4;
-            }
-            LOG.debug("here are the draggedPlayers  = " + appContext.getPlayer().getDraggedPlayers().toString());
-   //      LOG.debug("déjà inscrits à ce round 1 = " + round.getPlayers().size());
-     //       LOG.debug("nom des joueurs déjà inscrits à ce round = " + round.getPlayersList());
-    
-            int tot = appContext.getPlayer().getDraggedPlayers().size() + roundPlayersList().size();
-               LOG.debug("total déjà inscrits plus nouveaux candidats = " + tot);
-        if(tot > max){
-            // with messages placeholders
-            String msg = prepareMessageBean("inscription.toomuchplayers") + " {max} = " + max + " /tot " + tot; 
-            LOG.error(msg);
-            showMessageFatal(msg);
-        }
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+ public String otherPlayers() throws SQLException, Exception {
       return "inscriptions_other_players.xhtml?faces-redirect=true";
-   }catch(Exception e){
-            String msg = "££ Exception in otherPlayers = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-          }     
- // return null;      
- //   } // end catch
    } // end method
+*/ // end ✅ MIGRÉ - otherPlayers
    
-   public String createOtherPlayers() throws SQLException {  //new 03/09/2014, mod 30/06/2017 used in pickListPlayers not operational
-        LOG.debug("starting createOtherPlayers = ");
-  //      LOG.debug("List for players = " + playersTarget.toString());
-        LOG.debug("dlPlayers getSource 2 = " + dlPlayers.getSource().toString()); // colonne de gauche
-        LOG.debug("dlPlayers getTarget 2 = " + dlPlayers.getTarget().toString()); // colonne de droite
-        LOG.debug("there are ?? new inscriptions = " + dlPlayers.getTarget().size()); // joueurs sélectionnés
-        // à faire = vérifier que 3 joueurs maximum !
-        
-        for(int i=0; i < dlPlayers.getTarget().size() ; i++){
- //           LOG.debug("line 01");
-     //       LOG.debug(" -- item in for idplayer # = " + dlPlayers.getTarget().get(i).getIdplayer() );
-        }
-        LOG.debug("fulllist = " + fullList.toString());
-        LOG.debug("for round = " + round.toString());
-        LOG.debug("for player_has_round = " + inscription.toString());
-        LOG.debug("after createOtherPlayers");
-    //    boucler sur createInscription 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String createOtherPlayers() throws SQLException {
         return "inscription.xhtml?faces-redirect=true";
     }
+*/ // end ✅ MIGRÉ - createOtherPlayers
    
     public int getInputPlayingHcp() {
         return inputPlayingHcp;
@@ -1895,12 +1758,9 @@ public void roundWorkDate(ValueChangeEvent e) {
         this.inputPlayingHcp = inputPlayingHcp;
     }
 
-   public void findCourseListForClub() throws SQLException, Exception{ // mod 18/06/2022
-      LOG.debug("entering findCourseListForClub");
-   // was: courseListForClub = new lists.CourseListForClub().list(club, conn);
-   courseListForClub = courseListForClubService.list(club); // migrated 2026-02-24
-  // return null;
-}
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+   public void findCourseListForClub() throws SQLException, Exception { ... }
+*/
 // ce code n'a pas de sens ?
 // ✅ MIGRÉ vers ClubController (clubC) - selectorClubNextView — 2026-02-25
 /*
@@ -2015,106 +1875,9 @@ public void roundWorkDate(ValueChangeEvent e) {
   }
 */ // end ✅ MIGRÉ - clubAndCourseAction
   
-  public String selectedClub(Club c) { // coming from 
-    if (c == null) {
-        LOG.warn("Selected club param is null!");
-        showMessageFatal("Aucun club sélectionné !");
-        return null;
-    }
-    LOG.debug("Entering selectedClub with param club = " + c);
-    LOG.debug("club value = " + club);
-    club = c;
-    LOG.debug("Entering selectedClub with club = " + club);
-    try {
-        // récupère le contexte et fallback si null
-        enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                                                     .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
-         LOG.debug("Entering selectedClub with purpose = " + purpose);
-    //    enums.ClubSelectionPurpose purpose = clubSelectionContextBean.getPurpose();
-    //    if (purpose == null) {
-    //        purpose = enums.ClubSelectionPurpose.CREATE_PLAYER;
-    //    }
-        
-        // switch expression moderne
-        return switch (purpose) {
-            case CREATE_PLAYER -> {
-                appContext.getPlayer().setPlayerHomeClub(club.getIdclub());
-                LOG.debug("Home club set for CREATE_PLAYER: " + appContext.getPlayer());
-                dialogController.closeDialog(null);
-                yield createModifyPlayer.equals("M") ? 
-                        "player_modify.xhtml?faces-redirect=true" :
-                        "player.xhtml?faces-redirect=true";
-            }
-
-            case LOCAL_ADMIN -> {
-                    LOG.debug("inside LOCAL_ADMIN");
-             //   localAdmin.setPlayerHomeClub(club.getIdclub());
-                appContext.getLocalAdmin().setPlayerHomeClub(club.getIdclub()); // non testé
-                    LOG.debug("Home club set for LOCAL_ADMIN: " + appContext.getLocalAdmin());
-                dialogController.closeDialog(null);
-                yield null;
-            }
-
-            case CREATE_PRO -> {
-              //  localAdmin.setPlayerHomeClub(club.getIdclub());
-                appContext.getPlayerPro().setPlayerHomeClub(club.getIdclub()); // non testé
-                LOG.debug("Home club set for CREATE_PRO: " + appContext.getPlayerPro());
-                dialogController.closeDialog(null);
-                yield "professional.xhtml?faces-redirect=true";
-            }
-            
-            case CREATE_ROUND -> { // 04-02-2026
-               // localAdmin.setPlayerHomeClub(club.getIdclub());
-                LOG.debug("club setted for CREATE_ROUND: " + club);
-                LOG.debug("course setted for CREATE_ROUND: " + course);
-                dialogController.closeDialog(null);
-                yield null;
-            }
-
-            case PAYMENT_COTISATION -> {
-                round.setRoundDate(LocalDateTime.now());
-             // tarifMember = new find.FindTarifMembersData().find(club, round, conn);
-                tarifMember = findTarifMembersData.find(club, round); // migrated 2026-02-25
-                LOG.debug("TarifMember loaded for club = " + club);
-                dialogController.closeDialog(null);
-                yield null; // ou "cotisation.xhtml?faces-redirect=true" si nécessaire
-            }
-
-        //    case CREATE_COMPETITION -> {
-        //        competition.competitionDescription().setCompetitionClubId(club.getIdclub());
-        //        LOG.debug("Competition club set to = " + club.getIdclub());
-        //        dialogController.closeDialog(null);
-        //        yield "competition_create_description.xhtml?faces-redirect=true";
-        //    }
-
-            case MENU_UNAVAILABLE -> {
-                LOG.debug("Menu unavailable selected, club = " + club);
-                dialogController.closeDialog(null);
-                yield null;
-            }
-
-            default -> {
-                LOG.warn("Unknown ClubSelectionPurpose: " + purpose);
-                appContext.getPlayer().setPlayerHomeClub(club.getIdclub());
-                if (competition != null) {
-                    competition.competitionDescription().setCompetitionClubId(club.getIdclub());
-                }
-                dialogController.closeDialog(null);
-                yield createModifyPlayer.equals("M") ?
-                        "player_modify.xhtml?faces-redirect=true" :
-                        "player.xhtml?faces-redirect=true";
-            }
-        };
-
-    } catch (Exception e) {
-        String msg = "Exception in selectedClub version CDI : " + e.getMessage();
-        LOG.error(msg, e);
-        showMessageFatal(msg);
-        return null;
-    } finally {
-        clubSelectionContext.clear(); // toujours nettoyer le contexte
-    }
-}
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+  public String selectedClub(Club c) { ... }
+*/
  
   /*
  public String selectedClub(Club c) {   // coming from dialogClub.xhtml
@@ -2208,81 +1971,15 @@ public void roundWorkDate(ValueChangeEvent e) {
  //   return null;
     } // end class selectcourse
  */
-  public String selectedCourseForClub(Course c){   // coming from dialogCourse.xhtml  
-      // faut une 2e paramètre !!
-  try{
-           LOG.debug(" ... entering selectedCourseForClub ");
-           LOG.debug(" with course input parameter = " + c);
-     //      LOG.debug(" for player = " + player);
-           LOG.debug(" for club = " + club);
-            enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                                                     .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
-         LOG.debug("Entering selectedCourseForClub with purpose = " + purpose);
-        course = c;
-           LOG.debug(" course is now = " + course);
-     //              LOG.debug("course = " + course);
-        String msg = "Select Course Successfull = " + " <br/> CourseName = " + course.getCourseName();
-        LOG.debug(msg);
-        showMessageInfo(msg);
-        LOG.debug("selectedCourseForClub : inputSelectClub = " + sessionMap.get("inputSelectClub"));
-        
-    ///    boolean b = Controllers.DialogController.closeDialog("dialogCourse.xhtml"); // mod 02/10/2024
-         dialogController.closeDialog(null);
-    //    LOG.debug("DialogCourse closed !! = " + b);
-   //      LOG.debug("selectedCourseForClub, inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-   
-        if(sessionMap.get("inputSelectClub").equals("MenuUnavailable")) {  // positionné from menu
-           LOG.debug("handling menu unavailable");
-           LOG.debug("for unavailable = " + unavailable);
-           // chercher si structure existe
-           // à deplacer vers selectclub ??
-           unavailable.structure().setMenuLaunched(true); // provoque affichage menu interne dans unavailable_menu.xhtml
-           var v = readUnavailableStructure.read(club);
-              LOG.debug("variable v found = ENTITE UnavailableStructure " + v);
-           // positionner switch
-           
-           if (v != null && !v.getStructureList().isEmpty()){
-               unavailable.structure().setStructureList(v.getStructureList());
-               unavailable.structure().setStructureExists(true); // provoque affichage create periods
-               LOG.debug("structure exists " + v);
-           }else{
-               LOG.debug("NO structure exists " + v);
-           }
-           //return null;
-     //   boolean b = new DialogController().closeDialog("dialogCourse.xhtml"); // back to normal screen
-    ///     b = Controllers.DialogController.closeDialog("dialogCourse.xhtml"); // mod 03-04-2020
-          dialogController.closeDialog(null);
-    //      LOG.debug("DialogCourse closed !! = " + b);
-        return null;
-      }
-      
-    if(sessionMap.get("inputSelectClub").equals("CREATE COMPETITION")) {  // positionné dans menu
-        LOG.debug(" selectedCourseForClub - competition =  " + competition);
-      competition.competitionDescription().setCompetitionCourseId(course.getIdcourse());
-      competition.competitionDescription().setCompetitionCourseIdName(
-                         Integer.toString(course.getIdcourse()) + " - " + course.getCourseName());
-         LOG.debug(" competition updated CourseId= " + competition.competitionDescription()); 
-  ///    Controllers.DialogController.closeDialog("dialogCourse.xhtml"); // mod 03-04-2020
-       dialogController.closeDialog(null);
-      return null;//  return "competition_create_description.xhtml?faces-redirect=true";
-       }
-  } catch (Exception e) {
-            String msg = "££ Exception in selectedCourseForClub = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-    return null;
-    } // end class selectcours
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+  public String selectedCourseForClub(Course c) { ... }
+*/
   
-public String to_selectCourse_xhtml(String s){
-            LOG.debug("entering to_selectCourse_xhtml ... with string = " + s);
-       reset("Reset to_selectCourse " + s);
-       sessionMap.put("inputSelectCourse", s);
-            LOG.debug("course selected for :  = " + sessionMap.get("inputSelectCourse"));
-       return "selectCourse.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectCourse");
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+public String to_selectCourse_xhtml(String s) { ... }
+*/
 
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
 public String to_selectCourse2_xhtml(String s){
             LOG.debug("entering to_selectCourse2_xhtml ... with string = " + s);
        reset("Reset to_selectCourse " + s);
@@ -2295,39 +1992,19 @@ public String to_selectCourse2_xhtml(String s){
           LOG.debug("club selected for :  = " + sessionMap.get("inputSelectClub"));
        return "selectClubCourse.xhtml?faces-redirect=true";
    }
+*/
 
-public String to_selectGrpc_xhtml(String s){
-            LOG.debug("entering to_selectGprc_xhtml ... with string = " + s);
-       reset("Reset to_selectGrpc " + s);
-  //     sessionMap.put("inputSelectCourse", s);
-  //          LOG.debug("course selected for :  = " + sessionMap.get("inputSelectCourse"));
-       return "grpc_server.xhtml?faces-redirect=true"; // + sessionMap.get("inputSelectCourse");
-   }
-public String to_selectClubLA_xhtml(String s){
-            LOG.debug("entering to_selectClubLA_xhtml ... with string = " + s);
-       reset("Reset to_selectClubLA " + s);
-       if(s.equals("CreatePro"))  {
-           sessionMap.put("inputSelectClub", s);
-           return "professional.xhtml?faces-redirect=true";
-       }
-       sessionMap.put("inputSelectCourse", s);
-            LOG.debug("club selected for :  = " + sessionMap.get("inputSelectCourse"));
-      return "selectClubLocalAdmin.xhtml?faces-redirect=true"; //&cmd=" + sessionMap.get("inputSelectCourse"); 
-  //     
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+public String to_selectGrpc_xhtml(String s) { ... }
+*/
 
-public String to_selectClubSYS_xhtml(String s){
-            LOG.debug("entering to_selectClubSYS_xhtml ... with string = " + s);
-       reset("Reset to_selectClubSYS " + s);
-       if(s.equals("CreatePro"))  {
-           sessionMap.put("inputSelectClub", s);
-           return "professional.xhtml?faces-redirect=true";
-       }
-       sessionMap.put("inputSelectCourse", s);
-            LOG.debug("club selected for :  = " + sessionMap.get("inputSelectCourse"));
-      return "selectClubLocalAdmin.xhtml?faces-redirect=true"; //&cmd=" + sessionMap.get("inputSelectCourse"); 
-  //     
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+public String to_selectClubLA_xhtml(String s) { ... }
+*/
+
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+public String to_selectClubSYS_xhtml(String s) { ... }
+*/
 
 /*/ enlevé 03-02-2026
 public String to_selectMenuUnavailable_xhtml(String s){ 
@@ -2338,29 +2015,9 @@ public String to_selectMenuUnavailable_xhtml(String s){
       return "unavailable_menu.xhtml?faces-redirect=true";
    }
 */
-public String to_selectPurpose_xhtml(String menuSelection) { // new generic solution
-
-    LOG.debug("entering to_selectPurpose_xhtml with string = {}", menuSelection);
-   //  sessionMap.put("inputSelectClub", s); old for search
-    reset("Reset from to_selectPurpose_xhtml, with : " + menuSelection);
-
-    // 1️⃣ Résolution du purpose
-    ClubSelectionPurpose purpose = ClubSelectionPurpose.fromCode(menuSelection);
-      LOG.debug("purpose resolved = {}", purpose);
-
-    // 2️⃣ Ouverture du contexte CDI
-    clubSelectionContext.open(purpose);
-
-    // 3️⃣ Navigation déléguée à l’enum
-    var navigation =  purpose.navigationToFirst();
-      LOG.debug("navigation resolved = {}", navigation);
-      
-      if(menuSelection.equals("clubCreate")){
-           club.setCreateModify(true);  // gestion button dans club.xhtml
-      }
-      
-    return navigation;
-}
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+public String to_selectPurpose_xhtml(String menuSelection) { ... }
+*/
 
 
 /*
@@ -2377,399 +2034,64 @@ public String to_selectDesignationLA_xhtml(String s){  // LocalAdministrator
    }
 */
 
-public String to_selectCourseLA_xhtml(String s){
-            LOG.debug("entering to_selectCourseLA_xhtml ... with string = " + s);
-       reset("Reset to_selectClub2 " + s);
-       sessionMap.put("inputSelectCourse", s);
-       sessionMap.put("adminType","admin");
-            LOG.debug("club selected for :  = " + sessionMap.get("inputSelectCourse"));
-       return "selectCourseLocalAdmin.xhtml?faces-redirect=true"; //&cmd=" + sessionMap.get("inputSelectCourse");
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController
+public String to_selectCourseLA_xhtml(String s) { ... }
+*/
 
 
 
 
 
 
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
 public String to_update_help(String s){
             LOG.debug("entering to_update_help ... with string = " + s);
        reset("Reset to_selectCourse " + s);
-    //   sessionMap.put("inputSelectCourse", s);
-   //         LOG.debug("course selected for :  = " + sessionMap.get("inputSelectCourse"));
        return "treenode.xhtml?faces-redirect=true";
    }
-
-public String to_selectLocalAdmin_xhtml(String s){
-            LOG.debug("entering to_selectLocalAdmin_xhtml ... with string = " + s);
-       reset("Reset to_selectLocalAdmin" + s);
-       sessionMap.put("inputSelectPaiement", s);
-       
-     if(s.equals("Members")){
-        return "local_administrator_cotisations.xhtml?faces-redirect=true"; //&cmd=" + s;
-     }
-     if(s.equals("Greenfees")){
-        return "local_administrator_greenfees.xhtml?faces-redirect=true"; //&cmd=" + s;
-     }
-     return null;
-}
-
-public String to_selectSystemAdmin_xhtml(String s){
-            LOG.debug("entering to_selectSystemAdmin_xhtml ... with string = " + s);
-       reset("Reset to_selectSystemAdmin" + s);
-       sessionMap.put("inputSelectSubscriptions", s);
-       return "system_administrator_subscriptions.xhtml?faces-redirect=true"; //&cmd=" + s;
-   /*      
-     if(s.equals("Members")){
-        return "local_administrator_cotisations.xhtml?faces-redirect=true"; //&cmd=" + s;
-     }
-     if(s.equals("Greenfees")){
-        return "local_administrator_greenfees.xhtml?faces-redirect=true"; //&cmd=" + s;
-     }
-     return null;
 */
-}
 
+/* migrated on 2026-02-25 — now in Controller.refact.MemberController (memC)
+   public String to_selectLocalAdmin_xhtml(String s) { ... }
+*/
 
-public String to_selectPro_xhtml(String s){
-         LOG.debug("entering to_selectPro_xhtml ... with string = " + s);
-       reset("Reset to_selectPro" + s);
-       sessionMap.put("inputSelectPaiement", s);  // ?? utile
-     if(s.equals("Lessons")){
-        return "professional_lessons_paid.xhtml?faces-redirect=true"; //&cmd=" + s;
-     }
-     if(s.equals("Inscription")){
-        return "selectProForClub.xhtml?faces-redirect=true&cmd=" + s;}
-     return null;
-}
-public String to_selectClub_xhtml(String s){
-            LOG.debug("entering to_selectClub_xhtml ... with string = " + s);
-       reset("Reset to_selectClub" + s);
-       sessionMap.put("inputSelectCourse", s);
-       sessionMap.put("inputSelectClub", s); // fake 22-02-2024
-       return "selectClub.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectCourse");
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.MemberController (memC)
+   public String to_selectSystemAdmin_xhtml(String s) { ... }
+*/
 
-// 
-// new 24-08-2025
-public String to_selectClubDialog_xhtml(String s){
-            LOG.debug("entering to_selectClubDialog_xhtml ... with string = " + s);// PaymentCotisationSpontaneous
-       reset("Reset to_selectClubDialog" + s);
-    //   sessionMap.put("inputSelectCourse", s);
-       sessionMap.put("inputSelectClub", s);
-       return "selectClubDialog.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectClub");
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.MemberController (memC)
+   public String to_selectPro_xhtml(String s) { ... }
+*/
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String to_selectClub_xhtml(String s){ ... }
+*/
+
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String to_selectClubDialog_xhtml(String s){ ... }
+*/
 
 
 
-public String selectClub(Club c, String select){
-  try {
-            LOG.debug(" entering selectClub(Club) ... = ");
-            LOG.debug(" with select = " + select);
-            LOG.debug(" with in_club = " + c);
-        club = c;
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String selectClub(Club c, String select){ ... }
+*/
 
-        String msg = "Select Club Successfull l 1731 = "
-                + " <br/> Club name = " + club.getClubName()
-                + " <br/> inputSelectCourse = " + select;
-        LOG.debug(msg);
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String selectCourseLA(ECourseList in_club, String select){ ... }
+*/
 
-             LOG.debug("selectClub : inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-         if(sessionMap.get("inputSelectCourse") == null){
-                msg = "No InputSelectCourse !";
-                LOG.error(msg);
-                showMessageFatal(msg);
-                return null;
-         }
-          if(select.equals("CreatePro")) {// new 26-05-2021
-            return "professional.xhtml?faces-redirect=true";} 
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String selectClubCourse(){ ... }
+*/
 
-    //  enlevé 19/06/2022    if(select.equals("CreateUnavailableStructure")) {
-    //        return "unavailable_structure.xhtml?faces-redirect=true";} // mod 22-03-2020
-  
-       // mod 01-04-2020
-            if(select.equals("CreateUnavailablePeriod")) {
-            // compléter l'entité UnavailableStructure sessionMap.get("inputSelectCourse")
-            var v = readUnavailableStructure.read(club);
-         //   unavailable.structure(new read.ReadUnavailableStructure().read(club, conn)); // mod 20-04-2021
-          //  unavailable.structure(v); // mod 20-04-2021
-            unavailable.withStructure(v); // migration record 2026
-      // tester si erreur 
-               LOG.debug("returned with unavailable structure = " + unavailablestructure);
-            if(unavailable.structure() == null){
-                   // LOG.debug("error we go to createstructure");
-                     String msgerr =  LCUtil.prepareMessageBean("unavailable.structure.notfound");
-                    LOG.error(msgerr); 
-                     LCUtil.showMessageInfo(msgerr);
-                return "unavailable_structure.xhtml?faces-redirect=true";
-            }else{
-                club.setUnavailableStructure(unavailablestructure);
-                    LOG.debug("structure length = " + club.getUnavailableStructure().getStructureList().size());
-                return "unavailable_period.xhtml?faces-redirect=true"; // new 23-03-2020 22-03-2020
-            }
-        } // end if
-             
-             
-        if (select.equals("CreateTarifGreenfee")) {
-            return "tarif_greenfee_menu.xhtml?faces-redirect=true";} // mod 16-09-2018
-        
-        if (select.equals("CreateTarifMember")) {
-            return "tarif_members_menu.xhtml?faces-redirect=true";} // new 05-01-2019     
-             
-        if(select.equals("PaymentCotisationSpontaneous")) {
-               LOG.debug("entering PaymentCotisationSpontaneous");
-               LOG.debug("club = "+ club);
-               LOG.debug("round = "+ round); // normalement est null ?? payment pour quelle année ?
-               // round utilisé pour 
-         // tarifMember = new find.FindTarifMembersData().find(club, round, conn);  // mod 10/05/2022
-            tarifMember = findTarifMembersData.find(club, round); // migrated 2026-02-25
-            if(tarifMember == null){
-                String msgerr =  LCUtil.prepareMessageBean("tarif.member.notfound");
-                LOG.error(msgerr); 
-                LCUtil.showMessageFatal(msgerr);
-                return null;
-            }else{
-                return "cotisation.xhtml?faces-redirect=true";
-            }
-           
-       }
-
-  } catch (Exception e) {
-            String msg = "££ Exception in selectCourse = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-    return null;
-    } // end class selectcourse
-
-public String selectCourseLA(ECourseList in_club, String select){
-  try {
-            LOG.debug(" entering selectCourseLA ... = ");
-            LOG.debug(" with select = " + select);
-            LOG.debug(" with in_club = " + in_club);
-        club = in_club.club();    
-        course = in_club.course();
-        String msg = "Select Club Successfull l 1731 = "
-                + " <br/> Club name = " + club.getClubName()
-       //         + " <br/> Course name = " + course.getCourseName()
-        //        + " <br/> inputSelectCourse = " + sessionMap.get("inputSelectCourse");
-                + " <br/> inputSelectCourse = " + select;
-        LOG.debug(msg);
-             LOG.debug("selectClub, inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-         if(sessionMap.get("inputSelectCourse") == null){
-                msg = "No InputSelectCourse !";
-                LOG.error(msg);
-                showMessageFatal(msg);
-                return null;
-         }
-
-          if (select.equals("CreateTarifGreenfee")) {
-            return "tarif_greenfee_menu.xhtml?faces-redirect=true";}
-
-          if (sessionMap.get("inputSelectCourse").equals("CreateTarifMember")) {
-            return "tarif_members_menu.xhtml?faces-redirect=true";} // new 05-01-2019     
-             
-            if(sessionMap.get("inputSelectCourse").equals("CreateUnavailablePeriod")) {
-             var v = readUnavailableStructure.read(club);
-            unavailable.withStructure(v); // migration record 2026
-      // tester si erreur
-               LOG.debug("returned with unavailble structure = " + unavailablestructure);
-        if(unavailable.structure() == null){
-                   // LOG.debug("error we go to createstructure");
-                     String msgerr =  LCUtil.prepareMessageBean("unavailable.structure.notfound");
-                    LOG.error(msgerr); 
-                     LCUtil.showMessageInfo(msgerr);
-                return "unavailable_structure.xhtml?faces-redirect=true";
-            }else{
-                club.setUnavailableStructure(unavailablestructure);
-                    LOG.debug("structure length = " + club.getUnavailableStructure().getStructureList().size());
-                return "unavailable_period.xhtml?faces-redirect=true"; // new 23-03-2020 22-03-2020
-            }
-        } // end if      
-        if(select.equals("PaymentTarifMember")) {
-        // tarifMember = new find.FindTarifMembersData().find(club, round, conn);
-           tarifMember = findTarifMembersData.find(club, round); // migrated 2026-02-25
-            if(tarifMember == null){
-                String msgerr =  LCUtil.prepareMessageBean("tarif.member.notfound");
-                LOG.error(msgerr); 
-                LCUtil.showMessageFatal(msgerr);
-                return null;
-            }else{
-                 return "cotisation.xhtml?faces-redirect=true";
-            }
-           
-       }
-  // la suite n'est pas développée car doit rester dans selectCourse
-    
-        if (sessionMap.get("inputSelectCourse").equals("CreateRound")) {
-            return "round.xhtml?faces-redirect=true&cmd=round";} // mod 30/07/2014
-        
-        if (sessionMap.get("inputSelectCourse").equals("ini")) {
-            return "round.xhtml?faces-redirect=true&cmd=ini";} // mod 30/07/2014
-
-     // 08-12-2024 à modifier !!!   
-        if (sessionMap.get("inputSelectCourse").equals("ChartCourse")) {
-            return "statChartCourse.xhtml?faces-redirect=true";} // mod 01/04/2016
-     //   }
-  } catch (Exception e) {
-            String msg = "££ Exception in selectCourse = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-    return null;
-    } // end class selectcourse
-
-public String selectClubCourse(){ // new 02/10/2024
- try {
-     LOG.debug(" entering selectClubCourse ! ");
-     LOG.debug(" with club = " + club);
-     LOG.debug(" with course = " + course);
-     LOG.debug(" with sessionMap inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-   return null;
-// to be completed
-
- } catch (Exception e) {
-            String msg = "££ Exception in selectClubCourse = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-  //  return null;
-    } // end class selectClubCourse
-
-public String selectedCourse(){ // coming from selectClubCourse.xhtml
- try {
-        LOG.debug(" entering selectedCourse ");
-        LOG.debug("club = " + club);
-        LOG.debug("course = " + course);
-        LOG.debug("sessionMap inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-        enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                                                     .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
-         LOG.debug("Entering selectedCourse with purpose = " + purpose);
-      ///  if(sessionMap.get("inputSelectClub").equals("LocalAdministrator"))  {
-         if (purpose == ClubSelectionPurpose.CREATE_ROUND) {
-//     if(sessionMap.get("inputSelectCourse").equals("CreateRound")) {
-          //  return "round.xhtml?faces-redirect=true&cmd=round";} // mod 30/07/2014   
-         
-          // Navigation vers la page finale après sélection
-          LOG.debug(" return to xx " + purpose.navigationToFinal());
-          return purpose.navigationToFinal();  // → "createRound.xhtml?faces-redirect=true"
-         }
-          
-          
-     //  à compléter
-     LOG.debug("unknown case in selectedCourse !!");
-     return null;
-
- } catch (Exception e) {
-            String msg = "££ Exception in selectCourse = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-}
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String selectedCourse(){ ... }
+*/
 
 
-public String selectCourse(ECourseList ecl){
- try {
-            LOG.debug(" entering selectCourse(ECourseList) ... = ");
- //           LOG.debug(" with ecl = " + ecl.toString());
-        club = ecl.club();
-            LOG.debug("club = " + club);
-        course = ecl.course(); // on le perd ici ? je crois que oui !!!
-            LOG.debug("course = " + course);
-        String msg = "Select Course Successfull l 1731 = "
-                + " <br/> Club name = " + club.getClubName()
-                + " <br/> Course name = " + course.getCourseName()
-                + " <br/> inputSelectCourse = " + sessionMap.get("inputSelectCourse");
-        LOG.debug(msg);
-   //     showMessageInfo(msg); // enlevé 17-11-2018
- //  printMap(sessionMap);
-             LOG.debug("selectCourse, inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-         if(sessionMap.get("inputSelectCourse") == null){
-                msg = "No InputSelectCourse !";
-                LOG.error(msg);
-                showMessageFatal(msg);
-         }
-  //       LOG.debug("selectCourse, inputSelectCourse !! = " + sessionMap.get("inputSelectCourse"));
-         
-        if (sessionMap.get("inputSelectCourse").equals("CreateRound")) {
-            return "round.xhtml?faces-redirect=true&cmd=round";} // mod 30/07/2014
-        
-        if (sessionMap.get("inputSelectCourse").equals("ini")) {
-            return "round.xhtml?faces-redirect=true&cmd=ini";} // mod 30/07/2014
-        
-        if (sessionMap.get("inputSelectCourse").equals("CreateTarifGreenfee")) {
-            return "tarif_greenfee_menu.xhtml?faces-redirect=true";} // mod 16-09-2018
-        
-        if (sessionMap.get("inputSelectCourse").equals("CreateTarifMember")) {
-            return "tarif_members_menu.xhtml?faces-redirect=true";} // new 05-01-2019
-       
-
-  //      if(sessionMap.get("inputSelectCourse").equals("CreateUnavailableStructure")) {
-   //         return "unavailable_structure.xhtml?faces-redirect=true";
-   //     } // mod 22-03-2020
-
-      //  if(sessionMap.get("inputSelectCourse").equals("CreateUnavailablePeriod")) {
-      // mod 01-04-2020
-        if(sessionMap.get("inputSelectCourse").equals("CreateUnavailablePeriod")) {
-            // compléter l'entité UnavailableStructure sessionMap.get("inputSelectCourse")
-            var v = readUnavailableStructure.read(ecl.club());
-          //  unavailable.setStructure(new read.ReadUnavailableStructure().read(ecl.getClub(),conn)); // mod 31-03
-            unavailable.withStructure(v); // migration record 2026
-            // tester si erreur 
-            LOG.debug("returned with unavailble strucure = " + unavailablestructure);
-            if(unavailable.structure() == null){
-                   // LOG.debug("error we go to createstructure");
-                     String msgerr =  LCUtil.prepareMessageBean("unavailable.structure.notfound");
-                    LOG.error(msgerr); 
-                     LCUtil.showMessageInfo(msgerr);
-                return "unavailable_structure.xhtml?faces-redirect=true";
-            }else{
-                club.setUnavailableStructure(unavailablestructure);
-                    LOG.debug("structure length = " + club.getUnavailableStructure().getStructureList().size());
-                return "unavailable_period.xhtml?faces-redirect=true"; // new 23-03-2020 22-03-2020
-            }
-        } // end if
-    /////    
-        if(sessionMap.get("inputSelectCourse").equals("PaymentTarifMember")) {
-            LOG.debug("we are in paymentTarifMember");
-            LOG.debug("round = " + round);
-   //         loadTarifMember();  // mod 14-02-2019  used in ??.xhtml
-   /* distinguer le paiement cotisation pour un greenfee : round existe
-   // et le paiement spontané d'une cotisation : round existe pas 
-           if(round == null){  // paiement spontané
-               round.setRoundDate(LocalDateTime.now()); // date du jour 
-               tarifMember = new find.FindTarifMembersData().find(club, round.getRoundDate(), conn);
-               tarifMember.setType("S"); 
-           }else{
-               tarifMember = new find.FindTarifMembersData().find(club, round.getRoundDate(), conn);
-               tarifMember.setType("R"); // paiement pour participer à un round
-           }
- */
-            if(tarifMember == null){
-                String msgerr =  LCUtil.prepareMessageBean("tarif.member.notfound");
-                LOG.error(msgerr); 
-                LCUtil.showMessageFatal(msgerr);
-                return null;
-            }else{
-                 return "cotisation.xhtml?faces-redirect=true";
-            }
-           
-            }
-        // PF 15 à modifier 
-        if (sessionMap.get("inputSelectCourse").equals("ChartCourse")) {
-            return "statChartCourse.xhtml?faces-redirect=true";
-        } // mod 01/04/2016
-  } catch (Exception e) {
-            String msg = "££ Exception in selectCourse = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-    return null;
-    } // end class selectcourse
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public String selectCourse(ECourseList ecl) { ... }
+*/
 
 /* migrated on 2026-02-25 — now in Controller.refact.MemberController
 public String findTarifGreenfee(){
@@ -2784,56 +2106,14 @@ public String findTarifCotisation(){
 }
 */
  
-public String selectTravel(ECourseList ecl){ 
- try {
-        LOG.debug(" entering select Travel ...");
-            LOG.debug(" select Travel with Ecourselist = " + ecl.toString());
-            club = ecl.club();
-            course = ecl.course();
-
-        String msg = "Select Course Successfull l 1796 = "
-                + " <br/> Club name = " + club.getClubName()
-                + " <br/> Course name = " + course.getCourseName();
-        LOG.debug(msg);
-        showMessageInfo(msg);
-        // à vérifier 
-          LOG.debug("getInputSelectCourse = " + sessionMap.get("inputSelectCourse") ); // à vérifer
-            return "maps_home_club.xhtml?faces-redirect=true"; //?cmd=Rnd"; // mod 30/07/2014
-
-    } catch (Exception e) {
-            String msg = "££ Exception in selectTravel = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    }
- } // end class selectTravel
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public String selectTravel(ECourseList ecl) { ... }
+*/
 
 
-// solution PF15 utiliser p:chart basé sur XDEV !!!
- public String selectChart(ECourseList ecl){ //used in selectCourse.xhtml line 269
-  try {
-            LOG.debug("starting selectChart with ecl = " + ecl.toString());
-        club = ecl.club();
-        course = ecl.course();
-        String msg = "Select Course Successfull = "
-                + " <br/> Club name = " + club.getClubName()
-                + " <br/> Course name = " + course.getCourseName() + " / " + course.getIdcourse();
-            LOG.debug(msg);
-            showMessageInfo(msg);
-          LOG.debug("getInputSelectCourse = " + sessionMap.get("inputSelectCourse") ); // à vérifer
-       //PF 15 à modifier   
-       String v = new Controllers.ChartController().lineModelCourse(conn, appContext.getPlayer(), course);
-       setLineModelCourse(v); // new 10-12-2024
-          LOG.debug("Chart returned from ChartController = " + getLineModelCourse());
-       return "statChartCourse.xhtml?faces-redirect=true"; 
-     // return null;
-    } catch (Exception e) {
-            String msg = "££ Exception in selectChart = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    }
-} // end class selectTravel
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public String selectChart(ECourseList ecl) { ... }
+*/
 
 /*
 public String gRpcServer(String param){
@@ -2857,30 +2137,16 @@ public String gRpcServer(String param){
         } 
 } // end method HandicapModel
 */
-public void checkMail(String ini){
-        LOG.debug("starting checkMail with : " + ini);
-///    utils.CheckingMails.main(ini); // argument bidon !!
-        LOG.debug("ending checkMail with : " + ini);
-}
-public void newMessageFatal(String ini){
-        LOG.debug("starting newMessageFatal with : " + ini);
-///    utils.CheckingMails.main(ini); // argument bidon !!
-        LOG.debug(ini);
-     //   utils.LCUtil lcu = new utils.LCUtil();
- //       utils.LCUtil.showMessageFatalOld(ini);
-        LOG.debug("ending newMessageFatal with : " + ini);
-}
-public void to_reset_menu(String ini){ // workaround : vient de menu et n'accepte pas le String en retour 
-    reset(ini);
- //   player = new Player();
-    sessionMap.put("playerid", 0);
-    sessionMap.put("playerlastname", "");
-    sessionMap.put("playerage", 0);
-    String msg = "Reset PLAYER done = " + ini;
-    LOG.debug(msg);
-    showMessageInfo(msg);
-    
-}
+/* migrated on 2026-02-25 — now in Controller.refact.TechnicalController (techC)
+   public void checkMail(String ini) { ... }
+*/
+
+/* migrated on 2026-02-25 — now in Controller.refact.TechnicalController (techC)
+   public void newMessageFatal(String ini) { ... }
+*/
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public void to_reset_menu(String ini){ ... }
+*/
 
 // new 12-02-2026, called from LoginBean : supprimé !!
   //public String reset(String ini) {
@@ -2915,77 +2181,11 @@ public void to_reset_menu(String ini){ // workaround : vient de menu et n'accept
         }
         */
     // new suite migration vers Controlleurs externes    ////////////////
-    
-        appContext.reset();  // sauf Player 
-    // --- Reset global lists ---  reste provisoirement dans course controller sera migré ultérieurement
-        // was: lists.AllFlightsList.setListe(null);
-        allFlightsList.invalidateCache();               // migrated 2026-02-24
-        // was: lists.HandicapList.setListe(null);
-        handicapList.invalidateCache();                 // migrated 2026-02-24
-       // lists.InscriptionList.setListe(null);
-        inscriptionList.invalidateCache(); // new 23-02-2026
-        inscriptionListForOneRound.invalidateCache(); // migrated 2026-02-24
-        // was: lists.PlayersList.setListe(null);
-        playersList.invalidateCache();                  // migrated 2026-02-24
-        participantsRoundList.invalidateCache();       // migrated 2026-02-24
-        participantsStablefordCompetitionList.invalidateCache(); // migrated 2026-02-24
-        matchplayList.invalidateCache();                         // migrated 2026-02-24
-      //  lists.PlayedList.setListe(null);
-        playedList.invalidateCache();
-        recentRoundList.invalidateCache();             // migrated 2026-02-24
-        scoreCardList1EGA.invalidateCache();       // migrated 2026-02-24
-        // was: lists.CourseList.setListe(null);
-        courseList.invalidateCache();                   // migrated 2026-02-24
-        scoreCardList3.invalidateCache();          // migrated 2026-02-24
-        // was: lists.UnavailableListForDate.setListe(null);
-        unavailableListForDate.invalidateCache();        // migrated 2026-02-24
-        roundPlayersList.invalidateCache();            // migrated 2026-02-24
-        // was: lists.SubscriptionRenewalList.setListe(null);
-        subscriptionRenewalList.invalidateCache();       // migrated 2026-02-24
-        // was: lists.FlightAvailableList.setListe(null);
-        flightAvailableList.invalidateCache();          // migrated 2026-02-24
-        // was: lists.ClubDetailList.setListe(null);
-        clubDetailList.invalidateCache();               // migrated 2026-02-24
-        // was: lists.ClubCourseTeeListOne.setListe(null);
-        clubCourseTeeListOne.invalidateCache();         // migrated 2026-02-24
-        competitionInscriptionsList.invalidateCache();  // migrated 2026-02-24
-        competitionDescriptionList.invalidateCache();   // migrated 2026-02-24
-        competitionRoundsList.invalidateCache();        // migrated 2026-02-24
-        competitionStartList.invalidateCache();         // migrated 2026-02-24
-      //  lists.HandicapIndexList.setListe(null);
-        handicapIndexList.invalidateCache(); //setListe(null);   // ✅ instance, pas statique
-        // was: lists.CourseListForClub.setListe(null);
-        courseListForClubService.invalidateCache();     // migrated 2026-02-24
-        // was: lists.ClubList.setListe(null);
-        clubList.invalidateCache();                     // migrated 2026-02-24
-      //  lists.ClubsListLocalAdmin.setListe(null);
-        clubsListLocalAdmin.invalidateCache(); // mod 23-02-2026
-        // was: lists.LocalAdminCotisationList.setListe(null); // @ViewScoped resets per view
-        // was: lists.LocalAdminGreenfeeList.setListe(null);   // @ViewScoped resets per view
-        // was: lists.SystemAdminSubscriptionList.setListe(null); // @ViewScoped resets per view
-        // was: lists.CoursesListLocalAdmin.setListe(null);
-        coursesListLocalAdmin.invalidateCache();         // migrated 2026-02-24
-        // was: lists.ProfessionalClubList.setListe(null);
-        professionalClubList.invalidateCache();          // migrated 2026-02-24
-        // lists.LessonProList.setListe(null);
-        lessonProList.invalidateCache(); // migrated 2026-02-23
-        // was: lists.ProfessionalListForClub.setListe(null);  // @ViewScoped resets per view
-        registerResultList.invalidateCache();           // migrated 2026-02-24
-        // was: lists.ProfessionalListForPayments.setListe(null); // @ViewScoped resets per view
-        // was: lists.FindCountListProfessional.setListe(null);
-        findCountListProfessional.invalidateCache();     // migrated 2026-02-24
-        // was: find.FindSlopeRating.setListe(null);
-        findSlopeRating.invalidateCache();              // migrated 2026-02-24
-        // was: find.FindInfoStableford.setListe(null);
-        findInfoStableford.invalidateCache();           // migrated 2026-02-24
-        // was: find.FindCurrentSubscription.setListe(null);
-        findCurrentSubscription.invalidateCache();      // migrated 2026-02-24
-        // was: find.FindTeeStart.setListe(null);
-        findTeeStart.invalidateCache();                 // migrated 2026-02-24
-        // was: lists.SunriseSunsetList.setListe(null);
-        sunriseSunsetList.invalidateCache();            // migrated 2026-02-24
+
+        appContext.reset();  // sauf Player
+    // --- Reset global lists --- délégué à CacheInvalidator — migrated 2026-02-25
+        cacheInvalidator.invalidateAll();
         Controllers.LoggingUserController.setText("first start");
-        calcMatchplayResult.invalidateCache();          // migrated 2026-02-24
         // --- Clear dropped/dragged players if Player exists ---
         if (appContext.getPlayer() != null) {
             appContext.getPlayer().clearDroppedPlayers();
@@ -2995,18 +2195,18 @@ public void to_reset_menu(String ini){ // workaround : vient de menu et n'accept
     // --- Reset other entities ---
     //    player2 = new Player(); enlevé 14-02-2026 15:11
     //    playerTemp = new Player(); enlevé 12-02-2026
-        club = new Club();  // double emploi avec applicationcontroller 
-        course = new Course();
+        // club = new Club(); — removed 2026-02-25 (appContext.reset() s'en charge)
+        // course = new Course(); — removed 2026-02-25 (appContext.reset() s'en charge)
         handicap = new Handicap();
     //    handicapIndex = new HandicapIndex();
-        hole = new Hole();
+        // hole = new Hole(); — removed 2026-02-25 (migrated to ClubController)
         matchplay = new Matchplay();
         inscription = new Inscription();
         round = new Round();
         scoreMatchplay = new ScoreMatchplay();
         scoreStableford = new ScoreStableford();
         scoreScramble = new ScoreScramble();
-        tee = new Tee();
+        // tee = new Tee(); — removed 2026-02-25 (migrated to ClubController)
         subscription = new Subscription();
         cotisation = new Cotisation();
         playingHcp = new PlayingHandicap();
@@ -3015,13 +2215,13 @@ public void to_reset_menu(String ini){ // workaround : vient de menu et n'accept
         tarifMember = new TarifMember();
         creditcard = new Creditcard();
         creditcard.setPaymentOK(false);
-        holesGlobal = new HolesGlobal();
+        // holesGlobal = new HolesGlobal(); — removed 2026-02-25 (migrated to ClubController)
         login = new LoginBeanSecurity();
         password = new Password();
         cptFlight = 0;
         unavailable = new EUnavailable(new UnavailableStructure(), new UnavailablePeriod());
-        setProgress1(0);
-        competition = new ECompetition(new CompetitionDescription(), new CompetitionData());
+        // setProgress1(0); // migrated 2026-02-25 to PaymentController
+        // competition = new ECompetition(...) — removed 2026-02-25 (now in appContext.reset())
         unavailablestructure = new UnavailableStructure();
         unavailableperiod = new UnavailablePeriod();
 
@@ -3192,9 +2392,9 @@ public void createHole(){
     /* migrated on 2026-02-25 — now in Controller.refact.RoundController
         public void processChecked(AjaxBehaviorEvent e) { ... }
     */
-    public void convertYtoM() {  // mod 04-12-2017 
-        hole = utils.ConvertYardsToMeters.convertYtoM(hole);
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public void convertYtoM() { ... }
+*/
     /*
   public void createRound_old() throws SQLException{
        LOG.debug("entering createRound ");
@@ -3253,88 +2453,28 @@ public void createHole(){
     } // end method
   */
 
- public String PlayerDrop(DragDropEvent<?> event) {  // used in inscriptions_other_players.xhtml
-  try{
-          LOG.debug("Entering PlayerDrop");
-          LOG.debug("event PlayerDrop = " + event.getData().toString());
-          LOG.debug("DragId = " + event.getDragId());
-          LOG.debug("DropId = " + event.getDropId());
-    //event is EplayerPassword !!
-    EPlayerPassword epp = ((EPlayerPassword) event.getData());
-    Player playerDropped = epp.player();
- //        LOG.debug("PlayerLastName dropped = " + playerDropped.getPlayerLastName());
-         LOG.debug("Player dropped = " + playerDropped);
-   //  if(droppedPlayers.contains(playerDropped)){
-   LOG.debug("size = " + appContext.getPlayer().getDroppedPlayers().size());
-      if(appContext.getPlayer().getDroppedPlayers().contains(playerDropped)){    
-            String err = LCUtil.prepareMessageBean("déjà dans DroppedPlayers"); // pas possible ??
-            LOG.error(err); 
-            LCUtil.showMessageFatal(err);
-          return null;
-         }    
-
-      if(appContext.getPlayer().getDroppedPlayers().size() > 4){   
-           String msg = "There are more than 4 dropped players";
-            LOG.debug(msg);
-          LCUtil.showMessageFatal(msg);
-          return null;
-       }    
-         
-    // was: find.FindTeeStart.setListe(null); // new new !!! cherché longtemps !!! utilisait les data du current player !
-    findTeeStart.invalidateCache();                 // migrated 2026-02-24
-    List<String> ls = teeStartList(playerDropped); // new 01-04-2019
-       LOG.debug("teeStartList =  " + ls.toString());
-    appContext.getPlayer().getDroppedPlayers().forEach(item -> LOG.debug("before add ,list of dropped Players = " + item.getIdplayer())); 
-    appContext.getPlayer().getDroppedPlayers().add(playerDropped);
-      //    LOG.debug("After add, droppedPlayers = " +  Arrays.toString(player.getDroppedPlayers().toArray()));
-    appContext.getPlayer().getDroppedPlayers().forEach(item -> LOG.debug("after add, list of dropped Players =" + item.getIdplayer())); 
-          LOG.debug("After add, number of dropped players = " + appContext.getPlayer().getDroppedPlayers().size());
-    // le remove est adapté !!  éviter de dragger le player une seconde fois !!
-    
-     appContext.getPlayer().getDraggedPlayers().remove(epp);
-        LOG.debug("After remove, number of draggedPlayers = " + appContext.getPlayer().getDraggedPlayers().size());
-        LOG.debug("After remove, draggedPlayers = " + appContext.getPlayer().getDraggedPlayers().toString());
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+ public String PlayerDrop(DragDropEvent<?> event) {
     return null;
- } catch (Exception e) {
-            String msg = "£££ Exception in PlayerDrop = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;
- }
 } // end method
+*/ // end ✅ MIGRÉ - PlayerDrop
 
-public String PlayerRemove(Player p) {  // used in inscriptions_other_players.xhtml
- try{
-           LOG.debug("entering PlayerRemove");
-           LOG.debug("Player to remove from droppedPlayers = " + p);
-  //      player.getDroppedPlayers().forEach(item -> LOG.debug("before remove list of dropped Players =" + item.getIdplayer())); 
-  //        LOG.debug("Before remove, number of dropped players = " + player.getDroppedPlayers().size());
-        appContext.getPlayer().getDroppedPlayers().remove(p);
-   //         LOG.debug("After remove, droppedPlayers = " + droppedPlayers.toString());
-   //       LOG.debug("After remove, number of dropped players = " + player.getDroppedPlayers().size());
-        appContext.getPlayer().getDroppedPlayers(); // refresh screen
-   //     player.getDroppedPlayers().forEach(item -> LOG.debug("after remove list of dropped Players =" + item.getIdplayer())); 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+public String PlayerRemove(Player p) {
         return "inscriptions_other_players.xhtml?faces-redirect=true";
- }catch(Exception e){
-            String msg = "£££ Exception in PlayerRemove = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;
-  }
 } //end method PlayerRemove
+*/ // end ✅ MIGRÉ - PlayerRemove
     
     
 //new 16-09-201 remplace field round.roundPlayers
 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
 public List<Player> roundPlayersList() throws SQLException, Exception{
- //   LOG.debug("entering roundPlayersList");
- //   LOG.debug("with round =" + round);
-   lp = roundPlayersList.list(round); // migrated 2026-02-25
-   if(lp != null){
-       round.setPlayersString(Round.fillRoundPlayersString(lp));
-   }
+   lp = roundPlayersList.list(round);
+   if(lp != null) round.setPlayersString(Round.fillRoundPlayersString(lp));
    return lp;
 }
+*/ // end ✅ MIGRÉ - roundPlayersList
 
 /* migrated on 2026-02-24 — now in Controller.refact.RoundController
 public String createInscriptionOtherPlayers(){
@@ -3675,78 +2815,13 @@ public String createPassword() throws Exception{     // used in password_create.
 }    
 }// end method
 */
-  public String validateExistingPassword() throws SQLException { // coming from password_modify
-      // used in modify_password_.xhtml pour afficher 2e panelGrid
-try{
-        LOG.debug("entering validateExistingPassword");
-        LOG.debug(" with player = " + appContext.getPlayer());
-        LOG.debug(" with password = " + password);
-        LOG.debug(" with currentPassword = " + password.getCurrentPassword());  // user input to be validated
-        Password passwordtrf = password;
-     //   LOG.debug("password Player = " + player.getPlayerPassword());
-     // modifications suite passage à record depuis class
-     // EPlayerPassword epp = new EPlayerPassword(); old
-      EPlayerPassword epp = new EPlayerPassword(appContext.getPlayer(), password);
-   //   epp.player(player);2026
-    //  epp.setPassword(password);2026
-        LOG.debug("password transfered to ReadPlayer= " + epp.password());
-        
-    //  epp = new read.ReadPlayer().read(epp, conn); 
-      epp = playerManager.readPlayerWithPassword(epp.getPlayer().getIdplayer()); 
-      
-// 2e version, la première reste valable output = player only
-        LOG.debug("epp returned from LoadPlayer = " + epp);
-      password = epp.password();
-      password.setCurrentPassword(passwordtrf.getCurrentPassword());
-   //   epp.setPassword(password);
-   
-      epp = epp.withPassword(password); // record 2026 à modifier une seconde fois !!
-      
-        if(new find.FindPassword().passwordMatch(epp, conn)){   // is true
-                String msg = "existing password correct ! ";
-                  LOG.debug(msg);
-  ///                password.setShowCurrentPassword(true);
-//                  player.setWrkpassword(""); //fonctionne mais inutile
-// aller vers create-password directement
-                  passwordVerification("OK");
-                  return "password_create.xhtml?faces-redirect=true";
-        }else{
-                  String msg = "validateExistingPassword : old password NOT correct ! ";
-                  LOG.error(msg);
-           //       LCUtil.showMessageFatal(msg);
-                  passwordVerification("KO");  // blocage 15 min après 3 erreurs
-                  return null;
-             } 
-   }catch(Exception ex){
-    String msg = "validateExistingPassword Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public String validateExistingPassword() throws SQLException { ... }
+*/
   
-public String modifyPassword() throws SQLException, Exception{
- try{
-        LOG.debug("entering modifyPassword");
-        LOG.debug("with entite Password = " + password);
-  //  EPlayerPassword epp = new EPlayerPassword();
-    EPlayerPassword epp = new EPlayerPassword(appContext.getPlayer(), password); // 2026
- //   epp.setPassword(password);
- //   epp.setPlayer(player);
-    if(updatePassword.update(epp)){ // true
-        LOG.debug("boolean returned from modifyPassword is 'true' ");
-        return "login.xhtml?faces-redirect=true";
-    }else{
-        LOG.debug("boolean returned from modifyPassword is 'false' ");
-        return null;
-    }
-  }catch(Exception ex){
-        String msg = "modify Password Exception ! " + ex;
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return null;
-}    
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public String modifyPassword() throws SQLException, Exception { ... }
+*/
 
 /* migrated on 2026-02-25 — now in Controller.refact.MemberController
 public String findTarifGreenfeeEcl(ECourseList ecl){
@@ -3755,32 +2830,13 @@ public String findTarifGreenfeeEcl(ECourseList ecl){
 
 
 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
 public String findWeather(){
- try{
-    LOG.debug("starting findWeather");
-    LOG.debug("club = " + club.toString());
-    LOG.debug("player = " + appContext.getPlayer().toString());
-    LOG.debug("round = " + round.toString());
-        LOG.debug("just before findWeather");
- //   String weather = new find.FindWeather().currentWeatherByCityName(club);
-    String weather = new find.FindOpenWeather().find(club, conn); // new 03-11-2021 openweather
-    if(weather == null){
-          LOG.debug("Weather returned from findWeather is null ");
-       inscription.setWeather("Weather returned from findWeather is null");
-    } else{
-          LOG.debug("weather data is  OK = " + weather);
-         //        DialogController.showWeather();
-      inscription.setWeather(weather);
-      inscription.setShowWeather(true);
-    } 
-     return null; // to inscription.xhtml
-  }catch(Exception ex){
-    String msg = "finWeather Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-}  //end method   
+    String weather = findOpenWeather.find(club);
+    inscription.setWeather(weather);
+     return null;
+}  //end method
+*/ // end ✅ MIGRÉ - findWeather   
 
 /* migrated on 2026-02-25 — now in Controller.refact.MemberController
 public String selectTarif(ECourseList ecl){
@@ -3874,37 +2930,9 @@ public String inputTarifGreenfee(String param){
 }
 */
 
- public String createUnavailablePeriod(){
-try{   // from unavailable_period.xhtml
-        LOG.debug("entering createUnavailablePeriod!");
-       LOG.debug("entering createUnavailablePeriod for club = " + club);
-   //   unavailablePeriod.setIdclub(club.getIdclub()); 
-      unavailable.period().setIdclub(club.getIdclub()); 
-        String msg = "Indisponibilité to be created = " + unavailable.period();
-        LOG.info(msg);
-    //    showMessageInfo(msg);
-     
-    if(createUnavailablePeriod.create(unavailable.period())){
-        unavailable.period().setStartDate(null);  // presentation screen
-        unavailable.period().setEndDate(null);    // presentation screen
-        msg = "Unavailable Period created = " + unavailable.period();
-        LOG.info(msg);
-        showMessageInfo(msg);
-        return null;
-    }else{
-        msg = "Unavailable is NOT created !";
-        LOG.debug(msg);
-        showMessageFatal(msg);
-        return null;
-    }
-}catch(Exception ex){
-    String msg = "Exception in createUnavailable! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-//return null; // à modifier
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+ public String createUnavailablePeriod(){ ... }
+*/
  
 /* migrated on 2026-02-25 — now in Controller.refact.MemberController
 public String createTarifMembers() throws SQLException, Exception{
@@ -3926,25 +2954,9 @@ public String inputTarifMembersEquipments() throws SQLException, Exception{
 }
 */
 
-  public String inputUnvailableStructure() throws SQLException, Exception{  // used in unavailable_structure.xhtml
-try{
-    LOG.debug("entering inputUnvailableStructure !");
-        LOG.debug("entering inputUnvailableStructure for club = " + club);
-        LOG.debug("entering inputUnvailableStructure for unavailable = " + unavailable);
-         // TODO aller vers UnavailableController
-        // was: unavailable = new UnavailableController().inputUnvailableStructure(unavailable);
-        unavailable = unavailableController.inputUnvailableStructure(unavailable); // migrated 2026-02-24
-        LOG.debug("back from inputUnvailableStructure with unavailable = " + unavailable);
- //       LOG.debug("Unavailable itemStructure = "  + Arrays.deepToString(club.getUnavailableStructure().getItemStructure()));
-   return null; // retourne d'où il vient
-
-}catch(Exception ex){
-    String msg = "inputUnvailableStructure Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}
-} // end method   
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+  public String inputUnvailableStructure() throws SQLException, Exception{ ... }
+*/
  
 
 /* migrated on 2026-02-25 — now in Controller.refact.MemberController
@@ -3952,141 +2964,32 @@ public String showTarifMembers() throws SQLException, Exception{
 }
 */
 
-public String showUnavailableStructure() throws SQLException{
-try{
-  //   LOG.debug("entering showUnavailableStructure !");
-     LOG.debug("entering showUnavailableStructure for unvailable = " + unavailable);
-  //   club.getUnavailableStructure().RemoveNull(); // remove null from arrays
-      String msg = LCUtil.prepareMessageBean("unavailable.structure.show")
-        + "<br/> Unavailable Structure = " 
-   //           + Arrays.deepToString(club.getUnavailableStructure().getItemStructure())
-              + unavailable.structure().getStructureList().toString()
-//        + "<br/> date debut = " +  unavailable.getStructure().getStartDate()
- //       + "<br/> date fin = " +  unavailable.getStructure().getEndDate()
-        ;
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String showUnavailableStructure() throws SQLException{ ... }
+*/
 
-        LOG.info(msg);
-        showMessageInfo(msg);
-   //      return "tarif_members_menu.xhtml?faces-redirect=true";
-        return null; // fonctionne pas j'essaie
-        
-}catch(Exception ex){
-    String msg = "Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-} // end method    
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String showUnavailablePeriod(){ ... }
+*/
 
-public String showUnavailablePeriod() {   // version 1 method overloading sans paramètre from unavailable_show.xhtml
-try{
-      LOG.debug("entering showUnavailablePeriods for club = " + club);
-  //    LOG.debug("entering showUnavailablePeriods for ecl = " + ecl);
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public EUnavailable showUnavailablePeriods() throws SQLException{ ... }
+*/
 
-      // was: EUnavailable lun = new lists.UnavailableListForDate().list(LocalDateTime.now(), club, conn);
-      EUnavailable lun = unavailableListForDate.list(LocalDateTime.now(), club); // migrated 2026-02-24
-  // 3 linges suivantes le 06-06-2020
-   //  if(lun.isEmpty()){   //? works ??
-   LOG.debug("line 01");
-     if(lun == null){  
-         LOG.debug("pas de période d'indisponibilité");
-         unavailable = null;
-     }else{
-         unavailable = lun; //.get(0);   // first element of the list
-         String msg = "showUnavailablePeriods - first element of list is = " + lun.toString();
-         LOG.debug(msg);
-         showMessageInfo(msg);
-  //       DialogController.showUnavailable(); // new 22-01-2021 fonctionne pas !
-         return "unavailable_show.xhtml?faces-redirect=true";
-     }
- return null;
-  
-}catch(Exception ex){
-    String msg = "Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-} // end method    
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String showUnavailablePeriods(Club c) throws SQLException{ ... }
+*/
 
-public EUnavailable showUnavailablePeriods() throws SQLException{   // version 2 method overloading sans paramètre from unavailable_show.xhtml
-try{
-      LOG.debug("entering showUnavailablePeriods for club = " + club);
-  //    LOG.debug("entering showUnavailablePeriods for ecl = " + ecl);
-     // was: unavailable = new lists.UnavailableListForDate().list(LocalDateTime.now(), club, conn);
-     unavailable = unavailableListForDate.list(LocalDateTime.now(), club); // migrated 2026-02-24
-//        LOG.debug("showUnavailablePeriods - first element of list is = " + lun.get(0).toString());
-   return unavailable;
-}catch(Exception ex){
-    String msg = "Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-} // end method    
-
-public String showUnavailablePeriods(Club c) throws SQLException{   // version 1 method overloading sans paramètre from unavailable_show.xhtml
-try{
-        LOG.debug("entering showUnavailablePeriods for club input = " + c);
-     // was: EUnavailable lun = new lists.UnavailableListForDate().list(LocalDateTime.now(), c, conn);
-     EUnavailable lun = unavailableListForDate.list(LocalDateTime.now(), c); // migrated 2026-02-24
-     if(lun == null){
-         LOG.debug("lun is null");
-         LOG.debug("no unavailabilities known");
-         unavailable = null;
-         return "unavailable_show.xhtml?faces-redirect=true";
-     }else{
-         unavailable = lun;
-            LOG.debug("showUnavailablePeriods -  element is = " + lun);
-         return "unavailable_show.xhtml?faces-redirect=true";
-     }
-}catch(Exception ex){
-    String msg = "Exception in showUnavailablePeriods!! " + ex;
-    LOG.error(msg);
-    showMessageFatal(msg);
-    return null;
-}    
-} // end method    
-
-public String showUnavailablePeriods(ECourseList ecl) throws SQLException{
-    // version 2 method overloading from selectInscription.xhtml
-try{
-  //    LOG.debug("entering showUnavailablePeriods for ecl = " + ecl);
-    club = ecl.club();
-    // was: EUnavailable lun = new lists.UnavailableListForDate().list(LocalDateTime.now(), ecl.club(), conn);
-    EUnavailable lun = unavailableListForDate.list(LocalDateTime.now(), ecl.club()); // migrated 2026-02-24
-       LOG.debug("showUnavailablePeriods -  element of list is = " + lun);
-    return "unavailable_show.xhtml?faces-redirect=true";
-}catch(Exception ex){
-    String msg = "Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
-} // end method    
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+public String showUnavailablePeriods(ECourseList ecl) throws SQLException{ ... }
+*/
 /* migrated on 2026-02-25 — now in Controller.refact.RoundController
     public String selectedCompetitionScoreStableford(ECompetition ec) throws SQLException { ... }
 */
  
-public String selectedScoreToRegister(ECourseList ecl, String type) throws SQLException { // used in selectStablefordRounds.xhtml
-    LOG.debug(" ... entering selectedScoreToRegister with CURRENT player = " + appContext.getPlayer().getIdplayer()); 
-    LOG.debug("with ecl = " + ecl);
-    LOG.debug("with type = " + type);
- try{
-     round = ecl.round();
-     if(Round.GameType.STABLEFORD.toString().equals(round.getRoundGame())){
-           return LoadScoreStableford(ecl, type);
-     }
-
-     LOG.debug("!!! No register score for = " + round.getRoundGame());
-        return null;  // fake
-}catch(Exception ex){
-    String msg = "scoreStableford Exception ! " + ex;
-   LOG.error(msg);
-   showMessageFatal(msg);
-   return null;  
-}
-}
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String selectedScoreToRegister(ECourseList ecl, String type) throws SQLException { ... }
+*/
 /* migrated on 2026-02-25 — now in Controller.refact.RoundController
     public String RegisterScoreMatchplay(ECourseList ecl, String type) throws SQLException { ... }
 */
@@ -4150,96 +3053,13 @@ try{
 }    
 } // end method    
 */
- public String LoadScoreStableford(ECourseList ecl, String type) throws SQLException {    // used in selectStablefordRounds.xhtml
-   try{
-          LOG.debug(" ... entering LoadScoreStableford "); 
-          LOG.debug("   with type = " + type);
-          LOG.debug(" ..with ecl = " + ecl);
-     //     LOG.debug(" ..with player = " + player);
-        club = ecl.club();
-        course = ecl.course();
-        round = ecl.round();
-        
-     //       LOG.debug("round = " + round);
-    //        LOG.debug("RoundGame = " + round.getRoundGame());
-        tee = ecl.tee();
-        if(type.equals("competition")){
-            appContext.getPlayer().setIdplayer(ecl.player().getIdplayer());
-            appContext.getPlayer().setPlayerLastName(ecl.player().getPlayerLastName());
-            appContext.getPlayer().setPlayerFirstName("???");
-            appContext.getPlayer().setPlayerGender(ecl.player().getPlayerGender());
-            round.setIdround(ecl.round().getIdround());
-            course.setIdcourse(ecl.course().getIdcourse());
-            club.setIdclub(ecl.club().getIdclub());
-        }
-     //  scoreStableford = new StablefordController().completeScoreStableford(appContext.getPlayer(), round, ecl.tee(),conn);
-        scoreStableford = new StablefordController().completeScoreStableford(appContext.getPlayer(), round, ecl.tee());
-    //      LOG.debug("we use this completed scoreStableford = " + scoreStableford); 
-   sessionMap.put("scoreType", "INDIVIDUAL");
- return "score_stableford.xhtml?faces-redirect=true";
-  }catch(Exception ex){
-    String msg = "LoadScoreStableford Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-} finally{
-    //    player = player_save;
-           LOG.debug("player restored to : " + appContext.getPlayer().getIdplayer());
-//return 0;
-}    
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String LoadScoreStableford(ECourseList ecl, String type) throws SQLException { ... }
+*/
 
-public String calculateScoreStableford() throws SQLException, Exception{
-     final String methodName = utils.LCUtil.getCurrentMethodName(); 
-   LOG.debug("entering " + methodName);
- //  LOG.debug("with param = " + param);
-   LOG.debug(" for Round = " + round);
-   LOG.debug(" for Course = " + course);
-   LOG.debug(" for current Player = " + appContext.getPlayer());
-   LOG.debug(" with scoreType = " + sessionMap.get("scoreType")); // COMPETITION or INDIVIDUAL
-   LOG.debug(" with competition Player = " + sessionMap.get("competitionPlayer"));
-   LOG.debug(" for competition = " + competition);
-try{
-//       LOG.debug(" entering with score = " + scoreStableford);
-        Player p;
-  if(sessionMap.get("scoreType").equals("COMPETITION")){
-         LOG.debug("handling with scoreType = " + sessionMap.get("scoreType"));
-      int playerid = Integer.parseInt(sessionMap.get("competitionPlayer").toString());
-      p = new Player();
-      p.setIdplayer(playerid);
-   //   p = new read.ReadPlayer().read(p, conn);
-      p = playerManager.readPlayer(p.getIdplayer());
-  }else{ // is INDIVIDUAL
-       LOG.debug("handling with scoreType = " + sessionMap.get("scoreType"));
-      p = appContext.getPlayer();
-  }
-  
-      if(round.getRoundDate().isBefore(START_DATE_WHS) ){
-          String msg = "EGA Handicapping ! - THIS part is invalidated !";
-          LOG.error(msg);
-          showMessageFatal(msg);
-          return null;
-      }//else{
-           LOG.debug(" going to calculations ! " );
-     // old   scoreStableford = calc.CalcScoreStableford.calc(p, scoreStableford, round, course, tee, conn);
-         // new 16/1/2026 passage à CDI
-         scoreStableford = calcScoreStableford.calc(p, scoreStableford, round, course, tee, conn); 
-         
-         
-        // setScoreList(scoreStableford.getScoreList());
-         LOG.debug("scoreStableford completed = " + scoreStableford);
-         
-    // } //end else
-
-//   return null; mod 01/07/2022
-     return "score_stableford.xhtml?faces-redirect=true";
-}catch(Exception ex){
-    String msg = "Exception in calculateScoreStableford() " + ex;
-   LOG.error(msg);
-   showMessageFatal(msg);
-   return null;
-}    
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String calculateScoreStableford() throws SQLException, Exception { ... }
+*/
 /*
 public String calculateScoreMatchplay() throws SQLException, Exception{
      final String methodName = utils.LCUtil.getCurrentMethodName(); 
@@ -4266,47 +3086,13 @@ try{
 }    
 } // end method
 */
-public String loadStatisticsTable() throws SQLException, Exception{  // executed before include_statistics.xhtml
-   LOG.debug("entering loadStatisticsTable() !");
-try{
-          LOG.debug("scoreStableford = " + scoreStableford);
-       var v = new read.ReadStatisticsList().load(appContext.getPlayer(), round);
-       scoreStableford.setStatisticsList(v);
-       if(utils.LCUtil.isArrayAllZeroes(scoreStableford.getStrokeArray())){
-           int[] arr = scoreStableford.getScoreList().stream().mapToInt(i -> i.getStrokes()).toArray(); // create array from list
-           scoreStableford.setStrokeArray(arr);
-       }
-   var v1 = new StablefordController().completeStatisticsListWithStrokes(scoreStableford.getStatisticsList(), scoreStableford.getStrokeArray());
-   //    var v1 = new StablefordController().completeStatisticsListWithStrokes(scoreStableford.getStatisticsList(), arr);
-       scoreStableford.setStatisticsList(v1);
-    return "score_statistics.xhtml?faces-redirect=true";
-}catch(Exception ex){
-    String msg = "Exception in loadStatisticsTable()! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String loadStatisticsTable() throws SQLException, Exception { ... }
+*/
 
-public String createStatisticsStableford() throws SQLException{
-        LOG.debug(".. entering createStatisticsStableford");
-        LOG.debug("round = " + round);
-        LOG.debug("scoreStableford = " + scoreStableford);
-   //     LOG.debug("array statistics [][] = " + Arrays.deepToString(scoreStableford.getStatistics()));
-        LOG.debug("List statistics = " + scoreStableford.getStatisticsList().toString());
-        
-    if(createStatisticsStableford.create(appContext.getPlayer(), round, scoreStableford)){       // migrated 2026-02-24
-      //  String msg = "statistics created !! " + Arrays.deepToString(scoreStableford.getStatistics());
-         String msg = "statistics created !! " ; //+ scoreStableford.getStatisticsList().toString();
-  //       scoreStableford.setStatisticsList(null); // new 28/06/2022
-        LOG.debug(msg);
-        showMessageInfo(msg);
-        setNextScorecard(true); // affiche le bouton next(Scorecard) bas ecran à  droite
-    }else{
-        LOG.debug("statistics NOT created : error !!");
-    }
-  return null;
-}
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String createStatisticsStableford() throws SQLException { ... }
+*/
 
 /* migrated on 2026-02-24 — now in Controller.refact.RoundController
 public String createScoreStableford() throws SQLException, Exception{
@@ -4375,32 +3161,9 @@ return null;
 } // end method
 */
 
-public String createHandicapIndex(){
-     final String methodName = utils.LCUtil.getCurrentMethodName(); 
-   LOG.debug("entering " + methodName);
-   LOG.debug(" for ScoreStableford = " + scoreStableford);
-   LOG.debug("for HandicapIndex = " + appContext.getHandicapIndex()); // est non complété
-try{
-      if(! round.getRoundQualifying().equals("Y")){
-          String msg ="No HandicapIndex creation because Round is not Qualifying !";
-          LOG.error(msg);
-          showMessageFatal(msg);
-          return null;
-      } //else{
-
-     // handicapIndex = new Controllers.HandicapController().create(scoreStableford,appContext.getPlayer(),round, conn);
-      appContext.setHandicapIndex(handicapController.create(scoreStableford,appContext.getPlayer(),round));
-      if(appContext.getHandicapIndex() == null){
-          LOG.debug("handicapIndex is null in CourseController");
-      }
-  return "score_stableford.xhtml?faces-redirect=true";
-}catch(Exception ex){
-    String msg = "Exception in createHandicapIndex " + ex;
-   LOG.error(msg);
-   showMessageFatal(msg);
-   return null;
-}    
-} // end method    
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String createHandicapIndex() { ... }
+*/    
 /*
 public void createScoreMatchplay() throws SQLException{
 try{
@@ -4427,43 +3190,13 @@ try{
 }
 } // end method
  */
-public void validateScoreHoleMatchplay2(){
-    LOG.debug("entering validateScoreHoleMatchplay2 for hole = " );
-}
+/* migrated on 2026-02-25 -- now in Controller.refact.RoundController (roundC)
+   public void validateScoreHoleMatchplay2(){
+*/
         
-public void validateScoreHoleMatchplay(FacesContext context, UIComponent toValidate, Object value)
-      throws ValidatorException
-{
-LOG.debug("entering validateScoreHoleMatchplay");
-    LOG.debug("entering validateScoreMatchPlay - toValidate ClientId = " + toValidate.getClientId() );
-    LOG.debug("entering validateMP4 - toValidate Id = " + toValidate.getId() );
-    LOG.debug("entering validateMP4 - toValidate ClientId = " + toValidate.getClientId() );
-    LOG.debug("entering validateMP4 - value = " + value.toString());
-    LOG.debug("UIcomponent, getFamily = " + toValidate.getFamily());
-    LOG.debug("UIcomponent, context = " + context.toString());
-    LOG.debug("UIcomponent,message = " + toValidate.getClientId(context)); 
-    String confirm = (String)value;
-    
-    String field1Id = (String) toValidate.getAttributes().get("scorePlayer11");
-         LOG.debug(" validateMP4 - field1Id = " + field1Id);
-         
-    UIInput passComponent = (UIInput) context.getViewRoot().findComponent(field1Id);
-         LOG.debug(" validateMP4 - passComponent = " + passComponent);
-    String pass = (String) passComponent.getSubmittedValue();
-        LOG.debug(" validateMP4 - pass1 = " + pass);
-    if (pass == null){
-        pass = (String) passComponent.getValue();
-         LOG.debug(" validateMP4 - pass2 = " + pass);
-    }
-    
-    if (!pass.equals(confirm)){
-        LOG.debug(" validateMP4 - pass not equal confirm = " );
-        String error = toValidate.getClientId(context);
-        showMessageFatal(error);
-   //     String err = Application.getMessage(context, UsersDialog.ERROR_PASSWORD_MATCH);
-     //   throw new ValidatorException(new FacesMessage(err));
-    }
-}
+/* migrated on 2026-02-25 -- now in Controller.refact.RoundController (roundC)
+   public void validateScoreHoleMatchplay(FacesContext context, UIComponent toValidate, Object value)
+*/
     
 
 
@@ -4483,25 +3216,13 @@ public void setValues(String strokes) {
         VALUES.set(5, Integer.parseInt(strokes));
     }
 
-public String show_scorecard_empty(ECourseList ecl) throws SQLException{
-        LOG.debug("entering show_scoreCard_empty with :!" + ecl.toString() );
-    club.setIdclub(ecl.club().getIdclub());
-    course.setIdcourse(ecl.course().getIdcourse());
-    // à verifier
-    return showScoreList.show_empty(appContext.getPlayer(), club, course, round, inscription);   // migrated 2026-02-24
-}
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String show_scorecard_empty(ECourseList ecl) throws SQLException { ... }
+*/
 
-  public List<ECourseList> listRecentRounds() {
-        LOG.debug("...  entering listRecentRounds " );
-   try {
-        return recentRoundList.list(appContext.getPlayer()); // migrated 2026-02-24
- 
-   } catch (Exception ex) {
-            LOG.error("Exception ! " + ex);
-            showMessageFatal("Exception = " + ex.toString());
-            return null;
-     }
-    } //end method
+  /* migrated on 2026-02-25 -- now in Controller.refact.RoundController (roundC)
+   public List<ECourseList> listRecentRounds() {
+*/
   
     public List<ECourseList> listProfessionalForClub() {
         LOG.debug("...  entering listProfessionalForClub " );
@@ -4603,7 +3324,8 @@ public List<Flight> listFlights(){
        }
  //  1  ---------------- recherche sunrise et sunset 
  
-      Flight flight2 = new lists.SunriseSunsetList().list(round, club);
+      // Flight flight2 = new lists.SunriseSunsetList().list(round, club);
+      Flight flight2 = sunriseSunsetList.list(round, club); // migrated 2026-02-26
         LOG.debug("flight2 = " + flight2);
       if(flight2 == null){
           LOG.debug("flight is null !! cata");
@@ -4613,17 +3335,20 @@ public List<Flight> listFlights(){
  // 2 ------------------  creation tableFlights : 1 record toutes les 12 min en partant de sunrise jusque sunset
     //    LOG.debug("timeZone tz = " + club.getClubZoneId());
   //  liste avec tousl les flights de la journée
-      flightList = new lists.AllFlightsList().createTableFlights(flight2, club.getAddress().getZoneId());  // à changer  dans address.
+      // flightList = new lists.AllFlightsList().createTableFlights(flight2, club.getAddress().getZoneId());
+      flightList = allFlightsList.createTableFlights(flight2, club.getAddress().getZoneId()); // migrated 2026-02-26
  
       //   flightList.forEach(item -> LOG.debug("FlightList list " + item));
         LOG.debug("step 2-list created , size = " + flightList.size());
     //  boolean OK = new create.CreateTableFlights().create(flightList, course.getIdcourse(), conn);  // fake = courseid
     
-       if(new create.CreateTableFlights().create(flightList, course)){
+       // if(new create.CreateTableFlights().create(flightList, course)){
+       if(createTableFlights.create(flightList, course)){ // migrated 2026-02-26
             LOG.debug("boolean result create.CreateFlights = OK");
             // elimination des flights déjà réservés    
          //   flightList.forEach(item -> LOG.debug("FlightList list before " + item));
-            flightList = new lists.FlightAvailableList().listAllFlights();
+            // flightList = new lists.FlightAvailableList().listAllFlights();
+            flightList = flightAvailableList.listAllFlights(); // migrated 2026-02-26
        //     flightList.forEach(item -> LOG.debug("FlightList list after " + item));
       //  LOG.debug("flightList returned = " + flightList);
          return flightList;
@@ -4680,27 +3405,17 @@ public List<ECourseList> listPlayedRounds() throws SQLException {
     public List<ECourseList> registerStablefordResult() { ... }
 */
 
-public String to_selectMatchplayRounds_xhtml(String s) {
-            LOG.debug("entering to_ ... with string = " + s);
-            reset(s);
-   //    return "selectMatchplayRounds.xhtml?faces-redirect=true&game=matchplay&operation=create";
-       return "selectMatchplayRounds.xhtml?faces-redirect=true";
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String to_selectMatchplayRounds_xhtml(String s) { ... }
+*/
 
-public String to_creditcard_test_xhtml(String s) {
-            LOG.debug("entering to_ ... with string = " + s);
-            reset(s);
-            creditcard.setTotalPrice(155.6);
-            creditcard.setCommunication(" prepared creditcard communication");
-            creditcard.setCreditcardType("GREENFEE");
-       return "creditcard_test.xhtml?faces-redirect=true";
-   }
-public String to_stableford_playing_hcp_xhtml(String s) {
-            LOG.debug("entering to_ ... with string = " + s);
-            reset(s);
-            playingHcp = new PlayingHandicap();
-       return "stableford_playing_hcp.xhtml?faces-redirect=true";
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public String to_creditcard_test_xhtml(String s) { ... }
+*/
+
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String to_stableford_playing_hcp_xhtml(String s) { ... }
+*/
 public String to_selectPlayer_xhtml(String s) {
             LOG.debug("entering to selectPlayer_xhtml... with string = " + s);
             sessionMap.put("inputSelectHomeClub", s); 
@@ -4708,23 +3423,17 @@ public String to_selectPlayer_xhtml(String s) {
        return "selectPlayer.xhtml?faces-redirect=true";
    }
 
-public String to_selectScrambleRounds_xhtml(String s){
-            LOG.debug("entering to_selectScrambleRounds_xhtml ... with string = " + s);
-            reset(s);
-   //    return "selectMatchplayRounds.xhtml?faces-redirect=true&game=matchplay&operation=create";
-       return "selectScrambleRounds.xhtml?faces-redirect=true";
-   }
-public String to_selectRegisteredRounds_xhtml(String s){
-            LOG.debug("entering to_selectRegisteredRounds_xhtml with String = " + s);
-       reset(s);
-       return "selectRegisteredRounds.xhtml?faces-redirect=true&cmd=" + s;
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String to_selectScrambleRounds_xhtml(String s) { ... }
+*/
 
-public String to_selectParticipantsRound_xhtml(String s){
-            LOG.debug("entering to_selectParticpantsRound_xhtml with String = " + s);
-       reset(s);
-       return "select_participants_round.xhtml?faces-redirect=true&cmd=" + s;
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String to_selectRegisteredRounds_xhtml(String s) { ... }
+*/
+
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String to_selectParticipantsRound_xhtml(String s) { ... }
+*/
 
 /* just for testing from menu TEST
 public String to_select_tarifMembers_xhtml(Integer i) throws SQLException {
@@ -4737,6 +3446,7 @@ public String to_select_tarifMembers_xhtml(Integer i) throws SQLException {
 
 
 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
 public String to_select_inscription_xhtml(String s) throws Exception {
     try{
                 LOG.debug("entering to_select_inscription_round ... with string = " + s);
@@ -4764,17 +3474,20 @@ public String to_select_inscription_xhtml(String s) throws Exception {
             return null;
     }
 }
+end migrated to_select_inscription_xhtml */
+
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
 public String to_select_round_xhtml(String s) throws Exception {
     try{
                 LOG.debug("entering to_select_round_xhtml ... with string = " + s);
             setFilteredInscriptions(null);
             reset(s);
-       if(s.equals("INSCRIPTION")){ 
+       if(s.equals("INSCRIPTION")){
               LOG.debug("handling inscription !");
            sessionMap.put("inputSelectRound", s);
               LOG.debug("sessionMap : inputSelectRound = " + sessionMap.get("inputSelectRound"));
            return "selectRound.xhtml?faces-redirect=true";}
-   /*    if(s.equals(Round.GameType.STABLEFORD.toString()))
+   //    if(s.equals(Round.GameType.STABLEFORD.toString()))
             { return "selectInscription.xhtml?faces-redirect=true&cmd=" + s;}
        if(s.equals(Round.GameType.SCRAMBLE.toString()))   //  Ã  implémenter pu alors autre solution chacun s'inscrit isolÃ©ment et on regroupe ensuite ...
             { return "selectInscription.xhtml?faces-redirect=true&cmd=" + s;}
@@ -4786,21 +3499,24 @@ public String to_select_round_xhtml(String s) throws Exception {
             return "select_competition_player.xhtml?faces-redirect=true&cmd=" + s;}
        if(s.equals("TEST")){ 
             return "select_competition_player.xhtml?faces-redirect=true&cmd=" + s;}
-*/
- return "playing formule not found";   
+
+ return "playing formule not found";
  } catch (Exception ex) {
             LOG.error("Exception in to_select_inscription_xhtml! " + ex);
             showMessageFatal("Exception = " + ex.toString());
             return null;
     }
 }
+end migrated to_select_round_xhtml */
 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
 public String to_selectStablefordRounds_xhtml(String s) {
             LOG.debug("entering to_selectStablefordRounds_xhtml with string = " + s);
             reset(s);
   //          scoreStableford.setStatisticsList(null);
        return "selectStablefordRounds.xhtml?faces-redirect=true";
    }
+end migrated to_selectStablefordRounds_xhtml */
 /*
 public String to_show_played_rounds_xhtml(String s){
        LOG.debug("entering to_show_played_rounds_xhtml with string s = " + s);
@@ -4838,35 +3554,17 @@ public void to_selenium_createClub(String s) throws IOException{
    // à modifier    
     }
 */
-public String to_course_xhtml(String s) {
-        LOG.debug("entering to_course_xthml ... with string = " + s);
-            reset(s);
-       course.setCreateModify(true);  // gestion button dans ccourse.xhtml
-       return "course.xhtml?faces-redirect=true&operation=" + s;
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public String to_course_xhtml(String s) { ... }
+*/
 
-public String to_tee_xhtml(String s) {
-        LOG.debug("entering to_tee_xthml ... with string = " + s);
-            reset(s);
-       tee.setCreateModify(true);  // gestion button dans tee.xhtml
-       return "tee.xhtml?faces-redirect=true&operation=" + s;
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public String to_tee_xhtml(String s) { ... }
+*/
 
-public String to_clubModify_xhtml(String s){
-        LOG.debug("entering to_clubModify_xhtml ... with string = " + s);
-       reset("clubRestart " + s);
-       tee.setModifyClubCourseTee(true);
-       sessionMap.put("inputSelectClub", s);
-    //   if (s.equals("modify_club_improved")){
-       if (s.equals("clubModify")){    
-           return "selectClubModify.xhtml?faces-redirect=true";
-       }else{
-           sessionMap.put("inputSelectCourse", s);
-           return "modify_ClubCourseTee.xhtml?faces-redirect=true";
-       }
-  // 02-04     course.setInputSelectCourse(s);
-       
-   }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public String to_clubModify_xhtml(String s) { ... }
+*/
 
 /*
 public String to_clubDelete_xhtml(String s){
@@ -4882,11 +3580,13 @@ public String to_clubDelete_xhtml(String s){
        return "deleteClubCourseTee.xhtml?faces-redirect=true";
    }
 */
+/* dead code — commented Phase 3B 2026-02-25 — not referenced in any active XHTML
 public String to_player_xhtml(String s){
          LOG.debug("entering to_player_xthml ... with string = " + s);
        reset(s);
        return "player.xhtml?faces-redirect=true";
    }
+*/
 
 // ✅ MIGRÉ vers PlayerController (playerC) - to_player_modify — 2026-02-25
 /*
@@ -4904,20 +3604,23 @@ public String to_show_handicap_whs_xhtml(String s){
          return "show_handicap_whs.xhtml?faces-redirect=true";
    }
 */
+/* dead code — commented Phase 3B 2026-02-25 — not referenced in any active XHTML
 public String to_delete_player_xhtml(String s) throws Exception {
         LOG.debug("entering to_delete_player ... with string = " + s);
         reset(s);
         setDeletePlayer(Integer.parseInt(s));
        return "delete_cascading_player.xhtml?faces-redirect=true";
-   //         return "";
    }
-public String to_delete_club_xhtml(String s) throws Exception {    // not used
+*/
+
+/* dead code — commented Phase 3B 2026-02-25 — not referenced in any active XHTML
+public String to_delete_club_xhtml(String s) throws Exception {
             LOG.debug("entering to_delete_club ... with string = " + s);
         reset(s);
         setDeletePlayer(Integer.parseInt(s));
        return "delete_cascading_club.xhtml?faces-redirect=true";
-   //         return "";
    }
+*/
 // ✅ MIGRÉ vers PlayerController (playerC) - deleteCascadingPlayer — 2026-02-25
 /*
   public void deleteCascadingPlayer() throws SQLException, Exception{
@@ -4940,133 +3643,34 @@ public String to_delete_club_xhtml(String s) throws Exception {    // not used
 } //en dmethod create player
 */ // end ✅ MIGRÉ - deleteCascadingPlayer
 
-public String scorecard(ECourseList ecl) {
-  //  LOG.debug("Entering scorecard");// with ecl = " + ecl.toString());
-        LOG.debug("Entering scorecard with ecl = " + ecl.toDisplayString()) ; //toString());
-        club = ecl.club();
-        course = ecl.course();
-        round = ecl.round();
-        inscription = ecl.inscription();
-   //        LOG.debug("TeeStart from scorecard = " + inscription.getInscriptionTeeStart());
-        tee = ecl.tee();
-           LOG.debug("Tee is now = " + tee.toString());
-        String msg = "Select EcourseList Successful "
-                + " <br/> Club name = " + club.getClubName()
-                + " <br/> course name = " + course.getCourseName()
-                + " <br/> round = " + round.getIdround();
-        LOG.debug(msg);
- //       LOG.debug(" lists.ScoreCard3List.getListe() called = " + lists.ScoreCard3List.getListe());
- //       LOG.debug(" lists.ScoreCard2List.getListe() called = " + find.FindSlopeRating.getListe());
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String scorecard(ECourseList ecl) { ... }
+*/
 
-        return "scorecard.xhtml?faces-redirect=true";
- } //end scorecard
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String show_scorecard() throws SQLException, Exception { ... }
+*/
 
-public String show_scorecard() throws SQLException, Exception{
-        LOG.debug("entering show_scoreCard with round :!" + round); // 24-04-2020 is !N
-    // à faire différencier EGA et WHS    
-    // a faire = ne conserver que pour EGA
-       String[] list = null;
-       if(round.getRoundDate().isBefore(START_DATE_WHS) ){
-           LOG.info("this is an EGA round - nmore supported !!!");
-//           list = new Controllers.CalculateControllerEGA().calculate(player, round, course, tee, inscription, conn); // mod 27/05/2017
-           LOG.debug("after Calculate controller EGA = " + Arrays.deepToString(list));
-           if(list[0].equals("ERROR") ){
-             String msg = "Fatal error in CalculateController() " + Arrays.deepToString(list);
-             LOG.error(msg);
-             showMessageFatal(msg);
-             return null;
-          }else{
-              String msg = "CalculateControllerEGA is OK";
-              LOG.info(msg);
-    //          showMessageInfo(msg);
-              return "show_scorecard_ega.xhtml?faces-redirect=true";  // mod 05-04-2019
-          }
-       }else{
-           String msg = "this is a WHS round : "+ round.getIdround() + " on date = " + round.getRoundDate();
-           LOG.info(msg);
-           showMessageInfo(msg);
-           return "show_scorecard_whs.xhtml?faces-redirect=true";  // mod 05-04-2019
-       }    
-} // end show_scorecard
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ECourseList> ScoreCardList1EGA() throws SQLException, LCException, Exception { ... }
+*/
 
-public List<ECourseList> ScoreCardList1EGA() throws SQLException, LCException, Exception {
- try{
-        return scoreCardList1EGA.list(appContext.getPlayer(), round);                            // migrated 2026-02-24
- }catch (NullPointerException | SQLException ex){
-            String msg = "Exception in ScoreCardList1() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } finally {
- }
-} //end method
-
-public List<HandicapIndex> ScoreCardList1WHS() throws SQLException{
- try{
-     LOG.debug("entering ScoreCardList1WHS");
-//     LOG.debug("for handicapIndex = " + handicapIndex);
-//     LOG.debug("round = " + round);
-     appContext.getHandicapIndex().setHandicapPlayerId(appContext.getPlayer().getIdplayer());
-     appContext.getHandicapIndex().setHandicapDate(round.getRoundDate());
-  //   handicapIndex = new find.FindHandicapIndexAtDate().find(handicapIndex);
-     appContext.setHandicapIndex(new find.FindHandicapIndexAtDate().find(appContext.getHandicapIndex()));
-     
-    List<HandicapIndex> lhi = new ArrayList<>(); // faut une liste pour dataTable
-    lhi.add(appContext.getHandicapIndex());
-    return lhi;
- }catch (NullPointerException | SQLException ex){
-            String msg = "Exception in ScoreCardList1() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } finally {
- }
-} //end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<HandicapIndex> ScoreCardList1WHS() throws SQLException { ... }
+*/
 
 
-public List<ECourseList> ScoreCardList2() throws SQLException {
- try{  
-//   LOG.debug("entering ScoreCardList2");
-        // le nom est trompeur : fait beaucoup plus que son nom l'indique !
-      // was: return new find.FindSlopeRating().find(appContext.getPlayer(), round, conn);
-      return findSlopeRating.find(appContext.getPlayer(), round);  // migrated 2026-02-24
-    }catch (Exception ex){
-            String msg = "Exception in getScoreCardList2() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        } finally {
-      //  DBConnection.closeQuietly(conn, null, rs, ps);
-        }
-    } //end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ECourseList> ScoreCardList2() throws SQLException { ... }
+*/
 
-public List<ECourseList> ScoreCardList3() throws SQLException {
-   try{ 
-      LOG.debug("entering CourseC.ScoreCardList3");
-            return scoreCardList3.list(appContext.getPlayer(), round);                            // migrated 2026-02-24
-            
-  }catch (Exception ex){
-            String msg = "Exception in getScoreCardList3() " + ex;
-                LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-      } finally {
-      }
-    } //end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ECourseList> ScoreCardList3() throws SQLException { ... }
+*/
 
-public List<ScoreStableford.Score> ScoreCardList4() throws SQLException {
-   try{ 
-      LOG.debug("entering CourseC.ScoreCardList4");
-     ArrayList<ScoreStableford.Score> v1 = new read.ReadScoreList().read(appContext.getPlayer(),round,tee);
-   //    LOG.debug("result of readScoreList = " + v1);
-       return v1;
-  }catch (Exception ex){
-        String msg = "Exception in getScoreCardList3() " + ex;
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return null;
-  } finally { }
- } //end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ScoreStableford.Score> ScoreCardList4() throws SQLException { ... }
+*/
 
     public static boolean isShowButtonCreditCard() {
         return ShowButtonCreditCard;
@@ -5090,22 +3694,9 @@ public List<EPlayerPassword> listPlayers() throws SQLException {
         }
     } //end method
 */
-public void listSubscriptionRenewal(String s) throws SQLException {
-try {
-     LOG.debug("... entering listSubscriptionReneval " + s); // a quoi sert le s ? paramètre ?
-             // was: subscriptionRenewal = new lists.SubscriptionRenewalList().list(conn);
-             subscriptionRenewal = subscriptionRenewalList.list(); // migrated 2026-02-24
-    //         subscriptionReneval.forEach(item -> LOG.debug("liste " + item));  // java 8 lambda
-            String msg = "We send subscription Renewal Mails = " + subscriptionRenewal.size();
-            LOG.debug(msg);
-            LCUtil.showDialogInfo(msg);
-   } catch (Exception ex) {
-            String msg = "Exception in listSubscriptionRenewal " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-       //     return null;
-        } finally { }
-    } //end method        
+/* migrated on 2026-02-25 — now in Controller.refact.MemberController (memC)
+   public void listSubscriptionRenewal(String s) throws SQLException { ... }
+*/
         
  
 // ✅ MIGRÉ vers PlayerController (playerC) - validatePlayer — 2026-02-25
@@ -5115,25 +3706,9 @@ try {
 }
 */ // end ✅ MIGRÉ - validatePlayer
 
- public String creditCardMail() throws Exception{
-     LOG.debug("entering creditCardMail with creditcard typePayment = " + creditcard.getTypePayment());
-     // à faire : renvoyer le mail status dans l'écran 
-        if(Creditcard.etypePayment.GREENFEE.toString().equals(creditcard.getTypePayment())){
-  //         boolean ok = new mail.CreditcardMail().sendMailInscription(creditcard,tarifGreenfee, round, inscription);
-           if(new mail.CreditcardMail().sendMailGreenfee(appContext.getPlayer(), creditcard,tarifGreenfee, round, inscription)){
-               LOG.debug("");
-           }
-        }
-        if(Creditcard.etypePayment.SUBSCRIPTION.toString().equals(creditcard.getTypePayment())){
-            //creditCardSubscriptionMail();
-            boolean ok = new mail.CreditcardMail().sendMailSubscription(appContext.getPlayer(),creditcard, subscription);
-        }
-        if(Creditcard.etypePayment.COTISATION.toString().equals(creditcard.getTypePayment())){
-          //  creditCardCotisationMail();
-          boolean ok = new mail.CreditcardMail().sendMailCotisation(appContext.getPlayer(),creditcard, cotisation, club, tarifMember);
-        }
-     return "creditcard_payment_executed.xhtml?faces-redirect=true";
-  }
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public String creditCardMail() throws Exception { ... }
+*/
  /*
  public void createPlayer() {
     if (MIGRATION_PLAYER) { // 
@@ -5177,59 +3752,9 @@ public void createPlayer() throws SQLException, Exception{
 } //end method create player
 */
 
-public String createLocalAdministrator() throws SQLException, Exception{
- try{
-     LOG.debug("entering createLocalAdministrator");
-     LOG.debug(" for club = " + club);
-  //   LOG.debug(" with localAdmin = " + playerC.getLocalAdmin()); //null
-      LOG.debug(" with playerTemp = " + appContext.getPlayerTemp()); // new 05-02-2026
-      // pourquoi pas 
-    // Player p = new read.ReadPlayer().read(localAdmin,conn);
-    //  Player p = new read.ReadPlayer().read(appContext.getPlayerTemp(),conn);
-     Player localAdmin = playerManager.readPlayer(appContext.getPlayerTemp().getIdplayer());  // attention à vérifier !!!
-        LOG.debug("player role = " + localAdmin.getPlayerRole());
-     if(localAdmin.getPlayerRole().equals("PLAYER")){  // pas de modif si admin ou ADMIN donc on ne peut être localadmin que dans un club !!
-         localAdmin.setPlayerRole("admin"); // Local Administrator
-        if(updatePlayer.update(localAdmin)){
-           String msg = "Update Player with localAdmin = OK " + localAdmin;
-           LOG.info(msg);
-           showMessageInfo(msg);
-        }else{
-           String msg = "FAILURE Update player for localAdmin ! = " + localAdmin;
-           LOG.error(msg);
-           showMessageFatal(msg);
-           return null;
-        }
-      } else{
-         String msg="you are already admin or ADMIN = " + localAdmin.getPlayerRole();
-         LOG.info(msg);
-         showMessageInfo(msg);
-        // return null;
-      }
-  //   Club c = new load.LoadClub().load(club,conn); // pas nécessaire
-     club.setClubLocalAdmin(localAdmin.getIdplayer());
-  //   if(new update.UpdateClub().update(club, conn)){
-     if(new update.UpdateClub().update(club)){     
-        String msg = "Club updated local administrator created <br> = " 
-                + appContext.getLocalAdmin().getIdplayer() + " / " + appContext.getLocalAdmin().getPlayerLastName()
-                + "<br> for club = " + club.getIdclub() + " / " + club.getClubName();
-        LOG.info(msg);
-        showMessageInfo(msg);
-     }else{
-         String msg = "FAILURE modify club localAdmin ! = " + club;
-         LOG.error(msg);
-         showMessageFatal(msg);
-  //       return null;
-     }
-return null;
-
- }catch (Exception ex){
-            String msg = "Exception in createLocalAdministrator" + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
-} //end method createLocalAdministrator
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public String createLocalAdministrator() throws SQLException, Exception { ... }
+*/
 /*
 public String createProfessional() {  // coming from professional.xhtml
  try{
@@ -5266,160 +3791,30 @@ public String createProfessional() {  // coming from professional.xhtml
   }
 } //end method createLocalAdministrator
 */
-public String createCompetitionDescription() throws SQLException, IOException{
-        LOG.debug("entering CreateCompetitionDescription");
-        LOG.debug("for competition = " + competition);
-        LOG.debug("for club = " + club);
-        LOG.debug("for course = " + course);
-     //   on a mis à jour  value="#{courseC.competition.competitionDescription.competitionClubId}"
-     // si on utilise club de façon standard il faut faire le transfert ici
-     competition.competitionDescription().setCompetitionClubId(club.getIdclub());  // new 05-02-2026
-     // idem pour     value="#{courseC.competition.competitionDescription.competitionCourseId}"
-     competition.competitionDescription().setCompetitionCourseId(course.getIdcourse());
-   if(createCompetitionDescription.create(competition.competitionDescription())){  // migrated 2026-02-24
-       String msg = "competition Description created = "
-               + competition;
-            //   + competition.getCompetitionDescription().getCompetitionName()
-           //    + competition.getCompetitionDescription().getCompetitionId();
-       LOG.info(msg);
-       showMessageInfo(msg);
-   }else{
-       String msg = "ERROR Inscription competition KO for "
-               + competition.competitionDescription().getCompetitionName();
-       LOG.error(msg);
-       showMessageFatal(msg);
-   }
-  return null;
-} // end method createCompetition
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String createCompetitionDescription() throws SQLException, IOException { ... }
+*/
 
-// public String beforeInscriptionCompetition(ECompetition ec) throws SQLException, IOException{
-    public String beforeInscriptionCompetition(CompetitionDescription ec) throws SQLException, IOException{ // mod 18-03-2022
-  LOG.debug("entering inscriptionCompetition");
-  LOG.debug("with competition Description = " + ec); //.getCompetitionDescription());
-  // this.competition = ec;
-  
-  //competition.setCompetitionDescription(ec);
-  competition .withCompetitionDescription(ec); // migration record 2026
-  return "competition_inscription.xhtml?faces-redirect=true&operation=add";
-}
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String beforeInscriptionCompetition(CompetitionDescription ec) throws SQLException, IOException { ... }
+*/
 
- public List<String> competitionTimeStartList(String s) throws SQLException {
-       LOG.debug("entering timeStartListe = ..." );
-       LOG.debug("competition = " + competition);
-  try{ 
-      return new calc.CalcCompetitionTimeStartList().calc(competition);
-  } catch (Exception e) {
-            String msg = "££ Exception in timeStartListe ... = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-         return null; // indicates that the same view should be redisplayed
-   } finally { }
-} //end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<String> competitionTimeStartList(String s) throws SQLException { ... }
+*/
 
 
- public String createInscriptionCompetition(ECompetition ec) throws SQLException, IOException, InstantiationException{  
-       LOG.debug("entering CreateInscriptionCompetition with Competition param = " + ec);
-       LOG.debug("entering CreateInscriptionCompetition with Competition Data= " + competition.competitionData());
-       LOG.debug("for player = " + appContext.getPlayer());
-    competition.competitionData().setCmpDataCompetitionId(ec.competitionDescription().getCompetitionId());
-    competition.competitionData().setCmpDataPlayerId(appContext.getPlayer().getIdplayer());
-    competition.competitionData().setCmpDataPlayerGender(appContext.getPlayer().getPlayerGender());
-    competition.competitionData().setCmpDataPlayerFirstLastName(appContext.getPlayer().getPlayerLastName() + ", " + appContext.getPlayer().getPlayerFirstName());
-       LOG.debug("with competitionData = " + competition.competitionData());
-  if(createCompetitionData.create(competition.competitionData())){  // migrated 2026-02-24
-        String msg = "Inscription data competition OK for " + String.valueOf(competition.competitionData().getCmpDataCompetitionId());
-        LOG.info(msg);
-        showMessageInfo(msg);
-  }else{
-      String msg = "Failure Inscription competition NOT OK";
-        LOG.error(msg);
-        showMessageFatal(msg);
-  }
-    return "competition_list_inscriptions.xhtml?faces-redirect=true";
-}
+ /* migrated on 2026-02-25 -- now in Controller.refact.RoundController (roundC)
+   public String createInscriptionCompetition(ECompetition ec) throws SQLException, IOException, InstantiationException{
+*/
  
-//public String createRoundsCompetition(ECompetition ec) throws SQLException, IOException, Exception{
-    public String createRoundsCompetition(CompetitionDescription cd) throws SQLException, IOException, Exception{
-       LOG.debug("entering CreateRounds with CompetitionDescription = " + cd);
- //   competition = ec;
-  //     LOG.debug("with competition = " + competition);
- //   var cd = competition.getCompetitionDescription();
-  if( ! createCompetitionRounds.create(cd)){  // migrated 2026-02-24
-        String msg = "Create Rounds competition NOT OK for competition = " + cd.getCompetitionId();
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return null;
-  }else{
-      String msg = "Create Rounds competition OK for competition = " + cd.getCompetitionId();
-      LOG.info(msg);
-      showMessageInfo(msg);
-  }
-     cd.setCompetitionStatus("2");
-     if( ! updateCompetitionDescription.update(cd)){  // migrated 2026-02-24
-         String msg = "NOT modifiy Competition Description Status !! ";
-         LOG.debug(msg);
-         LCUtil.showMessageFatal(msg);
-         return null;
-     }else{
-         String msg = "competitionStatus = " + cd.getCompetitionStatus();
-         LOG.info(msg);
-         showMessageInfo(msg);
-     }
-  
-  
-  
-  // ici on a besoin des rounds créés !!
-  //var lp = new lists.CompetitionInscriptionsList().list(competition.getCompetitionDescription(),conn);
-  //lp.forEach(item -> LOG.debug("CompetitionInscriptionsList = " + "playerId = " + item.getCompetitionData().getCmpDataPlayerId()
-   //       +"roundId = "+ item.getCompetitionData().getCmpDataRoundId()));
-  
-    if( ! createCompetitionInscriptions.create(cd)){  // migrated 2026-02-24
-        String msg = "Create competitionInscriptions  NOT OK " + cd.getCompetitionId();
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return null;
-  }else{
-        String msg = "Create CompetitionInscriptionsOK " + cd.getCompetitionId();
-        LOG.info(msg);
-        showMessageInfo(msg);
-  }
-    
-//        String msg = "Created Rounds and Inscriptions competition OK = " + cd.getCompetitionId();
- //       LOG.info(msg);
-//        showMessageInfo(msg);
- 
-     cd.setCompetitionStatus("3");
-     if( ! updateCompetitionDescription.update(cd)){  // migrated 2026-02-24
-         String msg = "NOT modifiy Competition Description !! ";
-         LOG.info(msg);
-         showMessageInfo(msg);
-         return null;
-     }else{
-         String msg = "competitionStatus = " + cd.getCompetitionStatus();
-         LOG.info(msg);
-         showMessageInfo(msg);
-     }
-  competitionRoundsList.invalidateCache(); // new 03-11-2020 - migrated 2026-02-24
-   return "competition_admin_menu.xhtml?faces-redirect=true";
-}
+/* migrated on 2026-02-25 -- now in Controller.refact.RoundController (roundC)
+   public String createRoundsCompetition(CompetitionDescription cd) throws SQLException, IOException, Exception {
+*/
 
-  public String cancelInscriptionCompetition(ECompetition ec) throws Exception{
-        LOG.debug(" starting cancelInscriptionCompetition");
-        LOG.debug(" with ecl = " + ec.toString());
-    if(deleteInscriptionCompetition.delete(ec)){                                  // migrated 2026-02-24
-        String msg = "inscription deleted = " + ec.competitionData().getCmpDataId()
-                + " for player = " + ec.competitionData().getCmpDataPlayerId()
-                + " for competition = " + ec.competitionDescription().getCompetitionName() ;
-        LOG.info(msg);
-        showMessageInfo(msg);
-    }
- //     LOG.debug(" result of cancelInscritionCompetition = " + OK);
-      // afficher message de 
-      competitionInscriptionsList.invalidateCache();                          // migrated 2026-02-24
-      competitionInscriptionsList.list(ec.competitionDescription());          // refresh without deleted item
-      return "competition_list_inscriptions.xhtml?faces-redirect=true";  // refresh view without message !
-
-  }
+  /* migrated on 2026-02-25 -- now in Controller.refact.RoundController (roundC)
+   public String cancelInscriptionCompetition(ECompetition ec) throws Exception{
+*/
 
 
 // ✅ MIGRÉ vers ClubController (clubC) - createClub
@@ -5749,35 +4144,27 @@ public String loadHoles(ECourseList ecl, String type) throws SQLException, Excep
 */ // end ✅ MIGRÉ - createHolesGlobal
 
  
+// ✅ MIGRÉ vers ClubController (clubC) - viewHolesGlobal — 2026-02-25
+/*
   public String viewHolesGlobal() throws Exception{
-        LOG.debug("entering viewHolesGlobal  "); 
-        LOG.debug("for holesGlobal = " + holesGlobal);
-        LOG.debug("for club = " + club);
-        LOG.debug("for course = " + course);
-        LOG.debug("for tee = " + tee);
-  //     holesGlobal = new load.LoadHoles().LoadHolesArray(conn, tee);
+        LOG.debug("entering viewHolesGlobal  ");
        tee.setTeeHolesPlayed("01-18");
  return "modify_holes_global.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectCourse");
     } // end modifyHolesGlobal
+*/ // end ✅ MIGRÉ - viewHolesGlobal
  
+// ✅ MIGRÉ vers ClubController (clubC) - loadHole — 2026-02-25
+/*
 public String loadHole(ECourseList ecl) throws SQLException, Exception{
  try{
         LOG.debug("entering loadHole");
      tee = new read.ReadTee().read(ecl.tee());
-     course = new read.ReadCourse().read(ecl.course()); // pour avoir coursename, etc...
-     club = new read.ReadClub().read(ecl.club());  // pour avoir clubname, etc...
-        LOG.debug("idcourse after loadCourse= " + course.getIdcourse());  // si est null faut coplémter
-        LOG.debug("idtee after loadCourse= " + tee.getIdtee());  // si est null faut coplémter
-     if(course.getIdcourse() == null) {
-         course.setIdcourse(tee.getCourse_idcourse());
-         LOG.debug("idcourse forced");
-     }
+     course = new read.ReadCourse().read(ecl.course());
+     club = new read.ReadClub().read(ecl.club());
     if(tee != null){
-        tee.setCreateModify(false); // gestion button dans club.xhtml
+        tee.setCreateModify(false);
         return "hole.xhtml?faces-redirect=true&operation=modify hole";
     }else{
-        // error in create player
-        LOG.debug("error : tee not retreaved !!");
         return null;
     }
  }catch (Exception ex){
@@ -5786,7 +4173,8 @@ public String loadHole(ECourseList ecl) throws SQLException, Exception{
             showMessageFatal(msg);
             return null;
   }
-} //end method loadHolee
+} //end method loadHole
+*/ // end ✅ MIGRÉ - loadHole
 
 
 
@@ -5844,29 +4232,19 @@ public String loadClub(ECourseList ecl) throws SQLException, Exception{
 */ // end ✅ MIGRÉ - modifyClub
 
 
-public String modifyClubUnavailableStructure(String type) throws Exception { //modify club from unavailable_structure.xhtml
+// ✅ MIGRÉ vers ClubController (clubC) - modifyClubUnavailableStructure — 2026-02-25
+/*
+public String modifyClubUnavailableStructure(String type) throws Exception {
    LOG.debug("entering modifyClubUnavailableStructure  for club = " + club);
-   LOG.debug("  for type = " + type);
- try{
-     if(type.equals("modify")){
-         // normal case
-     }
      if(type.equals("delete")){
          unavailable.structure().setStructureList(null);
      }
-     // was: if(new UnavailableController().updateClub(unavailable, club, conn)){
      if(unavailableController.updateClub(unavailable, club)){
-         unavailable.structure().setStructureExists(true);  // menu management
+         unavailable.structure().setStructureExists(true);
      }
-      return null; // returns to calling screen
-
-  }catch (Exception ex){
-            String msg = "Exception in modifyClubUnavailableStructure " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
-} // end modifyClub
+      return null;
+} // end modifyClubUnavailableStructure
+*/ // end ✅ MIGRÉ - modifyClubUnavailableStructure
 /*
 public void modifyPlayer() throws SQLException, Exception{
  try{
@@ -5890,187 +4268,35 @@ public void modifyPlayer() throws SQLException, Exception{
 } //en dmethod create player
 */
 // enlevé 29-11-2018 à réécrire
- public String listParticipants_mp(Matchplay mp) throws SQLException {
-    try {
-                LOG.debug(" -- entering listParticipants_mp = " + mp.getIdround());
-                round.setIdround(mp.getIdround());
-  ////          listmatchplay = lists.ScamblePLayersList.listAllParticipants(round.getIdround(), conn);
-                LOG.debug(" -- exiting listParticipants_mp = ");
-                LOG.debug("liste participants matchplay = " + Arrays.deepToString(listmatchplay.toArray()) );
-  //            course.setIdcourse(inputPlayingHcp);
-                round.setRoundGame(listmatchplay.get(0).getRoundGame());
-           return "show_participants.xhtml?faces-redirect=true&cmd=MP_";
-        } catch (Exception ex) {
-            String msg = "Exception in getParticipantsList_mp() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        } finally {
-      //  DBConnection.closeQuietly(conn, null, rs, ps);
-        }
-    } //end method
+ /* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String listParticipants_mp(Matchplay mp) throws SQLException { ... }
+*/
 
- public String listParticipantsStablefordRound(ECourseList ecl) throws SQLException {
-  try {
-          LOG.debug(" -- entering listParticipantsStablefordRound = " + ecl.round().getIdround() );
-        round = ecl.round();
-        club = ecl.club();
-        course = ecl.course();
-        listStableford = participantsRoundList.list(round); // migrated 2026-02-24
-        if (listStableford.isEmpty()) {
-            String msg = "Aucun participant inscrit pour ce round ";
-            LOG.info(msg);
-            showMessageInfo(msg);
-            return null;
-        }
-         // Traitement normal
-        LOG.info("Traitement de {} participants", listStableford.size());
-      //  for (ECourseList2 participant : listStableford) {
-            // Logique métier
-      //  }
-//             LOG.debug(" -- exiting listParticipants_stableford = ");
-             LOG.debug("liste participants stableford = " + Arrays.deepToString(listStableford.toArray()) );
-   //          LOG.debug("PlayersString was " + round.getPlayersString());
-          String playersString = Round.fillRoundPlayersStringEcl(listStableford);
-          round.setPlayersString(playersString);
-             LOG.debug("PlayersString is now " + round.getPlayersString());
-          round.setRoundGame(listStableford.get(0).round().getRoundGame());
-           return "show_participants_stableford.xhtml?faces-redirect=true&cmd=ROUND";
-    } catch (InvalidRoundException e) {
-        // Gestion spécifique pour round invalide
-        String msg = "Round invalide : Ce parcours doit avoir 18 trous. " +
-                       "Veuillez vérifier la configuration du round." + e.getMessage();
-        LOG.error(msg);
-        showMessageFatal(msg); 
-        return null;
-   } catch (Exception ex) {
-            String msg = "Exception in listParticipantsStablefordRound" + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    }//  finally {  }
-    } //end method
+ /* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String listParticipantsStablefordRound(ECourseList ecl) throws SQLException { ... }
+*/
 
  
-  public List<ECourseList> listParticipantsStablefordCompetition(CompetitionDescription cde) throws SQLException {
-  try {
-          LOG.debug(" -- entering listParticipantsStablefordCompetition for CompetitionDescription = " + cde);
-  //     round.setRoundDate(ec.getCompetitionDescription().getCompetitionDate());
-   //    round.setIdround(ec.getCompetitionData().getCmpDataRoundId());
-   //    round.setRoundName(ec.getCompetitionDescription().getCompetitionName());
-   //    round.setRoundGame(ec.getCompetitionDescription().getCompetitionGame());
-
-     var li = participantsStablefordCompetitionList.list(cde); // migrated 2026-02-24
-       LOG.debug(" -- exiting listParticipantsStablefordCompetition = ");
-       LOG.debug(" with liste participants stableford = " + Arrays.deepToString(li.toArray()) );
-  //     LOG.debug("PlayersString was " + round.getPlayersString());
-//return listStableford;
-return li;
-
- //     return "competition_show_participants_stableford.xhtml?faces-redirect=true&cmd=COMPETITION";
-   } catch (Exception ex) {
-            String msg = "Exception in listParticipants_scramble" + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } finally {  }
-    } //end method
+  /* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ECourseList> listParticipantsStablefordCompetition(CompetitionDescription cde) throws SQLException { ... }
+*/
  
   
- public List<EMatchplayResult> calcMatchplayResult() throws SQLException { // button in show_participants_stableford.xhtml
-  try {
-          LOG.debug(" -- entering calcMatchplayResult");
-          
-      //TODO modifier : on prend les deux premiers    
-         if(listStableford.size() != 2){
-             String msg = "Pour matchplay il faut deux joueurs  !!";
-             LOG.error(msg);
-             showMessageFatal(msg);
-             return null;
-         }
-         var p1 = listStableford.get(0).player(); //.getIdplayer();
-           LOG.debug("listStableford player 1 = " + p1.getIdplayer());
-         var p2 = listStableford.get(1).player(); //.getIdplayer(); 
-           LOG.debug("listStableford player 2 = " + p2.getIdplayer());
-          
-     var li = calcMatchplayResult.calc(p1, p2, round); // migrated 2026-02-24
-  //     LOG.debug(" result calcMatchplay =  " + li);
-       LOG.debug(" with liste participants stableford = " + Arrays.deepToString(li.toArray()) );
-  //     LOG.debug("PlayersString was " + round.getPlayersString());
-     return li;
+ /* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<EMatchplayResult> calcMatchplayResult() throws SQLException { ... }
+*/
 
- //     return "competition_show_participants_stableford.xhtml?faces-redirect=true&cmd=COMPETITION";
-   } catch (Exception ex) {
-            String msg = "Exception in calcMatchplayResult " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } finally {  }
-    } //end method
-
- public List<ECourseList> listCourses() throws SQLException{
- try {
-     LOG.debug("listCourseOnly ? sessionMap = "+ sessionMap.get("inputSelectCourse"));
-
-     if(sessionMap.get("inputSelectCourse").equals("ChartCourse")
-      || sessionMap.get("inputSelectCourse").equals("CreateRound")
-      || sessionMap.get("inputSelectCourse").equals("createTarifGreenfee"))   {
-         return courseListOnly.list(); // club + course
-    }else{
-        return new lists.CourseList().list(); // club + course + tee
-   }
-  } catch (Exception ex) {
-            String msg = "Exception in listCourses() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } //end method
- }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC) as listCoursesPublic()
+ public List<ECourseList> listCourses() throws SQLException{ ... }
+*/
  
-  public List<Club> listLocalAdminClubsList() throws SQLException{
- try {
-   //  LOG.debug("listCourseOnly ? sessionMap = "+ sessionMap.get("inputSelectCourse"));
+/* migrated on 2026-02-25 — now in Controller.refact.MemberController (memC)
+   public List<Club> listLocalAdminClubsList() throws SQLException { ... }
+*/
 
-  //   if(sessionMap.get("inputSelectCourse").equals("ChartCourse")
-  //    || sessionMap.get("inputSelectCourse").equals("CreateRound")
-  //    || sessionMap.get("inputSelectCourse").equals("createTarifGreenfee"))   {
-  LOG.debug("player = " + appContext.getPlayer());
-      //   return new lists.ClubsListLocalAdmin().list(appContext.getPlayer());
-         return clubsListLocalAdmin.list(appContext.getPlayer());
-  //  }else{
-  //      return new lists.CourseList().list(conn);
-  // }
-  } catch (Exception ex) {
-            String msg = "Exception in listCourses() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } //end method
- }
- 
-   public List<ECourseList> listLocalAdminCoursesList(String select, String admin) throws SQLException{
- try {
-//     LOG.debug(" entering listLocalAdminCoursesList");
-//     LOG.debug("with sessionMap = "+ sessionMap.get("inputSelectCourse"));
-//     LOG.debug("with select = "+ select);
-//     LOG.debug("with admin = "+ admin);
-
-  //  if(sessionMap.get("inputSelectCourse").equals("ChartCourse")
-  //    || sessionMap.get("inputSelectCourse").equals("CreateRound")
- // if(select.equals("createTarifGreenfee")){
-  LOG.debug("player = " + appContext.getPlayer());
-         // was: return new lists.CoursesListLocalAdmin().list(appContext.getPlayer(), conn);
-         return coursesListLocalAdmin.list(appContext.getPlayer()); // migrated 2026-02-24
-  //  }else{
-  //      return new lists.CourseList().list(conn);
-  // }
-  } catch (Exception ex) {
-            String msg = "Exception in listCourses() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } //end method
- }
+/* migrated on 2026-02-25 — now in Controller.refact.MemberController (memC)
+   public List<ECourseList> listLocalAdminCoursesList(String select, String admin) throws SQLException { ... }
+*/
 
    /*  migré vers clubController 19-02-206
    public List<Club> listClubsDialog(String type) { // mod 02-02-2026 non testé coming from dialogClub.xhtml
@@ -6151,44 +4377,13 @@ return li;
     }
  } //end method
  */
- public List<Course> listCoursesForClub(String clubid) throws SQLException{
- try {
-     LOG.debug(" starting listCoursesForClub with param clubid = " + clubid);  // null
-     LOG.debug("at this moment we have club = " + club);
-     if(clubid == null || clubid.equals(EMPTY_STRING)){
-         LOG.debug("param clubid == null or empty");
-     }else{
-         club.setIdclub(Integer.parseInt(clubid));
-     }
-        LOG.debug("listCoursesForClub - Club = "+ club);
-     // was: return new lists.CourseListForClub().list(club, conn);
-     return courseListForClubService.list(club); // migrated 2026-02-24
- } catch (Exception ex) {
-            String msg = "Exception in listClubs() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } //end method
-  }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public List<Course> listCoursesForClub(String clubid) throws SQLException { ... }
+*/
  
-      public List<ECourseList> listDetailClub(String id) throws SQLException{ // used in dialogClubDetail.xhtml
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with id club = " + id);
- try {
-          Club c = new Club();
-          c.setIdclub(Integer.valueOf(id));
-          // was: lists.ClubDetailList.setListe(null);  //rei
-          clubDetailList.invalidateCache();           // migrated 2026-02-24
-          // was: return new lists.ClubDetailList().list(c, conn);
-          return clubDetailList.list(c);              // migrated 2026-02-24
-    } catch (Exception ex) {
-            String msg = "Exception in listDetailClub() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-    } //end method
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+      public List<ECourseList> listDetailClub(String id) throws SQLException{ ... }
+*/
  /* migrée 19-02-2026    
  public List<ECourseList2> listClubsCoursesTees(String param) throws SQLException {
    try {
@@ -6213,150 +4408,35 @@ return li;
    return null;
 } //end method
  */
-  public List<ECourseList> listInscriptions() throws SQLException{
-   try {
-        //    LOG.debug(" -- entering listInscriptions with inputInscription = " + getInputInscription());
-        //    LOG.debug(" -- entering listInscriptions ");
-        return new lists.InscriptionList().list();
-   } catch (Exception ex) {
-            String msg = "Exception in getInscriptionList() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        } finally {
-        }
-    } //end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ECourseList> listInscriptions() throws SQLException { ... }
+*/
   
 
-  public List<CompetitionDescription> listCompetitions(){  //throws SQLException{  // mod 17-03-2022
-   try {
-      LOG.debug(" -- entering listCompetitions ");
-
-        return competitionDescriptionList.list(); // migrated 2026-02-24
-    } catch (Exception ex) {
-            String msg = "Exception in listCompetitions() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        } finally {        }
-    } //end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<CompetitionDescription> listCompetitions() { ... }
+*/
        
  
-    public String beforeListInscriptionsCompetition(CompetitionDescription cd) throws SQLException, IOException{ // mod 17-03-2022
-  LOG.debug("entering beforeListInscriptionCompetition");
-  LOG.debug("with competition description = " + cd); //.getCompetitionDescription());
- // LOG.debug("with competition data = " + ec.getCompetitionData());
-//  LOG.debug("for competition = " + ec.getCompetitionDescription().getCompetitionId());
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String beforeListInscriptionsCompetition(CompetitionDescription cd) throws SQLException, IOException { ... }
+*/ 
 
-  //competition.setCompetitionDescription(cd);
-  competition.withCompetitionDescription(cd); // migration record 2026
-  competitionInscriptionsList.invalidateCache(); // new 31-10-2020 - migrated 2026-02-24
-  return "competition_list_inscriptions.xhtml?faces-redirect=true&operation=add";
-} 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String beforeCompetitionMenu(CompetitionDescription ec) throws SQLException, IOException { ... }
+*/ 
 
-    public String beforeCompetitionMenu(CompetitionDescription ec) throws SQLException, IOException{  // mod 17/03/2022
-  LOG.debug("entering beforeCompetitionMenu");
-  LOG.debug("with competition Description = " + ec);
- // LOG.debug("for competition = " + ec.getCompetitionDescription().getCompetitionId());
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ECompetition> listInscriptionsCompetition() throws SQLException, IOException { ... }
+*/
 
- // competition.setCompetitionDescription(ec);
-  competition.withCompetitionDescription(ec); // migration recod 2026
-  // rei liste !!
-//  CompetitionInscriptionsList.setListe(null); // new 31-10-2020
-  return "competition_admin_menu.xhtml?faces-redirect=true&operation=menu";
-} 
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public String beforeListStartCompetition(CompetitionDescription cd, String type_exec) throws SQLException, IOException { ... }
+*/ 
 
-public List<ECompetition> listInscriptionsCompetition() throws SQLException, IOException{
-     LOG.debug("entering listInscriptionsCompetition");
- //    LOG.debug("with competition Data = " + competition.getCompetitionData());
-     LOG.debug("with competition Description = " + competition.competitionDescription());
-//  LOG.debug("for competition ID = " + ec.getCompetitionDescription().getCompetitionId());
- // this.competition = ec;
-  //  String msg = "Data List OK";
-    //    LOG.debug(msg);
-    //    showMessageInfo(msg);
-    var lp1 = competitionInscriptionsList.list(competition.competitionDescription()); // migrated 2026-02-24
-    LOG.debug("var lp louis = " + lp1);
-   return lp1;
-}
-
-  public String beforeListStartCompetition(CompetitionDescription cd, String type_exec) throws SQLException, IOException{
-        LOG.debug("entering beforeListStartCompetition");
-        LOG.debug("with competition description = " + cd); //.getCompetitionDescription());
-        LOG.debug("with type = " + type_exec);
-    if(type_exec.equals(entite.CompetitionDescription.StatusExecution.PROVISIONAL.toString()) 
-       || type_exec.equals(entite.CompetitionDescription.StatusExecution.FINAL.toString())){
-        LOG.debug("good execution type - PROVISIONAL or FINAL");
-    }
-    // que faire avec FINAL ??
-    cd.setCompetitionExecution(type_exec);
-  //  competition.setCompetitionDescription(cd);
-    competition.withCompetitionDescription(cd); // migration record 2026
-      LOG.debug("competition modified = " + competition);
-    return "competition_list_start.xhtml?faces-redirect=true&operation=add";
-} 
-
-public List<ECompetition> listStartCompetition() throws SQLException, IOException, Exception{
- try{
-      LOG.debug("entering listStartCompetition");
-      LOG.debug("with competition Description = " + competition.competitionDescription());
-      LOG.debug("CompetitionStatus = " + competition.competitionDescription().getCompetitionStatus());
- //  if(competition.getCompetitionDescription().getCompetitionStatus().equals("1")){
- //          LOG.debug("Status is already 1 - nothing to do");
-           
-      String execution = competition.competitionDescription().getCompetitionExecution();
-          LOG.debug("CompetitionExecution = " + execution);
-      String msg = "ListStartCompetition OK";
-        LOG.debug(msg);
- // 1. d'abord '
-      List<ECompetition> li = competitionInscriptionsList.list(competition.competitionDescription()); // migrated 2026-02-24
-        LOG.debug("line 01 after call competitionInscriptionsList li size = " + li.size());
-     if(li == null){
-        msg = "there are no inscriptions : we do nothing for competition Id  = "
-                + competition.competitionDescription().getCompetitionId();
-        LOG.debug(msg);
-        LCUtil.showMessageFatal(msg);
-        return li;
-    }
- // 2. ensuite
-       LOG.debug("we go to CompetitionStartlist with Execution = " + execution);
-     li.get(0).competitionDescription().setCompetitionExecution(execution);
-    var csl = competitionStartList.list(li); // migrated 2026-02-24
-//       LOG.debug("we are back from competitionstartlist with csl = " + csl.toString());
-    if(csl == null){
-        msg = "Empty CompetitionStartList !! ";
-         LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
-         return null;
-    }else{
-         msg = "Completed CompetitionStartList = " + csl.size() +
-                 " for competition Id  = " + competition.competitionDescription().getCompetitionId();
-         LOG.info(msg);
-   //      LCUtil.showMessageInfo(msg);        
-     }   
-    // mod status
-         competition.competitionDescription().setCompetitionStatus("1");
-  //         LOG.debug("we go to update description with status = " + cde.getCompetitionStatus());
-         if(updateCompetitionDescription.update(competition.competitionDescription())){  // migrated 2026-02-24
-                msg = "OK result of modify Competition Description";
-                LOG.info(msg);
-                LCUtil.showMessageInfo(msg);        
- //            return true;
-         }else{
-                msg = "KO KO  result of modify Competition Description";
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg); 
-                return null;
-         }    
-     return csl;
-
- }catch (Exception ex){
-            String msg = "Exception in listStartCompetition() " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    }
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+   public List<ECompetition> listStartCompetition() throws SQLException, IOException, Exception { ... }
+*/
 
   /* migrated on 2026-02-24 — now in Controller.refact.RoundController
   public String cancelInscription(ECourseList ecl) throws Exception {
@@ -6411,31 +4491,12 @@ public List<ECompetition> listStartCompetition() throws SQLException, IOExceptio
   } //end method
   */
 
-  public List<ECourseList> listHandicaps() throws SQLException{
-   try {
- //           LOG.debug(" -- entering getHandicapList = " + player.getIdplayer() );
-         // was: return new lists.HandicapList().list(appContext.getPlayer(), conn);
-         return handicapList.list(appContext.getPlayer()); // migrated 2026-02-24
-   } catch (Exception ex) {
-            String msg = "Exception in listHandicaps " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        } finally {  }
-    } //end method
-  
- public List<ECourseList> listHandicapWHS() throws SQLException{
-   try {
- //           LOG.debug(" -- entering getHandicapList = " + player.getIdplayer() );
-         return new lists.HandicapIndexList().list(appContext.getPlayer());
-         
-      } catch (Exception ex) {
-            String msg = "Exception in listHandicapsWHS " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        } finally {  }
-    } //end method
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public List<ECourseList> listHandicaps() throws SQLException { ... }
+*/
+/* dead code — XHTML already uses playerC.listHandicapWHS()
+   public List<ECourseList> listHandicapWHS() throws SQLException { ... }
+*/
   
   
     /* à réécrire enlevé 29-11-2018
@@ -6472,155 +4533,18 @@ public List<ECompetition> listStartCompetition() throws SQLException, IOExceptio
         return applicationMap;
     }
 
- public String selectPlayer(EPlayerPassword epp) throws SQLException{
-try{
-    LOG.debug(" starting selectPlayer with player = " + epp.getPlayer());
-    appContext.setPlayer(epp.getPlayer()); // the magic happens here we go to playerC !!!
-       
-     if(appContext.getPlayer().getIdplayer() == null){
-         String err = "player is null = " + appContext.getPlayer();
-         LOG.debug(err);
-         showMessageFatal(err);
-         return null;
-     }else{
-         LOG.debug("current Player = " + appContext.getPlayer());
-     }
-      LanguageController.setLocale(Locale.of(appContext.getPlayer().getPlayerLanguage()));
-         LOG.debug("Language set = " + appContext.getPlayer().getPlayerLanguage());  
-         LOG.debug("Language is now = " +  LanguageController.getLanguage());  
-LOG.debug("1. verifying if there is an existing password");
-      Password p = passwordController.isExists(epp);
-      if (p == null){
-          LOG.debug("password is null ==> going to password_create");
-          return "password_create.xhtml?faces-redirect=true";
-      }
- LOG.debug("2. verifying if there is the is a blocking password too many trials");
-      if(passwordController.isBlocking(appContext.getPlayer())){
-          return "selectPlayer.xhtml?faces-redirect=true";
-      }
-
- LOG.debug("3. verifying if there is a valid subscription");
-  // subscription = new PaymentSubscriptionController().isExists(appContext.getPlayer(), conn);
-     subscription = paymentSubscriptionController.isExists(appContext.getPlayer()); // migrated 2026-02-25
-        LOG.debug("subscription valid ? = " + subscription);
-    if(subscription.isErrorStatus()){
-          LOG.debug("subscription is null ==> going to subscription.xhtml");
-          return "subscription.xhtml?faces-redirect=true";
-    }else{
-         // we continue
-    }
- LOG.debug("4. initialisations diverses");
- //LOG.debug("startin initialiations diverses")
-    //   localAdmin = new Player(); // bien le bon endroit ? supprimé et non testé
-       
-       sessionMap.put("playerid", appContext.getPlayer().getIdplayer());
-       if(sessionMap.get("playerid") == null){
-           LOG.debug("sessionMap playerid = null");
-       }else{
-           sessionMap.put("playerlastname", appContext.getPlayer().getPlayerLastName());
-           int yourAge = utils.LCUtil.calculateAgeFirstJanuary(appContext.getPlayer().getPlayerBirthDate());
-           sessionMap.put("playerage", yourAge);
-           setConnected(true); // affiche le bouton Logout via rendered dans header.xhtml
-           applicationMap.put("Connection",conn);  // utilisé dans ScheduleProController !! pour récupérer la connection
-              LOG.debug("applicationMap Connection is now for ScheduleProController = " + applicationMap.get("Connection"));
-           club.setIdclub(epp.player().getPlayerHomeClub());
-       //    player.setShowMenu(true);  // 17-04-2024 affiche le menu principal 
-           // mod 09-02-2026 après refact de playerController il faut le modifier et devient
-           appContext.getPlayer().setShowMenu(true); // mod 09-02-2026
-          
-           LOG.debug("refact 2026 : showmenu = " + appContext.getPlayer().isShowMenu());
-       }
- LOG.debug("5. create audit log");
-      if(createAudit.create(appContext.getPlayer())){
-            String msg = "createdAudit in selectPlayer ";
-            LOG.debug(msg);
-      }
- // everything controlled and initialized  //
-       return "welcome.xhtml?faces-redirect=true";
-  } catch (Exception e) {
-            String msg = "££ Exception selectPlayer = " + e.getMessage() + " for player = " + appContext.getPlayer();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null; // indicates that the same view should be redisplayed
-        } finally {
-        }  
-} // end method
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public String selectPlayer(EPlayerPassword epp) throws SQLException { ... }
+*/
  
-  public List<Professional> listProfessional() {
-   try {
-            LOG.debug(" -- entering listProfessional");
-    // liste des clubs ou il est pro
-         // was: listProfessional = new lists.ProfessionalClubList().list(appContext.getPlayer(), conn);
-         listProfessional = professionalClubList.list(appContext.getPlayer()); // migrated 2026-02-24
-         if(!listProfessional.isEmpty()){
-            String msg = "is a pro !!" + listProfessional;
-            LOG.debug(msg);
-            showMessageInfo(msg);
-            return listProfessional;
-        }else{
-            String msg = "is NOT  pro !!";
-            LOG.debug(msg);
-            return null;
-        }
-  } catch (Exception ex) {
-            String msg = "Exception in listProfessional " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-    } //end method
-  } //end 
+/* dead code — duplicate of playerC.getProfessionals()
+   public List<Professional> listProfessional() { ... }
+*/
   
   
-public String passwordVerification(String OK_KO){
-try{ // coming from welcome.xhtml provisoirement
-    LOG.debug(" starting passwordVerification with = " + OK_KO);
-    LOG.debug("for player player= " + appContext.getPlayer());
-    // non nil faut vérifier si blocage !!
-    if("OK".equals(OK_KO)){
-        String msg = "Password Correct";
-        LOG.debug(msg);
- //       showMessageInfo(msg);
-        return null;
-    }
-    if("KO".equals(OK_KO)){
-        String msg = LCUtil.prepareMessageBean("connection.failed");
-    //    String msg = "wrong password for this connection";
-        LOG.info(msg);
-        showMessageInfo(msg);
-        blocking = loadBlocking.load(appContext.getPlayer());
-        LOG.debug("returned blocking = " + blocking);
-        if(blocking == null){
-           LOG.debug("il n'existe pas de record blocage");
-           // faut en créer un !
-            boolean b = createBlocking.create(appContext.getPlayer());
-                LOG.debug("record bloking written ? = " + blocking);
-            return "selectPlayer.xhtml?faces-redirect=true";
-        }
-        if(blocking != null){ // blocking not null
-            if(blocking.getBlockingAttempts() > 2){
-                msg = LCUtil.prepareMessageBean("connection.blocked");
-    //    String msg = "wrong password for this connection";
-                LOG.info(msg);
-                showMessageInfo(msg);
-            }else{// si blocking < 2, rien faire
-                short s = blocking.getBlockingAttempts();
-                blocking.setBlockingAttempts(s+=1);
-                boolean b = updateBlocking.update(blocking);
-                return "selectPlayer.xhtml?faces-redirect=true";
-            }
-        } //end blocking nomt null
-    }
-    
-    return null;
-  } catch (Exception e) {
-            String msg = "££ Exception in passwordVerification = " + e.getMessage() + " for player = " + appContext.getPlayer().getPlayerLastName();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null; // indicates that the same view should be redisplayed
-        } finally {
-
-        }  
-} // end method passwordVerification
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public String passwordVerification(String OK_KO) { ... }
+*/
 
 public String findSun() throws SQLException, IOException{
     // ajouter boolean = correct insert !!!
@@ -6648,420 +4572,40 @@ public static void beforePreparePaymentLesson(ScheduleModel model, Professional 
 //  professional = pro;
 }
 */
- public String manageCotisation() throws Exception{ // called from cotisation.xhtml
- try{
-      LOG.debug("entering manageCotisation ");
-      LOG.debug("tarifMember = " + tarifMember);
-      LOG.debug("cotisation = " + cotisation); // est null
-      LOG.debug("round = " + round);
-    sessionMap.put("creditcardType", etypePayment.COTISATION);
-     // enlevé 25-08-2025(etypePayment.COTISATION.toString());  // new 15-08-2025 solution provisoire suite utilisation REST (pas le même context)!!
-      LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
-    cotisation = tarifMemberController.completeCotisation(tarifMember, appContext.getPlayer(), round);
-    if(cotisation == null){
-        String msg = "cotisation not found !! is null";
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return null;
-    }
-    cotisation.setIdplayer(appContext.getPlayer().getIdplayer());
-    cotisation.setIdclub(club.getIdclub());
-    cotisation.setCommunication(club.getClubName() + " : " + cotisation.getCommunication());
-       LOG.debug("Cotisation loaded = " + cotisation);
- //   boolean OK = false;
-
-     if(cotisation.getPrice() == 0.0){
-  //  if(cotisation.getPrice().equals(0.0)){    
-          String msg = "amount ZERO no payment needed !!";
-          LOG.info(msg);
-          showMessageInfo(msg);
-          return null;
-       }
-
-    if(cotisation.isCotisationError()){
-        String msg = "cotisation error !!";
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return null;
-    }
-//new 22-08-2025   
-   // if(sessionMap.get("inputSelectCourse").equals("PaymentCotisationSpontaneous")){
-    if(sessionMap.get("inputSelectClub").equals("PaymentCotisationSpontaneous")){    // mod 24-08-2025
-        cotisation.setType("spontaneous");
-            LOG.debug("Paiement spontané - NO inscription");
-    }else{
-        cotisation.setType("round"); // inscription à un round
-    }
-    LOG.debug("cotisation type : spontaneous ou round ? " + cotisation.getType());
-    
-    LOG.debug("amount non ZERO payment COTISATION needed !");
-    // creditcard = new Controllers.CreditcardController().completeWithCotisation(cotisation, appContext.getPlayer(), conn);
-    creditcard = creditcardController.completeWithCotisation(cotisation, appContext.getPlayer()); // migrated 2026-02-25
-    if(creditcard != null){ 
-        String msg = "creditcard completed with Cotisation ! ";
-        LOG.info(msg);
-    //          showMessageInfo(msg);
-        return "creditcard.xhtml?faces-redirect=true";
-    }else{
-        String msg = "paiement par creditcard KO : quelle conclusion ?";
-        LOG.error(msg);
-        showMessageFatal(msg);
-        throw new Exception(msg);
-      //        return null;
-    }
- }catch (SQLException ex){
-            String msg = "SQLException in manageCotisation " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }catch (Exception ex){
-            String msg = "Exception in manageCotisation " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
- } //end method manageCotisation
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public String manageCotisation() throws Exception { ... }
+*/
   
  
- public String manageLesson() throws Exception{ // called from schedule_pro.xhtml
- try{
-      LOG.debug("entering manageLesson");
-   // sessionMap.put("creditcardType", "LESSON");
-    sessionMap.put("creditcardType", etypePayment.LESSON); 
-       LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
- // va chercher dans autre controller
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public String manageLesson() throws Exception { ... }
+*/
  
-    professional = schedulerProController.getProfessional();
-    
-       LOG.debug("professional coming from SchedulerProController = " + professional);
-    club.setIdclub(professional.getProClubId());
-    club = new read.ReadClub().read(club);
-    Player p = new Player();
-    p.setIdplayer(professional.getProPlayerId());
-   // playerPro = new read.ReadPlayer().read(p, conn);
-    playerPro = playerManager.readPlayer(p.getIdplayer());
-    // 27-01-2023 erreur toutours dernière lesson !
- // va récupérer dans autre Controller !!
-    listLessons = schedulerProController.getListLessons();
-    // complete lesson with price
-    
-    //   LOG.debug("we manage a professional ?" + isProfessional().size() );
-     //  LOG.debug("we manage a professional ?" + appContext.getProfessionals().size() );
-     
-     
-     /// à modifier !!!
-  /////////////     LOG.debug("we manage a professional ?" + playerManager.findProfessionals());
-       
-       
-       
-       
-       // alors faire create lesson only et pas de payment ?
-       // vérifier si le student n'est pas aussi pro !! ex louis prend une lesson chez olivier
-    for(Lesson lesson2 : listLessons){
-         //    if(isProfessional() > 0){ // nombre de clubs ou il est pro
-         //        lesson2.setLessonAmount(0.0);
-         //    }else{
-                 lesson2.setLessonAmount(professional.getProAmount());
-         //    }
-             // si all-day mettre à zéro
-       //      LOG.debug("proAmount added = " + d);
-    }
-    
-    // quand le pro bloque une journée parce qu'il donne leçon dans un autre club
-   // if( !isProfessional().isEmpty()){ // new 08-02-2023
-  //  if (! appContext.getProfessionals().isEmpty()) {
-     if (! playerManager.findProfessionals(appContext.getPlayer()).isEmpty()) {    
-         for(Lesson lesson2 : listLessons){
-        // à faire : ajouter la référence du payement (generated key)
-        lesson2.setLessonAmount(0.0); // new 30-01-2023 16:27
-         if(createLesson.create(lesson2, appContext.getPlayer())){
-            String msg = "Lesson pro created = " + lesson2;
-            LOG.info(msg);
-            showMessageInfo(msg);
-         }else{
-            String msg = "error : lesson pro not registered !!";
-            LOG.error(msg);
-            showMessageFatal(msg);
-            break;
-         }
-    } // end for
-    return "welcome.xhtml?faces-redirect=true";
-} // end if Professional
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public String manageGreenfee() { ... }
+*/
 
-    listLessons.forEach(item -> LOG.debug("listLessons Start Date : " + item.getEventStartDate()));
-   // if(professional.getProAmount() == 0.0){ // mod 26-11-2025
-    if(professional.getProAmount().equals(0.0)){    
-        String msg = "amount ZERO no payment Lesson needed !!";
-        LOG.info(msg);
-        showMessageInfo(msg);
-        return null;
-    }
-    // creditcard = new Controllers.CreditcardController().completeWithLesson(professional, listLessons, appContext.getPlayer(), conn);
-    creditcard = creditcardController.completeWithLesson(professional, listLessons, appContext.getPlayer()); // migrated 2026-02-25
-    if(creditcard != null){ 
-        String msg = "Creditcard with lesson ! " +  creditcard;
-        LOG.info(msg);
-    //  showMessageInfo(msg);
-        return "price_pro.xhtml?faces-redirect=true";
-    }else{
-        String msg = "paiement par creditcard KO : quelle conclusion ?";
-        LOG.error(msg);
-        showMessageFatal(msg);
-        throw new Exception(msg);
-      //        return null;
-    }
- }catch (SQLException ex){
-            String msg = "SQLException in manageLesson " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }catch (Exception ex){
-            String msg = "Exception in manageLesson " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
- } //end method manageLesson
- 
- public String manageGreenfee() { // called from price_round_greenfee.xhtml
- try{
-      LOG.debug("entering manageGreenfee");
-      LOG.debug("with creditcard = " + creditcard);
-      LOG.debug("with greenfee = " + greenfee);
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public String testWebServiceHttp() { ... }
+*/
 
-      //  enlevé 25-08-2025 (etypePayment.GREENFEE.toString());  // new 15-08-2025 solution provisoire suite utilisation REST (pas le même context)!!
-
-       sessionMap.put("creditcardType", etypePayment.GREENFEE); 
-         LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
-
-  // 1.  complete greenfee with price   
-      greenfee = tarifGreenfeeController.completeGreenfee(tarifGreenfee, club, round,appContext.getPlayer());
-          LOG.debug("Greenfee completed with tarif data = " + greenfee);
-      if(greenfee.getPrice() == 0){
-    //  if(greenfee.getPrice().equals(0)){    
-          String msg = "amount ZERO,  no payment needed !!";
-          LOG.info(msg);
-          showMessageInfo(msg);
-          return null;
-       }
- // 2. complete creditcard 
-      // creditcard = new CreditcardController().completeWithGreenfee(greenfee,appContext.getPlayer(), conn);
-      creditcard = creditcardController.completeWithGreenfee(greenfee, appContext.getPlayer()); // migrated 2026-02-25
-          LOG.debug("Creditcard Greenfee completed = " + creditcard);
-     return("creditcard.xhtml?faces-redirect=true");
- }catch (Exception ex){
-            String msg = "Exception in manageGreenfee " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
- } // end method
-
-public String testWebServiceHttp() { // from menu TEST Webservice Creditcard Python
-//public void testWebServiceHttp() { // from menu TEST Webservice Creditcard Python    
-try{
-       LOG.debug("entering testWebserviceHttp for creditcard, server = python  ");
-    creditcard.setCreditCardHolder("LOUIS COLLET 11");
-    creditcard.setCreditCardIdPlayer(324713); // mod 31-01-2023
-    creditcard.setCommunication("creditcard using Java11HttpClientExample");
-    //  LOG.debug("testLC = " + ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
- ///   String ldString = LocalDate.now().plusMonths(2).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")); // toujours valide !!
-   //     LOG.debug("ldString = " + ldString);
- //      LOG.debug("contenu CreditCardExpirationDate = " + creditcard.getCreditCardExpirationDate());
-    creditcard.setCreditcardNumber("1111222233334444");
-    creditcard.setTotalPrice(35.0);
-    creditcard.setTypePayment("LESSON");
-    creditcard.setCreditcardType("VISA");
-    creditcard.setCreditcardVerificationCode((short)567);
-    creditcard.setPaymentOK(false);
-    creditcard.setCreditcardCurrency("EUR"); 
-      LOG.debug("just before send payment to python server " + creditcard);
-     String s = new HttpController().sendPaymentServer(creditcard);
-  //  if(creditcard.getErrorMessage() != null){
-     if(creditcard.getCreditCardIdPlayer() != null){    // fake test !!
-       String msg = "Payment validé par Amazone Payments Inc !";
-       LOG.info(msg);
-       showMessageInfo(msg);
-      // return "creditcard_payment_executed.xhtml?faces-redirect=true";
-       return "creditcard_accepted.xhtml?faces-redirect=true";
-   }else{
-       String msg = "payment rejected by Amazone Payments Inc ! !";
-       LOG.error(msg); // + creditcard.getErrorMessage());
-       showMessageFatal(msg);
-       return "welcome.xhtml?faces-redirect=true"; 
-  }
-  }catch (Exception ex){
-            String msg = "Exception in testWebServiceHttp" + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
-} // end method
-
- public void testWebService() {
-     String ws = null;
-     Response response = null;
-try{
-       LOG.debug("entering testWebservice ");
-    ObjectMapper om = new ObjectMapper();
-    om.registerModule(new JavaTimeModule());  // traiter LocalDateTime format 
-
-    Creditcard c = new Creditcard();
-    c.setCreditCardHolder("LOUIS COLLET");
-    c.setCreditCardIdPlayer(324713);
-    c.setCommunication("creditcard communication");
-  ///  c.setCreditCardExpirationDate(LocalDateTime.now());
-    c.setCreditcardNumber("1111222233334444");
-    c.setTotalPrice(35.0);
-    c.setTypePayment("LESSON");
-    c.setCreditcardType("VISA");
-    c.setCreditcardVerificationCode((short)567);
-    String strJson = om.writeValueAsString(c);
-       LOG.debug("creditcard data converted in json format = " + NEW_LINE + strJson);
- //      https://github.com/networknt/json-schema-validator PENDING
-       
-  // fake mod     
-    jakarta.ws.rs.client.Client client = ClientBuilder.newClient();
-    ws = "http://localhost:8083/creditcard/" + URLEncoder.encode(strJson,"utf-8");
-       LOG.debug("going to Webservice creditcard escaped \n" + ws);
-    WebTarget webTarget = client.target(ws);
-    Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-    // going to Python !!
-    
-    response = invocationBuilder.get();
-    response.bufferEntity(); // plusieurs calls de response possibles
-    String s = response.readEntity(String.class);
-      LOG.debug("readEntity s = " + s);
-    final Cookie sessionId = response.getCookies().get("JSESSIONID");  
-      LOG.debug("sessionId = " + sessionId);
-      
-      
-    if(response.getStatus() == Response.Status.OK.getStatusCode()){
-  //         String msg = "response - it is OK  = " + response.getStatus() + "<br/>\n" + ws;
-           String msg = response.readEntity(String.class); // + "<br/>\n" + ws;
-      //      String msg = "response - it is OK  = " + response ; //.readEntity(String.class); // + "<br/>\n" + ws;
-            LOG.debug(msg);
-   //         msg = response.readEntity(String.class);
-            showMessageInfo(msg);
-    }else{
-            String msg= "response - it is !NOT OK!  = " + response.getStatus() + "<br/>\n" + ws;
-            LOG.error(msg);
-            showMessageFatal(msg);
-    }
-   FacesContext facesContext = FacesContext.getCurrentInstance();
-    // This is the proper way to get the view's url
-   ViewHandler viewHandler = facesContext.getApplication().getViewHandler();
-      LOG.debug("we have viewhandler = " + viewHandler);
-   UIViewRoot viewRoot = viewHandler.createView(facesContext, facesContext.getViewRoot().getViewId());
-      LOG.debug("we have viewRoot = " + viewRoot);
-      LOG.debug("we have viewId = " + viewRoot.getViewId());
-  String actionUrl = viewHandler.getActionURL(facesContext, viewRoot.getViewId());
-      LOG.debug("we have actionUrl = " + actionUrl);
-    
-       creditcard = c;  //test only 
-       externalContext.redirect("creditcard_payment_executed.xhtml?faces-redirect=true");
-      
-      
-   } catch (Exception e) {
-            String msg = "£££ Exception in testWebService = " + e.getMessage() + ws;
-            LOG.error(msg);
-            showMessageFatal(msg);
-   } finally{
-        response.close();
-        LOG.debug("response closed");
-}  
-   }   
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public void testWebService() { ... }
+*/   
 
 
  
- public String manageSubscription() throws Exception{ // called from subscription.xhtml
- try{
-       LOG.debug("entering manageSubscription, coming from subscription.xhtml ");
-       LOG.debug(" with Subscription = " + subscription);
-       
-  //  enlevé 25-08-225   writeString(etypePayment.SUBSCRIPTION.toString());  // new 15-08-2025 solution provisoire !!
-       
-       
-  //  sessionMap.put("creditcardType", "SUBSCRIPTION");
-     // creditcard.setCreditcardType(etypePayment.SUBSCRIPTION.toString()); // new 15-08-2025
-      creditcard.setTypePayment(etypePayment.SUBSCRIPTION.toString()); // new 15-08-2025
-        LOG.debug(" with Creditcard = " + creditcard);
-      sessionMap.put("creditcardType", etypePayment.SUBSCRIPTION); 
-    // mod 30-07-2025
-    
-    // comment sauver pour utiliser en methode rest ?
-       LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
-    switch(subscription.getSubCode()){
-        case "TRIAL" -> {    // trial one day
-           LOG.debug("SubCode = TRIAL");
-         //  subscription = new PaymentsSubscriptionController().complete(subscription, conn); // new 24-08-2025
-         // boolean b = new payment.PaymentSubscriptionController().createPayment(subscription, conn);
-           boolean b = paymentSubscriptionController.createPayment(subscription); // migrated 2026-02-25
-           // à compléter
-           return "welcome.xhtml?faces-redirect=true";
-        }
-        case "MONTHLY","YEARLY" ->{ 
-            LOG.debug("getSubCode()is MONTHLY or YEARLY");
-            // mod 16-04-2024
-          //  subscription = new PaymentsSubscriptionController().completePriceAndCommunication(subscription);
-          // subscription = new PaymentSubscriptionController().complete(subscription, conn);
-            subscription = paymentSubscriptionController.complete(subscription); // migrated 2026-02-25
-            // creditcard = new CreditcardController().completeWithSubscription(subscription,appContext.getPlayer(),conn);
-            creditcard = creditcardController.completeWithSubscription(subscription, appContext.getPlayer()); // migrated 2026-02-25
-              LOG.debug("creditcard completed with subscription = " + creditcard);
-            return "creditcard.xhtml?faces-redirect=true";
-        }
-        default -> {LOG.debug(": getSubCode() UNKNOWN = " + subscription.getSubCode() );
-            return null;}
-    } //end switch
-    
-  }catch (Exception ex){
-            String msg = "Exception in manageSubscription " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
-//         return null;
- } //end method manageSubscription
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public String manageSubscription() throws Exception { ... }
+*/
 
-public String registereIDPlayer(){ // throws javax.smartcardio.CardException  // mod 03-12-2017
-    try{
-            LOG.debug("entering register eID Player");
-    //    appContext.getPlayer() = new smartCard.SmartcardBelgium().initClient();  // call webservice
-    
-    // modifié 112-02-2026 non testé !!
-        appContext.setPlayer(new smartCard.SmartcardBelgium().initClient());
-        
-        // http://localhost:8080/rest-demo-1.0/rest/tutorial/pojoJson"
-      //  Player player = new Player();
-      LOG.debug("back from external resource with cardBelgium = " + appContext.getPlayer());
-      if(appContext.getPlayer() == null){
-          String msg = "eid Card Belgium not found";
-          LOG.error(msg);
-          showMessageFatal(msg);
-          return null;
-      }
-    
-       LOG.debug("from registeeIDPlayer = ");// + p);
- //   player = p;
- return "player.xhtml?faces-redirect=true";
-  // return null; // provisoire
-    }catch (Exception ex){
-            String msg = "Exception in registereIDPLayer " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
-}  // end method    
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public String registereIDPlayer() { ... }
+*/
 
-public void onRowToggleCompetition(ToggleEvent event) { // competition
-    LOG.debug("event data = " + event.getData().toString());
-    LOG.debug("event visibility = " + event.getVisibility());
-  //  event.getComponent().
-     String msg =  "Row State " + event.getVisibility() + " / " + event.getData().toString();
-     LOG.debug(msg);
-     showMessageInfo(msg);
-    }
+/* migrated on 2026-02-25 -- now in Controller.refact.RoundController (roundC)
+   public void onRowToggleCompetition(ToggleEvent event) { // competition
+*/
 
 // ✅ MIGRÉ vers PlayerController (playerC) - rowPlayerSelect — 2026-02-25
 /*
@@ -7115,7 +4659,8 @@ public String logout(String lgt){
         if(appContext.getPlayer().getIdplayer()!= null){
             Audit a = new Audit();
             a.setAuditPlayerId(appContext.getPlayer().getIdplayer());
-            a = new find.FindLastAudit().find(a, conn);
+            // a = new find.FindLastAudit().find(a, conn);
+            a = findLastAudit.find(a); // migrated 2026-02-26
             if(a != null){
                 String msg = "ending an audit which started at : " + a.getAuditStartDate().format(ZDF_TIME);
                 LOG.debug(msg);
@@ -7178,51 +4723,27 @@ public String onFlowProcess(FlowEvent event) {
         this.skip = skip;
     }
 
-public void savePlayer(ActionEvent actionEvent) {
-        //Persist user  
-        LOG.debug("entering savePlayer !!");
-        FacesMessage msg = new FacesMessage("Successful", "Welcome :" + appContext.getPlayer().getPlayerFirstName());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public void savePlayer(ActionEvent actionEvent) { ... }
+*/
 
     public static boolean isPostback() {
         return FacesContext.getCurrentInstance().isPostback();
     }
 
-    public void preRenderClub() throws InstantiationException, SQLException, ClassNotFoundException, IllegalAccessException {
-        LOG.debug("preRenderClub called");
-        LOG.debug("preRenderView  : idclub = " + club.getIdclub());
-    //    PhaseId currentPhaseId = FacesContext.getCurrentInstance().getCurrentPhaseId();
-    //    LOG.debug("currentPhaseId 1 = " + currentPhaseId);
-        LOG.debug("currentPhaseId 1 = " + FacesContext.getCurrentInstance().getCurrentPhaseId());
-        LOG.debug("isPostBack ? = " + isPostback());
-        //    if(club.getIdclub()!= null)
-        if ((!isPostback()) && (club.getIdclub() != null))
-        //    postback = false
-        {
-            club = new Club();
-            LOG.debug("preRenderClub : club forced to null ");
-        }
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.ClubController (clubC)
+   public void preRenderClub() { ... }
+*/
 
     public void preRenderCourse() {
         LOG.debug("preRenderCourse called");
     }
 
-  public List<String> teeStartList(Player otherPlayer) throws SQLException {  // used in inscription.xhtml and inscriptions_other_players.xhtml
-       LOG.debug("entering teeStartList = ..." );
-       LOG.debug("with inscription player = " + otherPlayer.toString()); // si inscription d'autres players
-       LOG.debug("with current player = " + appContext.getPlayer().toString());
-     try{
-            // was: return new find.FindTeeStart().find(course, otherPlayer, round, conn);
-            return findTeeStart.find(course, otherPlayer, round);   // migrated 2026-02-24
-      } catch (Exception e) {
-            String msg = "££ Exception in teeStartList ... = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null; // indicates that the same view should be redisplayed
-        } finally { }
+/* migrated on 2026-02-25 — now in Controller.refact.RoundController (roundC)
+  public List<String> teeStartList(Player otherPlayer) throws SQLException {
+            return findTeeStart.find(course, otherPlayer, round);
     } //end method
+*/ // end ✅ MIGRÉ - teeStartList
  
  public void viewChartPlayedRound() {
     Map<String,Object> options = new HashMap<>();
@@ -7258,184 +4779,26 @@ public String getTeeValue(){
  	} 
 private TeeStart[] teeList;
 
-//  !! ne pas toucher ..String typePayment.
-public void onCompletePayment() {
-    LOG.debug("entering onCompletePayment coming from creditcard_accepted.xhtml"); // line 150
-  try{
-     creditcard.setTypePayment(sessionMap.get("creditcardType").toString());
-     savedType = creditcard.getTypePayment();
-        LOG.debug("before payment creditcard = " + creditcard); // completed
-    // IMPORTANT 
-   // new 29-07-2025 va chercher dans HttpController ... qui va dans webservice server python Amazone Payments Inc
-        // qui reviendra vers 
- ///    creditcard = new CreditcardController().getCC1(creditcard); 
-      // String v = new CreditcardController().getCC2(creditcard);
-      String v = creditcardController.getCC2(creditcard); // migrated 2026-02-25
-   //   String v = new HttpController().sendPaymentServer(creditcard); // plus besoinde passer par creditcardController !!
-        LOG.debug("var v returned in OnCompletePayment = " + v);
-        LOG.debug("creditcard returned in OnCompletePayment = " + creditcard);
-  //  if(v.equals("OK")){
-    if(v.equals("200")){    
-       String msg = "Payment validé par Amazone Payments Inc !";
-       LOG.info(msg);
-  ///     showMessageInfo(msg);
-          LOG.debug("sessionMap creditcardType in onCompletePayment = " + sessionMap.get("creditcardType").toString());
-       // new 17-11-2025 enfin une solution propre et pas un hack !!!
-           LOG.debug("before going with context to 5000/about");
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.getExternalContext().redirect("https://localhost:5000/about");
-        context.responseComplete(); // termine proprement le cycle JSF
-// Use FacesContext#responseComplete() to signal JSF that you've already handled the response
-// yourself and that JSF thus doesn't need to render the response
-// FacesContext.responseComplete() does not send any response to the client.
-// It merely sets a flag in the context to tell the JSF framework that no further 
-// lifecycle phases should be processed after the current one completes.    
-          LOG.debug("after redirect with context to 5000/about");  // passe la main à python   
-    }else{
-        String msg = "payment rejected by Amazone Payments Inc ! !";
-        showMessageFatal(msg);
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.getExternalContext().redirect("creditcard_payment_canceled.xhtml?faces-redirect=true");
-        context.responseComplete(); // termine proprement le cycle JSF
-    }
- }catch (Exception e) {
-            String msg = "££ Exception in onCompletePayment  = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-           //return null; // indicates that the same view should be redisplayed
- }
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public void onCompletePayment() { ... }
+*/
 
-} //end method onCompletePayment
-
-// new code 21-01-2026 saved in text editpadlite
-@jakarta.ws.rs.GET
-@jakarta.ws.rs.Path("payment_handle/{isbn}") 
-@Consumes(MediaType.TEXT_PLAIN)
-@Produces(MediaType.TEXT_HTML)
-public jakarta.ws.rs.core.Response handlePayments(
-        @PathParam("isbn") String uuid,
-        @Context HttpServletRequest request,
-        @Context HttpServletResponse response,
-        @Context UriInfo context,
-        @Context HttpHeaders hh,
-        @CookieParam("JSESSIONID") String sessionid,
-        @HeaderParam("User-Agent") String whichBrowser,
-        @HeaderParam("From") String from,
-        @CookieParam("PaymentReference") String reference,
-        @CookieParam("Amount") String amount,
-        @CookieParam("Currency") String currency,
-        @DefaultValue("2") @QueryParam("step") int step,
-        @DefaultValue("true") @QueryParam("min-m") boolean hasMin
-) throws IOException {
-
-    try {
-        LOG.debug("Payment reference = " + reference);
-        LOG.debug("Path parameters = " + context.getPathParameters());
-        LOG.debug("Absolute URI = " + context.getAbsolutePath());
-        LOG.debug("Amount = " + amount);
-
-        // Met à jour la référence et le type de paiement
-        creditcard.setCreditcardPaymentReference(reference);
-        creditcard.setTypePayment(getSavedType());
-        LOG.debug("Creditcard updated: " + creditcard);
-
-        // Vérifie si le creditcard a besoin d'être créé ou mis à jour
-        // boolean needsUpdate = new CreditcardController().needsUpdate(creditcard, appContext.getPlayer(), conn);
-        boolean needsUpdate = creditcardController.needsUpdate(creditcard, appContext.getPlayer()); // migrated 2026-02-25
-        LOG.debug("Creditcard in DB created or modified? " + needsUpdate);
-
-        creditcard.setPaymentOK(true);
-
-        // Crée le PaymentTarget correspondant
-        PaymentTarget target = switch (creditcard.getTypePayment()) {
-            case "SUBSCRIPTION" -> new payment.SubscriptionPayment(subscription);
-            case "COTISATION" -> new payment.CotisationPayment(cotisation);
-            case "GREENFEE" -> new payment.GreenfeePayment(greenfee);
-            default -> throw new IllegalArgumentException(
-                    "Unknown payment type: " + creditcard.getTypePayment()
-            );
-        };
-
-        // Orchestration du paiement via PaymentOrchestrator
-        LOG.debug("before PaymentOrchestrator");
-        // PaymentOrchestrator orchestrator = new PaymentOrchestrator(creditcard, appContext.getPlayer(), round, club, course, inscription, conn);
-        // PaymentOrchestrator orchestrator = new PaymentOrchestrator(creditcard, appContext.getPlayer(), round, club, course, inscription, conn, paymentSubscriptionController);
-        PaymentOrchestrator orchestrator = new PaymentOrchestrator(
-                creditcard, appContext.getPlayer(), round, club, course, inscription,
-                paymentSubscriptionController, paymentGreenfeeController // migrated 2026-02-25
-        );
-
-        orchestrator.handle(target);
-
-        // Redirection finale vers le serveur Python (confirmation)
-        return jakarta.ws.rs.core.Response
-                .status(Response.Status.FOUND)
-                .location(java.net.URI.create("https://localhost:5000/payment_generator"))
-                .build();
-
-    } catch (Exception e) {
-        String msg = "Exception in handlePayments: " + e.getMessage();
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return null; // Redisplay the same view
-    }
-}
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public jakarta.ws.rs.core.Response handlePayments(...) { ... }
+*/
 
 
 
-//  utilisé dans creditcard_accepted.xhtml
-public void onStart() {
-        String msg = "entering onStart, progress1 = " + progress1;
-        LOG.debug(msg);
-        showMessageInfo(msg);
-      //  FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Progress Started"));
-    }
-
-public void onProgress() {
-    String msg = "Progress Updated " + progress1;
-    showMessageInfo(msg);
-}
-
-
- public Integer getProgress1() {
-        progress1 = updateProgress(progress1);
-        return progress1;
-    }
- public void setProgress1(Integer progress1) {
-//     LOG.debug("progress 1 " + progress1);
-        this.progress1 = progress1;
-    }
- 
- private Integer updateProgress(Integer progress) { // important used in creditcard_accepted.xhtml de façon NON visible !!
-   //  LOG.debug("entering updateProgress with param = " + progress);
-        if(progress == null) {
-            progress = 0;
-        }else {
-            progress = progress + (int)(Math.random() * 35);
-            if(progress > 100)
-                progress = 100;
-        }
-   //      LOG.debug("progress returned = " + progress);
-        return progress;
-    }
-
- public void cancelProgress() {
-          LOG.debug("Payment canceled by User");
-        progress1 = null;
-        creditcard.setPaymentOK(false); // le paiement n'est pas exécuté!
-        String msg = "Creditcard payment canceled by user";
-        LOG.error(msg);
-        showMessageFatal(msg);
-    }
-
-// used in schedule_pro
-     public List<Lesson> getListLessons() {
-        return listLessons;
-    }
-
-    public void setListLessons(List<Lesson> listLessons) {
-        this.listLessons = listLessons;
-    }
+/* migrated on 2026-02-25 — now in Controller.refact.PaymentController (payC)
+   public void onStart() { ... }
+   public void onProgress() { ... }
+   public Integer getProgress1() { ... }
+   public void setProgress1(Integer progress1) { ... }
+   private Integer updateProgress(Integer progress) { ... }
+   public void cancelProgress() { ... }
+   public List<Lesson> getListLessons() { ... }
+   public void setListLessons(List<Lesson> listLessons) { ... }
+*/
   /* migré 23-02-2026
   public void textCalculationIndex() throws Exception {
   try{  
@@ -7461,15 +4824,17 @@ public void onProgress() {
   try{  
         LOG.debug("entering textCalculationRound"); // called from dialog_played_rounds.xhtml
         //       <f:viewAction action="#{courseC.textCalculationRound()}" />
-        LOG.debug("selected roundid = " + selectedPlayedRound.round().getIdround());
+        ECourseList selectedRound = appContext.getSelectedPlayedRound(); // migrated 2026-02-25 — was local field
+        LOG.debug("selected roundid = " + selectedRound.round().getIdround());
         LOG.debug("current playerid = "+ appContext.getPlayer().getIdplayer());
     LoggingUser logging = new LoggingUser();
     logging.setLoggingIdPlayer(appContext.getPlayer().getIdplayer());
-    logging.setLoggingIdRound(selectedPlayedRound.round().getIdround());
+    logging.setLoggingIdRound(selectedRound.round().getIdround());
     logging.setLoggingType("R"); // Round
        LOG.debug("logging_user = " + logging);
 // mod 16/08/2022 migration vers mongoDB
-     round.setCalculations(new Controllers.MongoCalculationsController().read(logging));
+     // new Controllers.MongoCalculationsController().read(logging)
+     round.setCalculations(mongoCalculationsController.read(logging)); // migrated 2026-02-26
     
  //          LOG.debug("Calculations text = " + round.getCalculations());
   }catch (Exception ex){
@@ -7524,7 +4889,8 @@ public void onProgress() {
 
       Club club = new Club();
       club.setIdclub(101);  //rigenée
-      club = new read.ReadClub().read(club);
+      // club = new read.ReadClub().read(club);
+      club = readClubService.read(club); // migrated 2026-02-26
          LOG.debug("club = " + club);
       Course course = new Course();
       Round round = new Round(); 
@@ -7683,20 +5049,9 @@ public void onProgress() {
     }
 } // end method
   */
-  public void onPlayerSelected(SelectEvent<?> event) {
-    Object obj = event.getObject();
-
-        switch (obj) {
-            case DialogResult<?> dr -> {
-                Player p = (Player) dr.data();
-             //   localAdmin = p;
-                appContext.setLocalAdmin(p); // non testé
-            } 
-                
-            case String s -> LOG.warn("Dialog returned String: {}", s);
-            default -> LOG.error("Unexpected dialog return type: {}", obj.getClass());
-        }
-  }
+/* migrated on 2026-02-25 — now in Controller.refact.PlayerController (playerC)
+   public void onPlayerSelected(SelectEvent<?> event) { ... }
+*/
    
   
    public void main(String args[]) throws InstantiationException, SQLException, ClassNotFoundException, IllegalAccessException {

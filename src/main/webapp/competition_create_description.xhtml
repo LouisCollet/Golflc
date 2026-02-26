@@ -34,10 +34,10 @@
      <p:inputText id="CompName"
                    size="50"
                    title="#{msg['tooltip.competition.name']}"
-                   value="#{courseC.competition.competitionDescription.competitionName}" />
+                   value="#{roundC.competition.competitionDescription.competitionName}" />
 
     <p:outputLabel for="@next"  value="#{msg['competition.date']} :"/>
-    <p:datePicker value="#{courseC.competition.competitionDescription.competitionDate}"
+    <p:datePicker value="#{roundC.competition.competitionDescription.competitionDate}"
                   id="competDateid"
                   locale="#{languageC.locale}"
                   pattern="dd/MM/yyyy HH:mm"
@@ -53,7 +53,7 @@
     </p:datePicker>
 
     <p:outputLabel for="@next"  value="#{msg['competition.start.inscription']} :"/>
-    <p:datePicker value="#{courseC.competition.competitionDescription.startInscriptionDate}"
+    <p:datePicker value="#{roundC.competition.competitionDescription.startInscriptionDate}"
                   id="startDateid"
                   locale="#{languageC.locale}"
                   lang="#{languageC.locale}"
@@ -68,10 +68,8 @@
                   >
     </p:datePicker>
     
-<!-- rendered="#{courseC.player.playerRole eq 'ADMIN' or courseC.player.playerRole eq 'admin'}">   -->
-
       <p:outputLabel for="@next"  value="#{msg['competition.end.inscription']} :"/>
-      <p:datePicker value="#{courseC.competition.competitionDescription.endInscriptionDate}"
+      <p:datePicker value="#{roundC.competition.competitionDescription.endInscriptionDate}"
                   id="endDateid"
                   locale="#{languageC.locale}"
                   pattern="dd/MM/yyyy HH:mm"
@@ -85,79 +83,20 @@
                   >
     </p:datePicker>
 
-         <p:outputLabel for="inputHomeClub" value="#{msg['player.homeclub']}" />
-            <h:panelGroup layout="block" id="containerClub">
-                <p:inputNumber
-                       id="inputHomeClub"
-                       label="HomeClub"
-                       styleClass="mystyle"
-                       value="#{courseC.competition.competitionDescription.competitionClubId}"
-                       size="5"
-                       decimalPlaces="0"
-                       emptyValue="0"
-                       style="margin-left:1.5em; margin-right:1.5em;" />
-                <p:commandButton 
-                         id="ButtonHomeClub"
-                         ajax="true"
-                         immediate="true"
-                         value="#{msg['button.player.homeclub']}"
-                         actionListener="#{dialogC.showSelectClub('competition_description')}"
-                         style="float:left;"
-                         icon="pi pi-search" >
-    <!--  dialogReturn gets triggered when the dialog is being closed. in  -->
-                    <p:ajax event="dialogReturn"
-                         update=":competition_description:inputHomeClub,clubName,competitionClubId" />
-                 </p:commandButton>
+            <!-- =================== INCLUDE CLUB SELECTOR =================== -->
+                <ui:include src="/include/include_club_selector.xhtml" >
+                    <ui:param name="clubLabel" value="Club 1" />
+                </ui:include>
+            <!-- =================== INCLUDE COURSE SELECTOR =================== -->
+                <ui:include src="/include/include_course_selector.xhtml" />
+                
       
-                <h:outputText id="clubName"
-                              value="#{courseC.club.clubName}"
-                              style="font-style:italic"/>
-                <h:outputText id="competitionClubId"
-                              value=" #{courseC.competition.competitionDescription.competitionClubId}"
-                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
-            </h:panelGroup>
-  <!-- new 16-10-2020          -->
-          <p:outputLabel for="inputCourseId" value="#{msg['course.id']} :" />
-          <h:panelGroup layout="block" id="containerCourse">
-           <p:inputNumber
-               id="inputCourseId"
-               label="inputCourse"
-               value="#{courseC.competition.competitionDescription.competitionCourseId}"
-               size="5"
-               decimalPlaces="0"
-               emptyValue="0"
-               style="margin-left:1.5em;margin-right:1.5em;"
-                />
-           <p:commandButton 
-                id="ButtonCourse"
-                ajax="true"
-                immediate="true"
-                value="#{msg['button.course.list']}"
-                actionListener="#{dialogC.showSelectCourse('competition',courseC.competition.competitionDescription.competitionClubId)}"
-                style="float:left;"
-                icon="pi pi-search" >
-                    <p:ajax event="dialogReturn"
-                            listener="#{dialogC.handleReturnCourse}"
-                            update=":competition_description:inputCourseId, courseName,courseId" />
-           </p:commandButton>
-
-           <h:outputText id="courseName"
-                          value=" #{courseC.course.courseName}"
-                          style="font-style:italic"/>
-            <h:outputText id="courseId"
-                          value=" #{courseC.course.idcourse}"
-                          style="font-weight:bold;font-size: 2em;font-style:italic;color: red"/>
-       </h:panelGroup>
-  <!--    ne fonctionne pas non plus !!
-  https://subscription.packtpub.com/book/web_development/9781849519281/1/ch01lvl1sec10/ajax-basics-with-process-and-update
-  https://github.com/ova2/primefaces-cookbook/blob/second-edition/src/main/java/org/primefaces/cookbook/controller/chapter1/PartialProcessingBean.java
-  -->
       <h:panelGroup id="panelGender" layout="block" >
                  <p:outputLabel for="gender" value="#{msg['player.gender']}" style="font-weight:bold"  />
                  <span class="ui-inputgroup-addon"><i class="pi pi user-minus"></i></span>
        </h:panelGroup>
                 <p:selectOneButton id="gender"
-                                   value="#{courseC.competition.competitionDescription.competitionGender}" >
+                                   value="#{roundC.competition.competitionDescription.competitionGender}" >
                     <f:selectItem itemLabel="#{msg['player.gent']}" itemValue="M"/>
                     <f:selectItem itemLabel="#{msg['player.lady']}" itemValue="L" />
                     <f:selectItem itemLabel="#{msg['player.intersex']}" itemValue="X" />
@@ -165,8 +104,8 @@
 
         <p:outputLabel for="@next" value="#{msg['round.game']} * " />
         <p:selectOneMenu id="game2"
-                         value="#{courseC.competition.competitionDescription.competitionGame}">
-            <f:selectItems value="#{courseC.gameList}"
+                         value="#{roundC.competition.competitionDescription.competitionGame}">
+            <f:selectItems value="#{roundC.gameList}"
                            var="role" 
                            itemLabel="#{role}"
                            itemValue="#{role}" />
@@ -174,15 +113,15 @@
  
         <p:outputLabel for="@next" value="#{msg['round.qualifying']}"   />
         <p:selectOneButton id="qualifying"
-                           value="#{courseC.competition.competitionDescription.competitionQualifying}"
+                           value="#{roundC.competition.competitionDescription.competitionQualifying}"
                            styleClass="oneradio" >
-               <f:selectItems value="#{courseC.availableQualifying}" />
+               <f:selectItems value="#{roundC.availableQualifying}" />
         </p:selectOneButton>
         
         <p:outputLabel for="@next" value="#{msg['competition.starthole']} :" />
         <p:inputNumber
 			id="startHole"
-                        value="#{courseC.competition.competitionDescription.competitionStartHole}"
+                        value="#{roundC.competition.competitionDescription.competitionStartHole}"
 			minValue="1"
                         emptyValue="1"
                         maxValue="10"
@@ -196,7 +135,7 @@
         <p:outputLabel for="@next" value="#{msg['competition.players']} :" />
         <p:inputNumber
 			id="FlightnumberPlayers"
-                        value="#{courseC.competition.competitionDescription.flightNumberPlayers}"
+                        value="#{roundC.competition.competitionDescription.flightNumberPlayers}"
                         size="1"
                         title="#{msg['tooltip.tarif.choice']}"
                         decimalPlaces="0"
@@ -204,7 +143,7 @@
          </p:inputNumber>
         
     <p:outputLabel for="@next"  value="#{msg['competition.pricegiving']} :"/>
-    <p:datePicker value="#{courseC.competition.competitionDescription.priceGivingTime}"
+    <p:datePicker value="#{roundC.competition.competitionDescription.priceGivingTime}"
                   id="givingtimeid"
                   locale="#{languageC.locale}"
                   pattern="HH:mm"
@@ -218,11 +157,11 @@
                   size="6"
                   >
     </p:datePicker>
-  <!--  mindate="#{courseC.competition.competitionDescription.minTime}"
-                  maxdate="#{courseC.competition.competitionDescription.maxTime}"  -->
+  <!--  mindate="#{roundC.competition.competitionDescription.minTime}"
+                  maxdate="#{roundC.competition.competitionDescription.maxTime}"  -->
   
     <p:outputLabel for="@next"  value="#{msg['competition.startinglist.publication']} :"/>
-    <p:datePicker value="#{courseC.competition.competitionDescription.startingListDate}"
+    <p:datePicker value="#{roundC.competition.competitionDescription.startingListDate}"
                   id="startListDateid"
                   locale="#{languageC.locale}"
                   pattern="dd/MM/yyyy HH:mm"
@@ -236,10 +175,8 @@
                   >
     </p:datePicker>
 
-<!-- rendered="#{courseC.player.playerRole eq 'ADMIN' or courseC.player.playerRole eq 'admin'}">   -->
-
       <p:outputLabel for="@next"  value="#{msg['competition.classment']} :"/>
-      <p:datePicker value="#{courseC.competition.competitionDescription.classmentDate}"
+      <p:datePicker value="#{roundC.competition.competitionDescription.classmentDate}"
                   id="classDateid"
                   locale="#{languageC.locale}"
                   pattern="dd/MM/yyyy HH:mm"
@@ -266,7 +203,7 @@
         <p:outputLabel for="@next" value="Série ${v} : "/>
         <p:inputNumber id="serie1${v}"
                 label="series"
-                value="#{courseC.competition.competitionDescription.seriesHandicap[v-1][0]}"
+                value="#{roundC.competition.competitionDescription.seriesHandicap[v-1][0]}"
                 size="5"
                 decimalPlaces="1"
                 emptyValue="00.0"
@@ -278,7 +215,7 @@
          <h:outputText value=" - "/>
          <p:inputNumber id="serie2${v}"
                 label="series"
-                value="#{courseC.competition.competitionDescription.seriesHandicap[v-1][1]}"
+                value="#{roundC.competition.competitionDescription.seriesHandicap[v-1][1]}"
                 size="5"
                 decimalPlaces="1"
                 emptyValue="00.0"
@@ -294,7 +231,7 @@
         <p:outputLabel for="@next" value="#{msg['competition.age.ladies']} :" />
         <p:inputNumber
 			id="AgeLadies"
-                        value="#{courseC.competition.competitionDescription.competitionAgeLadies}"
+                        value="#{roundC.competition.competitionDescription.competitionAgeLadies}"
                         required="true"
                         size="2"
                         title="#{msg['tooltip.tarif.choice']}"
@@ -304,7 +241,7 @@
  
          <p:outputLabel for="@next" value="#{msg['competition.age.men']} :" />
         <p:inputNumber	id="AgeMens"
-                        value="#{courseC.competition.competitionDescription.competitionAgeMens}"
+                        value="#{roundC.competition.competitionDescription.competitionAgeMens}"
                         required="true"
                         size="2"
                         title="#{msg['tooltip.tarif.choice']}"
@@ -313,7 +250,7 @@
          <p:outputLabel for="@next" value="#{msg['competition.maximum.inscriptions']} :" />
         <p:inputNumber
 			id="CompetitionmaximumPlayers"
-                        value="#{courseC.competition.competitionDescription.competitionMaximumPlayers}"
+                        value="#{roundC.competition.competitionDescription.competitionMaximumPlayers}"
                         required="true"
                         size="2"
                         title="#{msg['tooltip.tarif.choice']}"
@@ -324,10 +261,10 @@
                          id="ButtonCreate"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                     
                          icon="pi pi-plus"
                          style="width:140px"
-                         action="#{courseC.createCompetitionDescription()}"/>
+                         action="#{roundC.createCompetitionDescription()}"/>
     <!--
             <p:commandButton value="Visualisation"
                          id="commandButtonVisual"
@@ -335,7 +272,7 @@
                          update="growl-msg"
                          immediate="true" 
                          icon="pi pi-plus"
-                         action="#{courseC.showUnavailableStructure}"/>
+                         action="#{clubC.showUnavailableStructure}"/>
    immediate=true for skip validations    
          <p:commandButton value="#{msg['unavailable.structure.create']}"
                          id="commandButtonCreate"

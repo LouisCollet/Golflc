@@ -3,67 +3,82 @@ package entite.composite;
 import entite.Club;
 import entite.Player;
 import entite.Subscription;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import java.io.Serializable;
-import utils.LCUtil;
 
-@Named
-@RequestScoped 
+/**
+ * DTO immutable pour regrouper Subscription, Player et Club
+ * Représente une souscription d'un joueur dans un club
+ *
+ * Version refactorisée : Record sans CDI
+ */
+public record ESubscription(
+    Subscription subscription,
+    Player player,
+    Club club
+) {
 
-public class ESubscription implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-@Inject  private Subscription Subscription;
-@Inject  private Player player;
-@Inject  private Club club;
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public ESubscription {
+        // Validation métier possible
+        // ex : Objects.requireNonNull(subscription, "subscription obligatoire");
+    }
 
-public ESubscription(){  //constructor
-   
+    /**
+     * Constructeur secondaire : Subscription + Player uniquement
+     */
+    public ESubscription(Subscription subscription, Player player) {
+        this(subscription, player, null);
+    }
+
+    /* =======================
+       Getters explicites (JSF / EL)
+       ======================= */
+    public Subscription getSubscription() { return subscription; }
+    public Player getPlayer() { return player; }
+    public Club getClub() { return club; }
+
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+    public ESubscription withSubscription(Subscription subscription) {
+        return new ESubscription(subscription, this.player, this.club);
+    }
+
+    public ESubscription withPlayer(Player player) {
+        return new ESubscription(this.subscription, player, this.club);
+    }
+
+    public ESubscription withClub(Club club) {
+        return new ESubscription(this.subscription, this.player, club);
+    }
+
+    /* =======================
+       Formatage pour affichage/debug
+       ======================= */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : ESUBSCRIPTION
+            %s %s %s
+            """.formatted(
+                subscription != null ? subscription : "",
+                player != null ? player : "",
+                club != null ? club : ""
+        ).replaceAll("(?m)^\\s*$\n", "");
+    }
+
+    /* =======================
+       Vérifications métier
+       ======================= */
+    public boolean isComplete() {
+        return subscription != null && player != null && club != null;
+    }
+
+    public boolean hasEssentialData() {
+        return subscription != null && player != null;
+    }
+
+    public boolean hasAnyData() {
+        return subscription != null || player != null || club != null;
+    }
 }
-
-    public Subscription getSubscription() {
-        return Subscription;
-    }
-
-    public void setSubscription(Subscription Subscription) {
-        this.Subscription = Subscription;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
- //   public Club getClub() {
- //       return club;
- //   }
-
- //   public void setClub(Club club) {
-  //      this.club = club;
-  //  }
-
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
-        + TAB + Subscription
-        + TAB + player
-    //    + TAB + club    
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in ESubscription.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class

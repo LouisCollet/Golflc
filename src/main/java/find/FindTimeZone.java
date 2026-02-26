@@ -3,22 +3,21 @@ package find;
 import com.google.maps.GeoApiContext;
 import com.google.maps.TimeZoneApi;
 import com.google.maps.errors.ApiException;
-import static interfaces.GolfInterface.GoogleApiKey;
 import static interfaces.Log.LOG;
 import java.sql.SQLException;
 import java.util.TimeZone;
 import utils.LCUtil;
 
 public class FindTimeZone{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 // used for Club and Player !!
-// public static TimeZone find(GeocodingResult[] results) throws ApiException{ /*/ mod 15-10-2024
+
  public static TimeZone find(entite.LatLng latlng) throws ApiException{   
-   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+   final String methodName = utils.LCUtil.getCurrentMethodName();
 try{
        LOG.debug("entering " + methodName);
        java.util.TimeZone timeZone;
-       try (GeoApiContext context = new GeoApiContext.Builder().apiKey(GoogleApiKey).build()) {
+       try (GeoApiContext context = new GeoApiContext.Builder().apiKey(System.getenv("GOOGLE_MAPS_API_KEY")).build()) {
         //   LOG.debug("results 0 =" + results[0]);
          //  timeZone = TimeZoneApi.getTimeZone(context,results[0].geometry.location).await();
            com.google.maps.model.LatLng latlngGoogle = new com.google.maps.model.LatLng();

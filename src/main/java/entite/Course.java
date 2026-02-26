@@ -2,20 +2,15 @@ package entite;
 
 import static interfaces.Log.LOG;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Date;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import utils.LCUtil;
 
-@Named
-@RequestScoped
 public class Course implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
 @NotNull(message="Bean validation : the Course ID must be completed")
     private Integer idcourse;
 
@@ -36,7 +31,8 @@ private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
 @Max(value=74,message="{tee.slope.max}") // still used ??
     private Short coursePar;
 // new 19-08-2023
-    private Integer club_idclub;
+ //   private Integer club_idclub;
+    private int club_idclub;  // mod 15-02-026
   //  private Date courseBeginDate;
     private LocalDateTime courseBeginDate;
   //  private Date courseEndDate;
@@ -84,13 +80,15 @@ private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
  //       LOG.debug("setCoursepar to " + this.coursePar);
     }
 
-    public Integer getClub_idclub() {
+    public int getClub_idclub() {
         return club_idclub;
     }
 
-    public void setClub_idclub(Integer club_idclub) {
+    public void setClub_idclub(int club_idclub) {
         this.club_idclub = club_idclub;
     }
+
+ 
 
  //   public Date getCourseModificationDate() {
  //       return courseModificationDate;
@@ -154,24 +152,4 @@ public String toString(){
         return msg;
   }
 }
-  public static Course dtoMapper(ResultSet rs){
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-  try{
-        Course c = new Course();
-	c.setIdcourse(rs.getInt("idcourse"));
-        c.setCourseName(rs.getString("coursename") );
-        c.setCourseHoles(rs.getShort("CourseHoles"));
-        c.setCoursePar(rs.getShort("coursePar"));
-        c.setClub_idclub(rs.getInt("course.club_idclub"));
-       // c.setCourseBeginDate(rs.getTimestamp("courseBeginDate")); // format 'DATE' in database
-        c.setCourseBeginDate(rs.getTimestamp("courseBeginDate").toLocalDateTime());
-        c.setCourseEndDate(rs.getTimestamp("courseEndDate").toLocalDateTime());
-   return c;
- }catch(Exception e){
-    String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
 } // end class

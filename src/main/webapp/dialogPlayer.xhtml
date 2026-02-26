@@ -8,21 +8,17 @@
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
       template="templates/dialogTemplate.xhtml">
-<ui:define name="title">Dialog Players Page </ui:define>
+<ui:define name="title">Dialog Player Page </ui:define>
 <ui:define name="content">
     <c:set var="select" value="#{param.param_player}"/>
 
-<h:form id="form_select_player">
-<p:dataTable id="rounds"
-             value="#{courseC.listPlayers()}"
+<h:form id="form_dialogPlayer">
+<p:dataTable id="dataDialog"
+             value="#{playerC.listPlayers()}"
              var="c"
              rowIndexVar="row"
-             emptyMessage="#{msg['message.table.empty']}"
-             
-            >
-<!--   rowKey="#{c.player.idplayer}" 
-filteredValue="#{courseC.filteredPlayers} -->
-    
+             emptyMessage="#{msg['message.table.empty']}" >
+
 <f:facet name="header">
     <h:outputText escape="false" value="#{msg['message.playerslist']}(for = #{param.param_player})" />
 </f:facet>
@@ -41,16 +37,9 @@ filteredValue="#{courseC.filteredPlayers} -->
             <p:commandButton
                 id="selectButton"
                 value="#{c.player.idplayer} - #{msg['button.select']}"
-                action="#{courseC.selectDialogPlayer(c)}"
-                ajax="true"
+                action="#{courseC.selectedPlayerFromDialog(c)}"
                 icon="pi pi-arrow-left">
              </p:commandButton>
-
-<!--   onclick="PrimeFaces.error('This is an error message not ryder.')"  <f:setPropertyActionListener target="#{ryderC.selectDialogPlayer}" value="#{c.player}" 
-            <p:commandButton action="#{ryder.editAction()}">
-	         <f:param name="action" value="delete" />
-            </p:commandButton>
-           --> 
 	</p:column>
 
 	<p:column toggleable="false"

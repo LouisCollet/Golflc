@@ -13,7 +13,7 @@
 <h:form id="select_inscription_round">
 
 <p:dataTable id="recent_round"
-             value="#{courseC.listInscriptions()}"
+             value="#{roundC.listInscriptions()}"
              rowIndexVar="row"
              resizableColumns="true"
              var="c"
@@ -22,7 +22,7 @@
              style="border:solid 5px;overflow-x:scroll;"  >
 
 <p:ajax event="rowToggle" 
-        listener="#{courseC.onRowToggleCompetition}" />
+        listener="#{roundC.onRowToggleCompetition}" />
 <!-- update=":select_inscription_round:growl-msg"  -->
 <f:facet name="header">
     <h1>#{msg['message.selectround']} #{msg['message.for.inscription']}</h1>
@@ -48,7 +48,7 @@
                   width="20%" >
             <p:commandButton
                 id="selectButton"
-                action="#{courseC.selectRecentInscription(c)}"
+                action="#{roundC.selectRecentInscription(c)}"
                 value="#{c.round.idround} - Round"
                 icon="pi pi-angle-right">
              </p:commandButton>
@@ -59,7 +59,7 @@
                   width="20%" >
             <p:commandButton
                 id="selectButton2"
-                action="#{courseC.showUnavailablePeriods(c)}"
+                action="#{clubC.showUnavailablePeriods(c)}"
                 value="#{c.round.idround} - #{msg['button.select']}"
                 icon="pi pi-forward">
              </p:commandButton>
@@ -94,11 +94,11 @@
                   footerText="#{msg['round.canceled']}"
                   width="18%"
                   style="color:red"
-                  rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}"
+                  rendered="#{playerC.isAdmin()}"
                   id="cancelround">
             <p:commandButton
                 id="cancelButton"
-                action="#{courseC.cancelRound(c)}"
+                action="#{roundC.cancelRound(c)}"
                 value="#{msg['button.delete']} - #{c.round.idround}"
                 icon="pi pi-trash"
                 style="color:red" >
@@ -114,7 +114,7 @@
                   style="white-space:pre-line;text-align:right"
                   id="teestart"
                   width="5%"  >
-                        #{courseC.roundPlayersList().size()}
+                        #{roundC.roundPlayersList().size()}
         </p:column>
 -->
 	<p:column   id="colclubname"
@@ -190,7 +190,7 @@ colonne trop large
                 <h:outputText value="Nombre de joueurs:"/>
                 <h:outputText
                       id="zonedDate1"
-                      value="#{courseC.roundPlayersList().size()}" />
+                      value="#{roundC.roundPlayersList().size()}" />
 
                 <h:outputText value="Qualifying:" />
                 <h:outputText

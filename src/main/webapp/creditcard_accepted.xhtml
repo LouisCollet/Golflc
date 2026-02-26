@@ -10,7 +10,7 @@
       template="templates/masterTemplate.xhtml">
     <ui:define name="metadata">
     <f:metadata>
-        <f:viewAction action="#{courseC.setProgress1(0) }"/>
+        <f:viewAction action="#{payC.setProgress1(0) }"/>
      </f:metadata>
     <!-- https://stackoverflow.com/questions/6377798/what-can-fmetadata-fviewparam-and-fviewaction-be-used-for -->
 </ui:define>
@@ -47,13 +47,13 @@
 
 <h:form id="creditcard_accepted" >
 
-    <c:if test="#{courseC.creditcard.typePayment eq 'GREENFEE'}">
+    <c:if test="#{payC.creditcard.typePayment eq 'GREENFEE'}">
          <ui:include src="include/include_summary_round.xhtml"/>
     </c:if>
-    <c:if test="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}">
+    <c:if test="#{payC.creditcard.typePayment eq 'SUBSCRIPTION'}">
          <ui:include src="include/include_subscription.xhtml"/>
     </c:if>
-    <c:if test="#{courseC.creditcard.typePayment eq 'COTISATION'}">
+    <c:if test="#{payC.creditcard.typePayment eq 'COTISATION'}">
          <ui:include src="include/include_summary_club.xhtml"/>
     </c:if>
 <p:panelGrid
@@ -68,70 +68,70 @@
     <h:outputText
             id="subscription"
             escape="false"
-            rendered="#{courseC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
+            rendered="#{payC.creditcard.typePayment eq 'SUBSCRIPTION'}" 
             value="#{msg['title.payment.subscription']}">
     </h:outputText>
     <h:outputText
             id="inscription"
             escape="false"
-            rendered="#{courseC.creditcard.typePayment = 'GREENFEE'}" 
+            rendered="#{payC.creditcard.typePayment = 'GREENFEE'}" 
             value="#{msg['title.payment.round']}">
     </h:outputText>
     <h:outputText
             id="membership"
             escape="false"
-            rendered="#{courseC.creditcard.typePayment eq 'COTISATION'}" 
+            rendered="#{payC.creditcard.typePayment eq 'COTISATION'}" 
             value="#{msg['title.payment.cotisation']}">
     </h:outputText> 
       </h2>  
 </f:facet>
  
     <h:outputText value="#{msg['creditcard.amounttobepaid']} :" />
-    <h:outputText value="#{courseC.creditcard.totalPrice}"
+    <h:outputText value="#{payC.creditcard.totalPrice}"
                   style="font-size: 3rem;" />
 
     <h:outputText value="#{msg['tarif.members.currency']} :" />
-    <h:outputText value="#{courseC.creditcard.creditcardCurrency}"
+    <h:outputText value="#{payC.creditcard.creditcardCurrency}"
                   style="font-size: 2em;" />
 
     <h:outputText value="#{msg['creditcard.communication']} :" />
-    <h:outputText value="#{courseC.creditcard.communication}"
+    <h:outputText value="#{payC.creditcard.communication}"
                   title="#{msg['tooltip.club.clubaddress']}" />
 
     <h:outputText value="#{msg['creditcard.holder']} :" />
-    <h:outputText value="#{courseC.creditcard.creditcardHolder}" />
+    <h:outputText value="#{payC.creditcard.creditcardHolder}" />
 
     <h:outputText value="#{msg['creditcard.number']} :"/>
-    <h:outputText value="#{courseC.creditcard.creditcardNumber}" />
+    <h:outputText value="#{payC.creditcard.creditcardNumber}" />
 
     <h:outputText value="#{msg['creditcard.type']} :"/>
-    <h:outputText value="#{courseC.creditcard.creditcardType}"/>
+    <h:outputText value="#{payC.creditcard.creditcardType}"/>
 
     <h:outputText value="#{msg['creditcard.expirationdate']} :" />
 
-    <h:outputText value="#{courseC.creditcard.creditCardExpirationDateString}"/>
+    <h:outputText value="#{payC.creditcard.creditCardExpirationDateString}"/>
 
     <h:outputText value="#{msg['creditcard.industry']} :" />
-    <h:outputText value="#{courseC.creditcard.creditCardMajorIndustryIdentifier}" />
+    <h:outputText value="#{payC.creditcard.creditCardMajorIndustryIdentifier}" />
  <!-- https://www.primefaces.org/showcase/ui/misc/progressBar.xhtml?jfwid=85a80 -->
     <h:outputText  id="taskResult" value=" "/> 
     <p:progressBar id="progressBar2"
                    widgetVar="pbAjax" 
-                   ajax="true"
-                   value="#{courseC.progress1}"
+                    
+                   value="#{payC.progress1}"
                    labelTemplate="{value}%"
                    styleClass="animated"
                    global="false"
                    interval="1000"
-                   severity="#{courseC.progress1 eq 100 ? 'success' : 'warning'}"
+                   severity="#{payC.progress1 eq 100 ? 'success' : 'warning'}"
                    style="width:100%;height: 25px; font-size: 2em;color:red" >
   <!-- here is the magic ! -->
         <p:ajax event="complete" 
-                listener="#{courseC.onCompletePayment()}"
+                listener="#{payC.onCompletePayment()}"
                 update="taskResult,progressBar2"
                 oncomplete="PF('startButton2').disable()"/>
-        <p:ajax event="start" listener="#{courseC.onStart}" update="taskResult,growl-msg" /> 
-  <!--  clignote !!    <p:ajax event="progress" listener="#{courseC.onProgress}" update="growl-msg" />   -->
+        <p:ajax event="start" listener="#{payC.onStart}" update="taskResult,growl-msg" /> 
+  <!--  clignote !!    <p:ajax event="progress" listener="#{payC.onProgress}" update="growl-msg" />   -->
    </p:progressBar>
 <f:facet name="footer">
     <p:commandButton id="startButton"
@@ -140,7 +140,7 @@
                      type="button"
                      icon="pi pi-credit-card"
                      style="float: left;"
-                     rendered="#{courseC.creditcard.paymentOK eq false}"
+                     rendered="#{payC.creditcard.paymentOK eq false}"
                      update="taskResult,growl-msg"
                      onclick="PF('pbAjax').start();"
                      oncomplete="window.scrollTo(0,0); return false;" />
@@ -151,8 +151,8 @@
                      update="growl-msg"
                      icon="pi pi-undo"
                      style="float:right;"
-                     action="#{courseC.cancelProgress()}"
-                     immediate="false"
+                     action="#{payC.cancelProgress()}"
+                     
                      oncomplete="PF('pbAjax').cancel();PF('startButton2').enable()"
                      styleClass="ui-button-outlined"/>
 </f:facet>

@@ -26,36 +26,12 @@
         <h:outputText escape="false" value="#{msg['message.selectclub.cotisaton']}" />
     </f:facet>
 
-         <h:outputText value="#{msg['club.name']}" />
-         <h:panelGroup layout="block" id="container2">
-                <p:inputNumber
-                       id="inputClub"
-                       value="#{courseC.club.idclub}"
-                       size="5"
-                       style="margin-right: 10px;"
-                       decimalPlaces="0"
-                       minValue="1"
-                       emptyValue="0" />
-                <p:commandButton 
-                         id="ButtonClub"
-                         immediate="true"
-                         value="#{msg['button.player.homeclub']}"
-                         actionListener="#{dialogC.showSelectClub('cotisation_spontaneous')}"
-                         style="margin-right: 10px;"
-                         icon="pi pi-search" >
-                    <p:ajax event="dialogReturn"
-                         update="inputClub,clubName,playerClub" />
-                </p:commandButton>
-
-                <h:outputText id="clubName"
-                              value=" #{courseC.club.clubName}" 
-                              style="font-style:italic"/>  
-
-                <h:outputText id="playerClub"
-                              value=" #{courseC.club.idclub}"
-                              style="font-weight:bold;font-size: 2rem;font-style:italic;color: blue" />  
-          </h:panelGroup>
-
+    
+    <!-- =================== INCLUDE CLUB SELECTOR =================== -->
+                <ui:include src="/include/include_club_selector.xhtml" >
+                    <ui:param name="clubLabel" value="Club 1" />
+                </ui:include>
+    
 <f:facet name="footer">
     <p:commandButton
                          value="#{msg['button.club.choice']}"
@@ -63,13 +39,10 @@
                          ajax="false"
                          style="font-weight:normal "
                          update="growl-msg"
-                         immediate="false"
                          icon="pi pi-database"
-                         action="#{courseC.selectorClubNextView()}">
+                         action="#{clubC.selectorClubNextView()}">
                          
     </p:commandButton>                    
-        <!-- action="cotisation.xhtml?faces-redirect=true"/>  --> 
-                         
 </f:facet>
 </p:panelGrid>
 </h:form>

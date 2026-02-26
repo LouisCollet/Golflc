@@ -1,29 +1,23 @@
 package entite;
-import entite.composite.ECourseList;
+
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
-
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import utils.LCUtil;
 
-@Named //enlevé 19/07/2022
-@RequestScoped  
+//@Named //enlevé 14-02-2026
+//@RequestScoped  
 public class HandicapIndex implements Serializable {
-
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private int handicapId;
     private int handicapPlayerId;
     private int handicapRoundId;
@@ -45,7 +39,7 @@ public class HandicapIndex implements Serializable {
     private Short handicapPlayedStrokes;
  //   private Short handicapTotalStrokes;
 // working areas
-    private ECourseList selectedHandicap;
+  ///  private ECourseList2 selectedHandicap; // enlevé 23-02-2026 moved to PlayerController
     private List <?>filteredHandicaps;
     private String calculations;
     
@@ -124,13 +118,13 @@ public class HandicapIndex implements Serializable {
  //       LOG.debug("set handicap comment = " + this.handicapComment);
     }
 
-    public ECourseList getSelectedHandicap() {
-        return selectedHandicap;
-    }
+ //   public ECourseList2 getSelectedHandicap() {
+ //       return selectedHandicap;
+  //  }
 
-    public void setSelectedHandicap(ECourseList selectedHandicap) {
-        this.selectedHandicap = selectedHandicap;
-    }
+  //  public void setSelectedHandicap(ECourseList2 selectedHandicap) {
+  //      this.selectedHandicap = selectedHandicap;
+  //  }
 
     public List<?> getFilteredHandicaps() {
         return filteredHandicaps;
@@ -181,9 +175,9 @@ public class HandicapIndex implements Serializable {
     public void setHandicapExpectedSD9Holes(double handicapExpectedSD9Holes) {
         this.handicapExpectedSD9Holes = handicapExpectedSD9Holes;
     }
-
+/*
 public static HandicapIndex map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         HandicapIndex h = new HandicapIndex();
         h.setHandicapId(rs.getInt("HandicapId") );
@@ -209,10 +203,10 @@ public static HandicapIndex map(ResultSet rs) throws SQLException{
     return null;
   }
 } //end method    
-
+*/
 @Override
     public String toString(){
- //   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+ //   final String methodName = utils.LCUtil.getCurrentMethodName(); 
  try{ 
 //     LOG.debug("to String - HandicapId : "   + this.getHandicapId());
  return 

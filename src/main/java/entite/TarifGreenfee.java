@@ -18,9 +18,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -34,12 +34,12 @@ import static utils.LCUtil.showMessageFatal;
 @JsonInclude(JsonInclude.Include.NON_NULL) // new 27/05/2022
 @JsonPropertyOrder({"datesSeasonsList","greenfeeType","daysList","teeTimesList","equipmentsList","basicList","twilightList"}) // new 22/01/2019 not working ?
 
-@Named
+// @Named  // migrated 2026-02-24
 //@RequestScoped
-@SessionScoped // nécessaire 
+// @SessionScoped  // migrated 2026-02-24
 public class TarifGreenfee implements Serializable{
 
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName(); 
+     
 // fields reprises en json dans table mysql
   private ArrayList<DatesSeasons> datesSeasonsList = new ArrayList<>(); // pas de dimension de départ
   private ArrayList<TeeTimes> teeTimesList = new ArrayList<>(); 
@@ -800,7 +800,7 @@ public String showTarifGreenfee(){
 }
 
   public static TarifGreenfee map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
       // à adapter !!
         TarifGreenfee tg = new TarifGreenfee();

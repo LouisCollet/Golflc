@@ -26,7 +26,7 @@
     <p:textEditor id="textEditor"
                   secure="false"
                   widgetVar="editorVar"
-                  value="#{courseC.unavailable.period.comment}"
+                  value="#{clubC.unavailable.period.comment}"
                   height="70px" 
                   style="width:600px;background-color: whitesmoke;font-weight: normal;"
                   placeholder="Enter here your content" />
@@ -42,7 +42,7 @@
            styleClass="ui-page-theme-a ui-bar-inherit" >
         <p:outputPanel id="displayComment">
             <h3> Comment registered !</h3>
-            <h:outputText value="#{courseC.unavailable.period.comment}"
+            <h:outputText value="#{clubC.unavailable.period.comment}"
                           escape="false" />
         </p:outputPanel>
     </p:dialog>
@@ -52,7 +52,7 @@
                      value="#{msg['button.comment.add']}"
                      update="displayComment"
                      oncomplete="PF('dlg').show()"
-                     ajax="true"
+                      
                      icon="pi pi-plus" />
          <p:commandButton value="Clear"
                      type="buttonClear"

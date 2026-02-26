@@ -15,15 +15,16 @@
  <c:set var="clubid" value="#{param.clubId}"/>
  param clubid = #{clubid}
 <p:dataTable id="courses"
-             value="#{courseC.listCoursesForClub(clubid)}"
+             value="#{clubC.listCoursesForClub(clubid)}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredCourses}" >
 
 <f:facet name="header">
-   <!-- <h:outputText escape="false" value="#{msg['message.selectcourse']}" />  -->
-    <h2>#{msg['message.selectcourse']} (for club = #{param.clubId})</h2>
+   <div class="bg-warning">
+        <h2>#{msg['message.selectcourse']} (for club = #{param.clubId})</h2>
+   </div>
 </f:facet>
 
 <p:column 
@@ -38,10 +39,11 @@
                   style="width:100px" >
             <p:commandButton
                 id="selectButton"
-                action="#{courseC.selectedCourseForClub(c)}"
+                action="#{clubC.selectedCourseFromDialog(c)}"
+                
                 value="#{c.idcourse} - #{msg['button.select']}"
                 icon="pi pi-arrow-left">
-
+<!--  action="#{courseC.selectedCourseForClub(c)}"  -->
              </p:commandButton>
 	</p:column>
 

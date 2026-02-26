@@ -1,14 +1,11 @@
-
 package entite;
 
 import static interfaces.Log.LOG;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import utils.LCUtil;
 
 public class LatLng implements  interfaces.Log{
     private static final long serialVersionUID = 1L;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 
     private double lat;
     private double lng;
@@ -61,9 +58,9 @@ public String toString(){
         return msg;
   }
 }
-
+/*
   public static LatLng mapPlayer(ResultSet rs) throws SQLException{ // coming from Player.map
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
     //       LOG.debug("entering LatLng mapPlayer");
        String[] laln = null;
@@ -84,9 +81,10 @@ public String toString(){
       return null;
   }
 } //end method map
-  
+  */
+  /*
   public static LatLng mapClub(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         LatLng latlng = new LatLng();
         latlng.setLat(rs.getDouble("ClubLatitude") );
@@ -99,5 +97,5 @@ public String toString(){
     return null;
   }
 } //end method map
-
+*/
 } // end class

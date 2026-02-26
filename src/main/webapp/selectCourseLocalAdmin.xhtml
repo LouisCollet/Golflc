@@ -16,11 +16,11 @@
  <c:set var="select" value="#{inputSelectCourse}"/>
  <c:set var="admin"  value="#{adminType}"/>
 <p:dataTable id="courses"
-             value="#{courseC.listLocalAdminCoursesList(select, admin)}"
+             value="#{memC.listLocalAdminCoursesList(select, admin)}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCourses}" >
+             filteredValue="#{clubC.filteredCourses}" >
 
 <f:facet name="header">
     <h1>
@@ -78,7 +78,7 @@
                   rendered="#{inputSelectCourse eq 'CreateRound'}" >
             <p:commandButton
                 id="selectButtonCreateRound"
-                action="#{courseC.selectCourseLA(c, select)}"
+                action="#{clubC.selectCourseLA(c, select)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -90,7 +90,7 @@
                   rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" >
             <p:commandButton
                 id="selectButtonTarifGreenfee"
-                action="#{courseC.selectCourseLA(c, select)}"
+                action="#{clubC.selectCourseLA(c, select)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -102,7 +102,7 @@
                   rendered="#{inputSelectCourse eq 'CreateTarifMember'}" >
             <p:commandButton
                 id="selectButtonTarifMembers"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.club.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -114,7 +114,7 @@
                   rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" >
             <p:commandButton
                 id="selectButtonUnavailable"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.club.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -126,7 +126,7 @@
                   rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" >
             <p:commandButton
                 id="selectButtonUnavailablePeriod"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.club.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>

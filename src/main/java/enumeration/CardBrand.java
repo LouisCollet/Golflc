@@ -1,4 +1,4 @@
-package enums;
+package enumeration;
  /*
  * Credit Card Number
  * https://github.com/sualeh/credit_card_number

@@ -22,17 +22,19 @@
         <outputDir>${project.build.outputDirectory}</outputDir>  
         <build>${maven.build.timestamp}</build> 
 <!--       <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format> -->
-        <maven.build.timestamp.format>dd-MM-yyyy HH:mm:ss</maven.build.timestamp.format>
+ <!--       <maven.build.timestamp.format>dd-MM-yyyy HH:mm:ss</maven.build.timestamp.format> 
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format> -->
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> <!-- used by surefire -->
         <java.version>25</java.version> <!-- mod 29-09-2025 !! used by compiler was 23  -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version> <!-- mod 08-07-2025 was 10.0.0 // mod 30-07-2023 was 8.0.0 !! the great migration
             https://github.com/jakartaee/platform/blob/main/namespace/unaffected-packages.adoc -->
-        <primefaces.version>15.0.10</primefaces.version> <!-- mod 12-11-2025 was 15.0.9-->
-        <primefaces-extension.version>15.0.10</primefaces-extension.version> <!-- mod 30-09-2025 was 15.0.7-->
-        <omnifaces.version>5.0-M5</omnifaces.version> <!-- mod 25-11-2025 was 5.0-M4-->
+        <primefaces.version>15.0.13</primefaces.version> <!-- mod 13-02-2026 was 15.0.12 -->
+        <primefaces-extension.version>15.0.13</primefaces-extension.version> <!-- mod 30-09-2025 was 15.0.7-->
+        <omnifaces.version>5.0</omnifaces.version> <!-- mod 10-01-2026 was 5.0-M6 -->
         <chartjs.version>2.9.0</chartjs.version> <!-- mod 10-11-2025 was 2.8.1 -->
-        <mockito.version>5.20.0</mockito.version> <!-- new 08-12-2025 was 5.20.0-->
+        <mockito.version>5.21.0</mockito.version> <!-- mod 29-12-2025 was 5.20.0-->
    <!-- Official Maven Plugins --> 
         <maven.version>4.0.0-rc-5</maven.version> <!-- mod 25-11 was 4.0.0-rc-4  -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version><!-- mod 24-10-2025 was 3.14.0 -->
@@ -49,17 +51,30 @@
       <!--  <wildfly.home>c:/ProgramData/wildfly-35.0.0.Final4</wildfly.home>  new 03/11/20224 used in ??? -->
       <!--   <wildfly.version>35</wildfly.version> new 03/11/2024 not used in  -->
         <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version> <!-- mod 25-10-2025 was 3.6.1 -->
-        <maven-exec-plugin.version>3.6.2</maven-exec-plugin.version><!-- mod 10-11-2025 was 3.6.1 -->
+        <maven-exec-plugin.version>3.6.3</maven-exec-plugin.version><!-- mod 04-01-2026 was 3.6.2 -->
+
+
 
   <!--   <exec.file>mongo.MongoHelpLoad</exec.file> utils.Java11HttpClientExample-->
-        <exec.mainClass>update.UpdateCourse</exec.mainClass> <!-- >Controllers.HttpController selenium.SeleniumTest  ScreenShotCaptureSelenium execute le main de la classe (qu'il ne faut pas mentionner) -->
+        <exec.mainClass.pom>read.ReadClub</exec.mainClass.pom> <!-- dao.TestClubDAOMainical.icalservice_manual_test utils.CdiAuditScannern dao.TestClubDAOImpl utils.IcalServicetest.prepareStatement.ClubService>lists.CourseListupdate.UpdateClubsql.SqlFactoryutils.DBMetajollyday.JollyDayControllers.HttpController selenium.SeleniumTest  ScreenShotCaptureSelenium execute le main de la classe (qu'il ne faut pas mentionner) -->
         <!-- find.FindTarifMembersData Controllers.MongoHelpController to run with icon toolbar -->
 
-        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
-        <junit-jupiter.version>6.0.1</junit-jupiter.version> <!--mod 17-11-2025 was 6.0.0-->
+        <junit-jupiter.version>6.0.2</junit-jupiter.version><!-- mod 19-01-2026 was 6.0.1 old = 5.10.2-->
+        <junit-platform.version>1.10.2</junit-platform.version>
+     <!--   <junit-jupiter.version>5.10.5</junit-jupiter.version> mod 17-11-2025 was 6.0.0-->
+    <!--    <junit.jupiter.version>5.10.1</junit.jupiter.version>  -->
+        <failsafe.version>3.5.4</failsafe.version>  <!-- mod 28-01-2026-->
+        <arquillian.version>1.10.0.Final</arquillian.version>  <!-- mod 04-01-2026 was 1.8.0.Final-->
+        <wildfly.version>31.0.0.Beta3</wildfly.version> <!-- new 06-01-2025-->
+        <shrinkwrap.version>1.2.6</shrinkwrap.version>
         
   <!-- no test with this property https://www.baeldung.com/maven-skipping-tests -->
-        <tests.skip>true</tests.skip> <!-- mod 08-09-2022  if true, tests are skipped -->
+     <!--   <tests.skip>false</tests.skip>  mod 08-09-2022  if true, tests are skipped -->
+        
+        <skip.unit.tests>true</skip.unit.tests>  <!--  surefire -->
+        <skip.integration.tests>false</skip.integration.tests>  <!-- failsafe  -->
+        <!-- Pourquoi ? Parce que -DskipTests est une propriété système reconnue par Surefire ET Failsafe.  -->
+        
         <test.file>calc.GroupedTests.java</test.file>  <!-- file to be tested with icon toolbar -->
      <!--   <testng.version>7.11.0</testng.version>  mod 02-03-2025 xas 7.10.2 --> 
    <!--      <project.build.testOutputDirectory>src/test/java</project.build.testOutputDirectory>  this is the default  -->
@@ -71,20 +86,25 @@
         <primeflex.version>4.0.0</primeflex.version> <!-- modify also masterTemplate - mod 16-03-2025 was 3.3.1 used also in technical info MANIFEST.MF see manifestEntries further-->
         <log4j2.version>2.24.0</log4j2.version> <!-- mod 28/09/2024  was 2.22.1 -->
         <slf4j.version>2.0.17</slf4j.version><!-- mod 12-03-2025 was 2.0.163 -->
-        <jackson.version>2.20.1</jackson.version> <!--mod 17-11-2025 was 2.20.0 -->
-        <mysql-connector-j.version>9.5.0</mysql-connector-j.version>  <!-- used by RUN FILE mod 06-05-2025 was version 9.2.0-->
+        <jackson.version>2.21.0</jackson.version> <!--mod 28-01-2026 was 2.20.1 -->
+        <mysql-connector-j.version>9.6.0</mysql-connector-j.version>  <!-- used by RUN FILE mod 06-05-2025 was version 9.2.0-->
 
-        <resteasy.version>7.0.0.Final</resteasy.version> <!--  mod 19-10-2025 was 7.0.0.Beta1 -->
+        <resteasy.version>7.0.1.Final</resteasy.version> <!--  mod 27-12-2025 was 7.0.0.Final -->
         <version.server.bom>26.1.3.Final</version.server.bom>  <!--mod 11-12-2023 was 26.1.2.Final -->
 <!-- new 14/08/2022 -->
-        <mongodb-driver-sync.version>5.6.1</mongodb-driver-sync.version> <!-- mod 24-10-2025 was 5.6.0 -->
+        <mongodb-driver-sync.version>5.6.2</mongodb-driver-sync.version> <!-- mod 27-12-2025 was 5.6.1 -->
        <!-- <mongodb-driver-reactivestrings.version>4.11.1</mongodb-driver-reactivestrings.version> mod 11-12-2023 was 4.11.0 -->
-        <mongodb-crypt.version>5.6.1</mongodb-crypt.version><!--  mod 24-10-2025 was 5.6.0 -->
-        <protoc.version>1.77.0</protoc.version> <!--  mod 09-12-2025 was 1.76.0 -->
-        <grpc.version>4.33.1</grpc.version>  <!-- mod 25-11-2025 was 4.33.0 
+        <mongodb-crypt.version>5.6.2</mongodb-crypt.version><!--  mod 27-12-2025 was 5.6.1 -->
+        <protoc.version>1.78.0</protoc.version> <!--  mod 04-01-2026 was 1.77.0 -->
+      <!--  <grpc.version>4.33.2</grpc.version>   mod 27-12-2025 was 4.33.1 
                   https://github.com/grpc/grpc-java/issues/11015   -->
         <exec.inheritIo>true</exec.inheritIo><!--  mod 19-03-2023  https://github.com/apache/netbeans/issues/5552 -->
-        <selenium.version>4.38.0</selenium.version> <!--  mod 10-11-2025 was 4.36.0 -->
+        <selenium.version>4.39.0</selenium.version> <!--  mod 27-12-2025 was 4.38.0 -->
+        <jollyday.version>1.8.1</jollyday.version><!--  mod 19-01-2026 was 1.8.0 -->
+        <weld.version>6.0.4.Final</weld.version> <!--  pour tests via selenium -->
+        
+        
+        
     </properties>
 
  <dependencies>
@@ -106,13 +126,14 @@ provided by wildfly  -->
     <version>${jakartaee-api.version}</version>
     <scope>provided</scope>
 </dependency>
-
-  <!-- added dependency plugin 30/08/2022 -->
-  <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-api</artifactId> 
-      <version>1.77.0</version>   <!-- mod 09-12-2025 was 1.76.0  -->
-  </dependency>
+  <!-- added 30/08/2022 pour erreur .course_refactoring InvalidateCache
+<dependency> 
+    <groupId>jakarta.interceptor</groupId>
+    <artifactId>jakarta.interceptor-api</artifactId>
+    <version>2.2.0</version>
+    <scope>provided</scope>
+</dependency>
+-->
 
 <dependency>
     <groupId>org.omnifaces</groupId>
@@ -123,6 +144,7 @@ provided by wildfly  -->
     <groupId>org.primefaces.extensions</groupId>
     <artifactId>primefaces-extensions</artifactId>
     <version>${primefaces-extension.version}</version>
+    
     <classifier>jakarta</classifier>
 </dependency>
 <!-- pour charts à partir de PF 15  -->
@@ -142,28 +164,28 @@ provided by wildfly  -->
 <dependency>
     <groupId>org.apache.logging.log4j</groupId>
     <artifactId>log4j-api</artifactId>
-    <version>2.25.2</version> <!-- mod 24-10-2025 was 2.25.1 -->
+    <version>2.25.3</version> <!-- mod 04-01-2026 was 2.25.2 -->
   
 </dependency>
 
 <dependency>
     <groupId>org.apache.logging.log4j</groupId>
     <artifactId>log4j-core</artifactId>
-    <version>2.25.2</version> <!-- mod 24-10-2025 was 2.25.1 -->
+    <version>2.25.3</version> <!-- mod 04-01-2026 was 2.25.2 -->
 </dependency> 
 
 <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
 <dependency>
     <groupId>org.apache.poi</groupId>
     <artifactId>poi</artifactId>
-    <version>5.5.0</version> <!-- mod 25-11-2025 was 5.4.1 -->
+    <version>5.5.1</version> <!-- mod 27-12-2025 was 5.5.0 -->
 </dependency>
 
 <!-- new 28/08/2022 for export XLSX PF 12.0 https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas -->
 <dependency>
     <groupId>org.apache.poi</groupId>
     <artifactId>poi-ooxml</artifactId>
-    <version>5.5.0</version> <!-- mod 25-11-2025 was 5.4.1  -->
+    <version>5.5.1</version> <!-- mod 27-12-2025 was 5.5.0  -->
 </dependency>
 
 <!-- new 14-02-2024 https://stackoverflow.com/questions/71530141/java-lang-classnotfoundexception-org-apache-commons-io-output-unsynchronizedbyt    -->
@@ -178,12 +200,24 @@ provided by wildfly  -->
   <artifactId>jackson-core</artifactId>
   <version>${jackson.version}</version> 
 </dependency> 
-
+<!-- 
 <dependency>
   <groupId>com.fasterxml.jackson.core</groupId>
   <artifactId>jackson-annotations</artifactId>
-  <version>3.0-rc5</version> <!--  mod 12-09-2025 was jackson.version -->
+  <version>${jackson.version}</version>  mod 12-09-2025 was jackson.version 
 </dependency>
+-->
+<!-- Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/Jackson-annotations -->
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-annotations</artifactId>
+    <version>2.21</version>
+   <!-- <scope>compile</scope>  -->
+</dependency>
+
+
+
+
 
  <dependency>
     <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -202,7 +236,7 @@ provided by wildfly  -->
 <dependency>
     <groupId>com.google.maps</groupId>
     <artifactId>google-maps-services</artifactId>
-    <version>2.2.0</version>  <!-- mod 1-04-2022 was 1.0.0 mod 23-06-203 was 2.0.0 -->
+    <version>2.2.0</version>  <!-- mod 23-06-2023 was 2.0.0 -->
 </dependency>
 
 <dependency>
@@ -218,12 +252,14 @@ provided by wildfly  -->
     <version>5.12.0</version> <!--   mod 31-07-2025 was 5.11.2 -->
 </dependency>
 
-<dependency> <!-- added 19-12-2019 necessary for run file !!! mod 19/10/2022-->
+<!-- mod 26-01-2026  -->
+<dependency>
     <groupId>com.mysql</groupId>
     <artifactId>mysql-connector-j</artifactId>
     <version>${mysql-connector-j.version}</version>
-    <!--<scope>test</scope>   doit être test pour deplay-artifact via wildfly  -->
+    <scope>compile</scope>
 </dependency>
+
 
 <!-- Primefaces 10 https://mvnrepository.com/artifact/com.github.librepdf/openpdf -->
 <dependency>
@@ -236,20 +272,20 @@ provided by wildfly  -->
 <dependency>
     <groupId>org.mnode.ical4j</groupId>
     <artifactId>ical4j</artifactId>
-    <version>4.2.1</version> <!-- mod 25-11-2025 was 4.2.0 -->
+    <version>4.2.3</version> <!-- mod 10-01-2026 was 4.2.2-->
 </dependency>
 <!-- https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j-vcard -->
 <dependency>
     <groupId>org.mnode.ical4j</groupId>
     <artifactId>ical4j-vcard</artifactId>
-    <version>2.0.1</version> <!-- mod 12-01-2025 was 2.0.0 -->
+    <version>2.1.0</version> <!-- mod 04-01-2026 was 2.0.1 -->
 </dependency>
 
 <!-- https://mvnrepository.com/artifact/org.apache.tika/tika-java7 new 03-01-2020
 ava-7 reliant components, including FileTypeDetector implementations
      https://stackoverflow.com/questions/54078118/managed-bean-with-a-parameterized-bean-class-must-be-dependent-class-org-apach/55210108
      Exclude otherwise the following error is thrown:
-     WELD-000071: Managed bean with a parameterized bean class 
+  000071: Managed bean with a parameterized bean class 
      must be @Dependent: class org.apache.cxf.jaxrs.provider.XPathProvider 
 -->
 
@@ -265,32 +301,33 @@ ava-7 reliant components, including FileTypeDetector implementations
     <version>0.4.21</version> <!-- mod 24-10-2025 was 0.4.20-->
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.apache.maven/maven-plugin-api -->
+<!-- https://mvnrepository.com/artifact/org.apache.maven/maven-plugin-api 
 <dependency>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-plugin-api</artifactId>
     <version>${maven.version}</version>
 </dependency>
-<!-- https://mvnrepository.com/artifact/org.apache.maven/maven-core -->
+-->
+<!-- enlevé 18-12-2025 suggestion chat gpthttps://mvnrepository.com/artifact/org.apache.maven/maven-core 
 <dependency>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-core</artifactId>
     <version>${maven.version}</version>
 </dependency>
-
-<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/build-helper-maven-plugin -->
+-->
+<!--enlevé 22-01-2026 double emploi https://mvnrepository.com/artifact/org.codehaus.mojo/build-helper-maven-plugin 
 <dependency>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>build-helper-maven-plugin</artifactId>
-    <version>3.6.1</version> <!-- mod 13-06-2025 was 3.6.0 -->
+    <version>3.6.1</version> 
 </dependency>
-
+-->
 <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
 <dependency>
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-api</artifactId>
-    <version>6.0.1</version>
-    <type>jar</type>
+    <version>${junit-jupiter.version}</version>
+    <scope>test</scope>
 </dependency>
 
 <!-- new 20-05-2020 -->
@@ -316,14 +353,14 @@ ava-7 reliant components, including FileTypeDetector implementations
     <version>1.6.6</version> <!-- mod 27-10-2024 was 1.6.5 -->
 </dependency>
 
-<!-- https://www.mojohaus.org/exec-maven-plugin/ -->
+<!-- enlevé 19-12-2025 suite suggestion chatgpt : Les plugins ne vont jamais dans <dependencies> https://www.mojohaus.org/exec-maven-plugin/ 
 <dependency>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>exec-maven-plugin</artifactId>
-  <version>${maven-exec-plugin.version}</version> <!-- mod 10-11-2025 was 3.6.1 -->
+  <version>${maven-exec-plugin.version}</version> 
   <type>maven-plugin</type>
 </dependency>
-
+-->
 <!-- https://mvnrepository.com/artifact/pl.allegro.finance/tradukisto -->
 <dependency>
     <groupId>pl.allegro.finance</groupId>
@@ -357,13 +394,13 @@ ava-7 reliant components, including FileTypeDetector implementations
 <dependency>
     <groupId>com.google.cloud</groupId>
     <artifactId>google-cloud-translate</artifactId>
-    <version>2.80.0</version> <!-- mod 25-11-2025 was 2.78.0 -->
+    <version>2.82.0</version> <!-- mod 28-01-2026 was 2.81.0 -->
   </dependency>
 
 <dependency>
     <groupId>com.google.cloud</groupId>
     <artifactId>google-cloud-storage</artifactId>
-    <version>2.60.0</version> <!-- mod 17-11-2025 was 2.59.0 -->
+    <version>2.62.0</version> <!-- mod 28-01-2026 was 2.61.0 -->
   </dependency>
 <dependency>
     
@@ -376,45 +413,59 @@ ava-7 reliant components, including FileTypeDetector implementations
 <dependency>
     <groupId>org.quartz-scheduler</groupId>
     <artifactId>quartz</artifactId> 
-    <version>2.5.1</version> 
+    <version>2.5.2</version> 
 </dependency>
 <dependency>
     <groupId>org.quartz-scheduler</groupId>
     <artifactId>quartz-jobs</artifactId>
-    <version>2.5.1</version>
+    <version>2.5.2</version>
 </dependency>
 
 <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
 <dependency>
     <groupId>org.jsoup</groupId>
     <artifactId>jsoup</artifactId>
-    <version>1.21.2</version> <!--   mod 12-09-2025 was 1.21.1 -->
+    <version>1.22.1</version> <!--   mod 10-01-2026 was 1.21.2 -->
 </dependency>
 
-<!--  QR code  --> 
-<dependency>
-	<groupId>com.google.zxing</groupId>
-	<artifactId>core</artifactId>
-	<version>3.5.4</version>  <!--   mod 25-11-2025 was 3.5.3 -->
-</dependency>
- <dependency>
-        <groupId>com.google.zxing</groupId>
-        <artifactId>javase</artifactId>
-        <version>3.5.4</version> <!--   mod 25-11-2025 was 3.5.3 -->
+<!-- QRGen JavaSE (QR code generator) -->
+    <dependency>
+      <groupId>com.github.kenglxn.QRGen</groupId>
+      <artifactId>javase</artifactId>
+      <version>3.0.1</version>
     </dependency>
 
-<dependency>
-            <groupId>org.jsonschema2pojo</groupId>
-            <artifactId>jsonschema2pojo-core</artifactId>
-            <version>1.2.2</version> <!--   mod 29-09-2024 was 1.2.1 -->
+    <!-- ZXing core & javase (au besoin selon résolution classes) 
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>3.5.4</version>
+    </dependency>
+    -->
+  <!--  
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+      <version>3.5.4</version>
+    </dependency>
+-->
+<!--
+<dependency>   utilise zxing new 28-12-2025 
+    <groupId>net.glxn</groupId>
+    <artifactId>qrgen</artifactId>
+    <version>1.4</version>
 </dependency>
+-->
+
+
 <!-- enlevé 10-08-2025 https://mvnrepository.com/artifact/org.json/json 
 <dependency>
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
     <version>20250517</version>
 </dependency>-->
-<!-- https://mvnrepository.com/artifact/com.mchange/c3p0 database mysql résul tsquartz 
+
+<!-- https://mvnrepository.com/artifact/org.mongodb/bson --><!-- https://mvnrepository.com/artifact/com.mchange/c3p0 database mysql résul tsquartz 
 <dependency>
     <groupId>com.mchange</groupId>
     <artifactId>c3p0</artifactId>
@@ -423,180 +474,187 @@ ava-7 reliant components, including FileTypeDetector implementations
 -->
 
 
-<!-- https://mvnrepository.com/artifact/org.mongodb/bson -->
+
 <dependency>
-    <groupId>org.mongodb</groupId>
-    <artifactId>bson</artifactId>
-    <version>5.6.1</version> <!-- mod 24-10-2025 was 5.6.0  -->
+            <groupId>org.jsonschema2pojo</groupId>
+            <artifactId>jsonschema2pojo-core</artifactId>
+            <version>1.2.2</version> <!--   mod 29-09-2024 was 1.2.1 -->
 </dependency>
 
 <!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync -->
+<dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>bson</artifactId>
+    <version>5.6.2</version> <!-- mod 27-12-2025 was 5.6.1  -->
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core utile ??-->
 <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver-sync</artifactId>
     <version>${mongodb-driver-sync.version}</version>
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core utile ??-->
-<dependency>
+   <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver-core</artifactId>
     <version>${mongodb-driver-sync.version}</version> 
 </dependency>
-
-   <dependency>
+ <!--
+<dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-crypt</artifactId>
         <version>${mongodb-crypt.version}</version>
     </dependency>
-
-<dependency>
+   activé 13-08-2025  enlevé 30-12-2025
+        <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jackson2-provider</artifactId>
         <version>${resteasy.version}</version>
         <scope>provided</scope>
 </dependency>
-   <!-- activé 13-08-2025 --> 
-        <dependency>
+
+<dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-client</artifactId>
         <version>${resteasy.version}</version>
         <scope>provided</scope>
     </dependency>
- 
-<!-- https://www.primefaces.org/primeflex/
-1. recopier le .css vers ressources/css/primeflex/version
-2. adapter masterTemplate.xhtml line 60
--->    
-<dependency>
+  -->   
+ <!--  for google geocoding  11-04-2022 -->   
+ <dependency>
    <groupId>org.webjars.npm</groupId>
    <artifactId>primeflex</artifactId>
    <version>${primeflex.version}</version>
-</dependency>
- <!--  for google geocoding  11-04-2022 -->   
- <dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-api</artifactId>
-    <version>${slf4j.version}</version>
-</dependency>
+</dependency><!-- enlevé 12-12-2025 suite conflit avec JollyDay
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-simple</artifactId>
     <version>${slf4j.version}</version>
 </dependency>
-    
-    <!-- https://mvnrepository.com/artifact/org.xeustechnologies.google-api/google-api-spelling 
+ -->
+   <!-- enlevé 10-a1-2026 dded dependency plugin 30/08/2022 
+  <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-api</artifactId> 
+      <version>1.78.0</version>
+  </dependency>
+-->  
+    <!-- https://mvnrepository.com/artifact/io.grpc/grpc-netty-shaded 
+<dependency>
+    <groupId>io.grpc</groupId>
+    <artifactId>grpc-netty-shaded</artifactId>
+    <version>1.48.1</version>
+</dependency>
+--><!-- https://mvnrepository.com/artifact/org.xeustechnologies.google-api/google-api-spelling 
 <dependency>
     <groupId>org.xeustechnologies.google-api</groupId>
     <artifactId>google-api-spelling</artifactId>
     <version>1.1</version>
 </dependency>
    --> 
-   <!-- https://mvnrepository.com/artifact/io.grpc/grpc-netty-shaded 
-<dependency>
-    <groupId>io.grpc</groupId>
-    <artifactId>grpc-netty-shaded</artifactId>
-    <version>1.48.1</version>
-</dependency>
--->
+   
 
 <!-- https://mvnrepository.com/artifact/io.grpc/grpc-netty -->
 <dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>${slf4j.version}</version>
+</dependency>
+<!-- nécessaire  
+<dependency>
+    <groupId>org.jboss.as</groupId>
+    <artifactId>jboss-as-controller-client</artifactId>
+    <version>7.2.0.Final</version>
+</dependency>
+-->
+<!--enlevé 10- 1-2026
+<dependency>
     <groupId>io.grpc</groupId>
     <artifactId>grpc-netty</artifactId>
-    <version>1.77.0</version> <!-- mod 09-12-2025 was 1.76.0 -->
+    <version>1.78.0</version> 
+    <scope>provided</scope>>
 </dependency>
-
-
+   
 <dependency>
   <groupId>com.google.protobuf</groupId>
   <artifactId>protobuf-java</artifactId>
   <version>${grpc.version}</version>
 </dependency>
-   
+
+
 <dependency>
     <groupId>com.google.protobuf</groupId>
     <artifactId>protobuf-java-util</artifactId>
     <version>${grpc.version}</version>
-</dependency>
-
-   <!-- https://mvnrepository.com/artifact/io.grpc/grpc-protobuf -->
-<dependency>
+</dependency><dependency>
     <groupId>io.grpc</groupId>
     <artifactId>grpc-protobuf</artifactId>
-    <version>${protoc.version}</version> <!-- mod 22-08-2022 was 1.47.0 -->
+    <version>${protoc.version}</version> 
 </dependency>
-<!--  nécessaire pour erreur @annotations  -->
+
 <dependency>
     <groupId>io.grpc</groupId>
     <artifactId>grpc-stub</artifactId>
     <version>${protoc.version}</version>
 </dependency>
-
-
-   <dependency> <!-- necessary for Java 9+ -->
+-->
+<!-- enlevé 30-12-2025 necessary for Java 9+
+   <dependency> 
             <groupId>org.apache.tomcat</groupId>
             <artifactId>annotations-api</artifactId>
             <version>6.0.53</version>
             <scope>provided</scope>
         </dependency>
+  -->       
 <!-- mod 16-02-2024 https://mvnrepository.com/artifact/jakarta.activation/jakarta.activation-api -->
+<!-- https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api -->
+
+<!-- enlevé 
 <dependency>
     <groupId>jakarta.activation</groupId>
     <artifactId>jakarta.activation-api</artifactId>
-    <version>2.1.4</version> <!-- mod 29-09-2025 was 2.1.3  -->
+    <version>2.1.4</version> 
 </dependency>
-
-<!-- https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api -->
+-->
+<!--
 <dependency>
     <groupId>jakarta.mail</groupId>
     <artifactId>jakarta.mail-api</artifactId>
-    <version>2.1.5</version> <!-- mod 24-10-2025 was 2.1.4  -->
+    <version>2.1.5</version> 
 </dependency>
+-->
 
-<!-- new 15/11/2022 https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api -->
+<!-- new 11-03-2024 https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
 <dependency>
     <groupId>org.eclipse.angus</groupId>
     <artifactId>jakarta.mail</artifactId>
     <version>2.0.5</version> <!-- mod 24-10-2025 was 2.0.4  -->
-</dependency>
+</dependency><!-- new 16-05-2024 https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
 
-<!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api 
-<dependency>
-    <groupId>javax.mail</groupId>3    <artifactId>javax.mail-api</artifactId>
-    <version>1.6.2</version>
-</dependency>
 
-<dependency>
-    <groupId>javax.activation</groupId>
-    <artifactId>activation</artifactId>
-    <version>1.1.1</version>
-</dependency>
-next = new 11-03-2024
--->
-<!-- new 11-03-2024 https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
 <dependency>
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-core</artifactId>
     <version>4.2.37</version><!-- mod 29-09-2025 was 4.2.36  -->
-</dependency>
-
-<!-- new 16-05-2024 https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
-<dependency>
+</dependency><dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-java</artifactId>
     <version>${selenium.version}</version>  
+     <scope>test</scope>
 </dependency>
 <!-- new 16-05-2024 https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-chrome-driver -->
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-chrome-driver</artifactId>
     <version>${selenium.version}</version>
+    <scope>test</scope>
 </dependency>
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-devtools-v133</artifactId>
     <version>4.31.0</version>
+    <scope>test</scope>
 </dependency>
 
 
@@ -608,42 +666,37 @@ next = new 11-03-2024
    <!-- <scope>provided</scope>  mod 28-03-2025 by selenium-jupiter ?? -->
 </dependency>
 
+<!-- 28-03-2025 https://mvnrepository.com/artifact/org.assertj/assertj-core -->
+
+
 <dependency>
     <groupId>io.github.bonigarcia</groupId>
     <artifactId>selenium-jupiter</artifactId>
     <version>6.3.1</version> <!-- mod 29-09-2025 was 6.2.0  <scope>test</scope> -->
     <scope>test</scope>
-</dependency>
+</dependency><!--  <scope>test</scope>screenshot full page https://mvnrepository.com/artifact/ru.yandex.qatools.ashot/ashot
+screenshot full page -->
 
-<!-- 28-03-2025 https://mvnrepository.com/artifact/org.assertj/assertj-core -->
+
 <dependency>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-core</artifactId>
     <version>3.27.6</version> <!-- new 24-10-2025 was 3.27.4 <scope>test</scope> -->
     <scope>test</scope>
-</dependency>
+</dependency><!-- new 21-05-2024 https://mvnrepository.com/artifact/org.primefaces/primefaces-selenium-core -->
 
-<!--  <scope>test</scope>screenshot full page https://mvnrepository.com/artifact/ru.yandex.qatools.ashot/ashot
-screenshot full page -->
+
 <dependency>
     <groupId>ru.yandex.qatools.ashot</groupId>
     <artifactId>ashot</artifactId>
     <version>1.5.4</version>
-</dependency>
-
-<!-- new 21-05-2024 https://mvnrepository.com/artifact/org.primefaces/primefaces-selenium-core -->
-<dependency>
+</dependency><dependency>
     <groupId>org.primefaces</groupId>
     <artifactId>primefaces-selenium-core</artifactId>
     <version>${primefaces.version}</version>
     <scope>test</scope>
 </dependency>
-<dependency>
-    <groupId>org.primefaces</groupId>
-    <artifactId>primefaces-selenium-components</artifactId>
-    <version>${primefaces.version}</version>
-    <scope>test</scope>
-</dependency>
+<!-- https://mvnrepository.com/artifact/io.mikael/urlbuilder -->
 
 
   <!-- https://mvnrepository.com/artifact/org.testng/testng 
@@ -654,41 +707,273 @@ screenshot full page -->
     <type>jar</type>
 </dependency>
 -->
-  <!-- https://mvnrepository.com/artifact/io.mikael/urlbuilder -->
+  
 <dependency>
-    <groupId>io.mikael</groupId>
-    <artifactId>urlbuilder</artifactId>
-    <version>2.0.9</version>
+    <groupId>org.primefaces</groupId>
+    <artifactId>primefaces-selenium-components</artifactId>
+    <version>${primefaces.version}</version>
+    <scope>test</scope>
 </dependency>
   
 <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
 <dependency>
+    <groupId>io.mikael</groupId>
+    <artifactId>urlbuilder</artifactId>
+    <version>2.0.9</version>
+</dependency><dependency>
     <groupId>org.mockito</groupId>
     <artifactId>mockito-core</artifactId>
-    <version>5.20.0</version>
-    <type>jar</type>
+    <version>5.21.0</version>
+    <scope>test</scope>
 </dependency>
-<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter 
 <dependency>
     <groupId>org.mockito</groupId>
     <artifactId>mockito-junit-jupiter</artifactId>
     <version>${mockito.version}</version>
     <scope>test</scope>
 </dependency>
-  
- </dependencies>
+-->
+<!-- new 12-12-2025 jours fériés https://mvnrepository.com/artifact/de.jollyday/jollyday -->
+<dependency>
+    <groupId>de.focus-shift</groupId>
+    <artifactId>jollyday-core</artifactId>  <!--  was jollyday-core -->
+    <version>${jollyday.version}</version>
+    <!--  <exclusions>
+       Exclure SLF4J Simple pour éviter les warnings 
+            <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+            </exclusion>
+    </exclusions>-->
+</dependency>
 
+<!-- indispensable -->
+<dependency>
+  <groupId>de.focus-shift</groupId>
+  <artifactId>jollyday-jackson</artifactId>
+  <version>${jollyday.version}</version>
+</dependency>
+
+
+    <!-- MapStruct utilisé pour DTO voir pour creditcard -->
+<!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct 
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>${mapstruct.version}</version>
+</dependency>
+-->
+<!-- Arquillian JUnit 5 -->
+
+
+        <!-- ========================= -->
+        <!-- Arquillian core API -->
+        <!-- ========================= -->
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-test-api</artifactId>
+            <version>1.10.0.Final</version> <!-- mod 03-01-2025 was 1.8.0.Final -->
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ========================= -->
+        <!-- Arquillian JUnit 5 -->
+        <!-- ========================= -->
+        <dependency>
+            <groupId>org.jboss.arquillian.junit5</groupId>
+            <artifactId>arquillian-junit5-container</artifactId>
+            <version>${arquillian.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ========================= -->
+        <!-- ShrinkWrap -->
+        <!-- ========================= -->
+        <dependency>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-api</artifactId>
+            <version>${shrinkwrap.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-impl-base</artifactId>
+            <version>${shrinkwrap.version}</version>
+            <scope>test</scope>
+        </dependency>
+<!--
+<dependency>
+    <groupId>org.jboss.shrinkwrap.resolver</groupId>
+    <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+    <version>4.0.0</version> 
+    <scope>test</scope>
+</dependency>
+-->
+<!-- https://mvnrepository.com/artifact/org.jboss.shrinkwrap.resolver/shrinkwrap-resolver-impl-maven -->
+<dependency>
+    <groupId>org.jboss.shrinkwrap.resolver</groupId>
+    <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+    <version>3.3.4</version>
+    <scope>test</scope>
+
+</dependency>
+
+<dependency>
+    <groupId>org.jboss.shrinkwrap.resolver</groupId>
+    <artifactId>shrinkwrap-resolver-api-maven</artifactId>
+    <version>3.3.4</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- Pour résoudre les archives et les artefacts correctement -->
+<dependency>
+    <groupId>org.jboss.shrinkwrap.resolver</groupId>
+    <artifactId>shrinkwrap-resolver-impl-maven-archive</artifactId>
+    <version>3.3.4</version>
+    <scope>test</scope>
+</dependency>
+
+        <!-- ========================= -->
+        <!-- WildFly Arquillian (REMOTE) -->
+        <!-- ========================= -->
+
+<dependency>
+    <groupId>org.wildfly.arquillian</groupId>
+    <artifactId>wildfly-arquillian-container-remote</artifactId>
+    <version>6.0.0.Alpha1</version>  <!-- existe autre version  -->
+    <scope>test</scope>
+</dependency>
+<!--
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-bom</artifactId>
+      <version>${log4j2.version}</version>
+      <scope>import</scope>
+      <type>pom</type>
+    </dependency>
+-->
+<dependency>
+  <groupId>org.apache.logging.log4j</groupId>
+  <artifactId>log4j-slf4j2-impl</artifactId>
+  <version>2.25.3</version>
+  <scope>test</scope>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-client-all -->
+<dependency>
+    <groupId>org.wildfly</groupId>
+    <artifactId>wildfly-client-all</artifactId>
+    <version>39.0.0.Beta1</version>
+    <scope>test</scope>
+</dependency>
+
+        <!-- Weld SE for testing  added 04-01-2026 -->
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-core</artifactId>
+            <version>${weld.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+  <!--added 26-01-2026 Weld SE for testing    https://weld.cdi-spec.org/ 
+        CDI-api (provided) te permet de compiler les annotations CDI (@Inject, @Named, @ApplicationScoped, etc.).    -->  
+<dependency>
+   <groupId>jakarta.enterprise</groupId>
+   <artifactId>jakarta.enterprise.cdi-api</artifactId>
+   <version>4.1.0</version>
+   <scope>provided</scope>
+</dependency>
+<!--
+<dependency>
+    <groupId>jakarta.inject</groupId>
+    <artifactId>jakarta.inject-api</artifactId>
+    <version>2.0.1</version>  Pour utiliser jakarta.inject.Inject 
+</dependency>
+-->
+<!-- https://mvnrepository.com/artifact/org.wildfly.core/wildfly-controller-client -->
+<dependency>
+    <groupId>org.wildfly.core</groupId>
+    <artifactId>wildfly-controller-client</artifactId>
+    <scope>provided</scope> <!-- was test ou 'compile' si tu l'utilises hors tests -->
+    <version>31.0.0.Beta3</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.jboss/jboss-dmr -->
+<dependency>
+    <groupId>org.jboss</groupId>
+    <artifactId>jboss-dmr</artifactId>
+    <version>1.7.0.Final</version>
+</dependency>
+<!-- 
+<dependency>
+    <groupId>org.wildfly.core</groupId>
+    <artifactId>wildfly-version</artifactId>
+    <version>${wildfly.version}</version>
+    <scope>provided</scope>
+</dependency>
+-->
+<!-- https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2 -->
+<dependency>
+    <groupId>com.maxmind.geoip2</groupId>
+    <artifactId>geoip2</artifactId>
+    <version>5.0.2</version>
+</dependency>
+
+<!-- Déjà inclus, utilisez scope provided -->
+<dependency>
+    <groupId>org.eclipse.microprofile.config</groupId>
+    <artifactId>microprofile-config-api</artifactId>
+    <version>3.1</version>
+    <scope>provided</scope>
+</dependency>
+
+<!-- Source: https://mvnrepository.com/artifact/org.wildfly.core/wildfly-core-galleon-pack -->
+<dependency>
+    <groupId>org.wildfly.core</groupId>
+    <artifactId>wildfly-core-galleon-pack</artifactId>
+    <version>31.0.1.Final</version>
+    <type>pom</type>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>org.osgi</groupId>
+    <artifactId>org.osgi.annotation.versioning</artifactId>
+    <version>1.1.2</version>
+    <scope>provided</scope>
+</dependency>
+
+    <!-- Weld JUnit 5 pour test unitaire -->
+    <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-junit5</artifactId>
+        <version>5.0.3.Final</version> <!-- was 4.0.1.Final  -->
+        <scope>test</scope>
+    </dependency>
+    <!-- H2 in-memory 
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+        <version>2.4.240</version>
+        <scope>test</scope>
+    </dependency>
+-->
+
+
+ </dependencies>
+ 
+ 
 <build>
+    <!--  enlevé 22-01-2026 used for compilation protobuf-maven-plugin 
     <finalName>${finalName.version}</finalName>
         <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
-                <version>1.7.1</version>   <!--  used for compilation protobuf-maven-plugin -->
+                <version>1.7.1</version>   
             </extension>
         </extensions>
-        
-        
+-->
   <plugins>
  <!--  pour forcer version à exécuter -->  
     <plugin>
@@ -742,29 +1027,20 @@ screenshot full page -->
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <version>${maven-wildfly-plugin.version}</version>
                 <configuration>
-          <!--        <hostname>${wildfly-hostname}</hostname> -->
-    <!-- https://docs.wildfly.org/wildfly-maven-plugin/
-
-        new 06-09-2021  https://docs.wildfly.org/wildfly-maven-plugin/deploy-only-mojo.html
-https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-plugin/47335136#47335136
-  <port>8380</port>  This port is for the Wildfly Management Console (very confuse, I know), the default is 9990. -->
-          <!--          <javaOpts>-Djboss.http.port=8080</javaOpts>  -->
-              <!-- next line is default  -->
-           <!--         <filename>${project.build.finalName}.${project.packaging}</filename>  -->
-           
      <!--  If force is set to true, the server is queried to see if the application already exists.
            If the application already exists, the application is redeployed instead of deployed.  -->
                     <force>true</force>
                     <hostname>localhost</hostname> <!-- added 11-12-2025 default -->
                     <port>9990</port> <!-- added 11-12-2025 default -->
-                    <add-user> <!-- new 17-12-2022 -->
+                    <javaOpts>-Dapp.devMode=true</javaOpts> <!-- added 14/01/2026 used in ErrorController -->
+                    <!--<add-user>  new 17-12-2022 
                         <users>
                             <user>
                                 <username>LouisCollet</username>
                                 <password>Lc1lc2lc3</password>
                             </user>
                         </users>
-                    </add-user>
+                    </add-user>-->
                 </configuration>
                 <executions>
                     <!-- new 03/11/2024 starts wildfly server 
@@ -776,13 +1052,13 @@ https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-p
                         </goals>
                     </execution>
                    -->  <execution>
-                        <id>id-deploy-only-lc</id>
-                        <phase>install</phase>
+                        <id>package-deploy-only-lc</id>
+                        <phase>package</phase> <!-- mod 13-01-2026 was install -->
                         <goals>
                            <goal>deploy-only</goal> <!-- was deploy-only -->
                         </goals>
                     </execution>
-                    <!-- new 16-09-2023 remplace le copy manuel dans wildfly/standalone/deployments ?? à vérifier !!-->
+                    <!-- new 16-09-2023 remplace le copy manuel dans wildfly/standalone/deployments ?? à vérifier !!
                      <execution>
                         <id>id-deploy-driver-mysql</id>
                         <phase>install</phase>
@@ -794,7 +1070,7 @@ https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-p
                         <goals>
                             <goal>deploy-artifact</goal>
                         </goals>
-                    </execution>
+                    </execution>-->
                  </executions>
      </plugin>
 
@@ -803,52 +1079,32 @@ https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-p
     <artifactId>maven-war-plugin</artifactId>
     <version>${maven-war-plugin.version}</version>
     <configuration>
-        <!--       <attachClasses>true</attachClasses> new 30-11-2020 enlevé 08-12-2020 -->
-  <!--  http://maven.apache.org/shared/maven-archiver/index.html 
-   see also 
-   https://www.mojohaus.org/build-helper-maven-plugin/usage.html           
-              -->
-  <!--   If you use the following configuration, the file found in
-               ${project.build.outputDirectory}/META-INF/MANIFEST.MF will be used as the manifest file in the jar.      -->   
- <!--   <useDefaultManifestFile>true</useDefaultManifestFile> enlevé 05-06-2023 -->
-        <archive> 
-            <addMavenDescriptor>true</addMavenDescriptor> 
-            <index>false</index> 
+        <archive>
+            <addMavenDescriptor>true</addMavenDescriptor>
             <forced>true</forced>
-        <!--   <pomPropertiesFile>true</pomPropertiesFile>  
-               <manifestFile> son propre fichier</manifestFile> -->
             <manifest>
-                 <addClasspath>false</addClasspath>
-                 <classpathPrefix>**by LC**</classpathPrefix>
-                 <classpathLayoutType>repository</classpathLayoutType>
-                 <addDefaultEntries>true</addDefaultEntries>
-                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries> 
-                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> 
-                 <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
-                 <addExtensions>false</addExtensions>
-                 <mainClass>Main-Class entry by LC</mainClass>
-                 <packageName>Package by LC</packageName>
+                <addDefaultEntries>true</addDefaultEntries>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
             </manifest>
             <manifestEntries>
-                 <artifactId>${project.artifactId}</artifactId> 
-                 <groupId>${project.groupId}</groupId> 
-                 <version>${project.version}</version> 
-       <!-- following : used via MANIFEST.MF in InfoController.maven dans InfoController -->
-                 <netbeans>${netbeans.version}</netbeans>
-                 <primeflex>${primeflex.version}</primeflex>
-                 <javaEE>${jakartaee-api.version}</javaEE>
-                 <omnifaces>${omnifaces.version}</omnifaces>
-                 <PFextension>${primefaces.extension.version}</PFextension>
-                 <logging>${log4j2.version}</logging>
-                 <buildT>${timestamp}</buildT> <!-- Brussels time voir build-helper-maven-plugin further -->
-                 <be>${maven.build.timestamp}</be>
-                 <golflc>Application GolfLC - version 3.0 - WHS compatible</golflc>
+                <!-- Informations custom pour votre application -->
+                <netbeans>${netbeans.version}</netbeans>
+                <primeflex>${primeflex.version}</primeflex>
+                <javaEE>${jakartaee-api.version}</javaEE>
+                <omnifaces>${omnifaces.version}</omnifaces>
+                <PFextension>${primefaces.extension.version}</PFextension>
+                <logging>${log4j2.version}</logging>
+                <buildTime>${timestamp}</buildTime>
+                <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
+                <application>Application GolfLC - version 3.0 - WHS compatible</application>
             </manifestEntries>
         </archive>
-              <packagingExcludes>pom.xml</packagingExcludes> <!-- new 06-09-2018  --> 
-              <failOnMissingWebXml>false</failOnMissingWebXml><!-- default in 3.3.2  --> 
+        <packagingExcludes>pom.xml</packagingExcludes>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
     </configuration>
-</plugin>       
+</plugin>
  <!--  https://stackoverflow.com/questions/13228472/how-to-access-maven-build-timestamp-for-resource-filtering
  https://www.mojohaus.org/build-helper-maven-plugin/usage.html
  utilisé pour avoir le build time en local time
@@ -871,8 +1127,8 @@ https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-p
                 </execution>
             </executions>
         </plugin>          
-
-       <plugin> <!--https://maven.apache.org/plugins/maven-dependency-plugin/index.html-->
+<!-- enlevé 26-01-2026https://maven.apache.org/plugins/maven-dependency-plugin/index.html
+       <plugin> 
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>${maven-dependency-plugin.version}</version>
@@ -913,14 +1169,13 @@ https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-p
                     </execution>
                 </executions>
             </plugin>
-            
+-->            
 
-<!-- ajouté 21-05-2020  va avec Junit5-->
-<plugin>
-	<artifactId>maven-surefire-plugin</artifactId>
-	<version>${maven-surefire-plugin.version}</version>
-       <configuration>
-          <skipTests>${tests.skip}</skipTests>
+
+          
+          
+          
+          
       <!--      <suiteXmlFiles>
                 <suiteXmlFile>/src/test/resources/testng.xml</suiteXmlFile>
           </suiteXmlFiles>  
@@ -933,11 +1188,18 @@ https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-p
             <test>${test.file}</test>
 
           -->
-        </configuration>
-</plugin>
 
 
-<!-- 24-06-2022  pour gRPC-->
+<!-- 04-01-2026Plugin pour générer le rapport HTML -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-report-plugin</artifactId>
+            <version>3.5.4</version>
+            <configuration>
+                <outputDirectory>${project.build.directory}/surefire-html-report</outputDirectory>
+            </configuration>
+        </plugin>
+<!-- enlevé le 10-21-20264-06-2022  pour gRPC
     <plugin>
       <groupId>org.xolstice.maven.plugins</groupId>
       <artifactId>protobuf-maven-plugin</artifactId>
@@ -961,7 +1223,7 @@ https://stackoverflow.com/questions/47329021/change-http-port-in-wildfly-maven-p
         </execution>
       </executions>
     </plugin>
-    
+   --> 
     <!-- new 30/08/2022 pour execution RUN
  https://www.digitalocean.com/community/tutorials/exec-maven-plugin-run-java-programs-maven-build
   https://www.mojohaus.org/exec-maven-plugin/usage.html 
@@ -973,13 +1235,9 @@ https://github.com/mojohaus/exec-maven-plugin/releases    -->
                 <executions>
                     <execution>
                         <id>run-app</id>
-                     <!--   <phase>package</phase>
-                      -->  
                         <goals>
-                         <!--   <goal>java</goal> java goal doesn't spawn a new process execute Java programs in the same VM.-->
-                            <goal>java</goal> <!-- execute programs and Java programs in a separate process.  -->
+                            <goal>java</goal>
                         </goals>
-                        <!-- System.getenv() -->
                         <configuration>
                         <environmentVariables>
                             <LANG>en_US</LANG>
@@ -990,17 +1248,15 @@ https://github.com/mojohaus/exec-maven-plugin/releases    -->
                     </execution>
                 </executions>
 		<configuration>
-                    <executable>maven</executable> <!--  mod 03-12-2025 <executable>java</executable>  -->
-		    <mainClass>${exec.mainClass}</mainClass>
+               <!--  enlevé 30-01-2026 11:47    <executable>maven</executable>  mod 03-12-2025 <executable>java</executable>  -->
+		    <mainClass>${exec.mainClass.pom}</mainClass>
                     <longClasspath>true</longClasspath> <!-- new 31-01-2025 -->
                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
                         <arguments>
                             <argument>--enable-preview</argument>
                             <argument>foo</argument>
                             <argument>bar</argument>
-                      <!--       <argument>-classpath</argument>   -->
                         </arguments>
-                        <!-- System.getProperty() -->
                         <systemProperties>
                             <systemProperty>
                                 <key>env</key>
@@ -1047,41 +1303,92 @@ https://github.com/mojohaus/exec-maven-plugin/releases    -->
                     </execution>
                 </executions>
             </plugin>
- <plugin>
-        <!-- Compiler plugin https://maven.apache.org/plugins/maven-compiler-plugin/compile-mojo.html 
-     https://docs.oracle.com/en/java/javase/25/docs/specs/man/javac.html#option-parameters --> 
-     
+ <!-- 14-09-2025 sert à rien ?  -->
+   <plugin>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-compiler-plugin</artifactId>
     <version>${maven-compiler-plugin.version}</version>
     <configuration>
-        <fork>true</fork>
-        <meminitial>256m</meminitial>
-        <maxmem>2048m</maxmem>
-        <release>${java.version}</release>
-        <encoding>${project.build.sourceEncoding}</encoding>
-        <compilerArgs>
-            <arg>-Xlint:all,-serial,-path</arg>
-            <arg>-proc:none</arg>
-            <arg>-Xmaxerrs</arg>
-            <arg>50</arg>
-            <arg>--enable-preview</arg>
-            <arg>-J-Duser.language=fr_fr</arg>  <!-- new 04-12-2025 utilité ?? -->
-        </compilerArgs>
-        <showDeprecation>true</showDeprecation>
-        <showWarnings>true</showWarnings>
-        <failOnWarning>false</failOnWarning>
-        <verbose>false</verbose>
-        <debug>true</debug>
-        <debuglevel>lines,vars,source</debuglevel> <!-- new 03-12-2025 -->
-        <enablePreview>true</enablePreview> <!-- new 04-12-2025 double emploi avec arg ci-dessus ? -->
-        <proc>full</proc> <!-- new 04-12-2025 -->
-        <parameters>true</parameters> <!-- new 04-12-2025 -->
+    <fork>true</fork>
+    <useIncrementalCompilation>true</useIncrementalCompilation>
+ <!--    mod 13-01-2026<meminitial>256m</meminitial>
+     <maxmem>2048m</maxmem>
+     -->
+     <release>${java.version}</release>
+     <encoding>${project.build.sourceEncoding}</encoding>
+    <compilerArgs>
+        <arg>-Xlint:all,-serial,-path</arg>
+        <arg>-Xmaxerrs</arg>
+        <arg>50</arg>
+        <arg>-J-Duser.language=fr</arg>
+        <arg>-J-Duser.country=FR</arg>
+        <arg>--enable-preview</arg>
+        <arg>-J-Xms1024m</arg>
+        <arg>-J-Xmx2048m</arg>
+    </compilerArgs>
+     <showDeprecation>true</showDeprecation>
+     <showWarnings>true</showWarnings>
+     <failOnWarning>false</failOnWarning>
+     <verbose>false</verbose>
+     <debug>true</debug>
+     <debuglevel>lines,vars,source</debuglevel>
+     <enablePreview>true</enablePreview>
+     <proc>none</proc>
+     <parameters>true</parameters>   <!--Parameters prservés pour CDI/JAX-RS-->
     </configuration>
+    
    </plugin>
- <!-- 14-09-2025 sert à rien ?  -->  
-   
-</plugins>
+   <!-- new 26-01-2026 pour test intégration cdi/weld
+     Failsafe regarde tout ce qui est sous src/test/java et ensuite filtre selon le pattern (*IT.java par convention) ou le groupe/tag.
+    Par convention, Maven Failsafe exécute automatiquement tous les tests dont le nom correspond à :
+    **/*IT.java
+    **/*IT*.java
+    **/*ITCase.java 
+Les tests d’intégration seront exécutés lors de mvn verify ou mvn integration-test.   -->
+   <plugin>
+    <artifactId>maven-failsafe-plugin</artifactId>
+    <version>${failsafe.version}</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+            </goals>
+            <configuration>
+                <includes>
+                    <include>**/*IT.java</include>       <!-- convention integration tests -->
+                </includes>
+              <!--   <includeTags>integration</includeTags>  Compatible JUnit 5✔ Fonctionne avec @Tag("integration")  -->
+                <forkCount>1</forkCount>  <!-- exécute tests dans la JVM actuelle -->
+                <reuseForks>false</reuseForks> <!-- optionnel : ne réutilise pas de forks -->
+                <skipTests>${skip.integration.tests}</skipTests>
+                <skipITs>${skip.integration.tests}</skipITs>
+                <argLine>--enable-preview</argLine>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+
+   <!-- ajouté 21-05-2020  va avec Junit5-->
+<plugin>
+	<artifactId>maven-surefire-plugin</artifactId>
+	<version>${maven-surefire-plugin.version}</version>
+       <configuration>
+      <!--    <skipTests>${tests.skip}</skipTests>  -->
+          <skipTests>${skip.unit.tests}</skipTests>
+          <systemPropertyVariables>
+         <!--   <jboss.home>${env.JBOSS_HOME}</jboss.home>    04-01-2026 utilisée dans arquillian.xml  -->
+          </systemPropertyVariables>
+          <argLine>-Dfile.encoding=UTF-8</argLine>
+          <argLine>--enable-preview</argLine>
+          <includes>
+                <include>**/*Test.java</include><!-- convention unit tests -->
+          </includes>
+           <excludedGroups>integration</excludedGroups> <!-- voir failsafe !! exclut explicitement les tests integration -->
+          </configuration>
+</plugin>        
+
+  </plugins>
  
 <!--  12-04-2020 15:21 https://blog.frankel.ch/whats-the-version-of-my-deployed-application/   -->
 <resources>
@@ -1092,7 +1399,109 @@ https://github.com/mojohaus/exec-maven-plugin/releases    -->
 </resources>
  </build>
     
- <repositories> 
+  <!-- ✅ PROFILES - utilisé dans nbactions.xml Ajoutez ici, juste après </build> -->
+<profiles>
+    <profile>
+        <id>fast-it</id>
+        <properties>
+            <skip.unit.tests>true</skip.unit.tests>
+            <skip.integration.tests>false</skip.integration.tests>
+        </properties>
+    </profile>
+    
+    <profile>
+        <id>fast-ut</id>
+        <properties>
+            <skip.unit.tests>false</skip.unit.tests>
+            <skip.integration.tests>true</skip.integration.tests>
+        </properties>
+    </profile>
+    <!--
+        <profile>
+        <id>default-main</id>
+        <activation>
+            <property>
+                <name>!exec.mainClass</name>
+            </property>
+        </activation>
+        <properties>
+            <exec.mainClass>${exec.mainClass.pom>}</exec.mainClass>
+        </properties>
+    </profile>
+    -->
+    
+    
+</profiles>
+        <!--
+    <profile>
+        <id>fast-it</id>
+        <properties>
+ 
+                  <skip.unit.tests>true</skip.unit.tests>
+                  <skip.integration.tests>false</skip.integration.tests>
+        </properties>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+
+                        <forkCount>1</forkCount>
+                        <reuseForks>true</reuseForks>
+                        <useFile>false</useFile>
+                       
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+    -->
+     
+   
+    
+    
+<repositories>
+    <!-- 1️⃣ Maven Central : source principale -->
+    <repository>
+        <id>central</id>
+        <name>Maven Central Repository</name>
+        <url>https://repo.maven.apache.org/maven2</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
+
+    <!-- JitPack : fallback pour les libs absentes de Central 
+            JitPack configuré pour download de QRGen-->
+    <repository>
+        <id>jitpack.io</id>
+        <name>JitPack Repository</name>
+        <url>https://jitpack.io</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+    
+   <repository>
+    <id>jboss-public-repository-group</id>
+    <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+    <releases><enabled>true</enabled></releases>
+    <snapshots><enabled>true</enabled></snapshots>
+  </repository>
+    
+    
+    
+</repositories>
+
+     
+     
   <!--   enlevé 21-11-2020 transféré à projet mavenEID 
      <url>http://localhost:8080/users/collet/.m2/repository/com/jEidlib/1.1/jEidlib-1.1.jar</url>
      
@@ -1128,18 +1537,12 @@ https://github.com/mojohaus/exec-maven-plugin/releases    -->
         <layout>default</layout>
      </repository>
   -->   
-  </repositories>
+ 
 <!--
 <dependencyManagement>
 <dependencies>
  
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-bom</artifactId>
-      <version>${log4j2.version}</version>
-      <scope>import</scope>
-      <type>pom</type>
-    </dependency>
+
 
     <dependency>
         <groupId>org.jboss.resteasy</groupId>

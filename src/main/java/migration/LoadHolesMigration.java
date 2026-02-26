@@ -6,10 +6,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import utils.LCUtil;
-
-public class LoadHolesMigration implements interfaces.Log{
+import static interfaces.Log.LOG;
+public class LoadHolesMigration {
 
 public int[]load(Tee tee, Connection conn) throws SQLException{ 
         ResultSet rs = null;

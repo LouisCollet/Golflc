@@ -28,7 +28,6 @@
                      icon="pi pi-print" >
                <p:printer id="printerPrimefaces"
                           target="editor"
-                          
                           configuration="title: 'Print Handicap Calculations', timeout: 1000, globalStyles: true, addGlobalStyles : true, stylesheet : null, rejectWindow : true,
                             noPrintSelector : '.no-print', iframe : true, 
                             append : 'Free jQuery Plugins',
@@ -48,7 +47,7 @@
     <p:textEditor id="editor"
                   secure="false"
                   widgetVar="editor1"
-                  value="#{courseC.handicapIndex.calculations}"
+                  value="#{playerC.handicapIndex.calculations}"
                   style="width:900px;font-weight: normal; color:black; font-size:1.5em;"
                   readonly="true"
                   toolbarVisible="false" >

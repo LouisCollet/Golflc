@@ -24,25 +24,25 @@
 <f:facet name="header">
     <h:outputText escape="false" value="#{msg['message.welcome']}" />
 </f:facet>
-        <h:outputText value="#{courseC.player.playerFirstName}"
+        <h:outputText value="#{playerC.player.playerFirstName}"
                       style="font-weight:bold;" />
-        <h:outputText value="#{courseC.player.playerLastName}"
+        <h:outputText value="#{playerC.player.playerLastName}"
                       style="font-weight:bold;font-size: 2rem" />
       <c:set var="photo"
-             value="#{courseC.player.playerPhotoLocation}"/>
+             value="#{playerC.player.playerPhotoLocation}"/>
 
    <p:graphicImage id="image_photo_found"
                    value="#{imageView.getPhoto(photo)}"
                    stream="false"
                    rendered="#{photo ne 'no photo.jpeg'}"
-                   alt="There is no photo : #{courseC.player.playerLastName}"
+                   alt="There is no photo : #{playerC.player.playerLastName}"
                    style="float: right;">
    </p:graphicImage>
 
    <h:graphicImage id="image_photo_unknown"
                    name="images/photos/unknown.jpg"
                    rendered="#{photo eq 'no photo.jpeg'}"
-                   alt="no photo image missing :#{courseC.player.playerLastName}"
+                   alt="no photo image missing :#{playerC.player.playerLastName}"
                    style="float:right;">
    </h:graphicImage>
 
@@ -56,33 +56,33 @@
     style="width:70%"
     columns="2" >
 
-   <c:set var="pid" value="#{courseC.player.idplayer}"/>
+   <c:set var="pid" value="#{playerC.player.idplayer}"/>
  
     <h:outputText value="#{msg['message.last.session']}"  />
-        #{courseC.LastSession(pid)} 
+        #{playerC.lastSession(pid)}
 
     <h:outputText value="#{msg['subscription.startdate']}" />
-    <h:outputText value="#{courseC.subscription.startDate}">
+    <h:outputText value="#{memC.subscription.startDate}">
          <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
     </h:outputText>    
 
      <h:outputText value="#{msg['subscription.enddate']}" />
-     <h:outputText value="#{courseC.subscription.endDate}">
+     <h:outputText value="#{memC.subscription.endDate}">
          <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
      </h:outputText>
  
      <h:outputText value="Home Club" />
-     <h:outputText value="#{courseC.player.playerHomeClub}"/>
+     <h:outputText value="#{playerC.player.playerHomeClub}"/>
      
      <h:outputText value="Blocking Attempts" 
-                   rendered="#{courseC.blocking.blockingAttempts > 0}"/>
-     <h:outputText value="#{courseC.blocking.blockingAttempts}"
-                   rendered="#{courseC.blocking.blockingAttempts > 0}"/>
+                   rendered="#{playerC.blocking.blockingAttempts > 0}"/>
+    <h:outputText value="#{playerC.blocking.blockingAttempts}"
+                   rendered="#{playerC.blocking.blockingAttempts > 0}"/>
+    <h:outputText value="Pro"
+                   rendered="#{playerC.professional}"/>
+    <h:outputText value="#{playerC.professionalCount}"
+                   rendered="#{playerC.professional}"/>
 
-     <h:outputText value="Pro" 
-                   rendered="#{courseC.isProfessional().size() ne 0}"/>
-     <h:outputText value="#{courseC.isProfessional().size()}"
-                   rendered="#{courseC.isProfessional().size() ne 0}"/>
  </p:panelGrid>
 
     <p:megaMenu  id="megaMenu"
@@ -148,7 +148,7 @@
         <p:commandButton
                          value="#{msg['unavailable.title']}"
                          id="buttonUnavailable"
-                         ajax="true"
+                          
                          update="growl-msg"
                          icon="pi pi-sun"
                          style="margin: 0 auto;"

@@ -55,7 +55,7 @@ public class MongoHelpLoad {
         helpview.setHelpViewLanguage("FR");
         helpview.setHelpViewModificationDate(LocalDateTime.now());
      // call MongoHelpController
-        boolean b = Controllers.MongoHelpController.create(helpview);
+        boolean b = new Controllers.MongoHelpController().create(helpview);
         if(b){
             count = count + 1;
         }

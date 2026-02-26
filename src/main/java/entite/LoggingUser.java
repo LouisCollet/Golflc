@@ -11,7 +11,7 @@ import utils.LCUtil;
 
 public class LoggingUser implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 
     private Integer LoggingIdPlayer;
     private Integer LoggingIdRound;
@@ -85,7 +85,7 @@ public String toString(){
 }
 
   public static LoggingUser map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         LoggingUser logging = new LoggingUser();
         logging.setLoggingIdPlayer(rs.getInt("LoggingIdPlayer"));

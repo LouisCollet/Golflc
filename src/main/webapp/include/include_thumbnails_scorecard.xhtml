@@ -12,17 +12,17 @@
                 headerText="Thumbnail"
                 footerText="Thumbnail"
                 style="width:10%;text-align:center" >
-	<c:set var="th_photo" value="#{courseC.player.playerPhotoLocation}"/>
+	<c:set var="th_photo" value="#{playerC.player.playerPhotoLocation}"/>
             <p:graphicImage 
                 id="image_thumbnail"
                 name="images/thumbnails/thumbnail.#{th_photo}"
                 rendered="#{th_photo ne 'nophoto.jpeg'}"
-                alt="Photo missing for : #{courseC.player.playerLastName}"/>
+                alt="Photo missing for : #{playerC.player.playerLastName}"/>
             <p:graphicImage 
                 id="image_thumbnail_unknown"
                 title="this is the title !!"
                 name="images/thumbnails/thumbnail.unknown.jpg"
                 rendered="#{th_photo eq 'nophoto.jpeg'}"
-                alt="image missing for : #{courseC.player.playerLastName}"/>
+                alt="image missing for : #{playerC.player.playerLastName}"/>
 	</p:column>
 </ui:composition>

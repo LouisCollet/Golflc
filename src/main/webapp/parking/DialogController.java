@@ -4,7 +4,6 @@ import entite.Club;
 import entite.Flight;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.faces.application.FacesMessage;
 import jakarta.inject.Named;
 import java.io.IOException;
 import java.io.Serializable;
@@ -15,14 +14,17 @@ import java.util.Map;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DialogFrameworkOptions;
-import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
+import static utils.LCUtil.showMessageInfo;
 
 /**
  *http://www.javacodegeeks.com/2015/01/primefaces-opening-external-pages-in-dynamically-generated-dialog.html
- * http://www.journaldev.com/4056/primefaces-utilities-requestcontext-el-functions-dialog-framework-search-expression-framework
- * 
+
  */
+// ancienne version avec static méthodes doncPAS CDI compliant !!!
+// déjà migré pour local administrator
+// modifier courseController : insérer le @Iject de 
+// modifier les .xhtml : utiliser 
 //PrimeFaces's Dialog Framework (DF) 
 @Named("dialogC")
 @RequestScoped // mod 12-02-2023
@@ -184,7 +186,7 @@ public static void showFlight(){
             if(clubid == null){
                  String msg = "Please first select a club !" ; 
                  LOG.error(msg);
-                 LCUtil.showMessageFatal(msg);
+                 showMessageFatal(msg);
             }
     DialogFrameworkOptions options = DialogFrameworkOptions.builder()
         .draggable(true)
@@ -301,7 +303,7 @@ public static void showFlight(){
         LOG.debug("msg");
         LOG.debug("Workhour at this moment = " );
         PrimeFaces.current().ajax().update("form_round:idworkhour");
-        LCUtil.showMessageInfo(msg);
+        showMessageInfo(msg);
 } 
 
  // new 21-11-2020 
@@ -318,7 +320,7 @@ public static void showFlight(){
         Object rating = event.getObject(); 
         String msg = "Dialog return with rating : " + rating.toString();
         LOG.debug(msg);
-        LCUtil.showMessageInfo(msg);
+        showMessageInfo(msg);
 } 
 
 public static boolean closeDialog(Object obj) throws IOException{  // static added 16-02-2024

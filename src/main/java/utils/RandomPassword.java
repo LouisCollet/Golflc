@@ -1,9 +1,9 @@
 package utils;
 
 import java.security.SecureRandom;
+import static interfaces.Log.LOG;
 
-public class RandomPassword implements interfaces.Log
-{
+public class RandomPassword {
 private static final String NUMBERS = "0123456789";
 private static final String UPPER_ALPHABETS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 private static final String LOWER_ALPHABETS = "abcdefghijklmnopqrstuvwxyz";

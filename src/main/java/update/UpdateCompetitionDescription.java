@@ -2,97 +2,83 @@ package update;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entite.CompetitionDescription;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
-import utils.DBConnection;
+import javax.sql.DataSource;
 import utils.LCUtil;
 
-public class UpdateCompetitionDescription implements Serializable, interfaces.Log, interfaces.GolfInterface{
-   private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+@ApplicationScoped
+public class UpdateCompetitionDescription implements Serializable {
 
-public boolean update(final CompetitionDescription cd, final Connection conn) throws Exception{
-   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-        PreparedStatement ps = null;
-  try {
-           LOG.debug("... entering = " + methodName);
-           LOG.debug(" with competition = " + cd);
-    String co = utils.DBMeta.listMetaColumnsUpdate(conn, "competition_description");
-           LOG.debug("String from listMetaColumns = " + co);
-    final String query =  """
-            UPDATE competition_description
-            SET %s
-            WHERE CompetitionId = ?
-     """.formatted(co);
-    ps = conn.prepareStatement(query);
-    ps = CompetitionDescription.psCompetitionDescriptionModify(ps,cd);  // new 16/05/2022
-     utils.LCUtil.logps(ps);
-     int row = ps.executeUpdate(); // write into database
-       LOG.debug("rows modified competition_description = " + row);
-            if(row != 0) {
-                String msg =  LCUtil.prepareMessageBean("competition.description.modify")
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public UpdateCompetitionDescription() { }
+
+    public boolean update(final CompetitionDescription cd) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("with CompetitionDescription = " + cd);
+
+        try (Connection conn = dataSource.getConnection()) {
+
+            String co = utils.DBMeta.listMetaColumnsUpdate(conn, "competition_description");
+            LOG.debug(methodName + " - columns = " + co);
+
+            final String query = """
+                UPDATE competition_description
+                SET %s
+                WHERE CompetitionId = ?
+                """.formatted(co);
+
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                CompetitionDescription.psCompetitionDescriptionModify(ps, cd);
+                utils.LCUtil.logps(ps);
+
+                int row = ps.executeUpdate();
+                LOG.debug(methodName + " - rows modified = " + row);
+                if (row != 0) {
+                    String msg = LCUtil.prepareMessageBean("competition.description.modify")
                             + " <br/>ID = " + cd.getCompetitionId()
                             + " <br/>Name = " + cd.getCompetitionName();
                     LOG.debug(msg);
                     LCUtil.showMessageInfo(msg);
                     return true;
-            }else{
+                } else {
                     String msg = "-- NOT NOT successful " + methodName;
                     LOG.debug(msg);
                     LCUtil.showMessageInfo(msg);
                     return false;
+                }
             }
-}catch (SQLException sqle) {
-            String msg = "£££ SQLException in " + methodName + sqle.getMessage() + " ,SQLState = "
-                    + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
-}catch (Exception e) {
-            String msg = "£££ Exception in " + methodName + e;
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return false;
- } finally {
-            DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
-        }
-//         return false;
-    } //end UpdateCompetitionDescription
 
-  void main() throws SQLException, Exception{
-     Connection conn = new DBConnection().getConnection();
-  try{
-       CompetitionDescription competition = new CompetitionDescription();
-       competition.setCompetitionId(25);
-                      String msg =  LCUtil.prepareMessageBean("competition.description.modify")
-                            + " <br/>ID = " + competition.getCompetitionId()
-                            + " <br/>Name = " + competition.getCompetitionName();
-     //                       + " <br/>Par = " + competition.getCompetitionDescriptionPar();
-                    LOG.debug(msg);
-      
-    
-/*    
-     competition  = new LoadCompetitionDescription().load(competition,conn);
-        LOG.debug(" loadedcompetition = " + competition);
-     competition.setCompetitionAgeLadies((short)50);
-     competition.setCompetitionAgeMens((short)60);
-     competition.setCompetitionMaximumPlayers((short)59);
-     boolean b = new modify.UpdateCompetitionDescription().modify(competition, conn);
-        LOG.debug(" modified competition = " + b);
-*/
-     DBConnection.closeQuietly(conn, null, null, null);
- }catch (Exception e){
-            String msg = "££ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-          }
-   } // end main//
-} //end Class
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        CompetitionDescription cd = new CompetitionDescription();
+        cd.setCompetitionId(25);
+        // boolean b = update(cd);
+        LOG.debug("from main, UpdateCompetitionDescription = ");
+    } // end main
+    */
+
+} // end class

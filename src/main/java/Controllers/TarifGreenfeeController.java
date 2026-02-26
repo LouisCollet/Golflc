@@ -12,6 +12,7 @@ import entite.Round;
 import entite.TarifGreenfee;
 //import entite.TeeTimes;
 //import entite.Twilight;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.GolfInterface.ZDF_DAY;
 import static interfaces.Log.LOG;
 import java.sql.SQLException;
@@ -22,20 +23,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import utils.LCUtil;
 import static utils.LCUtil.myDoubleRound;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 import utils.TimeOverlap;
 
-// used in CourseController, not a Named bean
-public class TarifGreenfeeController implements interfaces.Log{
- public TarifGreenfeeController(){  // constructor
-    }
+@ApplicationScoped
+public class TarifGreenfeeController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public TarifGreenfeeController() { }
 
 public TarifGreenfee inputTarifGreenfeePeriods(TarifGreenfee tarifGreenfee){// throws SQLException, Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-        LOG.debug("entering inputTarifGreenfeePeriods with tarifGreenfee = " + tarifGreenfee);
+        LOG.debug("with inputTarifGreenfeePeriods with tarifGreenfee = " + tarifGreenfee);
   // verification overlapping et chronologie start-end
         if(tarifGreenfee.getDatesSeasonsList().size() >= 1){ // ce test nécessaire ??
             if(overlapCheckPeriods(tarifGreenfee)){
@@ -71,17 +78,16 @@ try{
     tarifGreenfee.setEndDate(null);
     
    return tarifGreenfee;
-}catch(Exception ex){
-    String msg = "££ inputTarifGreenfeePeriods Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return tarifGreenfee;
-}    
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return tarifGreenfee;
+}
 } // end method
 
 public boolean overlapCheckPeriods(TarifGreenfee tarif){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-    LOG.debug("entering overlapCheckPeriods");
             for(int i = 0; i < tarif.getDatesSeasonsList().size(); i++) {
                 LOG.debug("i = " + i);
               // new period
@@ -104,17 +110,17 @@ try{
                } // end if
             }  // end for}
             return false;
-}catch(Exception ex){
-            String msg = "overlapCheck Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return true;
-}     
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return true;
+}
 }  // end method
 
 public TarifGreenfee inputTarifGreenfeeBasic(TarifGreenfee tarifGreenfee){// throws SQLException, Exception{  // used in tarif_equipments.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-        LOG.debug("entering inputTarifGreenfeeBasic with tarifGreenfee = " + tarifGreenfee);
+        LOG.debug("with inputTarifGreenfeeBasic with tarifGreenfee = " + tarifGreenfee);
         // 30/04/2022 validation
     if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
       String msg = "Fatal error : season Basic does not exist !";
@@ -146,17 +152,17 @@ try{
     tarifGreenfee.setWorkSeason(null);
     tarifGreenfee.setWorkPrice(null);
    return tarifGreenfee;
-}catch(Exception ex){
-    String msg = "inputTarifGreenfeeBasic Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return tarifGreenfee;
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return tarifGreenfee;
 }
-} // end method 
+} // end method
 
  public TarifGreenfee inputTarifGreenfeeEquipments(TarifGreenfee tarifGreenfee){// throws SQLException, Exception{  // used in tarif_equipments.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-      LOG.debug("entering inputTarifGreenfeeEquipments !");
+      LOG.debug("with inputTarifGreenfeeEquipments !");
       LOG.debug("with tarif Equipments = " + tarifGreenfee.getEquipmentsList());
  // 30/04/2022 validation
     if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
@@ -180,13 +186,11 @@ try{
     tarifGreenfee.setWorkPrice(null); 
     tarifGreenfee.setEquipmentsReady(true); // gestion le menu
    return tarifGreenfee;
-}catch(Exception ex){
-            String msg = "inputTarifEquipments Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
 }
-} // end method   
+} // end method
 
  public boolean validPeriod( ArrayList<TarifGreenfee.DatesSeasons> periods, String season) {
     if(season.equals("A")){  // all seasons accepted
@@ -200,8 +204,10 @@ try{
     return false;
 }
  public TarifGreenfee inputTarifGreenfeeDays(TarifGreenfee tarifGreenfee){// throws SQLException, Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-     LOG.debug("entering inputTarifGreenfeeDays with tarifGreenfee = " + tarifGreenfee);
+     LOG.debug("with inputTarifGreenfeeDays with tarifGreenfee = " + tarifGreenfee);
      String msg = "input : DaysWorkPrice = "  + Arrays.toString(tarifGreenfee.getWorkDaysPrice());
      LOG.info(msg);
      showMessageInfo(msg);
@@ -244,17 +250,17 @@ try{
     tarifGreenfee.setWorkTwilight("N");  // init pour affichage
        LOG.debug("tarifGreenfee returned = " + tarifGreenfee);
   return tarifGreenfee;
-}catch(Exception ex){
-    String msg = "Exception in inputTarifGreenfeeDays! " + ex;
-    LOG.error(msg);
-    showMessageFatal(msg);
+} catch (Exception e) {
+    handleGenericException(e, methodName);
     return null;
 }
 } // end method
 
  public TarifGreenfee inputTarifGreenfeeHours(TarifGreenfee tarifGreenfee){// throws SQLException, Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-    LOG.debug("entering inputTarifHours with tarif = !" + tarifGreenfee);
+    LOG.debug("with inputTarifHours with tarif = !" + tarifGreenfee);
             LOG.debug("teeTimes List = "  + tarifGreenfee.getTeeTimesList());
        // 30/04/2022 validation
     if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
@@ -337,17 +343,17 @@ try{
        tarifGreenfee.setWorkPrice(null);
        tarifGreenfee.setUpdateReady(true); // gestion du menu
    return tarifGreenfee; 
-}catch(Exception ex){
-    String msg = "Exception in inputTarifHours! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-}    
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
+}
 } // end method
  
 public TarifGreenfee inputTarifGreenfeeTwilight(TarifGreenfee tarifGreenfee) {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-     LOG.debug("entering inputTarifTwilight with tarifGreenfee = " + tarifGreenfee);
+     LOG.debug("with inputTarifTwilight with tarifGreenfee = " + tarifGreenfee);
      // soit months est complété, soit season est complété
      List<Integer> months = null;
      if(tarifGreenfee.getMultiTwilight() != null){ // multiple months
@@ -386,17 +392,16 @@ try{
     tarifGreenfee.setTwilightDone(true); // gestion du menu fera afficher create all
        LOG.debug("tarifGreenfee returned = " + tarifGreenfee);
   return tarifGreenfee;
-}catch(Exception ex){
-    String msg = "Exception in inputTarifGreenfeeTwilight! " + ex;
-    LOG.error(msg);
-    showMessageFatal(msg);
+} catch (Exception e) {
+    handleGenericException(e, methodName);
     return null;
 }
 } // end method
   
  public boolean overlapCheckHours(TarifGreenfee tarif){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-       LOG.debug("entering overlapCheckHours");
        LOG.debug("existing hours = " + tarif.getTeeTimesList());
        LOG.debug("trying to insert new hours = " + tarif.getStartHour() + "/" + tarif.getEndHour());
  // candidate
@@ -426,20 +431,19 @@ try{
             }
         } // end for 
    return false;
-}catch(Exception ex){
-            String msg = "overlapCheck Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return true;
-}     
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return true;
+}
 }  // end method
  
  public Greenfee completeGreenfee(TarifGreenfee tarif, Club club, Round round, Player player) throws Exception{
+      final String methodName = utils.LCUtil.getCurrentMethodName();
+      LOG.debug("entering completeGreenfee");
       Greenfee greenfee = new Greenfee();
 try{
-        LOG.debug("entering completeGreenfee");
         LOG.debug("with tarif = " + tarif);
-     double d = new TarifGreenfeeController().calcGreenfeePrice(tarif);
+     double d = this.calcGreenfeePrice(tarif);
         LOG.debug("le prix du greenfee et des équipements est " + d);
      greenfee.setPrice(d);
 /*     if(greenfee.getPrice() == 0.0){
@@ -503,17 +507,15 @@ try{
       greenfee.setItems(sb.toString());
   return greenfee;
   
-}catch (Exception ex){
-    String msg = "Exception in LoadGreenfee ! " + ex;
-    LOG.error(msg);
-    showMessageFatal(msg);
+} catch (Exception e) {
+    handleGenericException(e, methodName);
     return null;
 }
-finally{}
 } //end method
 
  
  public double calcGreenfeePrice(TarifGreenfee tarif){
+     final String methodName = utils.LCUtil.getCurrentMethodName();
      LOG.debug(" -- Start of calc.CalcGreenfeePrice with tarif= " + tarif);
      // calcul le prix total à payer par creditcard
  try {
@@ -567,12 +569,9 @@ LOG.debug("calculating greenfee -----------------");
   // quels cas ??
   return 99.99;
  } catch (Exception e) {
-      String msg = " -- Error in calcPrixGreenfee " + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return 0.0;
+    handleGenericException(e, methodName);
+    return 0.0;
  }
- finally { }
-} // end method 
+} // end method
 
 } //end Class

@@ -2,16 +2,16 @@ package entite;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-@Named
-@SessionScoped
+// @Named  // migrated 2026-02-24
+// @SessionScoped  // migrated 2026-02-24
 
 public class PlayingHandicap implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;

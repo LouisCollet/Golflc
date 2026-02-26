@@ -9,7 +9,7 @@ import utils.LCUtil;
 
 // @Named  enlevé 07/08/2022
 public class Average implements Serializable, interfaces.Log{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
     private Short avgHole;
     private Short avgPar;
@@ -79,7 +79,7 @@ public Average(){
         this.countRounds = countRounds;
     }
 public static Average map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Average a = new Average();
             a.setAvgHole(rs.getShort("ScoreHole") );

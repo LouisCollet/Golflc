@@ -7,24 +7,39 @@ import jakarta.annotation.PostConstruct;
 import jakarta.ejb.DependsOn;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
+import jakarta.inject.Inject;
 // import jakarta.faces.annotation.FacesConfig;  enlevé JSF4
 import static utils.LCUtil.showMessageFatal;
 @Startup
 @Singleton
 @DependsOn("StartupBean")
 
-//  30-12-2018   https://rieckpil.de/howto-simple-form-based-authentication-for-jsf-2-3-with-java-ee-8-security-api/
-
-/*https://eclipse-ee4j.github.io/mojarra/
-https://github.com/eclipse-ee4j/mojarra/blob/2.3/README.md
-There is currently only one way to activate CDI in Jakarta Faces 2.3 and herewith make Jakarta Faces 2.3
-to run in full Jakarta Faces 2.3 modus.
-Put the @FacesConfig annotation on an arbitrary CDI managed bean. For example, a general startup/configuration bean.
-*/
-
 //@FacesConfig supprimé 30-07-2023 plus nécessaire avec JSF 4
 public class PostStartupBean {
+    @Inject private entite.Settings settings;       // ✅ force init de Settings
+     // Dans PostStartupBean — l'injection force l'instanciation de Settings
   @PostConstruct
+    public void init() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        
+        try {
+            // ✅ TimeZone par défaut
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Brussels"));
+            LOG.debug(methodName + " - TimeZone set to = " + TimeZone.getDefault());
+            LOG.debug(methodName + " - Settings already initialized: " + settings.getProperty("EXECUTION"));
+            // ✅ Settings.init() supprimé — @PostConstruct dans Settings CDI s'en charge
+            // ❌ entite.Settings.init();    → plus nécessaire
+            // ❌ settings.Settings.init();  → plus nécessaire
+            LOG.debug(methodName + " - exiting PostStartupBean");
+        } catch (Exception e) {
+            String msg = "Fatal Exception in " + methodName + " : " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+        }
+    } // end method
+  
+  /*
   public void init(){
    try{
   //     LOG.debug("@FacesConfig - CDI activated !!");
@@ -33,6 +48,8 @@ public class PostStartupBean {
        LOG.debug("TimeZone setted to = " + TimeZone.getDefault());
    // 14-04-2020 initialisation des settings ! important !!
        entite.Settings.init();
+       // new 31-12-2025
+       settings.Settings.init();
 
    // activer pour debugging
 //    Controllers.InfoController.ListAllSystemProperties();
@@ -49,4 +66,6 @@ public class PostStartupBean {
         showMessageFatal(msg);
 }
   } //end method init
+  */
+  
 } //end class

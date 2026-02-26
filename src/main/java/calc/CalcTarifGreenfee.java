@@ -18,7 +18,7 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import utils.DBConnection;
+// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import utils.LCUtil;
 
 public class CalcTarifGreenfee implements interfaces.GolfInterface{
@@ -49,11 +49,9 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface{
             return tarif;
        }  
        if(tarif.getGreenfeeType().equals("DA")){
-            LocalDate lddob = player.getPlayerBirthDate().toLocalDate();
-              LOG.debug("LocalDate playerBirthDate = " + lddob);
-       //     tarif = findDays(tarif, round, club.getAddress().getCountry(), lddob); // senior, junior, FRIDAY, WEEKEND, WEEK, HOLIDAY
-            // mod 22-12-2022
-            tarif = findDays(tarif, round, club.getAddress().getCountry().getCode(), lddob); // senior, junior, FRIDAY, WEEKEND, WEEK, HOLIDAY
+            LocalDate birthDate = player.getPlayerBirthDate().toLocalDate();
+              LOG.debug("LocalDate playerBirthDate = " + birthDate);
+            tarif = findDays(tarif, round, club.getAddress().getCountry().getCode(), birthDate); // senior, junior, FRIDAY, WEEKEND, WEEK, HOLIDAY
             return tarif;
        }  
        if(tarif.getGreenfeeType().equals("HO")){
@@ -295,8 +293,17 @@ return null;
  //    TarifGreenfee.DayType dayType = TarifGreenfee.DayType.WEEK;
         // Lundi, jours de la semaine, vendredi, week-end, jours fériés
         // MONDAY, WEEK, FRIDAY, WEEKEND, HOLIDAY
+         LOG.debug("entering findDayIndex");
+        LOG.debug("countryCode = " + country);
+        LOG.debug("round = " + round);
+        
      int iDay = 0;
   // is it an holiday ?    
+  // new 12-12-2025
+  
+      boolean bol = jollyday.JollyDay.isPublicHoliday(country, round.getRoundDate().toLocalDate());
+      LOG.debug("holiday from JollyDay = " + bol);
+  
      if(new utils.Holidays().CountryHolidays(round.getRoundDate().toLocalDate(), country.toUpperCase())) { // BE, ES ...
          iDay = 4; //dayType = DayType.HOLIDAY;
            LOG.debug("this is an Holiday !! " + round);
@@ -358,38 +365,11 @@ return null;
      return dayType;
  } // end method
  
-public static void main(String[] args) throws SQLException, Exception {
-//    LOG.debug("starting main");
-    Connection conn = new DBConnection().getConnection();
- try{
-    Course course = new Course();
-    course.setIdcourse(113); // 5 nations
-    Round round = new Round();
-    round.setRoundDate(LocalDateTime.of(2022, Month.OCTOBER, 7, 9, 30));
-    TarifGreenfee tarifGreenfee = new find.FindTarifGreenfeeData().find(round, conn);
-       LOG.debug("tarif found = " + tarifGreenfee);
-    Club club = new Club();
- //   club.getAddress().setCountry("FR");  // pour déterminer holidays (jours fériés selon le pays)
-     // mod 22-12-2022
-    club.getAddress().getCountry().setCode("FR");
-    Player player = new Player();
-    player.setPlayerBirthDate(LocalDateTime.parse("2018-11-03T12:45:30"));
-    tarifGreenfee = new CalcTarifGreenfee().calc(tarifGreenfee, round, club, player);
-    LOG.debug("");
-       LOG.debug("price greenfee = " + tarifGreenfee.getPriceGreenfee());
-       LOG.debug("tarif after calc = " + tarifGreenfee);
-     tarifGreenfee.setGreenfeeType("DA");
-     tarifGreenfee = new CalcTarifGreenfee().calc(tarifGreenfee, round, club, player);
-       LOG.debug("");
-         LOG.debug("tarif after days = " + tarifGreenfee);
-       String msg = NEW_LINE + "Tarif equipment choosen = " +  tarifGreenfee.getEquipmentChoosen();
-        LOG.debug(msg);
- } catch (Exception e) {
-            String msg = "££ Exception in CalcTarifGrennfee = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null,null); 
-   }
+/*
+void main() throws Exception, SQLException{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    // requires CDI container — cannot run standalone
 } //end main
+*/
 } //end class

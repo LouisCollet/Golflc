@@ -11,11 +11,8 @@ import org.openpdf.text.Document;
 import org.openpdf.text.DocumentException;
 import org.openpdf.text.Image;
 import org.openpdf.text.PageSize;
-
-
 import entite.PlayingHandicap;
 import entite.Round;
-import entite.Settings;
 import static interfaces.GolfInterface.ZDF_TIME;
 import java.io.*;
 import java.nio.file.Files;
@@ -36,6 +33,7 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.model.SelectItem;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -59,7 +57,7 @@ import org.primefaces.model.map.Overlay;
 @RequestScoped
 
 public class UtilsController implements Serializable, interfaces.GolfInterface, interfaces.Log{
-
+@Inject private entite.Settings settings;        // ✅ injection CDI
 private String content;
 //private static String locale;
 private String fmd;
@@ -444,7 +442,7 @@ public String ViewModificationDate() throws IOException{
 try{
     String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
   //      LOG.debug("viewId = " + viewId);
-   Path path = Paths.get(Settings.getProperty("WEBAPP") + viewId);// converts string to path  
+   Path path = Paths.get(settings.getProperty("WEBAPP") + viewId);// converts string to path  
    Instant instant = Files.getLastModifiedTime(path).toInstant();
    LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneOffset.systemDefault());
    return "<b>Last modification :</b> " + ZDF_TIME.format(ldt);
@@ -528,20 +526,11 @@ return str;
 } // end method
 */
 
-void main() throws Exception{
-  try{
-      var v = new UtilsController().ListGameType();
-  //    var v  = createFilterOptions();
-      LOG.debug("v = " + v);
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-         
-   }
-   } // end main//
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
 
-
-
-}// end class
+} // end class

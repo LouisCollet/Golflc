@@ -8,16 +8,6 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
- <!--
- next lines : afficher les tee possibles en fonction gender voir TeeStart  
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewAction action="#{courseC.LoadTeeStart()}"/>
-    </f:metadata>
-</ui:define>
- 
- 
--->   
 <ui:define name="title">Inscription Competition Page </ui:define>
 <ui:define name="content">
 <h:form id="inscription_competition"  >
@@ -32,15 +22,15 @@
 
 <f:facet name="header">
     <h:outputText escape="false" value="#{msg['competition.inscription.title']}" />
-    <h2>#{courseC.competition.competitionDescription.competitionName} </h2>
+    <h2>#{roundC.competition.competitionDescription.competitionName} </h2>
 </f:facet>
         <h:outputText value="#{msg['inscription.team']} :"   />
         <h:outputText id="competition" 
-                      value="#{courseC.competition.competitionDescription.competitionId}" />
+                      value="#{roundC.competition.competitionDescription.competitionId}" />
          <h:outputText value="#{msg['player.first']}"
                     style="width:20%" />
          <h:outputText
-                    value = "#{courseC.player.playerFirstName} - #{courseC.player.playerLastName}"/>
+                    value = "#{playerC.player.playerFirstName} - #{playerC.player.playerLastName}"/>
 
       <h:panelGroup id="panelG2" layout="block" >
         <h:outputText value="#{msg['competition.gender']} :" />
@@ -48,13 +38,13 @@
       </h:panelGroup>
 
         <h:outputText id="teegender2" 
-                      value="#{courseC.competition.competitionDescription.competitionGender}" />
+                      value="#{roundC.competition.competitionDescription.competitionGender}" />
  
         <h:outputText value="#{msg['competition.start.asked']} :"  />
         <p:selectOneMenu id="teestart"
-                         value="#{courseC.competition.competitionData.cmpDataAskedStartTime}"
+                         value="#{roundC.competition.competitionData.cmpDataAskedStartTime}"
                            >
-                    <f:selectItems value="#{courseC.competitionTimeStartList('current_player')}" />
+                    <f:selectItems value="#{roundC.competitionTimeStartList('current_player')}" />
         </p:selectOneMenu>
  <!-- test comptage
  next lines : afficher les tee possibles en fonction gender voir TeeStart  
@@ -71,9 +61,9 @@
                  value="#{msg['button.inscription.create']}"
                  update="growl-msg"
                  ajax="false"
-                 immediate="false"
+                  
                  icon="pi pi-pencil"
-                 action="#{courseC.createInscriptionCompetition(courseC.competition)}"
+                 action="#{roundC.createInscriptionCompetition(roundC.competition)}"
          />
 </f:facet>
 

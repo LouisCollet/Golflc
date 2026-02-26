@@ -19,13 +19,13 @@
                var="var"
                rowIndexVar="row"
                rowStyleClass="#{(row mod 5) eq 0 ? 'highlight' : null}"
-               value="#{courseC.scoreStableford.statisticsList}"
+               value="#{roundC.scoreStableford.statisticsList}"
                editable="true"
                editMode="cell"
                lazy="false"
                style="margin: 0 auto;width:60%;text-align:center;" >
             <p:ajax event="cellEdit"
-                    listener="#{courseC.scoreStableford.onCellEdit}"
+                    listener="#{roundC.scoreStableford.onCellEdit}"
                     update="growl-msg"/>
      <f:facet name="header">
         <h1>#{msg['title.score.statistics']}</h1>
@@ -156,9 +156,9 @@
             value="#{msg['button.score.statistics']}"
             update="growl-msg"
             ajax="false"
-            immediate="false"
+             
             icon="pi pi-database"
-            action="#{courseC.createStatisticsStableford}"/>
+            action="#{roundC.createStatisticsStableford()}"/>
         <p:commandButton value="Back Score screen"
                          id="commandButtonback"
                          ajax="false"

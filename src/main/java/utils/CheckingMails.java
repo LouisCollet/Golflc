@@ -13,8 +13,9 @@ import jakarta.mail.NoSuchProviderException;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 import java.util.Properties;
+import static interfaces.Log.LOG;
 
-public class CheckingMails implements interfaces.Log {
+public class CheckingMails {
 
    public void check(String host, String storeType, String user,
       String password) 
@@ -104,7 +105,7 @@ public class CheckingMails implements interfaces.Log {
          {
             LOG.debug("equals unsubscribe " + subject);
             // envoyer un mail de confirmayion de réception
-            mail.SendEmail sm = new mail.SendEmail();
+            // mail.MailSender sm = new mail.MailSender(); // removed 2026-02-26 — unused, all send calls commented
    // à modifier          
  //           boolean b = sm.sendHtmlMail("unsubscribe confirmation : " + from,
  //                   "mailbody = unsubscribe confirmation", "louis.collet@skynet.be","CHECKING",player.getPlayerLanguage());

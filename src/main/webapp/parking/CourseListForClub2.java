@@ -9,15 +9,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.validation.constraints.NotNull;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import utils.LCUtil;
+import static interfaces.Log.LOG;
+public class CourseListForClub2 {
 
-public class CourseListForClub2 implements interfaces.Log{
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
  private static List<String> liste = null;
     
 public List<String> list(Club club, final @NotNull Connection conn) throws SQLException{    
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
 if(liste == null){
         LOG.debug(" ... entering " + methodName);
         LOG.debug(" ... with club  " + club);

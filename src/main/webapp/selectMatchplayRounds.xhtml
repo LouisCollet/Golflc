@@ -7,22 +7,7 @@
       xmlns:p="primefaces"
 >
     <ui:composition template="templates/masterTemplate.xhtml">
-<!--
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewParam
-            required="true"
-            name="game"
-            value="#{courseC.inputScore}"
-            requiredMessage="You did not specify a cmd. (The game parameter is missing)"
-            converterMessage="Invalid cmd. (The game parameter is not a number)"
-            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
-            <f:validateLength minimum="3" />
-        </f:viewParam>
 
-    </f:metadata>
-</ui:define>
--->
 <ui:define name="title">Select Matchplay Rounds Page </ui:define>
 
 <ui:define name="content">
@@ -33,7 +18,7 @@
  -->
 <p:dataTable id="player_has_played_round"
              rowIndexVar="row"
-             value="#{courseC.listMatchplayRounds('mpl')}"
+             value="#{roundC.listMatchplayRounds('mpl')}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredCars}"
@@ -51,7 +36,7 @@
         <p:column headerText="#{msg['round.selected']}" style="width:100px" >
             <p:commandButton
                 id="selectButtonColumn"
-                action="#{courseC.listParticipants_mp(c)}"
+                action="#{roundC.listParticipants_mp(c)}"
                 value="#{c.idround} - #{msg['button.select']}"
                icon="pi pi-pencil">
              </p:commandButton>
@@ -101,7 +86,7 @@
         </p:column>
 
        <f:facet name="footer">
-           In total there are #{courseC.list.stream().count()} rounds.
+           In total there are #{roundC.listmatchplay.stream().count()} rounds.
        </f:facet>
 
 </p:dataTable>

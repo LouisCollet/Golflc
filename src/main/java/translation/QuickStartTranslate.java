@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package translation;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -9,7 +6,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.translate.Translate;
 import com.google.api.services.translate.model.TranslationsListResponse;
 import com.google.api.services.translate.model.TranslationsResource;
-import static interfaces.GolfInterface.GoogleApiKey;
+//import static interfaces.GolfInterface.GoogleApiKey;
 import static interfaces.Log.LOG;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -32,7 +29,7 @@ public class QuickStartTranslate{
                 ,"ES");// Target language
 
         // TODO: Set your API-Key from https://console.developers.google.com/
-        list.setKey(GoogleApiKey);
+        list.setKey(System.getenv("GOOGLE_MAPS_API_KEY"));
         TranslationsListResponse response = list.execute();
         for (TranslationsResource translationsResource : response.getTranslations()){
             LOG.debug(translationsResource.getTranslatedText());

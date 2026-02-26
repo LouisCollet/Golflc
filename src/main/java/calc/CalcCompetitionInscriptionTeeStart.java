@@ -1,67 +1,69 @@
 package calc;
 
-import entite.CompetitionDescription;
 import entite.Course;
-import entite.composite.ECompetition;
 import entite.Tee;
+import entite.composite.ECompetition;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import utils.DBConnection;
 
-public class CalcCompetitionInscriptionTeeStart implements interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+@ApplicationScoped
+public class CalcCompetitionInscriptionTeeStart implements Serializable, interfaces.GolfInterface {
 
-public String calc (ECompetition competition, Connection conn){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-     LOG.debug(" -- Start of " + methodName);
-     LOG.debug(" for Competition = " + competition);
-try {
-    var cde = competition.getCompetitionDescription();
-    var cda = competition.getCompetitionData();
-       LOG.debug("series handicap = " + Arrays.deepToString(cde.getSeriesHandicap()));
-       LOG.debug("gender = " + cda.getCmpDataPlayerGender());
-       LOG.debug(" handicap player = " + cda.getCmpDataHandicap());
-     Course course = new Course();
-     course.setIdcourse(cde.getCompetitionCourseId());
-     List<Tee> tees = new lists.TeesCourseList().list(course, conn);
- //       LOG.debug("line 01 - tee size = " + tees.size());
-     tees.forEach(item -> LOG.debug("Tees list = " + item));  // java 8 lambda
-        LOG.debug(" series handicap = " + Arrays.deepToString(cde.getSeriesHandicap()));
-   // faire le calcul ici !     
-     String TeeStart = "";
-     if(cda.getCmpDataPlayerGender().equals("M")){
-         TeeStart = "YELLOW / M / 01-18 / 37";
-         LOG.debug("TeeSTart forced to = " + TeeStart);
-     }else{
-         TeeStart = "BLUE / L / 01-18 / 188";
-         LOG.debug("TeeSTart forced to = " + TeeStart);
-     }  
-return TeeStart;
+    private static final long serialVersionUID = 1L;
 
- } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      utils.LCUtil.showMessageFatal(msg);
-      return null;
- } finally { }
-} // end method
+    @Inject private lists.TeesCourseList teesCourseList;
 
- void main() throws Exception {
-   Connection conn = new DBConnection().getConnection();
-try{
-   CompetitionDescription cde = new CompetitionDescription();
-   cde.setCompetitionId(24);
-   List<ECompetition> li = new lists.CompetitionRoundsList().list(cde, conn);
-   var firstItem = li.get(0);
-   String TeeStart = new CalcCompetitionInscriptionTeeStart().calc(firstItem, conn);
-        LOG.debug("from main, TeeStart = " + TeeStart);
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+    public CalcCompetitionInscriptionTeeStart() { }
+
+    public String calc(final ECompetition competition) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("for Competition = " + competition);
+
+        try {
+            var cde = competition.competitionDescription();
+            var cda = competition.competitionData();
+            LOG.debug(methodName + " - series handicap = " + Arrays.deepToString(cde.getSeriesHandicap()));
+            LOG.debug(methodName + " - gender = " + cda.getCmpDataPlayerGender());
+            LOG.debug(methodName + " - handicap player = " + cda.getCmpDataHandicap());
+
+            Course course = new Course();
+            course.setIdcourse(cde.getCompetitionCourseId());
+            List<Tee> tees = teesCourseList.list(course.getIdcourse());
+            tees.forEach(item -> LOG.debug(methodName + " - tee = " + item));
+
+            LOG.debug(methodName + " - series handicap = " + Arrays.deepToString(cde.getSeriesHandicap()));
+
+            String teeStart;
+            if (cda.getCmpDataPlayerGender().equals("M")) {
+                teeStart = "YELLOW / M / 01-18 / 37";
+                LOG.debug(methodName + " - TeeStart forced to = " + teeStart);
+            } else {
+                teeStart = "BLUE / L / 01-18 / 188";
+                LOG.debug(methodName + " - TeeStart forced to = " + teeStart);
+            }
+            return teeStart;
+
+        } catch (Exception e) {
+            String msg = methodName + " - error = " + e.getMessage();
             LOG.error(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-   } 
- } //end main
-} //end class
+            utils.LCUtil.showMessageFatal(msg);
+            return null;
+        }
+    } // end method
+
+    /*
+    void main() throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        // String teeStart = calc(competition);
+        // LOG.debug("from main, TeeStart = " + teeStart);
+        LOG.debug("from main, CalcCompetitionInscriptionTeeStart = ");
+    } // end main
+    */
+
+} // end class

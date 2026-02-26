@@ -16,7 +16,7 @@
 
 <!-- maintenant itération sur les periodes -->
  <p:dataTable var="item" 
-              value="#{courseC.tarifMember.basicList}"
+              value="#{memC.tarifMember.basicList}"
               rowIndexVar="row"
               emptyMessage="#{msg['message.table.empty']}"
               style="width:70%;text-align: center; margin-left:auto; margin-right:auto;"  >
@@ -56,7 +56,7 @@
 <!-- maintenant itération sur les equipements -->
 
     <p:dataTable var="item"
-                 value="#{courseC.tarifMember.equipmentsList}"
+                 value="#{memC.tarifMember.equipmentsList}"
                  rowIndexVar="row"
                  style="width:70%;text-align: center;margin-left:auto;margin-right:auto;"
                  emptyMessage="#{msg['message.table.empty']}" >
@@ -97,9 +97,9 @@
                          id="commandButtonManage"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                         
                          icon="pi pi-undo"
-                         action="#{courseC.manageCotisation()}"/>
+                         action="#{payC.manageCotisation()}"/>
     </f:facet>    
     </p:dataTable>
 

@@ -1,53 +1,66 @@
 package entite.composite;
 
 import entite.MatchplayPlayerResult;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
 import java.io.Serializable;
-import jakarta.inject.Inject;
-import utils.LCUtil;
 
-//@Named
-//@SessionScoped 
-//@RequestScoped
-public class EMatchplayResult implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-@Inject private MatchplayPlayerResult player1;
-@Inject private MatchplayPlayerResult player2;
+/**
+ * DTO immutable pour regrouper les résultats d'un match play
+ * Représente le résultat entre deux joueurs
+ *
+ * Version refactorisée : Record sans CDI
+ */
+public record EMatchplayResult(
+    MatchplayPlayerResult player1,
+    MatchplayPlayerResult player2
+) implements Serializable {
 
-    public MatchplayPlayerResult getPlayer1() {
-        return player1;
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EMatchplayResult {
+        // Validation métier possible
+        // ex : Objects.requireNonNull(player1, "player1 obligatoire");
     }
 
-    public void setPlayer1(MatchplayPlayerResult player1) {
-        this.player1 = player1;
+    /* =======================
+       Getters explicites (JSF / EL)
+       ======================= */
+    public MatchplayPlayerResult getPlayer1() { return player1; }
+    public MatchplayPlayerResult getPlayer2() { return player2; }
+
+    /* =======================
+       Withers (immutabilité)
+       ======================= */
+    public EMatchplayResult withPlayer1(MatchplayPlayerResult newPlayer1) {
+        return new EMatchplayResult(newPlayer1, this.player2);
     }
 
-    public MatchplayPlayerResult getPlayer2() {
-        return player2;
+    public EMatchplayResult withPlayer2(MatchplayPlayerResult newPlayer2) {
+        return new EMatchplayResult(this.player1, newPlayer2);
     }
 
-    public void setPlayer2(MatchplayPlayerResult player2) {
-        this.player2 = player2;
+    /* =======================
+       Formatage pour affichage/debug
+       ======================= */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : EMATCHPLAYRESULT
+             ,vers Player1 : %s
+             ,vers Player2 : %s
+            """.formatted(
+                player1 != null ? player1 : "",
+                player2 != null ? player2 : ""
+        ).replaceAll("(?m)^\\s*$\n", "");
     }
 
+    /* =======================
+       Vérifications rapides
+       ======================= */
+    public boolean isComplete() {
+        return player1 != null && player2 != null;
+    }
 
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
- //       + NEW_LINE + TAB + " ,vers Club : " + club
-        + NEW_LINE + TAB + " ,vers Player1 : " + player1
-        + NEW_LINE + TAB + " ,vers Player2 : " + player2
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in EMatchplayResult.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    public boolean hasAnyData() {
+        return player1 != null || player2 != null;
+    }
+}

@@ -2,56 +2,64 @@ package entite.composite;
 
 import entite.HandicapIndex;
 import entite.Player;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named
-@RequestScoped
-public class EPlayerHandicap implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-@Inject private HandicapIndex handicapIndex;
-@Inject private Player player;
-public EPlayerHandicap(){  //constructor
-   
-  }
+/**
+ * DTO immutable pour regrouper Player et HandicapIndex
+ * Représente le handicap d'un joueur
+ *
+ * Version refactorisée : Record sans CDI
+ */
+public record EPlayerHandicap(
+    HandicapIndex handicapIndex,
+    Player player
+) {
 
-    public Player getPlayer() {
-        return player;
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EPlayerHandicap {
+        // Validation métier optionnelle
+        // ex: Objects.requireNonNull(player, "player obligatoire");
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    /* =======================
+       Getters explicites (JSF)
+       ======================= */
+    public HandicapIndex getHandicapIndex() { return handicapIndex; }
+    public Player getPlayer() { return player; }
+
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+    public EPlayerHandicap withPlayer(Player newPlayer) {
+        return new EPlayerHandicap(this.handicapIndex, newPlayer);
     }
 
-    public HandicapIndex getHandicapIndex() {
-        return handicapIndex;
+    public EPlayerHandicap withHandicapIndex(HandicapIndex newHandicapIndex) {
+        return new EPlayerHandicap(newHandicapIndex, this.player);
     }
 
-    public void setHandicapIndex(HandicapIndex handicapIndex) {
-        this.handicapIndex = handicapIndex;
+    /* =======================
+       Formatage pour affichage/debug
+       ======================= */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : EPLAYERHANDICAP
+            %s %s
+            """.formatted(
+                handicapIndex != null ? handicapIndex : "",
+                player != null ? player : ""
+            ).replaceAll("(?m)^\\s*$\n", "");
     }
 
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
- //       + NEW_LINE + TAB + " ,vers Club : " + club
-        + NEW_LINE + TAB + " ,vers HandicapIndex : " + handicapIndex
-        + NEW_LINE + TAB + " ,vers Player : " + player
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in EPlayerHandicap.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    /* =======================
+       Vérifications métier
+       ======================= */
+    public boolean isComplete() {
+        return handicapIndex != null && player != null;
+    }
+
+    public boolean hasAnyData() {
+        return handicapIndex != null || player != null;
+    }
+}

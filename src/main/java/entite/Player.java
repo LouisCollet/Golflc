@@ -6,31 +6,25 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.inject.Produces;
 import jakarta.faces.event.ValueChangeEvent;
-import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Named;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import utils.LCUtil;
 
-@Named("player")
-@ViewScoped  // needed for player_wizard.xhtml ??
+// enlevé 11-02-2026 @Named("player")
+// enlevé 11-02-2026 @ViewScoped  // needed for player_wizard.xhtml ??
+
+
 public class Player implements Serializable{
     private static final long serialVersionUID = 1L;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     
  //   @Inject private Address address; // New 04-08-2022 Inject ne sert à rien ??
     private Address address; // New 04-08-2022
@@ -44,7 +38,7 @@ public class Player implements Serializable{
 @NotNull(message="{player.firstname.notnull}")
 @Size(max=45,message="{player.firstname.size}") 
 @Pattern(regexp = "[a-zA-Z0-9éèàê ç]*",message="{player.firstname.regex}")
-@Produces
+
 
 private String playerFirstName;
 
@@ -92,12 +86,13 @@ private short playerActivation;
 // utilisé pour afficher dans player.xhtml
 
 @JsonIgnore private Boolean eID;
-@JsonIgnore private Boolean showMenu;
+@JsonIgnore private boolean showMenu = false;  // pas Boolean !
 //@JsonIgnore private boolean NextPanelPassword = false;  // 16/11//2013
     // new 11/07/2017
 @JsonIgnore private List<Player> droppedPlayers;
     // new 28/02/2022
 @JsonIgnore private List<EPlayerPassword> draggedPlayers; 
+
 
 // https://stackoverflow.com/questions/8229638/how-to-use-enum-values-in-fselectitems
 public enum LanguageType {
@@ -146,10 +141,10 @@ public Player(){ // constructor
     draggedPlayers = new ArrayList<>(); // new 24/02/2022
 }
 
-@PostConstruct
-    public void init(){
-        // sert à quoi?
-}
+//@PostConstruct n'eet appelé qe dans un bean cdi
+//    public void init(){
+//        // sert à quoi?
+//}
     
     public void clearDroppedPlayers(){
         droppedPlayers.clear();// Remove all elements from the List
@@ -250,37 +245,18 @@ public String getPlayerEmail() {
     public void setPlayerActivation(short playerActivation) {
         this.playerActivation = playerActivation;
     }
-
-    public Boolean getShowMenu() {
-        return showMenu;
-    }
-
-    public void setShowMenu(Boolean showMenu) {
-        this.showMenu = showMenu;
-    }
-    
-    
-    
-/*
-    public String getPlayerZoneId() {
-        return playerZoneId;
-    }
-
-    public void setPlayerZoneId(String playerZoneId) {
-        this.playerZoneId = playerZoneId;
-    }
-
-    public String getPlayerStringLatLng() {
-        if(getPlayerLatLng() != null){
-            playerStringLatLng = Double.toString(getPlayerLatLng().getLat()) + "," + Double.toString(getPlayerLatLng().getLng());
-        }
-        return playerStringLatLng;
-    }
-
-    public void setPlayerStringLatLng(String playerStringLatLng) {
-        this.playerStringLatLng = playerStringLatLng;
-    }
-*/
+// remplacé par 
+    // Getter - DOIT s'appeler isShowMenu() ou getShowMenu() pas les deux !!!!! 11-02-2026
+public boolean isShowMenu() {
+  //  LOG.debug("🔍 isShowMenu() = " + showMenu);
+    return showMenu;
+}
+ 
+    // Setter
+   public void setShowMenu(boolean showMenu) {
+    LOG.debug("🔧 setShowMenu(" + showMenu + ")");
+    this.showMenu = showMenu;
+}
     
 /*DstOffset:    Offset for daylight-savings time in seconds. This will be zero if the time zone is not in Daylight Savings Time during the specified timestamp.
 	RawOffset:    Offset from UTC (in seconds) for the given location. This does not take into effect daylight savings.
@@ -442,149 +418,37 @@ public String toString(){
 }
 } // end method toString
 
-  public static Player map(ResultSet rs) throws SQLException{
-        Player player = new Player();
-  try{
- //   LOG.debug("entering mapPlayer");
-        player.setIdplayer(rs.getInt("idplayer"));
-        player.setPlayerFirstName(rs.getString("PlayerFirstName"));
-        player.setPlayerLastName(rs.getString("PlayerLastName"));
-     ///   Address address = Address.mapPlayer(rs);
-     ///   player.setAddress(address);
-        player.setAddress(Address.mapPlayer(rs)); // mod 15-10-2024 non testé
-        player.setPlayerBirthDate(rs.getTimestamp("PlayerBirthDate").toLocalDateTime());
-        player.setPlayerGender(rs.getString("playergender"));
-        player.setPlayerHomeClub(rs.getInt("playerhomeclub"));
-        player.setPlayerLanguage(rs.getString("playerLanguage"));
-        player.setPlayerEmail(rs.getString("PlayerEmail"));
-        player.setPlayerPhotoLocation(rs.getString("PlayerPhotoLocation"));
-        player.setPlayerRole(rs.getString("PlayerRole"));
-        player.setPlayerModificationDate(rs.getTimestamp("PlayerModificationDate")); // new 20-10-2023
-        // 28-06-2023 pour tester ...https://www.baeldung.com/jdbc-resultset
-   //     examineRs(rs);
-   //      LOG.debug("end of examineRs with player = " + player);
-        
-   //   LOG.debug("end of mapPlayer with player = " + player);
-   return player;
-  }catch(Exception e){
-   String msg = "£££ Exception mapPlayer = " + e.getMessage() + " for player = " + player.idplayer; //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
- //   LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
-  
   public static boolean examineRs(ResultSet rs) throws SQLException{
-      LOG.debug("entering examineRs ! ");
+    //    LOG.debug("entering examineRs ! ");
       ResultSetMetaData metaData = rs.getMetaData();
       Integer columnCount = metaData.getColumnCount();
       
       for (int columnNumber = 1; columnNumber <= columnCount; columnNumber++) {
-    String catalogName = metaData.getCatalogName(columnNumber);
-    String className = metaData.getColumnClassName(columnNumber);
-    String label = metaData.getColumnLabel(columnNumber);
-    String name = metaData.getColumnName(columnNumber);
-    String typeName = metaData.getColumnTypeName(columnNumber);
-    int type = metaData.getColumnType(columnNumber);
-    String tableName = metaData.getTableName(columnNumber);
-    String schemaName = metaData.getSchemaName(columnNumber);
-    boolean isAutoIncrement = metaData.isAutoIncrement(columnNumber);
-    boolean isCaseSensitive = metaData.isCaseSensitive(columnNumber);
-    boolean isCurrency = metaData.isCurrency(columnNumber);
-    boolean isDefiniteWritable = metaData.isDefinitelyWritable(columnNumber);
-    boolean isReadOnly = metaData.isReadOnly(columnNumber);
-    boolean isSearchable = metaData.isSearchable(columnNumber);
-    boolean isReadable = metaData.isReadOnly(columnNumber);
-    boolean isSigned = metaData.isSigned(columnNumber);
-    boolean isWritable = metaData.isWritable(columnNumber);
-    int nullable = metaData.isNullable(columnNumber);
+            String catalogName = metaData.getCatalogName(columnNumber);
+            String className = metaData.getColumnClassName(columnNumber);
+            String columnLabel = metaData.getColumnLabel(columnNumber);
+       //        LOG.debug("columnLabel = " + columnLabel);
+            String columnName = metaData.getColumnName(columnNumber);
+       //        LOG.debug("columnName = " + columnName);
+            String typeName = metaData.getColumnTypeName(columnNumber);
+            int type = metaData.getColumnType(columnNumber);
+       //        LOG.debug("type = " + type);
+            String tableName = metaData.getTableName(columnNumber);
+       //         LOG.debug("tableName = " + tableName);
+            String schemaName = metaData.getSchemaName(columnNumber);
+            boolean isAutoIncrement = metaData.isAutoIncrement(columnNumber);
+       //         LOG.debug("isAutoIncrement = " + isAutoIncrement);
+            boolean isCaseSensitive = metaData.isCaseSensitive(columnNumber);
+            boolean isCurrency = metaData.isCurrency(columnNumber);
+            boolean isDefiniteWritable = metaData.isDefinitelyWritable(columnNumber);
+            boolean isReadOnly = metaData.isReadOnly(columnNumber);
+            boolean isSearchable = metaData.isSearchable(columnNumber);
+            boolean isReadable = metaData.isReadOnly(columnNumber);
+            boolean isSigned = metaData.isSigned(columnNumber);
+            boolean isWritable = metaData.isWritable(columnNumber);
+            int nullable = metaData.isNullable(columnNumber);
     }  //end for
             
       return true;
-        }
-    
-  public static PreparedStatement psPlayerCreate(PreparedStatement ps, Player player, String batch){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-  try{
-      LOG.debug("entering psPlayerCreate");
-      ps.setInt(1, player.getIdplayer());
-      ps.setString(2, player.getPlayerFirstName());
-      ps.setString(3, player.getPlayerLastName());
-      ps.setString(4, player.getAddress().getStreet()); // new 05/09/2022
-      ps.setString(5, player.getAddress().getZipCode() + " " + player.getAddress().getCity()); // mod 31-12-2022
-      ps.setString(6, player.getAddress().getCountry().getCode()); // mod 22/12/2022
-      ps.setTimestamp(7,Timestamp.valueOf(player.getPlayerBirthDate()));
-      ps.setString(8, player.getPlayerGender());
-      ps.setInt(9, player.getPlayerHomeClub());
-            if(player.iseID()){ // player with belgian eID
-                 ps.setString(10,player.getPlayerPhotoLocation());
- //                       LOG.debug("photo file for database = " + photo );
-            }else{
-                 ps.setString(10,"no photo.jpeg");
-//                 LOG.debug("no photo.jpeg !! " + photo );
-            }
-       ps.setString(11, player.getPlayerLanguage());
-       ps.setString(12, player.getPlayerEmail());
-            if(batch.equals("B")){
-                LOG.debug("is batch execution ");
-                ps.setShort(13, Short.parseShort("1"));  // player activation
-            }else{
-                ps.setShort(13, (short) 0);}
-       //     ps.setString(13, player.getPlayerTimeZone().getTimeZoneId() ); // new 28/03/2017 using GoogleTimeZone
-      ps.setString(14, player.getAddress().getZoneId());
-            String s = Double.toString(player.getAddress().getLatLng().getLat())
-                    + "," + Double.toString(player.getAddress().getLatLng().getLng());
-  //             LOG.debug("String latlng for DB = " + s);
-      ps.setString(15, s);
-      ps.setString(16, null);  // le password est null à la création !!
-      ps.setString(17, null);  // les previous passwords sont null à la création !!
-      ps.setString(18, "PLAYER"); // PlayerRole = default
-      ps.setTimestamp(19, Timestamp.from(Instant.now()));
-
-return ps;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
   }
-  } // end method
-
-
-public static PreparedStatement psPlayerModify(PreparedStatement ps, Player player){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-  try{
-      LOG.debug("entering psPlayerModify");
-      // voir aussi http://www.javased.com/index.php?source_dir=archaius/archaius-core/src/main/java/com/netflix/config/sources/JDBCConfigurationSource.java
-      int index = 0;
-            ps.setString(++index, player.getPlayerFirstName());
-            ps.setString(2, player.getPlayerLastName());
-            ps.setString(3, player.getAddress().getStreet()); // new 05-09-2022
-            ps.setString(4, player.getAddress().getCity());
-      //      ps.setString(5, player.getAddress().getCountry());
-            // mod 22-12-2022
-            ps.setString(5, player.getAddress().getCountry().getCode().toUpperCase());
-            ps.setTimestamp(6,Timestamp.valueOf(player.getPlayerBirthDate())); // BirthDate format LocalDateTime
-            ps.setString(7, player.getPlayerGender());
-            ps.setInt(8, player.getPlayerHomeClub());
-            ps.setString(9, player.getPlayerLanguage());
-            ps.setString(10, player.getPlayerEmail());
-            ps.setString(11, player.getAddress().getZoneId() ); // mod 06-12-2023
-            String s = Double.toString(player.getAddress().getLatLng().getLat()) 
-                    + "," + Double.toString(player.getAddress().getLatLng().getLng());
-    //           LOG.debug("String latlng for DB = " + s);
-            ps.setString(12, s); // mod 04-04-2021
-     //      le mot de passe est modifié par ModifyPassword.java
-            ps.setString(13, player.getPlayerRole());
-        //clé de recherche used for WHERE ?    
-            ps.setInt(14, player.getIdplayer()); 
-
-return ps;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
 } // end class

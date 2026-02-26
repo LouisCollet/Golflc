@@ -4,17 +4,22 @@ import entite.Player;
 import entite.Round;
 import entite.ScoreStableford;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
 import java.sql.SQLException;
-import utils.DBConnection;
 import utils.LCUtil;
 import Controllers.LoggingUserController;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 
-public class CalcStablefordPlayingHandicap{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+@ApplicationScoped
+public class CalcStablefordPlayingHandicap implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
+    public CalcStablefordPlayingHandicap() { }
+    
+private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
  public int calc(final ScoreStableford score, final Player player, final Round round) throws SQLException, Exception{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
 try{
     // voir appendix C page 67/79
    
@@ -41,25 +46,18 @@ try{
 } finally{}
  } // end method
 
+ /*
  void main() throws SQLException, Exception{
-      Connection conn = new DBConnection().getConnection();
-  Player player = new Player();
-  player.setIdplayer(324713);
-   //   player = new load.LoadPlayer().load(player, conn);
-   
+      Player player = new Player();
+      player.setIdplayer(324713);
       Round round = new Round();
-      round.setIdround(589); // 473 = 9 holes
- //     LoggingUserController.setFILE_NAME(
- //              String.valueOf(player.getIdplayer()) 
- //              + "-" + String.valueOf(round.getIdround())
- //              + ".txt");
+      round.setIdround(589);
       LoggingUserController.write("1. text from main of " + CLASSNAME);
       LoggingUserController.write("2. text from main of " + CLASSNAME);
-      
-      round = new read.ReadRound().read(round, conn);
+      // round = readRound.read(round);  // @Inject ReadRound readRound
       ScoreStableford score = new ScoreStableford();
       int ph = new CalcStablefordPlayingHandicap().calc(score, player, round);
-         LOG.debug("main - course Handicap calculated = " + ph);
-     DBConnection.closeQuietly(conn, null, null, null);
-    }// end main
+      LOG.debug("main - course Handicap calculated = " + ph);
+ } // end main
+ */
 } // end class

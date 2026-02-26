@@ -12,12 +12,12 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+//@Named enlevé 14-02-2026
+//@RequestScoped
 public class Subscription implements Serializable, interfaces.GolfInterface{
      // Constants ----------------------------------------------------------------------------------
     private static final long serialVersionUID = 1L;
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
     private Integer idplayer;
     
     private LocalDateTime startDate;
@@ -127,7 +127,7 @@ public String getSubCode() {
 
  @Override
 public String toString(){
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+     final String methodName = utils.LCUtil.getCurrentMethodName();
   try{  
  //     LOG.debug("starting toString Subscription!");
      if(this.getClass() == null){
@@ -153,9 +153,9 @@ public String toString(){
         return msg;
   }
 }
-
+/*
 public static Subscription map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Subscription s = new Subscription();
         s.setIdplayer(rs.getInt("SubscriptionIdPlayer") );
@@ -173,5 +173,6 @@ public static Subscription map(ResultSet rs) throws SQLException{
     LCUtil.showMessageFatal(msg);
     return null;
   }
-} //end method
+} //end method map
+*/
 } // end class

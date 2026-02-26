@@ -3,7 +3,6 @@ package entite;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.AbstractMap;
@@ -12,27 +11,26 @@ import java.util.Properties;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import utils.LCUtil;
+import static org.omnifaces.util.Faces.getResourceAsStream;
 
 @Named("settings")
 @ApplicationScoped
 public class Settings implements Serializable{
     private static final long serialVersionUID = 1L;
-    // private static String USER_HOME = null;
-    // private static String USER_APP = null;
-    //private static String USER_DIR = null;
-    // private static String WEBAPP = null;
-    // private static String RESOURCES = null;
     private static Map<String, String> settings;
 
-   public Settings(){
-    }
+   public Settings(){    }
 
  public static void init(){   
   try{
          LOG.debug("entering init Settings");
        Properties properties = new Properties();
-   try ( InputStream inStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("golflc_settings.properties")) {
-          properties.load(inStream);
+   try ( InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("golflc_settings.properties")) {  //mod 15-12-2025
+       //  InputStream inputStream = getResourceAsStream("golflc_settings.properties")){
+       if (inputStream == null) {  // new 31-12-2025
+          throw new RuntimeException("Fichier golflc_settings.properties introuvable !");
+       }
+         properties.load(inputStream);
       }
       
        utils.LCUtil.printProperties("golflc_settings.properties");
@@ -74,7 +72,7 @@ public class Settings implements Serializable{
         return settings.get(s);
     }
 
-     @Override
+/*     @Override
 public String toString(){
  try{ 
  return 
@@ -93,6 +91,16 @@ public String toString(){
 //               + " ,THUMBNAILS_LIBRARY : " + getTHUMBNAILS_LIBRARY()
  //              + " execution : " + EXECUTION
          ;
+*/
+ @Override // new 31-12-2025 remplace versio au-dessus
+public String toString() {
+    StringBuilder sb = new StringBuilder("Settings:\n");
+    settings.forEach((k,v) -> sb.append(k).append("=").append(v).append("\n"));
+    return sb.toString();
+}
+ 
+ 
+ 
     }catch(Exception e){
         String msg = "£££ Exception in Settings.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
         LOG.error(msg);

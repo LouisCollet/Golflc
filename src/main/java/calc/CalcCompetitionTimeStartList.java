@@ -1,60 +1,54 @@
 package calc;
 
 import entite.composite.ECompetition;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
-import java.text.ParseException;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import utils.LCUtil;
 
+@ApplicationScoped
+public class CalcCompetitionTimeStartList implements Serializable, interfaces.GolfInterface {
 
-public class CalcCompetitionTimeStartList implements interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    private static final long serialVersionUID = 1L;
 
-public List<String> calc (ECompetition competition){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-     LOG.debug(" -- Start of " + methodName);
-     LOG.debug(" with Competition = " + competition);
-try {
-     LocalDateTime ldt = competition.getCompetitionDescription().getCompetitionDate(); 
-      int i = 0 ;
-      int interval = 12; // 12 min écart entre flights
-      int h = 0;
-      List<String> liste = new ArrayList<>();
-  //    ldt1 = LocalDateTime.of(2017,Month.SEPTEMBER,29,10,30); 
-   //   liste.add(LocalTime.parse("23:59:00") + " - no preference");
-      liste.add(" - no time preference");
-      while (h < 4){ // n donne le choix pour 4 périodes de départ
-   //       LOG.debug("i = " + i);
-          LocalDateTime ldt1 = ldt.plusMinutes(i*interval); 
-          LocalDateTime ldt2 = ldt1.plusHours(1);  //  départs par tranches d'une heure
-          liste.add(ldt1.toLocalTime() + " - " + ldt2.toLocalTime());
-          i = i + 6;
-          h++;
-      }
-          LOG.debug("at the end start timelist = " + liste.toString());
-   return liste;
- } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
- } finally { }
-} // end method
+    public CalcCompetitionTimeStartList() { }
 
- void main() throws Exception {//throws SQLException // testing purposes
-try{
-//LOG.debug("price greenfee = " + dd);
-        
- } catch (Exception e) {
-            String msg = "££ Exception in main CalcTarif= " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-   }finally{
-      //   DBConnection.closeQuietly(conn, null, null,null); 
-          }
-}// end main    
+    public List<String> calc(ECompetition competition) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
 
+        try {
+            LocalDateTime ldt = competition.competitionDescription().getCompetitionDate();
+            int i = 0;
+            int interval = 12; // 12 min écart entre flights
+            int h = 0;
+            List<String> liste = new ArrayList<>();
+            liste.add(" - no time preference");
+            while (h < 4) { // n donne le choix pour 4 périodes de départ
+                LocalDateTime ldt1 = ldt.plusMinutes(i * interval);
+                LocalDateTime ldt2 = ldt1.plusHours(1); // départs par tranches d'une heure
+                liste.add(ldt1.toLocalTime() + " - " + ldt2.toLocalTime());
+                i = i + 6;
+                h++;
+            }
+            LOG.debug(methodName + " - start timelist = " + liste);
+            return liste;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
 
-} //end class
+/*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        // tests locaux
+    } // end main
+*/
+
+} // end class

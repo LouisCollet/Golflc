@@ -3,22 +3,16 @@ package entite;
 
 import static interfaces.Log.LOG;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import utils.LCUtil;
 
-//@Named
-@Named("hole")
-@RequestScoped // new 21-10-2021
+
 public class Hole implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 @NotNull(message="Bean validation : the Hole ID must be completed")
     private Integer idhole;
 
@@ -42,8 +36,9 @@ public class Hole implements Serializable, interfaces.Log{
     @Max(value=18,message="Bean validation : the Hole Index is Max 18")
     private Short holeStrokeIndex;
 
-    private Integer tee_idtee;
-    private Integer tee_course_idcourse;
+    private int tee_idtee;
+    private int tee_course_idcourse;
+    
     private Date holeModificationDate;
 private boolean NextHole; // 15/01/2013
 private boolean CreateModify = true; // 12/08/2017
@@ -96,19 +91,19 @@ private boolean CreateModify = true; // 12/08/2017
         this.holeStrokeIndex = holeStrokeIndex;
     }
 
-    public Integer getTee_idtee() {
+    public int getTee_idtee() {
         return tee_idtee;
     }
 
-    public void setTee_idtee(Integer tee_idtee) {
+    public void setTee_idtee(int tee_idtee) {
         this.tee_idtee = tee_idtee;
     }
 
-    public Integer getTee_course_idcourse() {
+    public int getTee_course_idcourse() {
         return tee_course_idcourse;
     }
 
-    public void setTee_course_idcourse(Integer tee_course_idcourse) {
+    public void setTee_course_idcourse(int tee_course_idcourse) {
         this.tee_course_idcourse = tee_course_idcourse;
     }
 
@@ -160,9 +155,9 @@ public String toString(){
         return msg;
   }
 }
-
+/*
   public static Hole map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Hole h = new Hole();
         h.setIdhole(rs.getInt("idhole"));
@@ -180,6 +175,6 @@ public String toString(){
     return null;
   }
 } //end method map
-
+*/
 
 } // end class

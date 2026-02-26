@@ -1,5 +1,103 @@
 package create;
 
+import entite.Tee;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.annotation.Resource;
+import javax.sql.DataSource;
+
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static interfaces.Log.LOG;
+import utils.LCUtil;
+import static utils.LCUtil.showMessageFatal;
+import static utils.LCUtil.showMessageInfo;
+
+/**
+ * Service de création de Tee
+ * ✅ @ApplicationScoped - Stateless, partagé
+ * ✅ @Resource DataSource - Connection pooling
+ */
+@ApplicationScoped
+public class CreateTee implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * DataSource injecté par WildFly (connection pooling)
+     */
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public boolean create(final Tee tee) throws Exception {
+        
+        final String methodName = LCUtil.getCurrentMethodName();
+        String msg;
+        
+        try (Connection conn = dataSource.getConnection()) {
+            
+            conn.setAutoCommit(false);
+            
+            // ✅ PARTIE NON MODIFIÉE - DÉBUT
+            
+            // Validation
+            if (tee == null) {
+                msg = "Tee cannot be null";
+                LOG.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            if (tee.getCourse_idcourse() == 0) {
+                msg = "Tee must be associated with a course";
+                LOG.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            LOG.debug("Creating tee: {}", tee.toString());
+            
+            String query = LCUtil.generateInsertQuery(conn, "tee");
+            
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                sql.preparedstatement.psCreateUpdateTee.mapCreate(ps, tee);
+                LCUtil.logps(ps);
+                
+                int row = ps.executeUpdate();
+                
+                if (row == 0) {
+                    msg = "Fatal Error: No TEE created !";
+                    LOG.error(msg);
+                    showMessageFatal(msg);
+                    
+                    throw new SQLException(msg);
+                }
+            }
+            
+            int generatedId = LCUtil.generatedKey(conn);
+            tee.setIdtee(generatedId);
+            // ✅ Option 3 — notre style standard sans String.format
+            msg = "Tee created: " + " (ID: " + tee.getIdtee() + ")";
+            LOG.debug(msg);
+          //  showMessageInfo(msg);
+            conn.commit();
+            
+            // ✅ PARTIE NON MODIFIÉE - FIN
+            
+            return true;
+            
+        } catch (SQLException sqle) {
+            LCUtil.printSQLException(sqle);
+            LOG.error("SQLException in {}: {}", methodName, sqle.getMessage());
+            throw sqle;
+        } catch (Exception e) {
+            LOG.error("Exception in {}: {}", methodName, e.getMessage());
+            throw e;
+        }
+    }
+}
+
+/*
 import entite.Course;
 import entite.Tee;
 import entite.ValidationsLC;
@@ -11,18 +109,18 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
 public class CreateTee{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     
 public boolean create(
       //  final Club club,
         final Course course, final Tee tee,final Connection conn) throws SQLException{
-   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+   final String methodName = utils.LCUtil.getCurrentMethodName();
         PreparedStatement ps = null;
  try {
             LOG.debug("... starting " + methodName);
@@ -119,7 +217,7 @@ public boolean create(
 
 
 public static Tee completeMasterTeeAndDistanceTee (Tee tee, Course course, Connection conn) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
     try{
             
         if(tee.getTeeStart().equals("YELLOW") && tee.getTeeGender().equals("M") && tee.getTeeHolesPlayed().equals("01-18")){
@@ -213,7 +311,7 @@ public static Tee completeMasterTeeAndDistanceTee (Tee tee, Course course, Conne
                     String[] array = new String[2];
                     array[0] = " for distanceTee";
                     array[1] = tee.toString();
-                    String msgerr =  LCUtil.prepareMessageBean("mastertee.notfound",array);
+                    String msgerr =  LCUtil.prepareMessageBean1("mastertee.notfound",array);
                  //   msgerr = msgerr + " for distanceTee";
                     vlc.setStatus1(msgerr);
                     return vlc;
@@ -320,7 +418,7 @@ public static Tee completeMasterTeeAndDistanceTee (Tee tee, Course course, Conne
     boolean cr = new CreateTee().create(club, course, tee, conn);
         LOG.debug("from main, after lp = " + cr);
         
-    */    
+    *  
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
@@ -329,3 +427,4 @@ public static Tee completeMasterTeeAndDistanceTee (Tee tee, Course course, Conne
    }
    } // end main
 } //end class
+*/

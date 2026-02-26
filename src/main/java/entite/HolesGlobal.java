@@ -4,25 +4,29 @@ import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
 import java.util.Arrays;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 
-@Named
-@RequestScoped
+//@Named enlevé 21-02-2026
+//@RequestScoped
 public class HolesGlobal implements Serializable{
-    private int[][] dataHoles;
+
+    private static final int NB_HOLES   = 18;
+    private static final int NB_COLUMNS = 4;
+
+    public static final int COL_NUMBER      = 0;    // ✅ décommenté
+    public static final int COL_PAR         = 1;
+    public static final int COL_STROKEINDEX = 2;
+    public static final int COL_DISTANCE    = 3;
+
+    private int[][] dataHoles;                       // ✅ type déclaré
     private String type;
-public HolesGlobal(){ // constructor
-        dataHoles = new int[18][4]; // 18 trous, 4 données : number, par, strokeindex, distance
-        for(int[] subarray : dataHoles){
-            Arrays.fill(subarray, 0);
+
+    public HolesGlobal() {
+        dataHoles = new int[NB_HOLES][NB_COLUMNS];
+        for (int i = 0; i < NB_HOLES; i++) {
+            dataHoles[i][COL_NUMBER] = i + 1;        // ✅ COL_NUMBER défini
         }
-        // initialiser 
-        for(int i = 0; i < dataHoles.length; i++) {
-           dataHoles[i][0] = i+1; // numérote de 1 à 18
-        } 
-  //      LOG.debug("array dataHoles initialized at : " + Arrays.deepToString(dataHoles));
-} // end constructor
+    //    LOG.debug("HolesGlobal initialized: " + Arrays.deepToString(dataHoles)); // ✅ LOG accessible
+    }
 
     public int[][] getDataHoles() {
         return dataHoles;
@@ -41,12 +45,12 @@ public HolesGlobal(){ // constructor
     }
 
     @Override
-    public String toString()
-{ return 
-        (
-        NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase() + NEW_LINE 
-               + " ,array dataHoles : number, par, strokeindex, distance: " + Arrays.deepToString(dataHoles)
-               + " ,type (golbal or distance : " + type
+    public String toString(){
+        return (
+        NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
+        + NEW_LINE 
+        + " ,array dataHoles : number, par, strokeindex, distance: " + Arrays.deepToString(dataHoles)
+        + " ,type (golbal or distance : " + type
         );
 }
 } // end class

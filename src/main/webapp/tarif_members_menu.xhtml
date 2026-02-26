@@ -27,14 +27,14 @@
                expanded="true"
                icon="pi pi-check"
                style="font-size: 1.5em;" >
-        <p:menuitem value ="Members Tarif Periods = #{courseC.tarifMember.basicList.size()}"
+        <p:menuitem value ="Members Tarif Periods = #{memC.tarifMember.basicList.size()}"
                      outcome="tarif_members_cotisation.xhtml"
                      icon="pi pi-calendar" />
-         <!--  rendered="#{courseC.tarifMember.basicList.size() > 0}  -->
-         <p:menuitem value="Members Equipments = #{courseC.tarifMember.equipmentsList.size()}"
+         <!--  rendered="#{memC.tarifMember.basicList.size() > 0}  -->
+         <p:menuitem value="Members Equipments = #{memC.tarifMember.equipmentsList.size()}"
                      icon="pi pi-cog"
                      outcome="tarif_members_equipments.xhtml" />
-         <!--   rendered="#{courseC.tarifMember.equipmentsList.size() }" -->
+         <!--   rendered="#{memC.tarifMember.equipmentsList.size() }" -->
          <p:menuitem value="Members Discount"
                      icon="pi pi-dollar">
                 <p:outputLabel for="@next"
@@ -42,7 +42,7 @@
                                style="color:blue;width:350px;"/>
                 <p:selectOneMenu id="option"
                                  style="font-weight:bold;margin-left:1.5em;">
-                                 value="#{courseC.tarifMember.discount}" />
+                                 value="#{memC.tarifMember.discount}" />
                     <f:selectItem itemLabel="Select One" itemValue=""/>
                     <f:selectItem itemLabel="Option1 - Complete Year"    itemValue="Year"/>
                     <f:selectItem itemLabel="Option2 - Complete Months"  itemValue="Months"/>
@@ -60,17 +60,17 @@
     <p:submenu label="Create Members Tarif "
                icon="pi pi-check"
                expanded="true"
-               rendered="#{courseC.tarifMember.basicList.size() gt 0}"
+               rendered="#{memC.tarifMember.basicList.size() gt 0}"
                style="font-size: 1.5em;" >
          <p:menuitem  value="#{msg['tarif.print']}"
                      icon="pi pi-list"
-                     action="#{courseC.showTarifMembers()}"/>
+                     action="#{memC.showTarifMembers()}"/>
          <p:menuitem  value="#{msg['tarif.editor']}"
                      icon="pi pi-comment"
                      outcome="tarif_members_editor.xhtml" />
          <p:menuitem value="#{msg['tarif.create']}"
                      icon="pi pi-database"
-                     action="#{courseC.createTarifMembers}"/>
+                     action="#{memC.createTarifMembers}"/>
     </p:submenu> 
   
      <p:submenu label="Delete Member Cotisation Tarif "
@@ -81,8 +81,8 @@
              <p:commandButton
                 id="deleteButton"
                 style="color:red"
-                action="#{courseC.deleteTarifMember()}"
-                value="#{msg['button.delete']} #{courseC.club.clubName} (#{courseC.club.idclub})"
+                action="#{memC.deleteTarifMember()}"
+                value="#{msg['button.delete']} #{clubC.club.clubName} (#{clubC.club.idclub})"
                 icon="pi pi-trash" >
                 <p:confirm icon="pi pi-exclamation-triangle" />
            </p:commandButton>

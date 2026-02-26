@@ -15,7 +15,7 @@
 <ui:define name="content">
 <ui:define name="metadata">
     <f:metadata>
-        <f:viewAction  action="#{courseC.to_player_modify('M')}"/>
+        <f:viewAction  action="#{playerC.to_player_modify('M')}"/>
     </f:metadata>
 </ui:define>
 
@@ -40,7 +40,7 @@
                 <h:outputText value="#{msg['player.id']}" />
                 <h:outputText 
                         id="idplayer"
-			value="#{courseC.player.idplayer}"
+			value="#{playerC.player.idplayer}"
   />
 <!-- The Java EE 7 version of JSF (2.2) enables the definition of any arbitrary attributes,
 which are not going to be processed by the JSF runtime and directly passed to the browser. 
@@ -54,23 +54,23 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                               placeholder="this is a HTML5 placeholder"
                               size="45"
                               styleClass="noprocess"
-			      value="#{courseC.player.playerFirstName}" />
+			      value="#{playerC.player.playerFirstName}" />
 
 		<p:outputLabel for="@next" value="#{msg['player.lastname']}" />
 		<p:inputText  label="Lastname"
                               id="lastName"
                               size="45"
-			      value="#{courseC.player.playerLastName}" />
+			      value="#{playerC.player.playerLastName}" />
                 
                 <p:outputLabel for="@next" value="#{msg['player.gender']}" style="font-weight:bold"  />
                 <p:selectOneButton id="gender"
-                                  value="#{courseC.player.playerGender}"  >
+                                  value="#{playerC.player.playerGender}"  >
                     <f:selectItem itemLabel="#{msg['player.gent']}" itemValue="M"/>
                     <f:selectItem itemLabel="#{msg['player.lady']}" itemValue="L" />
                 </p:selectOneButton> 
 
                 <p:outputLabel for="@next" value="#{msg['player.birth']}"  />
-                <p:datePicker value="#{courseC.player.playerBirthDate}"
+                <p:datePicker value="#{playerC.player.playerBirthDate}"
                     id="birth"
                     locale="#{languageC.locale}"
                     label="LC label birth marche pas"
@@ -86,16 +86,16 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
 		<p:inputText  label="email"
                               id="email"
                               size="45"
-			      value="#{courseC.player.playerEmail}" />
+			      value="#{playerC.player.playerEmail}" />
         <p:commandButton
                          value="#{msg['button.player.identify']}"
                          id="buttonPlayerIdentify"
                          ajax="false"
                          style="font-weight:normal "
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-id-card"
-                         action="#{courseC.validatePlayer}"/>
+                         action="#{playerC.validatePlayer()}"/>
         <h:outputText value=" " />
         
         <!--  rendered="#{not courseC.connected}"   <p:keyFilter for="email" mask="email" />  -->
@@ -106,13 +106,13 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
     layout="tabular"
     columns="2"
     style="margin: 0 auto;width:60%"
-    rendered="#{courseC.nextPanelPlayer}"
+    rendered="#{playerC.nextPanelPlayer}"
     columnClasses="col1, col2">
                 <p:outputLabel value="#{msg['address.country.code']}" 
                                for="@next"/>
                 <p:autoComplete id="countryCustom"
-                                valueChangeListener="#{courseC.player.playerCountryListener}"
-                                value="#{courseC.player.address.country.code}"
+                                valueChangeListener="#{playerC.player.playerCountryListener}"
+                                value="#{playerC.player.address.country.code}"
                                 completeMethod="#{countryC.completeCountry}"
                                 var="country"
                                 itemLabel="#{country}" 
@@ -132,73 +132,49 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
      <!-- new 05-09-2022  -->
                 <p:outputLabel for="@next" value="#{msg['address.street']}" />
 		<p:inputText  id="street"
-                              value="#{courseC.player.address.street}"
+                              value="#{playerC.player.address.street}"
                               size="45"
                               immediate="true"
-                              valueChangeListener="#{courseC.player.playerStreetListener}"  />
+                              valueChangeListener="#{playerC.player.playerStreetListener}"  />
 
 		<p:outputLabel for="@next" value="#{msg['address.city']}" />
 		<p:inputText  
                               id="city"
-                              value="#{courseC.player.address.city}"
+                              value="#{playerC.player.address.city}"
                               size="45"
                               immediate="true"
-                              valueChangeListener="#{courseC.player.playerCityListener}" />
+                              valueChangeListener="#{playerC.player.playerCityListener}" />
 
                 <p:outputLabel for="@next" value="#{msg['player.language']}" />
                 <p:selectOneMenu id="lang"
-                                 value="#{courseC.player.playerLanguage}"
+                                 value="#{playerC.player.playerLanguage}"
                                  immediate="true"
                                  required="true"
-                                 valueChangeListener="#{courseC.player.playerLanguageListener}"  >
+                                 valueChangeListener="#{playerC.player.playerLanguageListener}"  >
                     <f:selectItem 
                                   itemLabel="?? Select"
                                   noSelectionOption="true"
                                   itemDisabled="true"
                                   itemValue="#{null}" />
-                       <f:selectItems value="#{courseC.player.LanguageType()}"
+                       <f:selectItems value="#{playerC.player.LanguageType()}"
                                    var="v"
                                    itemValue="#{v.label}"
                                    itemLabel="#{v}" />
                 </p:selectOneMenu>
-      
-            <p:outputLabel for="@next" value="#{msg['player.homeclub']}" />
-            <h:panelGroup layout="block" id="container2">
-                <p:inputNumber
-                       label="inputHomeClub"
-                       styleClass="mystyle"
-                       id="inputHomeClub"
-                       value="#{courseC.player.playerHomeClub}"
-                       size="5"
-                       style="margin-right: 10px;" />
-                <!--  24-03-2017 with immediate = true on peut l'utiliser sans provoquer d'erreurs de validation ! -->
-           <p:commandButton 
-                id="ButtonHomeClub"
-                value="#{msg['button.player.homeclub']}"
-                actionListener="#{dialogC.showSelectClub('player_modify')}"
-                style="float:left;"
-                icon="pi pi-search"  >
-                    <p:ajax event="dialogReturn"
-                            update=":form_player_modify:inputHomeClub,clubName,playerHomeClub" />
-            </p:commandButton>
-                <h:outputText id="clubName"
-                              value=" #{courseC.club.clubName}" 
-                              style="font-style:italic"/>  
-                <h:outputText id="playerHomeClub"
-                              value=" #{courseC.player.playerHomeClub}"
-                              style="font-weight:bold;font-size: 2rem;font-style:italic;color: red" />  
-            </h:panelGroup>
  
+           <!-- =================== INCLUDE COURSE SELECTOR =================== -->
+                <ui:include src="/include/include_club_selector.xhtml" />
+                
     <h:outputText value="#{msg['player.zoneid']}" />    
    <h:panelGroup layout="block" id="container3">
 	<h:outputText 
                       id="zone"
                       style="margin-right: 20px;"
-                      value="#{courseC.player.address.zoneId}" />
+                      value="#{playerC.player.address.zoneId}" />
    </h:panelGroup>
 
         <h:outputText value="#{msg['player.latlng']}" />
-	<h:outputText value="#{courseC.player.address.latLng.lat} , #{courseC.player.address.latLng.lng}" />
+	<h:outputText value="#{playerC.player.address.latLng.lat} , #{playerC.player.address.latLng.lng}" />
 
 <f:facet name="footer">
         <p:commandButton
@@ -207,15 +183,15 @@ http://jsflive.wordpress.com/2013/08/08/jsf22-html5/
                          ajax="false"
                          style="font-weight:normal "
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.modifyPlayer}"/>
-        <!--  rendered="#{not courseC.connected}"    -->
+                         action="#{playerC.updatePlayer()}"/>
+      
         <p:commandButton
                          value="#{msg['button.player.image']}"
                          id="button02"
                          ajax="false"
-                         rendered="#{courseC.nextPlayer}"
+                         rendered="#{playerC.nextPlayer}"
                          update="growl-msg"
                          immediate="true"
                          icon="pi pi-arrow-right"

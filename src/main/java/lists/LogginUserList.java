@@ -1,92 +1,95 @@
 package lists;
 
 import entite.LoggingUser;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
 
-public class LogginUserList{
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+@Named
+@ApplicationScoped
+public class LogginUserList implements Serializable {
 
- private static List<LoggingUser> liste = null;
-// pour migration mongoDB 16/08/2022
-public List<LoggingUser> list(final @NotNull Connection conn) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-if(liste == null){
-        LOG.debug(" ... entering " + methodName);
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
- final String query ="""
-        SELECT *
-        FROM logging_user
-      """;
-     ps = conn.prepareStatement(query);
-     utils.LCUtil.logps(ps);
-    rs =  ps.executeQuery();
-    liste = new ArrayList<>();
-	while(rs.next()){
-            LoggingUser c = entite.LoggingUser.map(rs);
-	 liste.add(c);
-	} // end while
-  //     LOG.debug(" -- before forEach " );
- //      liste.forEach(item -> LOG.debug("Course list " + item + "/"));  // java 8 lambda
-     // if(liste == null){
-      if(liste.isEmpty()){    
-         String msg = "££ Empty Result List in " + methodName;
-         LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
-   //      return null;
-     }else{
-         LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-     }
- return liste;
-}catch (SQLException e){ 
-        String error = "SQL Exception in " + methodName + ": " + e;
-	LOG.error(error);
-        LCUtil.showMessageFatal(error);
-        return null;
-}catch (Exception ex){
-    String error = "Exception in " + methodName + " / " + ex;
-    LOG.error(error);
-    LCUtil.showMessageFatal(error);
-    return null;
-}finally{
-        DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
- //   LOG.debug("escaped to " + methodName + "repetition thanks to lazy loading");
-    return liste;  //plusieurs fois ??
-}
-} //end method
+    private static final long serialVersionUID = 1L;
 
-    public static List<LoggingUser> getListe() {
-        return liste;
-    }
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-    public static void setListe(List<LoggingUser> liste) {
-        LogginUserList.liste = liste;
-    }
-    
-    
- void main() throws SQLException, Exception{
-     Connection conn = new DBConnection().getConnection();
-  try{
-    List<LoggingUser> lp = new LogginUserList().list(conn);
+    private List<LoggingUser> liste = null;
+
+    public LogginUserList() { }
+
+    public List<LoggingUser> list() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            return liste;
+        }
+
+        final String query = """
+                SELECT *
+                FROM logging_user
+                """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                while (rs.next()) {
+                    LoggingUser c = LoggingUser.map(rs);
+                    liste.add(c);
+                }
+                if (liste.isEmpty()) {
+                    LOG.warn(methodName + " - empty result list");
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    public List<LoggingUser> getListe()                       { return liste; }
+    public void              setListe(List<LoggingUser> liste) { this.liste = liste; }
+
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        List<LoggingUser> lp = new LogginUserList().list();
         LOG.debug("from main, after lp = " + lp);
         LOG.debug("nombre de logging users dans la liste = " + lp.size());
- } catch (Exception e) {
-            String msg = "££ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-          }
-   } // end main//
-} //end class
+    } // end main
+    */
+
+} // end class

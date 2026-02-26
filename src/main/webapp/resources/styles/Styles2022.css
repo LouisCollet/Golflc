@@ -285,3 +285,28 @@ By default, the vertical alignment of the content in a table is middle (for both
 .ui-panelgrid tr{
     border: none;
 }
+
+/* Fond jaune dans dialogTemplate.xhtml*/
+.bg-yellow {
+    background-color: #FFEB3B;
+}
+
+/* Fond jaune pâle */
+.bg-yellow-light {
+    background-color: #FFF9C4;
+}
+
+/* Fond jaune avec padding */
+.bg-yellow-box {
+    background-color: #FFEB3B;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+/* Avertissement jaune */
+.bg-warning {
+    background-color: #FFF3CD;
+    border: 1px solid #FFE69C;
+    color: #856404;
+}
+

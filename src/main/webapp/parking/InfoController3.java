@@ -1,266 +1,202 @@
 package Controllers;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.internal.build.MongoDriverVersion;
-import entite.Settings;
-import static interfaces.GolfInterface.ZDF_TIME;
-import static interfaces.Log.LOG;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.faces.context.ExternalContext;
-import jakarta.faces.context.FacesContext;
-import jakarta.inject.Inject;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
-import jakarta.servlet.ServletException;
-import java.io.*;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import org.bson.Document;
-import static org.omnifaces.util.Faces.getResourceAsStream;
-import org.primefaces.config.PrimeEnvironment; // new 04-12-2025
+import org.primefaces.config.PrimeEnvironment;
 
-@Named("infoC")
-@RequestScoped
-
-public class InfoController implements Serializable, interfaces.GolfInterface, interfaces.Log{
-   private static Attributes manifestAttributes = null;
-   private static String JQueryVersion;
-   
-public InfoController() throws IOException { //  constructor ! le faire private ??
-      LOG.debug("entering Infocontroller constructor");
-       // voir pom.xml manifestEntries pour les fields !!
-try{
-   try (InputStream inputStream = getResourceAsStream("/META-INF/MANIFEST.MF")){
-    if(inputStream != null){
-        manifestAttributes = new Manifest(inputStream).getMainAttributes();
-         LOG.debug("closing inputStream"); 
- //       inputStream.close(); // mod 24-04-2024 new 10-03-2024
-    }else{
-        LOG.debug("infoController : META-INF/MANIFEST.MF is null");
-    }
-   } // end try2
-}catch (Exception e){
-	LOG.debug("exception in InfoController constructor " + e);
-}
-} // end constructor
-
-public void login(){ // throws IOException, SQLException { // executed via actionView in login.xhtml
-        LOG.debug("entering login() coming from login.xhtml");
-}
-
-
-@Inject private ExternalContext externalContext;
-public String DeployVersion() throws IOException{
-    // version deployment (affichée dans login.xhtml)
-  String acp = externalContext.getApplicationContextPath();
-//     LOG.debug("ApplicationContextPath = " + acp); //    /GolfWfly-1.0-SNAPSHOT
-  Path path = Paths.get(Settings.getProperty("TARGET") + acp + ".war");// converts string to path  
-  FileTime fileTime = Files.getLastModifiedTime(path);
-  LocalDateTime ldt = LocalDateTime.ofInstant(fileTime.toInstant(), ZoneOffset.systemDefault());
-    return "<b>Deploy Version :</b> " + ZDF_TIME.format(ldt);
-}
-
-public String getClientIpAddress() throws UnknownHostException, ServletException{
-return InetAddress.getLocalHost().toString();
-}
-
-public String getClientIPv6Address() throws UnknownHostException{
-    return Inet6Address.getLocalHost().getHostAddress();
-}
-
-public String getClientMacAddress() throws UnknownHostException{
-try{
+@Named("infoC3")
+@ApplicationScoped
+public class InfoController3 implements Serializable, interfaces.GolfInterface, interfaces.Log {
     
-    /*
-    InetAddress ip = InetAddress.getLocalHost(); //getByName("192.168.46.53");
-    StringBuilder sb = new StringBuilder();
-
-    NetworkInterface ni = NetworkInterface.getByInetAddress(ip);
-    if (ni != null)    {
-      byte[] mac = ni.getHardwareAddress();
-      if (mac != null) {
-
-         for (int i = 0; i < mac.length; i++){
-           //             System.out.format("%02X%s",
-           //                     mac[i], (i < mac.length - 1) ? "-" : "");
-           sb.append(String.format("%02X%s",mac[i], (i < mac.length - 1) ? "-" : "") );
-         }
-      }else{
-              LOG.debug("Address doesn't exist or is not accessible.");
-         }
-     }else{ // ni = null
-          LOG.debug("Network Interface for the specified address is not found.");
-      }
-    */
-return "fake mac";
-}catch (Exception e){
-	LOG.debug("UnknowHostException = " + e);
-////}catch (Exception e){
-//	LOG.debug("SocketException = " + e);
-//}
-return "yes, Louis : Mac adress";
-} //end method
-}
-
-public String getGlobalAddress() throws UnknownHostException{
-    return Arrays.deepToString(InetAddress.getAllByName("localhost"));
-}
-
-public String getMySql() throws SQLException, Exception{
- //      LOG.debug("search version mySql");
-   Connection conn = new utils.DBConnection().getConnection();
-   String s = conn.getMetaData().getDatabaseProductName()
-    + " / " + conn.getMetaData().getDatabaseProductVersion()
-    + NEW_LINE + conn.getMetaData().getDriverName()
-    + " / " + conn.getMetaData().getDriverVersion();
-    utils.DBConnection.closeQuietly(conn, null, null,null);
-    return s;
- }
-
-public String getMongoDB() throws SQLException, Exception{
-    Document document = null;
-    //https://stackoverflow.com/questions/19274805/getting-version-of-mongo-instance-with-java-driver
-    try (MongoClient mongoClient = MongoClients.create("mongodb://localhost/")){
-               document = mongoClient.getDatabase("golflc").runCommand(new Document("buildInfo",1));
-        }
-    return "Driver version = " + MongoDriverVersion.VERSION + " - DB version = " + document.getString("version");
- }
-
-public void putMyStrings(){
-    //info coming from 
-    LOG.debug("entering putMyStrings");
- //  Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-   JQueryVersion = FacesContext.getCurrentInstance().getExternalContext()
-           .getRequestParameterMap().get("JQueryVersion");
-   LOG.debug("JQueryVersion is now = " + JQueryVersion);
-   
-
-}
-
-    public String getJQueryVersion() {
-        return FacesContext.getCurrentInstance().getExternalContext()
-           .getRequestParameterMap().get("JQueryVersion");
+    // ===== VARIABLES STATIQUES (ancien code) =====
+    private static Attributes manifestAttributes = null;
+    private static String JQueryVersion;
+    
+    // ===== VARIABLES D'INSTANCE (nouveau code) =====
+    private String groupId;
+    private String artifactId;
+    private String version;
+    private String buildTime;
+    private String applicationName;
+    
+    // ===== CONSTRUCTEUR =====
+    /**
+     * Constructeur - charge le MANIFEST initial
+     */
+    public InfoController3() throws IOException {
+        LOG.debug("entering InfoController constructor");
         
-   //     return JQueryVersion;
-    }
-
-public String getPrimefacesVersion(){
-   // return PrimeFaces.class.getPackage().getImplementationVersion(); // mod 04-12-2025
-    return PrimeEnvironment.class.getPackage().getImplementationVersion();
-}
-
-public String getPrimefacesExtensionVersion(){
-    return manifestAttributes.getValue("PFextension");
-}
-
-public String getLog4j2Version(){
-    return manifestAttributes.getValue("logging");
-}
-public String getApplicationVersion(){
-    return manifestAttributes.getValue("golflc");
-}
-public String getNetbeansVersion() {
-    return manifestAttributes.getValue("netbeans");
-}
-
-public String getPrimeflexVersion(){ //throws IOException{
-    return manifestAttributes.getValue("primeflex");
-}
-
-public String getJakartaEEVersion(){// throws IOException{
-    return manifestAttributes.getValue("javaEE");
-}
-
-public String getBuildVersion() {
-     return manifestAttributes.getValue("buildT");
-}
-
-public String getMojarraVersion(){
-    Package jsfPackage = FacesContext.class.getPackage();
-    return 
-        jsfPackage.getImplementationTitle() + " " +
-        jsfPackage.getImplementationVersion() + " " +
-        jsfPackage.getImplementationVendor() + " " +
-        jsfPackage.getSpecificationTitle() + " " +
-        jsfPackage.getSpecificationVersion();
- //   String specVendor = jsfPackage.getSpecificationVendor();
-  //  return implTitle + "/ " + implVersion + "/ " + implVendor + " / " + specTitle + "/ " + specVersion; // + "/" + specVendor;
-
-}
-public String getMavenVersion(){
-     return manifestAttributes.getValue("Build-Tool");
-}
-
-public String getOmnifacesVersion(){
-     return manifestAttributes.getValue("omnifaces");
-}
-//public String getJavaVersion(){
-public String javaVersion(){
-    return System.getProperty("java.runtime.version") + " from " + System.getProperty("java.vendor");
-}
-
-public String getJqueryVersion(){
-  //  return 
-//  String s = PrimeFaces.current().executeScript("jQuery().jquery");
-  return "unknown";
-}
-
-public String getIpadress6(){
-    return System.getProperty("java.runtime.version") + " from " + System.getProperty("java.vendor");
-}
-
-public String getOsVersion(){
-    return System.getProperty("os.name") + " " + System.getProperty("os.version")
-            + " " + System.getProperty("os.arch");
-}
-
-public static void ListAllSystemProperties() {
-    //https://docs.oracle.com/javase/tutorial/essential/environment/env.html
-try{
-   System.getenv().forEach((k, v) -> {
-       LOG.debug("Environment Variable = " + k + TAB + v);
-    });
- 
-   System.getProperties().entrySet().stream()
-            .map(e -> e.getKey() + ": " + e.getValue())
-            .forEach(e -> LOG.debug("System Property " + TAB + e));
-// liste.forEach(item -> LOG.debug("Flight list " + item));  // java 8 lambda
-
-}catch (Exception e){
-    String msg = "error listallasystemproperties = " + e ;
-        LOG.error("error = " + msg );
+        try (InputStream inputStream = getClass().getResourceAsStream("/META-INF/MANIFEST.MF")) {
+            if (inputStream != null) {
+                manifestAttributes = new Manifest(inputStream).getMainAttributes();
+                LOG.debug("MANIFEST.MF loaded successfully");
+            } else {
+                LOG.debug("infoController : META-INF/MANIFEST.MF is null");
+            }
+        } catch (Exception e) {
+            LOG.debug("exception in InfoController constructor: " + e);
         }
-} // end listallsytemproperti
-
- public static void printManifestAttributes() {
-   try {
-       Manifest manifest;
-       try (  InputStream in = getResourceAsStream("/META-INF/MANIFEST.MF")) { // sous /src/main/resources
-           manifest = new Manifest(in);
-       }
-    Attributes attributes = manifest.getMainAttributes();
-    
-    Iterator<Object> it = attributes.keySet().iterator();
-    while(it.hasNext()) {
-       String key = it.next().toString();
-       String value = attributes.getValue(key);
-        LOG.debug("manifest attribute = " + key + " / " + value);
     }
-   } catch (Exception ex) {
-       LOG.debug("error printattributes" + ex);
-   }
- } //end method
-}// end class
+    
+    // ===== POST CONSTRUCT =====
+    /**
+     * PostConstruct - charge les propriétés Maven et détails du MANIFEST
+     */
+    @PostConstruct
+    public void init() {
+        LOG.debug("Entering InfoController @PostConstruct init()");
+        loadMavenProperties();
+        loadManifestInfo();
+    }
+    
+    // ===== MÉTHODES DE CHARGEMENT (nouveau code) =====
+    /**
+     * Charge les propriétés depuis pom.properties (généré automatiquement par Maven)
+     */
+    private void loadMavenProperties() {
+        Properties props = new Properties();
+        String pomPropertiesPath = "/META-INF/maven/lc/GolfWfly/pom.properties";
+        
+        try (InputStream is = getClass().getResourceAsStream(pomPropertiesPath)) {
+            if (is != null) {
+                props.load(is);
+                this.groupId = props.getProperty("groupId");
+                this.artifactId = props.getProperty("artifactId");
+                this.version = props.getProperty("version");
+                
+                LOG.debug("Maven properties loaded: " + artifactId + " v" + version);
+            } else {
+                LOG.debug("pom.properties not found at: " + pomPropertiesPath);
+                // Valeurs par défaut pour le développement
+                this.groupId = "lc";
+                this.artifactId = "GolfWfly";
+                this.version = "DEV";
+            }
+        } catch (IOException e) {
+            LOG.debug("Error loading pom.properties: " + e);
+            // Valeurs par défaut en cas d'erreur
+            this.groupId = "lc";
+            this.artifactId = "GolfWfly";
+            this.version = "ERROR";
+        }
+    }
+    
+    /**
+     * Charge les informations depuis le MANIFEST.MF
+     */
+    private void loadManifestInfo() {
+        if (manifestAttributes != null) {
+            // Lecture des entrées custom du MANIFEST
+            this.buildTime = manifestAttributes.getValue("Build-Time");
+            this.applicationName = manifestAttributes.getValue("Application-Name");
+            
+            // Alternative: utiliser les entrées par défaut si version pas encore chargée
+            if (this.version == null || "DEV".equals(this.version) || "ERROR".equals(this.version)) {
+                String implVersion = manifestAttributes.getValue("Implementation-Version");
+                if (implVersion != null) {
+                    this.version = implVersion;
+                }
+            }
+            
+            LOG.debug("Manifest info loaded. Build time: " + buildTime);
+        } else {
+            LOG.debug("manifestAttributes is null, using default values");
+            this.buildTime = "N/A";
+            this.applicationName = "GolfLC WHS v3.0";
+        }
+    }
+    
+    // ===== VOS ANCIENNES MÉTHODES =====
+    /**
+     * Méthode login appelée depuis login.xhtml
+     */
+    public void login() {
+        LOG.debug("entering login() coming from login.xhtml");
+    }
+    
+    // ===== GETTERS POUR LES NOUVELLES PROPRIÉTÉS =====
+    public String getGroupId() {
+        return groupId;
+    }
+    
+    public String getArtifactId() {
+        return artifactId;
+    }
+    
+    public String getVersion() {
+        return version;
+    }
+    
+    public String getBuildTime() {
+        return buildTime;
+    }
+    
+    public String getApplicationName() {
+        return applicationName;
+    }
+    
+    /**
+     * Retourne les informations complètes de l'application
+     */
+    public String getFullInfo() {
+        return String.format("%s - %s:%s:%s (Build: %s)", 
+            applicationName != null ? applicationName : "N/A", 
+            groupId != null ? groupId : "N/A", 
+            artifactId != null ? artifactId : "N/A", 
+            version != null ? version : "N/A", 
+            buildTime != null ? buildTime : "N/A");
+    }
+    
+    // ===== GETTERS/SETTERS POUR L'ANCIEN CODE =====
+    public static Attributes getManifestAttributes() {
+        return manifestAttributes;
+    }
+    
+    public static String getJQueryVersion() {
+        return JQueryVersion;
+    }
+    
+    public static void setJQueryVersion(String jQueryVersion) {
+        JQueryVersion = jQueryVersion;
+    }
+    
+    // ===== MÉTHODES UTILITAIRES (si vous en aviez d'autres, ajoutez-les ici) =====
+    
+    /**
+     * Récupère une valeur spécifique du MANIFEST
+     * @param key La clé à rechercher
+     * @return La valeur ou null si non trouvée
+     */
+    public String getManifestValue(String key) {
+        if (manifestAttributes != null) {
+            return manifestAttributes.getValue(key);
+        }
+        return null;
+    }
+    
+    /**
+     * Affiche toutes les informations du MANIFEST (utile pour debug)
+     */
+    public void logAllManifestEntries() {
+        if (manifestAttributes != null) {
+            LOG.debug("=== MANIFEST Entries ===");
+            manifestAttributes.forEach((key, value) -> 
+                LOG.debug(key + " = " + value)
+            );
+        } else {
+            LOG.debug("No MANIFEST attributes available");
+        }
+    }
+    
+    
+    
+    
+    
+}

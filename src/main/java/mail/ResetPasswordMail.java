@@ -1,18 +1,30 @@
 package mail;
 
 import entite.Player;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.mail.MessagingException;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-public class ResetPasswordMail {
+@ApplicationScoped
+public class ResetPasswordMail implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject private MailSender mailSender;
+
+    public ResetPasswordMail() { }
 
     public Boolean send(Player player, String href) throws MessagingException, Exception {
-      LOG.debug("entering ResetPasswordMail.send");
-    String sujet = "You Forgot Your Password for the Application GolfLC";
-    String msg =
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            String sujet = "You Forgot Your Password for the Application GolfLC";
+            String msg =
                   " <br/>Welcome to GolfLC! at " + LocalDateTime.now().format(ZDF_TIME)
                 + " <br/> You have ask the reset of your password !"
                 + " <br/><b>ID         = </b>" + player.getIdplayer()
@@ -26,21 +38,27 @@ public class ResetPasswordMail {
                 + " <br/> <a href=" + href + "> "
                 + "Click here to Reset your password</a>"
                 + " <br/> See you soon back !"
-                + " <br/> The GolfLC team"
-                    ; 
+                + " <br/> The GolfLC team";
 
-                LOG.debug("mail to be sended = " + msg);
+            LOG.debug("mail to be sended = " + msg);
             String to = "louis.collet@skynet.be";
-            Path path = null;
-            boolean b = new mail.SendEmail().sendHtmlMail(sujet, msg, to, path, path, player.getPlayerLanguage());
-                LOG.debug("HTML Mail status = " + b);
-return b;
-} //end method
-     public Boolean sendMailResetOK(Player player) throws MessagingException, Exception {
- 
-               String sujet = "Successfull password reset to Golflc !!!";
-               String href = utils.LCUtil.firstPartUrl() + "/login.xhtml";
-               String msg =
+            byte[] pathQRC = null;
+            boolean b = mailSender.sendHtmlMail(sujet, msg, to, pathQRC, player.getPlayerLanguage());
+            LOG.debug("HTML Mail status = " + b);
+            return b;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    public Boolean sendMailResetOK(Player player) throws MessagingException, Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            String sujet = "Successfull password reset to Golflc !!!";
+            String href = utils.LCUtil.firstPartUrl() + "/login.xhtml";
+            String msg =
                   " <br/>Welcome to GolfLC! at " + LocalDateTime.now().format(ZDF_TIME)
                 + " <br/> Your password is reseted !"
                 + " <br/><b>ID         = </b>" + player.getIdplayer()
@@ -53,14 +71,17 @@ return b;
                 + " <br/> <a href=" + href + "> "
                 + "Click here to Connect</a>"
                 + " <br/> We hope to see you back soon!"
-                + " <br/> The GolfLC team"
-                       ;
-                     String to = "louis.collet@skynet.be";
-                     Path path = null;
-                     boolean b = new mail.SendEmail().sendHtmlMail(sujet,msg,to,path,
-                             path, player.getPlayerLanguage());
-                        LOG.debug("sendMailResetOK status = " + b);
-         
-    return true;
-     }
+                + " <br/> The GolfLC team";
+
+            String to = "louis.collet@skynet.be";
+            byte[] pathQRC = null;
+            boolean b = mailSender.sendHtmlMail(sujet, msg, to, pathQRC, player.getPlayerLanguage());
+            LOG.debug("sendMailResetOK status = " + b);
+            return true;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
 } // end class

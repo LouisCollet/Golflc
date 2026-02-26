@@ -27,17 +27,17 @@
 </f:facet>
     <h:outputText value="#{msg['subscription.new']}" />
     <p:selectOneButton id="subscr5"
-              value="#{courseC.subscription.subCode}"
-              rendered="#{courseC.subscription.trialCount le 5 
-                       or courseC.subscription.trialCount eq null}" >
+              value="#{memC.subscription.subCode}"
+              rendered="#{memC.subscription.trialCount le 5 
+                       or memC.subscription.trialCount eq null}" >
         <f:selectItem itemLabel="#{msg['subscription.trial']}" itemValue="TRIAL">   </f:selectItem>
         <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
         <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
      </p:selectOneButton>
                 
     <p:selectOneButton id="subscr6"
-              value="#{courseC.subscription.subCode}"
-              rendered="#{courseC.subscription.trialCount gt 5}" >
+              value="#{memC.subscription.subCode}"
+              rendered="#{memC.subscription.trialCount gt 5}" >
          <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
          <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
     </p:selectOneButton>
@@ -48,9 +48,9 @@
          id="button01"
          ajax="false"
          update="growl-msg"
-         immediate="false"
+          
          icon="pi pi-database"
-         action="#{courseC.manageSubscription()}" />
+         action="#{payC.manageSubscription()}" />
 </f:facet>
 </p:panelGrid>
 </h:form>

@@ -1,47 +1,34 @@
 package utils;
 
+// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import Controllers.LanguageController;
 import entite.Player;
 import static interfaces.Log.LOG;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
+// import java.sql.Connection; // removed 2026-02-26
+// import java.sql.SQLException; // removed 2026-02-26
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+
+import manager.PlayerManager;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.util.MapTimeZoneCache;
 import net.fortuna.ical4j.vcard.Group;
 //import net.fortuna.ical4j.vcard.Property;
-import net.fortuna.ical4j.vcard.PropertyFactory;
-import net.fortuna.ical4j.vcard.VCard;
-import net.fortuna.ical4j.vcard.VCardOutputter;
-import net.fortuna.ical4j.vcard.parameter.Language;
-import net.fortuna.ical4j.vcard.parameter.Type;
-import net.fortuna.ical4j.vcard.property.Address;
-import net.fortuna.ical4j.vcard.property.BDay;
-import net.fortuna.ical4j.vcard.property.Email;
-import net.fortuna.ical4j.vcard.property.Fn;
-import net.fortuna.ical4j.vcard.property.Gender;
-import net.fortuna.ical4j.vcard.property.N;
-import net.fortuna.ical4j.vcard.property.Note;
-import net.fortuna.ical4j.vcard.property.Org;
-import net.fortuna.ical4j.vcard.property.ProdId;
-import net.fortuna.ical4j.vcard.property.Role;
-import net.fortuna.ical4j.vcard.property.Telephone;
-import net.fortuna.ical4j.vcard.property.Title;
-import net.fortuna.ical4j.vcard.property.Version;
-import static utils.LCUtil.showMessageFatal;
 
+@RequestScoped
 public class VcardGenerator {
   //   invalidated on 12-11-2024 nouvelle version 2.0.0
 //     @SuppressWarnings("deprecation") à remplacer par @Deprecated ??
-
+ @Inject
+    private PlayerManager playerManager;
 // public static Path create(Player player){
     public static Path create(Player player){
 
@@ -135,24 +122,11 @@ return temp;
 */
 return null; // fake
   }
- void main() throws SQLException, Exception{
-     Connection conn = new DBConnection().getConnection();
-  try{
-       Player player = new Player();
-      player.setIdplayer(324713);
-      player = new read.ReadPlayer().read(player, conn);
-      Path path = create(player);
-         LOG.debug("Path bo = " + path.toString());
-         long bytes = Files.size(path);
-            LOG.debug(String.format("%,d bytes", bytes));
-            LOG.debug(String.format("%,d kilobytes", bytes / 1024));
-       
-   } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-//            LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-          }
-   } // end main//
+ /*
+ void main() {
+     final String methodName = utils.LCUtil.getCurrentMethodName();
+     LOG.debug("entering " + methodName);
+     // requires CDI container — cannot run standalone
+ } // end main
+ */
 } // end class

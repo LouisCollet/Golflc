@@ -18,27 +18,40 @@ http://middlewaremagic.com/jboss/?p=1050
 
 port est devenu 3308 à partir version mysql 8.2 le 31-10-2023  
     -->
-
+<!--  → c’est le nom du datasource utilisé dans l’API de management  et ce que tu passes à DatasourceMonitor.
+à modifier d'un nom plus explicite ?    -->
   <datasource jta="true"
               jndi-name="java:jboss/datasources/golflc" 
-              pool-name="MySqlDS" 
+              pool-name="GolfLCPool"
+              statistics-enabled="true"
               enabled="true" 
               use-java-context="true"
               spy="true"
               use-ccm="true">
     <connection-url>jdbc:mysql://localhost:3308/golflc?AllowMultiQueries=true&amp;AllowUserVariables=true&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;nullNamePatternMatchesAll=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>
     <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
-    <driver>mysql-connector-j-9.5.0.jar</driver> <!-- name mod 27-07-2025 -->
+    <driver>mysql-connector-j-9.6.0.jar</driver> <!-- name mod 27-07-2025 -->
     <pool>
         <min-pool-size>5</min-pool-size>
-        <max-pool-size>20</max-pool-size>
+        <max-pool-size>50</max-pool-size>
+        <prefill>true</prefill>  <!--  new 17-02-2026 indique à WildFly de pré-remplir le pool de connexions dès
+                                 le démarrage du serveur, jusqu'à atteindre le <min-pool-size> (5 dans ton cas).-->
     </pool>
-              <!--  enlevé 10-12-2025    <security>
-                        <user-name>****${env.MYSQL_USERNAME}</user-name>
-                        <password>****</password>
-                    </security>
-               -->
-    <validation>
+    <timeout>
+        <blocking-timeout-millis>5000</blocking-timeout-millis>
+        <idle-timeout-minutes>5</idle-timeout-minutes>
+    </timeout>
+      <!--    <security>
+            <user-name>${env.MYSQL_USERNAME}</user-name>
+            <password>${env.MYSQL_PASSWORD}</password>
+        </security>
+        -->
+    <security>
+            <user-name>LouisCollet</user-name>
+            <password>lc1lc2</password>
+    </security>
+ 
+     <validation>   <!-- ← évite connexions zombie balise ouvrante manquante -->
         <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
         <background-validation>true</background-validation>
         <validate-on-match>false</validate-on-match>

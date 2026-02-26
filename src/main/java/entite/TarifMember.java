@@ -16,20 +16,20 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.annotation.PostConstruct;  // migrated 2026-02-26 — POJO, not CDI-managed
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import utils.LCUtil;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 // @JsonInclude(Include.NON_NULL)  // ne fonctionne pas dans table multidimentional intéressant ?
-@Named("tarifMember") // nécessaire ??
-@RequestScoped
+// @Named("tarifMember")  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 
 // à modifier commer tarifgreenfee en utilisant des arraylist ipv arrays
 public class TarifMember implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
  @NotNull(message="{tarifMember.startdate.notnull}")
    private LocalDateTime startDate;
  @NotNull(message="{tarifMember.enddate.notnull}")
@@ -81,7 +81,7 @@ public TarifMember(){ // constructor
         discount = "";
     } // end constructor
 
-    @PostConstruct
+    // @PostConstruct  // migrated 2026-02-26 — POJO, not CDI-managed
     public void init(){
  //        sanitizer = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS);
  //        PolicyFactory policy = Sanitizers.FORMATTING.and(Sanitizers.LINKS);
@@ -269,7 +269,7 @@ public TarifMember(){ // constructor
 
 
 public static TarifMember map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         TarifMember tm = new TarifMember();
         ObjectMapper om = new ObjectMapper();

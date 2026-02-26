@@ -2,69 +2,85 @@ package update;
 
 import entite.Player;
 import static interfaces.Log.LOG;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import utils.DBConnection;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.annotation.Resource;
+import javax.sql.DataSource;
+import sql.SqlFactory;
+
+import sql.preparedstatement.psCreateUpdatePlayer;
 import utils.LCUtil;
 
-public class UpdatePlayer implements Serializable, interfaces.GolfInterface{
+@ApplicationScoped
+public class UpdatePlayer implements Serializable {
 
-public boolean update(final Player player, final Connection conn) throws Exception{
-        PreparedStatement ps = null;
-        int row = 0;
-        boolean b = false;
- try {
-          LOG.debug("entering UpdatePlayer.update");
-          LOG.debug(" with player = " + player);
-    String pl = utils.DBMeta.listMetaColumnsUpdate(conn, "player");
-          LOG.debug("String from listMetaColumns = " + pl);
-          LOG.debug("String modified for encryption password sha2 = " + pl);
-        final String query = """
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * DataSource injecté par WildFly
+     */
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    /**
+     * Mise à jour d’un Player
+     */
+    public boolean update(final Player player) throws Exception {
+
+        final String methodName = LCUtil.getCurrentMethodName();
+        String msg;
+        try (Connection conn = dataSource.getConnection()) {
+            conn.setAutoCommit(false);
+            LOG.debug("AutoCommit set to false");
+          // String query = utils.DBMeta.listMetaColumnsUpdate(conn, "player"); // enlève playerpassword
+         //   final String query = new SqlFactory().generateQueryUpdate(conn, "player");  // le where est inclus !!
+            final String co = new SqlFactory().listMetaColumnsUpdate(conn,"player"); // 
+            //   String co = utils.DBMeta.listMetaColumnsUpdate(conn, "course");
+            LOG.debug("String from listMetaColumns = " + co);
+          final String query = """
           UPDATE player
           SET %s
           WHERE player.idplayer=?;
-         """.formatted(pl) ; 
-    LOG.debug("query formatted Update Player = " + query);
-        // mod 14-04-2020
-    ps = conn.prepareStatement(query);
-    ps = Player.psPlayerModify(ps,player);
-    utils.LCUtil.logps(ps);
-    row = ps.executeUpdate(); // write into database
-  //              LOG.debug("row = " + row);
-            if (row != 0){
-                String msg =  LCUtil.prepareMessageBean("player.modify");
-                msg = msg // + "<h1> successful modify Player : "
-                            + " <br/>ID = " + player.getIdplayer()
-                            + " <br/>first = " + player.getPlayerFirstName()
-                            + " <br/>last = " + player.getPlayerLastName();
-                    LOG.debug(msg);
-                    LCUtil.showMessageInfo(msg);
-            }else{
-                    String msg = "row = 0 - Could not modify player";
+         """.formatted(co) ;
+
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                psCreateUpdatePlayer.mapUpdate(ps, player); //MapUpdate(ps, player);
+                LCUtil.logps(ps);
+                int row = ps.executeUpdate();
+                if (row == 0) {
+                    msg = "Fatal Error executeUpdate in " + methodName;
                     LOG.error(msg);
                     LCUtil.showMessageFatal(msg);
-// new 28/12/2014 - à tester                    
-                    throw (new SQLException(msg));
-                //    return false; pas compatible avec throw
+                    conn.rollback();
+                    throw new SQLException(msg);
+                }
             }
-return true;
-}catch (SQLException sqle) {
-            String msg = "£££ SQLException in Modify Player = " + sqle.getMessage() + " ,SQLState = "
-                    + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
+
+            conn.commit();
+            msg = "Player updated successfully";
+            LOG.debug(msg);
+            LCUtil.showMessageInfo(msg);
+            return true;
+
+        } catch (SQLException sqle) {
+            LCUtil.printSQLException(sqle);
+            msg = "SQLException in " + methodName + ": "
+                    + sqle.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            throw (new SQLException(msg)); // new 01-09-2019
-        //    return false;
-   } catch (Exception nfe) {
-            String msg = "£££ Exception in Modify Player = " + nfe.getMessage();
+            throw sqle;
+
+        } catch (Exception e) {
+            msg = "Exception in " + methodName + ": "
+                    + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            return false;
-   } finally {
-            DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014
+            throw e;
         }
-//         return false;
-    } //end modifyPlayer
-} //end Class
+    }
+}

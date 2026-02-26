@@ -17,7 +17,7 @@
     <ui:include src="include/include_summary_round.xhtml"/>
 
 <p:dataTable id="matchplay_table"
-             value="#{courseC.calcMatchplayResult()}"
+             value="#{roundC.calcMatchplayResult()}"
              var="c"
              rowIndexVar="rowIndex"
              emptyMessage="#{msg['message.table.empty']}"

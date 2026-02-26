@@ -1,7 +1,9 @@
 package utils;
 
-import entite.Settings;
+//import entite.Settings;
 import static interfaces.Log.LOG;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,14 +13,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@ApplicationScoped // mod 11/01
 public class FilesOfDirectoryHelp {
-
-  public static List<Path> files() throws IOException{
+@Inject private entite.Settings settings;        // ✅ injection CDI
+ // public static List<Path> files() throws IOException{
+     public List<Path> files() throws IOException{  
 //   String dir = Settings.getProperty("HELP");
  //    String dir = "C:/Users/Collet/Documents/NetBeansProjects/GolfWfly/src/main/webapp/help";
  //   LOG.debug("directory HELP = " + dir);
    
- List<Path> fileNames = Files.list(Paths.get(Settings.getProperty("HELP")))
+ List<Path> fileNames = Files.list(Paths.get(settings.getProperty("HELP")))
                              .filter(Files::isRegularFile)
                              .map(Path::getFileName)  // uniquement le nom de fichier !!
                              .collect(Collectors.toList());

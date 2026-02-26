@@ -1,6 +1,7 @@
 
 package entite;
 
+//import entite.composite.ECourseList;
 import entite.composite.ECourseList;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -13,14 +14,14 @@ import java.util.List;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
 import jakarta.validation.constraints.*;
-import org.primefaces.event.SelectEvent;
+//import org.primefaces.event.SelectEvent;
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+//@Named 14-02-2026
+//@RequestScoped
 public class Handicap implements Serializable, interfaces.GolfInterface{
     private static final long serialVersionUID = 1L;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
 @Past(message="{handicap.start.past}")
     private Date handicapStart;
 
@@ -38,7 +39,7 @@ public class Handicap implements Serializable, interfaces.GolfInterface{
     private Date handicapModificationDate;
     private ECourseList selectedHandicap; // mod 11-12-2018
     
-    private List <?>filteredHandicaps; // new 03/08/2014
+ //   private List <?>filteredHandicaps; // new 03/08/2014
  //   public Handicap()
  //   {
  //   }
@@ -109,31 +110,15 @@ public class Handicap implements Serializable, interfaces.GolfInterface{
         this.selectedHandicap = selectedHandicap;
     }
 
-    public List<?> getFilteredHandicaps() {
-        return filteredHandicaps;
-    }
+ //   public List<?> getFilteredHandicaps() {
+ //       return filteredHandicaps;
+ //   }
 
-    public void setFilteredHandicaps(List<?> filteredHandicaps) {
-        this.filteredHandicaps = filteredHandicaps;
-    }
-   // public void onRowSelect(SelectEvent event) {
-    public void onrowSelect(SelectEvent<Object> event) {
-        LOG.debug("onrowSelect Event fired !");
-    }
-    public void onrowUnselect(SelectEvent<Object> event) {
-        LOG.debug("onrowUnselect Event fired !");
-    }
-    
-    public void onrowSelectCheckbox(SelectEvent<Object> event) {
-        LOG.debug("onrowSelectCheckbox Event fired !");
-    }
-    
-    public void onrowUnselectCheckbox(SelectEvent<Object> event) {
-        LOG.debug("onrowSelectCheckbox Event fired !" + event.getObject().toString());
-    }
-    
+ //   public void setFilteredHandicaps(List<?> filteredHandicaps) {
+ //       this.filteredHandicaps = filteredHandicaps;
+ //   }
  public static Handicap map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Handicap h = new Handicap();
         h.setHandicapStart(rs.getTimestamp("idhandicap")) ;

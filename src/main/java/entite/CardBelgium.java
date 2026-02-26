@@ -4,14 +4,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
 import java.util.Date;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 
 
 //@Named enlevé 27-11-2020
-@Named
-@RequestScoped
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
+// @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY) enlevé 24-025-2026
+
 public class CardBelgium implements Serializable{
     final private static long serialVersionUID = 1L;
 
@@ -232,7 +233,7 @@ public String toString(){
 }   
 /*
 public static CardBelgium map(ResultSet rs) throws SQLException{
- //   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+ //   final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         CardBelgium c = new CardBelgium();
 /*        c.setIdclub(rs.getInt("idclub") );
