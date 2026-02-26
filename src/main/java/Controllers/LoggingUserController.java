@@ -2,13 +2,24 @@ package Controllers;
 
 import entite.LoggingUser;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
-import java.sql.SQLException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import java.io.Serializable;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageInfo;
 
-public class LoggingUserController {
+@Named("loggingUserC")
+@ApplicationScoped
+public class LoggingUserController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject private Controllers.MongoCalculationsController mongoCalculationsController; // migrated 2026-02-26
+
     private static String text = "start text";
+
+    public LoggingUserController() { }
 
  public static void write(String text){
    //  <p style="font-size:14px; "> Any text whose font we want to change </p>
@@ -72,7 +83,8 @@ public class LoggingUserController {
 
   public boolean createUpdateLoggingUser(LoggingUser logging) {
   try{
-      boolean b = new Controllers.MongoCalculationsController().create(logging);
+      // new Controllers.MongoCalculationsController().create(logging)
+      boolean b = mongoCalculationsController.create(logging); // migrated 2026-02-26
       return false;
   } catch (Exception e) {
         String msg = "exception in read !!" + e + "No calculations available !";
@@ -121,9 +133,11 @@ public class LoggingUserController {
     }
 }
   */
-public String read(LoggingUser logging, Connection conn) {
+/*
+public String read(LoggingUser logging) {
+  // ⚠️ cette méthode nécessite CDI — @Inject private read.ReadLoggingUser readLoggingUser
   try{
-    return new read.ReadLoggingUser().read(logging, conn).getLoggingCalculations();
+    return null; // TODO: injecter readLoggingUser via CDI
   } catch (Exception e) {
         String msg = "exception in read !!" + e + "No calculations available !";
         LOG.info(msg);
@@ -132,6 +146,7 @@ public String read(LoggingUser logging, Connection conn) {
         return null;
     }
 }
+*/
     public static String getText() {
         return text;
     }
@@ -139,7 +154,8 @@ public String read(LoggingUser logging, Connection conn) {
     public static void setText(String text) {
         LoggingUserController.text = text;
     }
- void main() throws SQLException, Exception{
+/*
+    void main() throws Exception {
  //public static void main(String[] args){
     LOG.debug("line 0");
 // ne fonctionne pas !!!
@@ -149,5 +165,6 @@ public String read(LoggingUser logging, Connection conn) {
   //             + System.lineSeparator() + " after lineSeparator");
 //       String s = read();
   //     LOG.debug("string readed = " + System.lineSeparator() + s);
-} //end main
+    } // end main
+*/
 } // end class

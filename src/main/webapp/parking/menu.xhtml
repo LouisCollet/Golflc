@@ -4,18 +4,14 @@
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-
       xmlns:p="primefaces">
 
     <h:head>  <title>IGNORED</title>    </h:head>
     <h:body>
 
-        <!-- rendered="#{(courseC.player.idplayer ne null) and (courseC.password.playerPassword ne null)}"  -->
-        <!-- mod 17-4-2024 si pas de subscription ou de password ==> affiche quand même le menu !old = rendered="#{(courseC.player.idplayer ne null)} -->
 <h:form id="form_menu"  >
-    <p:panelMenu id="panel_menu"
-                 
-                 rendered="#{(courseC.player.showMenu eq true)}" >
+    <p:panelMenu id="panel_menu">
+              <!--  enlevé provisoirement rendered="#{(playerC.player.showMenu eq true)}" >-->
     <p:submenu
                  icon="pi pi-check"
                  label="HOME LC" >
@@ -29,31 +25,27 @@
 -->    
      <p:submenu     label="#{msg['menu.system.admin']}" 
                     icon="pi pi-check"
-                    rendered="#{courseC.player.playerRole eq 'ADMIN'}">
+                    rendered="#{playerC.player.playerRole eq 'ADMIN'}">
         <p:menuitem id="menu_create_club"
                     
                     value="#{msg['menu.create.club']}"
                     action="#{courseC.to_club_xhtml('create club')}"
                     icon="pi pi-pencil" />
-   <!--     <p:menuitem value ="#{msg['menu.create.round']}-old"
-                         action="#{courseC.to_selectCourse_xhtml('CreateRound')}"
-                         icon="pi pi-list" />
-        -->
-                           
+
         <p:menuitem value ="#{msg['menu.create.round']}"
-                         action="#{courseC.to_selectCourse2_xhtml('CreateRound')}"
+                         action="#{courseC.to_selectClub2_xhtml('CreateRound')}"
                          icon="pi pi-list" />
-         
+         <!--   action="#{courseC.to_selectCourse2_xhtml('CreateRound')}"  -->
         <p:menuitem value ="Désignation Administrateur Local"            
-                    action="#{courseC.to_selectDesignationLA_xhtml('LocalAdministrator')}"
+                    action="#{courseC.to_selectClub2_xhtml('LocalAdministrator')}"
                     icon="pi pi-pencil" />
 
         <p:menuitem value ="Delete Club, Course, Tee"
-                    action="#{courseC.to_clubDelete_xhtml('delete_club_improved')}"
+                    action="#{courseC.to_clubDelete_xhtml('clubDelete')}"
                     icon="pi pi-trash" />
 
          <p:menuitem value ="Modify Club,Course,Tee"
-                     action="#{courseC.to_clubModify_xhtml('modify_club_improved')}"
+                     action="#{courseC.to_clubModify_xhtml('clubModify')}"
                      icon="pi pi-flag" />
 
         <p:menuitem value ="#{msg['menu.list.subscriptions']}"
@@ -73,9 +65,8 @@
     </p:submenu>    
         
     </p:submenu>
-<!-- rendered="#{courseC.player.playerRole eq 'ADMIN'}"  -->
         <p:submenu label="#{msg['menu.local.admin']}"
-               rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}">
+               rendered="#{playerC.player.playerRole.equalsIgnoreCase('ADMIN')}">
           <p:menuitem value ="#{msg['menu.create.round']}"
                          action="#{courseC.to_selectCourseLA_xhtml('CreateRound')}"
                          icon="pi pi-list" />
@@ -83,7 +74,7 @@
                       action="#{courseC.to_selectCourseLA_xhtml('CreateTarifGreenfee')}"
                       icon="pi pi-check" />
           <p:menuitem value ="#{msg['menu.create.pro']}"
-                      action="#{courseC.to_selectClubLA_xhtml('CreatePro')}"
+                      action="#{courseC.to_selectClub2_xhtml('CreatePro')}"
                       icon="pi pi-check" />
           <p:menuitem value ="#{msg['menu.create.tarif.member']}"
                       action="#{courseC.to_selectClubLA_xhtml('CreateTarifMember')}"
@@ -95,9 +86,9 @@
                       action="#{courseC.to_selectLocalAdmin_xhtml('Members')}"
                       icon="pi pi-check" />
           <p:menuitem value ="Etat du terrain : Menu" 
-                      action="#{courseC.to_selectMenuUnavailable_xhtml('MenuUnavailable')}"
+                      action="#{courseC.to_selectClub2_xhtml('MenuUnavailable')}"
                       icon="pi pi-check" /> 
-<!--          
+<!--   action="#{courseC.to_selectMenuUnavailable_xhtml('MenuUnavailable')}"       
           <p:menuitem value ="Etat du terrain : Structure" 
                     action="#{courseC.to_selectClubLA_xhtml('CreateUnavailableStructure')}"
                     icon="pi pi-check" />
@@ -108,9 +99,9 @@
     </p:submenu>
 
     <p:submenu label="COMPETITION ADMIN" 
-               rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}">
+               rendered="#{playerC.player.playerRole.equalsIgnoreCase('ADMIN')}">
           <p:menuitem value ="#{msg['menu.create.competition']}"
-                      action="#{courseC.to_competition_create_description_xhtml('CREATE COMPETITION')}"
+                      action="#{courseC.to_selectClub2_xhtml('Competition Description')}"
                       icon="pi pi-pencil" />  
           <p:menuitem value ="Inscription"
                       action="#{courseC.to_select_inscription_xhtml('PLAYER COMPETITION')}"
@@ -121,14 +112,14 @@
     </p:submenu>
 
     <p:submenu label="COMPETITION PLAYER" 
-               rendered="#{courseC.player.playerRole eq 'PLAYER'}">
+               rendered="#{playerC.player.playerRole eq 'PLAYER'}">
         <p:menuitem value ="#{msg['competition.inscription']}"
                     action="#{courseC.to_select_inscription_xhtml('PLAYER COMPETITION')}"
                     icon="pi pi-check" />
     </p:submenu>
 
      <p:submenu label="PROFESSIONAL">
-         <!--  rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')} -->
+         <!--  rendered="#{playerC.player.playerRole.equalsIgnoreCase('ADMIN')} -->
           <p:menuitem value ="Inscription Pro lesson"
                       action="#{courseC.to_selectPro_xhtml('Inscription')}"
                       icon="pi pi-search-plus" />
@@ -141,7 +132,7 @@
 
 <!--
      <p:submenu label="ETAT DU TERRAIN" 
-               rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}"> 
+               rendered="#{playerC.player.playerRole.equalsIgnoreCase('ADMIN')}"> 
     </p:submenu>
 -->
     <p:submenu label="PLAYER INFO">
@@ -197,12 +188,12 @@ url="show_played_rounds.xhtml?cmd=ini"
    <p:menuitem value ="Subscription = #{courseC.subscription.endDate}"
                url="subscription.xhtml"
                icon="pi pi-check" />
-   <p:menuitem value ="Payment Cotisation Member old "
+<!--   <p:menuitem value ="Payment Cotisation Member old "
                action="#{courseC.to_selectClub_xhtml('PaymentCotisationSpontaneous')}"
-               icon="pi pi-check" />
+               icon="pi pi-check" /> -->
    
    <p:menuitem value ="Payment Spontané Cotisation Member"
-               action="#{courseC.to_selectClubDialog_xhtml('PaymentCotisationSpontaneous')}"
+               action="#{courseC.to_selectClub2_xhtml('PaymentCotisation')}"
                icon="pi pi-check" />
    
 </p:submenu>
@@ -223,9 +214,12 @@ url="show_played_rounds.xhtml?cmd=ini"
     </p:submenu>
 
     <p:submenu label="HELP">
-        <p:menuitem value ="Technical info"
+        <p:menuitem value ="Technical info Version 1"
                     url="technical_info.xhtml"
-                    icon="pi pi-cog" />
+                    icon="pi pi-info-circle" />
+        <p:menuitem value ="Technical info Version 2"
+                    url="technical_info2.xhtml"
+                    icon="pi pi-info-circle" />
         <p:menuitem value ="Advanced Diagnostic"
                     url="admin_advanced.xhtml"
                     icon="pi pi-cog" />
@@ -233,7 +227,7 @@ url="show_played_rounds.xhtml?cmd=ini"
 
 
     <p:submenu label="BATCH"
-               rendered="#{courseC.player.playerRole eq 'ADMIN'}" >
+               rendered="#{playerC.player.playerRole eq 'ADMIN'}" >
          <p:menuitem value ="Thumbnails Generation"
                     action="#{batchC.thumbs('all files')}"
                     icon="pi pi-check" />
@@ -246,7 +240,7 @@ url="show_played_rounds.xhtml?cmd=ini"
     </p:submenu>
     
     <p:submenu label="TOOLS/TESTS"
-               rendered="#{courseC.player.playerRole eq 'ADMIN'}"
+               rendered="#{playerC.player.playerRole eq 'ADMIN'}"
                >
 <!-- If you are not using "url" but want to go with "action" then remember that you are doing a POST request.
 In this case you should either
@@ -254,7 +248,12 @@ In this case you should either
 2.Set ajax=false in your menuitems,  
   -->
 
-   <p:menuitem value ="Math Calculator"    url="calculator_css.xhtml" icon="pi pi-book" />
+   <p:menuitem value ="Club and Course Selector via include" 
+               url="selectClubCourse2.xhtml" 
+               icon="pi pi-book" />
+  
+  
+  <p:menuitem value ="Math Calculator"    url="calculator_css.xhtml" icon="pi pi-book" />
    <p:menuitem value ="Flex Form Layout" 
                url="flex_formlayout.xhtml" 
                icon="pi pi-book" />
@@ -268,6 +267,13 @@ In this case you should either
    <p:menuitem value ="creditcard Test"
                 action="#{courseC.to_creditcard_test_xhtml('creditcard')}"
                 icon="pi pi-check" />
+     <p:menuitem value ="geoCityDetector Test"
+                action="#{geoIPExamples.example1_Simple()}"
+                icon="pi pi-check" />
+        <p:menuitem value ="iPdetector Test"
+                action="#{ipDetectorTest.testIpDetection()}"
+                icon="pi pi-check" />
+   
    <p:menuitem value ="webservice Test"
                 action="#{courseC.testWebService()}"
                 icon="pi pi-check" />
@@ -277,6 +283,7 @@ In this case you should either
             <p:menuitem value ="test SendEmail" 
                      action="#{courseC.SendEmailTest()}"
                      icon="pi pi-check" />
+            
             <p:menuitem value ="Cell and Row editor"  url="editingRow.xhtml?cmd=ini&amp;operation=restart"   icon="pi pi-flag" />
          
       <!--       <p:menuitem value ="Restart Course"  url="courseRestart.xhtml?cmd=ini&amp;operation=restart" icon="pi pi-flag" />

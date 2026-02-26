@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -15,12 +15,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import utils.LCUtil;
 
-@Named //enlevé 10/06/2022 nécessaire car parent est named ?
-@RequestScoped
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 @JsonInclude(JsonInclude.Include.NON_NULL) // déplacé 10/06/2022
 public class UnavailableStructure implements Serializable{
 @JsonIgnore private static final long serialVersionUID = 1L;
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
 
 //private String[] itemStructure;
 // rybriques stockées en db
@@ -142,7 +142,7 @@ public UnavailableStructure(){    // constructor
  @Override
 public String toString(){ 
     if(structureList.isEmpty()){ // == null){
-       return ("UnavailableStructure is null, no print !! "  );
+       return (this.getClass().getSimpleName().toUpperCase() + " is null, no print !! ");
     }
     return 
         (NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName().toUpperCase() + NEW_LINE
@@ -152,9 +152,9 @@ public String toString(){
                + " <br/>,structureList: " + structureList.toString() 
         );
 }
-
+/*
 public static UnavailableStructure map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
          String structure = rs.getString("ClubUnavailableStructure");
             LOG.debug("String structure from DB = " + structure);
@@ -163,7 +163,6 @@ public static UnavailableStructure map(ResultSet rs) throws SQLException{
             return null;
          }
          ObjectMapper om = new ObjectMapper();
-  //       om.registerModule(new JavaTimeModule());
          UnavailableStructure str = om.readValue(structure,UnavailableStructure.class);
             LOG.debug("UnavailableStructure extracted from database = "  + str);
             LOG.debug("nombre d'items structure = " + str.getStructureList().size());
@@ -177,5 +176,6 @@ public static UnavailableStructure map(ResultSet rs) throws SQLException{
     LCUtil.showMessageFatal(msg);
     return null;
   }
+  */
 } //end method
-} // end class
+//} // end class

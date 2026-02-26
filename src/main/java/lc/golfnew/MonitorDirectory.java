@@ -9,8 +9,8 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
- 
-public class MonitorDirectory implements interfaces.Log
+import static interfaces.Log.LOG;
+public class MonitorDirectory 
 {
  private static final String basePath = "C:/aa (LC Data)/LC (User)/Golf/Ryder Cup";
  private static Path propDir;

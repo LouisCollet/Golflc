@@ -93,15 +93,15 @@
     <div id="map-canvas" style="height: 80%; top:10px; border: 1px solid black;"></div>
 <div id="divlc">
   <p:outputLabel value="Enter latitude" />
-  <p:inputText id="latitude" type="text" value="#{courseC.player.idplayer}" size="10"/>
+  <p:inputText id="latitude" type="text" value="#{playerC.player.idplayer}" size="10"/>
 </div>
     <h:form id="travel_modes">
         <p:panelGrid columns="2"
                      layout="tabular"> 
             <p:outputLabel value="Enter latitude" />
-            <p:inputText id="latitude2" type="text" value="#{courseC.player.playerFirstName}" size="20"/>
+            <p:inputText id="latitude2" type="text" value="#{playerC.player.playerFirstName}" size="20"/>
             <p:outputLabel value="Enter longitude" />
-            <p:inputText id="longitude" type="text" value="#{courseC.player.playerLastName}" size="20"/>
+            <p:inputText id="longitude" type="text" value="#{playerC.player.playerLastName}" size="20"/>
         </p:panelGrid>
     </h:form>
     </h:body>

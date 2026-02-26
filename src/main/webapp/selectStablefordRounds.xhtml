@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
@@ -12,11 +12,10 @@
 <h:form id="form_selectStablefordRounds">
 <p:dataTable id="player_has_played_round"
              rowIndexVar="row"
-             value="#{courseC.registerStablefordResult()}"
+             value="#{roundC.registerStablefordResult()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCars}"
-             >
+             filteredValue="#{courseC.filteredCars}" >
 
 <f:facet name="header">
             <h1>#{msg['message.selectround']} #{msg['message.for.score']}</h1>
@@ -32,12 +31,20 @@
                   width="12%" >
             <p:commandButton
                 id="selectButtonColumn"
-                action="#{courseC.selectedScoreToRegister(c, 'individual')}"
+                action="#{roundC.selectedScoreToRegister(c, 'individual')}"
                 value="#{c.round.idround} - #{msg['button.select']}"
                 icon="pi pi-pencil">
              </p:commandButton>
 	</p:column>
 
+    <!-- DEBUG VISIBLE -->
+    <h:outputText value="TYPE: #{c.round.roundDate.class.name} | " 
+                  style="color:red; font-weight:bold;"/>
+    <h:outputText value="VALEUR: #{c.round.roundDate} | " 
+                  style="color:red; font-weight:bold;"/>
+    
+    
+    
 	<p:column headerText="#{msg['round.date']}"
                   width="12%"
                   id="dateColumn">
@@ -60,6 +67,13 @@
             #{c.club.clubName} (#{c.club.idclub})
 	</p:column>
 
+     <!-- DEBUG VISIBLE -->
+    <h:outputText value="TYPE: #{c.course.courseBeginDate.class.name} | " 
+                  style="color:red; font-weight:bold;"/>
+    <h:outputText value="VALEUR: #{c.course.courseBeginDate} | " 
+                  style="color:red; font-weight:bold;"/>
+    
+      
 	<p:column id="coursenameColumn"
                   headerText="#{msg['course.name']}"
                   width="15%"
@@ -67,11 +81,11 @@
                   filterBy="#{c.course.courseName}" >
             <b>#{c.course.courseName} </b>(#{c.course.idcourse})
              <h:outputText value="#{c.course.courseBeginDate}">
-                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                  <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
              </h:outputText>
              <h:outputText value=" - "/>
              <h:outputText value="#{c.course.courseEndDate}">
-                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
             </h:outputText>
 	</p:column>
 

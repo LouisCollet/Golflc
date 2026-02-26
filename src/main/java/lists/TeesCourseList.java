@@ -1,7 +1,119 @@
+
 package lists;
 
 import entite.Course;
 import entite.Tee;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+import static interfaces.Log.LOG;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.sql.DataSource;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
+import rowmappers.RowMapper;
+import rowmappers.TeeRowMapper;
+
+@ApplicationScoped
+public class TeesCourseList implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    private List<Tee> liste = null;
+
+ //   public List<Tee> list(final Course course) throws SQLException {
+     public List<Tee> list(final int courseId) throws SQLException {    
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        
+        // ✅ Early return si cache existe
+        if (liste != null) {
+            LOG.debug("escaped to " + methodName + " repetition thanks to lazy loading");
+            return liste;
+        }
+
+        // Sinon, charger depuis la base de données
+        LOG.debug("entering " + methodName);
+      //  LOG.debug("with Course " + course);
+         LOG.debug("with Course " + courseId);
+
+        final String query = """
+            SELECT *
+            FROM tee, course
+            WHERE tee.course_idcourse = course.idcourse
+              AND course.idcourse = ?
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, courseId);
+            utils.LCUtil.logps(ps);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                RowMapper<Tee> teeMapper = new TeeRowMapper();
+                
+                while (rs.next()) {
+                    Tee t = teeMapper.map(rs);
+                    liste.add(t);
+                }
+                
+                if (liste.isEmpty()) {
+                    LOG.warn("Empty Result Table in " + methodName);
+                } else {
+                    LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
+                }
+                
+                return liste;
+            }
+            
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    // ✅ Getters/setters d'instance
+    public List<Tee> getListe()               { return liste; }
+    public void setListe(List<Tee> liste)     { this.liste = liste; }
+
+    // ✅ Invalidation explicite
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        Course course = new Course();
+        course.setIdcourse(41);
+        List<Tee> tees = new TeesCourseList().list(course.getIdcourse());
+        LOG.debug("tee list for a course = " + tees.size());
+        tees.forEach(item -> LOG.debug("Tee list for a Course " + item));
+    } // end main
+    */
+
+} // end Class
+/*
+import entite.Course;
+import entite.Tee;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,15 +121,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import utils.DBConnection;
+import rowmappers.RowMapper;
+import rowmappers.TeeRowMapper;
+import connection_package.DBConnection;
 import utils.LCUtil;
 
 public class TeesCourseList {
     private static List<Tee> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     
 public List<Tee> list(final Course course, final Connection conn) throws Exception{
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+     final String methodName = utils.LCUtil.getCurrentMethodName(); 
 if(liste == null){
        LOG.debug("entering " + methodName);
        LOG.debug("with Course " + course);
@@ -36,8 +150,9 @@ if(liste == null){
      utils.LCUtil.logps(ps);
      rs = ps.executeQuery();
      liste = new ArrayList<>();
+     RowMapper<Tee> teeMapper = new TeeRowMapper();
      while(rs.next()){
-         Tee t = Tee.dtoMapper(rs);
+         Tee t = teeMapper.map(rs);
          liste.add(t);
      } // end while
      if(liste.isEmpty()){
@@ -50,16 +165,11 @@ if(liste == null){
      }
  //  liste.forEach(item -> LOG.debug("Players list with Players and passwords " + item));  // java 8 lambda
 return liste;
-} catch(SQLException sqle){
-    String msg = "£££ SQL exception in " + methodName + "/" + sqle.getMessage() + " ,SQLState = " +
-            sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
+} catch(SQLException e){
+    handleSQLException(e, methodName);
     return null;
 }catch(Exception e){
-    String msg = "£££ Exception in " + methodName + " / " + e.getMessage();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
+    handleGenericException(e, methodName);
     return null;
 }finally{
     DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
@@ -81,12 +191,13 @@ return liste;
     }
     
   void main() throws SQLException, Exception {
-    Connection conn = new utils.DBConnection().getConnection();
+    Connection conn = new connection_package.DBConnection().getConnection();
     Course course = new Course();
     course.setIdcourse(41);
     List<Tee> tees = new TeesCourseList().list(course, conn);
         LOG.debug("tee list  for a course = " + tees.size());
     tees.forEach(item -> LOG.debug("Tee list for a Course " + item));
-    utils.DBConnection.closeQuietly(conn, null, null, null);
+    connection_package.DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } //end Class
+*/

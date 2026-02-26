@@ -9,22 +9,7 @@
       xmlns:p="primefaces"
      
       template="templates/masterTemplate.xhtml">
-<!--
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewParam
-            required="true"
-            name="game"
-            value="#{courseC.inputScore}"
-            requiredMessage="You did not specify a cmd. (The game parameter is missing)"
-            converterMessage="Invalid cmd. (The game parameter is not a number)"
-            validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
-            <f:validateLength minimum="3" />
-        </f:viewParam>
 
-    </f:metadata>
-</ui:define>
--->
 <ui:define name="title">Select Scramble Rounds Page </ui:define>
 
 <ui:define name="content">
@@ -35,7 +20,7 @@
  -->
 <p:dataTable id="player_has_played_round"
              rowIndexVar="row"
-             value="#{courseC.listScrambleRounds('scr')}"
+             value="#{roundC.listScrambleRounds('scr')}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredCars}"
@@ -110,7 +95,7 @@
         </p:column>
 
   <f:facet name="footer">
-     In total there are #{courseC.list.stream().count()} rounds.
+     In total there are #{roundC.listscr.stream().count()} rounds.
   </f:facet>
 
 </p:dataTable>

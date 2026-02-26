@@ -7,14 +7,14 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalTime;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 public class CompetitionData implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
 private Integer cmpDataId;
 
@@ -160,7 +160,7 @@ public CompetitionData(){ // constructor
 
  @Override
 public String toString(){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
  try{
    LOG.debug("starting toString " + methodName);
  //    LOG.debug("idclub : "   + this.getIdclub());
@@ -198,7 +198,7 @@ public String toString(){
 }
 
 public static CompetitionData map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         CompetitionData c = new CompetitionData();
         c.setCmpDataId(rs.getInt("CmpDataId") );

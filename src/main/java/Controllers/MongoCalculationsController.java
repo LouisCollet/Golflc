@@ -14,6 +14,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import entite.LoggingUser;
 import static interfaces.Log.LOG;
+import jakarta.enterprise.context.ApplicationScoped;
 import java.time.LocalDateTime;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -23,6 +24,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 
+@ApplicationScoped
 public class MongoCalculationsController {
     //https://mongodb.github.io/mongo-java-driver/3.12/javadoc/
 //    String uri = "mongodb://localhost:27017/?maxPoolSize=20&w=majority";
@@ -203,24 +205,11 @@ try (MongoClient mongoClien = MongoClients.create()) {
         }
     } // end method
   
-  void main() {
-       LOG.debug("starting main");
-     LoggingUser logging = new LoggingUser();
-     logging.setLoggingIdPlayer(324713);
-     logging.setLoggingIdRound(698);
-     logging.setLoggingType("R");
-   //  logging.setLoggingCalculations(LocalDateTime.now() + "updated LCLC!! these are the calculations details !!" + logging.getLoggingIdPlayer());
-     logging.setLoggingModificationDate(LocalDateTime.now());
-  //   boolean b = new MongoController().mongo(logging);
-  //   long b = new MongoController().delete(logging);
-   // boolean b = new MongoController().create(logging);
-   //  LOG.debug("result create = " + b);
- //     long l = new MongoCalculationsController().update(logging);
-  //     LOG.debug("\n\nupdate result = " + l);
- //   String s = new MongoCalculationsController().read(logging);
-  //    LOG.debug("\n\n read result = " + s);
-      new MongoCalculationsController().utilities();
-   //   LOG.debug("result main = " + b);
-  }
-  
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
+
 } // end class

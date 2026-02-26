@@ -6,11 +6,10 @@ import entite.Car;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import utils.LCUtil;
-
-public class ModifyCar implements interfaces.Log
-{
+import static interfaces.Log.LOG;
+public class ModifyCar {
     PreparedStatement ps = null;
 ////    static Savepoint savepoint1 = null;
     public boolean modifyCar(final Car car, final Connection conn) throws SQLException

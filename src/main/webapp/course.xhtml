@@ -14,10 +14,6 @@
 <h:graphicImage name="images/golf_course.jpg" alt="image missing : golf_course.jpg" style="float: left;"></h:graphicImage>
 <h:graphicImage name="images/golf_course.jpg" alt="image missing : golf_course.jpg" style="float: right;"></h:graphicImage>
 <!--    <h:body onload="startupSubmit();">  -->
-<h:body>
-<h:head>
-
-</h:head>
     
 <h:form id="form_course"  >
 
@@ -35,10 +31,10 @@
                 <p:inputText  label="Coursename"
                        id="CourseName"
                        title="#{msg['tooltip.course.coursename']}"
-                       value="#{courseC.course.courseName}"
+                       value="#{clubC.course.courseName}"
                        size="45" />
     <p:outputLabel for="@next"  value="#{msg['course.enddate']} :"/>
-    <p:datePicker value="#{courseC.course.courseEndDate}"
+    <p:datePicker value="#{clubC.course.courseEndDate}"
                   id="picker_endDate"
                   locale="#{languageC.locale}"
                   pattern="dd/MM/yyyy"
@@ -55,51 +51,35 @@
         <p:commandButton value="#{msg['button.course.create']}"
                          id="ButtonCreateCourse"
                          ajax="false"
-                         rendered="#{courseC.course.createModify eq true and courseC.tee.nextTee eq false}"
+                         rendered="#{clubC.course.createModify eq true and clubC.tee.nextTee eq false}"
                          update="growl-msg"
-                         immediate="false"
+                        
                          icon="pi pi-database"
                          style="float:left;"
-                         action="#{courseC.createCourse()}" />
+                         action="#{clubC.createCourse()}" />
          <p:commandButton value="#{msg['button.course.modify']}"
                          id="buttonModify"
                          ajax="false"
-                         rendered="#{courseC.course.createModify eq false}" 
+                         rendered="#{clubC.course.createModify eq false}" 
                          update="growl-msg"
-                         immediate="false"
+                         
                          icon="pi pi-database"
                          style="float:left;"
-                         action="#{courseC.modifyCourse()}" />
-         <!--    rendered="#{(not courseC.tee.nextTee) and (param.operation eq 'modify') }"  -->
+                         action="#{clubC.modifyCourse()}" />
+         <!--    rendered="#{(not clubC.tee.nextTee) and (param.operation eq 'modify') }"  -->
         <p:commandButton value="#{msg['course.next']}"
                          id="buttonNext"
                          update="growl-msg"
                          immediate="true"
                          ajax="false"
-                         rendered="#{courseC.tee.nextTee}"
+                         rendered="#{clubC.tee.nextTee}"
                          icon="pi pi-arrow-right"
                          style="float:right;"
                          action="tee.xhtml?faces-redirect=true"/>
 </f:facet>
 </p:panelGrid>
-
 <br/>
-<!--  
-
-modifié 26/08/2014 voir dans UtilsController
-<p:gmap center="#{courseC.club.clubLatitude},#{courseC.club.clubLongitude}"
-        id="circlemap"
-        zoom="15"
-        type="HYBRID"
-        style="width:800px;
-               height:400px;"
-        model="#{courseC.mapModel}"
-        streetView="true">
-
-</p:gmap>  
--->
 </h:form>
 
-</h:body>
 </ui:define>
 </ui:composition>

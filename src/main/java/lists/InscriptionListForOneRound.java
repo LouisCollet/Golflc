@@ -1,120 +1,124 @@
 package lists;
 
-import entite.composite.ECourseList;
+import entite.Club;
+import entite.Course;
 import entite.Round;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.ClubRowMapper;
+import rowmappers.CourseRowMapper;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.RowMapperRound;
 
-public class InscriptionListForOneRound implements interfaces.Log{
-    private static List<ECourseList> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-    
-public List<ECourseList> list(Round round, final Connection conn) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-    
-    LOG.debug(" ... entering InscriptionList !!");
-if(liste == null){
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
-     LOG.debug("starting getInscriptionList.. = " );
-/*String query = """
-           
-        SELECT *
-        FROM round
-        JOIN course
-            ON round.course_idcourse = course.idcourse
-        JOIN club
-            ON club.idclub = course.club_idclub
-        GROU P BY idround
-        ORDER by rounddate DESC
-        LIMIT 30;
-""";*/
-final String query = """
-            \n   /* lists.InscriptionList.list  */
-WITH selection AS (
-    SELECT * from round
-       WHERE round.idround = ?
-    )
-SELECT * FROM selection
-   JOIN course
-      ON course.idcourse = selection.course_idcourse
-   JOIN club
-      ON club.idclub = course.club_idclub
-   ORDER BY roundDate DESC
-   LIMIT 30;
-""";
+@Named
+@ApplicationScoped
+public class InscriptionListForOneRound implements Serializable {
 
-        ps = conn.prepareStatement(query);
-        ps.setInt(1, round.getIdround());
-        utils.LCUtil.logps(ps);
-	rs =  ps.executeQuery();
-        liste = new ArrayList<>();
-	while(rs.next()){
-            ECourseList ecl = new ECourseList(); // liste pour sélectionner un round player = entite.Player.mapPlayer(rs);
-            ecl.setClub(entite.Club.dtoMapper(rs));
-            ecl.setCourse(entite.Course.dtoMapper(rs));
-            ecl.setRound(new entite.Round().dtoMapper(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
-	liste.add(ecl);
-	} //end while
-     
-    if(liste == null){
-       String msg = "££ Empty Result List in " + methodName;
-       LOG.error(msg);
-       LCUtil.showMessageFatal(msg);
-   //    return null;
-    }else{
-         LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-     }    
- LOG.debug("Inscription liste = " + liste.toString());
-    return liste;
-}catch (SQLException e){
-    String error = "SQL Exception in " + methodName + " / " + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(error);
-        LCUtil.showMessageFatal(error);
-        return null;
-}catch (Exception ex){
-    LOG.error("Exception in " + methodName + " / " + ex);
-    LCUtil.showMessageFatal("Exception = " + ex.toString() );
-     return null;
-}finally{
-        DBConnection.closeQuietly(null, null, rs, ps);
-}
-}else{
-    //     LOG.debug("escaped to listinscription repetition thanks to lazy loading");
-    return liste;  //plusieurs fois ??
-} //end else    
-} //end method
+    private static final long serialVersionUID = 1L;
 
-    public static List<ECourseList> getListe() {
-        return liste;
-    }
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-    public static void setListe(List<ECourseList> liste) {
-        InscriptionListForOneRound.liste = liste;
-    }
-    
-  void main() throws SQLException, Exception {// testing purposes
-    Connection conn = new DBConnection().getConnection();
-  //  Player player = new Player();
-  //  player.setIdplayer(324713);
-    Round round = new Round(); 
-    round.setIdround(260);
-  //  Club club = new Club();
-  //  club.setIdclub(1006);
-    List<ECourseList> p1 = new InscriptionListForOneRound().list(round,conn);
+    private List<ECourseList> liste = null;
+
+    public InscriptionListForOneRound() { }
+
+    public List<ECourseList> list(final Round round) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            return liste;
+        }
+
+        final String query = """
+            /* lists.InscriptionListForOneRound.list */
+            WITH selection AS (
+                SELECT * FROM round
+                WHERE round.idround = ?
+            )
+            SELECT * FROM selection
+               JOIN course
+                  ON course.idcourse = selection.course_idcourse
+               JOIN club
+                  ON club.idclub = course.club_idclub
+               ORDER BY roundDate DESC
+               LIMIT 30;
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, round.getIdround());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                RowMapper<Club> clubMapper = new ClubRowMapper();
+                RowMapper<Course> courseMapper = new CourseRowMapper();
+                RowMapperRound<Round> roundMapper = new RoundRowMapper();
+                while (rs.next()) {
+                    Club club = clubMapper.map(rs);
+                    ECourseList ecl = ECourseList.builder()
+                            .club(club)
+                            .course(courseMapper.map(rs))
+                            .round(roundMapper.map(rs, club))
+                            .build();
+                    liste.add(ecl);
+                } // end while
+                if (liste.isEmpty()) {
+                    LOG.warn(methodName + " - empty result list for round=" + round.getIdround());
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    public List<ECourseList> getListe()                       { return liste; }
+    public void              setListe(List<ECourseList> liste) { this.liste = liste; }
+
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Round round = new Round();
+        round.setIdround(260);
+        List<ECourseList> p1 = list(round);
         LOG.debug("number extracted = " + p1.size());
-        LOG.debug("Inscription list = " + p1.toString());
-    DBConnection.closeQuietly(conn, null, null, null);
+        LOG.debug("inscription list = " + p1.toString());
+    } // end main
+    */
 
-}// end main
-    
-} //end class
+} // end class

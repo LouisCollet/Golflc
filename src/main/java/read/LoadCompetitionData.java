@@ -1,61 +1,72 @@
 package read;
 
 import entite.CompetitionData;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.DBConnection;
-import utils.LCUtil;
-// ne fonctionne pas ,,
-public class LoadCompetitionData{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-public CompetitionData load(CompetitionData competition,Connection conn) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
+import javax.sql.DataSource;
+
+@ApplicationScoped
+public class LoadCompetitionData implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public LoadCompetitionData() { }
+
+    public CompetitionData load(final CompetitionData competition) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
-        LOG.debug(" with competition = " + competition); 
- //   String ro = utils.DBMeta.listMetaColumnsLoad(conn, "competition_data");
+        LOG.debug(methodName + " - with competition = " + competition);
 
-final String query = """
-        SELECT *
-        FROM competition_data
-        WHERE CmpDataId = ?
- """;
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, competition.getCmpDataId());
-     utils.LCUtil.logps(ps); 
-     rs =  ps.executeQuery();
-     CompetitionData cd = new CompetitionData(); 
-     while(rs.next()){
-           cd = CompetitionData.map(rs);
-      }  //end while
-    return cd;
-}catch (SQLException e){
-    String msg = "SQLException in LoadRound() = " + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    String msg = "Exception in LoadRound = " + ex.toString();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-} //end method
+        final String query = """
+                SELECT *
+                FROM competition_data
+                WHERE CmpDataId = ?
+                """;
 
-void main() throws SQLException, Exception{ // testing purposes
-   Connection conn = new DBConnection().getConnection(); // main
-   CompetitionData competition = new CompetitionData();
-   competition.setCmpDataId(25);
-   competition  = new read.LoadCompetitionData().load(competition,conn);
-      LOG.debug(" loaded Competition Data = " + competition);
-   DBConnection.closeQuietly(conn, null, null, null);
-}// end main
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, competition.getCmpDataId());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                CompetitionData cd = new CompetitionData();
+                while (rs.next()) {
+                    cd = CompetitionData.map(rs);
+                }
+                return cd;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return null;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return null;
+        }
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        // nécessite contexte CDI — DataSource injecté par WildFly
+        // CompetitionData competition = new CompetitionData();
+        // competition.setCmpDataId(25);
+        // competition = new LoadCompetitionData().load(competition);
+        // LOG.debug(" loaded Competition Data = " + competition);
+    } // end main
+    */
+
 } // end class

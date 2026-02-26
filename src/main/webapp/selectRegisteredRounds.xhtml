@@ -33,7 +33,7 @@
     <!--	<h1>Score Card for Registered Round list</h1> -->
 
 <p:dataTable id="player_has_played_round"
-             value="#{courseC.listRecentRounds()}"
+             value="#{roundC.listRecentRounds()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
              filteredValue="#{courseC.filteredCars}"
@@ -47,7 +47,7 @@
                   width="10%" >
             <p:commandButton
                 id="selectButton"
-                action="#{courseC.scorecard(c)}"
+                action="#{roundC.scorecard(c)}"
                 value="#{c.round.idround} - #{msg['button.select']}"
                 icon="pi pi-map">
             </p:commandButton>
@@ -111,7 +111,7 @@
         </p:column>
 
 <f:facet name="footer">
-    There are #{courseC.listRecentRounds().stream().count()} rounds. 
+    There are #{roundC.listRecentRounds().stream().count()} rounds. 
 </f:facet>
 
 </p:dataTable>

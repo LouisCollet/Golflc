@@ -1,50 +1,78 @@
 package update;
 
 import entite.Player;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import utils.DBConnection;
+import javax.sql.DataSource;
 import utils.LCUtil;
 
-public class UpdatePlayerActivation implements interfaces.Log, interfaces.GolfInterface{
-    
- public boolean update(Player player, Connection conn) throws SQLException{
-    PreparedStatement ps = null;
-try{
-        LOG.debug("starting update activation table Player.. = " + player);
-    final String query = """
-            UPDATE player
-            SET PlayerActivation = 1
-            WHERE idplayer = ?
-         """;
-    ps = conn.prepareStatement(query);
-    ps.setInt(1,player.getIdplayer() );
-    utils.LCUtil.logps(ps);
-    int row = ps.executeUpdate();
-      if (row!=0){
-          LOG.debug("-- successful UPDATE player - PlayerActivation is now = 1");
-          return true;
-         // return "updated" + row ;
-        }else{
-             String msg = "-- UNsuccessful result in UPDATE for player : " + player.getIdplayer();
-             LOG.error(msg);
-             LCUtil.showMessageFatal(msg);
-          return false;
+/**
+ * Service d'activation de compte joueur (PlayerActivation = 1)
+ * ✅ @ApplicationScoped - Stateless, partagé
+ */
+@ApplicationScoped
+public class UpdatePlayerActivation implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public UpdatePlayerActivation() { }
+
+    public boolean update(Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(" with player = " + player);
+
+        final String query = """
+                UPDATE player
+                SET PlayerActivation = 1
+                WHERE idplayer = ?
+                """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, player.getIdplayer());
+            utils.LCUtil.logps(ps);
+
+            int row = ps.executeUpdate();
+            if (row != 0) {
+                LOG.debug("successful UPDATE player - PlayerActivation is now = 1");
+                return true;
+            } else {
+                String msg = "UNsuccessful result in UPDATE for player : " + player.getIdplayer();
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
         }
-}catch(SQLException e){
-    String msg = "SQL Exception in update player = " + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return false;
-}catch(Exception ex){
-    String msg = "Exception in updatePlayer() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return false;
-}finally{
-        DBConnection.closeQuietly(null, null, null, ps);
-}
-} //end method
-} //end class
+    } // end method
+
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Player player = new Player();
+        player.setIdplayer(324713);
+        boolean b = new update.UpdatePlayerActivation().update(player);
+        LOG.debug("from main, result = " + b);
+    } // end main
+    */
+
+} // end class

@@ -28,15 +28,17 @@
 <!-- https://stackoverflow.com/questions/18703704/conditionally-rendering-an-uiinclude -->
 <h:panelGroup id="wrapperPanel">
     <h:panelGroup id="tableRenderPanel"
-                  rendered="#{courseC.unavailable.structure.menuLaunched eq true}">
+                  rendered="#{clubC.unavailable.structure.menuLaunched eq true}">
         <ui:include src="include/include_summary_club.xhtml"/>
     </h:panelGroup>
 </h:panelGroup>
 
 <h:form id="unavailable_menu" enctype="application/x-www-form-urlencoded" >
+    
+    
 <p:panelMenu id="panel_menu"
              style="font-size: 1.0em; width:400px; margin:auto;"
-             rendered="#{courseC.unavailable.structure.menuLaunched eq true}"
+             rendered="#{clubC.unavailable.structure.menuLaunched eq true}"
              statefulGlobal="true"  >
     <p:submenu label="Input Etat du terrain" 
                icon="ui-icon-wrench"
@@ -53,7 +55,7 @@
          <p:submenu label="2. Create Periods Etat du terrain"
                     expanded="true"
                     style="font-size: 1.2em;"
-                    rendered="#{courseC.unavailable.structure.structureExists eq true}">
+                    rendered="#{clubC.unavailable.structure.structureExists eq true}">
              <p:menuitem value="Periods = "
                     icon="pi pi-cog"
                     outcome="unavailable_period.xhtml" />
@@ -67,8 +69,8 @@
     <p:commandButton
                 id="deleteButton"
                 style="color:red"
-                action="#{courseC.modifyClubUnavailableStructure('delete')}"
-                value="#{msg['button.delete']} #{courseC.club.clubName}"
+                action="#{clubC.modifyClubUnavailableStructure('delete')}"
+                value="#{msg['button.delete']} #{clubC.club.clubName}"
                 icon="pi pi-trash" >
                 <p:confirm icon="pi pi-exclamation-triangle" />
     </p:commandButton>

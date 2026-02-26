@@ -10,6 +10,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.awt.Desktop;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.io.Serializable;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -47,16 +47,24 @@ import software.xdev.chartjs.model.options.Plugins;
 import software.xdev.chartjs.model.options.Title;
 import software.xdev.chartjs.model.options.tooltip.TooltipOptions;
 import software.xdev.chartjs.model.options.Font;
+import static exceptions.LCException.handleGenericException;
 import static utils.LCUtil.showMessageFatal;
 // voir le doc charts by lc from PF 14.docx
 @Named("chartC")
 @RequestScoped
 public class ChartController implements Serializable{
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject private chartsdevx.CourseAverage courseAverage; // migrated 2026-02-26
+
     private String lineModel;
     private String lineModel1;
     private String lineModel2;
     private String mixedModel;
-    
+
+    public ChartController() { }
+
     @PostConstruct
     public void init() {
   //      createLineModel();
@@ -65,11 +73,12 @@ public class ChartController implements Serializable{
     }
     
     // http://www.primefaces.org/showcase/ui/chart/line.xhtml?jfwid=584f3
- public String lineModelCourse(Connection conn, Player player, Course course){  // used in statChartCourse.xhtml
+ public String lineModelCourse(Player player, Course course) throws SQLException {  // used in statChartCourse.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    LOG.debug("for course = " + course);
  try{
-       LOG.debug("entering lineModelCourse");
-       LOG.debug("for course = " + course);
-    List<Average> listAverage = new chartsdevx.CourseAverage().stat(conn, player, course);  // jdbc
+    List<Average> listAverage = courseAverage.stat(player, course); // migrated 2026-02-26
         if(listAverage.isEmpty()){
             String msg = "no rounds information known for this course !!! in ChartsLineModelCourse = " ;
             LOG.error(msg);
@@ -174,10 +183,8 @@ public class ChartController implements Serializable{
    return chart.toJson();
 
   } catch (Exception e) {
-            String msg = "£££ Exception in lineModelCourse = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
+    handleGenericException(e, methodName);
+    return null;
    }
 } // end method
  
@@ -388,43 +395,14 @@ try{
 	} //end method
 
   //  public static void main(final String[] args){
- public static void main(String args[])throws SQLException, Exception{   
-   //  Connection conn = new DBConnection().getConnection();
-     // https://github.com/xdev-software/chartjs-java-model/blob/develop/chartjs-java-model-demo/src/main/java/software/xdev/Application.java
-  try{
-		//  Desktop.getDesktop().browse(new URI("http://localhost:8080"));
-   //   Controllers.HttpController().OpenBrowserExample();
-                
-                
-      final BarData data = new BarData();
-		data.addLabels("A", "B", "C");
-		data.addDataset(new BarDataset()
-			.setLabel("Dataset1")
-			.setData(1, 3, 2));
-		
-		createAndOpenTestFile(new BarChart()
-			.setData(data)
-			.setOptions(new BarOptions()));
-      
-      /*    createAndOpenTestFile(new BarChart()
-			.setData(data)
-			.setOptions(new BarOptions()));  
-      Player player = new Player();
-      player.setIdplayer(324713);
-      Course course = new Course();
-      course.setIdcourse(86);
-    String av = new ChartController().lineModelCourse(conn, player, course);
-        LOG.debug("from main, string average = " + av);
-*/
- }catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-   }finally{
-       //  DBConnection.closeQuietly(conn, null, null , null); 
-   }
- } // end main//
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
 
-} //end class
+} // end class
 
     //    return new LineChart(data, options).toJson();
 		//	this.getWebContainer(),

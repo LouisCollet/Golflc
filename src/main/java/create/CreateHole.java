@@ -1,5 +1,106 @@
 package create;
 
+import entite.Hole;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.annotation.Resource;
+import javax.sql.DataSource;
+
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static interfaces.Log.LOG;
+import utils.LCUtil;
+
+/**
+ * Service de création de Hole
+ * ✅ @ApplicationScoped - Stateless, partagé
+ * ✅ @Resource DataSource - Connection pooling
+ */
+@ApplicationScoped
+public class CreateHole implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * DataSource injecté par WildFly (connection pooling)
+     */
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public boolean create(final Hole hole) throws Exception {
+        
+        final String methodName = LCUtil.getCurrentMethodName();
+        String msg;
+        
+        try (Connection conn = dataSource.getConnection()) {
+            
+            conn.setAutoCommit(false);
+            
+            // ✅ PARTIE NON MODIFIÉE - DÉBUT
+            
+            // Validation
+            if (hole == null) {
+                msg = "Hole cannot be null";
+                LOG.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            if (hole.getTee_course_idcourse() == 0 || hole.getTee_course_idcourse() == 0) {
+                msg = "Hole must be associated with a course";
+                LOG.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            if (hole.getHoleNumber() == null || hole.getHoleNumber() < 1 || hole.getHoleNumber() > 18) {
+                msg = "Hole number must be between 1 and 18";
+                LOG.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            LOG.debug("Creating hole #{}: {}", hole.getHoleNumber(), hole);
+            
+            String query = LCUtil.generateInsertQuery(conn, "hole");
+            
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                sql.preparedstatement.psCreateUpdateHole.mapCreate(ps, hole); // MapCreate(ps, hole);
+                LCUtil.logps(ps);
+                
+                int row = ps.executeUpdate();
+                
+                if (row == 0) {
+                    msg = "Fatal Error: No row inserted";
+                    LOG.error(msg);
+                    throw new SQLException(msg);
+                }
+            }
+            
+            int generatedId = LCUtil.generatedKey(conn);
+            hole.setIdhole(generatedId);
+            
+            msg = String.format("Hole #%d created (ID: %d)", 
+                               hole.getHoleNumber(), 
+                               hole.getIdhole());
+            LOG.debug(msg);
+            
+            conn.commit();
+            
+            // ✅ PARTIE NON MODIFIÉE - FIN
+            
+            return true;
+            
+        } catch (SQLException sqle) {
+            LCUtil.printSQLException(sqle);
+            LOG.error("SQLException in {}: {}", methodName, sqle.getMessage());
+            throw sqle;
+        } catch (Exception e) {
+            LOG.error("Exception in {}: {}", methodName, e.getMessage());
+            throw e;
+        }
+    }
+}
+/*
 import entite.Club;
 import entite.Course;
 import entite.Hole;
@@ -11,7 +112,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import static utils.LCUtil.generateInsertQuery;
 //import utils.LCUtil;
 import static utils.LCUtil.generatedKey;
@@ -21,8 +122,12 @@ import static utils.LCUtil.showMessageInfo;
 
 public class CreateHole implements Serializable,interfaces.Log{
 
- public boolean create(final Club club, final Course course,
-                         final Tee tee, final Hole hole, List<Integer> strokeIndex, final Connection conn) throws SQLException{
+ public boolean create(final Club club,
+            final Course course,
+            final Tee tee,
+            final Hole hole,
+            List<Integer> strokeIndex,
+            final Connection conn) throws SQLException{
         PreparedStatement ps = null;
    try {
             LOG.debug("Course ID    = " + course.getIdcourse());
@@ -127,3 +232,4 @@ public class CreateHole implements Serializable,interfaces.Log{
         }
     } //end create
 } //end class
+*/

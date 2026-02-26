@@ -2,27 +2,22 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-     
       xmlns:p="primefaces"
-     
       xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
 <ui:define name="title">Delete Club,Course,Tee,Holes Page </ui:define>
 <ui:define name="content">
 <h:form id="form_deleteClubCourseTee">
-<!--<h1>Create round : select a Course</h1>
-value="#{courseC.listCourses()} mod 27-06-2023"
--->
 
 <p:dataTable id="ClubCourseTee"
-             value="#{courseC.listClubsCoursesTees('one_club')}"
+             value="#{clubC.listClubsCoursesTees('one_club')}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCourses}"
+             filteredValue="#{clubC.filteredCourses}"
              rowHover="true" >
      
 <f:facet name="header">
@@ -54,7 +49,7 @@ value="#{courseC.listCourses()} mod 27-06-2023"
             <p:commandButton
                 id="deleteClub"
                 update="messages"
-                action="#{courseC.deleteClub(c)}"
+                action="#{clubC.deleteClub(c)}"
                 value="#{c.club.idclub}"
                 styleClass="ui-button-danger"
                 style="color:red;"
@@ -83,7 +78,7 @@ value="#{courseC.listCourses()} mod 27-06-2023"
                   groupRow="true">
             <p:commandButton
                 id="deleteCourse"
-                action="#{courseC.deleteCourse(c)}"
+                action="#{clubC.deleteCourse(c)}"
                 value="#{c.course.idcourse}"
                 style="color:red;"
                 icon="pi pi-trash">
@@ -104,7 +99,7 @@ value="#{courseC.listCourses()} mod 27-06-2023"
                   style="width:15%" >
             <p:commandButton
                 id="deleteTee"
-                action="#{courseC.deleteTee(c)}"
+                action="#{clubC.deleteTee(c)}"
                 value="#{c.tee.idtee} - #{c.tee.teeStart} - #{c.tee.teeGender} - #{c.tee.teeHolesPlayed}"
                 style="color:red;"
                 icon="pi pi-trash">

@@ -25,7 +25,7 @@
 
 <f:facet name="header">
     <h:outputText escape="false" value="#{msg['title.equipments.tarif']}" />
-    <h:outputText value="#{courseC.tarifMember.equipmentsList.size()}" />
+    <h:outputText value="#{memC.tarifMember.equipmentsList.size()}" />
 </f:facet>
     
 <h:panelGroup id="panelItem" layout="block" >
@@ -44,9 +44,9 @@
         <p:inputText   id="MembersText"
                         size="20"
                         title="#{msg['tooltip.tarif.item']}"
-	                value="#{courseC.tarifMember.workItem}" />
+	                value="#{memC.tarifMember.workItem}" />
         <p:inputNumber   id="MembersAmount"
-                       value="#{courseC.tarifMember.workPrice}"
+                       value="#{memC.tarifMember.workPrice}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="6"
                        decimalPlaces="1"
@@ -63,9 +63,9 @@
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.inputTarifMembersEquipments()}"/>
+                         action="#{memC.inputTarifMembersEquipments()}"/>
          <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

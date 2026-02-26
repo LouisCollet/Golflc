@@ -37,8 +37,8 @@
          <p:submenu label="1. Create Periods"
                     expanded="true"
                     style="font-size: 1.2em;font-weight:bold;"
-                    rendered="#{courseC.tarifGreenfee.updateReady ne true}">
-              <p:menuitem value ="Periods = #{courseC.tarifGreenfee.datesSeasonsList.size()}"
+                    rendered="#{memC.tarifGreenfee.updateReady ne true}">
+              <p:menuitem value ="Periods = #{memC.tarifGreenfee.datesSeasonsList.size()}"
                     icon="pi pi-calendar"  
                     outcome="tarif_greenfee_periods.xhtml" />
          </p:submenu>
@@ -46,9 +46,9 @@
          <p:submenu label="2. Create Equipments"
                     expanded="true"
                     style="font-size: 1.2em;"
-                    rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}">
-              <p:menuitem value="Equipments = #{courseC.tarifGreenfee.equipmentsList.size()}"
-                     rendered="#{courseC.tarifGreenfee.datesSeasonsList.size() gt 0}"
+                    rendered="#{memC.tarifGreenfee.datesSeasonsList.size() gt 0}">
+              <p:menuitem value="Equipments = #{memC.tarifGreenfee.equipmentsList.size()}"
+                     rendered="#{memC.tarifGreenfee.datesSeasonsList.size() gt 0}"
                      icon="pi pi-cog"
                      outcome="tarif_greenfee_equipments.xhtml" />
          </p:submenu>
@@ -56,21 +56,21 @@
          <p:submenu label="3. Create Greenfee"
                     expanded="true"
                     style="font-size: 1.2em;"
-                    rendered="#{courseC.tarifGreenfee.equipmentsReady eq true
-                           and courseC.tarifGreenfee.updateReady eq false}">
-            <p:menuitem value ="Basic = #{courseC.tarifGreenfee.basicList.size()}"
+                    rendered="#{memC.tarifGreenfee.equipmentsReady eq true
+                           and memC.tarifGreenfee.updateReady eq false}">
+            <p:menuitem value ="Basic = #{memC.tarifGreenfee.basicList.size()}"
                      icon="pi pi-check"   
                      outcome="tarif_greenfee_basic.xhtml" />
-            <p:menuitem value ="Hours = #{courseC.tarifGreenfee.teeTimesList.size()}"
+            <p:menuitem value ="Hours = #{memC.tarifGreenfee.teeTimesList.size()}"
                      icon="pi pi-clock" 
                      outcome="tarif_greenfee_hours.xhtml" />
-            <p:menuitem value="Days of Week = #{courseC.tarifGreenfee.daysList.size()}"
+            <p:menuitem value="Days of Week = #{memC.tarifGreenfee.daysList.size()}"
                      icon="pi pi-sun"
                      outcome="tarif_greenfee_days.xhtml" />
          </p:submenu>
 
          <p:submenu label="4. Create Twilight "
-               rendered="#{courseC.tarifGreenfee.twilightReady eq true}"
+               rendered="#{memC.tarifGreenfee.twilightReady eq true}"
                expanded="true"
                style="font-size: 1.2em;">
             <p:menuitem value="Twilight" 
@@ -78,11 +78,11 @@
                      outcome="tarif_greenfee_twilight.xhtml" />
          </p:submenu>
         
-        <!--  rendered="#{courseC.tarifGreenfee.updateReady eq true}"  twilight demande est fait -->
+        <!--  rendered="#{memC.tarifGreenfee.updateReady eq true}"  twilight demande est fait -->
         
     <p:submenu label="5. Create Greenfee Tarif "
-               rendered="#{courseC.tarifGreenfee.updateReady eq true
-                        and courseC.tarifGreenfee.twilightDone eq true}"
+               rendered="#{memC.tarifGreenfee.updateReady eq true
+                        and memC.tarifGreenfee.twilightDone eq true}"
                expanded="true"
                style="font-size: 1.2em;">
    <!--     
@@ -93,8 +93,8 @@
   -->       
             <p:menuitem value="Create all tarifs in one shot" 
                      icon="pi pi-database"
-                     rendered="#{courseC.tarifGreenfee.updateReady eq true}"
-                     action="#{courseC.createTarifGreenfee}"/>
+                     rendered="#{memC.tarifGreenfee.updateReady eq true}"
+                     action="#{memC.createTarifGreenfee}"/>
     </p:submenu>
         
        <p:submenu label="6. Delete Greenfee Tarif"
@@ -105,8 +105,8 @@
     <p:commandButton
                 id="deleteButton"
                 style="color:red"
-                action="#{courseC.deleteTarifGreenfee(year)}"
-                value="#{msg['button.delete']} #{courseC.course.courseName} (#{courseC.course.idcourse}) - year = #{utilsC.dateYear(0)}"
+                action="#{memC.deleteTarifGreenfee(year)}"
+                value="#{msg['button.delete']} #{clubC.course.courseName} (#{clubC.course.idcourse}) - year = #{utilsC.dateYear(0)}"
                 icon="pi pi-trash" >
                 <p:confirm icon="pi pi-exclamation-triangle" />
     </p:commandButton>

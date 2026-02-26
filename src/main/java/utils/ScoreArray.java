@@ -17,8 +17,7 @@ import jakarta.validation.Payload;
 @Target( { METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 
-public @interface ScoreArray // implements interfaces.Log
-{
+public @interface ScoreArray {
 // custom annotation properties
     String fields = null;
     

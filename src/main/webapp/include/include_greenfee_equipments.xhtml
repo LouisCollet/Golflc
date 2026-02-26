@@ -8,7 +8,7 @@
       xmlns:f="jakarta.faces.core">
     
     <p:dataTable var="item"
-                 value="#{courseC.tarifGreenfee.equipmentsList}"
+                 value="#{memC.tarifGreenfee.equipmentsList}"
                  style="width:40%;text-align: center;margin-left:auto;margin-right:auto;"
                  emptyMessage="#{msg['message.table.empty']}" >
         
@@ -34,7 +34,7 @@
         
         <p:column headerText="#{msg['tarif.members.currency']} " 
                   width="12%" >
-                 <h:outputText value="#{courseC.tarifGreenfee.currency}" />
+                 <h:outputText value="#{memC.tarifGreenfee.currency}" />
         </p:column>
         
         <p:column headerText="#{msg['tarif.members.choice']}"
@@ -57,9 +57,9 @@
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.showTarifGreenfee(courseId)}"/>
+                         action="#{memC.showTarifGreenfee(courseId)}"/>
          <p:commandButton value="#{msg['inscription.back']}"
                          id="commandButtonback"
                          ajax="false"
@@ -72,10 +72,10 @@
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          style="float: right;"
                          icon="pi pi-credit-card"
-                         action="#{courseC.manageGreenfee()}" />
+                         action="#{payC.manageGreenfee()}" />
 </f:facet>
     </p:dataTable>
 </ui:composition>

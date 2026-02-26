@@ -29,9 +29,9 @@ https://codepen.io/jreaux62/pen/vzoJNN
 <h:panelGroup id="panelGroup1"
               layout="block" 
               class="marquee-rtl"
-              rendered="#{courseC.inscription.showWeather}">
+              rendered="#{roundC.inscription.showWeather}">
  <div>
-     <h:outputText value="#{courseC.inscription.weather}"
+     <h:outputText value="#{roundC.inscription.weather}"
                    escape="false"/>
  </div>
 </h:panelGroup>
@@ -46,40 +46,40 @@ https://codepen.io/jreaux62/pen/vzoJNN
     <h:outputText escape="false" value="#{msg['inscription.data']}" />
 </f:facet>
     
-    <c:set var="max" value="#{courseC.round.roundGame eq 'MP_SINGLE'? 2 : 4}"/>
-    <c:set var="abb" value="${fn:substring(courseC.round.roundGame, 0, 3)}"/>
+    <c:set var="max" value="#{roundC.round.roundGame eq 'MP_SINGLE'? 2 : 4}"/>
+    <c:set var="abb" value="${fn:substring(roundC.round.roundGame, 0, 3)}"/>
 
         <p:outputLabel for="@next" value="#{msg['inscription.team']} :"   />
         <p:inputText id="inscription"
                      size="35"
-                     value="#{courseC.round.roundTeam}" />
+                     value="#{roundC.round.roundTeam}" />
 
         <p:outputLabel for="@next" value="#{msg['inscription.matchplay.team']}"
                       rendered="#{abb eq 'MP_'}" />
         <p:inputText id="matchplay"
                      size="3" 
                      rendered="#{abb eq 'MP_'}"
-                     value="#{courseC.inscription.inscriptionMatchplayTeam}" />
+                     value="#{roundC.inscription.inscriptionMatchplayTeam}" />
 <!--
 https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
 <c:set var="type" value="#{courseC.teeStartList(player)}"/>  onchange="setSelectionColor();" -->
 
- <c:set var="player" value="#{courseC.player}"/>
+ <c:set var="player" value="#{playerC.player}"/>
         <p:outputLabel for="@next" value="#{msg['tee.start']} :"  />
         <p:selectOneMenu id="teeStartSelect"
                        
-                         value="#{courseC.inscription.inscriptionTeeStart}" >
+                         value="#{roundC.inscription.inscriptionTeeStart}" >
             <f:selectItem  itemLabel="#{msg['inscription.tee.select']}"
                            itemValue=""
                            noSelectionOption="true"/>
             <f:selectItems id="teeStartList" class="classItem"
-                  value="#{courseC.teeStartList(player)}"  />
+                  value="#{roundC.teeStartList(player)}"  />
         </p:selectOneMenu>
         
         <p:outputLabel for="@next" value="#{msg['club.web']} :"  />
-        <h:outputLink value="https://#{courseC.club.clubWebsite}/"
+        <h:outputLink value="https://#{clubC.club.clubWebsite}/"
                       title="Club WebPage">
-            <h:outputText value="https://#{courseC.club.clubWebsite}"/>
+            <h:outputText value="https://#{clubC.club.clubWebsite}"/>
         </h:outputLink>
 <f:facet name="footer">
 <p:panelGrid columns="3"
@@ -89,9 +89,9 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          value="#{msg['button.inscription.create']}"
                          update="growl-msg"
                          ajax="false"
-                         immediate="false"
+                          
                          icon="pi pi-pencil"
-                         action="#{courseC.createInscription()}" />
+                         action="#{roundC.createInscription()}" />
     <p:commandButton 
                          id="buttonWeather"
                          value="#{msg['button.weather']}"
@@ -99,30 +99,30 @@ https://stackoverflow.com/questions/34351194/bootstrap-input-group-addon-styling
                          ajax="false"
                          immediate="true"
                          icon="pi pi-sun"
-                         action="#{courseC.findWeather()}" />
-    <c:set var="idcourse" value="#{courseC.course.idcourse}"/>
+                         action="#{roundC.findWeather()}" />
+    <c:set var="idcourse" value="#{clubC.course.idcourse}"/>
     <p:commandButton     id="buttonTarif"
                          value="#{msg['button.inscription.findtarif']} Greenfee"
                          update="growl-msg"
                          ajax="false"
-                         immediate="false"
+                          
                          icon="po pi-euro"
-                         action="#{courseC.showTarifGreenfee(idcourse)}" />
+                         action="#{memC.showTarifGreenfee(idcourse)}" />
     <p:commandButton     id="OtherPlayers"
-                         value="#{msg['button.inscription.otherplayers']} / #{courseC.roundPlayersList().size()}"
+                         value="#{msg['button.inscription.otherplayers']} / #{roundC.roundPlayersList().size()}"
                          update="growl-msg"
                          ajax="false"
-                         disabled="#{(!courseC.inscription.inscriptionOK) or (courseC.roundPlayersList().size() gt max)}"
-                         immediate="false"
+                         disabled="#{(!roundC.inscription.inscriptionOK) or (roundC.roundPlayersList().size() gt max)}"
+                          
                          icon="pi pi-user-plus"
                          action="select_other_players.xhtml?faces-redirect=true" />
     <p:commandButton     value="Visualisation"
                          id="commandButtonVisual"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false" 
+                           
                          icon="pi pi-info-circle"
-                         action="#{courseC.showUnavailablePeriod()}"/>
+                         action="#{clubC.showUnavailablePeriod()}"/>
           <h:outputText value=""/>
  </p:panelGrid>
 </f:facet>

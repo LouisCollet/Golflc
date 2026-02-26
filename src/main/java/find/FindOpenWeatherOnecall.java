@@ -13,13 +13,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Connection;
+import java.sql.Connection; // still used by find() method signature
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import net.fortuna.ical4j.util.MapTimeZoneCache;
-import utils.DBConnection;
+// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import static utils.LCUtil.showMessageFatal;
 
 //genrated by https://www.jsonschema2pojo.org/
@@ -178,22 +178,13 @@ sb.append("Infos météos")
 
 
    
+/*
  void main() throws IOException {
-  try{
-   Connection conn = new DBConnection().getConnection();
-   FindOpenWeatherOnecall fow = new FindOpenWeatherOnecall();
-   Club club = new Club();
-   club.setIdclub(113); // anderlecht
-   club = new read.ReadClub().read(club, conn);
-   String s = fow.find(club, conn);
-          LOG.debug("response in main = :" + s );
-   } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-//            LCUtil.showMessageFatal(msg);
-   }
-  
-   } // end main//
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    // requires CDI container — cannot run standalone
+ } // end main
+*/
  
  
 

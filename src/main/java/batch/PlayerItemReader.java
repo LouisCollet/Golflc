@@ -5,10 +5,11 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-import entite.Settings;
+//import entite.Settings;
 import static interfaces.Log.LOG;
 import jakarta.batch.api.chunk.AbstractItemReader;
 import jakarta.batch.runtime.context.JobContext;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.BufferedReader;
@@ -26,14 +27,14 @@ import java.util.List;
 // https://sqli.developpez.com/tutoriels/javaee/decouverte-batch-processing/
 // https://opencsv.sourceforge.net/
 @Named // CDI name used in GolfPlayers.xml
-
+@ApplicationScoped // mod 11/01
 public class PlayerItemReader extends AbstractItemReader {
     CSVReader reader = null;
     private int count = 0;
     private static int errorsCSV = 0;
     
     @Inject private JobContext jobCtx; // new 25-08-2023
-    
+    @Inject private entite.Settings settings;        // ✅ injection CDI
     
   //  static final int NORMAL_INPUT_FIELDS = 8;
 /** 
@@ -54,7 +55,7 @@ public void open(final Serializable checkpoint) throws Exception{
      //   String fileList = jobParameters.getProperty("fileList");
  try{
      LOG.debug("property log_file_name from Job of GolfPlayers.xml = " + jobCtx.getProperties().getProperty("log_file_name"));
-    String fileName = Settings.getProperty("BATCH") + "importPlayers.csv";
+    String fileName = settings.getProperty("BATCH") + "importPlayers.csv";
        LOG.debug("fileName for import players csv = " + fileName);
        Path path = Paths.get(fileName);   //      LOG.debug("myPath = " + myPath.toString());
    final CSVParser parser = new CSVParserBuilder()

@@ -1,5 +1,5 @@
 
-package utils;
+package ical;
 
 import entite.Club;
 import entite.Course;

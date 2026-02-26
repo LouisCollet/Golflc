@@ -7,6 +7,7 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml" >
+    
 <ui:define name="title">Create Professional </ui:define>
 <ui:define name="content">
 
@@ -21,68 +22,19 @@
     columns="2"
     columnClasses="col1, col2"
     style="width:70%">
-         <h:outputText value="#{msg['professional.title']}" />
-         <h:panelGroup id="container4" layout="block" >
-             <!--  value="#{courseC.professional.proPlayerId}" 
-             decimalPlaces="0"
-                       emptyValue="0"-->
-                <p:inputNumber
-                       id="inputPlayer"
-                       value="#{courseC.professional.proPlayerId}"
-                       size="7"
-                       
-                       style="margin-right: 10px;" />
-              <p:commandButton 
-                         id="ButtonPro"
-                         ajax="true"
-                         immediate="true"
-                         value="#{msg['button.player.list']}"
-                         actionListener="#{dialogC.showSelectPlayer('professional')}"
-                         style="margin-right: 10px;"
-                         icon="pi pi-search" >
-                    <p:ajax event="dialogReturn"
-                            update="inputPlayer,playerName,localAdminId,growl-msg" />
-                  </p:commandButton>
-
-                <h:outputText id="playerName"
-                              value="#{courseC.localAdmin.playerLastName}" 
-                              style="font-style:italic;margin-right: 10px;" />
-                <h:outputText id="localAdminId"
-                              value="#{courseC.localAdmin.idplayer}"
-                              style="font-weight:bold;font-size: 2rem;font-style:italic;color: red;"/>
-          </h:panelGroup>
-   <!--********************************* --> 
-         <h:outputText value="#{msg['club.name']}" />
-         <h:panelGroup layout="block" id="container2">
-                <p:inputNumber
-                       id="inputClub"
-                       value="#{courseC.localAdmin.playerHomeClub}"
-                       size="5"
-                       style="margin-right: 10px;"
-                       decimalPlaces="0"
-                       
-                       emptyValue="0" />
-                <!-- minValue="1" -->
-                <p:commandButton 
-                         id="ButtonClub"
-                         immediate="true"
-                         value="#{msg['button.player.homeclub']}"
-                         actionListener="#{dialogC.showSelectClub('professional')}"
-                         style="margin-right: 10px;"
-                         icon="pi pi-search" >
-                    <p:ajax event="dialogReturn"
-                         update="inputClub,clubName,playerClub,growl-msg"  />
-                  </p:commandButton>
-                <h:outputText id="clubName"
-                              value=" #{courseC.club.clubName}" 
-                              style="font-style:italic"/>  
-                <h:outputText id="playerClub"
-                              value=" #{courseC.localAdmin.playerHomeClub}"
-                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
-          </h:panelGroup> 
-         
+    
+       <f:facet name="header">
+        <h1>#{msg['message.select.pro']}</h1>
+    </f:facet>
+        <!-- =================== INCLUDE CLUB SELECTOR =================== -->
+                <ui:include src="/include/include_player_selector.xhtml" >
+                    <ui:param name="clubLabel" value="Club 1" />
+                </ui:include>
+        <!-- =================== INCLUDE COURSE SELECTOR =================== -->
+                <ui:include src="/include/include_club_selector.xhtml" />
+ 
     <h:outputText  value="#{msg['unavailable.period.start']} :"/>
-    <p:datePicker value="#{courseC.professional.proStartDate}"
+    <p:datePicker value="#{appContext.professional.proStartDate}"
                   id="startDatePro"
                   locale="#{languageC.locale}"
                   pattern="dd/MM/yyyy HH:mm"
@@ -98,7 +50,7 @@
     </p:datePicker>
 
       <h:outputText  value="#{msg['unavailable.period.end']} :"/>
-      <p:datePicker value="#{courseC.professional.proEndDate}"
+      <p:datePicker value="#{appContext.professional.proEndDate}"
                   id="endDatePro"
                   locale="#{languageC.locale}"
                   lang="#{languageC.locale}"
@@ -116,7 +68,7 @@
          <h:outputText  value="#{msg['professional.amount']} :"/>
          <p:inputNumber  label="lesson"
                        id="monday${i}"
-                       value="#{courseC.professional.proAmount}"
+                       value="#{appContext.professional.proAmount}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="4"
                        lang="#{languageC.locale}"
@@ -132,7 +84,7 @@
                          ajax="false"
                          style="font-weight:normal "
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
                          action="#{courseC.createProfessional}"/>
 </f:facet>

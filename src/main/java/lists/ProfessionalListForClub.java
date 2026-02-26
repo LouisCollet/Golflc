@@ -1,117 +1,123 @@
 package lists;
 
-import entite.composite.EClubPro;
+import entite.Club;
+import entite.Greenfee;
+import entite.Player;
+import entite.Professional;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Named;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.ClubRowMapper;
+import rowmappers.GreenfeeRowMapper;
+import rowmappers.PlayerRowMapper;
+import rowmappers.ProfessionalRowMapper;
+import rowmappers.RowMapper;
 
 // vérifier si un player est aussi un pro : retourner les liste des clubs où il est pro
 
 @Named()
 @ViewScoped // ?? nécessaire !! pour faire le total dans local_administrator_cotisations.xhtml
+public class ProfessionalListForClub implements Serializable {
 
-public class ProfessionalListForClub implements Serializable{
-    private static List<EClubPro> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-    
-public List<EClubPro> list(final Connection conn) throws Exception{
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-if(liste == null){
-       LOG.debug("entering " + methodName);
-   //    LOG.debug("with Player " + player);
-        PreparedStatement ps = null;
-        ResultSet rs = null;
- try{
- /*  mod 26-01-2023 final String query = """
-           SELECT *
-           FROM professional, club, player
-           WHERE professional.ProClubId = club.idclub
-           AND player.idplayer = ProplayerId
-           AND DATE(NOW()) BETWEEN DATE(ProClubStartDate) AND DATE(ProClubEndDate)
-           ORDER BY club.ClubName, player.PlayerLastName;
-     """;
-*/
- // liste de tous les pro
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    // ✅ Cache d'instance — @ViewScoped resets per view automatically
+    private List<ECourseList> liste = null;
+
+    public ProfessionalListForClub() { }
+
+    public List<ECourseList> list() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        // ✅ Early return — guard clause FIRST
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            return liste;
+        }
+
+        // liste de tous les pro
         final String query = """
-           SELECT *
-           FROM professional, club, player
-           WHERE professional.ProClubId = club.idclub
-            AND player.idplayer = ProplayerId
-            AND NOW() BETWEEN ProClubStartDate AND ProClubEndDate
-           ORDER BY club.ClubName, player.PlayerLastName;
-     """;
-    
-     ps = conn.prepareStatement(query);
-  //   ps.setInt(1, player.getIdplayer());
-     utils.LCUtil.logps(ps);
-     rs = ps.executeQuery();
-     liste = new ArrayList<>();
-     while(rs.next()){
-         EClubPro ecp = new EClubPro();
-   //      Professional pro = Professional.map(rs);
-         ecp.setClub(entite.Club.dtoMapper(rs));
-         ecp.setProfessional(entite.Professional.map(rs));
-         ecp.setPlayer(entite.Player.map(rs));
-         liste.add(ecp);
-     } // end while
-     if(liste.isEmpty()){
-         String error = "££ Empty Result Table in " + methodName;
-         LOG.error(error);
-    //     LCUtil.showMessageFatal(error);
-  //       return liste;
-     }else{
-         LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-     }
- //  liste.forEach(item -> LOG.debug("Players list with Players and passwords " + item));  // java 8 lambda
-return liste;
-} catch(SQLException sqle){
-    String msg = "£££ SQL exception in " + methodName + "/" + sqle.getMessage() + " ,SQLState = " +
-            sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}catch(Exception e){
-    String msg = "£££ Exception in " + methodName + " / " + e.getMessage();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
-  //   LOG.debug("escaped to " + methodName + " repetition thanks to lazy loading");
-    return liste;  //plusieurs fois ??
-   //then you should introduce lazy loading inside the getter method. I.e. if the property is null,
-    //then load and assign it to the property, else return it.
-} //end if
-} //end method
+            SELECT *
+            FROM professional, club, player
+            WHERE professional.ProClubId = club.idclub
+             AND player.idplayer = ProplayerId
+             AND NOW() BETWEEN ProClubStartDate AND ProClubEndDate
+            ORDER BY club.ClubName, player.PlayerLastName
+            """;
 
-    public static List<EClubPro> getListe() {
-        return liste;
-    }
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
 
-    public static void setListe(List<EClubPro> liste) {
-        ProfessionalListForClub.liste = liste;
-    }
-    
+            utils.LCUtil.logps(ps);
 
-  void main() throws SQLException, Exception {
-    Connection conn = new utils.DBConnection().getConnection();
-//   Player player = new Player();
- //   player.setIdplayer(324720);
-    
-    List<EClubPro> prof = new ProfessionalListForClub().list(conn);
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                RowMapper<Club> clubMapper = new ClubRowMapper();
+                RowMapper<Player> playerMapper = new PlayerRowMapper();
+                RowMapper<Greenfee> greenfeeMapper = new GreenfeeRowMapper();
+                RowMapper<Professional> professionalMapper = new ProfessionalRowMapper();
+
+                while (rs.next()) {
+                    ECourseList ecl = ECourseList.builder()
+                            .club(clubMapper.map(rs))
+                            .professional(professionalMapper.map(rs))
+                            .player(playerMapper.map(rs))
+                            .build();
+                    liste.add(ecl);
+                }
+                if (liste.isEmpty()) {
+                    LOG.warn(methodName + " - empty result list");
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    // ✅ Getters/setters d'instance
+    public List<ECourseList> getListe()              { return liste; }
+    public void setListe(List<ECourseList> liste)    { this.liste = liste; }
+
+    // ✅ Invalidation explicite
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        List<ECourseList> prof = new ProfessionalListForClub().list();
         LOG.debug("list Pro for Clubs = " + prof.size());
-    prof.forEach(item -> LOG.debug("Club(s) list for a Pro " + item));
-    utils.DBConnection.closeQuietly(conn, null, null, null);
-}// end main
-} //end Class
+    } // end main
+    */
+
+} // end class

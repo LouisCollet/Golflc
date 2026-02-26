@@ -18,7 +18,7 @@
 <ui:include src="include/include_summary_competition.xhtml"/>
 
 <p:dataTable id="competition"
-             value="#{courseC.listInscriptionsCompetition()}"
+             value="#{roundC.listInscriptionsCompetition()}"
              rowIndexVar="row"
              resizableColumns="true"
              var="c"
@@ -36,7 +36,7 @@
 
  <f:facet name="header">
     <h:outputText escape="false" value="#{msg['competition.inscriptions.title']}"/>
-    <h2>#{courseC.competition.competitionDescription.competitionName} </h2>
+    <h2>#{roundC.competition.competitionDescription.competitionName} </h2>
 </f:facet>
         <p:column headerText="#{msg['competition.data.id']}"
                   footerText="#{msg['competition.data.id']}"
@@ -69,8 +69,8 @@
                   id="cancelCompetition">
             <p:commandButton
                 id="cancelButton"
-                action="#{courseC.cancelInscriptionCompetition(c)}"
-                rendered="#{courseC.player.idplayer eq c.competitionData.cmpDataPlayerId}"
+                action="#{roundC.cancelInscriptionCompetition(c)}"
+                rendered="#{playerC.player.idplayer eq c.competitionData.cmpDataPlayerId}"
                 value="#{msg['button.delete']} - #{c.competitionData.cmpDataPlayerId}"
                 icon="pi pi-trash"
                 style="color:red"
@@ -82,7 +82,7 @@
            </p:commandButton>
             <p:commandButton 
                 id="cancelButtonempty"
-                rendered="#{courseC.player.idplayer ne c.competitionData.cmpDataPlayerId}"
+                rendered="#{playerC.player.idplayer ne c.competitionData.cmpDataPlayerId}"
                 style="color:red;float:left"
                 icon="pi pi-ban"
                 >
@@ -112,7 +112,7 @@
 
 <f:facet name="footer">
 
-Nombre d'inscrits : #{courseC.listInscriptionsCompetition().size()}
+Nombre d'inscrits : #{roundC.listInscriptionsCompetition().size()}
 
 </f:facet>
 <br/>

@@ -27,7 +27,7 @@
 
    <h:outputText value="Input message" />
    <p:inputText id="name"
-            value="#{courseC.creditcard.creditCardHolder}"
+            value="#{payC.creditcard.creditCardHolder}"
             placeholder="Input your message"
             required="false"/>
 
@@ -41,7 +41,7 @@
         <p:commandButton value="Send message to server"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-pencil"
                          action="#{grpcController.sendMessage()}" />
 

@@ -9,20 +9,41 @@ import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import utils.DBConnection;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.Serializable;
+import manager.PlayerManager;
 import utils.LCUtil;
 import static utils.LCUtil.roundDouble;
 
-public class CalculateHandicapIndex implements interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+@ApplicationScoped
+public class CalculateHandicapIndex implements Serializable, interfaces.GolfInterface {
 
-public HandicapIndex calc (HandicapIndex handicapIndex, final Connection conn){    
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    private PlayerManager playerManager;
+    @Inject
+    private Controllers.LoggingUserController loggingUserController; // migrated 2026-02-26
+    @Inject
+    private update.UpdateExceptionalScoreReduction updateExceptionalScoreReduction;   // migrated 2026-02-24
+    @Inject
+    private find.FindCountScoreDifferential findCountScoreDifferential;               // migrated 2026-02-24
+    @Inject
+    private find.FindLowHandicapIndex findLowHandicapIndex;                           // migrated 2026-02-24
+    @Inject
+    private lists.ScoreDifferentialList scoreDifferentialList;                        // migrated 2026-02-24
+    @Inject
+    private find.FindHandicapIndexAtDate findHandicapIndexAtDateService;              // migrated 2026-02-26
+
+    public CalculateHandicapIndex() { }
+
+    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+public HandicapIndex calc (HandicapIndex handicapIndex){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
      LOG.debug(" -- Start of " + methodName);
      LOG.debug(" with HandicapIndex = " + handicapIndex);
 try {
@@ -35,7 +56,8 @@ try {
 */
      LoggingUserController.write(CLASSNAME + "." + methodName,"i"); 
      LoggingUserController.write("Calculate new handicap whs", "t");
-       double currentIndex = new find.FindHandicapIndexAtDate().find(handicapIndex, conn).getHandicapWHS().doubleValue();  // belle acrobatie !
+       // new find.FindHandicapIndexAtDate().find(handicapIndex)
+       double currentIndex = findHandicapIndexAtDateService.find(handicapIndex).getHandicapWHS().doubleValue(); // migrated 2026-02-26 — bug fix
     // error returns null
        String msg = "currentIndex when the round was played = " + currentIndex;
        LOG.debug(msg);
@@ -57,13 +79,16 @@ try {
   
      Player p = new Player();
      p.setIdplayer(handicapIndex.getHandicapPlayerId());
-     p = new read.ReadPlayer().read(p, conn);
+     p = playerManager.readPlayer(p.getIdplayer());
+
+  //   p = new read.ReadPlayer().read(p, conn);
+     
   //   esr = 0;
  //       LOG.debug(" !!!!   ESR invalidated too complicated for test !!!!");
      if(esr < 0){
          // non testé !
             LOG.debug(" we modify the SD ! because esr is < 0 : " + esr);
-         boolean b = new update.UpdateExceptionalScoreReduction().update(p, esr, conn);
+         boolean b = updateExceptionalScoreReduction.update(p, esr);
          // tester return
            LOG.debug(" resultat modifyExceptionalScoreReduction " + b);
          Double d = esr;
@@ -79,19 +104,19 @@ try {
      // à modifier : faire extrait et compter les éléments de la liste
     
    
-    int countSD = new find.FindCountScoreDifferential().find(p, conn);
+    int countSD = findCountScoreDifferential.find(p);
 //       LOG.debug(" Number of existing Score Differentials (SD) = " + countSD);
     if(countSD < 20){
           msg = "Number of Score Differentials (SD) < 20 = " + countSD;
           LOG.debug(msg);
           LoggingUserController.write(msg); 
-          handicapIndex = SDLess20(p, handicapIndex, conn);
+          handicapIndex = SDLess20(p, handicapIndex);
           LOG.debug(" handicapWHS is now " + handicapIndex.getHandicapWHS());
     }else{ // sd >= 20 
           msg = " Number of Score Differentials (SD) > 20 = " + countSD;
           LOG.debug(msg);
           LoggingUserController.write(msg); 
-          handicapIndex = SDMore20(p, handicapIndex, conn);
+          handicapIndex = SDMore20(p, handicapIndex);
           LOG.debug(" handicapWHS is now " + handicapIndex.getHandicapWHS());
     }
     
@@ -102,14 +127,14 @@ try {
     LoggingUserController.write("the new handicap whs is : " + handicapIndex.getHandicapWHS(), "c"); // 12/09/2022
         
     // new 20/07/2022);
-    handicapIndex.setLowHandicapIndex(lowHandicapIndexForFutureUse(handicapIndex, conn));
+    handicapIndex.setLowHandicapIndex(lowHandicapIndexForFutureUse(handicapIndex));
 
   // new 14/07/2022  
       LoggingUser logging = new LoggingUser();
       logging.setLoggingIdPlayer(p.getIdplayer());
       logging.setLoggingIdRound(handicapIndex.getHandicapRoundId());
       logging.setLoggingType("H");
-      new Controllers.LoggingUserController().createUpdateLoggingUser(logging); //12-09-2022
+      loggingUserController.createUpdateLoggingUser(logging); // migrated 2026-02-26
     return handicapIndex;
  } catch (Exception e) {
       String msg = " -- Error in " + methodName + e.getMessage();
@@ -120,12 +145,12 @@ try {
 } // end method
 
 
-public HandicapIndex SDLess20 (final Player player, final HandicapIndex handicapIndex,final Connection conn){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+public HandicapIndex SDLess20 (final Player player, final HandicapIndex handicapIndex){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
 try{ 
         LOG.debug(" -- Start of " + methodName);
 // Tableau Rules of Handicapping page 39
-    List<HandicapIndex> listeSD = new lists.ScoreDifferentialList().list(player,"<20", conn);
+    List<HandicapIndex> listeSD = scoreDifferentialList.list(player,"<20");
  // on a une liste avec les Score Differentials 
         LOG.debug("SDLess20 - returned list = " );
        listeSD.forEach(item -> LOG.debug("Less 20 - Round Date " + item.getHandicapDate().format(ZDF_TIME_DAY)
@@ -173,14 +198,14 @@ try{
 }
 } // end method
 
-public HandicapIndex SDMore20 (final Player player, HandicapIndex handicapIndex, final Connection conn){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+public HandicapIndex SDMore20 (final Player player, HandicapIndex handicapIndex){
+    final String methodName = utils.LCUtil.getCurrentMethodName();
 try{ 
        LOG.debug("entering " + methodName);
        LOG.debug(" with HandicapIndex = " + handicapIndex);
         LoggingUserController.write(CLASSNAME + "." + methodName,"i");  
         
-    List<HandicapIndex> listeSD = new lists.ScoreDifferentialList().list(player,">20", conn);
+    List<HandicapIndex> listeSD = scoreDifferentialList.list(player,">20");
     String msg = "Calculated Handicap Index = selection of lowest 8 SD's = ";
     LOG.debug(msg);
     LoggingUserController.write(msg); 
@@ -216,7 +241,7 @@ try{
      handicapIndex.setHandicapComment(handicapIndex.getHandicapComment() + " : sd=8" + ",tot=" + sum);
 //+",avg=" + avg + ",lowest=" + lowest + ",adjustment=" + adjustment);
        LOG.debug("before caps reduction, handicapWHS  = " + handicapIndex.getHandicapWHS());
-     handicapIndex = calcSoftcapHardcap(handicapIndex, conn);
+     handicapIndex = this.calcSoftcapHardcap(handicapIndex);
        LOG.debug("after caps reduction, index = " + handicapIndex.getHandicapWHS());
      return handicapIndex;
 
@@ -230,7 +255,7 @@ try{
 
  public static double calcESR (double currentIndex, double currentScoreDifferential){
 // Exceptional Score Reduction page 48
-final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+final String methodName = utils.LCUtil.getCurrentMethodName();
 try{
      LOG.debug(" -- Start of " + methodName);
      LOG.debug(" -- currentIndex = " + currentIndex);
@@ -264,8 +289,8 @@ try{
 }
 } // end method
 
-  public static HandicapIndex calcSoftcapHardcap (HandicapIndex handicapIndex, Connection conn){    
-  final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+  public HandicapIndex calcSoftcapHardcap (HandicapIndex handicapIndex){
+  final String methodName = utils.LCUtil.getCurrentMethodName();
       try{
 // Limit on upward movement of a Handicap Index -  page 47
      LOG.debug(" -- Start of "  + methodName);
@@ -274,7 +299,7 @@ try{
      LoggingUserController.write("previous low handicap index" , "t"); 
   // à adapter !!
   // déplacé vers method
-     double lowHandicapIndex = new find.FindLowHandicapIndex().find(handicapIndex, conn);
+     double lowHandicapIndex = findLowHandicapIndex.find(handicapIndex);
      if(lowHandicapIndex == 0.0){
          return null; // cata !!
      }
@@ -348,9 +373,9 @@ try{
 }
 } // end method
   
- public static double lowHandicapIndexForFutureUse (HandicapIndex handicapIndex, Connection conn){
+ public double lowHandicapIndexForFutureUse (HandicapIndex handicapIndex){
 // point 5.7 page 79
-final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+final String methodName = utils.LCUtil.getCurrentMethodName();
 try{
      LOG.debug(" -- Start of " + methodName);
      LOG.debug(" -- handicapIndex = " + handicapIndex);
@@ -360,7 +385,7 @@ try{
      LoggingUserController.write("Scores between " + handicapIndex.getHandicapDate().minusYears(1).format(ZDF_YEAR) 
              + " and " + handicapIndex.getHandicapDate().format(ZDF_YEAR)); 
  //    double lowHandicapIndex = 0.0;
-     double lowHandicapIndex = new find.FindLowHandicapIndex().find(handicapIndex, conn);
+     double lowHandicapIndex = findLowHandicapIndex.find(handicapIndex);
      String msg = " Low handicap index is " + lowHandicapIndex;
       LOG.debug(msg);
       LoggingUserController.write(msg); 
@@ -372,8 +397,9 @@ try{
       return 99;
 }
 } // end method
+/*
 void main() throws Exception, SQLException{
-    Connection conn = new DBConnection().getConnection();
+    Connection conn = null; // new DBConnection().getConnection();
     Player player = new Player();
     player.setIdplayer(324713);
     Round round = new Round();
@@ -392,8 +418,9 @@ void main() throws Exception, SQLException{
  //   index = new CalculateHandicapWHS().calc(index,player, round, conn);
     handicapIndex = new CalculateHandicapIndex().calc(handicapIndex, conn);
      LOG.debug(" Voici votre nouveau Handicap : = " + handicapIndex);
-    DBConnection.closeQuietly(conn, null, null, null); 
+    // DBConnection.closeQuietly(conn, null, null, null);
 }// end main
+*/
 } //end class
 /*    Collections.sort(liste, new HandicapIndex.sortByScoreDifferential());  // static inner class !!!
      double tot = 0;

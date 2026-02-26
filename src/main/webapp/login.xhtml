@@ -2,73 +2,46 @@
 <!DOCTYPE html>
 <ui:composition 
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
+      xmlns:f="jakarta.faces.core"
       xmlns:p="primefaces"
-      xmlns:o="omnifaces"
       template="templates/masterTemplate.xhtml">
-<!-- xmlns:o="omnifaces" -->
-    
-<ui:define name="metadata">
-    <f:metadata>
-      <f:viewAction action="#{courseC.login()}"/>
-    </f:metadata>
-</ui:define>
- 
+
 <ui:define name="title">Login to GolfLC</ui:define>
-<!-- -->
+
 <ui:define name="content">
 
-    <a href="login.xhtml"></a>
-<h:link id="link01"
-        title="#{msg['login.user.old']}"
-        outcome="selectPlayer.xhtml"
-        
-        style="float:left;"  >
-        <h:graphicImage rendered="true" name="images/login.jpg" alt="image missing : login.jpg" style="float:left;"> </h:graphicImage>
-</h:link>
+    <!-- Force l'instanciation du LoginBean et l'appel de prepareLogin() -->
+    <!-- ✅ Garde f:viewAction pour appeler prepareLogin() -->
+    <f:metadata>
+        <f:viewAction action="#{loginBean.prepareLogin}" onPostback="false"/>
+    </f:metadata>
 
-<h:link id="link02"
-        title="#{msg['login.user.new']}"
-        outcome="register.xhtml"
-        style="float:right;" > 
-        <h:graphicImage rendered="true" name="images/register.jpg" alt="image missing :golf_register.jpg" style="float:right;"> </h:graphicImage>
-</h:link>
+    <h:form id="loginForm">
+        <p:panelGrid id="panelGridLogin" layout="flex" columns="2" columnClasses="col1Flex, col2Flex">
+            <f:facet name="header">
+                <h:outputText escape="false" value="#{msg['login.welcome']}" />
+            </f:facet>
 
-<h:form id="login"  >
-<!--  mod PF 13 tabular layout="tabular" -->
+            <h:outputText value="Jakarta version"/>
+            <h:outputText id="fmd" escape="false" value="#{infoC.DeployVersion()}" />
 
-<p:panelGrid id="panelGridLogin"
-             layout="flex"
-             columns="2"
-             columnClasses="col1Flex, col2Flex">
-   <f:facet name="header">
-        <h:outputText escape="false" value="#{msg['login.welcome']}"  />
-   </f:facet>
-      <h:outputText value="Jakarta version"/>
-      <h:outputText id="fmd" escape="false" value="#{infoC.DeployVersion()}" />
-      <h:outputText value="returning User" />
-      <h:outputText value="new User" 
-                    style="float:right;"/>
-    <h:link id="link03"
-        title="#{msg['login.user.old']}"
-        outcome="selectPlayer.xhtml"
-        style="float:right;"> 
-        <h:graphicImage name="images/arrow-left-3D.jpg"  style="float:left;" />
-    </h:link>  
-     
-  <h:link id="link04"
-        title="#{msg['login.user.new']}"
-        outcome="player.xhtml?cmd=new"
-        style="float:right;"> 
-         <h:graphicImage name="images/arrow-right-3D.jpg" style="float:right;" />
-  </h:link>  
+            <h:outputText value="Returning User" />
+            <h:outputText value="New User" style="float:right;"/>
 
-</p:panelGrid>
-<h:graphicImage name="images/welcome3.jpg"  style="float: inside;" />
-<i class="pi pi-check"></i>
+            <h:link id="linkReturning" title="#{msg['login.user.old']}" outcome="selectPlayer.xhtml">
+                <h:graphicImage name="images/arrow-left-3D.jpg"/>
+            </h:link>
 
-</h:form>
+            <h:link id="linkNew" title="#{msg['login.user.new']}" outcome="player.xhtml?cmd=new">
+                <h:graphicImage name="images/arrow-right-3D.jpg"/>
+            </h:link>
+        </p:panelGrid>
+
+        <h:graphicImage name="images/welcome3.jpg" />
+        <i class="pi pi-check"></i>
+    </h:form>
 </ui:define>
+
 </ui:composition>

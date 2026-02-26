@@ -24,19 +24,19 @@
       <h:outputText value="#{msg['start.date']} :"/>
       <h:outputText
             id="startDateCotisation" 
-            value="#{courseC.tarifMember.startDate}" >
+            value="#{memC.tarifMember.startDate}" >
           <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
       </h:outputText>
 
       <h:outputText value="#{msg['end.date']} :" />
       <h:outputText
             id="endDateCotisation" 
-            value="#{courseC.tarifMember.endDate}" >
+            value="#{memC.tarifMember.endDate}" >
           <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
       </h:outputText>
 
       <h:outputText value="#{msg['handicap.comment']} :" />
-      <c:set var="com" value="#{courseC.tarifMember.comment}" />
+      <c:set var="com" value="#{memC.tarifMember.comment}" />
       <h:outputText
             id="commentCotisation" 
             value="#{of:abbreviate(com, 30)}">
@@ -44,20 +44,20 @@
       </h:outputText>
       
       <!--
-  <c:forEach var="i" begin="0" end="#{courseC.tarifMember.basicList.size()}">
+  <c:forEach var="i" begin="0" end="#{memC.tarifMember.basicList.size()}">
    <h:outputText value="#{msg['tarif.members.items']} :"
-                 rendered="#{courseC.tarifMember.membersBase[i][0] ne null}"/>
+                 rendered="#{memC.tarifMember.membersBase[i][0] ne null}"/>
       
    <h:panelGroup id="panelItemSummaryGreenfee" layout="block"
-                  rendered="#{courseC.tarifMember.membersBase[i][0] ne null}">
-      <h:outputText value="#{courseC.tarifMember.membersBase[i][0]}"/>
-      <h:outputText value=" - #{courseC.tarifMember.membersBase[i][1]}"/>
-      <h:outputText value=" - #{courseC.tarifMember.membersBase[i][2]}"/>
+                  rendered="#{memC.tarifMember.membersBase[i][0] ne null}">
+      <h:outputText value="#{memC.tarifMember.membersBase[i][0]}"/>
+      <h:outputText value=" - #{memC.tarifMember.membersBase[i][1]}"/>
+      <h:outputText value=" - #{memC.tarifMember.membersBase[i][2]}"/>
    </h:panelGroup>
  </c:forEach>
 -->
  <!--     
-      <ui:repeat var="item" value="#{courseC.tarifMember.equipmentsList.size}"> 
+      <ui:repeat var="item" value="#{memC.tarifMember.equipmentsList.size}"> 
           <h:outputText value="#{item.startDate}">
              <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
           </h:outputText>
@@ -70,14 +70,14 @@
    -->   
       
   <!--    
-      <c:forEach var="i" begin="0" end="#{courseC.tarifMember.EquipmentsList.size()}">
+      <c:forEach var="i" begin="0" end="#{memC.tarifMember.EquipmentsList.size()}">
    <h:outputText value="#{msg['tarif.members.equipments']} :"
-                 rendered="#{courseC.tarifMember.priceEquipments[i][0] ne null}"/>
+                 rendered="#{memC.tarifMember.priceEquipments[i][0] ne null}"/>
    <h:panelGroup id="panelItemSummaryGreenfeeHours" layout="block"
-                  rendered="#{courseC.tarifMember.priceEquipments[i][0] ne null}">
-      <h:outputText value="#{courseC.tarifMember.priceEquipments[i][0]}"/>
-      <h:outputText value=" - #{courseC.tarifMember.priceEquipments[i][1]}"/>
-      <h:outputText value=" - #{courseC.tarifMember.priceEquipments[i][2]}"/>
+                  rendered="#{memC.tarifMember.priceEquipments[i][0] ne null}">
+      <h:outputText value="#{memC.tarifMember.priceEquipments[i][0]}"/>
+      <h:outputText value=" - #{memC.tarifMember.priceEquipments[i][1]}"/>
+      <h:outputText value=" - #{memC.tarifMember.priceEquipments[i][2]}"/>
    </h:panelGroup>
  </c:forEach>
 -->

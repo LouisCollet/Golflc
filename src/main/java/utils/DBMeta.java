@@ -1,12 +1,17 @@
 package utils;
 
+// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DBMeta{
 
@@ -62,7 +67,8 @@ catch (NullPointerException npe){
         //throw e;
 }finally{
     LOG.error("finally2 executed ! ");
-    DBConnection.closeQuietly(null, st, rs, null);
+    if (rs != null) try { rs.close(); } catch (Exception ignored) {}
+    if (st != null) try { st.close(); } catch (Exception ignored) {}
 }
 } // end method
 
@@ -225,7 +231,7 @@ The ResultSet returned from the getTables() method contains a list of table name
 }
 finally{
    // LOG.error("finally2 executed ! ");
-    DBConnection.closeQuietly(null, null, result, null);
+    if (result != null) try { result.close(); } catch (Exception ignored) {}
 }
 
 } // end method
@@ -410,7 +416,7 @@ StringBuilder sb = new StringBuilder();
       return null;
 }finally{
     //LOG.error("finally2 executed ! ");
-    DBConnection.closeQuietly(null, null, rs, null);
+    if (rs != null) try { rs.close(); } catch (Exception ignored) {}
   //  return null;
 }
 
@@ -526,11 +532,105 @@ Parameters:
       return null;
 }finally{
     //LOG.error("finally2 executed ! ");
-    DBConnection.closeQuietly(null, null, rs, null);
+    if (rs != null) try { rs.close(); } catch (Exception ignored) {}
 }
 
 } // end method
 
+public record ColumnMeta(  // new 16-12-2025
+        String name,
+        int jdbcType,
+        String sqlType,
+        int size,
+        boolean nullable,
+        String defaultValue,
+        boolean is_auto_increment,
+        boolean is_generated_column
+) {}
+
+public static List<ColumnMeta> getTableColumns( // new 16-12-2025
+        Connection connection,
+        String schema,
+        String tableName
+) throws SQLException {
+    LOG.debug("entering getTableColumns");
+    DatabaseMetaData meta = connection.getMetaData();
+    List<ColumnMeta> columns = new ArrayList<>();
+
+    try (ResultSet rs = meta.getColumns(
+            connection.getCatalog(),   // catalog (souvent null en MySQL)
+            schema,                    // schema (database name)
+            tableName,
+            null                        // toutes les colonnes
+    )) {
+        while (rs.next()) {
+            ColumnMeta col = new ColumnMeta(
+                    rs.getString("COLUMN_NAME"),
+                    rs.getInt("DATA_TYPE"),          // java.sql.Types
+                    rs.getString("TYPE_NAME"),       // VARCHAR, INT, etc.
+                    rs.getInt("COLUMN_SIZE"),
+                 //   rs.getBoolean("NULLABLE") == DatabaseMetaData.columnNullable,
+                    // DatabaseMetaData.columnNoNulls = 0 /DatabaseMetaData.columnNullable  = 1 /DatabaseMetaData.columnNullableUnknown = 2
+                    rs.getInt("NULLABLE") == DatabaseMetaData.columnNullable, 
+                    rs.getString("COLUMN_DEF"),
+                    "YES".equalsIgnoreCase(rs.getString("IS_AUTOINCREMENT")),
+                    "YES".equalsIgnoreCase(rs.getString("IS_GENERATEDCOLUMN"))
+            );
+            columns.add(col);
+        }
+    }
+     Set<String> pk = new HashSet<>();
+        try (ResultSet rs = meta.getPrimaryKeys(null, schema, tableName)) {
+        while (rs.next()) {
+            pk.add(rs.getString("COLUMN_NAME"));
+        }
+        LOG.debug("pk = " + pk.toString()); //pour club donne [idclub] 
+    }
+       
+    return columns;
+    
+}
+/*
+public String generateInsert(
+        String table,
+        List<ColumnMeta> columns
+) {
+    var insertable = columns.stream()
+            .filter(c -> !c.isAutoIncrement())
+            .toList();
+
+    String fields = insertable.stream()
+            .map(ColumnMeta::getName)
+            .collect(Collectors.joining(", "));
+
+    String values = insertable.stream()
+            .map(c -> "?")
+            .collect(Collectors.joining(", "));
+
+    return "INSERT INTO " + table +
+            " (" + fields + ") VALUES (" + values + ")";
+}
+*/
+
+
+
+
+
+private Set<String> readPrimaryKeys(
+        DatabaseMetaData meta,
+        String schema,
+        String tableName
+) throws SQLException {
+
+    Set<String> pk = new HashSet<>();
+
+    try (ResultSet rs = meta.getPrimaryKeys(null, schema, tableName)) {
+        while (rs.next()) {
+            pk.add(rs.getString("COLUMN_NAME"));
+        }
+    }
+    return pk;
+}
 public static String listMetaColumnsUpdate (final Connection conn, final String table) throws SQLException{
     ResultSet rs = null;
 try{
@@ -559,6 +659,7 @@ List<String> blacklist = Arrays.asList(
 // tout en minuscules
    for(int i=0,l=blacklist.size();i<l;++i){
       blacklist.set(i, blacklist.get(i).toLowerCase());
+      // il faudrait aussi enlever toutce qui a "modificationdate"
    }
    
    String s = "";
@@ -580,7 +681,7 @@ List<String> blacklist = Arrays.asList(
       LOG.error("Exception " + e);
       return null;
 }finally{
-    DBConnection.closeQuietly(null, null, rs, null);
+    if (rs != null) try { rs.close(); } catch (Exception ignored) {}
 }
 } //end method
 
@@ -625,42 +726,11 @@ public static void cursorHoldabilitySupport(DatabaseMetaData meta) throws SQLExc
 }
 
 
-void main() throws SQLException, Exception{
-
-Connection conn = new DBConnection().getConnection("testgolflc");
-//showColumns(conn,"club");
-//LOG.debug(" -- success   !!!! ");
-
-int c = CountColumns(conn,"player");
-LOG.debug(" -- # columns player = " + c);
-
- // c = CountColumns(conn,"player");
-//LOG.debug(" -- # columns = " + c);
-
-//listMetaTables(conn);
-//listMetaData(conn);
-String s = listMetaColumnsUpdate(conn, "round");
-LOG.debug(" columns for update = + "+ s);
-//String s = setterGenerator(conn, "handicap");
-
-//DBMeta md = new DBMeta();
-
-String play = listMetaColumnsLoad(conn,"player_has_round"); 
-LOG.debug(" main - columns = " + NEW_LINE + play);
-
-//String p = listMetaColumnsLoad2(conn,"player");  // is static 
-//LOG.debug(" main - player 2 = " + NEW_LINE + p);
-
-//p = p + NEW_LINE + "," + p1;
-//LOG.debug(" main - player + round = " + p);
 /*
-ResultSet rs = md.getTables(null, null, "%", null);
-while (rs.next()) {
-  LOG.debug(rs.getString(3));
-  String s = setterGenerator(conn, rs.getString(3));
-}
+void main() throws SQLException, Exception{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    // requires CDI container — cannot run standalone
+} // end main
 */
-//listMetaStoredPro(conn, "get_list_points");
-DBConnection.closeQuietly(conn, null, null, null);
-}// end main
 } // end class

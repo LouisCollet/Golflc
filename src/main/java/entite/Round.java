@@ -1,14 +1,15 @@
 
 package entite;
 
-import entite.composite.ECourseList;
+//import entite.composite.ECourseList;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import entite.composite.ECourseList;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
 import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
+// import jakarta.inject.Inject;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -27,8 +28,8 @@ import utils.LCUtil;
 import jakarta.faces.event.AjaxBehaviorEvent;
 import jakarta.faces.event.ValueChangeEvent;
 
-@Named // enlevé 20/06/2022
-@ViewScoped // new 07-03-2021 for date range filter
+//@Named // enlevé 20/06/2022
+//@ViewScoped // new 07-03-2021 for date range filter
 public class Round implements Serializable, interfaces.Log, interfaces.GolfInterface{
     private static final long serialVersionUID = 1L;
     private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
@@ -76,7 +77,8 @@ private String RoundScoreString;
     private String playersString;
     private String roundCompetition;
     private boolean showQualifying = false;  // afficher scrolling dans inscription.xhtml
-@Inject ScoreMatchplay scoreMatchplay;
+// @Inject  // migrated 2026-02-24
+ScoreMatchplay scoreMatchplay;
    private String calculations;   
     public Round(){
        this.playersList = new ArrayList<>();
@@ -130,7 +132,6 @@ private String RoundScoreString;
     }
 
     public List<Player> getPlayers() {
-        
         return playersList;
     }
 
@@ -161,6 +162,7 @@ private String RoundScoreString;
  //       LOG.debug(" from setRoundDate 3 - roundDate = " + roundDate.format(ZDF_TIME_HHmm));
  //       
         this.roundDate = roundDate;
+        
     }
 
     public ZonedDateTime getRoundDateZoned() {
@@ -298,7 +300,7 @@ public static String fillRoundPlayersStringEcl(java.util.List<ECourseList> playe
     ArrayList<Player> p = new ArrayList<>();   // transform player2 in list<player<    
     for(int i=0; i < players.size() ; i++){
 //    LOG.debug("elem = " + players.get(i).Eplayer.getPlayerLastName());
-       p.add(players.get(i).getPlayer());
+       p.add(players.get(i).player());
      //       LOG.debug(" -- item in for idplayer # = " + dlPlayers.getTarget().get(i).getIdplayer() );
     }   
     return fillRoundPlayersString(p); // next method
@@ -350,6 +352,7 @@ public String toString(){
                " ,Start : "   + this.getRoundStart()
     //           + " ,Nombre Players : "   + this.getRoundPlayers()
                + " ,Name Players : "   + this.getPlayersString()
+               + " ,getPlayers List: "   + this.getPlayers().toString()
                + " ,idCourse : "   + this.getCourseIdcourse()
                + " ,competition : "   + this.getRoundCompetition()
         );
@@ -361,8 +364,9 @@ public String toString(){
   }
 }
 // provoque faute !!
+/*
 public Round dtoMapper(ResultSet rs) throws SQLException{
- //     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+ //     final String methodName = utils.LCUtil.getCurrentMethodName(); 
  // LOG.debug("entering Round map  without club");
   try{
     //  Club club = null;
@@ -377,9 +381,10 @@ public Round dtoMapper(ResultSet rs) throws SQLException{
 
 }
 }
-
+*/
+/*
    public Round dtoMapper(ResultSet rs, Club club) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Round round = new Round();
  //        LOG.debug("entering mapRound with club = " + club);
@@ -425,4 +430,6 @@ public Round dtoMapper(ResultSet rs) throws SQLException{
     return null;
   }
 } //end method map (rs, club)
+   
+   */
 } //end class

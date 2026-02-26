@@ -1,6 +1,8 @@
 package exceptions;
 
-public class TimeLimitException extends Exception implements interfaces.Log{
+import static interfaces.Log.LOG;
+
+public class TimeLimitException extends Exception {
     
     public TimeLimitException(String message, Throwable cause)
    {

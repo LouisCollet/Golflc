@@ -12,31 +12,30 @@
 <ui:define name="content">
 <h:graphicImage name="images/golfcard.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
 <h:graphicImage name="images/golfcard.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
-<h:form id="form_modify_holes"  >
+<h:form id="form_holes_global"  >
     <ui:include src="include/include_summary_club.xhtml"/>
 <p:panelGrid id="panelgrid2"
              layout="tabular"
              columns="19"
              style="text-align:center;"
-             columnClasses="col1,col2" >
-<!--  complète 1ere ligne avec numéros de trou -->
+             
+             >
+<!-- columnClasses="col1,col2"  complète 1ere ligne avec numéros de trou -->
 <h:outputText value="#{msg['hole.number']}"   />
     <c:forEach var="i" begin="01" end="18" step="1">
              <h:outputText  id="holenumber${i}"
                     style="font-size:1.5rem;"
-                    value="#{courseC.holesGlobal.dataHoles[i-1][0]}" />
+                    value="#{clubC.holesGlobal.dataHoles[i-1][0]}" />
     </c:forEach>
  
 <!--  complète 2e ligne avec par -->
  <h:outputText id="output01"
-               value="#{msg['hole.par']}" 
-                />
-<!--   rendered="#{courseC.tee.teeHolesPlayed eq '01-18'}" -->
+               value="#{msg['hole.par']}" />
      <c:forEach var="i" begin="01" end="18" step="1">
              <p:inputNumber  id="par${i}"
                     label="Hole Par"
                     
-                    value="#{courseC.holesGlobal.dataHoles[i-1][1]}"
+                    value="#{clubC.holesGlobal.dataHoles[i-1][1]}"
                     size="1"
                      maxValue="5"
                     emptyValue="0"
@@ -48,14 +47,13 @@
             </p:inputNumber> 
     </c:forEach>
  
- <!--  complète 2e ligne avec strokeindex -->
+ <!--  complète 3e ligne avec strokeindex -->
   <h:outputText id="output02"
-                
                 value="#{msg['hole.index']}"   />
       <c:forEach var="i" begin="01" end="18" step="1">
        <p:inputNumber  id="holeindex${i}"
                     label="Stroke Index"
-                    value="#{courseC.holesGlobal.dataHoles[i-1][2]}"
+                    value="#{clubC.holesGlobal.dataHoles[i-1][2]}"
                     size="2"
                     maxValue="18"
                     emptyValue="0"
@@ -67,16 +65,13 @@
       </p:inputNumber>
     </c:forEach>
   
- <!--    complète 3e ligne avec distance remis19-08-2023 
-  rendered="#{courseC.scoreStableford.showCalculate eq true}"
-  rendered="#{courseC.scoreStableford.showCalculate eq true}"
- -->
+  <!--  complète 4e ligne avec distance -->
   <h:outputText id="output3"
                 value="#{msg['hole.distance']}"   />
      <c:forEach var="i" begin="01" end="18" step="1">
        <p:inputNumber  id="distance${i}"
                     label="Hole Distance"
-                    value="#{courseC.holesGlobal.dataHoles[i-1][3]}"
+                    value="#{clubC.holesGlobal.dataHoles[i-1][3]}"
                     size="3"
                    
                     maxValue="550"
@@ -97,27 +92,15 @@
     columnClasses="col1,col2"
     columns="2">
 <f:facet name="footer">
-    <!--   à faire en f C or M rendered="#{courseC.hole.nextHole}"
- action="#{courseC.modifyHolesGlobal}"   -->
        <p:commandButton 
                          id="buttonModify"
                          value="#{msg['button.holes.modify']}"
                          update="growl-msg"
                          ajax="false"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.createHolesGlobal('global')}" />
- 
- <!--       <p:commandButton 
-                         id="buttonCreate"
-                         value="#{msg['button.holes.create']}"
-                         update="growl-msg"
-                         ajax="false"
-                         immediate="false"
-                         icon="pi pi-database"
-                         action="modify_holes_global.xhtml"
-                          />
- -->
+                         action="#{clubC.createHolesGlobal('global')}" />
+
 </f:facet>
 </p:panelGrid>
 </h:form>

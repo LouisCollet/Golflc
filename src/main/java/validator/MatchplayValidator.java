@@ -5,7 +5,7 @@ import java.util.Arrays;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 /*
-public class MatchplayValidator implements interfaces.Log, ConstraintValidator<Matchplay, String[][]>
+public class MatchplayValidator , ConstraintValidator<Matchplay, String[][]>
 {
 //private String departement;
 

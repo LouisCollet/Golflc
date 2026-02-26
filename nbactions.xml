@@ -1,254 +1,371 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
+
+    <!-- Run Single Main (clic droit sur classe avec main()) -->
+<!-- Run Single Main (clic droit sur classe avec main())
+ne fonctionne pas !!!    -->
+
+    
+    <!-- ================================================= -->
+    <!-- =============== UNIT TESTS (UT) ================= -->
+    <!-- ================================================= -->
+
+    <!-- Test File (UT) - NetBeans standard -->
+    <!-- Utilisé automatiquement sur clic droit fichier -->
     <action>
-        <actionName>run</actionName>
-        <preAction>build-with-dependencies</preAction>
+        <actionName>test.single</actionName>
         <packagings>
             <packaging>*</packaging>
         </packagings>
         <goals>
-            <goal>process-classes</goal>
-            <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
+            <goal>test</goal>
+        </goals>
+        <activatedProfiles>
+            <activatedProfile>fast-ut</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- Run Single UT (clic droit fichier *Test.java) 
+    compile tout ! voir custom it qui fonctionne bien !! -->
+    <action>
+        <actionName>CUSTOM-UT-run-single</actionName>
+        <displayName>Run Single UT Fast</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+          <!--  <goal>test</goal> -->
+             <goal>org.codehaus.mojo:exec-maven-plugin:3.6.3:java</goal>
         </goals>
         <properties>
-            <exec.args>--enable-preview %classpath --module ${project.groupId}/${mainClass}</exec.args>
-            <exec.executable>java</exec.executable>
-            <Env.MAVEN_OPTS>-Djansi.passthrough=true --enable_preview</Env.MAVEN_OPTS>
+            <!-- NetBeans injecte automatiquement le nom de la classe -->
+            
+         <exec.mainClass>${packageClassName}</exec.mainClass>
+         <exec.classpathScope>runtime</exec.classpathScope>
+            <!-- Affichage du nom de la classe dans la console -->
+
+           <!-- Classpath minimal -->
+            <!-- Important pour éviter l'usage du nom de fichier -->
+            <surefire.useFile>false</surefire.useFile>
+        </properties>
+        <activatedProfiles>
+            <activatedProfile>fast-ut</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- Debug Test File (UT) -->
+    <action>
+        <actionName>debug.test.single</actionName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>test</goal>
+        </goals>
+        <properties>
+            <maven.surefire.debug>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
+            <jpda.listen>true</jpda.listen>
+        </properties>
+        <activatedProfiles>
+            <activatedProfile>fast-ut</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- Debug Single UT -->
+    <action>
+        <actionName>CUSTOM-UT-debug-single</actionName>
+        <displayName>Debug Single UT</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>test</goal>
+        </goals>
+        <properties>
+            <test>${className}</test>
+            
+            <maven.surefire.debug>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
+            <jpda.listen>true</jpda.listen>
+        </properties>
+        <activatedProfiles>
+            <activatedProfile>fast-ut</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- Run all UT -->
+    <action>
+        <actionName>CUSTOM-UT-run-all</actionName>
+        <displayName>Run All Unit Tests</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>test</goal>
+        </goals>
+        <activatedProfiles>
+            <activatedProfile>fast-ut</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- ================================================= -->
+    <!-- ============ INTEGRATION TESTS (IT) ============= -->
+    <!-- ================================================= -->
+
+    <!-- Run Single IT (clic droit fichier *IT.java) 
+    fonctionne bien !!-->
+    <action>
+        <actionName>CUSTOM-IT-run-single</actionName>
+        <displayName>Run Single IT Fast</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>failsafe:integration-test</goal>
+        </goals>
+        <properties>
+            <!-- NetBeans injecte automatiquement le nom de la classe -->
+            <it.test>${className}</it.test>
+            <!-- Important pour éviter l'usage du nom de fichier -->
+            <failsafe.useFile>false</failsafe.useFile>
+            <!-- JVM -->
+            <Env.MAVEN_OPTS>--enable-preview</Env.MAVEN_OPTS>
+        </properties>
+        <activatedProfiles>
+            <activatedProfile>fast-it</activatedProfile> <!--  voir dans pom.xml -->
+        </activatedProfiles>
+    </action>
+
+    <!-- Debug Single IT -->
+    <action>
+        <actionName>CUSTOM-IT-debug-single</actionName>
+        <displayName>Debug Single IT</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>failsafe:integration-test</goal>
+        </goals>
+        <properties>
+            <it.test>${className}</it.test>
+            <maven.failsafe.debug>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</maven.failsafe.debug>
+            <jpda.listen>true</jpda.listen>
+        </properties>
+        <activatedProfiles>
+            <activatedProfile>fast-it</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- Run all IT -->
+    <action>
+        <actionName>CUSTOM-IT-run-all</actionName>
+        <displayName>Run All IT (Fast)</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>failsafe:integration-test</goal>
+        </goals>
+        <activatedProfiles>
+            <activatedProfile>fast-it</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- Verify IT (lifecycle complet) -->
+    <action>
+        <actionName>CUSTOM-IT-verify</actionName>
+        <displayName>Verify IT</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>verify</goal>
+        </goals>
+        <activatedProfiles>
+            <activatedProfile>fast-it</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- ================================================= -->
+    <!-- ================= PROJECT ====================== -->
+    <!-- ================================================= -->
+
+    <action>
+        <actionName>clean</actionName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>clean</goal>
+        </goals>
+    </action>
+
+    <action>
+        <actionName>rebuild</actionName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>clean</goal>
+            <goal>package</goal>
+        </goals>
+    </action>
+
+
+<!-- ================================================= -->
+    <!-- =============== MAIN CLASSES ==================== -->
+    <!-- ================================================= -->
+
+<action>
+    <actionName>CUSTOM-main-single</actionName>
+    <displayName>Run Single Main</displayName>
+    <packagings>
+        <packaging>*</packaging>
+    </packagings>
+    <goals>
+        <goal>process-classes</goal>
+        <goal>exec:java</goal>
+    </goals>
+    <properties>
+        <!-- ✅ Propriété standard reconnue par exec-maven-plugin -->
+        <exec.mainClass.pom>${className}</exec.mainClass.pom>
+        
+        <!-- Arguments JVM (pas d'application) -->
+        <exec.vmArgs>--enable-preview</exec.vmArgs>
+        <!-- Arguments de l'application (si besoin) -->
+        <!-- <exec.args>arg1 arg2</exec.args> -->
+        <!-- Classpath -->
+        <exec.classpathScope>runtime</exec.classpathScope>
+        <!-- Skip tests -->
+        <skipTests>true</skipTests>
+    </properties>
+    <!-- Pas besoin de profil pour exécuter un main -->
+</action>
+<!--
+<action>
+            <actionName>CUSTOM-main-single2</actionName>
+            <displayName>Run Single Main by LC</displayName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                  <goal>org.codehaus.mojo:exec-maven-plugin:3.6.3:java</goal>
+            </goals>
+            <properties>
+                <exec.mainClass>${packageClassName}</exec.mainClass.pom>
+                <exec.classpathScope>runtime</exec.classpathScope>
+            </properties>
+</action>
+-->
+<action>
+            <actionName>CUSTOM-main-single2</actionName>
+            <displayName>Run Single Main by LC</displayName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+          <!--      <goal>process-classes</goal>  enlevé 30-01-2026 pour éviter toutes les compilations --> 
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.3:java</goal>
+            </goals>
+            <properties>
+         <!--       <exec.vmArgs></exec.vmArgs>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
+                <exec.executable>java</exec.executable>  -->
+                <exec.mainClass>${packageClassName}</exec.mainClass>
+         <!--       <exec.classpathScope>${classPathScope}</exec.classpathScope>  -->
+                <exec.classpathScope>runtime</exec.classpathScope>
+            </properties>
+</action>
+
+    <action>
+        <actionName>CUSTOM-run-current</actionName>
+        <displayName>Run Current Main (Compile-on-Save)</displayName>
+
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+
+        <goals>
+            <!-- Utilisation du plugin exec:java pour que Maven fournisse le classpath complet -->
+            <goal>org.codehaus.mojo:exec-maven-plugin:3.6.3:java</goal>
+        </goals>
+
+        <properties>
+            <!-- Classe principale de la source actuellement sélectionnée -->
+            <exec.mainClass>${packageClassName}</exec.mainClass>
+
+            <!-- Classpath Maven runtime complet -->
+            <exec.classpathScope>runtime</exec.classpathScope>
+
+            <!-- VM arguments éventuels (par ex. preview features) -->
+            <exec.vmArgs>--enable-preview</exec.vmArgs>
+
+            <!-- Arguments passés à main (facultatif) -->
+            <!-- <exec.args>arg1 arg2</exec.args> -->
+
+            <!-- Pas de recompilation globale -->
+            <skipTests>true</skipTests>
         </properties>
     </action>
-    <action>
+
+<action>
             <actionName>run.single.main</actionName>
+            <displayName>2 Run Single Main</displayName>
             <packagings>
                 <packaging>*</packaging>
             </packagings>
             <goals>
                 <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
-                
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.3:exec</goal>
             </goals>
             <properties>
-                
+                <exec.vmArgs></exec.vmArgs>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
-                
-                
-                
-                <Env.JAVA_HOME>C:\Program Files\Java\jdk-24</Env.JAVA_HOME>
-                <Env.MAVEN_OPTS>-Djansi.passthrough=true --enable-preview</Env.MAVEN_OPTS>
-                
-            </properties>
-        </action>
-    <action>
-            <actionName>rebuild</actionName>
-            <preAction>build-with-dependencies</preAction>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>clean</goal>
-                <goal>install</goal>
-                
-            </goals>
-            <properties>
-                <Env.MAVEN_OPTS>--enable-preview --enable-native-access=ALL-UNNAMED -Djansi.passthrough=false -Xmx1024m -Xms128m -Xss10m</Env.MAVEN_OPTS>
-                
-                <exec.args>-Xmx2048m</exec.args>
-                
-                
-            </properties>
-        </action>
-    <action>
-            <actionName>profile.single.main</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.5.1:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>--enable-preview -classpath %classpath ${packageClassName}</exec.args>
-                <exec.executable>java</exec.executable>
+                <exec.mainClass>${packageClassName}</exec.mainClass>
                 <exec.classpathScope>${classPathScope}</exec.classpathScope>
             </properties>
         </action>
-    <action>
-            <actionName>debug.test.single</actionName>
+
+
+
+
+<action>
+            <actionName>run.single.main</actionName>
+            <displayName>2 Run Single Main</displayName>
             <packagings>
                 <packaging>*</packaging>
             </packagings>
             <goals>
-                <goal>test-compile</goal>
-                <goal>surefire:test</goal>
                 <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.5.1:exec</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.3:exec</goal>
             </goals>
             <properties>
-                <test>${packageClassName}</test>
-                <forkMode>once</forkMode>
-                <maven.surefire.debug>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
-                <jpda.listen>true</jpda.listen>
-                <exec.args>-Xmx1024m</exec.args>
-                <argLine>--enable-preview</argLine>
+                <exec.vmArgs></exec.vmArgs>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.mainClass>${packageClassName}</exec.mainClass>
+                <exec.classpathScope>${classPathScope}</exec.classpathScope>
             </properties>
         </action>
-    <action>
+
+<action>
             <actionName>debug.single.main</actionName>
-            <preAction>build-with-dependencies</preAction>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>--enable-preview -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath ${packageClassName}</exec.args>
-                <exec.executable>java</exec.executable>
-                <exec.classpathScope>${classPathScope}</exec.classpathScope>
-                <jpda.listen>true</jpda.listen>
-            </properties>
-        </action>
-    <action>
-            <actionName>test.single</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>test-compile</goal>
-                <goal>surefire:test</goal>
-            </goals>
-            <properties>
-                <test>${packageClassName}</test>
-                <exec.args>-Xmx1024m</exec.args>
-                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
-                <argLine>--enable-preview</argLine>
-            </properties>
-        </action>
-    <action>
-            <actionName>debug</actionName>
-            <packagings>
-                <packaging>war</packaging>
-            </packagings>
-            <properties>
-                <exec.args>--enable-preview -Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</exec.args>
-                <jpda.listen>true</jpda.listen>
-                <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
-            </properties>
-        </action>
-        
-        <action>
-            <actionName>profile</actionName>
-            <packagings>
-                <packaging>war</packaging>
-            </packagings>
-            <properties>
-                <exec.args>--enable-preview</exec.args>
-                <exec.executable>java</exec.executable>
-                <netbeans.deploy.profilemode>true</netbeans.deploy.profilemode>
-            </properties>
-        </action>
-        
-        <action>
-            <actionName>CUSTOM-CustomActionbyLC</actionName>
-            <displayName>Custom Action by LC</displayName>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.1:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>-classpath %classpath ${packageClassName}</exec.args>
-                <Env.MAVEN_OPTS>--enable-preview</Env.MAVEN_OPTS>
-                
-                <exec.classpathScope>${classPathScope}</exec.classpathScope>
-                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
-            </properties>
-        </action>
-        
-        <action>
-            <actionName>CUSTOM-CustomRunByLC</actionName>
-            <displayName>Custom Run By LC</displayName>
-            <preAction>build-with-dependencies</preAction>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.2:java</goal>
-                
-            </goals>
-            <properties>
-                
-                <Env.MAVEN_OPTS>--enable-preview</Env.MAVEN_OPTS>
-                
-                <exec.executable>java</exec.executable>
-                
-                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
-                
-            </properties>
-        </action>
-        
-        <action>
-            <actionName>CUSTOM-RyderCalculate</actionName>
-            <displayName>RyderCalculate</displayName>
-            <goals>
-                <goal>exec:java</goal>
-                
-                
-            </goals>
-        </action>
-        
-        <action>
-            <actionName>build</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>install</goal>
-            </goals>
-            <properties>
-                <exec.args>--enable-preview</exec.args>
-            </properties>
-        </action>
-        
-        <action>
-            <actionName>clean</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>clean</goal>
-            </goals>
-            <properties>
-                <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
-            </properties>
-        </action>
-        
-        <action>
-            <actionName>test</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>test</goal>
-            </goals>
-            <properties>
-                <argLine>--enable-preview</argLine>
-            </properties>
-        </action>
-        
-        <action>
-            <actionName>profile.test.single</actionName>
             <packagings>
                 <packaging>*</packaging>
             </packagings>
             <goals>
                 <goal>process-test-classes</goal>
-                <goal>surefire:test</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:3.6.3:exec</goal>
             </goals>
             <properties>
-                <test>${packageClassName}</test>
-                <forkMode>once</forkMode>
-                <maven.surefire.debug>${exec.vmArgs}</maven.surefire.debug>
-                <exec.vmArgs></exec.vmArgs>
-                <exec.args></exec.args>
-                <argLine>--enable-preview</argLine>
+                <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.mainClass>${packageClassName}</exec.mainClass>
+                <exec.classpathScope>${classPathScope}</exec.classpathScope>
+                <jpda.listen>true</jpda.listen>
             </properties>
         </action>
+
+
 </actions>

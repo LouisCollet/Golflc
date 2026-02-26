@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static interfaces.Log.LOG;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.Dependent;  // migrated 2026-02-26
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -17,11 +18,12 @@ import java.util.Arrays;
 import java.util.List;
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+// @Named  // migrated 2026-02-24
+//@Dependent
+// @RequestScoped  // migrated 2026-02-24
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Password implements Serializable, interfaces.Log, interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
     
 @JsonIgnore // ne sera pas chargé en database
@@ -162,7 +164,7 @@ public String toString(){
 }
 
 public static Password map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
   //  LOG.debug("starting mapPassword for player = "); // + player);
         Password password = new Password();

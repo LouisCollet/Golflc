@@ -2,60 +2,97 @@ package charts;
 
 import entite.Handicap;
 import entite.Player;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
 
-public class HandicapDetail {
-    private static List<Handicap> liste = null;
+@ApplicationScoped
+public class HandicapDetail implements Serializable {
 
-public List<Handicap> getStatHcp(final Connection conn, final Player player) throws SQLException{
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
-      LOG.debug(" ... starting getStatHcp with player = " + player); 
-      // mod 10-12-2024 non testé
-String query = """
-SELECT PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer
-FROM player, handicap
-WHERE player.idplayer=?
-AND handicap.player_idplayer = player.idplayer
-""";
-        LOG.debug("player = " + player.getIdplayer());
-      ps = conn.prepareStatement(query);
-     ps.setInt(1, player.getIdplayer());
-     utils.LCUtil.logps(ps);
-		//get round data from database
-    rs =  ps.executeQuery();
-    liste = new ArrayList<>();
-    Handicap handicap = new Handicap();
-    while(rs.next()){
-            handicap = new Handicap();
-            handicap.setHandicapStart(rs.getDate("idhandicap") ); 
-            handicap.setHandicapPlayerEGA(rs.getBigDecimal("HandicapPlayerEGA") ); 
-            liste.add(handicap);
-    } //end while
-      LOG.debug("liste after while = " + liste.toString() );
-    return liste;
-}catch (SQLException e){
-    String msg = "SQL Exception in HandicapDetail() = " + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    String msg = "Other Exception in getStatHcp! " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return null;
-}finally{
-     DBConnection.closeQuietly(null, null, rs, ps);
-}
-} //end method
-} //end class
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public HandicapDetail() { }
+
+    public List<Handicap> getStatHcp(final Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with player = " + player);
+
+        final String query = """
+            SELECT PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer
+            FROM player, handicap
+            WHERE player.idplayer=?
+            AND handicap.player_idplayer = player.idplayer
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, player.getIdplayer());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Handicap> liste = new ArrayList<>();
+                while (rs.next()) {
+                    Handicap handicap = new Handicap();
+                    handicap.setHandicapStart(rs.getDate("idhandicap"));
+                    handicap.setHandicapPlayerEGA(rs.getBigDecimal("HandicapPlayerEGA"));
+                    liste.add(handicap);
+                }
+                LOG.debug("liste after while = " + liste.toString());
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    @Deprecated
+    public List<Handicap> getStatHcp(final Connection conn, final Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " [DEPRECATED bridge]");
+
+        final String query = """
+            SELECT PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer
+            FROM player, handicap
+            WHERE player.idplayer=?
+            AND handicap.player_idplayer = player.idplayer
+            """;
+
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, player.getIdplayer());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                List<Handicap> liste = new ArrayList<>();
+                while (rs.next()) {
+                    Handicap handicap = new Handicap();
+                    handicap.setHandicapStart(rs.getDate("idhandicap"));
+                    handicap.setHandicapPlayerEGA(rs.getBigDecimal("HandicapPlayerEGA"));
+                    liste.add(handicap);
+                }
+                LOG.debug("liste after while = " + liste.toString());
+                return liste;
+            }
+        }
+    } // end method
+
+} // end class

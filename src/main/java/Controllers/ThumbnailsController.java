@@ -1,5 +1,144 @@
-
 package Controllers;
+
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.name.Rename;
+import java.io.File;
+import java.io.Serializable;
+
+import static exceptions.LCException.handleGenericException;
+import static interfaces.Log.LOG;
+import jakarta.enterprise.context.ApplicationScoped;
+
+/**
+ * Controller de génération de thumbnails
+ * ✅ @RequestScoped — sans état entre requêtes
+ * ✅ Settings injecté — plus de Settings.getProperty() statique
+ * ✅ Méthodes static → instance (CDI incompatible avec static)
+ * ✅ Standards CDI : methodName + handleGenericException
+// ❌ @RequestScoped — nouvelle instance à chaque requête
+@RequestScoped
+public class ThumbnailsController implements Serializable { ... }
+
+// ✅ @ApplicationScoped — instance unique partagée
+@ApplicationScoped
+public class ThumbnailsController implements Serializable { ... }
+*/
+
+@Named("thumbnailsC")
+@ApplicationScoped
+public class ThumbnailsController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    // ✅ Injection CDI — plus de Settings.getProperty() statique
+    @Inject private entite.Settings settings;
+
+    public ThumbnailsController() { }
+
+    // ========================================
+    // THUMBS — tous les fichiers d'un répertoire
+    // ========================================
+
+    /**
+     * Génère les thumbnails pour tous les fichiers du répertoire PHOTOS_LIBRARY
+     */
+    public String thumbs(String s) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with param = " + s);
+        try {
+            File sourceDir      = new File(settings.getProperty("PHOTOS_LIBRARY"));      // ✅ new ajouté
+            File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));  // ✅ injecté
+            LOG.debug(methodName + " - sourceDir      = " + sourceDir);
+            LOG.debug(methodName + " - destinationDir = " + destinationDir);
+
+            Thumbnails.of(sourceDir.listFiles())
+                    .scale(0.30)
+                    .outputFormat("jpg")
+                    .toFiles(destinationDir, Rename.PREFIX_DOT_THUMBNAIL);
+
+            LOG.debug(methodName + " - finished");
+            return "menu.xhtml";
+
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return "error";
+        }
+    } // end method
+
+    // ========================================
+    // THUMBS — un seul fichier
+    // ✅ static → instance (CDI incompatible avec static)
+    // ========================================
+
+    /**
+     * Génère le thumbnail pour un seul fichier
+     */
+    public boolean thumbs(String s, File f) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with param = " + s + " , file = " + f.getName());
+        try {
+            File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));  // ✅ injecté
+
+            Thumbnails.of(settings.getProperty("PHOTOS_LIBRARY") + f.getName())
+                    .size(100, 100)
+                    .toFiles(destinationDir, Rename.PREFIX_DOT_THUMBNAIL);
+
+            LOG.debug(methodName + " - finished");
+            return true;
+
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    // ========================================
+    // THUMBS PHOTO — redimensionnement d'une photo
+    // ✅ static → instance (CDI incompatible avec static)
+    // ========================================
+
+    /**
+     * Redimensionne une photo (200x200) et la sauvegarde dans PHOTOS_LIBRARY
+     */
+    public boolean thumbsPhoto(String s, File f) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with param = " + s
+                + " , file = " + f.getAbsoluteFile());
+        try {
+            File sourceDir      = new File(settings.getProperty("PHOTOS_LIBRARY"));      // ✅ injecté
+            File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));  // ✅ injecté
+            LOG.debug(methodName + " - sourceDir      = " + sourceDir);
+            LOG.debug(methodName + " - destinationDir = " + destinationDir);
+
+            Thumbnails.of(settings.getProperty("PHOTOS_LIBRARY") + f.getName())
+                    .size(200, 200)
+                    .toFiles(sourceDir, Rename.NO_CHANGE);
+
+            LOG.debug(methodName + " - finished");
+            return true;
+
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    // ========================================
+    // MAIN DE TEST - conservé commenté
+    // ========================================
+
+    /*
+    void main() throws Exception {
+        thumbs("test");
+    } // end main
+    */
+
+} // end class
+
+/*
 
 import entite.Settings;
 import exceptions.ExceptionGolfLC;
@@ -7,6 +146,7 @@ import static interfaces.Log.LOG;
 import java.io.File;
 import java.io.IOException;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.name.Rename;
@@ -16,17 +156,19 @@ import utils.LCUtil;
 //@SessionScoped mod 14-03-2021
 @RequestScoped
 public class ThumbnailsController {
-
+@Inject private entite.Settings settings;        // ✅ injection CDI
     public ThumbnailsController(){
   //  constructor
 }
 
-public static String thumbs(String s) throws ExceptionGolfLC, IOException{
+//public static String thumbs(String s) throws ExceptionGolfLC, IOException{
+public String thumbs(String s) throws ExceptionGolfLC, IOException{    
     // all files from a directory
     //https://github.com/coobird/thumbnailator/wiki/Examples
 try{
         LOG.debug("... entering thumbs all files !! with param = " + s);
-     File SOURCEDIR = new File(Settings.getProperty("PHOTOS_LIBRARY"));
+  //   File SOURCEDIR = new File(Settings.getProperty("PHOTOS_LIBRARY"));
+     File SOURCEDIR = File(settings.getProperty("PHOTOS_LIBRARY"));
         LOG.debug("source dir = " + SOURCEDIR);
      File DESTINATIONDIR = new File(Settings.getProperty("THUMBNAILS_LIBRARY"));
         LOG.debug("destination dir = " + DESTINATIONDIR);
@@ -110,3 +252,4 @@ void main() throws ExceptionGolfLC, IOException  {
 //      thumbs("test", "f");
   }
 } //end class
+*/

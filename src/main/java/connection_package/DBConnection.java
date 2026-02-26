@@ -1,5 +1,5 @@
 
-package utils;
+package connection_package;
 
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.Properties;
 import javax.naming.*;
 import javax.sql.DataSource;
+import utils.LCUtil;
 
 public class DBConnection {
     static private Connection conn = null;
@@ -188,6 +189,7 @@ public static Properties findProperties() throws IOException{
         is.close();
     }
 } // end method
+
   public DataSource setDataSource() throws Exception{ 
 try{
     LOG.debug("starting setDataSource" );

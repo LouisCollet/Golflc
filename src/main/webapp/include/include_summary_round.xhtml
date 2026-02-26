@@ -21,22 +21,22 @@
       <h:outputText value="#{msg['round.id']} :" />
       <h:outputText
             id="idroundsummary" 
-            value="#{courseC.round.idround}" /> 
+            value="#{roundC.round.idround}" /> 
 
       <h:outputText value="#{msg['club.name']} :"/>
 	<h:outputText
             id="clubSummaryRound" 
-            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+            value="#{clubC.club.clubName} (#{clubC.club.idclub})" />
 
       <h:outputText value="#{msg['course.name']} :" />
       <h:outputText
             id="coursesummaryRound" 
-            value="#{courseC.course.courseName} (#{courseC.course.idcourse})- #{courseC.tee.teeHolesPlayed}" />
+            value="#{clubC.course.courseName} (#{clubC.course.idcourse})- #{clubC.tee.teeHolesPlayed}" />
 
       <h:outputText value="#{msg['round.date']} :" />
       <h:outputText
             id="rounddatesummary" 
-            value="#{courseC.round.roundDate}"
+            value="#{clubC.round.roundDate}"
             >
           <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
       </h:outputText>
@@ -44,39 +44,39 @@
       <h:outputText value="#{msg['round.game']} :" />
       <h:outputText
             id="roundgamesummary" 
-            value="#{courseC.round.roundGame}" />
+            value="#{roundC.round.roundGame}" />
 
       <h:outputText value="#{msg['round.name']} :" />
       <h:outputText
             id="roundNameSummary" 
-            value="#{courseC.round.roundName}" />
+            value="#{roundC.round.roundName}" />
       
       <h:outputText value="#{msg['competition.name']} :"
-                    rendered="#{courseC.competition.competitionDescription.competitionName ne null}" />
+                    rendered="#{roundC.competition.competitionDescription.competitionName ne null}" />
       <h:outputText
             id="competitioNameSummary" 
-            value="#{courseC.round.roundName}"
-            rendered="#{courseC.competition.competitionDescription.competitionName ne null}" />
+            value="#{roundC.round.roundName}"
+            rendered="#{roundC.competition.competitionDescription.competitionName ne null}" />
 
       <h:outputText value="Tee info :" />
       <h:outputText
             id="teeSummary" 
-            value="#{courseC.inscription.inscriptionTeeStart} - #{courseC.tee.idtee} ,MT = #{courseC.tee.teeMasterTee} ,DT = #{courseC.tee.teeDistanceTee} " />
+            value="#{roundC.inscription.inscriptionTeeStart} - #{clubC.tee.idtee} ,MT = #{clubC.tee.teeMasterTee} ,DT = #{clubC.tee.teeDistanceTee} " />
       
       <h:outputText value="#{msg['round.players']} :" />
-     <!--                    value="#{courseC.roundPlayersList().size()} = #{courseC.round.playersString}" /> -->  
-      <h:outputText  id="roundPlayers" 
-                     value="#{courseC.roundPlayersList().size()} = #{courseC.round.playersString}" />
+     <!--                    value="#{courseC.roundPlayersList().size()} = #{roundC.round.playersString}" /> -->
+      <h:outputText  id="roundPlayers"
+                     value="#{roundC.roundPlayersList().size()} = #{roundC.round.playersString}" />
             <h:outputText value="#{msg['player.selected']} :"
-                     rendered="#{courseC.player.getDroppedPlayers().size() gt 0}">
+                     rendered="#{playerC.player.getDroppedPlayers().size() gt 0}">
             </h:outputText>
             <h:panelGroup id="panelGroupIncludeSummary"
-                    rendered="#{courseC.player.getDroppedPlayers().size() gt 0}" >
+                    rendered="#{playerC.player.getDroppedPlayers().size() gt 0}" >
                 <h:outputText
                  id="selectedPlayersSummarySize" 
-                 value="#{courseC.player.getDroppedPlayers().size()} = "/>
+                 value="#{playerC.player.getDroppedPlayers().size()} = "/>
                 <h:outputText>
-                    <ui:repeat value="#{courseC.player.getDroppedPlayers()}"
+                    <ui:repeat value="#{playerC.player.getDroppedPlayers()}"
                                var="p">
                         <h:outputText
                              value="#{p.playerLastName} (#{p.idplayer}),">
@@ -86,16 +86,16 @@
             </h:panelGroup>
   
          <h:outputText value="#{msg['tee.slope']}"/>
-         <h:outputText value="#{courseC.tee.teeSlope}"/>
+         <h:outputText value="#{clubC.tee.teeSlope}"/>
 
          <h:outputText value="#{msg['tee.rating']}"/>
-         <h:outputText value="#{courseC.tee.teeRating}"/>
+         <h:outputText value="#{clubC.tee.teeRating}"/>
 
          <h:outputText value="#{msg['round.holes']}"/>
-         <h:outputText value="#{courseC.round.roundHoles}"/>
+         <h:outputText value="#{roundC.round.roundHoles}"/>
 
          <h:outputText value="#{msg['round.start']}"/>
-         <h:outputText value="#{courseC.round.roundStart}"/>
+         <h:outputText value="#{roundC.round.roundStart}"/>
          
 </p:panelGrid>
 <p:divider layout="horizontal" type="solid" />

@@ -1,133 +1,116 @@
 package lists;
 
 import entite.ScoreScramble;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
 import static utils.LCUtil.DatetoLocalDateTime;
 
-public class ScrambleList implements interfaces.Log
-{
-      private static List<ScoreScramble> liste = null;
+@Named
+@ApplicationScoped
+public class ScrambleList implements Serializable {
 
-public List<ScoreScramble> getList(final Connection conn, final String formula) throws SQLException
-//public List<Matchplay> getMatchplayList(final Connection conn) throws SQLException
-{
-  //  
+    private static final long serialVersionUID = 1L;
 
-if(liste == null)
-{
-        LOG.debug("starting ScrambleList with formula = " + formula);
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try
-{
-  String query =     // attention faut un espace en fin de ligne avant le " !!!!
-   " SELECT" +
-"          idround, roundgame, club.idclub, club.ClubName,  course.idcourse, course.CourseName, round.RoundDate, RoundName" +
-"          FROM round" +
-"          JOIN course" +
-"               ON course.idcourse = round.course_idcourse" +
-"           JOIN club" +
-"               ON club.idclub = course.club_idclub" +
-"           WHERE substring(roundgame,1,3)= UPPER(?) " +
-"           ORDER by rounddate desc"
-     ;
- ///       LOG.debug("round = " + in_round); //.getIdround()) ;
-    ps = conn.prepareStatement(query);
-    ps.setString(1, formula.toUpperCase() );
-        utils.LCUtil.logps(ps);
-    rs =  ps.executeQuery();
-        rs.last(); //on rÃ©cupÃ¨re le numÃ©ro de la ligne
-            LOG.debug("ResultSet MatchplayScrambleList has " + rs.getRow() + " lines.");
-     // a faire : valider qu'il y a 2 ou 4 lignes        
-        liste = new ArrayList<>();
-          //LOG.debug("just before while ! ");
-	while(rs.next()){
-		//LOG.debug("just after while ! ");
-           ScoreScramble mp = new ScoreScramble(); // liste pour sélectionner un round
-           mp.setIdround(rs.getInt("idround") );
-           java.util.Date d = rs.getTimestamp("roundDate");
-          mp.setRoundDate(DatetoLocalDateTime(d));
-           
-           
-   //        mp.setIdplayer(rs.getInt("idplayer") );
-   //        mp.setPlayerLastName(rs.getString("playerlastname") );
-   //        mp.setPlayerFirstName(rs.getString("playerfirstname") );
-           mp.setIdclub(rs.getInt("idclub") );
-           mp.setClubName(rs.getString("clubName") );
-    //       mp.setPlayerhasroundTeam(rs.getString("team"));
-    //       mp.setPlayerhasroundPlayerNumber(rs.getString("playernumber"));
-           mp.setIdcourse(rs.getInt("idcourse"));
-           mp.setCourseName(rs.getString("CourseName") );
-           mp.setRoundName(rs.getString("RoundName") );
-           mp.setRoundGame(rs.getString("roundgame"));
- //          mp.setRoundName(rs.getString("CourseName"));
- //          mp.setRoundNameName(rs.getString("compet"));
-  //         mp.setRoundNameDay(rs.getString("day"));
-  //         mp.setRoundNameMatch(rs.getString("_match"));
-                  //LOG.debug("inside while : " + mp.toString());
-			//store all data into a List
-	liste.add(mp);
-        
-	}
-        LOG.debug("liste {} = {} ", formula, Arrays.deepToString(liste.toArray()) );
-        
-    return liste;
-}catch (SQLException e){
-    String msg = "SQL Exception = " + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (NullPointerException npe){   
-    String msg = "NullPointerException in ScrambleList()" + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return null;
-}catch (Exception ex){
-    String msg = "Exception in ScrambleList()" + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
-    //     LOG.debug("escaped to ScrambleList repetition thanks to lazy loading");
-    return liste;  //not null, donc pas d'acces
-}
-}//end method
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-    public static List<ScoreScramble> getListe() {
-        return liste;
-    }
+    private List<ScoreScramble> liste = null;
 
-    public static void setListe(List<ScoreScramble> liste) {
-        ScrambleList.liste = liste;
-    }
+    public ScrambleList() { }
 
+    public List<ScoreScramble> getList(final String formula) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(methodName + " - with formula = " + formula);
 
-     public static void main(Connection c) throws SQLException // testing purposes
-{
-//Connection con = DBConnection.getConnection();
- LOG.debug("entering main of MatchplayList1");
-////    Round round = new Round(); 
-//player.setIdplayer(324713);
-   LOG.debug("entering main of MatchplayList2");
-////  round.setIdround(220);
-  LOG.debug("entering main of MatchplayList3");
-/////List<Matchplay> li = MatchplayScrambleList.getMatchplayList(220, c);
-//LOG.debug("liste matchplay from main = " + li.toString());
-//for (int x: par )
-//        LOG.debug(x + ",");
-//DBConnection.closeQuietly(con, null, null, null);
-}// end main
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            return liste;
+        }
 
-} // end Class
+        final String query = """
+            SELECT idround, roundgame, club.idclub, club.ClubName,
+                   course.idcourse, course.CourseName, round.RoundDate, RoundName
+            FROM round
+            JOIN course
+                ON course.idcourse = round.course_idcourse
+            JOIN club
+                ON club.idclub = course.club_idclub
+            WHERE substring(roundgame, 1, 3) = UPPER(?)
+            ORDER BY rounddate DESC
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, formula.toUpperCase());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                while (rs.next()) {
+                    ScoreScramble mp = new ScoreScramble();
+                    mp.setIdround(rs.getInt("idround"));
+                    java.util.Date d = rs.getTimestamp("roundDate");
+                    mp.setRoundDate(DatetoLocalDateTime(d));
+                    mp.setIdclub(rs.getInt("idclub"));
+                    mp.setClubName(rs.getString("clubName"));
+                    mp.setIdcourse(rs.getInt("idcourse"));
+                    mp.setCourseName(rs.getString("CourseName"));
+                    mp.setRoundName(rs.getString("RoundName"));
+                    mp.setRoundGame(rs.getString("roundgame"));
+                    liste.add(mp);
+                }
+                LOG.debug(methodName + " - liste {} = {} ", formula, Arrays.deepToString(liste.toArray()));
+                if (liste.isEmpty()) {
+                    LOG.warn(methodName + " - empty result list");
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    public List<ScoreScramble> getListe()                          { return liste; }
+    public void                setListe(List<ScoreScramble> liste) { this.liste = liste; }
+
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        // var li = getList("SCR");
+        // LOG.debug("from main, list = " + li);
+        LOG.debug("from main, ScrambleList = ");
+    } // end main
+    */
+
+} // end class

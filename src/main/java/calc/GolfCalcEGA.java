@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 import utils.ColumnComparator;
-import utils.DBConnection;
+import connection_package.DBConnection;
 
 public class GolfCalcEGA implements interfaces.GolfInterface // GolfInterface // throws IOException
 {

@@ -14,10 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import utils.LCUtil;
 
-//@Named("address") // mod 06-12-223
-//@ViewScoped // was session
+// used in player and club
 public class Address implements Serializable{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
     private Country country;
     private LatLng latLng;
@@ -115,8 +114,8 @@ public String toString(){
                + " ,ZoneId : " + this.getZoneId()
             //   + " ,Country : " + this.getCountry()
          //      + NEW_LINE + TAB
-               + latLng.toString()
-               + country.toString2() // attention !! was toString2
+               + " ,latlng " + latLng.toString()
+               + " ,country " + country.toString2() // attention !! was toString2
          );
         }catch(Exception e){
            String msg = "£££ Exception in Address.toString = " + e.getMessage();
@@ -125,9 +124,9 @@ public String toString(){
            return msg;
   }
 }
-
+/*
 public static Address mapPlayer(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Address address = new Address();
         address.setStreet(rs.getString("PlayerStreet"));
@@ -147,10 +146,11 @@ public static Address mapPlayer(ResultSet rs) throws SQLException{
     LCUtil.showMessageFatal(msg);
     return null;
   }
-} //end method
-
+} //end method 
+*/
+/*
 public static Address mapClub(ResultSet rs){ // throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Address address = new Address();
         address.setStreet(rs.getString("clubAddress") );
@@ -168,4 +168,5 @@ public static Address mapClub(ResultSet rs){ // throws SQLException{
     return null;
   }
 } //end method
+*/
 } // end class

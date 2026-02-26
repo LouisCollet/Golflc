@@ -85,7 +85,11 @@
              <p:tabView dynamic="true" cache="false">
                 <p:tab title="WEB.XML PARAMS">
           <p:panelGrid columns="3" style="width:100%"  layout="tabular" columnClasses="col1, col1, col1">
-            <p:dataTable value="#{advancedAdmin.contextParameters}" var="param" rows="15" paginator="true" filterBy="#{param.key}" >
+            <p:dataTable value="#{advancedAdmin.contextParameters}"
+                         var="param"
+                         rows="15"
+                         paginator="true"
+                         filterBy="#{param.key}" >
                 <p:column headerText="Parameter" ><h:outputText value="#{param.key}"/></p:column>
                 <p:column headerText="Value"><h:outputText value="#{param.value}"/></p:column>
             </p:dataTable>

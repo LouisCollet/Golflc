@@ -9,24 +9,22 @@ import jakarta.servlet.annotation.WebListener;
 import jakarta.servlet.http.HttpSessionBindingEvent;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
 import java.time.LocalDateTime;
 import utils.LCUtil;
 import jakarta.servlet.http.HttpSessionBindingListener;
 import jakarta.servlet.http.HttpSessionListener;
 
 
-@WebListener // new 26-08-2025 https://www.logicbig.com/tutorials/java-ee-tutorial/java-servlet/http-session-binding-listener.html
-
-@Named("cotisation")
-@RequestScoped
+@WebListener // enlevé 25/01/2026 new 26-08-2025 https://www.logicbig.com/tutorials/java-ee-tutorial/java-servlet/http-session-binding-listener.html
+//@Named("cotisation") 14-02-2026
+//@RequestScoped
 
 
 //public class Cotisation implements Serializable, interfaces.GolfInterface{
 public class Cotisation implements Serializable, HttpSessionBindingListener, HttpSessionListener {    
     private static final long serialVersionUID = 1L;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private Integer idplayer;
     
   @NotNull(message="{cotisation.startdate.notnull}")
@@ -58,14 +56,14 @@ public class Cotisation implements Serializable, HttpSessionBindingListener, Htt
     private String status;
     boolean cotisationError;
     private int days;
-    private String type; // "round"=lors inscription round, "spontaneous" pour payment spontané
+    private String type; // "round"=lors inscription round, "spontaneous" pour payment spontané, volontaire voluntary
     
 public Cotisation(){    // constructor
    cotisationError = false;
  //  LOG.debug("constructor Cotisation executed !");
 }
 
-// new 26-08-2025
+/* new 26-08-2025
 @Override
   public void valueBound(HttpSessionBindingEvent event) {
       LOG.debug("-- HttpSessionBindingListener#valueBound() --");
@@ -79,7 +77,7 @@ public Cotisation(){    // constructor
       System.out.printf("removed attribute name: %s, value:%s %n",
               event.getName(), event.getValue());
   }
-
+*/
     public int getDays() {
         return days;
     }
@@ -224,9 +222,9 @@ public String toString(){
         return msg;
   }
 }
-
+/* enlevé 25/01/2026
 public static Cotisation map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Cotisation c = new Cotisation(); // différence avec @Inject Cotisation.cotisation ??
         c.setIdclub(rs.getInt("CotisationIdClub"));
@@ -247,9 +245,10 @@ public static Cotisation map(ResultSet rs) throws SQLException{
     return null;
   }
 } //end method
+*/
 /* enlevé 23-01-2023
 public static Cotisation mapGreenfee(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Cotisation c = new Cotisation(); // différence avec @Inject Cotisation.cotisation ??
         c.setIdclub(rs.getInt("GreenfeeIdClub"));

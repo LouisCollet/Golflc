@@ -1,86 +1,77 @@
 package delete;
 
 import entite.TarifGreenfee;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import utils.DBConnection;
+import javax.sql.DataSource;
 import utils.LCUtil;
 
-public class DeleteTarifGreenfee implements interfaces.GolfInterface{
-     private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-     
-  public boolean delete(final TarifGreenfee tarif, String year, final Connection conn) throws Exception {
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-      PreparedStatement ps = null;
-try{ 
-       LOG.debug("starting " + methodName);
-       // à modifier tarifYear n'est pas utile !!
-    final String query ="""
-              DELETE
-              FROM tarif_greenfee
-              WHERE tarif_greenfee.TarifCourseId = ?
-              AND TarifYear = ?
-              """;
+@ApplicationScoped
+public class DeleteTarifGreenfee implements Serializable, interfaces.GolfInterface {
 
-    ps = conn.prepareStatement(query);
-    ps.setInt(1, tarif.getTarifCourseId());
-  /*  attention manipulation à modifier !
-    String s = tarif.getStartDate().format(ZDF_DAY);
-        LOG.debug("s ZDF_DAY = " + s);
-        LOG.debug("s = " + tarif.getStartDate().format(ZDF_YEAR));
-    String Syear = s.substring(s.length() - 4);
-    int year = Integer.valueOf(Syear);
-       LOG.debug("year version 1 = " + year);
-       LOG.debug("int year version 2 = " + Integer.valueOf(tarif.getStartDate().format(ZDF_YEAR)));
-       
-   */    
-    ps.setInt(2, Integer.valueOf(year));
-    LCUtil.logps(ps); 
-    int row_deleted = ps.executeUpdate();
-    if(row_deleted != 0){
-        String msg = "TarifGreenfee deleted ! for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
-        LOG.info(msg);
-        LCUtil.showMessageInfo(msg);
-        return true;
-    }else{
-        String msg = "Error delete TarifGreenfee for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return false;
-    }
-}catch (SQLException e){
-    String msg = "SQL Exception in " + methodName + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return false;
-}catch (Exception ex){
-    String msg = "Exception in " + methodName + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return false;
-}finally{
-        utils.DBConnection.closeQuietly(null, null, null, ps);
-}
-} //end method
+    private static final long serialVersionUID = 1L;
 
- void main() throws SQLException, Exception{
-     Connection conn = new DBConnection().getConnection();
- try{
-     TarifGreenfee tarif = new TarifGreenfee();
-     tarif.setTarifCourseId(23);
-     tarif.setStartDate(LocalDateTime.parse("2019-01-01T12:30:30"));
-     boolean b = new DeleteTarifGreenfee().delete(tarif, "2022", conn);
-       LOG.debug("from main - resultat deleted TarifGreenfee = " + b);
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-       DBConnection.closeQuietly(conn, null, null, null); 
-          }
-} // end method main
-} //end class
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public DeleteTarifGreenfee() { }
+
+    public boolean delete(final TarifGreenfee tarif, String year) throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        final String query = """
+                DELETE
+                FROM tarif_greenfee
+                WHERE tarif_greenfee.TarifCourseId = ?
+                AND TarifYear = ?
+                """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, tarif.getTarifCourseId());
+            ps.setInt(2, Integer.valueOf(year));
+            LCUtil.logps(ps);
+            int rowDeleted = ps.executeUpdate();
+            if (rowDeleted != 0) {
+                String msg = "TarifGreenfee deleted ! for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
+                LOG.info(msg);
+                LCUtil.showMessageInfo(msg);
+                return true;
+            } else {
+                String msg = "Error delete TarifGreenfee for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return false;
+        }
+    } // end method
+
+    /** @deprecated Use {@link #delete(TarifGreenfee, String)} instead — migrated 2026-02-24 */
+    /*
+    void main() throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        TarifGreenfee tarif = new TarifGreenfee();
+        tarif.setTarifCourseId(23);
+        boolean b = new DeleteTarifGreenfee().delete(tarif, "2022");
+        LOG.debug("from main - resultat deleted TarifGreenfee = " + b);
+    } // end main
+    */
+
+} // end class

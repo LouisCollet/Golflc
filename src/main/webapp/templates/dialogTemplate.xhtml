@@ -28,7 +28,9 @@ au mot clé refresh et à la précision URL=chemin-vers-ma-page.-->
     <h:outputScript library="js" name="print.min.js" target="head"/>
 </h:head>
 
-<h:body id="body_master_template"> <!-- new 13/07/2014-->
+<h:body id="body_master_template"> 
+    
+    <!-- new 13/07/2014-->
 <!-- Just put them in a .css file which you include
 by <h:outputStylesheet> inside the beginning of the <h:body>
 JSF will automatically relocate the stylesheet
@@ -60,10 +62,11 @@ will thus ensure that the stylesheet is loaded after the PrimeFaces' default sty
             <ui:include src="/help_read.xhtml"/>
         </div>-->
 <!--    South - Footer -->
-        <div class="col-12">
+        <div class="col-12 bg-warning">
             <b>View : </b> #{view.viewId}
             <h:outputText id="fmd" 
                           escape="false" 
+                          
                           value="#{utilsC.ViewModificationDate()}"></h:outputText>
         </div>
     </div> <!-- class p-grid -->

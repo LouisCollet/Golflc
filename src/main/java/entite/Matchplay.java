@@ -6,8 +6,8 @@ import java.util.Date;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
 
-@Named
-@RequestScoped
+//@Named enlevé 14-02-2026
+//@RequestScoped
 public class Matchplay implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
 

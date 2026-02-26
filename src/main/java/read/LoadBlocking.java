@@ -2,65 +2,79 @@ package read;
 
 import entite.Blocking;
 import entite.Player;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.DBConnection;
+import javax.sql.DataSource;
 
-public class LoadBlocking{
+@ApplicationScoped
+public class LoadBlocking implements Serializable {
 
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    private static final long serialVersionUID = 1L;
 
-public Blocking load(Player player, Connection conn) throws SQLException, Exception{
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-try{
-//        LOG.debug("entering  "+ methodName + " for player = " + player.getIdplayer());
-     String query =
-              "SELECT *"
-              + " from blocking"
-              + " where BlockingPlayerId = ?"
-             ;
-      ps = conn.prepareStatement(query);
-      ps.setInt(1, player.getIdplayer());
-        utils.LCUtil.logps(ps); 
-      rs = ps.executeQuery();
-      int i = 0;      
-        Blocking a = null;
-	while(rs.next()){
-            i++;
-             a = entite.Blocking.mapBlocking(rs);
-	}
-//        LOG.debug("i = " + i);
-       if(i == 0){
-         String msg = "££ Empty Result Table in " + methodName;
-         LOG.error(msg);
-  //       LCUtil.showMessageInfo(msg);
-         return null;
-     }else{
-         LOG.debug("ResultSet " + methodName + " has " + i + " lines.");
-     }  
-   return a;
-}catch(Exception ex){
-    String err = "-- Exception in ! " + CLASSNAME + " / " + ex.toString() + "/";
-    LOG.error(err);
-    return null;
-} // end catch
-finally{
-    DBConnection.closeQuietly(null, null, rs, ps);
-}
-} // end method find
-    
- void main() throws Exception , Exception{
-    Connection conn = new DBConnection().getConnection();
-    Player player = new Player();
-    player.setIdplayer(206658);
-    Blocking blocking = new LoadBlocking().load(player, conn);
-        LOG.debug("Blocking found = " + blocking);
-    DBConnection.closeQuietly(conn, null, null, null);
-}// end main
- 
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public LoadBlocking() { }
+
+    public Blocking load(final Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(methodName + " - for player = " + player.getIdplayer());
+
+        final String query = """
+                SELECT *
+                FROM blocking
+                WHERE BlockingPlayerId = ?
+                """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, player.getIdplayer());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                int i = 0;
+                Blocking a = null;
+                while (rs.next()) {
+                    i++;
+                    a = entite.Blocking.mapBlocking(rs);
+                }
+                if (i == 0) {
+                    LOG.debug(methodName + " - no blocking found for player = " + player.getIdplayer());
+                    return null;
+                } else {
+                    LOG.debug(methodName + " - blocking found, lines = " + i);
+                }
+                return a;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return null;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return null;
+        }
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        // nécessite contexte CDI — DataSource injecté par WildFly
+        // Player player = new Player(); player.setIdplayer(206658);
+        // Blocking blocking = new LoadBlocking().load(player);
+        // LOG.debug("Blocking found = " + blocking);
+    } // end main
+    */
+
 } // end class

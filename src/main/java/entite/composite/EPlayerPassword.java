@@ -2,54 +2,65 @@ package entite.composite;
 
 import entite.Password;
 import entite.Player;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
-import java.io.Serializable;
-import utils.LCUtil;
 
-@Named // nécessaire ?
-@RequestScoped
-public class EPlayerPassword implements Serializable{
-    private Player player;  // was public
-    private Password password; // was public
+/**
+ * DTO immutable pour regrouper Player et Password
+ * Utilisé pour l'authentification et la gestion des mots de passe
+ *
+ * Version refactorisée : Record sans CDI
+ */
+public record EPlayerPassword(
+    Player player,
+    Password password
+) {
 
- public EPlayerPassword(){  // init dans constructor
-        player = new Player();
-        password = new Password();
-    }
- 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EPlayerPassword {
+        // Validation métier possible
+        // ex : Objects.requireNonNull(player, "player obligatoire");
+        // ex : Objects.requireNonNull(password, "password obligatoire");
     }
 
-    public Password getPassword() {
-        return password;
+    /* =======================
+       Getters explicites (JSF / EL)
+       ======================= */
+    public Player getPlayer() { return player; }
+    public Password getPassword() { return password; }
+
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+    public EPlayerPassword withPlayer(Player newPlayer) {
+        return new EPlayerPassword(newPlayer, this.password);
     }
 
-    public void setPassword(Password password) {
-        this.password = password;
+    public EPlayerPassword withPassword(Password newPassword) {
+        return new EPlayerPassword(this.player, newPassword);
     }
 
-@Override
-public String toString(){ 
- try{
-  //  LOG.debug("starting toString EPlayerPassword !");
-    return 
-        (NEW_LINE + "from entite " + getClass().getSimpleName().toUpperCase() + " : "
-       + getPlayer()
-       + getPassword()
-        );
-    }catch(Exception e){
-        String msg = "£££ Exception in EPlayerPassword.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    /* =======================
+       Formatage pour affichage/debug
+       ======================= */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : EPLAYERPASSWORD
+            %s %s
+            """.formatted(
+                player != null ? player : "",
+                password != null ? password : ""
+            ).replaceAll("(?m)^\\s*$\n", "");
+    }
+
+    /* =======================
+       Vérifications métier
+       ======================= */
+    public boolean isComplete() {
+        return player != null && password != null;
+    }
+
+    public boolean hasAnyData() {
+        return player != null || password != null;
+    }
+}

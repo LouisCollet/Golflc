@@ -1,128 +1,155 @@
 package read;
 
-import entite.composite.EPlayerPassword;
+import connection_package.ConnectionProvider;
+import connection_package.ProdDB;
 import entite.Player;
+import entite.composite.EPlayerPassword;
+import rowmappers.PlayerRowMapper;
+import rowmappers.RowMapper;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import utils.LCUtil;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
 
-public class ReadPlayer{
-   private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-public Player read(Player player, Connection conn) throws SQLException{
-    // ancienne version
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-try{
-  //    LOG.debug("entering ReadPlayer.read with player = " + player);
- //   String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
- //       LOG.debug("String from listMetaColumns = " + pl);
+/**
+ * Classe refactorée pour lire un Player ou EPlayerPassword
+ * Similaire au style de CreatePlayer
+ */
+@ApplicationScoped
+public class ReadPlayer implements Serializable {
 
-final String query = """
-        SELECT *
-        FROM Player
-        WHERE idplayer = ?
-       """ ;
-//        LOG.debug("Selected Player  = " + player.toString()); 
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, player.getIdplayer());
-     utils.LCUtil.logps(ps); 
-     rs =  ps.executeQuery();
-     Player p = new Player();
-     int i = 0;
-     while(rs.next()){
-           i++;
-           p = entite.Player.map(rs);
-	}  //end while
- //       LOG.debug("player mapped = " + p);
-   //  if(p.getIdplayer() == null){
-      if(i == 0){
-         String msg = "££ Empty Result in " + methodName;
-         LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
-         return null;
-     }else{
-         LOG.debug("ResultSet " + methodName + " has " + i + " lines.");
-     }
-    return p;
-}catch (SQLException e){
-    String msg = "SQLException in LoadPlayer() = " + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-    //    return null;
-        return player; // mod 29-05-2023
-}catch (Exception ex){
-    LOG.error("Exception ! " + ex);
-    LCUtil.showMessageFatal("Exception in LoadPlayer = " + ex.toString() );
-     return null;
-}finally{
-       // DBConnection.closeQuietly(conn, null, rs, ps);
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    @ProdDB
+    private ConnectionProvider connectionProvider;
+
+      /**
+     * DataSource injecté par WildFly
+     */
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+    
+    
+    /** Constructeur pour MAIN ou tests hors CDI */
+    public ReadPlayer() {}
+
+    public ReadPlayer(ConnectionProvider connectionProvider) {
+        this.connectionProvider = connectionProvider;
+    }
+
+    /**
+     * Lecture d'un Player simple par id
+     */
+    public Player read(Player player) throws Exception {
+        final String methodName = LCUtil.getCurrentMethodName();
+        final String query = """
+                SELECT *
+                FROM Player
+                WHERE idplayer = ?
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+       //   try (Connection conn = datasource.getConnection();        
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, player.getIdplayer());
+            LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                RowMapper<Player> mapper = new PlayerRowMapper();
+
+                if (rs.next()) {
+                    Player p = mapper.map(rs);
+                    LOG.debug("ReadPlayer OK in {}: {}", methodName, p);
+                    return p;
+                }
+
+                String msg = "Player not found in " + methodName;
+                LOG.warn(msg);
+                LCUtil.showMessageFatal(msg);
+                return null;
+            }
+        } catch (Exception ex) {
+            String msg = "Exception in " + methodName + ": " + ex.getMessage();
+            LOG.error(msg, ex);
+            LCUtil.showMessageFatal(msg);
+            throw ex;
+        }
+    }
+
+    /**
+     * Lecture d'un EPlayerPassword
+     */
+    public EPlayerPassword read(EPlayerPassword epp) throws Exception {
+        final String methodName = LCUtil.getCurrentMethodName();
+        final String query = """
+                SELECT *
+                FROM Player
+                WHERE idplayer = ?
+                """;
+
+        try (Connection conn = connectionProvider.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, epp.player().getIdplayer());
+            LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                RowMapper<Player> playerMapper = new PlayerRowMapper();
+                EPlayerPassword result = new EPlayerPassword(null, null);
+
+                if (rs.next()) {
+                    Player player = playerMapper.map(rs);
+                    var password = entite.Password.map(rs); // mapping password
+                    result = new EPlayerPassword(player, password);
+                    LOG.debug("ReadPlayer EPlayerPassword OK in {}: {}", methodName, result);
+                } else {
+                    String msg = "Player not found in " + methodName;
+                    LOG.warn(msg);
+                    LCUtil.showMessageFatal(msg);
+                }
+
+                return result;
+            }
+        } catch (Exception ex) {
+            String msg = "Exception in " + methodName + ": " + ex.getMessage();
+            LOG.error(msg, ex);
+            LCUtil.showMessageFatal(msg);
+            throw ex;
+        }
+    }
+
+    /**
+     * Main pour tests hors CDI
+     */
+    public static void main(String[] args) {
+        try {
+            ConnectionProvider provider = new connection_package.JdbcConnectionProvider();
+            ReadPlayer readPlayer = new ReadPlayer(provider);
+
+            Player p = new Player();
+            p.setIdplayer(324715);
+
+            Player loaded = readPlayer.read(p);
+            LOG.debug("Loaded Player = {}", loaded);
+
+            // Test EPlayerPassword
+            EPlayerPassword epp = new EPlayerPassword(p, null);
+            EPlayerPassword loadedEpp = readPlayer.read(epp);
+            LOG.debug("Loaded EPlayerPassword = {}", loadedEpp);
+
+        } catch (Exception e) {
+            LOG.error("Error in main", e);
+        }
+    }
 }
-} //end method
-
-
-public EPlayerPassword read(EPlayerPassword epp, final Connection conn) throws SQLException{
-    // nouvelle version avec le password !!
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
-    LOG.debug("entering " + methodName + " with epp = " + epp);
-//    Player player = epp.getPlayer();
-    String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
-
- //   mod 27-02-2024 final String query =
- //       "SELECT " + pl
- //       + " FROM Player"
- //       + " WHERE idplayer = ?" ;
-//        LOG.debug("Selected Player  = " + player.toString()); 
-
-final String query = """
-        SELECT *
-        FROM Player
-        WHERE idplayer = ?
-       """ ;
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, epp.getPlayer().getIdplayer());
-     utils.LCUtil.logps(ps); 
-     rs =  ps.executeQuery();
-  //    EPlayerPassword epp2 = new EPlayerPassword();
-     int i = 0;
-     while(rs.next()){
-          i++;
-          epp.setPlayer(entite.Player.map(rs));
-          epp.setPassword(entite.Password.map(rs));
-	}  //end while
-     LOG.debug("ResultSet " + methodName + " has " + i + " lines.");
-    return epp;
-}catch (SQLException e){
-    String msg = "SQLException in LoadPlayer() = " + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    LOG.error("Exception ! " + ex);
-    LCUtil.showMessageFatal("Exception in LoadPlayer = " + ex.toString() );
-     return null;
-}finally{
-       // DBConnection.closeQuietly(conn, null, rs, ps);
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-} //end metho
-
-void main() throws SQLException, Exception{ // testing purposes
-    Connection conn = new DBConnection().getConnection();
-    Player player = new Player();
-    player.setIdplayer(324715);
- //   Player p = new ReadPlayer().load(player,conn);
-  //     LOG.debug(" main : player loaded = " + p.toString());
-    DBConnection.closeQuietly(conn, null, null, null);
-}// end main
-} // end class

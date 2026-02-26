@@ -11,14 +11,15 @@
   <div class="header-footer">
    <p:panelGrid id="panelGridStartHeader"
               layout="tabular"
-              rendered="#{courseC.player.idplayer != null}"
+              rendered="#{playerC.player != null and playerC.player.idplayer != null}"
+              
               style="width:70%">
         <f:facet name="header">
-       <!--    <h:outputText value="header facet" /> columns="4" columnClasses="col1,col2,col1,col2" -->
+       <!--  rendered="#{playerC.player.idplayer != null}"  <h:outputText value="header facet" /> columns="4" columnClasses="col1,col2,col1,col2" -->
              <p:commandButton
                          id="buttonLogout"
                          title="Power OFF"
-                         ajax="true"
+                          
                          value="Logout"
                          immediate="true"
                          update="growl-msg"
@@ -28,8 +29,8 @@
                          style="margin-left:2.5rem;" />
 <!--  onclick="window.location.reload();"  -->
      <p:idleMonitor id="idleMonitor_timeout" timeout="500000">
-       <p:ajax event="idle"   listener="#{LCUtil.onIdleMonitor()}"   update="growl-msg" />
-       <p:ajax event="active" listener="#{LCUtil.onActiveMonitor()}" update="growl-msg" />
+       <p:ajax event="idle"   listener="#{utilC.onIdleMonitor()}"   update="growl-msg" />
+       <p:ajax event="active" listener="#{utilC.onActiveMonitor()}" update="growl-msg" />
     </p:idleMonitor> 
             
  <p:selectOneMenu value="#{activeLocale.languageTag}"
@@ -58,13 +59,14 @@
 <p:commandButton value="HelpWrite"
                  icon="pi pi-pencil"
                  title="Write help (Admin only)"
-                 rendered="#{courseC.player.playerRole eq 'ADMIN'}"
+                
+                 rendered="#{playerC.isAdmin()}"
                  style="float: right;margin-left:2.5em;"
                  update="growl-msg"
                  ajax="false"
-                 immediate="false"
+                  
                  action="#{mongoHelpC.showHelpFile()}" />
-<!-- problème ici ??  -->
+<!-- problème ici ??  rendered="#{playerC.player.playerRole eq 'ADMIN'}" -->
 <p:commandButton value="Footer"
                  icon="pi pi-arrow-down"
                  title="Show the footer"
@@ -77,7 +79,7 @@
                  title="Take a shot for analysis"
                  ajax="false"
                  update="growl-msg"
-                 immediate="false"
+                  
                  icon="pi pi-camera"
                  style="float:right;margin-left:2.5em;"
                  action="#{courseC.screenShot(view.viewId)}" />
@@ -88,18 +90,19 @@
     </f:facet> columns="8" PanelGrid "form_header:panelGridHeader" columns must be a number that factors into 12. For example: 1,2,3,4,6,12-->
  <p:panelGrid id="panelGridHeader"
               layout="tabular"
-              rendered="#{courseC.player.idplayer != null}"
+              rendered="#{playerC.player != null and playerC.player.idplayer != null}"
+            
               columns="8"
               style="width:90%;font-size:0.8rem;"
               columnClasses="col1,col2,col1,col2,col1,col2,col1,col2"
                >
-<!--   -->
+<!--    rendered="#{playerC.player.idplayer != null}" -->
     <h:outputText value="Current Player"
                   style="margin-left:1.5em;" />
-     <h:outputText value=" #{courseC.player.idplayer}
-                    , first name = #{courseC.player.playerFirstName}
-                    , last name =  #{courseC.player.playerLastName}
-                    , role =  #{courseC.player.playerRole}"
+     <h:outputText value=" #{playerC.player.idplayer}
+                    , first name = #{playerC.player.playerFirstName}
+                    , last name =  #{playerC.player.playerLastName}
+                    , role =  #{playerC.player.playerRole}"
                     escape="false" />
      <h:outputText value="View"/>
      <h:outputText value="#{view.viewId}" /> 
@@ -120,7 +123,7 @@
      <h:outputText value=" #{courseC.subscription.trialCount}" />
 
      <h:outputText value="ZoneId Time Zone : " />
-     <h:outputText value=" #{courseC.player.address.zoneId}" />
+     <h:outputText value=" #{playerC.player.address.zoneId}" />
     
      <h:outputText value="Execution : " />
      <h:outputText value="#{settings.getProperty('EXECUTION')}" />
@@ -134,11 +137,11 @@
     </h:outputText>
 -->
 
- <!--  sidebar voir masterTemplate -->
+ <!--  sidebar voir masterTemplate  rendered="#{playerC.player.idplayer != null}"-->
  
  <p:panelGrid id="panelGridStartFooter"
               layout="tabular"
-              rendered="#{courseC.player.idplayer != null}" >
+              rendered="#{playerC.player != null and playerC.player.idplayer != null}" >
 <f:facet name="footer">
     <p:ajaxStatus style="width:200px;height:20px;" 
                onstart="PF('statusDialog').show()"

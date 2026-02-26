@@ -1,18 +1,18 @@
 package entite;
 
 import static interfaces.Log.LOG;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 public class Activation implements Serializable, interfaces.Log, interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
     private static final long serialVersionUID = 1L;
     private String activationKey;
     private Integer activationPlayerId;
@@ -80,7 +80,7 @@ public String toString(){
   }
 }
 public static Activation map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Activation a = new Activation();
             a.setActivationKey(rs.getString("ActivationKey") );

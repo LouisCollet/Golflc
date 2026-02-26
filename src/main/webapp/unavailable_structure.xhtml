@@ -11,7 +11,7 @@
 
     <ui:define name="metadata">
     <f:metadata>
-        <f:viewAction action="#{courseC.findCourseListForClub()}"/>
+        <f:viewAction action="#{clubC.findCourseListForClub()}"/>
     </f:metadata>
 </ui:define>
     
@@ -34,14 +34,14 @@
          <p:outputLabel value="#{msg['course.id']}"/>
          <i class="pi pi-cog"></i>
          <i class="pi pi-list"></i>
-         #{courseC.unavailable.structure.structureList.size()}
+         #{clubC.unavailable.structure.structureList.size()}
      </h:panelGroup>
      
      <p:selectOneMenu id="workCourseId"
-                      value="#{courseC.unavailable.structure.workCourseId}" >
+                      value="#{clubC.unavailable.structure.workCourseId}" >
          <f:selectItem itemLabel="Select One"  itemValue=""/>
          <f:selectItem itemLabel="#{msg['unavailable.structure.allcourses']}" itemValue="9999"/>
-         <f:selectItems value="#{courseC.courseListForClub}"
+         <f:selectItems value="#{clubC.courseListForClub}"
                         var="c"
                         itemLabel="#{c.idcourse}-#{c.courseName}"
                         itemValue="#{c.idcourse}"/>
@@ -51,23 +51,23 @@
      <p:inputText     id="CauseUnavailable"
                       size="25"
                       title="#{msg['tooltip.tarif.item']}"
-                      value="#{courseC.unavailable.structure.workItem}"   />
+                      value="#{clubC.unavailable.structure.workItem}"   />
      
 <f:facet name="footer">
             <p:commandButton value="#{msg['unavailable.structure.add']}"
                          id="commandButtonAdd"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-plus"
-                         action="#{courseC.inputUnvailableStructure()}"/>
+                         action="#{clubC.inputUnvailableStructure()}"/>
             <p:commandButton value="Visualisation"
                          id="commandButtonVisual"
                          ajax="false"
                          update="growl-msg"
                          immediate="true" 
                          icon="pi pi-plus"
-                         action="#{courseC.showUnavailableStructure}"/>
+                         action="#{clubC.showUnavailableStructure}"/>
     <!-- immediate=true for skip validations  style="float: right;color:red;"
     -->
             <p:commandButton value="#{msg['unavailable.structure.create']}"
@@ -77,8 +77,8 @@
                          immediate="true"
                          icon="pi pi-database"
                          style="float: right;"
-                         rendered="#{courseC.unavailable.structure.itemExists eq true}"
-                         action="#{courseC.modifyClubUnavailableStructure('modify')}"/>
+                         rendered="#{clubC.unavailable.structure.itemExists eq true}"
+                         action="#{clubC.modifyClubUnavailableStructure('modify')}"/>
             <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

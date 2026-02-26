@@ -2,57 +2,78 @@ package entite.composite;
 
 import entite.Club;
 import entite.Course;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named
-@RequestScoped 
-public class EClubCourse implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-@Inject  private Course course;
-@Inject  private Club club;
+/**
+ * DTO immutable pour regrouper Club et Course
+ * Représente un parcours dans un club
+ * Compatible JSF grâce aux getters explicites
+ */
+public record EClubCourse(
+        Club club,
+        Course course
+) {
 
-public EClubCourse(){  //No-args constructor
-}
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EClubCourse {
+        // Validation selon vos règles métier
+    }
+
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+    public EClubCourse withClub(Club newClub) {
+        return new EClubCourse(newClub, this.course);
+    }
+
+    public EClubCourse withCourse(Course newCourse) {
+        return new EClubCourse(this.club, newCourse);
+    }
+
+    /* =======================
+       Getters explicites pour JSF
+       ======================= */
+    public Club getClub() {
+        return club != null ? club : new Club();
+    }
 
     public Course getCourse() {
-        return course;
+        return course != null ? course : new Course();
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    /**
+     * Formatage pour affichage/debug
+     */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : ECLUBCOURSE
+            %s %s
+            """.formatted(
+                club != null ? club : "",
+                course != null ? course : ""
+        ).replaceAll("(?m)^\\s*$\n", "");
     }
 
-    public Club getClub() {
-        return club;
+    /**
+     * Vérifie si toutes les données sont présentes
+     */
+    public boolean isComplete() {
+        return club != null && course != null;
     }
 
-    public void setClub(Club club) {
-        this.club = club;
+    /**
+     * Vérifie si au moins une donnée est présente
+     */
+    public boolean hasAnyData() {
+        return club != null || course != null;
     }
 
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase() + NEW_LINE 
-        + NEW_LINE + TAB
-               + " ,vers Club : " + club
-        + NEW_LINE + TAB
-               + " ,vers Course : " + course
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in EClubCourse.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    @Override
+    public String toString() {
+        return "EClubCourse{" +
+                "club=" + club +
+                ", course=" + course +
+                '}';
+    }
+}

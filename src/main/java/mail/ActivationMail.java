@@ -6,7 +6,10 @@ import entite.Round;
 import static interfaces.GolfInterface.SDF_TIME;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -14,7 +17,14 @@ import java.util.ArrayList;
 import jakarta.mail.MessagingException;
 import static utils.LCUtil.showMessageFatal;
 
-public class ActivationMail{
+@ApplicationScoped
+public class ActivationMail implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject private mail.MailSender mailSender; // migrated 2026-02-26
+
+    public ActivationMail() { }
 
     public Boolean sendMailAccountCreated(Player player, String href) throws MessagingException, Exception {
         LOG.debug("entering sendMailAccountCreated for player = " + player);
@@ -41,9 +51,10 @@ public class ActivationMail{
      //           LOG.debug(msg);
             String sujet = "Activate Your Account for GolfLC";
             String to = "louis.collet@skynet.be";
-            Path path = null;
-            boolean b = new mail.SendEmail().sendHtmlMail(sujet,msg,to,path,
-                    path, player.getPlayerLanguage());
+         //   Path path = null;
+         //   byte[] path = null;
+            byte[] pathICS = null;
+            boolean b = mailSender.sendHtmlMail(sujet,msg,to, pathICS, player.getPlayerLanguage());
                 LOG.debug("sendMailAccountCreated status = " + b);
 return b;
 }
@@ -69,54 +80,23 @@ return b;
                      
  // à mofifier             //       <a href=" + href + ">"
                      String to = "louis.collet@skynet.be";
-                     Path path = null;
-                     boolean b = new mail.SendEmail().sendHtmlMail(sujet,msg,to,path,
-                             path, player.getPlayerLanguage());
+                  //   Path path = null;
+                     byte[] pathICS = null;
+                     boolean b = mailSender.sendHtmlMail(sujet,msg,to,pathICS, player.getPlayerLanguage());
                         LOG.debug("HTML Mail status = " + b);
      return b;
     }
     
+    /*
     void main() throws IOException {
-  try{
-      // not working error compilation 
-      Player player = new Player();
-      player.setIdplayer(456783);  // muntingh
-      player.setPlayerLastName("Muntingh");
-      player.setPlayerEmail("theo.muntingh@skynet.be");
-      Player player2 = new Player();
-      player2.setIdplayer(2014101);  // muntingh
-      Player player3 = new Player();
-      player3.setIdplayer(2014102);  
-      ArrayList<Player> p = new ArrayList<>();   // transform player2 in list<player<    
-      p.add(player2);
-      p.add(player3);
-      player.setDroppedPlayers(p);
- 
-      Player invitedBy = new Player();
-      invitedBy.setIdplayer(324713);
-      player.setPlayerLastName("Collet");
-
-      Club club = new Club();
-      club.setClubName("Cabopino");
-
-  //    Course course = new Course();
- 
-      Round round = new Round(); 
-      round.setRoundDate(LocalDateTime.of(2018, Month.NOVEMBER, 17, 12, 15));
-      round.setRoundGame("round game : STABLEFORD");
-      round.setPlayersString("inscrits précédemment : Corstjens, Bauer");
-
-    new ActivationMail().sendMailActivationOK(player);
-    String to = "louis.collet@skynet.be";
-     Path path = null;
-    boolean b = new mail.SendEmail().sendHtmlMail("sujet de test from main","message du mail",to,path,
-            path, player.getPlayerLanguage());
-       LOG.debug("HTML Mail status = " + b);
-   } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-   }
-   } // end main//
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Player player = new Player();
+        player.setIdplayer(456783);
+        player.setPlayerLastName("Muntingh");
+        player.setPlayerEmail("theo.muntingh@skynet.be");
+        new ActivationMail().sendMailActivationOK(player);
+    } // end main
+    */
 
 } // end class

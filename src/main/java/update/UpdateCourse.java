@@ -1,6 +1,99 @@
 package update;
 
 import entite.Course;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.annotation.Resource;
+import javax.sql.DataSource;
+
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import static interfaces.Log.LOG;
+import sql.SqlFactory;
+import utils.LCUtil;
+
+/**
+ * Service de mise à jour de Course
+ * ✅ @ApplicationScoped - Stateless, partagé
+ * ✅ @Resource DataSource - Connection pooling
+ */
+@ApplicationScoped
+public class UpdateCourse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * DataSource injecté par WildFly (connection pooling)
+     */
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public boolean update(final Course course) throws Exception {
+        
+        final String methodName = LCUtil.getCurrentMethodName();
+        String msg;
+        
+        try (Connection conn = dataSource.getConnection()) {
+            
+            conn.setAutoCommit(false);
+            
+            // ✅ PARTIE NON MODIFIÉE - DÉBUT
+            
+            // Validation
+            if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
+                msg = "Course ID is required for update";
+                LOG.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            
+            LOG.debug("Updating course: {}", course.toString());
+            
+            // Update Course
+            String query = new SqlFactory().generateQueryUpdate(conn, "course");
+            
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                sql.preparedstatement.psCreateUpdateCourse.mapUpdate(ps, course);
+                LCUtil.logps(ps);
+                
+                int rowsAffected = ps.executeUpdate();
+                
+                if (rowsAffected == 0) {
+                    msg = "No rows updated - Course may not exist: ID " + course.getIdcourse();
+                    LOG.error(msg);
+                    throw new SQLException(msg);
+                }
+            }
+            
+            msg = String.format("Course updated: %s (ID: %d)", 
+                               course.getCourseName(), 
+                               course.getIdcourse());
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
+            
+            conn.commit();
+            
+            // ✅ PARTIE NON MODIFIÉE - FIN
+            
+            return true;
+            
+        } catch (SQLException sqle) {
+            LCUtil.printSQLException(sqle);
+            msg = "SQLException in " + methodName + ": " + sqle.getMessage();
+            LOG.error(msg);
+            throw sqle;
+        } catch (Exception e) {
+            msg = "Exception in " + methodName + ": " + e.getMessage();
+            LOG.error(msg);
+            throw e;
+        }
+    }
+}
+
+/*
+
+import entite.Course;
 import static interfaces.GolfInterface.DATE_BEGIN_COURSE;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
@@ -8,21 +101,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import utils.LCUtil;
 
 public class UpdateCourse {
-   private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+   
 public boolean update(final Course course, final Connection conn) throws Exception{
-   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+   final String methodName = utils.LCUtil.getCurrentMethodName();
         PreparedStatement ps = null;
  try {
             LOG.debug("... entering = " + methodName);
             LOG.debug(" with course = " + course);
-            
-            
-            
-            
         String co = utils.DBMeta.listMetaColumnsUpdate(conn, "course");
             LOG.debug("String from listMetaColumns = " + co); //  coursename=?, courseholes=?, coursepar=?, coursebegindate=?, courseenddate=?
      final String query = """
@@ -30,13 +119,14 @@ public boolean update(final Course course, final Connection conn) throws Excepti
           SET %s
           WHERE course.idcourse=?;
          """.formatted(co) ;
-     
+     // situation : une des field renvoie vers club et ne doit pas être modifiée !
+     // par exemple 
      /* %s replaced by co https://stackoverflow.com/questions/63687580/how-can-i-add-variables-inside-java-15-text-block-feature   
         Java 15 does not support interpolation directly within text blocks
         "String interpolation" meaning  evaluating a string literal containing one or more placeholders,
         yielding a result in which the placeholders are replaced with their corresponding values
         The solution in Java 15 is to use String.formatted() method: 
-     */
+     *
         ps = conn.prepareStatement(query);
             ps.setString(1, course.getCourseName());
           //  ps.setShort(2, (short) 18);// mod 12-11-2018 toujour 18 holes  enlevé dans blacklist de columns update
@@ -124,3 +214,4 @@ catch (SQLException sqle) {
  }
 } // end main
 } //end Class
+*/

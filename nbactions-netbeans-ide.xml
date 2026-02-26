@@ -1,150 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
-        <action>
-            <actionName>run</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>%classpath --module ${project.groupId}/${mainClass}</exec.args>
-                <exec.executable>java</exec.executable>
-                <Env.MAVEN_OPTS>-Djansi.passthrough=true</Env.MAVEN_OPTS>
-            </properties>
-        </action>
-        <action>
-            <actionName>run.single.main</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>-classpath test_instructions.test_3.java</exec.args>
-                <exec.executable>java</exec.executable>
-                <exec.classpathScope>${classPathScope}</exec.classpathScope>
-                <jpda.listen>maven</jpda.listen>
-                <Env.JAVA_HOME>C:\Program Files\Java\jdk-17</Env.JAVA_HOME>
-                <Env.MAVEN_OPTS>-Djansi.passthrough=true</Env.MAVEN_OPTS>
-            </properties>
-        </action>
-        <action>
-            <actionName>rebuild</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>clean</goal>
-                <goal>install</goal>
-            </goals>
-            <properties>
-                <Env.MAVEN_OPTS>-Djansi.passthrough=false</Env.MAVEN_OPTS>
-            </properties>
-        </action>
-        <action>
-            <actionName>profile.single.main</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>-classpath %classpath ${packageClassName}</exec.args>
-                <exec.executable>java</exec.executable>
-                <exec.classpathScope>${classPathScope}</exec.classpathScope>
-            </properties>
-        </action>
-        <action>
-            <actionName>debug.test.single</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>test-compile</goal>
-                <goal>surefire:test</goal>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
-            </goals>
-            <properties>
-                <test>${packageClassName}</test>
-                <forkMode>once</forkMode>
-                <maven.surefire.debug>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</maven.surefire.debug>
-                <jpda.listen>true</jpda.listen>
-                <exec.args>-Xmx1024m</exec.args>
-            </properties>
-        </action>
-        <action>
-            <actionName>debug.single.main</actionName>
-            <preAction>build-with-dependencies</preAction>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath ${packageClassName}</exec.args>
-                <exec.executable>java</exec.executable>
-                <exec.classpathScope>${classPathScope}</exec.classpathScope>
-                <jpda.listen>true</jpda.listen>
-            </properties>
-        </action>
-        <action>
-            <actionName>test.single</actionName>
-            <packagings>
-                <packaging>*</packaging>
-            </packagings>
-            <goals>
-                <goal>test-compile</goal>
-                <goal>surefire:test</goal>
-            </goals>
-            <properties>
-                <test>${packageClassName}</test>
-                <exec.args>-Xmx1024m</exec.args>
-                <Env.JAVA_HOME>C:\Program Files\Java\jdk-16</Env.JAVA_HOME>
-            </properties>
-        </action>
-        <action>
-            <actionName>debug</actionName>
-            <packagings>
-                <packaging>war</packaging>
-            </packagings>
-            <properties>
-                <exec.args>--enable-preview -Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}</exec.args>
-                <jpda.listen>true</jpda.listen>
-                <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
-            </properties>
-        </action>
-        <action>
-            <actionName>profile</actionName>
-            <packagings>
-                <packaging>war</packaging>
-            </packagings>
-            <properties>
-                <exec.args>--enable-preview</exec.args>
-                <exec.executable>java</exec.executable>
-                <netbeans.deploy.profilemode>true</netbeans.deploy.profilemode>
-            </properties>
-        </action>
-        <action>
-            <actionName>CUSTOM-CustomActionbyLC</actionName>
-            <displayName>Custom Action by LC</displayName>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:3.0.0:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>-classpath %classpath ${packageClassName}</exec.args>
-                <exec.executable>java</exec.executable>
-                <exec.classpathScope>${classPathScope}</exec.classpathScope>
-            </properties>
-        </action>
-    </actions>
+    <!-- =========================
+         RUN SINGLE INTEGRATION TEST
+         ========================= -->
+    <action>
+        <actionName>run.single.IT</actionName>
+        <displayName>Run Single IT</displayName>
+
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+
+        <goals>
+            <goal>failsafe:integration-test</goal>
+        </goals>
+
+        <prompt>
+            <message>Nom complet de la classe IT à exécuter (ex: sql_test.UpdateSqlBuilderAllTablesIT) :</message>
+            <property>packageClassName</property>
+        </prompt>
+
+        <properties>
+            <!-- Passe la classe choisie au plugin failsafe -->
+            <it.test.class>${packageClassName}</it.test.class>
+
+            <!-- JVM options -->
+            <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
+            <Env.MAVEN_OPTS>--enable-preview</Env.MAVEN_OPTS>
+
+            <!-- Failsafe options -->
+            <forkCount>0</forkCount>
+            <reuseForks>false</reuseForks>
+        </properties>
+    </action>
+
+    <!-- =========================
+         TEST SINGLE (UNIT TEST)
+         ========================= -->
+    <action>
+        <actionName>test.single</actionName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>test-compile</goal>
+            <goal>surefire:test</goal>
+        </goals>
+        <properties>
+            <test>${packageClassName}</test>
+            <Env.JAVA_HOME>C:\Program Files\Java\jdk-25</Env.JAVA_HOME>
+            <argLine>--enable-preview</argLine>
+        </properties>
+    </action>
+
+    <!-- =========================
+         REBUILD
+         ========================= -->
+    <action>
+        <actionName>rebuild</actionName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>clean</goal>
+            <goal>install</goal>
+        </goals>
+        <properties>
+            <Env.MAVEN_OPTS>-Djansi.passthrough=false --enable-preview</Env.MAVEN_OPTS>
+        </properties>
+    </action>
+
+</actions>

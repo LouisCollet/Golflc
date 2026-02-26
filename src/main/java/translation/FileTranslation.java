@@ -8,7 +8,7 @@ import com.google.api.services.translate.model.TranslationsListResponse;
 import com.google.api.services.translate.model.TranslationsResource;
 //import exceptions.HandledException;
 import exceptions.LCException;
-import static interfaces.GolfInterface.GoogleApiKey;
+//import static interfaces.GolfInterface.GoogleApiKey;
 import static interfaces.Log.LOG;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +19,7 @@ import java.util.List;
 import utils.LCUtil;
 
 public class FileTranslation{
-      private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+      
  public static String translateFile(Path path, String targetLanguage) throws IOException, GeneralSecurityException {    
  try{
    //https://any-api.com/googleapis_com/translate/docs/translations/language_translations_list 
@@ -48,7 +48,7 @@ public class FileTranslation{
         //List<String> result = Files.readAllLines(Paths.get(filename), charset);
            LOG.debug("result = " + data);
         Translations.List list = translate.new Translations().list(data, "");
-        list.setKey(GoogleApiKey);
+        list.setKey(System.getenv("GOOGLE_MAPS_API_KEY"));
         list.setSource("fr"); // si pas spécifié l'API la détermine
         list.setTarget(targetLanguage);
 //        list.setPrettyPrint(Boolean.TRUE);
@@ -74,14 +74,14 @@ public class FileTranslation{
 } // translate
     
  public static String translateList(List<String> list, String targetLanguage) throws IOException, GeneralSecurityException {
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+     final String methodName = utils.LCUtil.getCurrentMethodName(); 
  try{
    //https://any-api.com/googleapis_com/translate/docs/translations/language_translations_list 
    // https://developers.google.com/resources/api-libraries/documentation/translate/v2/java/latest/com/google/api/services/translate/Translate.Builder.html
 
     if(targetLanguage == null){
         Exception e = new Exception(" = targetLanguage not completed"); 
-        throw new LCException("LCException in : " + methodName, e);
+        throw new Exception("LCException in : " + methodName, e);
     }
     return translateData(list, targetLanguage);
     
@@ -107,7 +107,7 @@ public class FileTranslation{
         //List<String> result = Files.readAllLines(Paths.get(filename), charset);
            LOG.debug("result = " + data);
         Translations.List list = translate.new Translations().list(data, "");
-        list.setKey(GoogleApiKey);
+        list.setKey(System.getenv("GOOGLE_MAPS_API_KEY"));
         list.setSource("fr"); // si pas spécifié l'API la détermine
         list.setTarget(targetLanguage);
 //        list.setPrettyPrint(Boolean.TRUE);

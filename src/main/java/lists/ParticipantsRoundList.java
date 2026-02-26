@@ -1,9 +1,20 @@
 package lists;
 
 import entite.Classment;
-import entite.composite.ECourseList;
+import entite.Club;
+import entite.Course;
+import entite.Inscription;
+import entite.Player;
 import entite.Round;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import exceptions.InvalidRoundException;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,117 +22,145 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.ClubRowMapper;
+import rowmappers.CourseRowMapper;
+import rowmappers.InscriptionRowMapper;
+import rowmappers.PlayerRowMapper;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.RowMapperRound;
 
-public class ParticipantsRoundList implements Serializable, interfaces.Log{
-    private static List<ECourseList> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
- 
-  public List<ECourseList> list(final Round round ,final Connection conn) throws SQLException{ 
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
-    
-if(liste == null){
-    LOG.debug(" ... entering " + methodName);
-    LOG.debug(" with Round = " + round);
-    
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
-    String query = """
-       SELECT *
-       FROM player
-       JOIN round
-          ON round.idround = ?
-       JOIN course
-          ON round.course_idcourse = course.idcourse
-       JOIN club
-          ON course.club_idclub = club.idclub
-       JOIN player_has_round
-          ON  InscriptionIdPlayer = player.idplayer
-          AND InscriptionIdRound = round.idround
-       ORDER by player_has_round.InscriptionFinalResult,In‌scriptionMatchplayTeam asc;
-    """;
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, round.getIdround() ); 
-     utils.LCUtil.logps(ps);
-     rs =  ps.executeQuery();
-    liste = new ArrayList<>();
-	while(rs.next()){
-          ECourseList ecl = new ECourseList();
-          ecl.setClub(entite.Club.dtoMapper(rs));
-          ecl.setCourse(entite.Course.dtoMapper(rs));
-          ecl.setRound(new entite.Round().dtoMapper(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
-          ecl.setInscription(entite.Inscription.map(rs));
-          ecl.setPlayer(entite.Player.map(rs));
-          Classment cla = new read.ReadClassment().read(ecl.getPlayer(), ecl.getRound(),conn);
-          ecl.setClassment(cla);
-	liste.add(ecl);
-	} // end while
-    if(liste.isEmpty()){
-       String msg = "Empty List in " + methodName;
-       LOG.info(msg);
-       LCUtil.showMessageInfo(msg);
- //      return null;
-    }else{
-         LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-     }    
-    LOG.debug("ending with liste  =  ",  Arrays.deepToString(liste.toArray()) );
-    
-// https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
-// https://stackoverflow.com/questions/51565422/java-8-compare-multiple-fields-in-different-order-using-comparator
+@Named
+@ApplicationScoped
+public class ParticipantsRoundList implements Serializable {
 
-    liste.sort(Comparator.comparingInt((ECourseList p)-> p.getClassment().getTotalPoints() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast9() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast6() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast3() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast1() ).reversed()
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    @Inject private read.ReadClassment readClassment;
+
+    // cache intentionally disabled — always recomputes (scores change in real time)
+    private List<ECourseList> liste = null;
+
+    public ParticipantsRoundList() { }
+
+    public List<ECourseList> list(final Round round) throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("with Round = " + round);
+        LOG.debug("with holes = " + round.getRoundHoles());
+
+        if (round == null) {
+            LOG.error(methodName + " - Round cannot be null");
+            throw new IllegalArgumentException("Round cannot be null");
+        }
+
+        // Validation : 18 trous requis
+        if (round.getRoundHoles() != 18) {
+            LOG.warn("Round {} has {} holes, expected 18", round.getIdround(), round.getRoundHoles());
+            throw new InvalidRoundException(
+                "Le round doit avoir exactement 18 trous. Trouvé : " + round.getRoundHoles()
             );
-     liste.forEach(item -> LOG.debug("liste AFTER sort = " + NEW_LINE + item.getPlayer().getPlayerFirstName() + " / "
-                                            + item.getPlayer().getIdplayer() + " /" + item.getClassment()));
-    return liste;
-}catch (SQLException e){
-        String msg = "SQL Exception in " + methodName + e;
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    String msg = "Exception in getParticipantsStableford() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}finally{
-        DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
-   //    LOG.debug("escaped to listParticipants repetition with lazy loading");
-    return liste;  //plusieurs fois ??
-    }
-} //end method
+        }
 
-    public static List<ECourseList> getListe() {
-        return liste;
-    }
+        final String query = """
+            SELECT *
+            FROM player
+            JOIN round
+               ON round.idround = ?
+            JOIN course
+               ON round.course_idcourse = course.idcourse
+            JOIN club
+               ON course.club_idclub = club.idclub
+            JOIN player_has_round
+               ON  InscriptionIdPlayer = player.idplayer
+               AND InscriptionIdRound = round.idround
+            ORDER BY player_has_round.InscriptionFinalResult, InscriptionMatchplayTeam ASC;
+            """;
 
-    public static void setListe(List<ECourseList> liste) {
-        ParticipantsRoundList.liste = liste;
-    }
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
 
-void main() throws SQLException, Exception {
-    Connection conn = new DBConnection().getConnection();
-   Round round = new Round(); 
-   round.setIdround(656);
-  List<ECourseList> p1 = new ParticipantsRoundList().list(round, conn);
-//  Classment c = new Classment();
-      LOG.debug("Inscription list = " + p1.toString());
-  p1.forEach(item -> LOG.debug("Participants Stableford list = " + item.getClassment() + "/" + item.getPlayer().getPlayerLastName()));  // java 8 lambda
-  p1.forEach(item -> LOG.debug("Participants Round list = " + item.getPlayer().getIdplayer()
-           + "/" + item.getInscription().getInscriptionMatchplayTeam()));
-       //   getPlayer().getPlayerLastName()));  // java 8 lambda                     
-     
-     
-     DBConnection.closeQuietly(conn, null, null, null);
-}// end main
-} //end class
+            ps.setInt(1, round.getIdround());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                RowMapper<Club> clubMapper = new ClubRowMapper();
+                RowMapper<Course> courseMapper = new CourseRowMapper();
+                RowMapper<Player> playerMapper = new PlayerRowMapper();
+                RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
+                RowMapperRound<Round> roundMapper = new RoundRowMapper();
+                while (rs.next()) {
+                    Player player = playerMapper.map(rs);
+                    Club club = clubMapper.map(rs);
+                    Round r = roundMapper.map(rs, club);
+                    Classment classment = readClassment.read(player, r);
+                    LOG.debug("classment = " + classment);
+                    ECourseList ecl = ECourseList.builder()
+                            .club(club)
+                            .course(courseMapper.map(rs))
+                            .inscription(inscriptionMapper.map(rs))
+                            .round(r)
+                            .player(player)
+                            .classment(classment)
+                            .build();
+                    liste.add(ecl);
+                } // end while
+                if (liste.isEmpty()) {
+                    LOG.warn(methodName + " - empty list for round=" + round.getIdround());
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+                LOG.debug("ending with liste = {}", Arrays.deepToString(liste.toArray()));
+                // https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
+                liste.sort(Comparator.comparingInt((ECourseList p) -> p.classment().getTotalPoints()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast9()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast6()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast3()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast1()).reversed());
+                liste.forEach(item -> LOG.debug("liste AFTER sort = " + item.player().getPlayerFirstName()
+                        + " / " + item.player().getIdplayer() + " / " + item.classment()));
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    public List<ECourseList> getListe()                       { return liste; }
+    public void              setListe(List<ECourseList> liste) { this.liste = liste; }
+
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Round round = new Round();
+        round.setIdround(767); // doit avoir 18 trous
+        round.setRoundHoles(18);
+        List<ECourseList> p1 = list(round);
+        LOG.debug("inscription list = " + p1.toString());
+        p1.forEach(item -> LOG.debug("Participants Stableford list = "
+                + item.classment() + "/" + item.player().getPlayerLastName()));
+    } // end main
+    */
+
+} // end class

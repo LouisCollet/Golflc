@@ -67,20 +67,20 @@
     <h:outputText  id="Total"
                 value="#{msg['creditcard.amounttobepaid']} :" />
     <h:outputText  id="TotalPrice"
-                value="#{courseC.creditcard.totalPrice}"
+                value="#{payC.creditcard.totalPrice}"
                 style="font-size: 3em;" />
 
     
      <h:outputText  
                 value="#{msg['tarif.members.currency']} :" />
     <h:outputText id="Currency"
-                  value="#{courseC.creditcard.creditcardCurrency}"
+                  value="#{payC.creditcard.creditcardCurrency}"
                   style="font-size: 2em;" />
     
     <h:outputText value="#{msg['creditcard.communication']} :" />
     <h:outputText 
                   id="Communication"
-                  value="#{courseC.creditcard.communication}"
+                  value="#{payC.creditcard.communication}"
                   title="#{msg['tooltip.club.clubaddress']}" />
 
    <h:panelGroup id="panelG2" layout="block" >
@@ -88,11 +88,11 @@
                     <i class="pi pi-creditcard"></i>
    </h:panelGroup>
    <p:selectOneMenu id="TypeCreditcard"
-                    value="#{courseC.creditcard.creditcardType}"
+                    value="#{payC.creditcard.creditcardType}"
                     required="true"
-                    valueChangeListener="#{courseC.creditCardTypeListener}"
+                    valueChangeListener="#{payC.creditCardTypeListener}"
                     title="#{msg['tooltip.creditcard.type']}" >
-                <f:selectItems value="#{courseC.creditcard.cards}"/>
+                <f:selectItems value="#{payC.creditcard.cards}"/>
         <!--        <p:ajax event="change" render="@form"/>  -->
                 <p:ajax event="change" update="@form"/>
    </p:selectOneMenu>
@@ -114,12 +114,12 @@
                                placeholderName="Optimus Prime" -->
         </f:facet>
 		<p:inputText id="number"
-                             value="#{courseC.creditcard.creditcardNumber}"
+                             value="#{payC.creditcard.creditcardNumber}"
                              placeholder="Card number"
                              inputmode="numeric"
                              required="true" />
 		<p:inputText id="name"
-                             value="#{courseC.creditcard.creditcardHolder}"
+                             value="#{payC.creditcard.creditcardHolder}"
                              placeholder="Full name"
                              required="true"/>
          <p:outputPanel id="expiration">
@@ -139,13 +139,13 @@
                           onchange="$('#expiry').val(PF('monthPicker').input.val()); $('#expiry')[0].dispatchEvent(new Event('change'));"/>
             <!--  Hide Expiration field so we can use PF MonthPicker    inputmode="numeric"-->
             <p:inputText id="expiry"
-                         value="#{courseC.creditcard.creditCardExpirationDateString}"
+                         value="#{payC.creditcard.creditCardExpirationDateString}"
                          placeholder="MM/YY"
                          inputmode="numeric"
                          style="display:none"/>
         </p:outputPanel>
 	    <p:inputText id="cvc"
-                             value="#{courseC.creditcard.creditcardVerificationCode}"
+                             value="#{payC.creditcard.creditcardVerificationCode}"
                              placeholder="CVC"
                              size="5"
                              inputmode="numeric"
@@ -159,14 +159,14 @@
                          immediate="true"
                          icon="pi pi-undo"
                          style="float: left;"
-                         rendered="#{courseC.creditcard.typePayment eq 'GREENFEE'}" 
+                         rendered="#{payC.creditcard.typePayment eq 'GREENFEE'}" 
                          action="inscription.xhtml?faces-redirect=true"
                          oncomplete="PF('dlg').show()" />
            <p:commandButton value="#{msg['payment.selected']}"
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                        
                          style="float: right;"
                          icon="pi pi-credit-card"
                          action="creditcard_accepted.xhtml?faces-redirect=true">

@@ -3,9 +3,9 @@ package entite;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
-import jakarta.annotation.PostConstruct;
-import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Named;
+// import jakarta.annotation.PostConstruct;  // migrated 2026-02-26 — POJO, not CDI-managed
+// import jakarta.faces.view.ViewScoped;  // migrated 2026-02-26
+// import jakarta.inject.Named;  // migrated 2026-02-26
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,10 +15,10 @@ import org.primefaces.event.CellEditEvent;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 
-@Named //enlevé 10/07/2022
-@ViewScoped //@RequestScoped mod 09-04-2023 change rien ! totaux pas corrects
+//@Named //enlevé 10/07/2022
+//@ViewScoped //@RequestScoped mod 09-04-2023 change rien ! totaux pas corrects
 public class ScoreStableford implements Serializable{
- private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+ 
     private Integer idscore;
  // pour download db pour liste scorecard   
     private Short scoreHole;
@@ -67,7 +67,7 @@ public class ScoreStableford implements Serializable{
     private Short slopeRating;
     private int start = 0;
     private int holes = 0;
-    
+    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
 public ScoreStableford(){ // constructor
   //     LOG.debug(" entering constructor scorestableford");
        strokeArray = new int[18]; // new 16-11-2020
@@ -87,7 +87,7 @@ public ScoreStableford(){ // constructor
 
  //           LOG.debug(" array statistics initialized" + Arrays.deepToString(statistics) );
     }
-@PostConstruct
+// @PostConstruct  // migrated 2026-02-26 — POJO, not CDI-managed
 public void init(){
       LOG.debug(" from init in ScoreStableford");
     strokeArray = new int[18]; // new 16-11-2020
@@ -303,7 +303,7 @@ public class Score{
         }
         
   public static ScoreStableford.Score map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
          ScoreStableford.Score score = new ScoreStableford().new Score();
          score.setHole(rs.getInt("ScoreHole"));
@@ -663,7 +663,6 @@ public class Score{
     }
 
 
-
     public ArrayList<Statistics> getStatisticsList() {
         return statisticsList;
     }
@@ -718,7 +717,7 @@ public void onCellEdit(CellEditEvent<Object> event) { // used in include_statist
     
  @Override
     public String toString(){
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+     final String methodName = utils.LCUtil.getCurrentMethodName();
  try{
      if(this.getClass() == null){
         return (CLASSNAME + " is null, no print !! ");
@@ -774,9 +773,9 @@ public void onCellEdit(CellEditEvent<Object> event) { // used in include_statist
         return msg;
   }
 } // end toString
-
+/*
  public static ScoreStableford map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+      final String methodName = utils.LCUtil.getCurrentMethodName();
   try{
         ScoreStableford s = new ScoreStableford();
             s.setScoreHole(rs.getShort("ScoreHole") );
@@ -798,4 +797,5 @@ public void onCellEdit(CellEditEvent<Object> event) { // used in include_statist
     return null;
   }
 } //end method map
+ */
 } // end class

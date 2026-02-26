@@ -1,161 +1,129 @@
-
 package delete;
 
 import entite.Club;
 import entite.Course;
 import entite.Player;
 import entite.Round;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.DBConnection;
+import javax.sql.DataSource;
 import utils.LCUtil;
-import static utils.LCUtil.showMessageFatal;
 
-public class DeleteInscription implements interfaces.Log, interfaces.GolfInterface{
- public boolean delete(final Player player, final Round round, Club club, Course course,Connection conn) throws Exception {
-        PreparedStatement ps = null;     // a modifier pour tenir compte du round, sinon delete de tous les round !
-                // il faut aussi modifier le nombre de joueurs inscrits dans RoundPlayers !!!
-try{   //encore Ã  faire : delete du record activation s'il existe ...
-         LOG.debug("starting delete for inscription ... = " );
-         LOG.debug("for player  = " + player.toString() );
-         LOG.debug("for player last name= " + player.getPlayerLastName() );
-         LOG.debug("for round = " + round.toString() );
-   //      LOG.debug("for club = " + club.toString() );
-   //      LOG.debug("for course = " + course.toString() );
- 
-      int rows = new find.FindCountScore().find(conn, player, round, "rows");
-       if (rows == 99){
-           LOG.error("Fatal error in getcountscore/count rows");
-           return false;
-//           throw new Exception(" -- Fatal error in getCountStore, score = " + rows);
-       }
-       if (rows == 0){ // le score n'est pas encore enregistré
-            LOG.debug(" OK -- Score pas encore enregistré  ! ");
-       }else{
-            String msg = " -- score enregistré : delete refused rows =  " + rows;
-            LOG.debug(msg);
-            showMessageFatal(msg);
+@ApplicationScoped
+public class DeleteInscription implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    @Inject private find.FindCountScore findCountScore;
+
+    public DeleteInscription() { }
+
+    public boolean delete(final Player player, final Round round, final Club club, final Course course) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("for player = " + player);
+        LOG.debug("for round = " + round);
+
+        int rows = findCountScore.find(player, round, "rows");
+        if (rows == 99) {
+            LOG.error(methodName + " - fatal error in findCountScore");
             return false;
-       }
+        }
+        if (rows == 0) {
+            LOG.debug(methodName + " - OK, score not yet registered");
+        } else {
+            String msg = " -- score already registered: delete refused rows = " + rows;
+            LOG.debug(msg);
+            LCUtil.showMessageFatal(msg);
+            return false;
+        }
 
-    String query = """
-        DELETE
-        from player_has_round
-        WHERE InscriptionIdPlayer = ?
-        AND InscriptionIdRound = ?
-     """;
-    ps = conn.prepareStatement(query); 
-    ps.setInt(1, player.getIdplayer());
-    ps.setInt(2, round.getIdround());
-    LCUtil.logps(ps); 
-    rows = ps.executeUpdate();
-        LOG.debug("deleted inscription = " + rows);
-    if (rows == 0){ // no delete !!
-        String msg =  LCUtil.prepareMessageBean("inscription.not.canceled");
-        msg = msg   + "<br/>player id = " + player.getIdplayer();
-        msg = msg   + "<br/>Player Last Name = " + player.getPlayerLastName();
-        msg = msg   + "<br/>Round id = " + round.getIdround();
-        LOG.debug(msg);
-        LCUtil.showMessageInfo(msg);
-        return false;
-   }else{ // row deleted
-        String msg =  LCUtil.prepareMessageBean("inscription.canceled")
-         + " <br/>Player id = " + player.getIdplayer()
-         + " <br/>Player Last Name = " + player.getPlayerLastName()
-         + " <br/>Round id = " + round.getIdround();
-      // à faire : modify round.roundPlayers
-        LOG.debug(msg);
-        LCUtil.showMessageInfo(msg);
-        // à fair modify round?roundPlayers (nombre de joueurs du flight
-        
-    query = """
-        DELETE
-        FROM payments_greenfee
-        WHERE GreenfeeIdPlayer = ?
-        AND GreenfeeIdRound = ?
-      """ ;
-    ps = conn.prepareStatement(query); 
-    ps.setInt(1, player.getIdplayer());
-    ps.setInt(2, round.getIdround());
-    LCUtil.logps(ps); 
-  //  int row_score = ps.executeUpdate();
-        LOG.debug("deleted PaymentGreenfee  = " + ps.executeUpdate());
-  //      boolean b = new mail.InscriptionMail().delete(player, round, club, course);
-        return true;
-}
-/*    
-        
-  final String query = " DELETE from score where score.player_has_round_player_idplayer = ?";
-    ps = conn.prepareStatement(query); 
-    ps.setInt(1, player.getIdplayer());
-    LCUtil.logps(ps); 
-    int row_score = ps.executeUpdate();
-        LOG.debug("deleted score = " + row_score);
-        
-        
-        
-        
-    query = " delete from handicap where handicap.player_idplayer = ?";
-    ps = conn.prepareStatement(query); 
-    ps.setInt(1, idplayer);
-    LCUtil.logps(ps); 
-    int row_hcp = ps.executeUpdate();
-        LOG.debug("deleting handicap = " + row_hcp);
-    
-    query = " delete from player where player.idplayer = ?";
-    ps = conn.prepareStatement(query); 
-    ps.setInt(1, idplayer);
-    LCUtil.logps(ps); 
-    int row_player = ps.executeUpdate();
-        LOG.debug("deleting player = " + row_player);
-   */ 
+        try (Connection conn = dataSource.getConnection()) {
 
+            // 1. DELETE inscription
+            int rowPhr;
+            try (PreparedStatement ps = conn.prepareStatement("""
+                    DELETE FROM player_has_round
+                    WHERE InscriptionIdPlayer = ?
+                      AND InscriptionIdRound = ?
+                    """)) {
+                ps.setInt(1, player.getIdplayer());
+                ps.setInt(2, round.getIdround());
+                LCUtil.logps(ps);
+                rowPhr = ps.executeUpdate();
+                LOG.debug(methodName + " - deleted inscription = " + rowPhr);
+            }
 
-  //  String msg = "<br/> <h1>Records deleted = " 
-                  //      + " <br/></h1>player = " + idplayer
-        //                + " <br/>score = " + row_score
-        //                + " <br/>inscription = " + row_phr;
-     //                   + " <br/>handicap = " + row_hcp
-       //                 + " <br/>player = " + row_player;
-  //         LOG.debug(msg);
-  //      LCUtil.showMessageInfo(msg);
-  //      return "Inscription deleted ! ";
+            if (rowPhr == 0) {
+                String msg = LCUtil.prepareMessageBean("inscription.not.canceled")
+                        + "<br/>player id = " + player.getIdplayer()
+                        + "<br/>Player Last Name = " + player.getPlayerLastName()
+                        + "<br/>Round id = " + round.getIdround();
+                LOG.debug(msg);
+                LCUtil.showMessageInfo(msg);
+                return false;
+            }
 
-}catch (SQLException e){
-    String msg = "SQL Exception in DeleteInscription = " + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return false;
-}catch (Exception ex){
-    String msg = "Exception in DeleteInscription() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return false;
-}finally{
-        utils.DBConnection.closeQuietly(null, null, null, ps);
-}
-} //end method
+            String msg = LCUtil.prepareMessageBean("inscription.canceled")
+                    + " <br/>Player id = " + player.getIdplayer()
+                    + " <br/>Player Last Name = " + player.getPlayerLastName()
+                    + " <br/>Round id = " + round.getIdround();
+            LOG.debug(msg);
+            LCUtil.showMessageInfo(msg);
 
-public static void main(String args[]) throws SQLException, Exception{     
- try{
-       LOG.debug("Input main = ");
-    Connection conn = new DBConnection().getConnection();
-    Player player = new Player();
-    player.setIdplayer(324715);
-    Round round = new Round(); 
-    round.setIdround(757);
-    Club club = new Club();
-    Course course = new Course();
-    boolean b = new DeleteInscription().delete(player,round,club, course, conn);
-    DBConnection.closeQuietly(conn, null, null, null);
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-   }finally{
-     //    DBConnection.closeQuietly(null, stm, rs, null); 
-          }
-   } // end method main
-} //end class
+            // 2. DELETE greenfee payment
+            try (PreparedStatement ps = conn.prepareStatement("""
+                    DELETE FROM payments_greenfee
+                    WHERE GreenfeeIdPlayer = ?
+                      AND GreenfeeIdRound = ?
+                    """)) {
+                ps.setInt(1, player.getIdplayer());
+                ps.setInt(2, round.getIdround());
+                LCUtil.logps(ps);
+                LOG.debug(methodName + " - deleted PaymentGreenfee = " + ps.executeUpdate());
+            }
+
+            return true;
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    // ===========================================================================================
+    // BRIDGE — @Deprecated — pour les appelants legacy (new DeleteInscription().delete(player, round, club, course, conn))
+    // À supprimer quand tous les appelants seront migrés en CDI
+    // ===========================================================================================
+    /** @deprecated Utiliser {@link #delete(Player, Round, Club, Course)} via injection CDI */
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Player player = new Player();
+        player.setIdplayer(324715);
+        Round round = new Round();
+        round.setIdround(757);
+        Club club = new Club();
+        Course course = new Course();
+        boolean b = delete(player, round, club, course);
+        LOG.debug("delete result = " + b);
+    } // end main
+    */
+
+} // end class

@@ -11,12 +11,15 @@ https://ocamil.com/index.php/javaee/jsf-javaserver-faces/jsf-facesservlet-et-fac
 https://ocamil.com/index.php/javaee/jsf-javaserver-faces/jsf-presentation 
 https://balusc.omnifaces.org/2015/09/what-mojarra-context-parameters-are.html
 jsf4.0.2 que faire avec com.sun ??    -->
+<!--  enlevé 30-125-2025 starts JSF  plus nécessairea avec JSF 4.1.5 
+ As of Jakarta Faces 4.0 @FacesConfig still removes the need to explicitly add a FacesServlet entry to web.xml.
+https://github.com/eclipse-ee4j/mojarra/blob/4.1/README.md  
 <servlet>
     <servlet-name>Faces Servlet</servlet-name>
-    <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class> <!--  starts JSF  plus nécessairea avec JSF 4 ?-->
+    <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class> 
     <load-on-startup>1</load-on-startup>
 </servlet>
-
+  -->
 <servlet-mapping>
     <servlet-name>Faces Servlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>
@@ -27,11 +30,11 @@ jsf4.0.2 que faire avec com.sun ??    -->
         <welcome-file>/login.xhtml</welcome-file>
 </welcome-file-list>
 
-<!-- sets the default session timeout to 40 minutes. -->
+<!-- sets the default session timeout to 40 minutes. ATTENTION positionné pour test -->
 <session-config>
         <session-timeout>40</session-timeout> 
 </session-config>
-<!-- ajouté 20-07-2022 -->
+<!-- ajouté 20-07-2022 
     <error-page>
         <exception-type>jakarta.faces.application.ViewExpiredException</exception-type>
         <location>/session_expired.xhtml</location>
@@ -40,6 +43,34 @@ jsf4.0.2 que faire avec com.sun ??    -->
         <exception-type>java.lang.Throwable</exception-type>
         <location>/error_throw.xhtml</location>
     </error-page>
+ -->   
+<!-- modification 14/1/2026 -->
+
+<error-page>
+    <exception-type>jakarta.faces.application.ViewExpiredException</exception-type>
+    <location>/session_expired.xhtml</location>
+</error-page>
+
+<error-page>
+    <exception-type>java.lang.Throwable</exception-type>
+    <location>/error_throw.xhtml</location>
+</error-page>
+
+<error-page>
+    <error-code>404</error-code>
+    <location>/error_throw.xhtml</location>
+</error-page>
+
+<error-page>
+    <error-code>500</error-code>
+    <location>/error_throw.xhtml</location>
+</error-page>
+
+
+
+
+
+
 
 <!-- new 09-11-2020 https://www.journaldev.com/3229/primefaces-fileupload-component-example-tutorial 
     https://stackoverflow.com/questions/17339830/overview-of-all-jsf-related-web-xml-context-parameter-names-and-values
@@ -65,6 +96,14 @@ jsf4.0.2 que faire avec com.sun ??    -->
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
 </context-param>
+<!--  new 16/01.2026  -->
+<context-param>
+    <description>Facelets Development</description>
+    <param-name>jakarta.faces.FACELETS_DEVELOPMENT</param-name>
+    <param-value>true</param-value>
+</context-param>
+
+
 <!-- increase buffer size to avoid JSF1095 errors
 https://stackoverflow.com/questions/17762462/getting-warning-from-jsf-the-response-was-already-committed-by-the-time-we-trie
 https://balusc.omnifaces.org/2015/09/what-mojarra-context-parameters-are.html
@@ -183,7 +222,7 @@ enlevé 16-08-2021
 -->
 <context-param>
     <param-name>jakarta.faces.FACELETS_REFRESH_PERIOD</param-name>
-    <param-value>-1</param-value>
+    <param-value>0</param-value>
 </context-param>
 <context-param>
     <description>FLEX layout de masterTemplate depuis PF 10</description>
@@ -198,8 +237,11 @@ Consider setting the 'resteasy.preferJacksonOverJsonB' property to 'false' to re
         <param-name>resteasy.preferJacksonOverJsonB</param-name>
         <param-value>false</param-value> <!-- mod 09-05-2025 was true  -->
 </context-param>
-
-
+<!-- new 02-02-2026 pour logging détaillé 
+<context-param>
+    <param-name>jakarta.faces.FACELETS_REFRESH_PERIOD</param-name>
+    <param-value>0</param-value>
+</context-param>-->
 <!-- new 19-06-2021 enlevé 24-01-2022
 https://www.quartz-scheduler.org/api/2.1.7/org/quartz/ee/servlet/QuartzInitializerListener.html
 <context-param>

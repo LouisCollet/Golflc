@@ -3,12 +3,10 @@
 <!DOCTYPE html>
 <html
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-     
-      xmlns:p="primefaces"
->
+      xmlns:p="primefaces" >
 <ui:composition template="templates/masterTemplate.xhtml">
 <ui:define name="title">Restart Hole Page </ui:define>
 
@@ -27,8 +25,6 @@
 
 <h:form id="hole_restart"  >
 
-
-
 <p:panelGrid id="panel1"
              columns="2"
              layout="tabular"
@@ -41,7 +37,7 @@
         <p:inputNumber 
                    label="clublbl"
                    id="clubid"
-                   value="#{courseC.club.idclub}"
+                   value="#{clubC.club.idclub}"
                    title="This tooltip is displayed when input gets the focus"
                    size="4"
                    
@@ -51,17 +47,15 @@
        <p:inputNumber
                    label="courselbl"
                    id="courseid"
-                   value="#{courseC.course.idcourse}"
+                   value="#{clubC.course.idcourse}"
                    title="This tooltip is displayed when input gets the focus"
-                   size="2"
-                   
-                        />
+                   size="2"/>
        <h:outputText value="#{msg['tee.id']} :" />
 
        <p:inputNumber
                    label="teelbl"
                    id="teeid"
-                   value="#{courseC.tee.idtee}"
+                   value="#{clubC.tee.idtee}"
                    title="This tooltip is displayed when input gets the focus"
                    size="3"
                    
@@ -71,7 +65,7 @@
        <p:inputNumber
                    label="hole num"
                         id="holenumb"
-                        value="#{courseC.hole.holeNumber}"
+                        value="#{clubC.hole.holeNumber}"
                         title="This tooltip is displayed when input gets the focus"
                         size="3"
                        
@@ -79,7 +73,7 @@
 
        <h:outputText value="#{msg['hole.par']} :"   />
        <p:selectOneButton id="par"
-                         value="#{courseC.hole.holePar}"
+                         value="#{clubC.hole.holePar}"
                >
             <f:selectItem itemLabel="Par 3"  itemValue="3" />
             <f:selectItem itemLabel="Par 4"  itemValue="4" />
@@ -88,10 +82,10 @@
 
        
                 <h:outputText  value="#{msg['hole.index']} :"   />
-                <p:selectOneMenu id="index" value="#{courseC.hole.holeStrokeIndex}">
+                <p:selectOneMenu id="index" value="#{clubC.hole.holeStrokeIndex}">
                     <f:selectItem itemLabel="??"
                                   itemValue="#{null}" />
-                    <f:selectItems value="#{courseC.indexNumbers(18)}"/>
+                    <f:selectItems value="#{clubC.indexNumbers(18)}"/>
                 </p:selectOneMenu>
 
        <h:outputText
@@ -103,7 +97,7 @@
            <p:column colspan="2">
                 <p:inputNumber
                        id="holeDistance"
-                       value="#{courseC.hole.holeDistance}"
+                       value="#{clubC.hole.holeDistance}"
                        size="4"
                        
                        />
@@ -112,9 +106,9 @@
                          id="cb2"
                          update="holeDistance"
                          ajax="false"
-                         immediate="false"
+                          
                          icon="pi pi-arrow-right"
-                         action="#{courseC.convertYtoM}">
+                         action="#{clubC.convertYtoM()}">
                  </p:commandButton>
            </p:column>
        </p:row>
@@ -125,7 +119,7 @@
                          id="cb1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
                          action="#{courseC.createHole}"/>
 </f:facet>

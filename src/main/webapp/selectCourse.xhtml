@@ -36,11 +36,11 @@
  input2 =  #{inputSelectCourse} 
  -->   
 <p:dataTable id="courses"
-             value="#{courseC.listCourses()}"
+             value="#{clubC.listCoursesPublic()}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCourses}"
+             filteredValue="#{clubC.filteredCourses}"
              
              >
 <!-- rowHover="true"
@@ -105,7 +105,7 @@
                   rendered="#{inputSelectCourse eq 'CreateRound'}" >
             <p:commandButton
                 id="selectButtonCreateRound"
-                action="#{courseC.selectCourse(c)}"
+                action="#{clubC.selectCourse(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -124,7 +124,7 @@
                   rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" >
             <p:commandButton
                 id="selectButtonTarif"
-                action="#{courseC.selectCourse(c)}"
+                action="#{clubC.selectCourse(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -136,7 +136,7 @@
                   rendered="#{inputSelectCourse eq 'CreateTarifMember'}" >
             <p:commandButton
                 id="selectButtonTarifMembers"
-                action="#{courseC.selectCourse(c)}"
+                action="#{clubC.selectCourse(c)}"
                 value="#{c.club.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -148,7 +148,7 @@
                   rendered="#{inputSelectCourse eq 'PaymentTarifMember'}" >
             <p:commandButton
                 id="selectButtonPaymentTarifMembers"
-                action="#{courseC.selectCourse(c)}"
+                action="#{clubC.selectCourse(c)}"
                 value="#{c.club.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -160,7 +160,7 @@
                   rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" >
             <p:commandButton
                 id="selectButtonUnavailable"
-                action="#{courseC.selectCourse(c)}"
+                action="#{clubC.selectCourse(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -173,7 +173,7 @@
                   rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" >
             <p:commandButton
                 id="selectButtonUnavailablePeriod"
-                action="#{courseC.selectCourse(c)}"
+                action="#{clubC.selectCourse(c)}"
                 value="#{c.course.idcourse} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -237,7 +237,7 @@
                   style="width:10%" >
             <p:commandButton
                 id="selectTravel"
-                action="#{courseC.selectTravel(c)}"
+                action="#{clubC.selectTravel(c)}"
                 value="Car"
                 icon="pi pi-question"
                 >
@@ -252,7 +252,7 @@
                   >
             <p:commandButton
                 id="selectScorecard"
-                action="#{courseC.show_scorecard_empty(c)}"
+                action="#{roundC.show_scorecard_empty(c)}"
                 value="Scorecard"
                 icon="pi pi-map"
                 >
@@ -266,7 +266,7 @@
                   style="width:10%" >
             <p:commandButton
                 id="selectChart"
-                action="#{courseC.selectChart(c)}"
+                action="#{clubC.selectChart(c)}"
                 value="Chart"
                 icon="pi pi-chart-line" >
              </p:commandButton>

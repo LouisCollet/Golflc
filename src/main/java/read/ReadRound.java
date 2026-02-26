@@ -1,59 +1,84 @@
 package read;
 
 import entite.Round;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapperRound;
+import java.sql.Connection;
 
-public class ReadRound{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-public Round read(Round round,Connection conn) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
+@ApplicationScoped
+public class ReadRound implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    public ReadRound() { }
+
+    public Round read(Round round) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
-  //      LOG.debug(" with round = " + round); 
-     final String query = "SELECT * "
-        + " FROM Round "
-        + " WHERE idround = ?" ;
 
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, round.getIdround());
-     utils.LCUtil.logps(ps); 
-     rs =  ps.executeQuery();
-     Round r = new Round(); 
-     while(rs.next()){
-       //    r = new entite.Round().map(rs,club); // mod 19-02-2020 pour générer ZonedDateTime
-           r = new entite.Round().dtoMapper(rs); // club sera null
-      }  //end while
-    return r;
-}catch (SQLException e){
-    String msg = "SQLException in LoadRound() = " + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    String msg = "Exception in LoadRound = " + ex.toString();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-     return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-} //end method
+        if (round == null || round.getIdround() == null) {
+            throw new IllegalArgumentException("Round.idround must not be null");
+        }
 
-void main() throws SQLException, Exception{ // testing purposes
-   Connection conn = new DBConnection().getConnection(); // main
-   Round round = new Round();
-   round.setIdround(630);
-   round  = new ReadRound().read(round,conn);
-     LOG.debug(" loaded tee = " + round);
-   DBConnection.closeQuietly(conn, null, null, null);
-}// end main
+        final String query = """
+            SELECT *
+            FROM Round
+            WHERE idround = ?
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, round.getIdround());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                RowMapperRound<Round> roundMapper = new RoundRowMapper();
+                if (rs.next()) {
+                    Round mapped = roundMapper.map(rs, null);
+                    mapped.setIdround(round.getIdround()); // garantie
+                    return mapped;
+                }
+                return null;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return null;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return null;
+        }
+    } // end method
+
+    // ===========================================================================================
+    // BRIDGE — @Deprecated — pour les appelants legacy (new ReadRound().read(round, conn))
+    // À supprimer quand tous les appelants seront migrés en CDI
+    // ===========================================================================================
+    /** @deprecated Utiliser {@link #read(Round)} via injection CDI */
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Round round = new Round();
+        round.setIdround(630);
+        round = read(round);
+        LOG.debug("loaded round = " + round);
+    } // end main
+    */
+
 } // end class

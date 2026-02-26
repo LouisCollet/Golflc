@@ -11,12 +11,15 @@ https://ocamil.com/index.php/javaee/jsf-javaserver-faces/jsf-facesservlet-et-fac
 https://ocamil.com/index.php/javaee/jsf-javaserver-faces/jsf-presentation 
 https://balusc.omnifaces.org/2015/09/what-mojarra-context-parameters-are.html
 jsf4.0.2 que faire avec com.sun ??    -->
+<!--  enlevé 30-125-2025 starts JSF  plus nécessairea avec JSF 4.1.5 
+ As of Jakarta Faces 4.0 @FacesConfig still removes the need to explicitly add a FacesServlet entry to web.xml.
+https://github.com/eclipse-ee4j/mojarra/blob/4.1/README.md  
 <servlet>
     <servlet-name>Faces Servlet</servlet-name>
-    <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class> <!--  starts JSF  plus nécessairea avec JSF 4 ?-->
+    <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class> 
     <load-on-startup>1</load-on-startup>
 </servlet>
-
+  -->
 <servlet-mapping>
     <servlet-name>Faces Servlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>

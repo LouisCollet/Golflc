@@ -26,7 +26,7 @@
     <h:outputText escape="false" value="#{msg['title.unavailable.period']}" />
 </f:facet>
     <h:outputText  value="#{msg['unavailable.period.start']} :"/>
-    <p:datePicker value="#{courseC.unavailable.period.startDate}"
+    <p:datePicker value="#{clubC.unavailable.period.startDate}"
                   id="startDateid"
                   locale="#{languageC.locale}"
                   pattern="dd/MM/yyyy HH:mm"
@@ -42,7 +42,7 @@
     </p:datePicker>
 
       <h:outputText value="#{msg['unavailable.period.end']} :"/>
-      <p:datePicker value="#{courseC.unavailable.period.endDate}"
+      <p:datePicker value="#{clubC.unavailable.period.endDate}"
                   id="endDateid"
                   locale="#{languageC.locale}"
                   lang="#{languageC.locale}"
@@ -64,12 +64,12 @@
      </h:panelGroup>
 
     <h:outputText id="comment"
-              value="#{courseC.unavailable.period.comment}"
+              value="#{clubC.unavailable.period.comment}"
               escape="false"  />
 </p:panelGrid>  
 
 <p:dataTable id="tablePeriod"
-             value="#{courseC.unavailable.structure.structureList}"
+             value="#{clubC.unavailable.structure.structureList}"
              var="var"
              style="margin: 0 auto;width:50%"
              rowIndexVar="row"
@@ -88,7 +88,7 @@
               width="15%">
        <p:selectBooleanButton 
                              id="ButtonChoix_yes_no${i}"
-                             value="#{courseC.unavailable.period.itemPeriod[row]}"
+                             value="#{clubC.unavailable.period.itemPeriod[row]}"
                              onLabel="Yes"
                              offLabel="No"
                              onIcon="pi pi-check"
@@ -106,16 +106,16 @@
                          id="commandButtonCreate"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.createUnavailablePeriod()}"/>
+                         action="#{clubC.createUnavailablePeriod()}"/>
           <p:commandButton value="#{msg['tarif.editor']}"
                          id="commandButtonBack"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-comment"
-                         disabled="#{courseC.unavailable.period.itemPeriod[0] eq null}"
+                         disabled="#{clubC.unavailable.period.itemPeriod[0] eq null}"
                          action="unavailable_editor.xhtml?faces-redirect=true"
                          />
           <p:commandButton value="Visualisation"
@@ -131,7 +131,7 @@
                          update="growl-msg"
                          immediate="true" 
                          icon="pi pi-plus"
-                         action="#{courseC.showUnavailableStructure}"/>
+                         action="#{clubC.showUnavailableStructure}"/>
           <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonMenu"
                          ajax="false"

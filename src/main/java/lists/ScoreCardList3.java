@@ -1,156 +1,159 @@
 package lists;
 
-import entite.composite.ECourseList;
+import entite.Club;
+import entite.Hole;
+import entite.Inscription;
 import entite.Player;
 import entite.Round;
+import entite.ScoreStableford;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import jakarta.inject.Named;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.ClubRowMapper;
+import rowmappers.HoleRowMapper;
+import rowmappers.InscriptionRowMapper;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.RowMapperRound;
+import rowmappers.ScoreStablefordRowMapper;
 
 @Named
-public class ScoreCardList3 {
-    private static List<ECourseList> liste = null; 
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-public List<ECourseList> list(final Player player, final Round round ,
-     //   final Inscription inscription,
-        final Connection conn) throws SQLException{
- final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+@ApplicationScoped
+public class ScoreCardList3 implements Serializable {
 
-if(liste != null){ // mod 09-04-2023
-    LOG.debug("escaped to ScoreCard3List repetition thanks to lazy loading");
-  //  LOG.debug("ScoreCard3List = " + liste);
-    liste.forEach(item -> LOG.debug("hole = " + item.getScoreStableford().getScoreHole()
-                            + " / points = " + item.getScoreStableford().getScorePoints()));
-    LOG.debug("total points = " + liste.stream()
-             .mapToInt(o->o.getScoreStableford().getScorePoints())
-             .sum());
-    return liste;
-} //end if
-    
-    LOG.debug("... entering " + methodName);
-    LOG.debug("with Player = ... = " + player.toString());
-    LOG.debug("with Round = ... = " + round.toString());
-//    LOG.debug("with Inscription = ... = " + inscription);
+    private static final long serialVersionUID = 1L;
 
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
- //   String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
- //   String sc = utils.DBMeta.listMetaColumnsLoad(conn, "score");
- //   String ho = utils.DBMeta.listMetaColumnsLoad(conn, "hole");
-  // String cl = utils.DBMeta.listMetaColumnsLoad(conn, "Club");
-  //   String co = utils.DBMeta.listMetaColumnsLoad(conn, "Course");
-//    String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
-  
-    String query = """
-        SELECT *
-         FROM course
-         JOIN player
-             ON player.idplayer = ?
-         JOIN round
-             ON round.idround = ?
-             AND round.course_idcourse = course.idcourse
-          JOIN player_has_round
-            ON  InscriptionIdPlayer = player.idplayer
-            AND InscriptionIdRound = round.idround
-          JOIN tee
-            ON course.idcourse = tee.course_idcourse
-            AND player_has_round.InscriptionIdTee = tee.idtee
-            AND tee.TeeGender = player.PlayerGender
-          JOIN hole
-            ON hole.tee_idtee = tee.TeeMasterTee
-            AND hole.tee_course_idcourse = course.idcourse
-            AND Hole.HoleNumber between roundstart and roundstart + roundholes - 1
-          JOIN score
-            ON score.player_has_round_player_idplayer = player.idplayer
-            AND score.player_has_round_round_idround = round.idround
-            AND hole.HoleNumber = score.ScoreHole
-          ORDER by hole.HoleNumber
-        """     ;
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, player.getIdplayer());
-     ps.setInt(2, round.getIdround());
- //    ps.setString(3, inscription.getInscriptionTeeStart() );
-         utils.LCUtil.logps(ps);
-    rs =  ps.executeQuery();
-    liste = new ArrayList<>();
-    while(rs.next()){
-          ECourseList ecl = new ECourseList();
-          ecl.setHole(entite.Hole.map(rs));
-       //   ecl.setRound(new entite.Round().map(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
-          ecl.setRound(new entite.Round().dtoMapper(rs));  // mod 21-10-2021
-          ecl.setInscription(entite.Inscription.map(rs));
-          ecl.setScoreStableford(entite.ScoreStableford.map(rs));
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-      liste.add(ecl );
-            //    LOG.debug("just after add to listsc3");
-  } //end while
-     if(liste.isEmpty()){
-         String msg = "££ Empty Result List in " + methodName;
-         LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
-  //       return null;
-     }else{
-         LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-     }
- ///  LOG.debug("exiting ScoreCard3List with " + liste.toString());
- 
-    return liste;
-}catch (SQLException e){
-        String msg = "SQL Exception in getScoreCard3List " + e;
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    String msg = "Exception in getScoreCard3List() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps);
-}
+    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    private List<ECourseList> liste = null;
 
-//}else{
-//      LOG.debug("escaped to ScoreCard3List repetition thanks to lazy loading");
-//      LOG.debug("ScoreCard3List = " + liste);
-//return liste;
-//}
+    public ScoreCardList3() { }
 
-} //end method
+    public List<ECourseList> list(final Player player, final Round round) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
 
-    public static List<ECourseList> getListe() {
-        return liste;
-    }
-    public static void setListe(List<ECourseList> liste) {
-        ScoreCardList3.liste = liste;
-    }
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            liste.forEach(item -> LOG.debug("hole = " + item.scoreStableford().getScoreHole()
+                    + " / points = " + item.scoreStableford().getScorePoints()));
+            LOG.debug("total points = " + liste.stream()
+                    .mapToInt(o -> o.scoreStableford().getScorePoints())
+                    .sum());
+            return liste;
+        }
 
- void main() throws SQLException, Exception{
-     Connection conn = new DBConnection().getConnection();
-  try{
+        LOG.debug(methodName + " with Player = " + player);
+        LOG.debug(methodName + " with Round = " + round);
+
+        final String query = """
+            SELECT *
+             FROM course
+             JOIN player
+                 ON player.idplayer = ?
+             JOIN round
+                 ON round.idround = ?
+                 AND round.course_idcourse = course.idcourse
+              JOIN player_has_round
+                ON  InscriptionIdPlayer = player.idplayer
+                AND InscriptionIdRound = round.idround
+              JOIN tee
+                ON course.idcourse = tee.course_idcourse
+                AND player_has_round.InscriptionIdTee = tee.idtee
+                AND tee.TeeGender = player.PlayerGender
+              JOIN hole
+                ON hole.tee_idtee = tee.TeeMasterTee
+                AND hole.tee_course_idcourse = course.idcourse
+                AND Hole.HoleNumber between roundstart and roundstart + roundholes - 1
+              JOIN score
+                ON score.player_has_round_player_idplayer = player.idplayer
+                AND score.player_has_round_round_idround = round.idround
+                AND hole.HoleNumber = score.ScoreHole
+              ORDER by hole.HoleNumber
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, player.getIdplayer());
+            ps.setInt(2, round.getIdround());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
+                RowMapper<Hole> holeMapper = new HoleRowMapper();
+                RowMapper<ScoreStableford> scoreStablefordMapper = new ScoreStablefordRowMapper();
+                RowMapperRound<Round> roundMapper = new RoundRowMapper();
+                RowMapper<Club> clubMapper = new ClubRowMapper();
+                Club club = new Club();
+                club = clubMapper.map(rs); // ne va rien donner ?
+                while (rs.next()) {
+                    ECourseList ecl = ECourseList.builder()
+                            .inscription(inscriptionMapper.map(rs))
+                            .round(roundMapper.map(rs, club))
+                            .hole(holeMapper.map(rs))
+                            .scoreStableford(scoreStablefordMapper.map(rs))
+                            .build();
+                    liste.add(ecl);
+                }
+            }
+
+            if (liste.isEmpty()) {
+                LOG.warn(methodName + " - empty result list");
+            } else {
+                LOG.debug(methodName + " - list size = " + liste.size());
+            }
+            return liste;
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    // ✅ Getters/setters d'instance
+    public List<ECourseList> getListe()                 { return liste; }
+    public void setListe(List<ECourseList> liste)       { this.liste = liste; }
+
+    // ✅ Invalidation explicite
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();
-        round.setIdround(636); // bawette
-   //     Inscription inscription = new Inscription();
-   //     inscription.setInscriptionIdTee(157);
-        var v = new ScoreCardList3().list(player, round, conn);
-     //   List<ECourseList> ec = new ScoreCard3List().list(player, round, conn);
-         v.forEach(item -> LOG.debug("list of items =" + item));  // java 8 lambda
-         v.forEach(item -> LOG.debug("scoreStableford =" + item.getScoreStableford()));  // java 8 lambda);
- }catch (Exception e){
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-          }
-   } // end main//
-} //end Class
+        round.setIdround(636);
+        // var v = list(player, round);
+        // v.forEach(item -> LOG.debug("list of items =" + item));
+        LOG.debug("from main, ScoreCardList3 = ");
+    } // end main
+    */
+
+} // end class

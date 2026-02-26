@@ -3,15 +3,107 @@ package read;
 import entite.Player;
 import entite.Round;
 import entite.ScoreStableford;
+import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 
-public class ReadStatisticsList implements interfaces.Log{
+@ApplicationScoped
+public class ReadStatisticsList implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    /**
+     * Charge les statistiques d'un score pour un joueur et un round
+     * Utilisé dans include_statistics.xhtml pour compléter la dataTable
+     */
+    public ArrayList<ScoreStableford.Statistics> load(final Player player, final Round round) throws SQLException {
+        LOG.debug("starting ReadStatisticsList.load");
+
+        final String query = """
+            SELECT *
+            FROM score, round
+            WHERE score.player_has_round_player_idplayer = ?
+              AND round.idround = ?
+              AND score.player_has_round_round_idround = round.idround
+              AND round.idround = score.player_has_round_round_idround
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, player.getIdplayer());
+            ps.setInt(2, round.getIdround());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                ArrayList<ScoreStableford.Statistics> statisticsList = new ArrayList<>();
+
+                while (rs.next()) {
+                    ScoreStableford.Statistics sta = new ScoreStableford().new Statistics();
+                    sta.setHole(rs.getInt("ScoreHole"));
+                    sta.setPar(rs.getInt("ScorePar"));
+                    sta.setStroke(rs.getInt("ScoreStroke"));
+                    sta.setFairway(rs.getInt("ScoreFairway"));
+                    sta.setGreen(rs.getInt("ScoreGreen"));
+                    sta.setPutt(rs.getInt("ScorePutts"));
+                    sta.setBunker(rs.getInt("ScoreBunker"));
+                    sta.setPenalty(rs.getInt("ScorePenalty"));
+                    statisticsList.add(sta);
+                }
+
+                LOG.debug("ReadStatisticsList returned " + statisticsList.size() + " statistics");
+                return statisticsList;
+            }
+
+        } catch (SQLException e) {
+            String msg = "SQLException in readStatisticsList: " + e.getMessage()
+                    + ", SQLState = " + e.getSQLState()
+                    + ", ErrorCode = " + e.getErrorCode();
+            LOG.error(msg, e);
+            throw e;
+
+        } catch (Exception e) {
+            String msg = "Exception in readStatisticsList: " + e.getMessage();
+            LOG.error(msg, e);
+            throw new SQLException(msg, e);
+        }
+    } // end method
+
+    void main() throws SQLException {
+        Player player = new Player();
+        Round round = new Round();
+        player.setIdplayer(324713);
+        round.setIdround(676);
+        
+        var v = new read.ReadStatisticsList().load(player, round);
+        LOG.debug("result main size = " + v.size());
+        LOG.debug("result main = " + v.toString());
+    } // end main
+
+} // end class
+/*
+import entite.Player;
+import entite.Round;
+import entite.ScoreStableford;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import connection_package.DBConnection;
+import utils.LCUtil;
+import static interfaces.Log.LOG;
+public class ReadStatisticsList {
      public ArrayList<ScoreStableford.Statistics> load(Connection conn, final Player player, final Round round) throws SQLException{     
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -76,3 +168,4 @@ void main() throws SQLException, Exception {
     DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } // end class
+*/

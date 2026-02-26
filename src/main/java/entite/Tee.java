@@ -4,10 +4,6 @@ package entite;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
@@ -18,11 +14,10 @@ import java.util.Arrays;
 import java.util.List;
 import utils.LCUtil;
 
-@Named
-@RequestScoped
+
 public class Tee implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
 //@NotNull(message="Bean validation : the Tee ID must be completed")
     private Integer idtee;
 
@@ -53,7 +48,8 @@ private BigDecimal teeRating;
     private Short teePar;
 private boolean notFound;
 
-private Integer course_idcourse;
+// private Integer course_idcourse;
+private int course_idcourse;
 
 // private Date teeModificationDate;
 private boolean NextTee; // 23/06/2013
@@ -137,13 +133,15 @@ private Integer teeDistanceTee;
         this.teeClubHandicap = teeClubHandicap;
     }
 
-    public Integer getCourse_idcourse() {
+    public int getCourse_idcourse() {
         return course_idcourse;
     }
 
-    public void setCourse_idcourse(Integer course_idcourse) {
+    public void setCourse_idcourse(int course_idcourse) {
         this.course_idcourse = course_idcourse;
     }
+
+
 
  //   public Date getTeeModificationDate() {
 //        return teeModificationDate;
@@ -244,9 +242,9 @@ public String toString(){
         return msg;
   }
 }   
-
+/* migrated
   public static Tee dtoMapper(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Tee t = new Tee();
         t.setIdtee(rs.getInt("idtee"));
@@ -268,5 +266,5 @@ public String toString(){
      return null;
   }
 } //end method map
-
+*/
 } // end class

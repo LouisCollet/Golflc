@@ -33,4 +33,12 @@ static void displayInterfaceInformation(NetworkInterface netint) throws SocketEx
     out.printf("MTU: %s\n", netint.getMTU());
     out.printf("\n");
  }
+static void cdiVersion(){
+        
+    
+    
+        }
+
+
+
  }  

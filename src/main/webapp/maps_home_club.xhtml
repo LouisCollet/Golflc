@@ -39,20 +39,20 @@
         <h:outputText value="Départ" 
                       style="width: 100px;"/>
         <h:inputText id="txtSource" 
-                     value="#{courseC.player.address.city}" size="40"/>
+                     value="#{playerC.player.address.city}" size="40"/>
 
         <h:outputText value="Destination" 
                       style="width: 100px;"/>
         <h:inputText id="txtDestination" 
-                     value="#{courseC.club.address.street},#{courseC.club.address.city},#{courseC.club.address.country.code}" size="60"/>
+                     value="#{clubC.club.address.street},#{clubC.club.address.city},#{clubC.club.address.country.code}" size="60"/>
 
         <p:outputLabel for="@next" value="#{msg['club.latitude']} :"   />
         <p:inputText   id="ClubLatitude"
-                       value="#{courseC.club.clubLatitude}"/>
+                       value="#{clubC.club.clubLatitude}"/>
     
         <p:outputLabel for="@next" value="#{msg['club.longitude']} :"   />
         <p:inputText   id="ClubLongitude"
-                       value="#{courseC.club.clubLongitude}"/>
+                       value="#{clubC.club.clubLongitude}"/>
  <!--       
         getRoute se trouve dans un fichier.js externe 
         <h:button value="Back to selectCourse" outcome="selectCourse.xhtml"/

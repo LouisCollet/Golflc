@@ -42,7 +42,7 @@
         <p:inputText id="textA21"
                      size="25"
                      title="#{msg['tooltip.club.clubname']}"
-		     value="#{courseC.club.clubName}"
+		     value="#{clubC.club.clubName}"
                       />
 
         <p:outputLabel for="@next" 
@@ -805,14 +805,14 @@ FlexGrid is a CSS utility based on flexbox. For more information about Flex, vis
 A basic grid is defined by giving a container grid class and children the col class. 
 Children of the grid will have the same width and scale according to the width of the parent.
 <div class="grid">
-    <div class="col">col 1#{courseC.player.playerFirstName}</div>
+    <div class="col">col 1#{playerC.player.playerFirstName}</div>
     <div class="col">
-        <input id="lastname1" type="text" value="#{courseC.player.playerFirstName}">
+        <input id="lastname1" type="text" value="#{playerC.player.playerFirstName}">
         </input>
     </div>
-    <div class="col">col 3#{courseC.player.playerFirstName}</div>
+    <div class="col">col 3#{playerC.player.playerFirstName}</div>
     <div class="col">col 2
-        <input id="lastname1" type="text" value="#{courseC.player.playerFirstName}"/>
+        <input id="lastname1" type="text" value="#{playerC.player.playerFirstName}"/>
     </div>
 </div>
 

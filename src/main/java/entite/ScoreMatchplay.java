@@ -9,8 +9,8 @@ import java.util.Arrays;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
 
-@Named("scoreMatchplay")
-@RequestScoped
+//@Named("scoreMatchplay")enlevé 14-02-2026
+//@RequestScoped
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY) // private or public !
 public class ScoreMatchplay implements Serializable{
     private static final long serialVersionUID = 1L;

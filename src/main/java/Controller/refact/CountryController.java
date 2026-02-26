@@ -1,32 +1,44 @@
-package Controllers;
+package Controller.refact;
 
+import context.ApplicationContext;
+import entite.Club;
 import entite.Country;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.primefaces.event.SelectEvent;
-import services.CountryService;
+import static utils.LCUtil.showMessageFatal;
+import static utils.LCUtil.showMessageInfo;
 
-// not used anymore 29/12/2022
 
 @Named("countryC")
 @ApplicationScoped 
 // @SessionScoped
 public class CountryController implements Serializable{
-    @Inject private CountryService countryService;
+    @Inject private service.CountryService countryService;
    private static Map<String, String> countriesMap = null;
    private List<Country> countries;
+   @Inject private ApplicationContext appContext;
+      private Country country;
 
+    public Country getCountry() {
+        return country;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+      
     public List<Country> getCountries() {
         LOG.debug("entering getCountries for countries = " + countries);
         return countries;
@@ -42,7 +54,7 @@ public CountryController(){  // constructor
         countriesMap = createMap(Locale.ENGLISH); // à modifier en fonction user ? non default = "en"
            LOG.debug("just before getCountries");
    //     countries = new services.CountryService().init();
-        countries = new services.CountryService().getCountries();
+        countries = new service.CountryService().getCountries();
 }
      
     public Map<String, String> getCountriesMap() {
@@ -122,8 +134,8 @@ try{
   //          LOG.debug("Done");
         }      
     } // end method
-
-public List<Country> completeCountry(String query) { // autocomplete used in club.xhtml    player.xhtml
+/*
+public List<Country> completeCountry(String query) { // autocomplete used in club.xhtml/player.xhtml
     LOG.debug("entering CountryController completeCountry with query = " + query);
         String queryLowerCase = query.toLowerCase();
   //      LOG.debug("countryService = " + countryService);
@@ -140,21 +152,92 @@ public List<Country> completeCountry(String query) { // autocomplete used in clu
                         .contains(queryLowerCase))
                         .collect(Collectors.toList());
  //       return countries;
+    } // end method
+*/
+public List<Country> completeCountry(String query) {
+        try {
+             LOG.debug("entering CountryController completeCountry with query = " + query);
+            if (query == null || query.trim().isEmpty()) return Collections.emptyList();
+
+            List<Country> allCountries = countryService.getCountries();
+            if (allCountries == null || allCountries.isEmpty()) {
+                LOG.warn("Country list is empty from CountryService");
+                return Collections.emptyList();
+            }
+
+            String lowerQuery = query.toLowerCase();
+            List<Country> filtered = allCountries.stream()
+                .filter(c -> c.getName() != null && c.getName().toLowerCase().contains(lowerQuery))
+                .limit(10)
+                .collect(Collectors.toList());
+
+            LOG.debug("Found {} countries matching '{}'", filtered.size(), query);
+            return filtered;
+        } catch (Exception e) {
+            LOG.error("Error in completeCountry", e);
+            return Collections.emptyList();
+        }
+    } // end method
+
+
+//public void onCountrySelect(SelectEvent<String> event) {
+//        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Country Selected", event.getObject()));
+//    }
+
+    public void onCountrySelect(SelectEvent<String> event) {
+        try {
+            LOG.debug("entering onCountrySelect for Club");
+            String countrySelected = event.getObject();
+            String msg = "country selected = " + countrySelected;
+            LOG.debug(msg);
+
+            if (countrySelected == null || countrySelected.trim().isEmpty()) {
+                LOG.warn("Country code is null or empty");
+                showMessageInfo("Invalid country selection");
+                return;
+            }
+
+            List<Country> allCountries = countryService.getCountries();
+            Country selectedCountry = allCountries.stream()
+                .filter(c -> c.getCode() != null &&
+                            c.getCode().equalsIgnoreCase(countrySelected))
+                .findFirst()
+                .orElse(null);
+
+            if (selectedCountry == null) {
+                LOG.warn("Country not found for code: {}", countrySelected);
+                showMessageInfo("Country not found: " + countrySelected);
+                return;
+            }
+
+            this.country = selectedCountry;
+
+            Club club = appContext.getClub();               // ✅ current supprimé
+
+            if (club != null && club.getAddress() != null) {
+                // Code original : club.getAddress().getCountry().setCode(countrySelected)
+                club.getAddress().getCountry().setCode(countrySelected);
+                LOG.debug("club address is now = {}", club.getAddress());
+                String confirmMsg = String.format("Country selected: %s (%s)",
+                                                 selectedCountry.getName(),
+                                                 countrySelected);
+                showMessageInfo(confirmMsg);
+            } else {
+                LOG.warn("Club or club address is null");
+                showMessageInfo("Cannot set country: club address not initialized");
+            }
+        } catch (Exception e) {
+            String errorMsg = "Error in onCountrySelect: " + e.getMessage();
+            LOG.error(errorMsg, e);
+            showMessageFatal(errorMsg);
+        }
     }
 
-public void onCountrySelect(SelectEvent<String> event) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Country Selected", event.getObject()));
-    }
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
 
-  void main() {
-	CountryController cc = new CountryController();
-	var v = cc.createMap(Locale.ENGLISH);
-        LOG.debug("createMap = " + v.toString());
-	//var list = obj.getListOfCountries(); //Locale.ENGLISH
-        var list = cc.completeCountry(""); //Locale.ENGLISH
-        
-   //     LOG.debug(" " + b);
-        list.forEach(item -> LOG.debug("list of countries = " + item));  // java 8 lambda
-     } //end main 
-
-}
+} // end class

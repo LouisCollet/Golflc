@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jakarta.annotation.Generated;
-import jakarta.inject.Named;
+// import jakarta.inject.Named;  // migrated 2026-02-24
 
 // generated !!https://github.com/joelittlejohn/jsonschema2pojo/wiki/Getting-Started#using-jsonschema2pojo-within-your-java-project-embedded
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -204,7 +204,7 @@ this.additionalProperties.put(name, value);
 
 // ----------------------------------
 
-@Named
+// @Named  // migrated 2026-02-24
 
 //-----------------------------------com.example.Clouds.java-----------------------------------
 

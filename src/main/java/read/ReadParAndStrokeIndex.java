@@ -8,29 +8,122 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import utils.DBConnection;
+import javax.sql.DataSource;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
+
+@ApplicationScoped
+public class ReadParAndStrokeIndex implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    /**
+     * Lit les PAR et Stroke Index depuis le master tee (YELLOW, M, 01-18)
+     * Complète le scoreStableford avec les arrays PAR et INDEX
+     */
+    public ScoreStableford read(final Course course, ScoreStableford scoreStableford) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+
+        LOG.debug("entering " + methodName);
+        LOG.debug("with course = " + course);
+        LOG.debug("with scoreStableford = " + scoreStableford);
+
+        final String query = """
+            WITH
+               selection1 AS (
+                  SELECT * FROM hole
+                     WHERE hole.tee_course_idcourse = ?
+                ),
+               selection2 AS ( -- master tee
+                  SELECT idtee FROM tee
+                  WHERE tee.course_idcourse = ?
+                    AND tee.TeeStart = "YELLOW"
+                    AND tee.TeeGender = "M"
+                    AND tee.TeeHolesPlayed = "01-18"
+                )
+            SELECT * FROM selection1
+               JOIN selection2
+               WHERE selection1.tee_idtee = selection2.idtee
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, course.getIdcourse());
+            ps.setInt(2, course.getIdcourse());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                int i = 0;
+                int[] PAR = new int[18];   // contient les par des 18 trous
+                int[] INDEX = new int[18]; // contient les index des 18 trous
+
+                while (rs.next()) {
+                    PAR[i] = rs.getInt("HolePar");
+                    INDEX[i] = rs.getInt("HoleStrokeIndex");
+                    i++;
+                }
+
+                LOG.debug("finishing " + methodName + " with par          = " + Arrays.toString(PAR));
+                LOG.debug("finishing " + methodName + " with Stroke Index = " + Arrays.toString(INDEX));
+
+                scoreStableford.setParArray(PAR);
+                scoreStableford.setIndexArray(INDEX);
+
+                return scoreStableford;
+            }
+
+        } catch (SQLException e) {
+            String msg = "SQLException in " + methodName + ": " + e.getMessage()
+                    + ", SQLState = " + e.getSQLState()
+                    + ", ErrorCode = " + e.getErrorCode();
+            LOG.error(msg, e);
+            throw e;
+
+        } catch (Exception e) {
+            String msg = "Exception in " + methodName + ": " + e.getMessage();
+            LOG.error(msg, e);
+            throw new SQLException(msg, e);
+        }
+    } // end method
+
+    void main() throws SQLException {
+        Course course = new Course();
+        course.setIdcourse(681);
+        ScoreStableford scoreStableford = new ScoreStableford();
+
+        scoreStableford = new read.ReadParAndStrokeIndex().read(course, scoreStableford);
+        LOG.info("scoreStableford with arrays par and stroke index = " + scoreStableford);
+    } // end main
+
+} // end class
+/*
+import entite.Course;
+import entite.ScoreStableford;
+import static interfaces.Log.LOG;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import connection_package.DBConnection;
 import utils.LCUtil;
 
 public class ReadParAndStrokeIndex {
-private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
 
 public ScoreStableford read(Connection conn, final Course course, ScoreStableford scoreStableford) throws SQLException{
-final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering " + methodName);
     LOG.debug("with course  = " + course);
     LOG.debug("with scoreStableford = " + scoreStableford); // output
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
-/*    
-final String query = """
-      SELECT *
-      FROM hole
-      WHERE hole.tee_course_idcourse = ?
-      GROU P BY HoleNumber
- """; 
-à remplacer par le 30/09/2024
-    */
 final String query = """
 WITH
    selection1 AS (
@@ -104,3 +197,4 @@ void main() throws SQLException, Exception{
     DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } // end class
+*/

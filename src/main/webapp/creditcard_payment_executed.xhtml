@@ -42,34 +42,34 @@
     <h:outputText  id="Total"
                 value="#{msg['creditcard.amountpaid']} :" />
     <h:outputText  id="TotalPrice"
-                value="#{courseC.creditcard.totalPrice}"
+                value="#{payC.creditcard.totalPrice}"
                 style="font-size: 3rem;" />
     
     <h:outputText value="#{msg['tarif.members.currency']} :" />
-    <h:outputText value="#{courseC.creditcard.creditcardCurrency}"
+    <h:outputText value="#{payC.creditcard.creditcardCurrency}"
                   style="font-size: 2em;" />
     
     <h:outputText value="#{msg['creditcard.communication']} :" />
     <h:outputText id="Communication"
-                  value="#{courseC.creditcard.communication}"
+                  value="#{payC.creditcard.communication}"
                   title="#{msg['tooltip.club.clubaddress']}" />
     
     <h:outputText value="#{msg['creditcard.holder']} :" />
     <h:outputText  id="Holder"
-                   value="#{courseC.creditcard.creditcardHolder}" />
+                   value="#{payC.creditcard.creditcardHolder}" />
     
     <h:outputText  value="#{msg['creditcard.number']} :"/>
     <h:outputText  id="creditcardNumber"
-                   value="#{courseC.creditcard.creditCardNumberSecret}" />
+                   value="#{payC.creditcard.creditCardNumberSecret}" />
   <!--  
     <h:outputText value="#{msg['creditcard.type']} :"   />
     <h:outputText  id="TypeCreditcard"
-                   value="#{courseC.creditcard.creditcardType}" />
+                   value="#{payC.creditcard.creditcardType}" />
 -->
     <h:outputText id="communication"
                   value="#{msg['creditcard.reference']} : "/>
     <h:outputText id="taskResult"
-                  value="#{courseC.creditcard.creditcardPaymentReference}"/>
+                  value="#{payC.creditcard.creditcardPaymentReference}"/>
 
     <f:facet name="footer">
          <p:commandButton value="Back to Welcome screen"

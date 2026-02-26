@@ -1,0 +1,100 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:h="jakarta.faces.html"
+    xmlns:p="primefaces"
+    xmlns:f="jakarta.faces.core"
+    xmlns:cc="jakarta.faces.composite">
+
+    <!-- ========================= summaryCompetition.xhtml-->
+    <!-- Déclaration des attributs -->
+    <!-- ========================= -->
+    <cc:interface>
+        <cc:attribute name="competition" required="true" />
+        <cc:attribute name="tee" required="false" />
+        <cc:attribute name="droppedPlayers" required="false" />
+    </cc:interface>
+
+    <!-- ========================= -->
+    <!-- Implementation du composant -->
+    <!-- ========================= -->
+    <cc:implementation>
+
+        <p:panel class="shadow-2 surface-card p-3 mb-4">
+
+            <!-- Header -->
+            <div class="grid grid-nogutter align-items-center mb-3">
+                <div class="col-12 md:col-6 font-bold text-lg">
+                    <h2>#{msg['title.summary.competition']}</h2>
+                </div>
+                <div class="col-12 md:col-6 text-right font-medium">
+                    <h:outputText value="#{cc.attrs.competition.competitionDate}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="localDateTime"/>
+                    </h:outputText>
+                </div>
+            </div>
+
+            <!-- Body Grid: 3 cols desktop, 2 cols tablet, 1 col mobile -->
+            <div class="grid grid-nogutter gap-3">
+
+                <!-- Competition Name -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['competition.name']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">#{cc.attrs.competition.competitionName}</div>
+
+                <!-- Club -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['club.name']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">#{cc.attrs.competition.competitionClubId}</div>
+
+                <!-- Course & Holes Played -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['course.name']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">
+                    #{cc.attrs.competition.competitionCourseIdName}
+                    <ui:fragment rendered="#{not empty cc.attrs.tee}">
+                        - #{cc.attrs.tee.teeHolesPlayed} holes
+                    </ui:fragment>
+                </div>
+
+                <!-- End Inscription -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['competition.end.inscription']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">
+                    <h:outputText value="#{cc.attrs.competition.endInscriptionDate}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="localDateTime"/>
+                    </h:outputText>
+                </div>
+
+                <!-- Game -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['round.game']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">#{cc.attrs.competition.competitionGame}</div>
+
+                <!-- Gender -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['competition.gender']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">#{cc.attrs.competition.competitionGender}</div>
+
+                <!-- Qualifying -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['competition.qualifying']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">#{cc.attrs.competition.competitionQualifying}</div>
+
+                <!-- Status -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['competition.status']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">#{cc.attrs.competition.competitionStatus}</div>
+
+                <!-- Max Players -->
+                <div class="col-12 sm:col-6 md:col-4 font-bold">#{msg['competition.maxplayers']}:</div>
+                <div class="col-12 sm:col-6 md:col-8">#{cc.attrs.competition.competitionMaximumPlayers}</div>
+
+            </div>
+
+            <!-- Dropped Players -->
+            <ui:fragment rendered="#{not empty cc.attrs.droppedPlayers}">
+                <p:divider layout="horizontal" />
+                <h:outputText value="#{msg['player.selected']}:" class="font-bold mb-2" />
+                <ui:repeat value="#{cc.attrs.droppedPlayers}" var="p">
+                    <h:outputText value="#{p.playerLastName} (#{p.idplayer}), " />
+                </ui:repeat>
+            </ui:fragment>
+
+        </p:panel>
+
+    </cc:implementation>
+
+</ui:composition>

@@ -16,44 +16,35 @@
 <f:facet name="header">
     <h1>#{msg['title.summary.club']}</h1>
 </f:facet>
-      
-
       <h:outputText value="#{msg['club.name']} :"   />
 	<h:outputText
             id="clubsummary" 
-            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+            value="#{clubC.club.clubName} (#{clubC.club.idclub})" />
 
       <h:outputText value="#{msg['course.name']} :"
-            rendered="#{courseC.course.courseName ne null}"/>
+            rendered="#{clubC.course.courseName ne null}"/>
       <h:outputText
             id="coursesummary"
-            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" 
-            rendered="#{courseC.course.courseName ne null}"/>
+            value="#{clubC.course.courseName} (#{clubC.course.idcourse})" 
+            rendered="#{clubC.course.courseName ne null}"/>
 
       <h:outputText value="#{msg['club.zoneid']} :"   />
 	<h:outputText
             id="clubszoneId" 
-            value="#{courseC.club.address.zoneId}" />
+            value="#{clubC.club.address.zoneId}" />
         
         <h:outputText value="#{msg['address.city']} :"   />
-	<h:outputText
-            id="clubsCity" 
-            value="#{courseC.club.address.city} - #{courseC.club.address.country.code}" />  
-       
-        <h:outputText value="#{msg['club.id']} :"   />
-	<h:outputText
-            id="clubId" 
-            value="#{courseC.club.idclub}" />
-        
+	<h:outputText id="clubsCity" 
+            value="#{clubC.club.address.city} - #{clubC.club.address.country.code}" />  
+
       <h:outputText value="#{msg['tee.id']} :" 
-                    rendered="#{courseC.tee.idtee != null}"/>
+                    rendered="#{clubC.tee.idtee != null}"/>
       <h:outputText
             id="teesummary"
-            value="(#{courseC.tee.idtee}) S=#{courseC.tee.teeGender} ,START=#{courseC.tee.teeStart} ,HP=#{courseC.tee.teeHolesPlayed} ,MT=#{courseC.tee.teeMasterTee} 
-                    ,DT=#{courseC.tee.teeDistanceTee} "
+            value="(#{clubC.tee.idtee}) S=#{clubC.tee.teeGender} ,START=#{clubC.tee.teeStart} ,HP=#{clubC.tee.teeHolesPlayed} ,MT=#{clubC.tee.teeMasterTee} 
+                    ,DT=#{clubC.tee.teeDistanceTee} "
             title="#{msg['title.hole.holenumber']}"
-            rendered="#{courseC.tee.idtee != null}"/>
-                     
+            rendered="#{clubC.tee.idtee != null}"/>
 </p:panelGrid>
 <p:divider layout="horizontal" type="solid" />
 </ui:composition>

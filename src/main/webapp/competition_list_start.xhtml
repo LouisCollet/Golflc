@@ -16,7 +16,7 @@
 <ui:include src="include/include_summary_competition.xhtml"/>
 
 <p:dataTable id="competition"
-             value="#{courseC.listStartCompetition()}"
+             value="#{roundC.listStartCompetition()}"
              rowIndexVar="row"
              resizableColumns="true"
              var="c"
@@ -26,7 +26,7 @@
  <f:facet name="header">
     <h:outputText escape="false" value="#{msg['competition.startinglist.title'] }" />
     <h2>#{c.competitionDescription.competitionName} </h2>
-    execution = #{courseC.competition.competitionDescription.competitionExecution}
+    execution = #{roundC.competition.competitionDescription.competitionExecution}
 </f:facet>
     
          <p:column id="compFlight"
@@ -68,7 +68,7 @@
                 id="registerScore2"
                 ajax="false"
                 rendered="#{c.competitionDescription.competitionStatus eq '3'}"
-                action="#{courseC.selectedCompetitionScoreStableford(c)}"
+                action="#{roundC.selectedCompetitionScoreStableford(c)}"
                 value="#{c.competitionData.cmpDataPlayerId}-Score"
                 style="float:right;"
                 title="#{msg['tooltip.competition.score']}"
@@ -88,7 +88,7 @@
                 id="registerScore1"
                 ajax="false"
                 rendered="#{c.competitionDescription.competitionStatus eq '3'}"
-                action="#{courseC.selectedCompetitionScoreStableford(c)}"
+                action="#{roundC.selectedCompetitionScoreStableford(c)}"
                 value="#{c.competitionData.cmpDataPlayerId}-Score"
                 style="float:right;"
                 title="#{msg['tooltip.competition.score']}"
@@ -126,7 +126,7 @@
 	</p:column>
 
 <f:facet name="footer">
-<!-- rendered="#{courseC.player.playerRole eq 'ADMIN' or courseC.player.playerRole eq 'admin'}" 
+<!-- 
 
  https://stackoverflow.com/questions/20456143/auto-calculate-total-sum-of-a-column-with-numeric-data-in-datatable-footer/
 h:dataTable value="#{bean.items}" var="item">
@@ -137,10 +137,10 @@ h:dataTable value="#{bean.items}" var="item">
         Total: #{bean.items.stream().map(item->item.number).sum()}
     </f:facet> #{c.competitionData.cmpDataId}
 </h:dataTable>
-/> value="#{courseC.listStartCompetition()}"
-total des Id = #{courseC.listStartCompetition().stream().c.map(item->c.competitionData.cmpDataId).sum()}
+/> value="#{roundC.listStartCompetition()}"
+total des Id = #{roundC.listStartCompetition().stream().c.map(item->c.competitionData.cmpDataId).sum()}
 -->
-Nombre d'inscrits : #{courseC.listStartCompetition().size()}
+Nombre d'inscrits : #{roundC.listStartCompetition().size()}
 
 </f:facet>
 <br/>

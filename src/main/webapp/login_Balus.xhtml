@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE html>
 <html
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces"
->
+      xmlns:p="primefaces">
 
 <ui:composition template="templates/masterTemplate.xhtml">
-    <!--  new 27-08-2018  
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewAction action="#{courseC.login.start()}"/>
-    </f:metadata>
-</ui:define>
--->
+
 <ui:define name="title">
     Login
 </ui:define>
@@ -26,8 +18,7 @@
 <h:link id="link01"
         title="#{msg['login.user.old']}"
         outcome="views/selectPlayer.xhtml"
-        style="float:left;"
-        >
+        style="float:left;" >
         <h:graphicImage 
                     rendered="true"
                     name="images/login.jpg"
@@ -39,8 +30,7 @@
 <h:link id="link02"
         title="#{msg['login.user.new']}"
         outcome="register.xhtml"
-        style="float:right;"
-        > 
+        style="float:right;" > 
         <h:graphicImage 
                 rendered="true"
                 name="images/register.jpg"

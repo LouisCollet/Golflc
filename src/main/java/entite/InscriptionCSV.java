@@ -2,10 +2,10 @@
 package entite;
 
 import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
-@Named
-@RequestScoped
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 public class InscriptionCSV implements Serializable, interfaces.Log, interfaces.GolfInterface{
     private static final long serialVersionUID = 1L;
 

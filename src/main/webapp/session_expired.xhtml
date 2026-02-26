@@ -8,12 +8,19 @@
       xmlns:of="omnifaces"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-
-    <ui:define name="metadata">
+<!-- old solution 
+<ui:define name="metadata">
     <f:metadata>
         <f:viewAction action="#{courseC.logout(param['cmd'])}"/>
     </f:metadata>
 </ui:define>
+  -->  
+    <!-- METADATA en direct -->
+<f:metadata>
+    <f:viewAction action="#{courseC.logout(param['cmd'])}"/>
+</f:metadata>
+    
+    
     
 <ui:define name="title">Session Expired </ui:define>
 <ui:define name="content">
@@ -41,6 +48,7 @@
     <h1>Session Expired !! <br/>
          #{msg['login.welcome.back']} <br/>
          #{param['cmd']}
+        
     </h1>
 </f:facet>
 
@@ -52,19 +60,6 @@
      <li>Max Inactive Interval : #{session.maxInactiveInterval}</li>
      <li>Session Creation Time: #{session.creationTime}</li>
      <li>Session Id: #{session.id}</li>
-<!--  LocalDateTime ldt = Instant.ofEpochMilli(session.getCreationTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
-  //      LOG.debug("session was created at localdatetime : " + ldt.format(ZDF_TIME)); 
-  //      LOG.debug("destroy time = " + LocalDateTime.now().format(ZDF_TIME));
-   
-     
-       ne donnent rien ==>
-     <li>Ajax partialView request: #{facesContext.partialViewContext.ajaxRequest ? 'Yes' : 'No'}</li>
-     <li>Status code: #{requestScope['jakarta.servlet.error.status_code']}</li>
-     <li>Exception type : #{requestScope['jakarta.servlet.error.exception_type']}</li>
-     <li>Exception message: #{requestScope['jakarta.servlet.error.message']}</li>
-     <li>Stack trace:
-         <pre>#{of:printStackTrace(requestScope['jakarta.servlet.error.exception'])}</pre>
-     </li>  -->
  </ul>
 
 <f:facet name="footer">

@@ -1,165 +1,169 @@
 package lists;
 
 import entite.Classment;
+import entite.Club;
 import entite.CompetitionDescription;
-import entite.composite.ECourseList;
+import entite.Course;
 import entite.HandicapIndex;
+import entite.Inscription;
+import entite.Player;
+import entite.Round;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.ClubRowMapper;
+import rowmappers.CourseRowMapper;
+import rowmappers.InscriptionRowMapper;
+import rowmappers.PlayerRowMapper;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.RowMapperRound;
 
-public class ParticipantsStablefordCompetitionList implements Serializable, interfaces.Log{
-    private static List<ECourseList> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
- 
-  public List<ECourseList> list(final CompetitionDescription competition ,final Connection conn) throws SQLException{ 
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+@Named
+@ApplicationScoped
+public class ParticipantsStablefordCompetitionList implements Serializable, interfaces.Log {
 
-if(liste == null){
-    LOG.debug(" ... entering " + methodName);
-    LOG.debug(" with Competition Description = " + competition);
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
+    private static final long serialVersionUID = 1L;
 
-    final String query = """
-       SELECT *
-       FROM player
-       JOIN competition_description
-          ON CompetitionId = ?
-       JOIN round
-           ON round.RoundName = competition_description.CompetitionName
-       JOIN course
-           ON round.course_idcourse = course.idcourse
-       JOIN club
-           ON course.club_idclub = club.idclub
-       JOIN player_has_round
-           ON  InscriptionIdPlayer = player.idplayer
-           AND InscriptionIdRound = round.idround
-       ORDER by player_has_round.InscriptionFinalResult DESC
-    """;
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, competition.getCompetitionId()); //.getCompetitionName());
+    @Inject private read.ReadClassment            readClassment;
+    @Inject private find.FindHandicapIndexAtDate  findHandicapIndexAtDate;
 
-      utils.LCUtil.logps(ps);
-    rs =  ps.executeQuery();
-    liste = new ArrayList<>();
-    int i = 0;
-  //  Club club = null;
-	while(rs.next()){
-            i++;
-          ECourseList ecl = new ECourseList();
-          ecl.setClub(entite.Club.dtoMapper(rs));
-          ecl.setCourse(entite.Course.dtoMapper(rs));
-          ecl.setRound(new entite.Round().dtoMapper(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
-          ecl.setInscription(entite.Inscription.map(rs));
-          ecl.setPlayer(entite.Player.map(rs));
-       // et si erreur ? cla = null
-          Classment cla = new read.ReadClassment().read(ecl.getPlayer(), ecl.getRound(),conn);
-          ecl.setClassment(cla);
-          HandicapIndex handicapIndex = new HandicapIndex();
-          handicapIndex.setHandicapPlayerId(ecl.getPlayer().getIdplayer());
-          handicapIndex.setHandicapDate(ecl.getRound().getRoundDate());
-          handicapIndex = new find.FindHandicapIndexAtDate().find(handicapIndex, conn);
-          ecl.setHandicapIndex(handicapIndex);
-	liste.add(ecl);
-	} // end while
-  if(i == 0){
-       String msg = "££ Empty Result List in " + methodName;
-       LOG.error(msg);
-       LCUtil.showMessageFatal(msg);
- //      return null;
-  }else{
-         LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-   }
-    LOG.debug("ending liste  =  ",  Arrays.deepToString(liste.toArray()) );
-    
-// https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
-  //LOG.debug
-  //liste.forEach(item -> LOG.debug("liste before sort " + item));
-  liste.forEach(item -> LOG.debug("liste BEFORE sort " + NEW_LINE + item.getPlayer().getPlayerLastName()+ item.getClassment().getTotalPoints()));
-/* bug !!
-  liste.sort(Comparator.comparingInt((ECourseList p)->p.Eclassment.getTotalPoints() ).reversed()  // descending
-   //        liste.sort(Comparator.comparingInt((ECourseList p)->p.Eclassment.getLast3() ).reversed()
-               //    .thenComparing((ECourseList p)->p.Eclassment.getTotalPoints() )
-              .thenComparingInt((ECourseList p)->p.Eclassment.getLast9() ).reversed()
-              .thenComparingInt((ECourseList p)->p.Eclassment.getLast6() ).reversed()
-                 .thenComparingInt((ECourseList p)->p.Eclassment.getLast3() ).reversed()
-                .thenComparingInt((ECourseList p)->p.Eclassment.getLast1() ).reversed()
-            );
-  liste.forEach(item -> LOG.debug("liste AFTER sort1 " + NEW_LINE + item.Eplayer.getPlayerFirstName()+ item.Eclassment));
-  */
-   // attention au au -p
-   ///https://stackoverflow.com/questions/51565422/java-8-compare-multiple-fields-in-different-order-using-comparator
-   //There is no need to use the method Comparator::reverse. 
-   //Since you want to reverse the comparison based on the integer, just negate the age -p.getAge()
-// and it will be sorted in the descending order:
-    liste.sort(Comparator.comparingInt((ECourseList p)-> p.getClassment().getTotalPoints() ).reversed()  // -p=descending trick !!!
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast9() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast6() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast3() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast1() ).reversed()
-            );
+    private List<ECourseList> liste = null;
 
- //  liste.sort(Comparator.comparing((ECourseList p)-> p.getClassment().getTotalPoints()).reversed());// p)-> -p.getClassment().getTotalPoints() ));
-    
- //  .thenComparingInt((ECourseList p)-> -p.getClassment().getLast1() )
-    
-     liste.forEach(item -> LOG.debug("liste AFTER sort = " + NEW_LINE + item.getPlayer().getPlayerFirstName() + " / "
-                                            + item.getPlayer().getIdplayer() + " /" + item.getClassment()));
-    return liste;
-}catch (NullPointerException npe){ 
-    String msg = "NullPointerException in " + methodName + npe;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}catch (SQLException e){
-        String msg = "SQL Exception in " + methodName + e;
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    String msg = "Exception in getParticipantsStableford() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}finally{
-        DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
-   //    LOG.debug("escaped to listParticipants repetition with lazy loading");
-    return liste;  //plusieurs fois ??
-    }
-} //end method
+    public ParticipantsStablefordCompetitionList() { }
 
-    public static List<ECourseList> getListe() {
-        return liste;
-    }
-    public static void setListe(List<ECourseList> liste) {
-        ParticipantsStablefordCompetitionList.liste = liste;
-    }
+    public List<ECourseList> list(final CompetitionDescription competition) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(methodName + " - with Competition Description = " + competition);
 
- void main() throws SQLException, Exception {// testing purposes
-    Connection conn = new DBConnection().getConnection();
-    CompetitionDescription cde = new CompetitionDescription();
-    
- //  cde.setCompetitionName("Competition de test 24");
-   cde.setCompetitionId(24);
-   List<ECourseList> ecl = new ParticipantsStablefordCompetitionList().list(cde, conn);
-     LOG.debug("résultat : " + ecl.getFirst()); // was get(0)
-   Classment c = new Classment();
-      LOG.debug("Inscription list = " + ecl.toString());
-     ecl.forEach(item -> LOG.debug("Participants Stableford list = " + item.getClassment() + "/" + item.getPlayer().getPlayerLastName()));  // java 8 lambda                     
-   DBConnection.closeQuietly(conn, null, null, null);
-}// end main
-} //end class
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            return liste;
+        }
+
+        final String query = """
+            SELECT *
+            FROM player
+            JOIN competition_description
+               ON CompetitionId = ?
+            JOIN round
+                ON round.RoundName = competition_description.CompetitionName
+            JOIN course
+                ON round.course_idcourse = course.idcourse
+            JOIN club
+                ON course.club_idclub = club.idclub
+            JOIN player_has_round
+                ON  InscriptionIdPlayer = player.idplayer
+                AND InscriptionIdRound = round.idround
+            ORDER BY player_has_round.InscriptionFinalResult DESC
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, competition.getCompetitionId());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                int i = 0;
+                RowMapper<Club> clubMapper = new ClubRowMapper();
+                RowMapper<Course> courseMapper = new CourseRowMapper();
+                RowMapper<Player> playerMapper = new PlayerRowMapper();
+                RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
+                RowMapperRound<Round> roundMapper = new RoundRowMapper();
+                while (rs.next()) {
+                    i++;
+                    Player player = playerMapper.map(rs);
+                    Club club = clubMapper.map(rs);
+                    Round round = roundMapper.map(rs, club);
+                    Classment classment = readClassment.read(player, round);
+                    LOG.debug(methodName + " - classment in while = " + classment);
+                    HandicapIndex handicapIndex = new HandicapIndex();
+                    handicapIndex.setHandicapPlayerId(player.getIdplayer());
+                    handicapIndex.setHandicapDate(round.getRoundDate());
+                    handicapIndex = findHandicapIndexAtDate.find(handicapIndex);
+                    LOG.debug(methodName + " - handicapIndex in while = " + handicapIndex);
+                    ECourseList ecl = ECourseList.builder()
+                            .club(club)
+                            .course(courseMapper.map(rs))
+                            .handicapIndex(handicapIndex)
+                            .inscription(inscriptionMapper.map(rs))
+                            .round(round)
+                            .player(player)
+                            .classment(classment)
+                            .build();
+                    liste.add(ecl);
+                } // end while
+                if (i == 0) {
+                    LOG.warn(methodName + " - empty result list");
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+
+                liste.forEach(item -> LOG.debug("liste BEFORE sort" + NEW_LINE
+                        + item.player().getPlayerLastName() + item.classment().getTotalPoints()));
+
+                liste.sort(Comparator.comparingInt((ECourseList p) -> p.classment().getTotalPoints()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast9()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast6()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast3()).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast1()).reversed());
+
+                liste.forEach(item -> LOG.debug("liste AFTER sort = " + NEW_LINE
+                        + item.player().getPlayerFirstName() + " / "
+                        + item.player().getIdplayer() + " /" + item.classment()));
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    public List<ECourseList> getListe()                          { return liste; }
+    public void              setListe(List<ECourseList> liste)   { this.liste = liste; }
+
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        // CompetitionDescription cde = new CompetitionDescription();
+        // cde.setCompetitionId(24);
+        // var ecl = list(cde);
+        // LOG.debug("from main, ecl = " + ecl);
+        LOG.debug("from main, ParticipantsStablefordCompetitionList = ");
+    } // end main
+    */
+
+} // end class

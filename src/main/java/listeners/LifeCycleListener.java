@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 package listeners;
-
+import static interfaces.Log.LOG;
 import jakarta.faces.event.PhaseEvent;
 import jakarta.faces.event.PhaseId;
 
 
-public class LifeCycleListener implements interfaces.Log{
+public class LifeCycleListener {
     public PhaseId getPhaseId() {
         return PhaseId.ANY_PHASE;
     }

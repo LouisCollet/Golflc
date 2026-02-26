@@ -30,12 +30,12 @@
      <h:outputText value="#{msg['tarif.season']} " />
      <i class="pi pi-cloud" ></i>
      <i class="pi pi-sun"   ></i>
-     #{courseC.tarifGreenfee.teeTimesList.size()}
+     #{memC.tarifGreenfee.teeTimesList.size()}
     </h:panelGroup>
 
      <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{courseC.tarifGreenfee.workSeason}" >
+                          value="#{memC.tarifGreenfee.workSeason}" >
             <f:selectItem itemLabel="#{msg['tarif.all']}"     itemValue="A" />
             <f:selectItem itemLabel="#{msg['tarif.high']}"   itemValue="H" />
             <f:selectItem itemLabel="#{msg['tarif.medium']}" itemValue="M" />
@@ -47,7 +47,7 @@
                         size="20"
                         required="false"
                         title="#{msg['tooltip.tarif.item']}"
-	                value="#{courseC.tarifGreenfee.workItem}"
+	                value="#{memC.tarifGreenfee.workItem}"
                         placeholder="Enter item " />
        
        <h:panelGroup id="panelGroupComment" layout="block" >       
@@ -55,7 +55,7 @@
           <i class="pi pi-clock"></i>
        </h:panelGroup>
        <p:datePicker id="starttime"
-                         value="#{courseC.tarifGreenfee.startHour}"
+                         value="#{memC.tarifGreenfee.startHour}"
                          timeOnly="true"
                          pattern="HH:mm"
                          label="Tarif tranche horaire : startHour"
@@ -70,7 +70,7 @@
 
          <h:outputText  value="#{msg['tarif.hours.end']} :"/>
          <p:datePicker id="endtime"
-                        value="#{courseC.tarifGreenfee.endHour}"
+                        value="#{memC.tarifGreenfee.endHour}"
                         timeOnly="true"
                         pattern="HH:mm"
                         label="Tarif tranche horaire : endHour"
@@ -84,7 +84,7 @@
          </p:datePicker>
        <h:outputText  value="#{msg['tarif.members.price']} :"/>
        <p:inputNumber  id="price"
-                       value="#{courseC.tarifGreenfee.workPrice}"
+                       value="#{memC.tarifGreenfee.workPrice}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="6"
                   
@@ -98,7 +98,7 @@
         <h:outputText  value="#{msg['tarif.twilight']} :"/>
         <p:selectOneButton id="ChoiceTwilight"
                           required="true"
-                          value="#{courseC.tarifGreenfee.workTwilight}" >
+                          value="#{memC.tarifGreenfee.workTwilight}" >
             <f:selectItem itemLabel="No"  itemValue="N" />
             <f:selectItem itemLabel="#{msg['tarif.twilight']}" itemValue="Y" />
             <f:selectItem itemLabel="Previous"  itemValue="P"/>
@@ -109,9 +109,9 @@
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          icon="pi pi-database"
-                         action="#{courseC.inputTarifGreenfee('HO')}"/>
+                         action="#{memC.inputTarifGreenfee('HO')}"/>
          <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

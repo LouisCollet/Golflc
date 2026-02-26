@@ -27,11 +27,11 @@
             <h:outputText value="#{msg['tarif.season']} " />
                 <i class="pi pi-cloud"></i>
                 <i class="pi pi-sun"></i>
-                #{courseC.tarifGreenfee.daysList.size()}
+                #{memC.tarifGreenfee.daysList.size()}
             </h:panelGroup>
         <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{courseC.tarifGreenfee.workSeason}" >
+                          value="#{memC.tarifGreenfee.workSeason}" >
             <f:selectItem itemLabel="#{msg['tarif.all']}"     itemValue="A" />
             <f:selectItem itemLabel="#{msg['tarif.high']}"    itemValue="H" />
             <f:selectItem itemLabel="#{msg['tarif.medium']}"  itemValue="M" />
@@ -43,13 +43,13 @@
                         size="20"
                         required="false"
                         title="#{msg['tooltip.tarif.item']}"
-	                value="#{courseC.tarifGreenfee.workItem}"
+	                value="#{memC.tarifGreenfee.workItem}"
                         placeholder="Enter category " />
 
        <h:outputText  value="#{msg['tarif.days.monday']} :"/>
          <p:inputNumber
                        id="monday"
-                       value="#{courseC.tarifGreenfee.workDaysPrice[0]}"
+                       value="#{memC.tarifGreenfee.workDaysPrice[0]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                        label="Tarif days : monday"
@@ -67,7 +67,7 @@
          <h:outputText  value="#{msg['tarif.days.week']} :"/>
             <p:inputNumber  label="Week"
                        id="week"
-                       value="#{courseC.tarifGreenfee.workDaysPrice[1]}"
+                       value="#{memC.tarifGreenfee.workDaysPrice[1]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                        lang="#{languageC.locale}"
@@ -84,7 +84,7 @@
        <h:outputText  value="#{msg['tarif.days.friday']} :"/>
             <p:inputNumber  label="Friday"
                        id="friday"
-                       value="#{courseC.tarifGreenfee.workDaysPrice[2]}"
+                       value="#{memC.tarifGreenfee.workDaysPrice[2]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                        lang="#{languageC.locale}"
@@ -101,7 +101,7 @@
        <h:outputText  value="#{msg['tarif.days.weekend']} :"/>
        <p:inputNumber  label="Weekend Label"
                        id="weekend"
-                       value="#{courseC.tarifGreenfee.workDaysPrice[3]}"
+                       value="#{memC.tarifGreenfee.workDaysPrice[3]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                        emptyValue="0"
@@ -117,7 +117,7 @@
        <h:outputText  value="#{msg['tarif.days.holidays']} :"/>
           <p:inputNumber  label="Holidays"
                        id="holidays"
-                       value="#{courseC.tarifGreenfee.workDaysPrice[4]}"
+                       value="#{memC.tarifGreenfee.workDaysPrice[4]}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="5"
                        emptyValue="0"
@@ -133,7 +133,7 @@
         <h:outputText  value="#{msg['tarif.twilight']} :"/>
         <p:selectOneButton id="ChoiceTwilight"
                           required="true"
-                          value="#{courseC.tarifGreenfee.workTwilight}" >
+                          value="#{memC.tarifGreenfee.workTwilight}" >
             <f:selectItem itemLabel="No"  itemValue="N" />
             <f:selectItem itemLabel="#{msg['tarif.twilight']}" itemValue="Y" />
             <f:selectItem itemLabel="Previous"  itemValue="P"/>
@@ -144,10 +144,10 @@
                          id="commandButtonCreate"
                          ajax="false"
                          update="growl-msg"
-                         immediate="false"
+                          
                          style="float: left;"
                          icon="pi pi-database"
-                         action="#{courseC.inputTarifGreenfee('DA')}"/>
+                         action="#{memC.inputTarifGreenfee('DA')}"/>
          <p:commandButton value="#{msg['tarif.back']}"
                          id="commandButtonback"
                          ajax="false"

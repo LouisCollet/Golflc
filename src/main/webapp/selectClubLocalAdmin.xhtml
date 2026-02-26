@@ -17,11 +17,11 @@
  <c:set var="selectClub" value="#{inputSelectClub}"/>
  
 <p:dataTable id="courses"
-             value="#{courseC.listLocalAdminClubsList()}"
+             value="#{memC.listLocalAdminClubsList()}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCourses}"
+             filteredValue="#{clubC.filteredCourses}"
              
              >
 <!-- rowHover="true"
@@ -88,7 +88,7 @@
                   rendered="#{inputSelectCourse eq 'CreateRound'}" >
             <p:commandButton
                 id="selectButtonCreateRound"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -100,7 +100,7 @@
                   rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" >
             <p:commandButton
                 id="selectButtonTarifGreenfee"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -113,7 +113,7 @@
                   rendered="#{inputSelectCourse eq 'CreateTarifMember'}" >
             <p:commandButton
                 id="selectButtonTarifMembers"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -125,7 +125,7 @@
                   rendered="#{inputSelectClub eq 'CreatePro'}" >
             <p:commandButton
                 id="selectButtonCreatePro"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -140,7 +140,7 @@
                   rendered="#{inputSelectCourse eq 'PaymentTarifMember'}" >
             <p:commandButton
                 id="selectButtonPaymentTarifMembers"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -152,7 +152,7 @@
                   rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" >
             <p:commandButton
                 id="selectButtonUnavailable"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>
@@ -164,7 +164,7 @@
                   rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" >
             <p:commandButton
                 id="selectButtonUnavailablePeriod"
-                action="#{courseC.selectClub(c, select)}"
+                action="#{clubC.selectClub(c, select)}"
                 value="#{c.idclub} - #{msg['button.select']}"
                 icon="pi pi-check">
              </p:commandButton>

@@ -11,7 +11,7 @@
 
 <h:form id="select_competition" enctype="application/x-www-form-urlencoded">
 <p:dataTable id="competition"
-             value="#{courseC.listCompetitions()}"
+             value="#{roundC.listCompetitions()}"
              rowIndexVar="row"
              resizableColumns="true"
              var="c"
@@ -20,7 +20,7 @@
              rowKey="#{c.competitionId}"
              >
 <p:ajax event="rowToggle" 
-        listener="#{courseC.onRowToggleCompetition}" />
+        listener="#{roundC.onRowToggleCompetition}" />
 
 <f:facet name="header">
     <h1>#{msg['message.selectcompetition']}  #{param.cmd}</h1>
@@ -73,7 +73,7 @@
                   width="20%" >
             <p:commandButton
                 id="selectButtonInscription"
-                action="#{courseC.beforeInscriptionCompetition(c)}"
+                action="#{roundC.beforeInscriptionCompetition(c)}"
                 rendered="#{c.competitionStatus eq 0}"
                 value="#{c.competitionId}"
                 title="#{msg['tooltip.inscriptions.now']}"
@@ -96,7 +96,7 @@
                   width="20%" >
             <p:commandButton
                 id="selectButtonStartingList"
-                action="#{courseC.beforeListInscriptionsCompetition(c)}"
+                action="#{roundC.beforeListInscriptionsCompetition(c)}"
                 value="#{c.competitionId}"
                 title="#{msg['tooltip.inscriptions.on']}"
                 icon="pi pi-forward">
@@ -110,7 +110,7 @@
            <h:panelGroup id="panelG2" layout="block" >
             <p:commandButton
                 id="provisionalStartingList"
-                action="#{courseC.beforeListStartCompetition(c, 'PROVISIONAL')}"
+                action="#{roundC.beforeListStartCompetition(c, 'PROVISIONAL')}"
                 value="#{c.competitionId}"
                 style="float:left;"
                 title="#{msg['tooltip.inscriptions.provisional']}"
@@ -187,7 +187,7 @@
                 <h:outputText value="#{msg['competition.current.inscriptions']} :" />
                 <h:outputText
                       id="competitionCurrentPlayers"
-                      value="#{courseC.listInscriptionsCompetition().size()}"/>
+                      value="#{roundC.listInscriptionsCompetition().size()}"/>
 
             </p:panelGrid>
   </p:rowExpansion>

@@ -3,9 +3,13 @@ package Controllers;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.internal.build.MongoDriverVersion;
-import entite.Settings;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
+import static interfaces.Log.NEW_LINE;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
@@ -28,25 +32,26 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import javax.sql.DataSource;
 import org.bson.Document;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 import org.primefaces.config.PrimeEnvironment; // new 04-12-2025
 
 @Named("infoC")
-@RequestScoped
+@ApplicationScoped // mod 11/01
 
-public class InfoController implements Serializable, interfaces.GolfInterface, interfaces.Log{
-   private static Attributes manifestAttributes = null;
-   private static String JQueryVersion;
-   
+public class InfoController implements Serializable, interfaces.GolfInterface{
+   @Inject private entite.Settings settings;        // ✅ injection CDI
+    private static Attributes manifestAttributes = null;
+
 public InfoController() throws IOException { //  constructor ! le faire private ??
-      LOG.debug("entering Infocontroller constructor");
+    //  LOG.debug("entering Infocontroller constructor");
        // voir pom.xml manifestEntries pour les fields !!
 try{
    try (InputStream inputStream = getResourceAsStream("/META-INF/MANIFEST.MF")){
     if(inputStream != null){
         manifestAttributes = new Manifest(inputStream).getMainAttributes();
-         LOG.debug("closing inputStream"); 
+   //      LOG.debug("closing inputStream"); 
  //       inputStream.close(); // mod 24-04-2024 new 10-03-2024
     }else{
         LOG.debug("infoController : META-INF/MANIFEST.MF is null");
@@ -62,15 +67,16 @@ public void login(){ // throws IOException, SQLException { // executed via actio
 }
 
 
-@Inject private ExternalContext externalContext;
+@Inject 
+private ExternalContext externalContext;
 public String DeployVersion() throws IOException{
     // version deployment (affichée dans login.xhtml)
   String acp = externalContext.getApplicationContextPath();
 //     LOG.debug("ApplicationContextPath = " + acp); //    /GolfWfly-1.0-SNAPSHOT
-  Path path = Paths.get(Settings.getProperty("TARGET") + acp + ".war");// converts string to path  
+  Path path = Paths.get(settings.getProperty("TARGET") + acp + ".war");// converts string to path  
   FileTime fileTime = Files.getLastModifiedTime(path);
   LocalDateTime ldt = LocalDateTime.ofInstant(fileTime.toInstant(), ZoneOffset.systemDefault());
-    return "<b>Deploy Version :</b> " + ZDF_TIME.format(ldt);
+    return ZDF_TIME.format(ldt);
 }
 
 public String getClientIpAddress() throws UnknownHostException, ServletException{
@@ -118,17 +124,42 @@ return "yes, Louis : Mac adress";
 public String getGlobalAddress() throws UnknownHostException{
     return Arrays.deepToString(InetAddress.getAllByName("localhost"));
 }
-
+/*
 public String getMySql() throws SQLException, Exception{
  //      LOG.debug("search version mySql");
-   Connection conn = new utils.DBConnection().getConnection();
+   Connection conn = new connection_package.DBConnection().getConnection();
    String s = conn.getMetaData().getDatabaseProductName()
     + " / " + conn.getMetaData().getDatabaseProductVersion()
     + NEW_LINE + conn.getMetaData().getDriverName()
     + " / " + conn.getMetaData().getDriverVersion();
-    utils.DBConnection.closeQuietly(conn, null, null,null);
+    connection_package.DBConnection.closeQuietly(conn, null, null,null);
     return s;
  }
+*/
+@Resource(lookup = "java:jboss/datasources/golflc")
+private DataSource dataSource;
+
+public String getMySql() throws SQLException {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+
+    try (Connection conn = dataSource.getConnection()) {            // ✅ try-with-resources
+        return conn.getMetaData().getDatabaseProductName()
+                + " / " + conn.getMetaData().getDatabaseProductVersion()
+                + NEW_LINE + conn.getMetaData().getDriverName()
+                + " / " + conn.getMetaData().getDriverVersion();
+
+    } catch (SQLException e) {
+        handleSQLException(e, methodName);
+        return "";                                                  // ✅ jamais null
+    } catch (Exception e) {
+        handleGenericException(e, methodName);
+        return "";                                                  // ✅ jamais null
+    }
+}
+
+
+
 
 public String getMongoDB() throws SQLException, Exception{
     Document document = null;
@@ -138,7 +169,7 @@ public String getMongoDB() throws SQLException, Exception{
         }
     return "Driver version = " + MongoDriverVersion.VERSION + " - DB version = " + document.getString("version");
  }
-
+/*
 public void putMyStrings(){
     //info coming from 
     LOG.debug("entering putMyStrings");
@@ -146,20 +177,16 @@ public void putMyStrings(){
    JQueryVersion = FacesContext.getCurrentInstance().getExternalContext()
            .getRequestParameterMap().get("JQueryVersion");
    LOG.debug("JQueryVersion is now = " + JQueryVersion);
-   
-
 }
-
+*/
     public String getJQueryVersion() {
-        return FacesContext.getCurrentInstance().getExternalContext()
-           .getRequestParameterMap().get("JQueryVersion");
-        
-   //     return JQueryVersion;
+        return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("JQueryVersion");
     }
 
 public String getPrimefacesVersion(){
    // return PrimeFaces.class.getPackage().getImplementationVersion(); // mod 04-12-2025
     return PrimeEnvironment.class.getPackage().getImplementationVersion();
+  //  return Primefaces.version();
 }
 
 public String getPrimefacesExtensionVersion(){
@@ -169,6 +196,15 @@ public String getPrimefacesExtensionVersion(){
 public String getLog4j2Version(){
     return manifestAttributes.getValue("logging");
 }
+
+public String getWeldVersion(){
+    return utils.WildFlyEnvironmentInfo.getWeldVersion();
+}
+
+public String getServerVersion(){
+    return utils.WildFlyEnvironmentInfo.getWildFlyVersion();
+}
+
 public String getApplicationVersion(){
     return manifestAttributes.getValue("golflc");
 }
@@ -185,7 +221,7 @@ public String getJakartaEEVersion(){// throws IOException{
 }
 
 public String getBuildVersion() {
-     return manifestAttributes.getValue("buildT");
+     return manifestAttributes.getValue("buildTime");
 }
 
 public String getMojarraVersion(){
@@ -226,7 +262,7 @@ public String getOsVersion(){
     return System.getProperty("os.name") + " " + System.getProperty("os.version")
             + " " + System.getProperty("os.arch");
 }
-
+/*
 public static void ListAllSystemProperties() {
     //https://docs.oracle.com/javase/tutorial/essential/environment/env.html
 try{
@@ -263,4 +299,5 @@ try{
        LOG.debug("error printattributes" + ex);
    }
  } //end method
+*/
 }// end class

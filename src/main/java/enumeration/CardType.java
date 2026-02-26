@@ -1,4 +1,4 @@
-package enums;
+package enumeration;
 
 import static interfaces.Log.LOG;
 import java.util.regex.Pattern;

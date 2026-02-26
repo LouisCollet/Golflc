@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
@@ -15,8 +15,7 @@
              value="#{courseC.registerStablefordResult()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCars}"
-             >
+             filteredValue="#{courseC.filteredCars}" >
 
 <f:facet name="header">
             <h1>#{msg['message.selectround']} #{msg['message.for.score']}</h1>
@@ -67,11 +66,11 @@
                   filterBy="#{c.course.courseName}" >
             <b>#{c.course.courseName} </b>(#{c.course.idcourse})
              <h:outputText value="#{c.course.courseBeginDate}">
-                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                  <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
              </h:outputText>
              <h:outputText value=" - "/>
              <h:outputText value="#{c.course.courseEndDate}">
-                <f:convertDateTime type="date" pattern="dd/MM/yyyy" />
+                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
             </h:outputText>
 	</p:column>
 

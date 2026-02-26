@@ -3,12 +3,12 @@ package entite;
 
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import jakarta.inject.Named;
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import java.io.Serializable;
 import utils.LCUtil;
 
 //https://stackoverflow.com/questions/14926148/java-enum-usage-getting-and-setting
-@Named
+// @Named  // migrated 2026-02-24
 public class ValidationsLC implements Serializable{
 private ValidationStatus stat = ValidationStatus.APPROVED; // Default priority
 

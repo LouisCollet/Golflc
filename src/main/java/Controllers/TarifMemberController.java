@@ -8,6 +8,7 @@ import entite.Round;
 import entite.TarifMember;
 //import static interfaces.GolfInterface.temporalFirst;
 //import static interfaces.GolfInterface.temporalLast;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -16,21 +17,26 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
-//used in CourseController
-public class TarifMemberController implements interfaces.Log{
- private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
- public TarifMemberController(){  // constructor
-    }
+@ApplicationScoped
+public class TarifMemberController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public TarifMemberController() { }
 
  
  
 public TarifMember inputTarifMembersCotisation(TarifMember tarifMember) throws SQLException, Exception{  // used in tarif_members.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-    LOG.debug("entering inputTarifMembersCotisation with tarifMember = !"+ tarifMember);
+    LOG.debug("with inputTarifMembersCotisation with tarifMember = !"+ tarifMember);
   LOG.debug("workRangeAge = " + tarifMember.getWorkRangeAge());
      if(tarifMember.getWorkRangeAge() == null){ // pas complété dans écran
          tarifMember.setWorkRangeAge("00-00");
@@ -58,17 +64,17 @@ try{
         LOG.debug(msg);
         showMessageInfo(msg);
    return tarifMember;
-}catch(Exception ex){
-    String msg = "inputTarifMembers Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
 }
 } // end method
 
 public TarifMember inputTarifMembersEquipments(TarifMember tarifMember) throws SQLException, Exception{  // used in tarif_equipments.xhtml
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-       LOG.debug("entering inputTarifMembersEquipments with tarifMember = "+ tarifMember);
+    LOG.debug("with inputTarifMembersEquipments with tarifMember = "+ tarifMember);
     EquipmentsAndBasic equipments = new EquipmentsAndBasic( // mod 09/05/2022
             tarifMember.getWorkItem(),
             "H", // season default ??
@@ -82,16 +88,14 @@ try{
     LOG.info(msg);
     showMessageInfo(msg);
   return tarifMember; 
-}catch(Exception ex){
-    String msg = "inputTarifMembersEquipments Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
+} catch (Exception e) {
+    handleGenericException(e, methodName);
+    return null;
 }
- } // end method
+} // end method
 
 public Cotisation completeCotisation(TarifMember tarif, Player player, Round round) throws Exception{
-   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+   final String methodName = utils.LCUtil.getCurrentMethodName();
      Cotisation cotisation = new Cotisation();
     try{
         LOG.debug("entering " + methodName);
@@ -127,7 +131,7 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
        LOG.debug("with Cotisation modified start and end date= " + cotisation);    
  //      LOG.debug("cotisation startDate = " + cotisation.getCotisationStartDate());
  //      LOG.debug("cotisation endDate   = " + cotisation.getCotisationEndDate());
-    cotisation = new TarifMemberController().calcCotisationPrice(tarif, player, cotisation); 
+    cotisation = this.calcCotisationPrice(tarif, player, cotisation);
           LOG.debug("cotisation with price calculated = " + cotisation.getPrice());
     if(cotisation.getPrice() == 0.0){
             String msgerr = "Le total est zéro - il faut choisir au moins un item !!!";
@@ -163,18 +167,16 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
  //         LOG.debug("final selectedItems = " + sb);
       cotisation.setItems(sb.toString());
   return cotisation;
-}catch (Exception ex){
-    String msg = "Exception in " + methodName + " / " +ex;
-    LOG.error(msg);
-    showMessageFatal(msg);
+} catch (Exception e) {
+    handleGenericException(e, methodName);
     return null;
 }
-finally{}
 } //end method
 public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisation cotisation){
-     LOG.debug(" -- Start of CalcTarifMember.findTarif");
-     LOG.debug(" -- Start of CalcTarifMember.findTarif with tarifMember= " + tarif);
-     LOG.debug(" -- Start of CalcTarifMember.findTarif with cotisation= " + cotisation);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    LOG.debug(" -- Start of CalcTarifMember.findTarif with tarifMember= " + tarif);
+    LOG.debug(" -- Start of CalcTarifMember.findTarif with cotisation= " + cotisation);
  try {
  //       à faire : proportion pour abonnement en cours d'année (année incomplète)
           LOG.debug("validating cotisation age range- --------");
@@ -292,11 +294,8 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
          cotisation.setPrice(utils.LCUtil.myDoubleRound(total,2));
       return cotisation;
  } catch (Exception e) {
-      String msg = " -- Error in calcTarifMember " + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
+    handleGenericException(e, methodName);
+    return null;
  }
- finally { }
-} // end method 
+} // end method
 } //end Class

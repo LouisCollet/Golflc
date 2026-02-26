@@ -27,7 +27,7 @@ import utils.LCUtil;
 
 
 
-@Named("loginBean")
+@Named("loginBeantest")
 @RequestScoped
 public class LoginBean {
 

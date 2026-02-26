@@ -51,7 +51,7 @@
                   style="font-weight:bold"/>
                    <p:selectOneMenu
                     id="country"
-                    value="#{courseC.club.address.country.code}"
+                    value="#{clubC.club.address.country.code}"
                     >
                     <f:selectItem
                          itemLabel="??"
@@ -125,7 +125,7 @@
                          value="#{msg['button.hcp.calculate']}"
                          update="growl-msg"
                          ajax="false"
-                         immediate="false"
+                          
                          icon="pi pi-database"
                          action="#{courseC.calculateHcpScramble()}"/>
 

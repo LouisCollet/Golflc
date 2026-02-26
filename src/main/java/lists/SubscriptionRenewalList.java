@@ -1,111 +1,124 @@
 package lists;
 
-import entite.composite.ECourseList;
 import entite.Player;
 import entite.Subscription;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.PlayerRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.SubscriptionRowMapper;
 
-public class SubscriptionRenewalList implements interfaces.Log{
-    private static List<ECourseList> liste = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-    
-public List<ECourseList> list(final Connection conn) throws Exception{
-if(liste == null){
-    try{
-           LOG.debug("starting getListSubscriptions = " );
-       liste = new ArrayList<>();
-       String su = utils.DBMeta.listMetaColumnsLoad(conn, "payments_subscription");
-       String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
-       final String query =
-        "SELECT "
-             + su + "," + pl +
-        " FROM payments_subscription" +
-        " JOIN player" +
-        "   on player.idplayer = subscriptionIdPlayer" +
-        "   and PlayerActivation = '1' " +
-        " WHERE " +
-        "     YEAR(SubscriptionEndDate) = YEAR(CURRENT_DATE())" +
-        "     AND MONTH(SubscriptionEndDate) = MONTH(CURRENT_DATE()) + 1"  // subscriptions à échéance le mois suivant
-        ;
-       ps = conn.prepareStatement(query);
-       rs = ps.executeQuery();
-    liste = new ArrayList<>(); // new 02/06/2013
-    while(rs.next()){
-          ECourseList ecl = new ECourseList(); // est réi, donc total = 0
-          Player p = entite.Player.map(rs);
-          ecl.setPlayer(p);
-          Subscription s = entite.Subscription.map(rs);
-          ecl.setSubscription(s);
-          liste.add(ecl);
-     } // end while
+// non testé
+@ApplicationScoped
+public class SubscriptionRenewalList implements Serializable {
 
-  //  LOG.debug("closing SubscriptionRenevalList with players = " + Arrays.deepToString(liste.toArray()) );
-  liste.forEach(item -> LOG.debug("players candidates to renewal =  " + item));  // java 8 lambda
-  
-  //// partie 2
-   for(ECourseList item : liste){
-        	LOG.debug("Player we send a Subscription Renewal mail = " + item.getPlayer().getPlayerLastName());
-        //     mail.SubscriptionMail sm = new mail.SubscriptionMail();
-             new mail.SubscriptionMail().sendMail(item.getPlayer(),item.getSubscription());
-      } //end for
-return liste;
+    private static final long serialVersionUID = 1L;
 
-} catch(SQLException sqle){
-    String msg = "£££ SQL exception in SubscriptionRenewalList = " + sqle.getMessage() + " ,SQLState = " +
-            sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}catch(Exception e){
-    String msg = "£££ Exception in SubscriptionRenewalList = " + e.getMessage();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}finally{
-           DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
-   //  LOG.debug("escaped to listallplayers repetition thanks to lazy loading");
-    return liste;  //plusieurs fois ??
-   //then you should introduce lazy loading inside the getter method. I.e. if the property is null,
-    //then load and assign it to the property, else return it.
-}
-    //end if
-} //end method
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-    public static List<ECourseList> getListe() {
-        return liste;
-    }
+    @jakarta.inject.Inject private mail.SubscriptionMail subscriptionMail;  // migrated 2026-02-26
 
-    public static void setListe(List<ECourseList> liste) {
-        SubscriptionRenewalList.liste = liste;
-    }
-    
-     void main() throws SQLException, Exception{
-     Connection conn = new DBConnection().getConnection();
-  try{
-     //   Player player = new Player();
-     //   player.setIdplayer(324713);
-     //   Round round = new Round(); 
-     //   round.setIdround(300);
-       List<ECourseList> ec = new SubscriptionRenewalList().list(conn);
+    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    private List<ECourseList> liste = null;
+
+    public SubscriptionRenewalList() { }
+
+    public List<ECourseList> list() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        // ✅ Early return — guard clause FIRST
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            return liste;
+        }
+
+        final String query = """
+            SELECT *
+            FROM payments_subscription
+            JOIN player
+               ON player.idplayer = subscriptionIdPlayer
+               AND PlayerActivation = '1'
+            WHERE YEAR(SubscriptionEndDate) = YEAR(CURRENT_DATE())
+              AND MONTH(SubscriptionEndDate) = MONTH(CURRENT_DATE()) + 1
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                RowMapper<Player> playerMapper = new PlayerRowMapper();
+                RowMapper<Subscription> subscriptionMapper = new SubscriptionRowMapper();
+
+                while (rs.next()) {
+                    ECourseList ecl = ECourseList.builder()
+                            .player(playerMapper.map(rs))
+                            .subscription(subscriptionMapper.map(rs))
+                            .build();
+                    liste.add(ecl);
+                }
+                liste.forEach(item -> LOG.debug("players candidates to renewal = " + item));
+
+                // partie 2 — envoi des mails de renouvellement
+                for (ECourseList item : liste) {
+                    LOG.debug("Player we send a Subscription Renewal mail = " + item.player().getPlayerLastName());
+                    // new mail.SubscriptionMail().sendMail(...)
+                    subscriptionMail.sendMail(item.player(), item.subscription()); // migrated 2026-02-26
+                } // end for
+
+                if (liste.isEmpty()) {
+                    LOG.warn(methodName + " - empty result list");
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    // ✅ Getters/setters d'instance
+    public List<ECourseList> getListe()              { return liste; }
+    public void setListe(List<ECourseList> liste)    { this.liste = liste; }
+
+    // ✅ Invalidation explicite
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        List<ECourseList> ec = new SubscriptionRenewalList().list();
         LOG.debug("from main, ec = " + ec);
- }catch (Exception e){
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-          }
-   } // end main//
-} //end class
-    
+    } // end main
+    */
+
+} // end class

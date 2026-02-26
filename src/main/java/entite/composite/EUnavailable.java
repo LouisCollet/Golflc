@@ -2,56 +2,74 @@ package entite.composite;
 
 import entite.UnavailablePeriod;
 import entite.UnavailableStructure;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import java.io.Serializable;
-import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named // enlevé 14/06/2022
-@ViewScoped // new 13-02-2021
-public class EUnavailable implements Serializable{
-    private UnavailableStructure structure;
-    private UnavailablePeriod period;
- 
- public EUnavailable(){  // init dans constructor
-        structure = new UnavailableStructure();
-        period = new UnavailablePeriod();
+/**
+ * DTO immutable pour regrouper UnavailableStructure et UnavailablePeriod
+ * Représente une période d'indisponibilité d'une structure
+ *
+ * Version refactorisée : Record sans CDI
+ */
+public record EUnavailable(
+    UnavailableStructure structure,
+    UnavailablePeriod period
+) {
+
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EUnavailable {
+        // Validation métier possible
+        // ex : Objects.requireNonNull(structure, "structure obligatoire");
     }
 
-    public UnavailableStructure getStructure() {
-        return structure;
+    /* =======================
+       Getters explicites (JSF / EL)
+       ======================= */
+    public UnavailableStructure getStructure() { return structure; }
+    public UnavailablePeriod getPeriod() { return period; }
+
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+    public EUnavailable withStructure(UnavailableStructure structure) {
+        return new EUnavailable(structure, this.period);
     }
 
-    public void setStructure(UnavailableStructure structure) {
-        this.structure = structure;
+    public EUnavailable withPeriod(UnavailablePeriod period) {
+        return new EUnavailable(this.structure, period);
     }
 
-    public UnavailablePeriod getPeriod() {
-        return period;
+    /* =======================
+       Formatage pour affichage/debug
+       ======================= */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : EUNAVAILABLE
+            %s %s
+            """.formatted(
+                structure != null ? structure : "",
+                period != null ? period : ""
+        ).replaceAll("(?m)^\\s*$\n", "");
     }
 
-    public void setPeriod(UnavailablePeriod period) {
-        this.period = period;
+    /* =======================
+       Formatage HTML (compatibilité legacy)
+       ======================= */
+    public String toHtmlString() {
+        return "FROM ENTITE : EUNAVAILABLE<br/>"
+             + (structure != null ? structure : "")
+             + "<br/>"
+             + (period != null ? period : "");
     }
 
+    /* =======================
+       Vérifications métier
+       ======================= */
+    public boolean isComplete() {
+        return structure != null && period != null;
+    }
 
-@Override
-public String toString(){ 
- try{
-    LOG.debug("starting toString EUnavailable !");
-    return 
-        (NEW_LINE 
-            + "from entite " + getClass().getSimpleName().toUpperCase() + " : "
-       +  "<br/>" + getStructure()
-       +  "<br/>" + getPeriod()
-        );
-    }catch(Exception e){
-        String msg = "£££ Exception in EUnavailable.toString = " + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    public boolean hasAnyData() {
+        return structure != null || period != null;
+    }
+}

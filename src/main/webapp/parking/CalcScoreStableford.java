@@ -15,18 +15,18 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.stream.IntStream;
-import utils.DBConnection;
+import connection_package.DBConnection;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
 // calclu à partir 1/10/2024 voir document Belgium WHS-update ...
 public class CalcScoreStableford implements interfaces.GolfInterface {
-  private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+  private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();    
   
 public CalcScoreStableford(){ }
   
  public static ScoreStableford calc(final Player player, ScoreStableford score, final Round round, final Course course, final Tee tee,final Connection conn){
-   final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+   final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("... entering " + methodName);
     LOG.debug(" with ScoreStableford = " + score);
     LOG.debug(" with Round = " + round);
@@ -55,7 +55,8 @@ try{
  //         showMessageInfo(msg);
       }
 
-     if(utils.LCUtil.isArrayOneZero(arr)){
+   //  if(utils.LCUtil.isArrayOneZero(arr)){
+     if(utils.LCUtil.containsZero(arr)){     
         String msg = "There is (at least...) one result = 0 - correction needed !!";
           LOG.error(msg);
           showMessageFatal(msg);
@@ -289,7 +290,7 @@ try{
 } // end method netDoubleBogeyAdjustment
 */
 public static int[] calculatePoints(ScoreStableford score){
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+     final String methodName = utils.LCUtil.getCurrentMethodName();
      LOG.debug(" entering calculatePoints " + methodName);
         LOG.debug("with scoreStableford = " + score);
   //   LOG.debug("strokeArray = " + Arrays.toString(score.getStrokeArray()));
@@ -321,7 +322,7 @@ try{
 // new 16-04-2025 -- WHS revision 10/2024
 // dans score_stableford.xhtml pour les trous non joués on encode -1 comme strokes
 public static int[] completeHolesNotPlayed(ScoreStableford score){
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+     final String methodName = utils.LCUtil.getCurrentMethodName();
      LOG.debug("  " + methodName);
      LOG.debug("strokeArray = " + Arrays.toString(score.getStrokeArray()));
      LOG.debug("parArray    = " + Arrays.toString(score.getParArray()));

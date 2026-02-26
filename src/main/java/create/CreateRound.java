@@ -1,5 +1,222 @@
+
 package create;
 
+import entite.Club;
+import entite.Course;
+import entite.Round;
+import entite.UnavailablePeriod;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+
+import javax.sql.DataSource;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.JDBCType;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+import static interfaces.GolfInterface.ZDF_TIME;
+import static interfaces.GolfInterface.ZDF_TIME_HHmm;
+import static interfaces.Log.LOG;
+import static utils.LCUtil.showMessageFatal;
+import static utils.LCUtil.showMessageInfo;
+
+/**
+ * Création d'un round en base de données
+ * ✅ Migré vers CDI (@ApplicationScoped)
+ * ✅ Connection supprimée — gérée via DataSource injecté
+ * ✅ try-with-resources (plus de finally/closeQuietly)
+ * ✅ handleGenericException / handleSQLException
+ * ✅ main() conservée commentée
+ */
+@ApplicationScoped
+public class CreateRound implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    // ✅ Injection DataSource WildFly
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
+
+    // ========================================
+    // CREATE
+    // ========================================
+
+    /**
+     * Crée un round en base après validation.
+     * Convertit la date locale en UTC avant insertion.
+     *
+     * @param round       le round à créer
+     * @param course      le course associé
+     * @param club        le club associé (pour la timezone)
+     * @param unavailable les périodes d'indisponibilité
+     * @return true si succès, false sinon
+     */
+    public boolean create(final Round round, final Course course,
+                          final Club club, final UnavailablePeriod unavailable) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("round to be created = " + round);
+        LOG.debug("course = " + course);
+        LOG.debug("club   = " + club);
+
+        // Validation avant insertion
+        if (!validate(round, course, unavailable)) {
+            LOG.debug(methodName + " - validation error, aborting");
+            return false;
+        }
+
+        // ✅ try-with-resources : Connection et PreparedStatement fermés automatiquement
+        try (Connection conn        = dataSource.getConnection();
+             PreparedStatement ps   = conn.prepareStatement(
+                     utils.LCUtil.generateInsertQuery(conn, "round"))) {
+
+            LOG.debug(methodName + " - ZoneId = " + club.getAddress().getZoneId());
+
+            // Conversion date locale → UTC pour stockage en base
+            ZonedDateTime zdt = round.getRoundDate()
+                    .atZone(ZoneId.of(club.getAddress().getZoneId()))
+                    .withZoneSameInstant(ZoneId.of("UTC"));
+            LocalDateTime ldt = zdt.toLocalDateTime();
+
+            LOG.debug(methodName + " - ZonedDateTime UTC for DB = " + zdt + " , offset = " + zdt.getOffset());
+            LOG.debug(methodName + " - LocalDateTime UTC for DB = " + ldt);
+
+            ps.setNull(1, java.sql.Types.INTEGER);              // auto-increment
+            ps.setObject(2, ldt, JDBCType.TIMESTAMP);
+            ps.setString(3, round.getRoundGame());
+            ps.setInt(4, round.getRoundCBA());
+            ps.setString(5, round.getRoundName());
+            ps.setString(6, round.getRoundQualifying());
+            ps.setInt(7, round.getRoundHoles());
+            ps.setInt(8, round.getRoundStart());
+            ps.setString(9, round.getRoundCompetition());
+            ps.setString(10, "no MP score");                    // MatchplayResult
+            ps.setInt(11, 0);                                   // RoundPlayers — not used since 16-09-2021
+            ps.setString(12, round.getRoundTeam());
+            ps.setInt(13, course.getIdcourse());
+            ps.setTimestamp(14, Timestamp.from(Instant.now()));
+
+            utils.LCUtil.logps(ps);
+            int x = ps.executeUpdate();
+
+            if (x != 0) {
+                round.setIdround(utils.LCUtil.generatedKey(conn));
+                String msg = utils.LCUtil.prepareMessageBean("round.created")
+                        + round.getIdround()
+                        + " <br/>genre = "       + round.getRoundGame()
+                        + " <br/>competition = " + round.getRoundName()
+                        + " <br/>qualifying = "  + round.getRoundQualifying()
+                        + " <br/>holes = "       + round.getRoundHoles()
+                        + " <br/>start = "       + round.getRoundStart()
+                        + " <br/>date = "        + round.getRoundDate().format(ZDF_TIME_HHmm)
+                        + " <br/>UTC ZonedDateTime DB inserted = " + zdt.format(ZDF_TIME_HHmm);
+                LOG.debug(msg);
+                showMessageInfo(msg);
+                return true;
+            } else {
+                String msg = "NOT Successful " + methodName
+                        + " <br/>id = "          + round.getIdround()
+                        + " <br/>genre = "       + round.getRoundGame()
+                        + " <br/>competition = " + round.getRoundName()
+                        + " <br/>qualifying = "  + round.getRoundQualifying()
+                        + " <br/>holes = "       + round.getRoundHoles()
+                        + " <br/>start = "       + round.getRoundStart()
+                        + " <br/>date = "        + round.getRoundDate().format(ZDF_TIME);
+                LOG.error(msg);
+                showMessageFatal(msg);
+                return false;
+            }
+
+        } catch (SQLException sqle) {
+            handleSQLException(sqle, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method create
+
+    // ========================================
+    // VALIDATE
+    // ========================================
+
+    /**
+     * Vérifie que la date du round est dans la période d'ouverture du course.
+     *
+     * @return true si valide, false sinon
+     */
+    public boolean validate(final Round round, final Course course,
+                            final UnavailablePeriod unavailable) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        try {
+            LOG.debug("course begin date = " + course.getCourseBeginDate()); // format localdatetime
+            LocalDateTime cb = course.getCourseBeginDate();
+            LOG.debug(methodName + " - courseBegin = " + cb);
+            if (round.getRoundDate().isBefore(cb)) {
+                String msg = utils.LCUtil.prepareMessageBean("round.notopened");
+                LOG.error(msg);
+                showMessageFatal(msg);
+                return false;
+            }
+            LOG.debug("course end date = " + course.getCourseEndDate()); // format localdatetime
+            LocalDateTime ce = course.getCourseEndDate();
+            LOG.debug(methodName + " - courseEnd = " + ce);
+            if (round.getRoundDate().isAfter(ce)) {
+                String msg = utils.LCUtil.prepareMessageBean("round.closed");
+                LOG.error(msg);
+                showMessageFatal(msg);
+                return false;
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+        // ✅ finally supprimé — closeQuietly(null,null,null,null) ne faisait rien
+    } // end method validate
+
+    // ========================================
+    // MAIN DE TEST - conservé commenté
+    // ========================================
+
+    /*
+    public void main(String[] args) throws Exception {
+        Connection conn = new DBConnection().getConnection();
+        try {
+            Round round = new Round();
+            round.setRoundDate(LocalDateTime.parse("2018-11-03T12:45:30"));
+            Course course = new Course();
+            course.setIdcourse(135);
+            course.setCourseBeginDate(LocalDateTime.parse("31/12/2019")); // à corriger format
+            course.setCourseEndDate(LocalDateTime.parse("31/12/2021"));
+            UnavailablePeriod unavailable = new UnavailablePeriod();
+            Club club = null; // fake — à corriger
+            boolean lp = new CreateRound().create(round, course, club, unavailable, conn);
+            LOG.debug("from main, after lp = " + lp);
+        } catch (Exception e) {
+            String msg = "££ Exception in main = " + e.getMessage();
+            LOG.error(msg);
+        } finally {
+            DBConnection.closeQuietly(conn, null, null, null);
+        }
+    } // end main
+    */
+
+} // end class
+
+/*
 import entite.Club;
 import entite.Course;
 import entite.Round;
@@ -14,14 +231,16 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import utils.DBConnection;
+import connection_package.DBConnection;
+import static interfaces.GolfInterface.ZDF_TIME;
+import static interfaces.GolfInterface.ZDF_TIME_HHmm;
 import utils.LCUtil;
 import static utils.LCUtil.DatetoLocalDateTime;
 
-public class CreateRound implements interfaces.Log, interfaces.GolfInterface{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+public class CreateRound {
+    
     public boolean create(final Round round, final Course course, final Club club, UnavailablePeriod unavailable, final Connection conn) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+        final String methodName = utils.LCUtil.getCurrentMethodName(); 
         PreparedStatement ps = null;
         try {
             // lors d'une prochaine modfication, séparer create de validate comme dans createGreenfee
@@ -184,3 +403,4 @@ public class CreateRound implements interfaces.Log, interfaces.GolfInterface{
    } // end main
 
 } //end class
+*/

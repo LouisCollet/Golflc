@@ -38,7 +38,7 @@
     
     <h:outputText value="Upload file" /> 
     <p:fileUpload id="uploader1"
-               label="Choose the photo to upload, #{courseC.player.playerFirstName}"
+               label="Choose the photo to upload, #{playerC.player.playerFirstName}"
                auto="false"
                update="growl-msg"
                listener="#{fileUploadC.handleFileUpload}"
@@ -85,7 +85,7 @@
                         cols="33"
                         rows="3" />
         <p:fileUpload widgetVar="uploadDnd"
-                      label="Choose the photo to drop, #{courseC.player.playerFirstName}"
+                      label="Choose the photo to drop, #{playerC.player.playerFirstName}"
                       listener="#{fileUploadC.handleFileUpload}"
                       dropZone="customDropZone"
                       mode="advanced"

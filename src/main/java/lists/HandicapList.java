@@ -1,111 +1,123 @@
 package lists;
 
 import entite.Club;
-import entite.composite.ECourseList;
+import entite.Course;
 import entite.Player;
+import entite.Round;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import utils.DBConnection;
-import utils.LCUtil;
+import javax.sql.DataSource;
+import rowmappers.ClubRowMapper;
+import rowmappers.CourseRowMapper;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.RowMapperRound;
 
-public class HandicapList {
-    private static List<ECourseList> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-public List<ECourseList> list(final Player player, final Connection conn) throws SQLException{  
-if(liste == null){
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
-        LOG.debug(" ... entering " + methodName);
-    PreparedStatement ps = null;
-    ResultSet rs = null;
-try{
- //    String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
- //    String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
- //    String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
- //    String ha = utils.DBMeta.listMetaColumnsLoad(conn, "handicap");
-/*String query =
-        "SELECT "
-        +  co + "," + ro + "," + pl + "," + ha
-        + " FROM handicap, round, course, player"
-        + " WHERE handicap.round_idround = round.idround"
-        + "     and round.course_idcourse = course.idcourse"
-        + "     and player.idplayer = ?"
-	+"      and handicap.player_idplayer = player.idplayer"
-        + " GROUP by idhandicap"
-        + " ORDER by idhandicap DESC"
-    ;
-*/
- final String query = """
-             \n   /* lists.HandicapList.list  */
-        SELECT *
-        FROM handicap, round, course, player
-        WHERE handicap.round_idround = round.idround
-             AND round.course_idcourse = course.idcourse
-             AND player.idplayer = ?
-             AND handicap.player_idplayer = player.idplayer
-        GROUP by idhandicap
-        ORDER by idhandicap DESC
-    """;
+@ApplicationScoped
+public class HandicapList implements Serializable {
 
-     ps = conn.prepareStatement(query);
-     ps.setInt(1, player.getIdplayer());
-     utils.LCUtil.logps(ps);
-     rs =  ps.executeQuery();
-    liste = new ArrayList<>();
-     while(rs.next()){
-	     ECourseList ecl = new ECourseList();
-             ecl.setHandicap(entite.Handicap.map(rs));
-             ecl.setRound(new entite.Round().dtoMapper(rs,new Club()));
-             ecl.setCourse(entite.Course.dtoMapper(rs));
-	liste.add(ecl);
-      }
-     if(liste.isEmpty()){
-         String msg = "££ Empty Result List in " + methodName;
-         LOG.error(msg);
-         LCUtil.showMessageFatal(msg);
-    //     return null;
-     }else{
-         LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-     }
-  return liste;
-}catch (SQLException e){
-        String msg = "SQL Exception in " + methodName + " /" + e.toString() + ", SQLState = " + e.getSQLState()
-            + ", ErrorCode = " + e.getErrorCode();
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return null;
-}catch (Exception ex){
-    String msg = "Exception in " + methodName + " / " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-}finally{
-        DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
-}else{
-   //  LOG.debug("escaped to handicaplist repetition with lazy loading");
-    return liste;  //plusieurs fois ??
-}
-} //end method
+    private static final long serialVersionUID = 1L;
 
-    public static List<ECourseList> getListe() {
-        return liste;
-    }
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-    public static void setListe(List<ECourseList> liste) {
-        HandicapList.liste = liste;
-    }
-    
-    void main() throws SQLException, Exception {// testing purposes
-    Connection conn = new DBConnection().getConnection();
-    Player player = new Player();
-    player.setIdplayer(324713);
-    List<ECourseList> p1 = new HandicapList().list(player, conn);
-        LOG.debug("Handicap list = " + p1.toString());
-    DBConnection.closeQuietly(conn, null, null, null);
-}// end main
-} //end class
+    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    private List<ECourseList> liste = null;
+
+    public HandicapList() { }
+
+    public List<ECourseList> list(final Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        // ✅ Early return — guard clause FIRST
+        if (liste != null) {
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            return liste;
+        }
+
+        final String query = """
+               /* lists.HandicapList.list  */
+            SELECT *
+            FROM handicap, round, course, player
+            WHERE handicap.round_idround = round.idround
+                 AND round.course_idcourse = course.idcourse
+                 AND player.idplayer = ?
+                 AND handicap.player_idplayer = player.idplayer
+            GROUP by idhandicap
+            ORDER by idhandicap DESC
+            """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, player.getIdplayer());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                liste = new ArrayList<>();
+                RowMapper<Course> courseMapper = new CourseRowMapper();
+                RowMapperRound<Round> roundMapper = new RoundRowMapper();
+                RowMapper<Club> clubMapper = new ClubRowMapper();
+                Club club = new Club();
+                club = clubMapper.map(rs);
+                while (rs.next()) {
+                    ECourseList ecl = ECourseList.builder()
+                            .course(courseMapper.map(rs))
+                            .round(roundMapper.map(rs, club))
+                            .build();
+                    liste.add(ecl);
+                }
+                if (liste.isEmpty()) {
+                    LOG.warn(methodName + " - empty result list");
+                } else {
+                    LOG.debug(methodName + " - list size = " + liste.size());
+                }
+                return liste;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    // ✅ Getters/setters d'instance
+    public List<ECourseList> getListe()              { return liste; }
+    public void setListe(List<ECourseList> liste)    { this.liste = liste; }
+
+    // ✅ Invalidation explicite
+    public void invalidateCache() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.liste = null;
+        LOG.debug(methodName + " - cache invalidated");
+    } // end method
+
+    /*
+    void main() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Player player = new Player();
+        player.setIdplayer(324713);
+        List<ECourseList> p1 = new HandicapList().list(player);
+        LOG.debug("Handicap list = " + p1);
+    } // end main
+    */
+
+} // end class

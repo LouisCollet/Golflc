@@ -1,9 +1,16 @@
 package lists;
 
 import entite.Classment;
+import entite.Club;
 import entite.CompetitionDescription;
-import entite.composite.ECourseList;
+import entite.Course;
+
 import entite.HandicapIndex;
+import entite.Inscription;
+import entite.Player;
+import entite.Round;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -14,15 +21,25 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import utils.DBConnection;
+import rowmappers.ClubRowMapper;
+import rowmappers.CourseRowMapper;
+import rowmappers.InscriptionRowMapper;
+import rowmappers.PlayerRowMapper;
+import rowmappers.RoundRowMapper;
+import rowmappers.RowMapper;
+import rowmappers.RowMapperRound;
+import connection_package.DBConnection;
+import entite.composite.ECourseList;
+import rowmappers.ClassmentRowMapper;
+import rowmappers.HandicapIndexRowMapper;
 import utils.LCUtil;
 
 public class ParticipantsStablefordCompetitionList implements Serializable, interfaces.Log{
     private static List<ECourseList> liste = null;
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    
  
-  public List<ECourseList> list(final CompetitionDescription competition ,final Connection conn) throws SQLException{ 
-    final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+  public List<ECourseList> list(final CompetitionDescription competition ,final Connection conn) throws SQLException, Exception{ 
+    final String methodName = utils.LCUtil.getCurrentMethodName();
 
 if(liste == null){
     LOG.debug(" ... entering " + methodName);
@@ -55,23 +72,52 @@ try{
     rs =  ps.executeQuery();
     liste = new ArrayList<>();
     int i = 0;
-  //  Club club = null;
+    RowMapper<Club> clubMapper = new ClubRowMapper();
+    RowMapper<Course> courseMapper = new CourseRowMapper();
+    RowMapper<Player> playerMapper = new PlayerRowMapper();
+    RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
+    RowMapperRound<Round> roundMapper = new RoundRowMapper(); // accepte rs et 
+    RowMapper<HandicapIndex> handicapIndexMapper = new HandicapIndexRowMapper();
+    RowMapper<Classment> classmentMapper = new ClassmentRowMapper();
+    
+//    club = clubMapper.map(rs);
 	while(rs.next()){
             i++;
-          ECourseList ecl = new ECourseList();
-          ecl.setClub(entite.Club.dtoMapper(rs));
-          ecl.setCourse(entite.Course.dtoMapper(rs));
-          ecl.setRound(new entite.Round().dtoMapper(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
-          ecl.setInscription(entite.Inscription.map(rs));
-          ecl.setPlayer(entite.Player.map(rs));
+            Player player = playerMapper.map(rs);
+            Club club = clubMapper.map(rs);
+            Round round = roundMapper.map(rs, club);
+            Classment classment  = new read.ReadClassment().read(player, round, conn); 
+
+            HandicapIndex handicapIndex = new HandicapIndex();
+            handicapIndex.setHandicapPlayerId(player.getIdplayer());
+            handicapIndex.setHandicapDate(round.getRoundDate());
+            handicapIndex = new find.FindHandicapIndexAtDate().find(handicapIndex, conn);
+            ECourseList ecl = ECourseList.builder()
+                    .club(club)
+                    .course(courseMapper.map(rs))
+                    .handicapIndex(handicapIndexMapper.map(rs))
+                    .inscription(inscriptionMapper.map(rs))
+                    .round(round)
+                    .player(player)
+                    .classment(classmentMapper.map(rs))
+            .build();
+            
+            
+         // ECourseList ecl = new ECourseList();
+      //    ecl.setClub(clubMapper.map(rs));
+        //  ecl.setCourse(courseMapper.map(rs));
+         // ecl.setRound(new entite.Round().dtoMapper(rs,ecl.getClub()));// mod 19-02-2020 pour générer ZonedDateTime
+        //  ecl.setRound(roundMapper.map(rs, ecl.getClub()));
+        //  ecl.setInscription(inscriptionMapper.map(rs));
+        //  ecl.setPlayer(playerMapper.map(rs));
        // et si erreur ? cla = null
-          Classment cla = new read.ReadClassment().read(ecl.getPlayer(), ecl.getRound(),conn);
-          ecl.setClassment(cla);
-          HandicapIndex handicapIndex = new HandicapIndex();
-          handicapIndex.setHandicapPlayerId(ecl.getPlayer().getIdplayer());
-          handicapIndex.setHandicapDate(ecl.getRound().getRoundDate());
-          handicapIndex = new find.FindHandicapIndexAtDate().find(handicapIndex, conn);
-          ecl.setHandicapIndex(handicapIndex);
+          
+        //  ecl.setClassment(cla);
+       //   HandicapIndex handicapIndex = new HandicapIndex();
+        //  handicapIndex.setHandicapPlayerId(ecl.player().getIdplayer());
+        //  handicapIndex.setHandicapDate(ecl.round().getRoundDate());
+        //  handicapIndex = new find.FindHandicapIndexAtDate().find(handicapIndex, conn);
+       //   ecl.setHandicapIndex(handicapIndex);
 	liste.add(ecl);
 	} // end while
   if(i == 0){
@@ -87,7 +133,7 @@ try{
 // https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
   //LOG.debug
   //liste.forEach(item -> LOG.debug("liste before sort " + item));
-  liste.forEach(item -> LOG.debug("liste BEFORE sort " + NEW_LINE + item.getPlayer().getPlayerLastName()+ item.getClassment().getTotalPoints()));
+  liste.forEach(item -> LOG.debug("liste BEFORE sort " + NEW_LINE + item.player().getPlayerLastName()+ item.classment().getTotalPoints()));
 /* bug !!
   liste.sort(Comparator.comparingInt((ECourseList p)->p.Eclassment.getTotalPoints() ).reversed()  // descending
    //        liste.sort(Comparator.comparingInt((ECourseList p)->p.Eclassment.getLast3() ).reversed()
@@ -104,19 +150,19 @@ try{
    //There is no need to use the method Comparator::reverse. 
    //Since you want to reverse the comparison based on the integer, just negate the age -p.getAge()
 // and it will be sorted in the descending order:
-    liste.sort(Comparator.comparingInt((ECourseList p)-> p.getClassment().getTotalPoints() ).reversed()  // -p=descending trick !!!
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast9() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast6() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast3() ).reversed()
-                     .thenComparingInt((ECourseList p)-> p.getClassment().getLast1() ).reversed()
+    liste.sort(Comparator.comparingInt((ECourseList p)-> p.classment().getTotalPoints() ).reversed()  // -p=descending trick !!!
+                     .thenComparingInt((ECourseList p)-> p.classment().getLast9() ).reversed()
+                     .thenComparingInt((ECourseList p)-> p.classment().getLast6() ).reversed()
+                     .thenComparingInt((ECourseList p)-> p.classment().getLast3() ).reversed()
+                     .thenComparingInt((ECourseList p)-> p.classment().getLast1() ).reversed()
             );
 
  //  liste.sort(Comparator.comparing((ECourseList p)-> p.getClassment().getTotalPoints()).reversed());// p)-> -p.getClassment().getTotalPoints() ));
     
  //  .thenComparingInt((ECourseList p)-> -p.getClassment().getLast1() )
     
-     liste.forEach(item -> LOG.debug("liste AFTER sort = " + NEW_LINE + item.getPlayer().getPlayerFirstName() + " / "
-                                            + item.getPlayer().getIdplayer() + " /" + item.getClassment()));
+     liste.forEach(item -> LOG.debug("liste AFTER sort = " + NEW_LINE + item.player().getPlayerFirstName() + " / "
+                                            + item.player().getIdplayer() + " /" + item.classment()));
     return liste;
 }catch (NullPointerException npe){ 
     String msg = "NullPointerException in " + methodName + npe;
@@ -124,14 +170,10 @@ try{
     LCUtil.showMessageFatal(msg);
     return null;
 }catch (SQLException e){
-        String msg = "SQL Exception in " + methodName + e;
-	LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
+        handleSQLException(e, methodName);
         return null;
-}catch (Exception ex){
-    String msg = "Exception in getParticipantsStableford() " + ex;
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
+}catch (Exception e){
+    handleGenericException(e, methodName);
     return null;
 }finally{
         DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
@@ -159,7 +201,7 @@ try{
      LOG.debug("résultat : " + ecl.getFirst()); // was get(0)
    Classment c = new Classment();
       LOG.debug("Inscription list = " + ecl.toString());
-     ecl.forEach(item -> LOG.debug("Participants Stableford list = " + item.getClassment() + "/" + item.getPlayer().getPlayerLastName()));  // java 8 lambda                     
+     ecl.forEach(item -> LOG.debug("Participants Stableford list = " + item.classment() + "/" + item.player().getPlayerLastName()));  // java 8 lambda                     
    DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } //end class

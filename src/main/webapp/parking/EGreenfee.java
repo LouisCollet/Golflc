@@ -3,67 +3,70 @@ package entite.composite;
 import entite.Club;
 import entite.Greenfee;
 import entite.Player;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named
-@RequestScoped 
+/**
+ * DTO immutable pour regrouper Greenfee, Player et Club
+ * Représente un green fee payé par un joueur dans un club
+ *
+ * Version refactorisée : Record sans CDI
+ */
+public record EGreenfee(
+    Greenfee greenfee,
+    Player player,
+    Club club
+) {
 
-public class EGreenfee implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-@Inject  private Greenfee greenfee;
-@Inject  private Player player;
-@Inject  private Club club;
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EGreenfee {
+        // Validation selon vos règles métier
+    }
 
-public EGreenfee(){  //constructor
-   
+    /* =======================
+       Getters explicites pour JSF
+       ======================= */
+    public Greenfee getGreenfee() { return greenfee; }
+    public Player getPlayer() { return player; }
+    public Club getClub() { return club; }
+
+    /* =======================
+       Withers pour immutabilité
+       ======================= */
+    public EGreenfee withGreenfee(Greenfee newGreenfee) {
+        return new EGreenfee(newGreenfee, this.player, this.club);
+    }
+
+    public EGreenfee withPlayer(Player newPlayer) {
+        return new EGreenfee(this.greenfee, newPlayer, this.club);
+    }
+
+    public EGreenfee withClub(Club newClub) {
+        return new EGreenfee(this.greenfee, this.player, newClub);
+    }
+
+    /* =======================
+       Formatage pour affichage/debug
+       ======================= */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : EGREENFEE
+            %s %s %s
+            """.formatted(
+                greenfee != null ? greenfee : "",
+                player != null ? player : "",
+                club != null ? club : ""
+            ).replaceAll("(?m)^\\s*$\n", ""); // supprime les lignes vides
+    }
+
+    /* =======================
+       Vérifications rapides
+       ======================= */
+    public boolean isComplete() {
+        return greenfee != null && player != null && club != null;
+    }
+
+    public boolean hasAnyData() {
+        return greenfee != null || player != null || club != null;
+    }
 }
-
-    public Greenfee getGreenfee() {
-        return greenfee;
-    }
-
-    public void setGreenfee(Greenfee greenfee) {
-        this.greenfee = greenfee;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public Club getClub() {
-        return club;
-    }
-
-    public void setClub(Club club) {
-        this.club = club;
-    }
-
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
-        + TAB + greenfee
-        + TAB + player
-        + TAB + club    
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in ECotisation.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class

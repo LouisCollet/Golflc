@@ -3,67 +3,81 @@ package entite.composite;
 import entite.Club;
 import entite.Cotisation;
 import entite.Player;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named
-@RequestScoped 
+/**
+ * DTO immutable pour regrouper Cotisation, Player et Club
+ * Représente une cotisation d'un joueur dans un club
+ * Compatible JSF grâce aux getters explicites
+ */
+public record ECotisation(
+        Cotisation cotisation,
+        Player player,
+        Club club
+) {
 
-public class ECotisation implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-@Inject  private Cotisation cotisation;
-@Inject  private Player player;
-@Inject  private Club club;
-
-public ECotisation(){  //constructor
-   
-}
-
-    public Cotisation getCotisation() {
-        return cotisation;
+    // Constructeur compact avec validation optionnelle
+    public ECotisation {
+        // Validation selon vos règles métier
     }
 
-    public void setCotisation(Cotisation cotisation) {
-        this.cotisation = cotisation;
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+
+    public ECotisation withCotisation(Cotisation newCotisation) {
+        return new ECotisation(newCotisation, this.player, this.club);
+    }
+
+    public ECotisation withPlayer(Player newPlayer) {
+        return new ECotisation(this.cotisation, newPlayer, this.club);
+    }
+
+    public ECotisation withClub(Club newClub) {
+        return new ECotisation(this.cotisation, this.player, newClub);
+    }
+
+    /* =======================
+       Getters explicites pour JSF
+       ======================= */
+
+    public Cotisation getCotisation() {
+        // Si null, retourne un objet vide pour éviter NullPointerException en JSF
+        return cotisation != null ? cotisation : new Cotisation();
     }
 
     public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
+        return player != null ? player : new Player();
     }
 
     public Club getClub() {
-        return club;
+        return club != null ? club : new Club();
     }
 
-    public void setClub(Club club) {
-        this.club = club;
+    /**
+     * Formatage pour affichage/debug
+     */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : ECOTISATION
+            %s %s %s
+            """.formatted(
+                cotisation != null ? cotisation : "",
+                player != null ? player : "",
+                club != null ? club : ""
+            ).replaceAll("(?m)^\\s*$\n", "");
     }
 
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
-        + TAB + cotisation
-        + TAB + player
-        + TAB + club    
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in ECotisation.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+    /**
+     * Vérifie si toutes les données sont présentes
+     */
+    public boolean isComplete() {
+        return cotisation != null && player != null && club != null;
+    }
+
+    /**
+     * Vérifie si au moins une donnée est présente
+     */
+    public boolean hasAnyData() {
+        return cotisation != null || player != null || club != null;
+    }
+}

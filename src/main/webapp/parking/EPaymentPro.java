@@ -4,76 +4,93 @@ import entite.Club;
 import entite.LessonPayment;
 import entite.Player;
 import entite.Professional;
-import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
-import static interfaces.Log.TAB;
-import java.io.Serializable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import utils.LCUtil;
 
-@Named
-@RequestScoped 
+/**
+ * DTO immutable pour regrouper Club, Professional, LessonPayment et Student
+ * Représente un paiement de leçon d'un élève à un professionnel dans un club
+ *
+ * Version refactorisée : Record sans CDI
+ */
+public record EPaymentPro(
+    Club club,
+    Professional professional,
+    LessonPayment lessonPayment,
+    Player student
+) {
 
-public class EPaymentPro implements Serializable{
-    //@Inject creates instance + initialize : pas nécessaire dans constructeur !
-@Inject private Club club;
-@Inject private Professional professional;
-@Inject private LessonPayment lessonPayment;
-@Inject private Player student;
-// @Inject private Player player;
-
-public EPaymentPro(){  //constructor
+    /**
+     * Constructeur compact avec validation optionnelle
+     */
+    public EPaymentPro {
+        // Validation métier optionnelle
+        // ex: Objects.requireNonNull(professional, "professional obligatoire");
     }
 
-    public Club getClub() {
-        return club;
+    /* =======================
+       Getters explicites (JSF)
+       ======================= */
+    public Club getClub() { return club; }
+    public Professional getProfessional() { return professional; }
+    public LessonPayment getLessonPayment() { return lessonPayment; }
+    public Player getStudent() { return student; }
+
+    /* =======================
+       Withers (remplacement des setters)
+       ======================= */
+    public EPaymentPro withClub(Club newClub) {
+        return new EPaymentPro(newClub, this.professional, this.lessonPayment, this.student);
     }
 
-    public void setClub(Club club) {
-        this.club = club;
+    public EPaymentPro withProfessional(Professional newProfessional) {
+        return new EPaymentPro(this.club, newProfessional, this.lessonPayment, this.student);
     }
 
-    public Professional getProfessional() {
-        return professional;
+    public EPaymentPro withLessonPayment(LessonPayment newLessonPayment) {
+        return new EPaymentPro(this.club, this.professional, newLessonPayment, this.student);
     }
 
-    public void setProfessional(Professional professional) {
-        this.professional = professional;
+    public EPaymentPro withStudent(Player newStudent) {
+        return new EPaymentPro(this.club, this.professional, this.lessonPayment, newStudent);
     }
 
-    public Player getStudent() {
-        return student;
+    /* =======================
+       Formatage pour affichage/debug
+       ======================= */
+    public String toDisplayString() {
+        return """
+            FROM ENTITE : EPAYMENTPRO
+            %s %s %s %s
+            """.formatted(
+                club != null ? club : "",
+                professional != null ? professional : "",
+                lessonPayment != null ? lessonPayment : "",
+                student != null ? student : ""
+            ).replaceAll("(?m)^\\s*$\n", "");
     }
 
-    public void setStudent(Player student) {
-        this.student = student;
+    /* =======================
+       Vérifications métier
+       ======================= */
+    public boolean isComplete() {
+        return club != null
+            && professional != null
+            && lessonPayment != null
+            && student != null;
     }
 
-    public LessonPayment getLessonPayment() {
-        return lessonPayment;
+    /**
+     * Données essentielles (avant paiement)
+     */
+    public boolean hasEssentialData() {
+        return club != null
+            && professional != null
+            && student != null;
     }
 
-    public void setLessonPayment(LessonPayment lessonPayment) {
-        this.lessonPayment = lessonPayment;
+    public boolean hasAnyData() {
+        return club != null
+            || professional != null
+            || lessonPayment != null
+            || student != null;
     }
-
-@Override
-public String toString(){ 
- try{
-//    LOG.debug("starting toString ECompetition !");
-    return ( 
-          NEW_LINE + "FROM ENTITE : " + getClass().getSimpleName().toUpperCase()
-        + NEW_LINE + TAB + " ,vers Club : " + club
-        + NEW_LINE + TAB + " ,vers Professional : " + professional
-        + NEW_LINE + TAB + " ,vers Player Pro: " + student
-        );
-  }catch(Exception e){
-        String msg = "£££ Exception in EPaymentPro.toString = " + e.getMessage();
-        LOG.error(msg);
-        LCUtil.showMessageFatal(msg);
-        return msg;
-  }
-} //end method
-} // end class
+}

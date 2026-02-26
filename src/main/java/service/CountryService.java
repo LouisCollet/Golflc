@@ -1,5 +1,5 @@
 
-package services;
+package service;
 
 import entite.Country;
 import static interfaces.Log.LOG;
@@ -38,7 +38,7 @@ public CountryService(){
         countries = CountryService.toCountryStream(Locale.getISOCountries())
                 .sorted(Comparator.comparing(Country::getName))
                 .collect(Collectors.toList());
-            LOG.debug("list of countries version = " + countries.size() + " / " + countries.toString());
+        //    LOG.debug("list of countries version = " + countries.size() + " / " + countries.toString());
     }
 // new 24-06-2025
     public static Stream<Country> toCountryStream(String... isoCodes) {
@@ -64,3 +64,79 @@ public CountryService(){
         return new ArrayList<>(locales);
     }
  }
+
+/*
+package services;
+
+import entite.Country;
+import static interfaces.Log.LOG;
+import java.io.Serializable;
+import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+
+@Named
+//@SessionScoped
+@ApplicationScoped // mod 24/12/2022
+public class CountryService implements Serializable{
+
+//    @Inject Country country;
+    private List<Country> countries;
+    private Map<Integer, Country> countriesAsMap;
+    private List<Country> locales;
+    private Map<Integer, Country> localesAsMap;
+//    private int i = 0;
+public CountryService(){
+    LOG.debug("constructor CountryService");
+ //   if(i == 0){
+//        init();
+ //       i++;
+ //   }
+    
+}
+    @PostConstruct
+    public void init() {
+        LOG.debug("entering CountryService init()");
+        countries = new ArrayList<>();
+   //     locales = new ArrayList<>();
+
+        String[] isoCodes = Locale.getISOCountries();
+            LOG.debug("number of isoCodes = " + isoCodes.length);
+        
+        for(int i = 0; i < isoCodes.length; i++) {
+         //   Locale locale = new Locale("", isoCodes[i]);
+            Locale locale = Locale.of("", isoCodes[i]);
+            countries.add(new Country(i, locale));
+        }
+            LOG.debug("number of countries = " + countries.size());
+
+    }
+
+    public List<Country> getCountries() {
+        return new ArrayList<>(countries);
+    }
+
+    public Map<Integer, Country> getCountriesAsMap() {
+        if (countriesAsMap == null) {
+            countriesAsMap = getCountries().stream().collect(Collectors.toMap(Country::getId, country -> country));
+        }
+        return countriesAsMap;
+    }
+    
+    public List<Country> getLocales() {
+        return new ArrayList<>(locales);
+    }
+    
+    public Map<Integer, Country> getLocalesAsMap() {
+        if (localesAsMap == null) {
+            localesAsMap = getLocales().stream().collect(Collectors.toMap(Country::getId, country -> country));
+        }
+        return localesAsMap;
+    }
+}
+*/

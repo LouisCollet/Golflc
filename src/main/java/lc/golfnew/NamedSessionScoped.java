@@ -5,15 +5,13 @@
  */
 package lc.golfnew;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.enterprise.inject.Stereotype;
 import jakarta.inject.Named;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  *
@@ -25,7 +23,7 @@ import jakarta.inject.Named;
 @Named
 @SessionScoped
 @Stereotype
-@Retention(RUNTIME)
-@Target({METHOD, FIELD, TYPE})
+@Retention((RetentionPolicy.RUNTIME))
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE})
 public @interface NamedSessionScoped {
 }

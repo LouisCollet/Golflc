@@ -5,3 +5,18 @@
     </exclusions>
   </deployment>
 </jboss-deployment-structure>
+
+
+<!--  Éviter les conflits avec le logging de WildFly
+WildFly a son propre système de logging (basé sur JBoss Logging). Ajoutez ce fichier jboss-deployment-structure.xml dans WEB-INF/ :
+xml<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+    <deployment>
+        <exclusions>
+            <module name="org.apache.log4j"/>
+            <module name="org.slf4j"/>
+            <module name="org.slf4j.impl"/>
+            <module name="org.jboss.logging"/>
+        </exclusions>
+    </deployment>
+</jboss-deployment-structure>  -->

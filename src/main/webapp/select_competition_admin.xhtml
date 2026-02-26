@@ -14,7 +14,7 @@
 <h:form id="select_competition" enctype="application/x-www-form-urlencoded">
 
 <p:dataTable id="competition"
-             value="#{courseC.listCompetitions()}"
+             value="#{roundC.listCompetitions()}"
              rowIndexVar="row"
              resizableColumns="true"
              var="c"
@@ -24,7 +24,7 @@
              >
 <!-- 30-09-2021 PF11 ajouté rowKey et supprimé      filteredValue="#{courseC.filteredInscriptions}"   -->
 <p:ajax event="rowToggle" 
-        listener="#{courseC.onRowToggleCompetition}" />
+        listener="#{roundC.onRowToggleCompetition}" />
 
 <f:facet name="header">
     <h1>#{msg['message.selectcompetition']}  #{param.cmd}</h1>
@@ -80,11 +80,11 @@
     	<p:column headerText="#{msg['competition.admin.menu']}"
                   footerText="#{msg['competition.admin.menu']}"
                   width="20%"
-                  rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}"
+                  rendered="#{playerC.isAdmin()}"
                   >
             <p:commandButton 
                 id="selectButtonInscription"
-                 action="#{courseC.beforeCompetitionMenu(c)}"
+                 action="#{roundC.beforeCompetitionMenu(c)}"
                 value="Menu #{c.competitionId}"
                 title="#{msg['tooltip.inscriptions.now']}"
                 icon="pi pi-user-edit">
@@ -97,69 +97,12 @@
                   >
             <p:commandButton
                 id="selectButtonStartingList"
-                action="#{courseC.beforeListInscriptionsCompetition(c)}"
+                action="#{roundC.beforeListInscriptionsCompetition(c)}"
                 value="#{c.competitionId}"
                 title="#{msg['tooltip.inscriptions.on']}"
                 icon="pi pi-forward">
             </p:commandButton>
 	</p:column>
-<!--
-    	<p:column headerText="#{msg['competition.startinglist.provisional']}"
-                  footerText="#{msg['competition.startinglist.provisional']}"
-                  width="15%"
-                  style="white-space:pre-line;"
-                  rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}">
-  
-            <p:commandButton
-                id="provisionalStartingList"
-                action="#{courseC.beforeListStartCompetition(c,'PROVISIONAL')}"
-                value="#{c.competitionId}"
-                
-                title="#{msg['tooltip.inscriptions.provisional']}"
-                icon="pi pi-sign-in">
-            </p:commandButton>
-
-
-	</p:column>
-
-        <p:column headerText="#{msg['competition.startinglist.final']}"
-                  footerText="#{msg['competition.startinglist.final']}"
-                  width="10%"
-                  style="white-space:pre-line;"
-                  rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}">
-            <p:commandButton
-                id="finalStartingList2"
-                rendered="#{c.competitionStatus eq '0'}"
-                action="#{courseC.beforeListStartCompetition(c, 'FINAL')}"
-                value="#{c.competitionId}"
-                title="#{msg['tooltip.inscriptions.final']}"
-                icon="pi pi-sign-out">
-            </p:commandButton>
-        </p:column>
-
-    	<p:column headerText="#{msg['competition.rounds']}"
-                  footerText="#{msg['competition.rounds']}"
-                  width="15%"
-                  style="white-space:pre-line;"
-                  rendered="#{courseC.player.playerRole.equalsIgnoreCase('ADMIN')}">
-            <p:commandButton
-                id="createRounds"
-                rendered="#{c.competitionStatus eq '1'}"
-                action="#{courseC.createRoundsCompetition(c)}"
-                value="#{c.competitionId}"
-                title="#{msg['tooltip.inscriptions.round']}"
-                icon="pi pi-sign-out">
-            </p:commandButton>
-            <p:commandButton
-                id="cancelRoundsempty"
-                rendered="#{c.competitionStatus > 1}"
-                style="color:red;float:left"
-                title="#{msg['tooltip.inscriptions.off']}"
-                icon="pi pi-ban"
-                >
-           </p:commandButton>
-	</p:column>
--->
 
 <p:rowExpansion>
             <p:panelGrid id="display"
@@ -232,7 +175,7 @@
                 <h:outputText value="#{msg['competition.current.inscriptions']} :" />
                 <h:outputText
                       id="competitionCurrentPlayers"
-                      value="#{courseC.listInscriptionsCompetition().size()}"/>
+                      value="#{roundC.listInscriptionsCompetition().size()}"/>
 
             </p:panelGrid>
   </p:rowExpansion>

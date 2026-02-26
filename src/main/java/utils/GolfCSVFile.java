@@ -13,6 +13,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.sql.Connection;
 import java.sql.SQLException;
+import jakarta.inject.Inject;
 
 @Named("golfCSV")
 @SessionScoped
@@ -26,15 +27,16 @@ import java.sql.SQLException;
  //     private static int nb = 0;
       private static int errorsCSV = 0;
       private static Player player = new Player();
-      private static Handicap handicap ; 
+      private static Handicap handicap ;
       private static final Charset cs = Charset.forName("UTF-8");
+@Inject private create.CreatePlayer createPlayerService; // migrated 2026-02-26
 static final int NORMAL_INPUT_FIELDS = 13;
 public GolfCSVFile()	
 {
 // constructor
 }
 
-public static  String [] getCSVExtract(final Connection conn, final File fi) throws SQLException {
+public String [] getCSVExtract(final Connection conn, final File fi) throws SQLException { // static removed 2026-02-26 — CDI @Inject requires instance method
 //  nb++;
         LOG.debug("starting getExtract");
   try 
@@ -126,7 +128,8 @@ boolean b = false;
        //      LOG.debug("boolean returned from create player = " + b);
    // à modidier ici !!
         HandicapIndex handicapIndex = new HandicapIndex();
-             if( ! new create.CreatePlayer().create(player, handicapIndex, conn, "B")){ // new 20/10/2014
+          //   if( ! new create.CreatePlayer().create(player, handicapIndex, conn, "B")){ // new 20/10/2014
+               if( ! createPlayerService.create(player, handicapIndex,"B")){ // migrated 2026-02-26
                   LOG.debug("boolean returned from create player is false ==> rollback ");
                   array_return[0]= "ERROR";
                   array_return[1]= "ROLLBACK started";

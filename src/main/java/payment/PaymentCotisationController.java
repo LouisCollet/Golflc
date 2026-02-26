@@ -1,4 +1,4 @@
-package Controllers;
+package payment;
 
 import entite.Club;
 import entite.Cotisation;
@@ -11,13 +11,22 @@ import static interfaces.Log.LOG;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import utils.LCUtil;
+import static utils.LCUtil.prepareMessageBean;
+
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-public class PaymentsCotisationController implements Serializable, interfaces.Log{
-    
-public PaymentsCotisationController(){ } // constructor
+@ApplicationScoped
+public class PaymentCotisationController implements Serializable, interfaces.Log{
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject private create.CreateInscription createInscriptionService; // migrated 2026-02-25
+    @Inject private create.CreatePaymentCotisation createPaymentCotisationService; // migrated 2026-02-26
+
+public PaymentCotisationController(){ } // constructor
 
 // new 21-01-2023 vient de courseController
 //@Inject @SessionMap
@@ -55,9 +64,10 @@ try{
             }
                LOG.debug("inscription error = " + inscription.isInscriptionError());
                LOG.debug("inscription OK = " + inscription.isInscriptionOK());
-              inscription = new create.CreateInscription().create(round, player, player,
+           // inscription = new create.CreateInscription().create(round, player, player, inscription, club, course, "A", conn);
+              inscription = createInscriptionService.create(round, player, player,
                       inscription,
-                      club, course, "A", conn);
+                      club, course, "A"); // migrated 2026-02-25
               if( ! inscription.isInscriptionError()){  // no errors
                   msg = "no error :  Inscription done";
                   LOG.info(msg);
@@ -81,13 +91,13 @@ try{
 } //end method
 
 
-private static boolean payment(Cotisation cotisation, Connection conn){ 
+private boolean payment(Cotisation cotisation, Connection conn){ // static removed 2026-02-26 — CDI @Inject requires instance method
  try{
       LOG.debug("entering createPaymentCotisation");
       LOG.debug("with cotisation = " + cotisation);
  
-      if(new create.CreatePaymentCotisation().create(cotisation, conn)){ //true
-        String msg = LCUtil.prepareMessageBean("subscription.success")
+      if(createPaymentCotisationService.create(cotisation)){ // migrated 2026-02-26
+        String msg = prepareMessageBean("subscription.success")
                   + cotisation //.getCotisationStartDate().format(ZDF_DAY) + " - " 
           //        + cotisation.getCotisationEndDate().format(ZDF_DAY)
                   + " for club = " + cotisation.getIdclub();
@@ -108,16 +118,11 @@ private static boolean payment(Cotisation cotisation, Connection conn){
   }
  } //end method createPaymentCotisation
 
- void main() throws Exception, Throwable {
-    Connection conn = new utils.DBConnection().getConnection();
-  try{
+    /*
+    void main() throws Exception, Throwable {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
 
- } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-     utils.DBConnection.closeQuietly(conn, null, null , null); 
-   }
-} // end main//
 } // end class

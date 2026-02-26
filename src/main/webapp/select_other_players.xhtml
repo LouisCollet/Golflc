@@ -14,12 +14,11 @@
 
 <ui:include src="include/include_summary_round.xhtml"/>
 <p:dataTable id="table_players"
-             value="#{courseC.listPlayers()}"
+             value="#{playerC.listPlayers()}"
              var="c"
-             
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
-             selection="#{courseC.player.draggedPlayers}"
+             selection="#{playerC.player.draggedPlayers}"
              rowKey="#{c.player.idplayer}">
     <!-- PF13 selectionMode="multiple"  -->
  <c:set var="s0" value="#{v.inscriptionTeam}"/>
@@ -27,9 +26,9 @@
 <f:facet name="header">
             <p:commandButton
                 id="cmd01Button"
-                action="#{courseC.otherPlayers()}"
+                action="#{roundC.otherPlayers()}"
                 icon="pi pi-external-link"
-                value="#{msg['button.selectotherplayers']} #{4 - courseC.roundPlayersList().size()} joueurs"
+                value="#{msg['button.selectotherplayers']} #{4 - roundC.roundPlayersList().size()} joueurs"
                
                 style="float:left">
             </p:commandButton>
@@ -63,7 +62,7 @@
      headerText="Select"
      footerText="Select" />
   <p:ajax event="rowSelectCheckbox" 
-             listener="#{courseC.rowPlayerSelect}"
+             listener="#{playerC.rowPlayerSelect}"
              update=":selectPlayers:table_players"
        />
 

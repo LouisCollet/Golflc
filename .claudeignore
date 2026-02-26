@@ -1,0 +1,32 @@
+﻿# ✅ Build output — jamais utile pour Claude
+target/
+*.class
+*.war
+*.jar
+*.ear
+
+# ✅ Logs
+*.log
+logs/
+
+# ✅ IDE NetBeans
+nbproject/private/
+nb-configuration.xml
+.settings/
+.classpath
+.project
+
+# ✅ Git
+.git/
+
+# ✅ Work in progress — pas en production
+src/main/webapp/parking/
+
+# ✅ Fichiers générés
+src/main/webapp/javax.faces.resource/
+src/main/webapp/WEB-INF/lib/
+
+# ✅ Resources statiques — inutiles pour migration Java
+src/main/webapp/resources/images/
+src/main/webapp/resources/css/
+src/main/webapp/resources/js/

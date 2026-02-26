@@ -4,24 +4,36 @@ import Controllers.LoggingUserController;
 import entite.Player;
 import entite.Round;
 import entite.ScoreStableford;
-import entite.Tee;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
+import jakarta.enterprise.context.ApplicationScoped;
+import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.SQLException;
-import utils.DBConnection;
-import utils.LCUtil;
 import static utils.LCUtil.myDoubleRound;
 
-public class CalcStablefordScoreDifferential{
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+/**
+ * Calcul du Score Differential Stableford (WHS).
+ * Migrated to CDI — 2026-02-25
+ */
+@ApplicationScoped
+public class CalcStablefordScoreDifferential implements Serializable {
 
-    // à partir 1/10/2024 voir documenbt Belgium WHS-update ...
- public double calc (final ScoreStableford score, final Player player,final Round round,  final Connection conn) throws Exception{
-     final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME);
+    private static final long serialVersionUID = 1L;
+
+    private static final String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
+    public CalcStablefordScoreDifferential() { }
+
+    /**
+     * Calcule le score differential.
+     * @param score le ScoreStableford (avec slopeRating, courseRating, adjustedGrossScore, playerHandicapWHS)
+     * @param player le joueur
+     * @param round le round (pour roundHoles)
+     * @return le score differential arrondi à 1 décimale
+     */
+    public double calc(final ScoreStableford score, final Player player, final Round round) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
  try{
        LOG.debug(" ...entering " + methodName);
        LOG.debug(" with score = " + score);
@@ -232,39 +244,23 @@ public class CalcStablefordScoreDifferential{
 //       return scoreDifferentialDouble;
    // end holes = 9;
   
- }catch(Exception ex){
-     String error = "Exception in " + methodName + ex;
-      LOG.error(error);
-      LCUtil.showMessageFatal(error);
+ } catch (Exception e) {
+      handleGenericException(e, methodName);
       return 999;
-  } finally {
-  }    
-// return 0;
- } // end method   
-    
-public static void main(String[] args) throws SQLException, Exception {
-     Connection conn = new DBConnection().getConnection();
- try{
-      Player player = new Player();
-      player.setIdplayer(324713);
-   //   player = new load.LoadPlayer().load(player, conn);
-      ScoreStableford score = new ScoreStableford();
-      score.setCourseHandicap(16); // à modifier 
-      score.setAdjustedGrossScore(31); // egal total points stableford
-      Round round = new Round();
-      round.setIdround(728); // 473 = 9 holes
-      round = new read.ReadRound().read(round, conn);
-      Tee tee= new Tee();
-      tee.setIdtee(156);
-   //   tee= new read.ReadTee().read(tee, conn);
-      double res = new calc.CalcStablefordScoreDifferential().calc(score, player, round, conn);
-         LOG.debug("main - scoreDifferential calculated = " + res);
-  } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-      //      LCUtil.showMessageFatal(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
-   }
-    }// end main
+  }
+ } // end method
+
+    /** @deprecated Use {@link #calc(ScoreStableford, Player, Round)} without Connection */
+    @Deprecated
+    public double calc(final ScoreStableford score, final Player player, final Round round, final Connection conn) {
+        return calc(score, player, round);
+    } // end method
+
+/*
+void main() {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    // tests locaux
+} // end main
+*/
 } // end class

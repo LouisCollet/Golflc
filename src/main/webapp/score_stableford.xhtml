@@ -13,7 +13,7 @@
 <h:graphicImage name="images/golfcard.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
 <h:graphicImage name="images/golfcard.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
 
-<!--    handicapType = #{courseC.scoreStableford.handicapType}
+<!--    handicapType = #{roundC.scoreStableford.handicapType}
    / param playerid = #{param.playerId}
    / param playername = #{param.playerName}
 <br/>
@@ -28,7 +28,7 @@
                var="var"
                rowIndexVar="row"
                rowStyleClass="#{(row mod 3) eq 0 ? 'highlight' : null}"
-               value="#{courseC.scoreStableford.scoreList}"
+               value="#{roundC.scoreStableford.scoreList}"
                editable="true"
                editMode="cell"
                lazy="false"
@@ -36,7 +36,7 @@
                widgetVar="cellProducts"
                style="margin: 0 auto;width:90%;text-align:center;" >
             <p:ajax event="cellEdit"
-                    listener="#{courseC.scoreStableford.onCellEdit}"
+                    listener="#{roundC.scoreStableford.onCellEdit}"
                     update="growl-msg"/>
      <f:facet name="header">
          <h1>#{msg['title.score.results']}</h1>
@@ -52,7 +52,7 @@
  
         <p:column 
                   headerText="#{msg['hole.par']} "
-                  footerText="#{msg['course.par']} = #{courseC.scoreStableford.getScoreList().stream().map(o->o.getPar()).sum()}"
+                  footerText="#{msg['course.par']} = #{roundC.scoreStableford.getScoreList().stream().map(o->o.getPar()).sum()}"
                   width="12%" 
                   style="color: green;font-weight:bold;">
             <h:outputText value="#{var.par}" />
@@ -60,7 +60,7 @@
  
         <p:column 
                   headerText="#{msg['hole.distance']} "
-                  footerText="#{msg['course.distance']} = #{courseC.scoreStableford.getScoreList().stream().map(o->o.getDistances()).sum()}"
+                  footerText="#{msg['course.distance']} = #{roundC.scoreStableford.getScoreList().stream().map(o->o.getDistances()).sum()}"
                   width="12%" 
                   style="color:white;">
             <h:outputText value="#{var.distances}" />
@@ -73,7 +73,7 @@
         </p:column>
  <!--    -->
         <p:column headerText="#{msg['hole.extra']} "
-                  footerText="#{msg['hole.extra']} = #{courseC.scoreStableford.getScoreList().stream().map(o->o.getExtra()).sum()}"
+                  footerText="#{msg['hole.extra']} = #{roundC.scoreStableford.getScoreList().stream().map(o->o.getExtra()).sum()}"
                   width="12%"
                   style="color:white;font-size:1.5em;font-weight:bold">
             <h:outputText value="*"    rendered="#{var.extra eq 1}" style="font-size:2.0em"/>
@@ -83,7 +83,7 @@
         </p:column>
             <p:column headerText="#{msg['score.gross']}"
                       width="12%"
-                      footerText="#{msg['score.gross']} = #{courseC.scoreStableford.getScoreList().stream().map(o->o.getStrokes()).sum()}" >
+                      footerText="#{msg['score.gross']} = #{roundC.scoreStableford.getScoreList().stream().map(o->o.getStrokes()).sum()}" >
                 <p:cellEditor>
                     <f:facet name="output">
                         <h:outputText value="#{var.strokes}"/>
@@ -104,8 +104,8 @@
        <p:column headerText="#{msg['score.points']} "
                  width="12%"
                  style="color:red;font-size:1.5em;font-weight:bold"
-                 footerText="#{msg['score.points']} = #{courseC.scoreStableford.getScoreList().stream().map(o->o.getPoints()).sum()}"
-                 rendered="#{courseC.scoreStableford.getScoreList().stream().map(o->o.getPoints()).sum() gt 0}" >
+                 footerText="#{msg['score.points']} = #{roundC.scoreStableford.getScoreList().stream().map(o->o.getPoints()).sum()}"
+                 rendered="#{roundC.scoreStableford.getScoreList().stream().map(o->o.getPoints()).sum() gt 0}" >
            <h:outputText value="#{var.points}" />
         </p:column>
 
@@ -118,18 +118,18 @@
               update="growl-msg"
               ajax="false"
               rendered="#{session.getAttribute('scoreType')eq 'COMPETITION'}" 
-              immediate="false"
+               
               icon="pi pi-list"
               action="competition_list_start.xhtml"/>
-      <!--  rendered="#{courseC.scoreStableford.showCalculate eq true}" -->
+      <!--  rendered="#{roundC.scoreStableford.showCalculate eq true}" -->
       <p:commandButton 
               id="buttonCalculateScore"
               value="#{msg['button.score.calculate']}"
               update="growl-msg"
               ajax="false"
-              immediate="false"
+               
               icon="pi pi-question"
-              action="#{courseC.calculateScoreStableford()}"/>
+              action="#{roundC.calculateScoreStableford()}"/>
       <p:commandButton 
               id="buttonCreateStableford"
               value="#{msg['button.score.create']}"
@@ -137,11 +137,11 @@
               ajax="false"
               immediate="true"
               icon="pi pi-database"
-              rendered="#{courseC.scoreStableford.showCreate eq true}"
-              action="#{courseC.createScoreStableford()}"/>
+              rendered="#{roundC.scoreStableford.showCreate eq true}"
+              action="#{roundC.createScoreStableford()}"/>
       
     <h:panelGroup id="panelGroupQualifying"
-                  rendered="#{courseC.scoreStableford.showCreateHandicapIndex eq true}"
+                  rendered="#{roundC.scoreStableford.showCreateHandicapIndex eq true}"
                   layout="block">
         <p:commandButton 
               id="buttonCreateHandicapIndex"
@@ -152,7 +152,7 @@
               icon="pi pi-database"
               
               styleClass="ui-button-success"
-              action="#{courseC.createHandicapIndex()}"/>
+              action="#{roundC.createHandicapIndex()}"/>
       <!--    partialSubmit="true"
               process="comment"
     -->         
@@ -163,7 +163,7 @@
         <p:outputLabel for="@next" value="#{msg['handicap.comment']} *"/>
             <p:inputText
             id="comment"
-            value="#{courseC.handicapIndex.handicapComment}"
+            value="#{appContext.handicapIndex.handicapComment}"
             size="45"
             title="#{msg['tooltip.handicap.comment']}"
             placeholder="Comment for handicap change" />
@@ -176,26 +176,26 @@
               update="growl-msg"
               immediate="true"
               ajax="false"
-              rendered="#{courseC.scoreStableford.showButtonStatistics}"
+              rendered="#{roundC.scoreStableford.showButtonStatistics}"
               icon="pi pi-pencil"
-              action="#{courseC.loadStatisticsTable()}"/>
+              action="#{roundC.loadStatisticsTable()}"/>
     </p:panelGrid>
     </f:facet>
 </p:dataTable>
 
 <p:panelGrid id="panelgrid6"
-             rendered="#{courseC.scoreStableford.showLineDifferential}"
+             rendered="#{roundC.scoreStableford.showLineDifferential}"
              layout="tabular"
              columns="6"
              style="font-size:2.0em;color:blue;"   >
     <h:outputText value="#{msg['score.scoredifferential']}"/>
-    <h:outputText value="#{courseC.scoreStableford.scoreDifferential}"
+    <h:outputText value="#{roundC.scoreStableford.scoreDifferential}"
                 style="font-size:2.0em;color:blue;border:solid 3px; width:50%" />
     <h:outputText value="#{msg['score.adjusted']}"/>
-    <h:outputText value="#{courseC.scoreStableford.adjustedGrossScore}"
+    <h:outputText value="#{roundC.scoreStableford.adjustedGrossScore}"
                 style="font-size:2.0em;color:blue;border:solid 3px; width:50%"  />
     <h:outputText value="#{msg['score.strokes']}"/>
-    <h:outputText value="#{courseC.scoreStableford.totalStrokes}"
+    <h:outputText value="#{roundC.scoreStableford.totalStrokes}"
                 style="font-size:2.0em;color:blue;border:solid 3px; width:50%" />
 </p:panelGrid>
 
@@ -203,13 +203,13 @@
               footer="Footer WHS"
               widgetVar="dlg2" 
               minHeight="40"
-              rendered="#{courseC.round.roundHoles eq 18}"
+              rendered="#{roundC.round.roundHoles eq 18}"
               styleClass="ui-page-theme-a ui-bar-inherit"  >
-        <h:outputText value="#{courseC.scoreStableford.scoreDifferential}"
+        <h:outputText value="#{roundC.scoreStableford.scoreDifferential}"
                       style="font-size:2.0em;color:blue;width:250%"/>
-        <h:outputText value="#{courseC.scoreStableford.adjustedGrossScore}"
+        <h:outputText value="#{roundC.scoreStableford.adjustedGrossScore}"
                 style="font-size:2.0em;color:blue;border:solid 5px; width:250%"/>
-        <h:outputText value="#{courseC.scoreStableford.totalStrokes}"
+        <h:outputText value="#{roundC.scoreStableford.totalStrokes}"
                 style="font-size:2.0em;color:blue;border:solid 5px; width:250%" />
     </p:dialog>
 

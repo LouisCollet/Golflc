@@ -20,15 +20,15 @@
                 <p:inputNumber
                        id="inputClub"
                        label="HomeClub"
-                       styleClass="mystyle"
-                       value="#{courseC.club.idclub}"
+                      
+                       value="#{clubC.club.idclub}"
                        size="5"
                        decimalPlaces="0"
                        emptyValue="0"
                        style="margin-left:1.5rem;margin-right:1.5rem;" />
                 <p:commandButton 
                          id="ButtonHomeClub"
-                         ajax="true"
+                          
                          immediate="true"
                          value="#{msg['button.player.homeclub']}"
                          actionListener="#{dialogC.showSelectClub('unavailable')}"
@@ -38,10 +38,10 @@
                             update=":form_club_course:inputClub,clubName,ClubId" />
                  </p:commandButton>
                 <h:outputText id="clubName"
-                              value="#{courseC.club.clubName}"
+                              value="#{clubC.club.clubName}"
                               style="font-style:italic"/>
                 <h:outputText id="ClubId"
-                              value=" #{courseC.club.idclub}"
+                              value=" #{clubC.club.idclub}"
                               style="font-weight:bold;font-size: 2rem;font-style:italic;color: red" />  
             </h:panelGroup>
 
@@ -49,29 +49,29 @@
           <h:panelGroup layout="block" id="containerCourse">
            <p:inputNumber
                id="inputCourse"
-               value="#{courseC.course.idcourse}"
+               value="#{clubC.course.idcourse}"
                size="5"
                decimalPlaces="0"
                emptyValue="0"
                style="margin-left:1.5rem;margin-right:1.5rem;" />
            <p:commandButton 
                 id="ButtonCourse"
-                ajax="true"
+                 
                 immediate="true"
                 value="#{msg['button.course.list']}"
-                actionListener="#{dialogC.showSelectCourse('include',courseC.club.idclub)}"
+                actionListener="#{dialogC.showSelectCourse('include',clubC.club.idclub)}"
                 style="float:left;"
                 icon="pi pi-search" >
                     <p:ajax event="dialogReturn"
-                            listener="#{dialogC.handleReturnCourse}"
+                           
                             update=":form_club_course:inputCourse, courseName,courseId" />
            </p:commandButton>
-
+<!--  listener="#{dialogC.handleReturnCourse}"  -->
            <h:outputText id="courseName"
-                          value=" #{courseC.course.courseName}"
+                          value=" #{clubC.course.courseName}"
                           style="font-style:italic"/>
             <h:outputText id="courseId"
-                          value=" #{courseC.course.idcourse}"
+                          value=" #{clubC.course.idcourse}"
                           style="font-weight:bold;font-size: 2rem;font-style:italic;color: red"/>
        </h:panelGroup>
           

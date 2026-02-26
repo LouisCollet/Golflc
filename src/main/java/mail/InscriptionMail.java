@@ -1,28 +1,40 @@
-
 package mail;
 
 import entite.Club;
 import entite.Course;
 import entite.Player;
 import entite.Round;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.GolfInterface.ZDF_TIME_HHmm;
 import static interfaces.Log.LOG;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.mail.MessagingException;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
-public class InscriptionMail{
+@ApplicationScoped
+public class InscriptionMail implements Serializable {
 
-public Boolean create(Player player, Player invitedBy, Round round, Club club, Course course )
-        throws MessagingException, Exception {
-        LOG.debug("entering InscriptionMail.create");
-try{
-        String sujet = "Your Round Inscription via GolfLC";
-        String mail = 
+    private static final long serialVersionUID = 1L;
+
+    @Inject private utils.QRCodeService qrService;
+    @Inject private MailSender mailSender;
+    @Inject private ical.IcalService icalService;
+
+    public InscriptionMail() { }
+
+    public Boolean create(Player player, Player invitedBy, Round round, Club club, Course course)
+            throws MessagingException, Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            String sujet = "Your Round Inscription via GolfLC";
+            String mail =
                   " <br/>Inscription Confirmation - GolfLC!"
                 + " <br/> Round Game   = " + round.getRoundGame()
                 + " <br/> Round Date   = " + round.getRoundDate().format(ZDF_TIME_HHmm)
@@ -37,52 +49,40 @@ try{
                 + " <br/><b>City       = </b>" + player.getAddress().getCity()
                 + " <br/><b>Email      = </b>" + player.getPlayerEmail()
                 + " <br/><b>Invited by     = </b>" + invitedBy.getPlayerLastName() + ", " + invitedBy.getPlayerFirstName()
- + " <br/>En utilisant le fichier .ics attaché à ce message, vous pouvez ajouter ce rendez-vous à votre agenda"
+                + " <br/>En utilisant le fichier .ics attache a ce message, vous pouvez ajouter ce rendez-vous a votre agenda"
                 + " <br/> Thank you !"
-                + " <br/> The GolfLC team"
-     //           + " <br/>" + LocalDateTime.now().format(ZDF_TIME)
-                    ; 
-                String to = "louis.collet@skynet.be";
-    // insérer ici le ics
-          Path pathICS = new utils.IcalGenerator().create(player, invitedBy, round, club, course, true);
-    //                LOG.debug("pathICS = " + pathICS);
-             LOG.debug("Size pathICS = " + Files.size(pathICS));
-          String s = mail.replaceAll("<br/>","\n").replaceAll("<b>","").replaceAll("</b>","");
-          Path pathQRC = utils.QRCodeGenerator.manageQR(s);
-            LOG.debug("Size pathQRC = " + Files.size(pathQRC));
+                + " <br/> The GolfLC team";
 
-          if(new mail.SendEmail().sendHtmlMail(sujet,mail,to,pathICS,pathQRC,player.getPlayerLanguage())){
-   //           LOG.debug("HTML Mail status = " + b);
-             String msg = "Vous allez recevoir un mail de confirmation de votre inscription ";
-             LOG.info(msg);
-             showMessageInfo(msg);
-             return true;
-          }else{
-            String msg = "mail de confirmation NOT sent !!";
-            LOG.error(msg);
-            showMessageFatal(msg);
-              
-              
-              return false;
-          }
+            String to = "louis.collet@skynet.be";
+            byte[] pathICS = icalService.generateIcs(player, invitedBy, round, club, course, true);
+            String content = mail.replaceAll("<br/>", "\n").replaceAll("<b>", "").replaceAll("</b>", "");
+            byte[] pathQRC = qrService.generateQR(content, 200);
+            LOG.debug("reponse de qrService = " + Arrays.toString(pathQRC));
 
+            if (mailSender.sendHtmlMail(sujet, mail, to, pathICS, pathQRC, player.getPlayerLanguage())) {
+                String msg = "Vous allez recevoir un mail de confirmation de votre inscription ";
+                LOG.info(msg);
+                showMessageInfo(msg);
+                return true;
+            } else {
+                String msg = "mail de confirmation NOT sent !!";
+                LOG.error(msg);
+                showMessageFatal(msg);
+                return false;
+            }
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
 
-}catch (Exception ex){
-    String msg = "Exception in InscriptionMail.create " + ex;
-    LOG.error(msg);
-    showMessageFatal(msg);
-    return false;
-}finally{  //      return false;
-     
- }
-} // end method create
-
-
-public Boolean delete(Player player, Round round, Club club, Course course) throws MessagingException, Exception {
-        LOG.debug("entering InscriptionMail.delete");
- try{       
-    String sujet = "Cancellation of your Round Inscription in GolfLC";
-    String mail =
+    public Boolean delete(Player player, Round round, Club club, Course course)
+            throws MessagingException, Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            String sujet = "Cancellation of your Round Inscription in GolfLC";
+            String content =
                   " <br/>Annulation Confirmation - GolfLC!"
                 + " <br/>" + LocalDateTime.now().format(ZDF_TIME)
                 + " <br/> Round Game   = " + round.getRoundGame()
@@ -97,38 +97,21 @@ public Boolean delete(Player player, Round round, Club club, Course course) thro
                 + " <br/><b>City       = </b>" + player.getAddress().getCity()
                 + " <br/><b>Email      = </b>" + player.getPlayerEmail()
                 + " <br/> Thank you !"
-                + " <br/> The GolfLC team"
-                    ; 
+                + " <br/> The GolfLC team";
 
- //   FileOutputStream fos = new mail.FileICS().create(player, player, round, club, course, false);
-    Path pathICS = new utils.IcalGenerator().create(player, player, round, club, course, false);
-        LOG.debug("PathICS = " + pathICS);
-// tester résultat ?
- //  String data2 = LocalDateTime.now() + "<br/> <bold> from courseController - sendmailtest Hello ! This is golfLC, the famous application v2";
-  //   Path path2 = utils.QRCodeGenerator.manageQR(data, path);
-    Path pathQRC = utils.QRCodeGenerator.manageQR(mail);
-    String to = "louis.collet@skynet.be";
-  //  Path pathQRC = null;
-    boolean b = new mail.SendEmail().sendHtmlMail(sujet,mail,to,
-      //      "ADD_ICS",
-            pathICS, // new 07-10-2021
-            pathQRC, player.getPlayerLanguage());
-       LOG.debug("HTML Mail status = " + b);
-return b;
+            byte[] pathICS = icalService.generateIcs(player, player, round, club, course, false);
+            LOG.debug("PathICS = " + pathICS);
+            byte[] pathQRC = qrService.generateQR(content, 200);
+            LOG.debug("reponse de qrService = " + pathQRC.toString());
 
-}catch (Exception ex){
-    String msg = "Exception in InscriptionMail.delete " + ex;
-    LOG.error(msg);
-    showMessageFatal(msg);
-    return false;
-}finally{  //      return false;
-     
- }
+            String to = "louis.collet@skynet.be";
+            boolean b = mailSender.sendHtmlMail(sujet, content, to, pathICS, pathQRC, player.getPlayerLanguage());
+            LOG.debug("HTML Mail status = " + b);
+            return b;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
 
-} //end method
-
-
-
-
-    } // end Class
-//} // end class
+} // end class

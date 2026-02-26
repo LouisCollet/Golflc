@@ -2,20 +2,20 @@
 package entite;
 
 import static interfaces.Log.LOG;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
+// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
+// import jakarta.inject.Named;  // migrated 2026-02-24
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import org.primefaces.PrimeFaces;
 import utils.LCUtil;
-@Named
-@RequestScoped
+// @Named  // migrated 2026-02-24
+// @RequestScoped  // migrated 2026-02-24
 public class Blocking implements Serializable, interfaces.Log, interfaces.GolfInterface{
-    
-    // à modifier
     private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
+    // à modifier
+    
     private static final long serialVersionUID = 1L;
     private Integer blockingPlayerId;
     private LocalDateTime blockingLastAttempt; 
@@ -90,7 +90,7 @@ LOG.debug("starting toString for Blocking!");
   }
 }
 public static Blocking mapBlocking(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(CLASSNAME); 
+      final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Blocking b = new Blocking();
             b.setBlockingPlayerId(rs.getInt("BlockingPlayerId") );

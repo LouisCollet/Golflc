@@ -34,39 +34,39 @@
 <f:facet name="header">
     <h1>#{msg['title.score.results']} scramble</h1>
     
-         idclub = #{courseC.club.idclub}
+         idclub = #{clubC.club.idclub}
          , cmd = #{param.cmd}
          , operation = #{param.operation}
          , inputClubOperation = #{courseC.inputClubOperation}
-         , nextScorecard = #{courseC.nextScorecard}
+         , nextScorecard = #{roundC.nextScorecard}
     
 </f:facet>
       <h:outputText value="#{msg['round.id']} :" />
       <h:outputText
             id="idround" 
-            value="#{courseC.round.Roundname} (#{courseC.round.idround})"
+            value="#{roundC.round.Roundname} (#{roundC.round.idround})"
             title="This tooltip is displayed when input gets the focus" />
 
       <h:outputText value="#{msg['player.id']} :" />
       <h:outputText
             id="idplayer1" 
-            value="#{courseC.player.playerLastName} (#{courseC.player.idplayer})"
+            value="#{playerC.player.playerLastName} (#{playerC.player.idplayer})"
             title="This tooltip is displayed when input gets the focus" />
 
       <h:outputText value="#{msg['club.name']} :"   />
 	<h:outputText
             id="clubn" 
-            value="#{courseC.club.clubName} (#{courseC.club.idclub})" />
+            value="#{clubC.club.clubName} (#{clubC.club.idclub})" />
 
       <h:outputText value="#{msg['course.name']} :" />
       <h:outputText
             id="idcourse" 
-            value="#{courseC.course.courseName} (#{courseC.course.idcourse})" />
+            value="#{clubC.course.courseName} (#{clubC.course.idcourse})" />
 
       <h:outputText value="#{msg['round.date']} :" />
       <h:outputText
             id="rounddate" 
-            value="#{courseC.round.roundDate}"
+            value="#{roundC.round.roundDate}"
             
             >
               <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
@@ -83,7 +83,7 @@
              layout="tabular"
              style="text-align:center;"
              columnClasses="className"
-             rendered="#{courseC.round.roundHoles eq 18 or courseC.round.roundStart eq 1}"
+             rendered="#{roundC.round.roundHoles eq 18 or roundC.round.roundStart eq 1}"
              >
 <!-- first line : hole  style="font-size: 3em;" -->    
     <h:outputText value="  #{msg['score.aller']}"
@@ -110,7 +110,7 @@
     <c:forEach var="i" begin="01" end="09" step="1">
         <h:inputText  id="score01-09${i}"
                 label="ScoreLC"
-                value="#{courseC.scoreStableford.holes[i-1]}"
+                value="#{roundC.scoreStableford.holes[i-1]}"
                 size="2"
                 onchange="repl(this);"
                 required="true"
@@ -129,7 +129,7 @@
              layout="tabular"
              columnClasses="className"
              style="text-align:center;"
-             rendered="#{courseC.round.roundHoles eq 18 or courseC.round.roundStart eq 10}"
+             rendered="#{roundC.round.roundHoles eq 18 or roundC.round.roundStart eq 10}"
              >
     <h:outputText value="#{msg['score.return']}"   />
     <c:forEach var="i" begin="10" end="18" step="1">
@@ -149,7 +149,7 @@
     <c:forEach var="i" begin="10" end="18" step="1">
             <h:inputText  id="score10-18${i}"
                     label="ScoreLC"
-                    value="#{courseC.scoreStableford.holes[i-1]}"
+                    value="#{roundC.scoreStableford.holes[i-1]}"
                     size="2"
                     onchange="repl(this);"
                     required="true"
@@ -174,7 +174,7 @@
                          update="growl-msg"
                          ajax="false"
  
-                         immediate="false"
+                          
                          icon="pi pi-database"
                          action="#{courseC.createScoreScramble}"/>
         
@@ -193,8 +193,8 @@
 
     <!-- 
      rendered="#{courseC.showButtonCreateStatistics}"
-    rendered="#{not courseC.nextScorecard}"
-                          rendered="#{courseC.nextScorecard}"   --> 
+    rendered="#{not roundC.nextScorecard}"
+                          rendered="#{roundC.nextScorecard}"   --> 
     
 </p:panelGrid>
 

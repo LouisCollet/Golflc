@@ -130,13 +130,11 @@ ClassLoader clo = Thread.currentThread().getContextClassLoader();
  //   }
 } //end run
 
-  void main() throws Exception {
-      LOG.debug("entering main");
-    SchedulerQuartzController sc = new SchedulerQuartzController();
- //   sc.run();
-      // wait 10 minutes to show jobs
- //   Thread.sleep(1000 * 10); // milliseconds
- //   sc.list();
-    sc.stop();
-  }
-} //end Class
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+    } // end main
+    */
+
+} // end class
