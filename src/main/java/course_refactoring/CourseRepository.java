@@ -1,48 +1,52 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package course_refactoring;
 
 import entite.Club;
 import entite.Course;
 import entite.Tee;
+import entite.composite.ECourseList;
+import static exceptions.LCException.handleSQLException;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.RowMapper;
 import rowmappers.TeeRowMapper;
-import connection_package.DBConnection;
-import entite.composite.ECourseList;
 
-@ApplicationScoped // ?? à changer je pense
-public class CourseRepository {
+@ApplicationScoped
+public class CourseRepository implements Serializable {
 
- //   @Inject
- //   private DataSource dataSource;
+    private static final long serialVersionUID = 1L;
 
-    public List<ECourseList> findAllValidCourses() throws SQLException, Exception {
+    @Resource(lookup = "java:jboss/datasources/golflc")
+    private DataSource dataSource;
 
-        String sql = """
+    public CourseRepository() { }
+
+    public List<ECourseList> findAllValidCourses() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
+        final String sql = """
             SELECT *
             FROM club
             JOIN course ON club.idclub = course.club_idclub
             JOIN tee ON tee.course_idcourse = course.idcourse
             WHERE course.CourseEndDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             ORDER BY clubname, coursename, idtee, teestart
-        """;
+            """;
 
-        List<ECourseList> result = new ArrayList<>();
-
-        try (Connection conn = new DBConnection().getConnection(); // à vérifier va être fermée ?
+        try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -50,22 +54,25 @@ public class CourseRepository {
             RowMapper<Course> courseMapper = new CourseRowMapper();
             RowMapper<Tee> teeMapper = new TeeRowMapper();
 
+            List<ECourseList> result = new ArrayList<>();
             while (rs.next()) {
-             //   ECourseList ecl = new ECourseList();
                 ECourseList ecl = ECourseList.builder()
                     .club(clubMapper.map(rs))
                     .course(courseMapper.map(rs))
                     .tee(teeMapper.map(rs))
-                .build();
-       //         ecl.setClub(clubMapper.map(rs));
-        //        ecl.setCourse(courseMapper.map(rs));
-        //        ecl.setTee(teeMapper.map(rs));
+                    .build();
                 result.add(ecl);
             }
-            LOG.debug("at this moment is conn closed ? " + conn.isClosed());
+            LOG.debug(methodName + " - list size = " + result.size());
+            return List.copyOf(result);
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Collections.emptyList();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
         }
-      LOG.debug("list result = " + result.toString());
-     //   return result;
-        return List.copyOf(result);  //mod 02-01-2025
-    }
+    } // end method
+
 } // end class

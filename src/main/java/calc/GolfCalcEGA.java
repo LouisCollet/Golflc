@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 import utils.ColumnComparator;
-import connection_package.DBConnection;
 
 public class GolfCalcEGA implements interfaces.GolfInterface // GolfInterface // throws IOException
 {
@@ -287,23 +286,12 @@ return roundResult;
 */
 // -----------------------------------------------------------------------------
 
-void main() throws SQLException, Exception{
-  
-    Connection conn = new DBConnection().getConnection();
-    Player player = new Player();
-    player.setIdplayer(324713);
- //   LOG.debug("line 010");
-    Round round = new Round();
-    round.setIdround(437);
- //    LOG.debug("line 011");
-   // LocalDateTime ldt = LocalDateTime.of(2017,Month.AUGUST,26,0,0);
-   // round.setRoundDate(ldt);
-   //        LOG.debug("line 012");
- //   int[][] a = new LoadstrokesEurrray().load(conn, points, player, round);
- //   LOG.debug(" array points filled = " + Arrays.deepToString(a));
-
-DBConnection.closeQuietly(conn, null, null, null);
-
-}// end main
+/*
+void main() throws SQLException, Exception {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    // tests locaux — DBConnection removed 2026-02-28
+} // end main
+*/
 
 } // end class

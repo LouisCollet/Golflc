@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import connection_package.DBConnection;
 import utils.DBMeta;
 
 public class SqlFactory {
@@ -170,106 +169,80 @@ final String query = """
     } //end method 
     //old solution
     public String listMetaColumnsUpdate2 (final Connection conn, final String table) throws SQLException{
-    ResultSet rs = null;
-try{
-    DatabaseMetaData meta = conn.getMetaData();
-  //  String   catalog          = null;
-  //  String   schemaPattern    = null;
-  //  String   tableNamePattern = table;
-   // String   columnNamePattern = null;
-
-   rs = meta.getColumns(conn.getCatalog(), null, table, null);
-      LOG.debug("We SKIP the first column !! ");
-   rs.first();  // grosse astuce ! ne pas prendre la première field : idplayer, idclub, etc ...
-     // parce que c'est toujours ?? la clé ??
-   StringBuilder sb = new StringBuilder();
- // http://mysql-0v34c10ck.blogspot.com/2011/05/better-way-to-get-primary-key-columns.html
-// les colonnes suivantes ne doivent PAS être MAJ en update car ce sont des clés ou des zones protégées
-   List<String> blacklist = Arrays.asList( 
-        "playerphotolocation", "playerActivation", "playermodificationdate","playerpassword", "playerPreviousPasswords",
-        "clubmodificationdate","club_idclub",
-        "coursemodificationdate","course_idcourse",// "courseholes",
-        "teemodificationdate", "tee_idtee", "tee_course_idcourse",
-        "holenumber", "holemodificationdate",
-        "auditstartdate","auditmodificationdate",
-        "CmpDataCompetitionId"
-        );
-// tout en minuscules
-   for(int i=0,l=blacklist.size();i<l;++i){
-      blacklist.set(i, blacklist.get(i).toLowerCase());
-   }
-   
-   String s = "";
-   while(rs.next()){
-       s = rs.getString(4).toLowerCase(); // 4.COLUMN_NAME String => column name 
-        if(blacklist.contains(s)){
-            LOG.debug("We SKIP this column from the blacklist !!= " + s);
-             continue;
-        }else{
-          //  LOG.debug("We will update this column = " + s);
-        }
-        sb.append(s).append(" = ?, "); 
- //       LOG.debug("inside loop, sb = " + sb);
-    }  //end while
-  sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
-        LOG.debug("sb listMetaColumnsUpdate = " + sb);
-  return sb.toString();
-}catch(Exception e){
-      LOG.error("Exception " + e);
-      return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, null);
-}
+    try{
+        DatabaseMetaData meta = conn.getMetaData();
+        try (ResultSet rs = meta.getColumns(conn.getCatalog(), null, table, null)) {
+            LOG.debug("We SKIP the first column !! ");
+            rs.first();  // ne pas prendre la première field : idplayer, idclub, etc ...
+            StringBuilder sb = new StringBuilder();
+            List<String> blacklist = Arrays.asList(
+                "playerphotolocation", "playerActivation", "playermodificationdate","playerpassword", "playerPreviousPasswords",
+                "clubmodificationdate","club_idclub",
+                "coursemodificationdate","course_idcourse",
+                "teemodificationdate", "tee_idtee", "tee_course_idcourse",
+                "holenumber", "holemodificationdate",
+                "auditstartdate","auditmodificationdate",
+                "CmpDataCompetitionId"
+            );
+            for(int i=0,l=blacklist.size();i<l;++i){
+                blacklist.set(i, blacklist.get(i).toLowerCase());
+            }
+            while(rs.next()){
+                String s = rs.getString(4).toLowerCase();
+                if(blacklist.contains(s)){
+                    LOG.debug("We SKIP this column from the blacklist !!= " + s);
+                    continue;
+                }
+                sb.append(s).append(" = ?, ");
+            }  //end while
+            sb.deleteCharAt(sb.lastIndexOf(","));
+            LOG.debug("sb listMetaColumnsUpdate = " + sb);
+            return sb.toString();
+        } // end try ResultSet
+    }catch(Exception e){
+        LOG.error("Exception " + e);
+        return null;
+    }
 } //end method
 
     // modification chatgpt
 public String listMetaColumnsUpdate(final Connection conn, final String table) throws SQLException {
-    ResultSet rs = null;
     try {
         DatabaseMetaData meta = conn.getMetaData();
-        rs = meta.getColumns(conn.getCatalog(), null, table, null);
-        StringBuilder sb = new StringBuilder();
-        // blacklist (inchangée, mais sécurisée)
-        Set<String> blacklist = new HashSet<>(Arrays.asList(
-            "playerphotolocation", "playeractivation",
-         //   "playermodificationdate", enlevé pour test
-            "playerpassword", "playerpreviouspasswords",
-            "clubmodificationdate", "club_idclub",
-            "coursemodificationdate", "course_idcourse",
-            "teemodificationdate", "tee_idtee", "tee_course_idcourse",
-            "holenumber", "holemodificationdate",
-            "auditstartdate", "auditmodificationdate",
-            "cmpdatacompetitionid"
-        ));
-        boolean firstColumnSkipped = false;
-        while (rs.next()) {
-            // ⚠️ comportement IDENTIQUE à rs.first() + rs.next()
-            if (!firstColumnSkipped) {
-                firstColumnSkipped = true;
-                continue;
+        try (ResultSet rs = meta.getColumns(conn.getCatalog(), null, table, null)) {
+            StringBuilder sb = new StringBuilder();
+            Set<String> blacklist = new HashSet<>(Arrays.asList(
+                "playerphotolocation", "playeractivation",
+                "playerpassword", "playerpreviouspasswords",
+                "clubmodificationdate", "club_idclub",
+                "coursemodificationdate", "course_idcourse",
+                "teemodificationdate", "tee_idtee", "tee_course_idcourse",
+                "holenumber", "holemodificationdate",
+                "auditstartdate", "auditmodificationdate",
+                "cmpdatacompetitionid"
+            ));
+            boolean firstColumnSkipped = false;
+            while (rs.next()) {
+                if (!firstColumnSkipped) {
+                    firstColumnSkipped = true;
+                    continue;
+                }
+                String column = rs.getString("COLUMN_NAME").toLowerCase();
+                if (blacklist.contains(column) || column.contains("modificationdate")){
+                    LOG.debug("We SKIP this column from the blacklist: {}", column);
+                    continue;
+                }
+                sb.append(column).append(" = ?, ");
             }
-            String column = rs.getString("COLUMN_NAME").toLowerCase();
-            if (blacklist.contains(column) || column.contains("modificationdate")){
-                LOG.debug("We SKIP this column from the blacklist: {}", column);
-                continue;
+            if (sb.length() >= 2) {
+                sb.setLength(sb.length() - 2);
             }
-            sb.append(column).append(" = ?, ");
-        }
-        // ✔ suppression propre du dernier ", "
-        if (sb.length() >= 2) {
-            sb.setLength(sb.length() - 2);
-        }
-
-        LOG.debug("sb listMetaColumnsUpdate = {}", sb);
-     //   debugChars("new chatgpt", old1);
-        return sb.toString();
-
+            LOG.debug("sb listMetaColumnsUpdate = {}", sb);
+            return sb.toString();
+        } // end try ResultSet
     } catch (Exception e) {
         LOG.error("Exception in listMetaColumnsUpdate", e);
-      //  return null;
         throw e;
-    } finally {
-        DBConnection.closeQuietly(null, null, rs, null);
     }
 }
 // new 28-01 conn ??
@@ -367,71 +340,12 @@ try{
       }
 }
 
- void main() throws SQLException, Exception{
-    Connection conn = new DBConnection().getConnection();
+/*
+void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-  try{
-      // Affiche la classe principale passée par Maven
-        String className = System.getProperty("printClassName");
-        if (className != null) {
-            LOG.debug("Classe principale passée par Maven : " + className);
-        }
-      
-      
-    String tableName = "club"; // tested : one Club, Course à verifier "hole" ceratinq query sont entièrement manuels !!
-    String old1 = new SqlFactory().listMetaColumnsUpdate(conn, tableName);
-    String old2 = new SqlFactory().listMetaColumnsUpdate2(conn, tableName);
-    String new1 = new SqlFactory().generateQueryUpdate(conn, tableName);
-    var result = listMetaColumnsUpdate3(conn, "Course");
-
-   LOG.debug("SET clause = {}", result.sql());
-   LOG.debug("Columns count = {}", result.columnCount());
-   LOG.debug("Columns result  = {}", result.sql());
-   System.out.println("[" + result.sql() + "]");
-System.out.println("length = " + result.sql().length());
- //   String new2 = new SqlFactory().listMetaColumnsUpdate3(conn, tableName);
-    if(old1.equals(new1)){
-          LOG.debug("old solution = new solution = \n" + old1);
-    }else{
-          LOG.debug("old NOT = new : old SOLUTION = \n " + old1);
-          LOG.debug("old NOT = new : new SOLUTION = \n " + new1);
-    }
-    if(old1.equals(old2)){
-          LOG.debug("old solution1 = old solution2 = \n" + old1);
-    }else{
-         LOG.debug("old solution1 NOT = old solution2 = \n");
-         LOG.debug("old1 = \n" + old1);
-         LOG.debug("old2 = \n" + old2);
-     //    debugChars("old1", old1);
-     //    debugChars("old2", old2);
-         LOG.debug("new1 = \n" + new1);
-  //       LOG.debug("new2 = \n" + new2);
-    }
-    LOG.debug("old1.length = " + old1.length());
-    LOG.debug("old2.length = " + old2.length());
-    LOG.debug("new1.length = " + new1.length());
-//    LOG.debug("new2.length = " + new2.length());
-
-for (int i = 0; i < Math.min(old1.length(), old2.length()); i++) {
-    if (old1.charAt(i) != old2.charAt(i)) {
-        LOG.debug("Diff at index " + i +
-                  " [" + (int) old1.charAt(i) + "] vs [" + (int) old2.charAt(i) + "]");
-        break;
-    }
-}
-    
-    
-  //  List<Average> av = new CourseAverage().stat(conn, player, course);
-      //   LOG.debug("new solution = " + s1);
- } catch(SQLException e){
-    handleSQLException(e, methodName);
-  //  return null;
-  }catch (Exception e) {
-    handleGenericException(e, methodName);
-    //return null;   
- }finally{
-    DBConnection.closeQuietly(conn, null, null , null); 
- }
- } // end main//
+    LOG.debug("entering " + methodName);
+    // tests locaux — DBConnection removed 2026-02-28
+} // end main
+*/
 
 } //end class
