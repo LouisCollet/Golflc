@@ -21,7 +21,12 @@ import java.util.List;
 // import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import utils.LCUtil;
 
-public class CalcTarifGreenfee implements interfaces.GolfInterface{
+@jakarta.enterprise.context.ApplicationScoped
+public class CalcTarifGreenfee implements interfaces.GolfInterface, java.io.Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public CalcTarifGreenfee() { }
 
     public TarifGreenfee calc(TarifGreenfee tarif, Round round, Club club, Player player){   
      LOG.debug(" -- Start of CalcTarifGreenfee with Tarif = " + tarif);

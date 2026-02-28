@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import jakarta.annotation.PostConstruct;
 import org.primefaces.event.SelectEvent;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
@@ -48,14 +49,15 @@ public class CountryController implements Serializable{
         this.countries = countries;
     }
         
-public CountryController(){  // constructor
-    LOG.debug("entering CountryController");
-  //       LOG.debug("step 1");
-        countriesMap = createMap(Locale.ENGLISH); // à modifier en fonction user ? non default = "en"
-           LOG.debug("just before getCountries");
-   //     countries = new services.CountryService().init();
-        countries = new service.CountryService().getCountries();
-}
+    public CountryController() { }
+
+    @PostConstruct
+    public void init() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        countriesMap = createMap(Locale.ENGLISH);
+        countries = countryService.getCountries(); // migrated 2026-02-28 — was new service.CountryService()
+    } // end method
      
     public Map<String, String> getCountriesMap() {
   //      LOG.debug("entering getCountriesMap()");
