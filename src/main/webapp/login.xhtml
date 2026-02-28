@@ -10,13 +10,13 @@
 
 <ui:define name="title">Login to GolfLC</ui:define>
 
-<ui:define name="content">
-
-    <!-- Force l'instanciation du LoginBean et l'appel de prepareLogin() -->
-    <!-- ✅ Garde f:viewAction pour appeler prepareLogin() -->
+<ui:define name="metadata">
     <f:metadata>
         <f:viewAction action="#{loginBean.prepareLogin}" onPostback="false"/>
     </f:metadata>
+</ui:define>
+
+<ui:define name="content">
 
     <h:form id="loginForm">
         <p:panelGrid id="panelGridLogin" layout="flex" columns="2" columnClasses="col1Flex, col2Flex">

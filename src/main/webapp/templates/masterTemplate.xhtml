@@ -8,6 +8,8 @@
     lang="#{languageC.locale}" 
     xml:lang="#{languageC.locale}">
 
+<ui:insert name="metadata"> </ui:insert>
+
 <h:head id="head_PrimeFlex3">
    <meta name="description" 
          content="GolfLC Application"/> 
@@ -52,8 +54,7 @@
             locale="#{languageC.locale}" 
             contentType="text/html;charset=utf-8"
             encoding="UTF-8">
- 
-    <ui:insert name="metadata"> </ui:insert>
+
 <div class="card">
   <!--
     <p:sidebar id="sidebarTop"
@@ -90,8 +91,6 @@
      </p:sidebar>
 
 
-
-<ui:insert name="metadata" />
 
     <div class="grid">
 <!--   North - Header, width = 12 col -->

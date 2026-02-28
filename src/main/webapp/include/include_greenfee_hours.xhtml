@@ -17,7 +17,7 @@
 
         <p:column headerText="#{msg['round.hour']} "
                   width="12%" >
-            <h:outputText value="#{courseC.round.roundDate}">
+            <h:outputText value="#{appContext.round.roundDate}">
                   <f:convertDateTime type="localDateTime" pattern="HH:mm" />
             </h:outputText>
         </p:column>

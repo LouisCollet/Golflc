@@ -2,7 +2,7 @@
 package connection_package;
 
 import Controller.refact.PlayerController;
-import Controllers.CourseController;
+// import Controllers.CourseController; // removed 2026-02-28 — renamed to NavigationController
 import context.ApplicationContext;
 import entite.Player;
 import static interfaces.Log.LOG;

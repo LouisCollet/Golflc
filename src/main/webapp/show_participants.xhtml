@@ -13,7 +13,7 @@
         <f:viewParam
             required="true"
             name="cmd"
-            value="#{courseC.inputcmdParticipants}"
+            value="#{roundC.inputcmdParticipants}"
             requiredMessage="You did not specify a cmd. (The cmd parameter is missing)"
             converterMessage="Invalid cmd. (The cmd parameter is not a number)"
             validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
@@ -24,7 +24,7 @@
         <f:viewParam
             required="false"
             name="operation"
-            value="#{courseC.inputClubOperation}"
+            value="#{roundC.inputClubOperation}"
             requiredMessage="You did not specify a operation. (The id parameter is missing)"
             converterMessage="Invalid operation. (The id parameter is not a number)"
             validatorMessage="Invalid operation. (The operation parameter is not a positive number, minimum 6 length)">
@@ -42,7 +42,7 @@
 <h:form id="participants_rounds">
 
 <p:dataTable id="played_rounds_table1"
-             value="#{courseC.getListmatchplay()}"
+             value="#{roundC.listmatchplay}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
@@ -73,7 +73,7 @@
 </p:dataTable>
                                                            
 <p:dataTable id="played_rounds_table2"
-             value="#{courseC.getListmatchplay()}"
+             value="#{roundC.listmatchplay}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
@@ -106,20 +106,20 @@
 <f:facet name="footer">
 
         <p:commandButton id="button01"
-                         value="#{msg['button.score.create']} #{courseC.inputcmdParticipants} Matchplay"
+                         value="#{msg['button.score.create']} #{roundC.inputcmdParticipants} Matchplay"
                          update="growl-msg"
                          immediate="true"
                          ajax="false"
-                         rendered="#{courseC.inputcmdParticipants eq 'MP_'}" 
+                         rendered="#{roundC.inputcmdParticipants eq 'MP_'}" 
                          icon="pi pi-database"
                          action="score_matchplay.xhtml?faces-redirect=true"/>
 
         <p:commandButton id="button02"
-                         value="#{msg['button.score.create']} #{courseC.inputcmdParticipants} Scramble"
+                         value="#{msg['button.score.create']} #{roundC.inputcmdParticipants} Scramble"
                          update="growl-msg"
                          immediate="true"
                          ajax="false"
-                         rendered="#{courseC.inputcmdParticipants eq 'SCR'}" 
+                         rendered="#{roundC.inputcmdParticipants eq 'SCR'}" 
                          icon="pi pi-database"
                          action="score_scramble.xhtml?faces-redirect=true"/>
 </f:facet>

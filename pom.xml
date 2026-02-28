@@ -101,7 +101,7 @@
         <exec.inheritIo>true</exec.inheritIo><!--  mod 19-03-2023  https://github.com/apache/netbeans/issues/5552 -->
         <selenium.version>4.39.0</selenium.version> <!--  mod 27-12-2025 was 4.38.0 -->
         <jollyday.version>1.8.1</jollyday.version><!--  mod 19-01-2026 was 1.8.0 -->
-        <weld.version>6.0.4.Final</weld.version> <!--  pour tests via selenium -->
+        <weld.version>6.0.4.Final</weld.version> <!--  pour refactoring CDI -->
         
         
         
@@ -865,7 +865,7 @@ screenshot full page -->
 <dependency>
     <groupId>org.wildfly</groupId>
     <artifactId>wildfly-client-all</artifactId>
-    <version>39.0.0.Beta1</version>
+    <version>39.0.0.Final</version>
     <scope>test</scope>
 </dependency>
 
@@ -897,7 +897,7 @@ screenshot full page -->
     <groupId>org.wildfly.core</groupId>
     <artifactId>wildfly-controller-client</artifactId>
     <scope>provided</scope> <!-- was test ou 'compile' si tu l'utilises hors tests -->
-    <version>31.0.0.Beta3</version>
+    <version>31.0.1.Final</version>
 </dependency>
 <!-- https://mvnrepository.com/artifact/org.jboss/jboss-dmr -->
 <dependency>

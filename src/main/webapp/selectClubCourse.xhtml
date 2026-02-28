@@ -41,31 +41,31 @@
                         
                         <!-- Texte conditionnel selon le contexte -->
                         <h:outputText
-                            rendered="#{inputSelectCourse eq 'CreateRound'}" 
+                            rendered="#{appContext.inputSelectCourse eq 'CreateRound'}" 
                             value=" #{msg['message.for.round']}" />
                         <h:outputText
-                            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+                            rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}" 
                             value=" #{msg['message.for.tarif']}" />
                         <h:outputText
-                            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+                            rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}" 
                             value=" #{msg['message.for.tarif.members']}" />
                         <h:outputText
-                            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+                            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}" 
                             value=" #{msg['message.for.unavailable']}" />
                         <h:outputText
-                            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+                            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}" 
                             value=" #{msg['message.for.unavailable']}" />
                         <h:outputText
-                            rendered="#{inputSelectCourse eq 'ChartRound'}" 
+                            rendered="#{appContext.inputSelectCourse eq 'ChartRound'}" 
                             value=" #{msg['message.for.detail']}" />
                         <h:outputText
-                            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+                            rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}" 
                             value=" #{msg['message.for.average']}" />
                     </h1>
                     
                     <!-- Debug info (à retirer en production) -->
                     <p style="font-size: 0.9em; color: #666;">
-                        Parameter from sessionMap = #{inputSelectCourse}
+                        Parameter from sessionMap = #{appContext.inputSelectCourse}
                     </p>
                 </f:facet>
                 
@@ -87,7 +87,7 @@
                         style="width:240px;"
                         action="#{clubC.clubAndCourseAction()}" />
                 </f:facet>
-           <!--     action="#{courseC.selectedCourse()}" /> -->     
+           <!--     action="#{navC.selectedCourse()}" /> -->     
             </p:panelGrid>
             
         </h:form>

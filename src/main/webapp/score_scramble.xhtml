@@ -37,7 +37,7 @@
          idclub = #{clubC.club.idclub}
          , cmd = #{param.cmd}
          , operation = #{param.operation}
-         , inputClubOperation = #{courseC.inputClubOperation}
+         , inputClubOperation = #{roundC.inputClubOperation}
          , nextScorecard = #{roundC.nextScorecard}
     
 </f:facet>
@@ -98,7 +98,7 @@
               style="background-color: lightskyblue;"
               />
    <c:forEach var="i" begin="01" end="09" step="1">
-       <h:outputText value="#{courseC.parArray[i-1]}"
+       <h:outputText value="#{roundC.parArray[i-1]}"
                      style="font-style: italic" />
    </c:forEach>
 
@@ -141,7 +141,7 @@
               style="background-color: lightskyblue;"
               />
    <c:forEach var="i" begin="10" end="18" step="1">
-       <h:outputText value="${courseC.parArray[i-1]}"
+       <h:outputText value="${roundC.parArray[i-1]}"
                      style="font-style: italic"/>
    </c:forEach>
 
@@ -168,31 +168,24 @@
     columnClasses="className"
     columns="2">
 <f:facet name="footer">
-        <p:commandButton 
-                         id="button01"
+        <!-- createScoreScramble + showButtonCreateStatistics — commented 2026-02-28
+             Methods never existed. CreateScoreScramble service needs to be created first.
+        <p:commandButton id="button01"
                          value="#{msg['button.score.create']}"
-                         update="growl-msg"
-                         ajax="false"
- 
-                          
+                         update="growl-msg" ajax="false"
                          icon="pi pi-database"
-                         action="#{courseC.createScoreScramble}"/>
-        
-        <!--   rendered="#{courseC.showButtonCreateScore}"  -->
-        <p:commandButton 
-                         id="button02"
+                         action="#{roundC.createScoreScramble()}"/>
+        <p:commandButton id="button02"
                          value="#{msg['button.score.statistics']}"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         rendered="#{courseC.showButtonCreateStatistics}"
-                        icon="pi pi-pencil"
-                         style="float: right;"
+                         update="growl-msg" immediate="true" ajax="false"
+                         rendered="#{roundC.showButtonCreateStatistics}"
+                         icon="pi pi-pencil" style="float: right;"
                          action="score_statistics.xhtml?faces-redirect=true"/>
+        -->
 </f:facet>
 
     <!-- 
-     rendered="#{courseC.showButtonCreateStatistics}"
+     rendered="#{navC.showButtonCreateStatistics}"
     rendered="#{not roundC.nextScorecard}"
                           rendered="#{roundC.nextScorecard}"   --> 
     

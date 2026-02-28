@@ -19,14 +19,14 @@
 <!--
    sessionMap.get("inputSelectCourse")  -->
    
-<c:set var="select" value="#{inputSelectPaiement}"/> 
+<c:set var="select" value="#{appContext.inputSelectPaiement}"/> 
  
    <p:dataTable id="TableLocalAdmin"
                 var="c"
                 widgetVar="customersTable"
                 value="#{memC.listLocalAdminCotisation(select)}"
                 sortBy="#{c.club.clubName}"
-                filteredValue="#{courseC.filteredCars}"
+                filteredValue="#{memC.filteredCars}"
                 multiViewState="true"
                 >
        <!--   -->
@@ -35,12 +35,12 @@
     <h1>
         <h:outputText
             id="Rnd"
-            rendered="#{inputSelectPaiement eq 'Greenfees'}" 
+            rendered="#{appContext.inputSelectPaiement eq 'Greenfees'}" 
             value="#{msg['message.for.paiement.greenfee']}">
         </h:outputText>
         <h:outputText
             id="tarif"
-            rendered="#{inputSelectPaiement eq 'Members'}" 
+            rendered="#{appContext.inputSelectPaiement eq 'Members'}" 
             value="#{msg['message.for.paiement.cotisation']}">
         </h:outputText>
     </h1>

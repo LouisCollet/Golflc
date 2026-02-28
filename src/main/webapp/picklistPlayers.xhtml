@@ -15,7 +15,7 @@
  <h:form id="picklist" enctype="application/x-www-form-urlencoded">
 <h3> Players Picklist </h3>
 <p:pickList id="picklistPlayers"
-                value="#{courseC.dlPlayers}"
+                value="#{roundC.dlPlayers}"
                 var="pl"
                 itemValue="#{pl}" 
                 itemLabel="#{pl.idplayer} / #{pl.playerLastName} / #{pl.playerFirstName} / #{pl.playerGender}"
@@ -26,14 +26,13 @@
                 
                 style="border:solid 5px" 
             >
- <!--  onTransfer="handleTransfer(e)                showSourceFilter="true"" 
+ <!--  onTransfer="handleTransfer(e)                showSourceFilter="true""
         <f:facet name="sourceCaption">Available Players</f:facet>
-        <f:facet name="targetCaption">Ordered Players</f:facet> 
+        <f:facet name="targetCaption">Ordered Players</f:facet>
 -->
         <f:facet name="sourceCaption"> #{msg['button.availableplayers']} </f:facet>
-        <f:facet name="targetCaption"> #{msg['button.orderedplayers']}   </f:facet> 
-                  list="#{courseC.fullList}" />   
- -->
+        <f:facet name="targetCaption"> #{msg['button.orderedplayers']}   </f:facet>
+        <!-- list="#{navC.fullList}" removed 2026-02-28 — fullList no longer exists -->
     </p:pickList>  
 
     <p:commandButton id="button01"

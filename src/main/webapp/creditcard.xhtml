@@ -15,8 +15,8 @@
      <h:form id="creditcard" >  
 <h:graphicImage name="images/credit-card-1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
 <h:graphicImage name="images/credit-card-2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
-  <!--   creditcardType = #{creditcardType} -->
-   <c:set var="type" value="#{creditcardType}"/>
+  <!--   creditcardType = #{appContext.creditcardType} -->
+   <c:set var="type" value="#{appContext.creditcardType}"/>
      <c:if test="#{type eq 'GREENFEE'}">
          <ui:include src="include/include_summary_round.xhtml"/>
     </c:if>

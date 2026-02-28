@@ -13,14 +13,14 @@
         <f:viewParam
             required="true"
             name="uuid"
-            value="#{courseC.activation.activationKey}"
+            value="#{playerC.activation.activationKey}"
             requiredMessage="You did not specify a cmd. (The - activationKey - parameter is missing)"
             converterMessage="Invalid cmd. (The - activationKey - parameter is not a number)"
             validatorMessage="Invalid cmd. (The - activationKey - parameter is not a positive number, minimum 3 length, maximum 40 length)">
             <f:validateLength minimum="3" maximum="40" />
         </f:viewParam>
         <f:viewAction action="#{languageC.setLanguage(param.language)}"/>
-        <f:viewAction action="#{courseC.completeActivation(param.uuid)}"/>
+        <f:viewAction action="#{playerC.completeActivation(param.uuid)}"/>
      </f:metadata>    
     <!-- https://stackoverflow.com/questions/6377798/what-can-fmetadata-fviewparam-and-fviewaction-be-used-for -->
 </ui:define>
@@ -59,7 +59,7 @@
                          update="growl-msg"
                          immediate="true"
                          icon="pi pi-pencil"
-                         action="#{courseC.activateNewPlayer()}"/>
+                         action="#{playerC.activateNewPlayer()}"/>
 </f:facet>
 </p:panelGrid>
 </h:form>

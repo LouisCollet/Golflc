@@ -21,8 +21,8 @@
                                  value="Logout"
                                  icon="pi pi-power-off"
                                  immediate="true"
-                                 action="#{courseC.logout('from button Logout')}"
-                                 rendered="#{courseC.connected}" />
+                                 action="#{playerC.logout('from button Logout')}"
+                                 rendered="#{appContext.connected}" />
 
                 <p:selectOneMenu value="#{activeLocale.languageTag}">
                     <f:selectItems value="#{activeLocale.availableLocales}"
@@ -58,10 +58,12 @@
                                  type="button"
                                  onclick="PF('sidebarDown').show()" />
 
+                <!-- screenShot removed 2026-02-28 — method was dead (Selenium test-only, removed 2026-01-10)
                 <p:commandButton value="Screenshot"
                                  icon="pi pi-camera"
                                  ajax="false"
-                                 action="#{courseC.screenShot(view.viewId)}" />
+                                 action="#{navC.screenShot(view.viewId)}" />
+                -->
 
             </div>
         </div>

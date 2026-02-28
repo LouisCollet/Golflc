@@ -53,9 +53,7 @@ public class FileUploadController implements Serializable {
     @Inject private PlayerController            playerController;       // ✅ plus new
     @Inject private update.UpdatePlayerPhotoLocation updatePlayerPhotoLocation; // ✅ plus new
 
-    @Inject
-    @SessionMap
-    private Map<String, Object> sessionMap;
+    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
 
     private String dropZoneText = "Drop zone p:inputTextarea demo.";
 
@@ -121,7 +119,7 @@ public class FileUploadController implements Serializable {
             }
 
             // ✅ Mise à jour Player — via injection CDI
-            int playerId = Integer.parseInt(sessionMap.get("playerid").toString());
+            int playerId = appContext.getPlayer().getIdplayer();
             playerController.loadPlayer(playerId);
             Player p = appContext.getPlayer();
             p.setPlayerPhotoLocation(file.getName());

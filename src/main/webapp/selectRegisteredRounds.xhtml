@@ -15,7 +15,7 @@
         <f:viewParam
             required="true"
             name="cmd"
-            value="#{courseC.inputScorecard}"
+            value="#{roundC.inputScorecard}"
             requiredMessage="You did not specify a cmd. (The id parameter is missing)"
             converterMessage="Invalid cmd. (The id parameter is not a number)"
             validatorMessage="Invalid cmd. (The cmd parameter is not a positive number, minimum 3 length)">
@@ -36,7 +36,7 @@
              value="#{roundC.listRecentRounds()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCars}"
+             filteredValue="#{roundC.filteredCars}"
              >
 
 <f:facet name="header">

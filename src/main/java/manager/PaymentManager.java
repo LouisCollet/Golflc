@@ -29,9 +29,7 @@ public class PaymentManager implements Serializable {
     @Inject private create.CreateCreditcard   createCreditcardService;
     @Inject private read.ReadCreditcard       readCreditcardService;
     @Inject private update.ModifyCreditcard   modifyCreditcardService;
-
     @Inject private mail.CreditcardMail       creditcardMail;
-
     @Inject private ApplicationContext        appContext;
 
     public PaymentManager() { }
@@ -118,6 +116,7 @@ public class PaymentManager implements Serializable {
      * @param newCard la carte saisie par l'utilisateur
      * @param player  le joueur concerne
      * @return true si une creation ou modification a ete effectuee
+     * @throws java.sql.SQLException
      */
     public boolean needsUpdate(Creditcard newCard, Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();

@@ -19,7 +19,7 @@
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCourses}" >
+             filteredValue="#{clubC.filteredCourses}" >
 
 <f:facet name="header">
    <div class="bg-warning">
@@ -43,7 +43,7 @@
                 
                 value="#{c.idcourse} - #{msg['button.select']}"
                 icon="pi pi-arrow-left">
-<!--  action="#{courseC.selectedCourseForClub(c)}"  -->
+<!--  action="#{navC.selectedCourseForClub(c)}"  -->
              </p:commandButton>
 	</p:column>
 

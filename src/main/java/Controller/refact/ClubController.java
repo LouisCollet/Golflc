@@ -11,6 +11,7 @@ import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import manager.ClubManager;
@@ -52,9 +53,9 @@ public class ClubController implements Serializable {
     @Inject private read.ReadTee readTeeService; // migrated 2026-02-25
     @Inject private read.ReadHole readHoleService; // migrated 2026-02-25
     @Inject private Controllers.UnavailableController unavailableController; // migrated 2026-02-25
-    @Inject @SessionMap private Map<String, Object> sessionMap; // migrated 2026-02-25
+    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
     @Inject private read.ReadUnavailableStructure readUnavailableStructure; // migrated 2026-02-25
-    @Inject private Controllers.CourseController courseController; // migrated 2026-02-25 — pour reset() legacy
+    @Inject private Controller.refact.NavigationController navigationController; // renamed from CourseController 2026-02-28
     @Inject private create.CreateUnavailablePeriod createUnavailablePeriodService; // migrated 2026-02-25 — Groupe D
     @Inject private lists.UnavailableListForDate unavailableListForDate; // migrated 2026-02-25 — Groupe D
     @Inject private lists.CourseListOnly courseListOnly; // migrated 2026-02-25 — Groupe B
@@ -63,6 +64,8 @@ public class ClubController implements Serializable {
     @Inject private find.FindTarifMembersData findTarifMembersData; // migrated 2026-02-25 — Groupe C
     @Inject private Controller.refact.PlayerController playerController; // migrated 2026-02-25 — Groupe C (createModifyPlayer)
     @Inject private Controllers.ChartController chartController; // migrated 2026-02-26
+    @Inject private lists.ProfessionalListForClub professionalListForClub; // migrated 2026-02-28 from NavigationController
+    @Inject private create.CreateProfessional createProfessionalService; // migrated 2026-02-28 from CourseController
 
     // ========== CHAMPS À AJOUTER avec les autres champs ==========
 private List<Flight> flightList = Collections.emptyList();
@@ -101,6 +104,31 @@ private EPlayerPassword selectedPlayerEPP = null;
         lineModelCourse     = null;
         LOG.debug("ClubController initialized");
     }
+
+    // ========================================
+    // CDI EVENT — ResetEvent observer — 2026-02-26
+    // ========================================
+
+    public void onReset(@Observes events.ResetEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " — source: " + event.getSource());
+        flightList        = Collections.emptyList();
+        cptFlight         = 0;
+        tee               = new Tee();
+        hole              = new Hole();
+        country           = new Country();
+        holesGlobal       = new HolesGlobal();
+        courseListForClub  = Collections.emptyList();
+        teeListForCourse  = Collections.emptyList();
+        holeListForTee    = Collections.emptyList();
+        filteredClubs     = Collections.emptyList();
+        STROKEINDEX       = true;
+        filteredCourses   = null;
+        lineModelCourse   = null;
+        tarifMember       = new TarifMember();
+        selectedPlayerEPP = null;
+        LOG.debug(methodName + " — ClubController reset done");
+    } // end method
 
     // ========================================
     // Délégation - Club et Course
@@ -1372,7 +1400,7 @@ public void convertYtoM() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         tee.setTeeHolesPlayed("01-18");
-        return "modify_holes_global.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectCourse");
+        return "modify_holes_global.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectCourse();
     } // end method
 
     /**
@@ -1455,33 +1483,33 @@ public void convertYtoM() {
             String msg = "Select Course Successful = "
                     + " <br/> Club name = " + appContext.getClub().getClubName()
                     + " <br/> Course name = " + appContext.getCourse().getCourseName()
-                    + " <br/> inputSelectCourse = " + sessionMap.get("inputSelectCourse");
+                    + " <br/> inputSelectCourse = " + appContext.getInputSelectCourse();
             LOG.debug(msg);
 
-            LOG.debug(methodName + ", inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-            if (sessionMap.get("inputSelectCourse") == null) {
+            LOG.debug(methodName + ", inputSelectCourse = " + appContext.getInputSelectCourse());
+            if (appContext.getInputSelectCourse() == null) {
                 msg = "No InputSelectCourse !";
                 LOG.error(msg);
                 showMessageFatal(msg);
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("CreateRound")) {
+            if (appContext.getInputSelectCourse().equals("CreateRound")) {
                 return "round.xhtml?faces-redirect=true&cmd=round";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("ini")) {
+            if (appContext.getInputSelectCourse().equals("ini")) {
                 return "round.xhtml?faces-redirect=true&cmd=ini";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("CreateTarifGreenfee")) {
+            if (appContext.getInputSelectCourse().equals("CreateTarifGreenfee")) {
                 return "tarif_greenfee_menu.xhtml?faces-redirect=true";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("CreateTarifMember")) {
+            if (appContext.getInputSelectCourse().equals("CreateTarifMember")) {
                 return "tarif_members_menu.xhtml?faces-redirect=true";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("CreateUnavailablePeriod")) {
+            if (appContext.getInputSelectCourse().equals("CreateUnavailablePeriod")) {
                 var v = readUnavailableStructure.read(ecl.club());
                 EUnavailable unavailable = appContext.getUnavailable();
                 unavailable.withStructure(v);
@@ -1498,7 +1526,7 @@ public void convertYtoM() {
                 }
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("PaymentTarifMember")) {
+            if (appContext.getInputSelectCourse().equals("PaymentTarifMember")) {
                 LOG.debug(methodName + " - we are in paymentTarifMember");
                 LOG.debug(methodName + " - round = " + appContext.getRound());
                 if (tarifMember == null) {
@@ -1511,7 +1539,7 @@ public void convertYtoM() {
                 }
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("ChartCourse")) {
+            if (appContext.getInputSelectCourse().equals("ChartCourse")) {
                 return "statChartCourse.xhtml?faces-redirect=true";
             }
         } catch (Exception e) {
@@ -1538,7 +1566,7 @@ public void convertYtoM() {
                     + " <br/> Course name = " + appContext.getCourse().getCourseName();
             LOG.debug(msg);
             showMessageInfo(msg);
-            LOG.debug(methodName + " - inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
+            LOG.debug(methodName + " - inputSelectCourse = " + appContext.getInputSelectCourse());
             return "maps_home_club.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -1563,7 +1591,7 @@ public void convertYtoM() {
                     + " / " + appContext.getCourse().getIdcourse();
             LOG.debug(msg);
             showMessageInfo(msg);
-            LOG.debug(methodName + " - inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
+            LOG.debug(methodName + " - inputSelectCourse = " + appContext.getInputSelectCourse());
             // new Controllers.ChartController().lineModelCourse(conn, ...)
             String v = chartController.lineModelCourse(appContext.getPlayer(), appContext.getCourse()); // migrated 2026-02-26
             setLineModelCourse(v);
@@ -1585,7 +1613,7 @@ public void convertYtoM() {
     public String to_course_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
+        navigationController.reset(s);
         appContext.getCourse().setCreateModify(true);
         return "course.xhtml?faces-redirect=true&operation=" + s;
     } // end method
@@ -1597,7 +1625,7 @@ public void convertYtoM() {
     public String to_tee_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
+        navigationController.reset(s);
         tee.setCreateModify(true);
         return "tee.xhtml?faces-redirect=true&operation=" + s;
     } // end method
@@ -1669,13 +1697,13 @@ public void convertYtoM() {
     public String to_clubModify_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("clubRestart " + s);
+        navigationController.reset("clubRestart " + s);
         tee.setModifyClubCourseTee(true);
-        sessionMap.put("inputSelectClub", s);
+        appContext.setInputSelectClub(s);
         if (s.equals("clubModify")) {
             return "selectClubModify.xhtml?faces-redirect=true";
         } else {
-            sessionMap.put("inputSelectCourse", s);
+            appContext.setInputSelectCourse(s);
             return "modify_ClubCourseTee.xhtml?faces-redirect=true";
         }
     } // end method
@@ -1703,60 +1731,60 @@ public void convertYtoM() {
     public String to_selectCourse_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectCourse " + s);
-        sessionMap.put("inputSelectCourse", s);
-        LOG.debug("course selected for :  = " + sessionMap.get("inputSelectCourse"));
-        return "selectCourse.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectCourse");
+        navigationController.reset("Reset to_selectCourse " + s);
+        appContext.setInputSelectCourse(s);
+        LOG.debug("course selected for :  = " + appContext.getInputSelectCourse());
+        return "selectCourse.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectCourse();
     } // end method
 
     public String to_selectCourse2_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectCourse " + s);
-        sessionMap.put("inputSelectCourse", s);
-        sessionMap.put("inputSelectClub", s);
-        LOG.debug("course selected for :  = " + sessionMap.get("inputSelectCourse"));
-        LOG.debug("club selected for :  = " + sessionMap.get("inputSelectClub"));
+        navigationController.reset("Reset to_selectCourse " + s);
+        appContext.setInputSelectCourse(s);
+        appContext.setInputSelectClub(s);
+        LOG.debug("course selected for :  = " + appContext.getInputSelectCourse());
+        LOG.debug("club selected for :  = " + appContext.getInputSelectClub());
         return "selectClubCourse.xhtml?faces-redirect=true";
     } // end method
 
     public String to_selectGrpc_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectGrpc " + s);
+        navigationController.reset("Reset to_selectGrpc " + s);
         return "grpc_server.xhtml?faces-redirect=true";
     } // end method
 
     public String to_selectClubLA_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectClubLA " + s);
+        navigationController.reset("Reset to_selectClubLA " + s);
         if (s.equals("CreatePro")) {
-            sessionMap.put("inputSelectClub", s);
+            appContext.setInputSelectClub(s);
             return "professional.xhtml?faces-redirect=true";
         }
-        sessionMap.put("inputSelectCourse", s);
-        LOG.debug("club selected for :  = " + sessionMap.get("inputSelectCourse"));
+        appContext.setInputSelectCourse(s);
+        LOG.debug("club selected for :  = " + appContext.getInputSelectCourse());
         return "selectClubLocalAdmin.xhtml?faces-redirect=true";
     } // end method
 
     public String to_selectClubSYS_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectClubSYS " + s);
+        navigationController.reset("Reset to_selectClubSYS " + s);
         if (s.equals("CreatePro")) {
-            sessionMap.put("inputSelectClub", s);
+            appContext.setInputSelectClub(s);
             return "professional.xhtml?faces-redirect=true";
         }
-        sessionMap.put("inputSelectCourse", s);
-        LOG.debug("club selected for :  = " + sessionMap.get("inputSelectCourse"));
+        appContext.setInputSelectCourse(s);
+        LOG.debug("club selected for :  = " + appContext.getInputSelectCourse());
         return "selectClubLocalAdmin.xhtml?faces-redirect=true";
     } // end method
 
     public String to_selectPurpose_xhtml(String menuSelection) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = {}", menuSelection);
-        courseController.reset("Reset from to_selectPurpose_xhtml, with : " + menuSelection);
+        navigationController.reset("Reset from to_selectPurpose_xhtml, with : " + menuSelection);
 
         // 1. Résolution du purpose
         enumeration.ClubSelectionPurpose purpose = enumeration.ClubSelectionPurpose.fromCode(menuSelection);
@@ -1779,36 +1807,36 @@ public void convertYtoM() {
     public String to_selectCourseLA_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectClub2 " + s);
-        sessionMap.put("inputSelectCourse", s);
-        sessionMap.put("adminType", "admin");
-        LOG.debug("club selected for :  = " + sessionMap.get("inputSelectCourse"));
+        navigationController.reset("Reset to_selectClub2 " + s);
+        appContext.setInputSelectCourse(s);
+        appContext.setAdminType("admin");
+        LOG.debug("club selected for :  = " + appContext.getInputSelectCourse());
         return "selectCourseLocalAdmin.xhtml?faces-redirect=true";
     } // end method
 
     public String to_update_help(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_update_help " + s);
-        sessionMap.put("inputSelectCourse", s);
+        navigationController.reset("Reset to_update_help " + s);
+        appContext.setInputSelectCourse(s);
         return "editor_help.xhtml?faces-redirect=true";
     } // end method
 
     public String to_selectClub_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectClub" + s);
-        sessionMap.put("inputSelectCourse", s);
-        sessionMap.put("inputSelectClub", s);
-        return "selectClub.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectCourse");
+        navigationController.reset("Reset to_selectClub" + s);
+        appContext.setInputSelectCourse(s);
+        appContext.setInputSelectClub(s);
+        return "selectClub.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectCourse();
     } // end method
 
     public String to_selectClubDialog_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset("Reset to_selectClubDialog" + s);
-        sessionMap.put("inputSelectClub", s);
-        return "selectClubDialog.xhtml?faces-redirect=true&cmd=" + sessionMap.get("inputSelectClub");
+        navigationController.reset("Reset to_selectClubDialog" + s);
+        appContext.setInputSelectClub(s);
+        return "selectClubDialog.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectClub();
     } // end method
 
     // ========================================
@@ -1819,10 +1847,8 @@ public void convertYtoM() {
     public void to_reset_menu(String ini) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
-        courseController.reset(ini);
-        sessionMap.put("playerid", 0);
-        sessionMap.put("playerlastname", "");
-        sessionMap.put("playerage", 0);
+        navigationController.reset(ini);
+        // sessionMap.put("playerid/playerlastname/playerage") — removed 2026-02-28, dead code
         String msg = "Reset PLAYER done = " + ini;
         LOG.debug(msg);
         showMessageInfo(msg);
@@ -1839,14 +1865,57 @@ public void convertYtoM() {
         courseListForClub = courseListForClubService.list(appContext.getClub()); // migrated 2026-02-25
     } // end method
 
+    /** Migrated 2026-02-28 from NavigationController */
+    public List<ECourseList> listProfessionalForClub() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            return professionalListForClub.list();
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    /**
+     * Créer un professional pour un club.
+     * Migré depuis CourseController — 2026-02-28
+     */
+    public String createProfessional() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug(methodName + " - club = " + appContext.getClub());
+            LOG.debug(methodName + " - playerTemp = " + appContext.getPlayerTemp());
+            LOG.debug(methodName + " - professional = " + appContext.getProfessional());
+
+            appContext.getProfessional().setProClubId(appContext.getClub().getIdclub());
+            appContext.getProfessional().setProPlayerId(appContext.getPlayerTemp().getIdplayer());
+
+            if (createProfessionalService.create(appContext.getProfessional())) {
+                String msg = "professional created";
+                LOG.info(msg);
+                showMessageInfo(msg);
+            } else {
+                String msg = "FATAL error : professional NOT created - " + appContext.getProfessional();
+                LOG.error(msg);
+                showMessageFatal(msg);
+            }
+            return null;
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return null;
+        }
+    } // end method
+
     public List<ECourseList> listCoursesPublic() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            LOG.debug("listCourseOnly ? sessionMap = " + sessionMap.get("inputSelectCourse"));
-            if (sessionMap.get("inputSelectCourse").equals("ChartCourse")
-                    || sessionMap.get("inputSelectCourse").equals("CreateRound")
-                    || sessionMap.get("inputSelectCourse").equals("createTarifGreenfee")) {
+            LOG.debug("listCourseOnly ? sessionMap = " + appContext.getInputSelectCourse());
+            if (appContext.getInputSelectCourse().equals("ChartCourse")
+                    || appContext.getInputSelectCourse().equals("CreateRound")
+                    || appContext.getInputSelectCourse().equals("createTarifGreenfee")) {
                 return courseListOnly.list();
             } else {
                 return courseListService.list();
@@ -1922,8 +1991,8 @@ public void convertYtoM() {
                     yield null;
                 }
                 case PAYMENT_COTISATION -> {
-                    courseController.getRound().setRoundDate(LocalDateTime.now());
-                    tarifMember = findTarifMembersData.find(appContext.getClub(), courseController.getRound());
+                    appContext.getRound().setRoundDate(LocalDateTime.now());
+                    tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound()); // migrated 2026-02-26 navigationController.getRound() → appContext
                     LOG.debug("TarifMember loaded for club = " + appContext.getClub());
                     dialogController.closeDialog(null);
                     yield null;
@@ -1968,11 +2037,11 @@ public void convertYtoM() {
             String msg = "Select Course Successfull = <br/> CourseName = " + appContext.getCourse().getCourseName();
             LOG.debug(msg);
             showMessageInfo(msg);
-            LOG.debug(methodName + " : inputSelectClub = " + sessionMap.get("inputSelectClub"));
+            LOG.debug(methodName + " : inputSelectClub = " + appContext.getInputSelectClub());
 
             dialogController.closeDialog(null);
 
-            if ("MenuUnavailable".equals(sessionMap.get("inputSelectClub"))) {
+            if ("MenuUnavailable".equals(appContext.getInputSelectClub())) {
                 LOG.debug("handling menu unavailable");
                 EUnavailable unavailable = appContext.getUnavailable();
                 LOG.debug(methodName + " for unavailable = " + unavailable);
@@ -1990,7 +2059,7 @@ public void convertYtoM() {
                 return null;
             }
 
-            if ("CREATE COMPETITION".equals(sessionMap.get("inputSelectClub"))) {
+            if ("CREATE COMPETITION".equals(appContext.getInputSelectClub())) {
                 LOG.debug(methodName + " - competition = " + appContext.getCompetition());
                 appContext.getCompetition().competitionDescription().setCompetitionCourseId(appContext.getCourse().getIdcourse());
                 appContext.getCompetition().competitionDescription().setCompetitionCourseIdName(
@@ -2020,8 +2089,8 @@ public void convertYtoM() {
                     + " <br/> inputSelectCourse = " + select;
             LOG.debug(msg);
 
-            LOG.debug(methodName + " : inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-            if (sessionMap.get("inputSelectCourse") == null) {
+            LOG.debug(methodName + " : inputSelectCourse = " + appContext.getInputSelectCourse());
+            if (appContext.getInputSelectCourse() == null) {
                 msg = "No InputSelectCourse !";
                 LOG.error(msg);
                 showMessageFatal(msg);
@@ -2059,8 +2128,8 @@ public void convertYtoM() {
             if (select.equals("PaymentCotisationSpontaneous")) {
                 LOG.debug("entering PaymentCotisationSpontaneous");
                 LOG.debug("club = " + appContext.getClub());
-                LOG.debug("round = " + courseController.getRound());
-                tarifMember = findTarifMembersData.find(appContext.getClub(), courseController.getRound());
+                LOG.debug("round = " + appContext.getRound());
+                tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound()); // migrated 2026-02-26 navigationController.getRound() → appContext
                 if (tarifMember == null) {
                     String msgerr = LCUtil.prepareMessageBean("tarif.member.notfound");
                     LOG.error(msgerr);
@@ -2090,8 +2159,8 @@ public void convertYtoM() {
                     + " <br/> Club name = " + appContext.getClub().getClubName()
                     + " <br/> inputSelectCourse = " + select;
             LOG.debug(msg);
-            LOG.debug(methodName + " inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
-            if (sessionMap.get("inputSelectCourse") == null) {
+            LOG.debug(methodName + " inputSelectCourse = " + appContext.getInputSelectCourse());
+            if (appContext.getInputSelectCourse() == null) {
                 msg = "No InputSelectCourse !";
                 LOG.error(msg);
                 showMessageFatal(msg);
@@ -2102,11 +2171,11 @@ public void convertYtoM() {
                 return "tarif_greenfee_menu.xhtml?faces-redirect=true";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("CreateTarifMember")) {
+            if (appContext.getInputSelectCourse().equals("CreateTarifMember")) {
                 return "tarif_members_menu.xhtml?faces-redirect=true";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("CreateUnavailablePeriod")) {
+            if (appContext.getInputSelectCourse().equals("CreateUnavailablePeriod")) {
                 var v = readUnavailableStructure.read(appContext.getClub());
                 EUnavailable unavailable = appContext.getUnavailable();
                 unavailable.withStructure(v);
@@ -2124,7 +2193,7 @@ public void convertYtoM() {
             }
 
             if (select.equals("PaymentTarifMember")) {
-                tarifMember = findTarifMembersData.find(appContext.getClub(), courseController.getRound());
+                tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound()); // migrated 2026-02-26 navigationController.getRound() → appContext
                 if (tarifMember == null) {
                     String msgerr = LCUtil.prepareMessageBean("tarif.member.notfound");
                     LOG.error(msgerr);
@@ -2135,15 +2204,15 @@ public void convertYtoM() {
                 }
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("CreateRound")) {
+            if (appContext.getInputSelectCourse().equals("CreateRound")) {
                 return "round.xhtml?faces-redirect=true&cmd=round";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("ini")) {
+            if (appContext.getInputSelectCourse().equals("ini")) {
                 return "round.xhtml?faces-redirect=true&cmd=ini";
             }
 
-            if (sessionMap.get("inputSelectCourse").equals("ChartCourse")) {
+            if (appContext.getInputSelectCourse().equals("ChartCourse")) {
                 return "statChartCourse.xhtml?faces-redirect=true";
             }
         } catch (Exception e) {
@@ -2159,7 +2228,7 @@ public void convertYtoM() {
         try {
             LOG.debug(methodName + " with club = " + appContext.getClub());
             LOG.debug(methodName + " with course = " + appContext.getCourse());
-            LOG.debug(methodName + " with sessionMap inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
+            LOG.debug(methodName + " with sessionMap inputSelectCourse = " + appContext.getInputSelectCourse());
             return null; // to be completed
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -2173,7 +2242,7 @@ public void convertYtoM() {
         try {
             LOG.debug("club = " + appContext.getClub());
             LOG.debug("course = " + appContext.getCourse());
-            LOG.debug("sessionMap inputSelectCourse = " + sessionMap.get("inputSelectCourse"));
+            LOG.debug("sessionMap inputSelectCourse = " + appContext.getInputSelectCourse());
             enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
                     .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
             LOG.debug(methodName + " with purpose = " + purpose);

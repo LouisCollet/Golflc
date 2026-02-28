@@ -12,6 +12,7 @@ import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.faces.annotation.SessionMap;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIInput;
@@ -34,8 +35,11 @@ import org.primefaces.event.ToggleEvent;
 import static interfaces.Log.LOG;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import org.primefaces.PrimeFaces;
+import org.primefaces.model.DualListModel;
 import manager.PlayerManager;
 import manager.RoundManager;
 import static utils.LCUtil.DatetoLocalDateTime;
@@ -65,8 +69,7 @@ public class RoundController implements Serializable {
     @Inject private ApplicationContext                  appContext;
     @Inject private DialogController                    dialogController;
 
-    @Inject @SessionMap
-    private Map<String, Object> sessionMap;
+    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
 
     // ✅ Injections compétition — migrated 2026-02-25
     @Inject private lists.MatchplayList                 matchplayList;
@@ -114,8 +117,11 @@ public class RoundController implements Serializable {
     @Inject private lists.CompetitionInscriptionsList   competitionInscriptionsList;
     @Inject private lists.RecentRoundList               recentRoundList;
 
-    // ✅ Injection CourseController — Phase 3B navigation — migrated 2026-02-25
-    @Inject private Controllers.CourseController        courseController;
+    // ✅ Injection MongoDB — migrated 2026-02-26
+    @Inject private Controllers.MongoCalculationsController mongoCalculationsController;
+
+    // ✅ Injection NavigationController — renamed from CourseController 2026-02-28
+    @Inject private Controller.refact.NavigationController        navigationController;
 
     // ✅ Injections Phase 3A — Competition management — migrated 2026-02-25
     @Inject private create.CreateCompetitionDescription createCompetitionDescriptionService; // Phase 3A
@@ -137,6 +143,10 @@ public class RoundController implements Serializable {
     private TarifGreenfee       tarifGreenfee;
     private List<?>             filteredCars;     // PrimeFaces dataTable requirement
 
+    // ✅ State PlayingHcp — migrated 2026-02-26
+    private PlayingHandicap        playingHcp;
+    private int                    inputPlayingHcp = 0; // migrated 2026-02-27 from CourseController
+
     // ✅ State compétition — migrated 2026-02-25
     private Matchplay              matchplay;
     private Flight                 flight;
@@ -148,6 +158,16 @@ public class RoundController implements Serializable {
     // ✅ State Phase 3A — Competition fields — migrated 2026-02-25
     private Map<String, String>    availableQualifying;
     private List<String>           gameList;
+
+    // ✅ State migrated 2026-02-28 from NavigationController
+    private ArrayList<Flight>              filteredFlights;
+    private DualListModel<Player>          dlPlayers;
+    private String                         inputClubOperation = null;
+    private String                         inputcmdParticipants = null;
+    private String                         inputScorecard = null;
+    private int[]                          parArray = null;
+    private String                         otherGame = null;
+    private boolean                        skip;
 
     public RoundController() { }
 
@@ -170,6 +190,42 @@ public class RoundController implements Serializable {
         availableQualifying.put("Qualifying", "Y");
         gameList = Arrays.asList("STABLEFORD","SCRAMBLE","CHAPMAN","STROKEPLAY","MP_FOURBALL","MP_FOURSOME","MP_SINGLE");
         LOG.debug("RoundController initialized");
+    } // end method
+
+    // ========================================
+    // CDI EVENT — ResetEvent observer — 2026-02-26
+    // ========================================
+
+    public void onReset(@Observes events.ResetEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " — source: " + event.getSource());
+        listStableford      = Collections.emptyList();
+        nextInscription     = false;
+        nextScorecard       = false;
+        cptFlight           = 0;
+        lp                  = null;
+        tarifGreenfee       = null;
+        filteredCars        = null;
+        matchplay           = new Matchplay();
+        flight              = new Flight();
+        scoreMatchplay      = new ScoreMatchplay();
+        listmatchplay       = Collections.emptyList();
+        listscr             = Collections.emptyList();
+        tee                 = new Tee();
+        availableQualifying = new java.util.LinkedHashMap<>();
+        availableQualifying.put("Non Qualifying", "N");
+        availableQualifying.put("Qualifying", "Y");
+        gameList = Arrays.asList("STABLEFORD","SCRAMBLE","CHAPMAN","STROKEPLAY","MP_FOURBALL","MP_FOURSOME","MP_SINGLE");
+        // migrated 2026-02-28 from NavigationController
+        filteredFlights      = null;
+        dlPlayers            = null;
+        inputClubOperation   = null;
+        inputcmdParticipants = null;
+        inputScorecard       = null;
+        parArray             = null;
+        otherGame            = null;
+        skip                 = false;
+        LOG.debug(methodName + " — RoundController reset done");
     } // end method
 
     // ========================================
@@ -420,7 +476,7 @@ public class RoundController implements Serializable {
         try {
             dialogController.closeDialog(null);
 
-            Object mode = sessionMap.get("inputSelectRound");
+            Object mode = appContext.getInputSelectRound();
             if ("INSCRIPTION".equals(mode)) {
                 Round round = appContext.getRound();
                 List<ECourseList> li = roundManager.listInscriptionsForRound(round); // ✅ via manager
@@ -489,13 +545,13 @@ public class RoundController implements Serializable {
             LOG.debug("with round = " + round);
             LOG.debug("with scoreStableford = " + score);
 
-            Object scoreType = sessionMap.get("scoreType");
+            Object scoreType = appContext.getScoreType();
             LOG.debug("with scoreType = " + scoreType);
 
             Player p;
             if ("COMPETITION".equals(scoreType)) {
                 LOG.debug("handling COMPETITION scoreType");
-                int playerid = Integer.parseInt((String) sessionMap.get("competitionPlayer"));
+                int playerid = appContext.getCompetitionPlayerId();
                 p = playerManager.readPlayer(playerid);
             } else {
                 LOG.debug("handling INDIVIDUAL scoreType");
@@ -711,9 +767,9 @@ public class RoundController implements Serializable {
                 LOG.debug("this is a CREATION! no prefilling");
             }
 
-            sessionMap.put("competitionPlayer", String.valueOf(competitionPlayer.getIdplayer()));
-            sessionMap.put("scoreType", "COMPETITION");
-            LOG.debug("sessionMap - competitionPlayer = " + sessionMap.get("competitionPlayer"));
+            appContext.setCompetitionPlayerId(competitionPlayer.getIdplayer());
+            appContext.setScoreType("COMPETITION");
+            LOG.debug("competitionPlayerId = " + appContext.getCompetitionPlayerId());
 
             String s = "score_stableford.xhtml?faces-redirect=true"
                     + "&cmd=COMPETITION"
@@ -831,6 +887,48 @@ public class RoundController implements Serializable {
 
     public List<?> getFilteredCars()                         { return filteredCars; }
     public void setFilteredCars(List<?> filteredCars)         { this.filteredCars = filteredCars; }
+
+    // ✅ Getters/setters migrated 2026-02-28 from NavigationController
+    public ArrayList<Flight> getFilteredFlights()                         { return filteredFlights; }
+    public void setFilteredFlights(ArrayList<Flight> filteredFlights)     { this.filteredFlights = filteredFlights; }
+
+    public DualListModel<Player> getDlPlayers()                          { return dlPlayers; }
+    public void setDlPlayers(DualListModel<Player> dlPlayers)            { this.dlPlayers = dlPlayers; }
+
+    public String getInputClubOperation()                                { return inputClubOperation; }
+    public void setInputClubOperation(String inputClubOperation)         { this.inputClubOperation = inputClubOperation; }
+
+    public String getInputcmdParticipants()                              { return inputcmdParticipants; }
+    public void setInputcmdParticipants(String inputcmdParticipants)     { this.inputcmdParticipants = inputcmdParticipants; }
+
+    public String getInputScorecard()                                    { return inputScorecard; }
+    public void setInputScorecard(String inputScorecard) {
+        LOG.debug("setInputScorecard = " + inputScorecard);
+        this.inputScorecard = inputScorecard;
+        if ("ini".equals(inputScorecard)) {
+            scoreCardList3.invalidateCache();
+        }
+    } // end method
+
+    public int[] getParArray()                                           { return parArray; }
+    public void setParArray(int[] parArray)                              { this.parArray = parArray; }
+
+    public String getOtherGame()                                         { return otherGame; }
+    public void setOtherGame(String otherGame)                           { this.otherGame = otherGame; }
+
+    public boolean isSkip()                                              { return skip; }
+    public void setSkip(boolean skip)                                    { this.skip = skip; }
+
+    public String onFlowProcess(org.primefaces.event.FlowEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " — old=" + event.getOldStep() + ", new=" + event.getNewStep());
+        if (skip) {
+            skip = false;
+            return "confirm";
+        } else {
+            return event.getNewStep();
+        }
+    } // end method
 
     // ========================================
     // MÉTHODES MIGRÉES depuis CourseController — Groupe A Round/Inscription — 2026-02-25
@@ -1105,7 +1203,7 @@ public class RoundController implements Serializable {
                     appContext.getPlayer(), appContext.getRound(), ecl.tee());
             appContext.setScoreStableford(score);
 
-            sessionMap.put("scoreType", "INDIVIDUAL");
+            appContext.setScoreType("INDIVIDUAL");
             return "score_stableford.xhtml?faces-redirect=true";
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
@@ -1123,13 +1221,13 @@ public class RoundController implements Serializable {
         LOG.debug("for Round = " + appContext.getRound());
         LOG.debug("for Course = " + appContext.getCourse());
         LOG.debug("for current Player = " + appContext.getPlayer());
-        LOG.debug("with scoreType = " + sessionMap.get("scoreType"));
-        LOG.debug("with competition Player = " + sessionMap.get("competitionPlayer"));
+        LOG.debug("with scoreType = " + appContext.getScoreType());
+        LOG.debug("with competitionPlayerId = " + appContext.getCompetitionPlayerId());
         try {
             Player p;
-            if ("COMPETITION".equals(sessionMap.get("scoreType"))) {
+            if ("COMPETITION".equals(appContext.getScoreType())) {
                 LOG.debug("handling COMPETITION scoreType");
-                int playerid = Integer.parseInt(sessionMap.get("competitionPlayer").toString());
+                int playerid = appContext.getCompetitionPlayerId();
                 p = playerManager.readPlayer(playerid);
             } else {
                 LOG.debug("handling INDIVIDUAL scoreType");
@@ -1264,6 +1362,24 @@ public class RoundController implements Serializable {
             LOG.debug("liste participants matchplay = " + Arrays.deepToString(listmatchplay.toArray()));
             round.setRoundGame(listmatchplay.get(0).getRoundGame());
             return "show_participants.xhtml?faces-redirect=true&cmd=MP_";
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return null;
+        }
+    } // end method
+
+    /**
+     * Liste des participants Scramble.
+     * Créé 2026-02-28 — navC.listParticipants_scramble n'existait pas, calqué sur listParticipants_mp
+     */
+    public String listParticipants_scramble(ScoreScramble scr) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with round = " + scr.getIdround());
+        try {
+            Round round = appContext.getRound();
+            round.setIdround(scr.getIdround());
+            round.setRoundGame(scr.getRoundGame());
+            return "show_participants.xhtml?faces-redirect=true&cmd=SCR";
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
             return null;
@@ -1924,8 +2040,8 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
         try {
-            courseController.setFilteredInscriptions(null);
-            courseController.reset(s);
+            // setFilteredInscriptions(null) removed 2026-02-28 — dead field, reset() handles cleanup
+            navigationController.reset(s);
             if (s.equals("TEST")) {
                 return "selectRound.xhtml?faces-redirect=true&cmd=" + s;
             }
@@ -1960,12 +2076,12 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
         try {
-            courseController.setFilteredInscriptions(null);
-            courseController.reset(s);
+            // setFilteredInscriptions(null) removed 2026-02-28 — dead field, reset() handles cleanup
+            navigationController.reset(s);
             if (s.equals("INSCRIPTION")) {
                 LOG.debug("handling inscription !");
-                sessionMap.put("inputSelectRound", s);
-                LOG.debug("sessionMap : inputSelectRound = " + sessionMap.get("inputSelectRound"));
+                appContext.setInputSelectRound(s);
+                LOG.debug("sessionMap : inputSelectRound = " + appContext.getInputSelectRound());
                 return "selectRound.xhtml?faces-redirect=true";
             }
             return "playing formule not found";
@@ -1983,7 +2099,7 @@ public class RoundController implements Serializable {
     public String to_selectParticipantsRound_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
+        navigationController.reset(s);
         return "select_participants_round.xhtml?faces-redirect=true&cmd=" + s;
     } // end method
 
@@ -1994,7 +2110,7 @@ public class RoundController implements Serializable {
     public String to_selectStablefordRounds_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
+        navigationController.reset(s);
         return "selectStablefordRounds.xhtml?faces-redirect=true";
     } // end method
 
@@ -2005,7 +2121,7 @@ public class RoundController implements Serializable {
     public String to_selectRegisteredRounds_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
+        navigationController.reset(s);
         return "selectRegisteredRounds.xhtml?faces-redirect=true&cmd=" + s;
     } // end method
 
@@ -2016,9 +2132,33 @@ public class RoundController implements Serializable {
     public String to_stableford_playing_hcp_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
-        courseController.setPlayingHcp(new PlayingHandicap());
+        navigationController.reset(s);
+        this.playingHcp = new PlayingHandicap(); // migrated 2026-02-26 — was navigationController.setPlayingHcp()
         return "stableford_playing_hcp.xhtml?faces-redirect=true";
+    } // end method
+
+    /**
+     * Navigation vers scramble_playing_hcp
+     * Migré depuis menu.xhtml url= — 2026-02-28
+     */
+    public String to_scramble_playing_hcp_xhtml(String s) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with string = " + s);
+        navigationController.reset(s);
+        this.playingHcp = new PlayingHandicap();
+        return "scramble_playing_hcp.xhtml?faces-redirect=true";
+    } // end method
+
+    /**
+     * Navigation vers othergames_playing_hcp
+     * Migré depuis menu.xhtml url= — 2026-02-28
+     */
+    public String to_othergames_playing_hcp_xhtml(String s) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with string = " + s);
+        navigationController.reset(s);
+        this.playingHcp = new PlayingHandicap();
+        return "othergames_playing_hcp.xhtml?faces-redirect=true";
     } // end method
 
     /**
@@ -2028,7 +2168,7 @@ public class RoundController implements Serializable {
     public String to_selectMatchplayRounds_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
+        navigationController.reset(s);
         return "selectMatchplayRounds.xhtml?faces-redirect=true";
     } // end method
 
@@ -2039,8 +2179,84 @@ public class RoundController implements Serializable {
     public String to_selectScrambleRounds_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
-        courseController.reset(s);
+        navigationController.reset(s);
         return "selectScrambleRounds.xhtml?faces-redirect=true";
+    } // end method
+
+    // ========================================
+    // MONGO CALCULATIONS — migrated 2026-02-26 from CourseController
+    // ========================================
+
+    /**
+     * Charge le texte des calculs MongoDB pour le round sélectionné.
+     * Appelé depuis dialog_played_rounds.xhtml via f:viewAction.
+     */
+    public void textCalculationRound() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            ECourseList selectedRound = appContext.getSelectedPlayedRound();
+            LOG.debug(methodName + " - selected roundid = " + selectedRound.round().getIdround());
+            LOG.debug(methodName + " - current playerid = " + appContext.getPlayer().getIdplayer());
+            LoggingUser logging = new LoggingUser();
+            logging.setLoggingIdPlayer(appContext.getPlayer().getIdplayer());
+            logging.setLoggingIdRound(selectedRound.round().getIdround());
+            logging.setLoggingType("R"); // Round
+            LOG.debug(methodName + " - logging_user = " + logging);
+            selectedRound.round().setCalculations(mongoCalculationsController.read(logging));
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    // ========================================
+    // PLAYING HCP — migrated 2026-02-26 from CourseController
+    // ========================================
+
+    public PlayingHandicap getPlayingHcp() {
+        return playingHcp;
+    } // end method
+
+    public void setPlayingHcp(PlayingHandicap playingHcp) {
+        this.playingHcp = playingHcp;
+    } // end method
+
+    public void simulateHcpStb() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug(methodName + " - PlayingHcp = " + playingHcp);
+            LOG.debug(methodName + " - array input data " + Arrays.toString(playingHcp.getHcpScr()));
+            Handicap h = new Handicap();
+            h.setHandicapPlayerEGA(java.math.BigDecimal.valueOf(playingHcp.getHandicapPlayerEGA()));
+
+            Tee t = new Tee();
+            t.setTeeSlope(playingHcp.getTeeSlope().shortValue());
+            LOG.debug(methodName + " - slope = " + t.getTeeSlope());
+            t.setTeeRating(java.math.BigDecimal.valueOf(playingHcp.getTeeRating()));
+            LOG.debug(methodName + " - rating = " + t.getTeeRating());
+            t.setTeePar(playingHcp.getCoursePar().shortValue());
+            LOG.debug(methodName + " - par = " + t.getTeePar());
+
+            Round r = new Round();
+            r.setRoundHoles(playingHcp.getRoundHoles());
+            int i = 0;
+            // int i = new calc.CalcStablefordPlayingHandicapEGA().calculatePlayingHcp(conn, h, t, r);
+            playingHcp.setPlayingHandicap(i);
+            LOG.debug(methodName + " - Playing Hcp calculated = " + playingHcp.getPlayingHandicap());
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    public void calculateHcpScramble() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug(methodName + " - input array data = " + Arrays.toString(playingHcp.getHcpScr()));
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
     } // end method
 
     /*
@@ -2051,5 +2267,44 @@ public class RoundController implements Serializable {
         LOG.debug("RoundController main() — non applicable sans contexte CDI");
     } // end main
     */
+
+    // ========================================
+    // viewChartPlayedRound — migrated 2026-02-27 from CourseController
+    // ========================================
+
+    public void viewChartPlayedRound() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Map<String, Object> options = new HashMap<>();
+        options.put("modal", true);
+        options.put("draggable", false);
+        options.put("resizable", true);
+        options.put("contentHeight", 320);
+        options.put("contentWidth", 640);
+        options.put("closable", true);
+        options.put("header", "header by LC");
+        PrimeFaces.current().dialog().openDynamic("viewChartRounds", options, null);
+    } // end method
+
+    // ========================================
+    // initInputPlayingHcp — migrated 2026-02-27 from CourseController
+    // ========================================
+
+    public void initInputPlayingHcp(int inputPlayingHcp) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        this.inputPlayingHcp = inputPlayingHcp;
+        LOG.debug(methodName + " - inputPlayingHcp = " + inputPlayingHcp);
+        PlayingHandicap ph = new PlayingHandicap();
+        ph.setPlayingHandicap(this.inputPlayingHcp);
+    } // end method
+
+    public int getInputPlayingHcp() {
+        return inputPlayingHcp;
+    } // end method
+
+    public void setInputPlayingHcp(int inputPlayingHcp) {
+        this.inputPlayingHcp = inputPlayingHcp;
+    } // end method
 
 } // end class
