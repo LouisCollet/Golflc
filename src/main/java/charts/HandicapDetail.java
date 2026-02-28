@@ -65,34 +65,6 @@ public class HandicapDetail implements Serializable {
         }
     } // end method
 
-    @Deprecated
-    public List<Handicap> getStatHcp(final Connection conn, final Player player) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " [DEPRECATED bridge]");
-
-        final String query = """
-            SELECT PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer
-            FROM player, handicap
-            WHERE player.idplayer=?
-            AND handicap.player_idplayer = player.idplayer
-            """;
-
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setInt(1, player.getIdplayer());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                List<Handicap> liste = new ArrayList<>();
-                while (rs.next()) {
-                    Handicap handicap = new Handicap();
-                    handicap.setHandicapStart(rs.getDate("idhandicap"));
-                    handicap.setHandicapPlayerEGA(rs.getBigDecimal("HandicapPlayerEGA"));
-                    liste.add(handicap);
-                }
-                LOG.debug("liste after while = " + liste.toString());
-                return liste;
-            }
-        }
-    } // end method
+    // @Deprecated bridge removed 2026-02-28 — no callers with Connection conn
 
 } // end class

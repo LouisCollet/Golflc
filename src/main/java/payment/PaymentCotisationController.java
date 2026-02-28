@@ -9,7 +9,6 @@ import entite.Player;
 import entite.Round;
 import static interfaces.Log.LOG;
 import java.io.*;
-import java.sql.Connection;
 import java.sql.SQLException;
 import static utils.LCUtil.prepareMessageBean;
 
@@ -32,17 +31,16 @@ public PaymentCotisationController(){ } // constructor
 //@Inject @SessionMap
 //  private Map<String, Object> sessionMap;
 
-public boolean RegisterPaymentandInscription(final Creditcard creditcard, final Cotisation cotisation, final Player player, final Round round, final Club club, 
+public boolean RegisterPaymentandInscription(final Creditcard creditcard, final Cotisation cotisation, final Player player, final Round round, final Club club,
         final Course course,
-        Inscription inscription,
-        final Connection conn) throws SQLException, Exception {
+        Inscription inscription) throws SQLException, Exception { // Connection conn removed 2026-02-28 — unused
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
 try{
-           LOG.debug("entering RegisterPaymentandInscription");
            LOG.debug("with cotisation = " + cotisation);
- ///          LOG.debug("with inscription = " + inscription);
 
-  // 1. Register payment  faut le faire avant car l'inscription va vérifier !!! 
-          if(! payment(cotisation, conn)){ 
+  // 1. Register payment  faut le faire avant car l'inscription va vérifier !!!
+          if(! payment(cotisation)){ 
                String msg = "Create Payment Cotisation FAILED !";
                LOG.error(msg);
                showMessageFatal(msg);
@@ -91,7 +89,7 @@ try{
 } //end method
 
 
-private boolean payment(Cotisation cotisation, Connection conn){ // static removed 2026-02-26 — CDI @Inject requires instance method
+private boolean payment(Cotisation cotisation) { // Connection conn removed 2026-02-28 — unused
  try{
       LOG.debug("entering createPaymentCotisation");
       LOG.debug("with cotisation = " + cotisation);
