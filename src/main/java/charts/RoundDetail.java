@@ -76,40 +76,6 @@ public class RoundDetail implements Serializable {
         }
     } // end method
 
-    @Deprecated
-    public List<Average> getRoundDetail(final Connection conn, final Player player, final Round round) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " [DEPRECATED bridge]");
-
-        final String query = """
-            SELECT scorehole, scorepar, scorestrokeindex, scoreextrastroke,
-                round( avg(scorestroke),1 ) as averageStroke,
-                round( avg(scorepoints),1 ) as averagePoints,
-                count(distinct idround) as countround
-            FROM score, round, course
-            WHERE
-                round.idround = ?
-                and score.player_has_round_player_idplayer = ?
-                and score.player_has_round_round_idround = round.idround
-            GROUP BY scorehole
-            ORDER by scorehole
-            """;
-
-        try (PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setInt(1, round.getIdround());
-            ps.setInt(2, player.getIdplayer());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                List<Average> listAverage = new ArrayList<>();
-                while (rs.next()) {
-                    Average average = entite.Average.map(rs);
-                    listAverage.add(average);
-                }
-                LOG.debug("listavg after while = " + listAverage.toString());
-                return listAverage;
-            }
-        }
-    } // end method
+    // @Deprecated bridge removed 2026-02-28 — no callers with Connection conn
 
 } // end class

@@ -250,11 +250,7 @@ public class CalcStablefordScoreDifferential implements Serializable {
   }
  } // end method
 
-    /** @deprecated Use {@link #calc(ScoreStableford, Player, Round)} without Connection */
-    @Deprecated
-    public double calc(final ScoreStableford score, final Player player, final Round round, final Connection conn) {
-        return calc(score, player, round);
-    } // end method
+    // @Deprecated bridge removed 2026-02-28 — no callers with Connection conn
 
 /*
 void main() {
