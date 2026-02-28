@@ -23,7 +23,7 @@
              value="#{roundC.listScrambleRounds('scr')}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{courseC.filteredCars}"
+             filteredValue="#{roundC.filteredCars}"
              >
 
 <f:facet name="header">
@@ -38,7 +38,7 @@
         <p:column headerText="#{msg['round.selected']}" style="width:100px" >
             <p:commandButton
                 id="selectButtonColumn"
-                action="#{courseC.listParticipants_scramble(c)}"
+                action="#{roundC.listParticipants_scramble(c)}"
                 value="#{c.idround} - #{msg['button.select']}"
                icon="pi pi-pencil">
              </p:commandButton>

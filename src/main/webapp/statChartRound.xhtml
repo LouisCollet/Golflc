@@ -20,12 +20,14 @@
     id="panelgrid"
     layout="tabular"
     columns="1"  >
-<p:chart 
+<!-- LineModel() removed 2026-02-28 — method never existed, chart page non-functional
+<p:chart
          id="newlinear"
-         model="#{courseC.LineModel()}" 
+         model="#{navC.LineModel()}"
          style="height:400px; width:950px; margin-top:20px"
          widgetVar="chart"
          />
+-->
 
 </p:panelGrid>
 <p:commandButton type="button"

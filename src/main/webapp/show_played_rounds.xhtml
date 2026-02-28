@@ -28,7 +28,7 @@
             emptyMessage="#{msg['message.table.empty']}"
             rowIndexVar="row"
             selectionMode="single" >
-<!--   filterBy="#{courseC.filterBy}" -->
+<!--   filterBy="#{navC.filterBy}" -->
 <f:facet name="header">
             <p:commandButton 
                 actionListener="#{dialogC.showRound()}" 
@@ -40,7 +40,7 @@
                        listener="#{dialogC.onDialogReturn(event)}"/>
             </p:commandButton>
             <p:commandButton 
-                actionListener="#{courseC.viewChartPlayedRound}" 
+                actionListener="#{roundC.viewChartPlayedRound}" 
                 icon="pi pi-external-link"
                 value="View Chart"
                 style="float:right">

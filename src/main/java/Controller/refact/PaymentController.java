@@ -9,6 +9,7 @@ import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.faces.annotation.SessionMap;
 import jakarta.faces.application.ViewHandler;
 import jakarta.faces.component.UIViewRoot;
@@ -16,6 +17,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ValueChangeEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Consumes;
@@ -25,11 +27,14 @@ import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
@@ -67,7 +72,9 @@ public class PaymentController implements Serializable {
 
     @Inject private ApplicationContext                          appContext;
     @Inject private PaymentManager                              paymentManager;
-    @Inject private Controllers.CreditcardController            creditcardController;
+    @Inject private read.ReadCreditcard                          readCreditcard;       // migrated 2026-02-26 — was CreditcardController
+    @Inject private create.CreateCreditcard                       createCreditcard;     // migrated 2026-02-26
+    @Inject private update.ModifyCreditcard                       modifyCreditcard;     // migrated 2026-02-26
     @Inject private payment.PaymentSubscriptionController       paymentSubscriptionController;
     @Inject private payment.PaymentGreenfeeController           paymentGreenfeeController;
     @Inject private Controllers.TarifMemberController           tarifMemberController;
@@ -77,7 +84,7 @@ public class PaymentController implements Serializable {
     @Inject private manager.PlayerManager                       playerManager;
     @Inject private read.ReadClub                               readClubService;
     @Inject private Controllers.HttpController                  httpController;
-    @Inject @SessionMap private Map<String, Object>             sessionMap;
+    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
     @Inject private mail.CreditcardMail                         creditcardMail;  // migrated 2026-02-26
 
     // ========================================
@@ -109,6 +116,26 @@ public class PaymentController implements Serializable {
     } // end method
 
     // ========================================
+    // CDI EVENT — ResetEvent observer — 2026-02-26
+    // ========================================
+
+    public void onReset(@Observes events.ResetEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " — source: " + event.getSource());
+        creditcard     = new Creditcard();
+        savedType      = null;
+        progress1      = 0;
+        greenfee       = new Greenfee();
+        tarifGreenfee  = new TarifGreenfee();
+        tarifMember    = new TarifMember();
+        professional   = null;
+        listLessons    = new ArrayList<>();
+        selectedLesson = null;
+        playerPro      = null;
+        LOG.debug(methodName + " — PaymentController reset done");
+    } // end method
+
+    // ========================================
     // METHODES D'ACTION — migrées depuis CourseController 2026-02-25
     // ========================================
 
@@ -119,8 +146,8 @@ public class PaymentController implements Serializable {
             LOG.debug("tarifMember = " + tarifMember);
             LOG.debug("cotisation = " + appContext.getCotisation()); // est null
             LOG.debug("round = " + appContext.getRound());
-            sessionMap.put("creditcardType", etypePayment.COTISATION);
-            LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
+            appContext.setCreditcardType(etypePayment.COTISATION.toString());
+            LOG.debug("creditcardType = " + appContext.getCreditcardType());
             Cotisation cotisation = tarifMemberController.completeCotisation(tarifMember, appContext.getPlayer(), appContext.getRound());
             if (cotisation == null) {
                 String msg = "cotisation not found !! is null";
@@ -147,7 +174,7 @@ public class PaymentController implements Serializable {
                 return null;
             } // end if
 
-            if (sessionMap.get("inputSelectClub").equals("PaymentCotisationSpontaneous")) {
+            if (appContext.getInputSelectClub().equals("PaymentCotisationSpontaneous")) {
                 cotisation.setType("spontaneous");
                 LOG.debug("Paiement spontané - NO inscription");
             } else {
@@ -157,7 +184,7 @@ public class PaymentController implements Serializable {
 
             LOG.debug("amount non ZERO payment COTISATION needed !");
             appContext.setCotisation(cotisation);
-            creditcard = creditcardController.completeWithCotisation(cotisation, appContext.getPlayer()); // migrated 2026-02-25
+            creditcard = completeWithCotisation(cotisation, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
             if (creditcard != null) {
                 String msg = "creditcard completed with Cotisation ! ";
                 LOG.info(msg);
@@ -181,8 +208,8 @@ public class PaymentController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            sessionMap.put("creditcardType", etypePayment.LESSON);
-            LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
+            appContext.setCreditcardType(etypePayment.LESSON.toString());
+            LOG.debug("creditcardType = " + appContext.getCreditcardType());
 
             professional = schedulerProController.getProfessional();
             LOG.debug("professional coming from SchedulerProController = " + professional);
@@ -226,7 +253,7 @@ public class PaymentController implements Serializable {
                 showMessageInfo(msg);
                 return null;
             } // end if
-            creditcard = creditcardController.completeWithLesson(professional, listLessons, appContext.getPlayer()); // migrated 2026-02-25
+            creditcard = completeWithLesson(professional, listLessons, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
             if (creditcard != null) {
                 String msg = "Creditcard with lesson ! " + creditcard;
                 LOG.info(msg);
@@ -253,8 +280,8 @@ public class PaymentController implements Serializable {
             LOG.debug("with creditcard = " + creditcard);
             LOG.debug("with greenfee = " + greenfee);
 
-            sessionMap.put("creditcardType", etypePayment.GREENFEE);
-            LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
+            appContext.setCreditcardType(etypePayment.GREENFEE.toString());
+            LOG.debug("creditcardType = " + appContext.getCreditcardType());
 
             // 1. complete greenfee with price
             greenfee = tarifGreenfeeController.completeGreenfee(tarifGreenfee, appContext.getClub(), appContext.getRound(), appContext.getPlayer());
@@ -266,7 +293,7 @@ public class PaymentController implements Serializable {
                 return null;
             } // end if
             // 2. complete creditcard
-            creditcard = creditcardController.completeWithGreenfee(greenfee, appContext.getPlayer()); // migrated 2026-02-25
+            creditcard = completeWithGreenfee(greenfee, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
             LOG.debug("Creditcard Greenfee completed = " + creditcard);
             return("creditcard.xhtml?faces-redirect=true");
         } catch (Exception ex) {
@@ -282,12 +309,13 @@ public class PaymentController implements Serializable {
         LOG.debug("entering " + methodName);
         try {
             Subscription subscription = appContext.getSubscription();
+            subscription.setIdplayer(appContext.getPlayer().getIdplayer());
             LOG.debug("coming from subscription.xhtml with Subscription = " + subscription);
 
             creditcard.setTypePayment(etypePayment.SUBSCRIPTION.toString());
             LOG.debug(" with Creditcard = " + creditcard);
-            sessionMap.put("creditcardType", etypePayment.SUBSCRIPTION);
-            LOG.debug("sessionMap creditcardType created = " + sessionMap.get("creditcardType"));
+            appContext.setCreditcardType(etypePayment.SUBSCRIPTION.toString());
+            LOG.debug("creditcardType = " + appContext.getCreditcardType());
             switch (subscription.getSubCode()) {
                 case "TRIAL" -> {    // trial one day
                     LOG.debug("SubCode = TRIAL");
@@ -298,7 +326,7 @@ public class PaymentController implements Serializable {
                     LOG.debug("getSubCode()is MONTHLY or YEARLY");
                     subscription = paymentSubscriptionController.complete(subscription); // migrated 2026-02-25
                     appContext.setSubscription(subscription);
-                    creditcard = creditcardController.completeWithSubscription(subscription, appContext.getPlayer()); // migrated 2026-02-25
+                    creditcard = completeWithSubscription(subscription, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
                     LOG.debug("creditcard completed with subscription = " + creditcard);
                     return "creditcard.xhtml?faces-redirect=true";
                 }
@@ -338,16 +366,16 @@ public class PaymentController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " coming from creditcard_accepted.xhtml");
         try {
-            creditcard.setTypePayment(sessionMap.get("creditcardType").toString());
+            creditcard.setTypePayment(appContext.getCreditcardType());
             savedType = creditcard.getTypePayment();
             LOG.debug("before payment creditcard = " + creditcard);
-            String v = creditcardController.getCC2(creditcard); // migrated 2026-02-25
+            String v = httpController.sendPaymentServer(creditcard); // migrated 2026-02-26 — was creditcardController.getCC2()
             LOG.debug("var v returned in OnCompletePayment = " + v);
             LOG.debug("creditcard returned in OnCompletePayment = " + creditcard);
             if (v.equals("200")) {
                 String msg = "Payment validé par Amazone Payments Inc !";
                 LOG.info(msg);
-                LOG.debug("sessionMap creditcardType in onCompletePayment = " + sessionMap.get("creditcardType").toString());
+                LOG.debug("creditcardType in onCompletePayment = " + appContext.getCreditcardType());
                 LOG.debug("before going with context to 5000/about");
                 FacesContext context = FacesContext.getCurrentInstance();
                 context.getExternalContext().redirect("https://localhost:5000/about");
@@ -370,7 +398,7 @@ public class PaymentController implements Serializable {
     @jakarta.ws.rs.Path("payment_handle/{isbn}")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_HTML)
-    public jakarta.ws.rs.core.Response handlePayments(
+public jakarta.ws.rs.core.Response handlePayments(
             @PathParam("isbn") String uuid,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
@@ -398,7 +426,7 @@ public class PaymentController implements Serializable {
             creditcard.setTypePayment(getSavedType());
             LOG.debug("Creditcard updated: " + creditcard);
 
-            boolean needsUpdate = creditcardController.needsUpdate(creditcard, appContext.getPlayer()); // migrated 2026-02-25
+            boolean needsUpdate = needsUpdate(creditcard, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
             LOG.debug("Creditcard in DB created or modified? " + needsUpdate);
 
             creditcard.setPaymentOK(true);
@@ -622,6 +650,366 @@ public class PaymentController implements Serializable {
                 progress = 100;
         } // end if
         return progress;
+    } // end method
+
+    // ========================================
+    // METHODES METIER PRIVEES — migrées depuis CreditcardController 2026-02-26
+    // ========================================
+
+    private Creditcard prefilling(Player player) throws SQLException, Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Creditcard c = readCreditcard.read(player);
+        LOG.debug("creditcard loaded = " + c);
+        if (c.getCreditcardNumber() == null) {
+            LOG.debug("First utilisation of a creditcard for user = " + player.getPlayerLastName());
+            c.setCreditCardHolder("first use");
+        } else {
+            c.setCreditCardIdPlayer(player.getIdplayer());
+            c.setCreditCardHolder(c.getCreditcardHolder());
+            c.setCreditcardNumber(c.getCreditcardNumber());
+            c.setCreditcardType(c.getCreditcardType());
+            c.setCreditCardExpirationDateLdt(c.getCreditCardExpirationDateLdt());
+            String lastTwo = String.valueOf(c.getCreditCardExpirationDateLdt().getYear()).substring(2);
+            String s = String.valueOf(c.getCreditCardExpirationDateLdt().getMonthValue())
+                    + "/" + lastTwo;
+            c.setCreditCardExpirationDateString(s);
+            c.setCreditcardVerificationCode(c.getCreditcardVerificationCode());
+            LOG.debug("creditcard completed with db info = " + c);
+        } // end if
+        return c;
+    } // end method
+
+    private Creditcard completeWithGreenfee(Greenfee greenfee, Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with Greenfee " + greenfee);
+        try {
+            if (greenfee.getPrice() == 0) {
+                LOG.debug("amount ZERO no payment needed !");
+                return null;
+            } // end if
+            Creditcard cc = prefilling(player);
+            LOG.debug("creditcard prefilled with player's data = " + cc);
+            cc.setPaymentOK(false);
+            cc.setTotalPrice(greenfee.getPrice());
+            cc.setCommunication(greenfee.getCommunication());
+            cc.setTypePayment(Creditcard.etypePayment.GREENFEE.toString());
+            cc.setCreditcardCurrency(greenfee.getCurrency());
+            return cc;
+        } catch (Exception ex) {
+            String msg = "Creditcardpayment Greenfee Exception ! " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
+    } // end method
+
+    private Creditcard completeWithLesson(Professional professional, List<Lesson> lessons,
+            Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("with listLessons = " + lessons);
+            LOG.debug("Professional = " + professional);
+            LOG.debug("Player = " + player);
+            if (professional.getProAmount() == 0) {
+                LOG.debug("Amount ZERO no payment Lesson needed !");
+                return null;
+            } // end if
+            Creditcard cc = prefilling(player);
+            LOG.debug("creditcard after prefilling = " + cc);
+            cc.setPaymentOK(false);
+            cc.setTotalPrice(professional.getProAmount() * lessons.size());
+            String s = "";
+            for (Lesson lesson : lessons) {
+                s = s + lesson.getEventStartDate().toString() + " / ";
+            } // end for
+            cc.setCommunication("Réservation Lesson : "
+                    + s + " ,pro # = " + professional.getProPlayerId());
+            cc.setTypePayment(Creditcard.etypePayment.LESSON.toString());
+            LOG.debug("exiting completeWithLesson with creditcard = " + cc);
+            return cc;
+        } catch (Exception ex) {
+            String msg = "Exception in completeWithLesson ! " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
+    } // end method
+
+    private Creditcard completeWithCotisation(Cotisation cotisation, Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("Cotisation = " + cotisation);
+            if (cotisation.getPrice() == 0) {
+                LOG.debug("amount ZERO no payment needed !");
+                return null;
+            } // end if
+            Creditcard cc = prefilling(player);
+            LOG.debug("creditcard prefilled = " + cc);
+            cc.setPaymentOK(false);
+            cc.setTotalPrice(cotisation.getPrice());
+            cc.setCommunication(cotisation.getCommunication());
+            cc.setTypePayment(Creditcard.etypePayment.COTISATION.toString());
+            LOG.debug("creditcard completed with Cotisation = " + cc);
+            return cc;
+        } catch (Exception ex) {
+            String msg = "Creditcardpayment Cotisation Exception ! " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
+    } // end method
+
+    private Creditcard completeWithSubscription(Subscription subscription, Player player) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("subscription = " + subscription);
+            if (subscription.getSubscriptionAmount() == 0) {
+                LOG.debug("amount ZERO -- No payment needed !");
+                return null;
+            } // end if
+            Creditcard cc = prefilling(player);
+            cc.setPaymentOK(false);
+            cc.setTotalPrice(subscription.getSubscriptionAmount());
+            cc.setCommunication(subscription.getCommunication());
+            cc.setTypePayment(Creditcard.etypePayment.SUBSCRIPTION.toString());
+            LOG.debug("creditcard completed with subscription = " + cc);
+            return cc;
+        } catch (Exception ex) {
+            String msg = "completeWithSubscription Exception ! " + ex;
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
+    } // end method
+
+    private boolean needsUpdate(Creditcard c, Player player) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("with creditcard input = " + c);
+            Creditcard creditc = readCreditcard.read(player);
+            if (creditc == null) {
+                LOG.debug("CREATION : First utilisation of a creditcard for user = " + player.getPlayerLastName());
+                if (createCreditcard.create(c)) {
+                    LOG.debug("creditcard is created in DB");
+                    return true;
+                } else {
+                    LOG.debug("ERROR : creditcard NOT created in DB");
+                    return false;
+                } // end if
+            } // end first cc
+
+            if (creditc.getCreditCardExpirationDateLdt().equals(c.getCreditCardExpirationDateLdt())
+                    && creditc.getCreditcardNumber().equals(c.getCreditcardNumber())
+                    && creditc.getCreditcardHolder().equals(c.getCreditcardHolder())
+                    && creditc.getCreditcardVerificationCode().equals(c.getCreditcardVerificationCode())
+                    && creditc.getCreditcardType().equals(c.getCreditcardType())) {
+                LOG.debug("creditcard already registered and all data are the same - no update DB needed");
+                return false;
+            } else {
+                LOG.debug("a modified creditcard has been introduced !");
+                if (modifyCreditcard.modify(creditcard)) {
+                    String msg = "creditcard is modified in DB";
+                    LOG.info(msg);
+                    showMessageInfo(msg);
+                    return true;
+                } else {
+                    LOG.error("ERROR : creditcard is NOT modified in DB");
+                    return false;
+                } // end if
+            } // end equals
+        } catch (Exception e) {
+            String msg = "Exception in needsUpdate: " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return false;
+        }
+    } // end method
+
+    private Boolean handlePaymentSubscription(Creditcard c, Subscription subscription) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("handlePayments for subscription = " + subscription);
+            LOG.debug("handlePayments Subscription with creditcard input = " + c);
+            subscription.setPaymentReference(c.getCreditcardPaymentReference());
+            subscription.setIdplayer(c.getCreditCardIdPlayer());
+
+            if (paymentSubscriptionController.createPayment(subscription)) {
+                LOG.debug("after Subscription createPayment : we are OK " + subscription);
+                String msg = utils.LCUtil.prepareMessageBean("subscription.success")
+                        + " start date = " + subscription.getStartDate().format(interfaces.GolfInterface.ZDF_DAY)
+                        + " end date = " + subscription.getEndDate().format(interfaces.GolfInterface.ZDF_DAY);
+                LOG.info(msg);
+                return true;
+            } else {
+                String msg = "error : subscription NOT modified !!";
+                LOG.error(msg);
+                showMessageFatal(msg);
+                return false;
+            } // end if
+        } catch (Exception e) {
+            String msg = "Exception in handlePaymentSubscription: " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return false;
+        }
+    } // end method
+
+    // ========================================
+    // ENDPOINTS JAX-RS — migrés depuis CreditcardController 2026-02-26
+    // ========================================
+
+    @jakarta.ws.rs.GET
+    @jakarta.ws.rs.Path("payment_choice/{isbn}")
+    public jakarta.ws.rs.core.Response paymentChoice(
+            @PathParam("isbn") String param,
+            @Context HttpServletRequest servletRequest,
+            @Context ServletContext servletContext,
+            @Context jakarta.ws.rs.core.Request request,
+            @Context HttpHeaders headers,
+            @Context UriInfo uriInfo,
+            @CookieParam("JSESSIONID") String sessionid,
+            @HeaderParam("User-Agent") String whichBrowser,
+            @HeaderParam("From") String from,
+            @CookieParam("User") String user,
+            @CookieParam("PaymentReference") String reference,
+            @CookieParam("Amount") String amount,
+            @CookieParam("Currency") String Currency
+    ) throws IOException, WebApplicationException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + ", coming from payment server");
+        try {
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setNoCache(true);
+            cacheControl.setNoStore(true);
+            cacheControl.setMustRevalidate(true);
+            LOG.debug("with param = " + param);
+            LOG.debug("with UriInfo = " + uriInfo.getRequestUri().toString());
+            LOG.debug("Amount = " + amount);
+            LOG.debug("PaymentReference = " + reference);
+            LOG.debug("ServletContext getContextPath = " + servletContext.getContextPath());
+            String href = "http://localhost:8080" + servletContext.getContextPath();
+            String location = href + "/rest/paymentController";
+            LOG.debug("location = " + location);
+
+            if (param.equals("phase1")) {
+                LOG.debug("handling param phase1 = " + param);
+                return jakarta.ws.rs.core.Response
+                        .status(Response.Status.FOUND)
+                        .location(java.net.URI.create(location + "/payment_canceled" + "/101"))
+                        .header("type", "payment_cancel")
+                        .build();
+            } // end phase 1
+
+            if (param.equals("phase2")) {
+                LOG.debug("handling param phase2 = " + param);
+                return Response
+                        .status(Response.Status.FOUND)
+                        .location(java.net.URI.create(location + "/payment_confirmed"))
+                        .build();
+            } // end phase 2
+
+            if (param.equals("phase3")) {
+                LOG.debug("handling param phase3 = " + param);
+                return Response
+                        .status(Response.Status.FOUND)
+                        .location(java.net.URI.create(location + "/payment_handle" + "/101"))
+                        .build();
+            } // end phase 3
+
+            return Response.status(Response.Status.NOT_FOUND).entity("redirect from payment_choice - unknown param or not yet implemented").build();
+        } catch (Exception e) {
+            String msg = "Exception in paymentChoice: " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
+    } // end method
+
+    @jakarta.ws.rs.GET
+    @jakarta.ws.rs.Path("payment_canceled/{isbn}")
+    public Response paymentCancel(
+            @PathParam("isbn") String id,
+            @Context HttpServletRequest request,
+            @Context HttpServletResponse response,
+            @CookieParam("JSESSIONID") String sessionid,
+            @HeaderParam("type") String type,
+            @CookieParam("Amount") String amount
+    ) throws IOException, WebApplicationException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + ", coming from python server");
+        try {
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setMaxAge(3600);
+            cacheControl.setNoCache(true);
+            cacheControl.setNoStore(true);
+            cacheControl.setMustRevalidate(true);
+            cacheControl.setPrivate(true);
+            LOG.debug("PathParam isbn converted to id = " + id);
+            LOG.debug("JSESSIONID = " + sessionid);
+            LOG.debug("Amount = " + amount);
+            LOG.debug("@HeaderParam type = " + type);
+            creditcard.setCreditcardPaymentReference(null);
+            creditcard.setCommunication("Payment refused by User Client");
+            LOG.debug("going to /creditcard_payment_canceled.xhtml");
+            LOG.debug("request.getContextPath() = " + request.getContextPath());
+            response.sendRedirect(request.getContextPath() + "/creditcard_payment_canceled.xhtml?faces-redirect=true&message=Canceled by User");
+            return Response
+                    .status(Response.Status.ACCEPTED)
+                    .entity("Payment is canceled")
+                    .header("Pragma", "no-cache")
+                    .header("Expires", "0")
+                    .cacheControl(cacheControl)
+                    .build();
+        } catch (Exception e) {
+            String msg = "Exception in paymentCancel: " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
+    } // end method
+
+    @jakarta.ws.rs.GET
+    @jakarta.ws.rs.Path("payment_confirmed")
+    public Response paymentConfirmed(
+            @Context HttpServletRequest request,
+            @Context HttpServletResponse response,
+            @Context HttpHeaders headers,
+            @CookieParam("JSESSIONID") String sessionid,
+            @HeaderParam("User-Agent") String whichBrowser,
+            @HeaderParam("From") String from,
+            @CookieParam("User") String user,
+            @CookieParam("PaymentReference") String reference,
+            @CookieParam("Amount") String amount,
+            @CookieParam("Currency") String Currency
+    ) throws IOException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + ", coming from python server");
+        try {
+            LOG.debug(NEW_LINE);
+            LOG.debug("JSESSIONID = " + sessionid);
+            LOG.debug("headers = " + headers);
+            LOG.debug("response header payment reference = " + response.getHeader("PaymentReference"));
+            LOG.debug("creditcard = " + creditcard);
+            LOG.debug("browser = " + whichBrowser);
+            LOG.debug("User = " + user);
+            LOG.debug("Amount = " + amount);
+            creditcard.setTotalPrice(Double.valueOf(amount));
+            creditcard.setCreditcardPaymentReference(reference);
+            LOG.debug("going to /creditcard_payment_executed.xhtml");
+            response.sendRedirect(request.getContextPath() + "/creditcard_payment_executed.xhtml");
+            return Response.status(Response.Status.ACCEPTED).build();
+        } catch (Exception e) {
+            String msg = "Exception in paymentConfirmed: " + e.getMessage();
+            LOG.error(msg);
+            showMessageFatal(msg);
+            return null;
+        }
     } // end method
 
     // ========================================

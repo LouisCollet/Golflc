@@ -8,6 +8,7 @@ import entite.Creditcard;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import io.mikael.urlbuilder.UrlBuilder;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -29,9 +30,14 @@ import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.HexFormat;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 import static utils.LCUtil.showMessageFatal;
 import io.mikael.urlbuilder.UrlBuilder;
@@ -73,14 +79,17 @@ public class HttpController implements Serializable{
     }
 
 public HttpController() {  // constructor
-  cookieManager = new CookieManager(); 
+}
+
+@PostConstruct
+public void init() {
+  cookieManager = new CookieManager();
   cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-    LOG.debug("new cookieManager in constructor");
+    LOG.debug("new cookieManager in init");
   cookieStore = cookieManager.getCookieStore();  // abstract cannot be instanciated
-    LOG.debug("cookieStore created in constructor");
-  httpClient = getHttpClient();  // immutable 
-    LOG.debug("new httpClient in constructor");
-  
+    LOG.debug("cookieStore created in init");
+  httpClient = getHttpClient();  // immutable
+    LOG.debug("new httpClient in init");
 } 
 /* fonctionne pas
 public String goBack() { // You can retrieve the previous page's URL using the Referer header from the HttpServletRequest.
@@ -107,17 +116,13 @@ public String goBack() { // You can retrieve the previous page's URL using the R
 */
 
 //public final HttpClient getHttpClient(){ // mod 10-08-2025
-  public final HttpClient getHttpClient(){ // remis 10-08-2025 ??
+  public HttpClient getHttpClient(){ // removed final — CDI proxy requires non-final methods
     try{
         LOG.debug("entering getHttpClient()"); // voir initialisations dans constructor !!
-     //Once created, an HttpClient instance is immutable, thus automatically thread-safe, and you can send multiple requests with it.   
+     //Once created, an HttpClient instance is immutable, thus automatically thread-safe, and you can send multiple requests with it.
     // CookieManager adds the cookies to the CookieStore for every HTTP response and retrieves cookies from the CookieStore for every HTTP request.
 
-    
-  // skipper SSL control Alternatively, we can programmatically set this property before creating our client:
-//Properties props = System.getProperties();
-//props.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
-
+    // cert.pem imported into Java truststore (cacerts) via keytool — 2026-02-27
     HttpClient httpClient2 = HttpClient.newBuilder()
         .version(HttpClient.Version.HTTP_1_1) // If you know in advance that the server only speaks HTTP/1.1,
                     //you may create the client with version(Version.HTTP_1_1).
@@ -125,13 +130,36 @@ public String goBack() { // You can retrieve the previous page's URL using the R
         .followRedirects(HttpClient.Redirect.NORMAL) // or ALWAYS ?CookieHandler.setDefault(cm);
         .cookieHandler(cookieManager)  // instanciated in constructor
         .build();
+
+    /* trust-all SSLContext — kept as fallback if cacerts import not possible
+    HttpClient.Builder builder = HttpClient.newBuilder()
+        .version(HttpClient.Version.HTTP_1_1)
+        .connectTimeout(Duration.ofSeconds(50))
+        .followRedirects(HttpClient.Redirect.NORMAL)
+        .cookieHandler(cookieManager);
+    boolean devMode = Boolean.parseBoolean(System.getProperty("app.devMode", "false"));
+    if (devMode) {
+        javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[]{
+            new javax.net.ssl.X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() { return new java.security.cert.X509Certificate[0]; }
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) { }
+            }
+        };
+        javax.net.ssl.SSLContext sslContext = javax.net.ssl.SSLContext.getInstance("TLS");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+        builder.sslContext(sslContext);
+        LOG.debug("devMode=true — using trust-all SSLContext for self-signed certs");
+    }
+    HttpClient httpClient2 = builder.build();
+    */
     LOG.debug("exiting getHttpClient()");
    return httpClient2;
   }catch (Exception e){
      String msg = "fatal error in getHttpClient() " + e ;
      LOG.debug(msg );
      return null;
-}    
+}
 } // end getClient()
     
 
@@ -183,7 +211,7 @@ System.out.println(cert.getSubjectX500Principal());
               //  .header("key1", "value1") // on récupère le paramètre dans python  request.headers.get('key1')
               //  .header("key2", "value2")
                // .header("returnDirectory", "http://localhost:8080/GolfWfly-1.0-SNAPSHOT/rest/creditcardController/") 
-                .header("ReturnDirectory",  utils.LCUtil.firstPartUrl() + "/rest/creditcardController/")
+                .header("ReturnDirectory",  utils.LCUtil.firstPartUrl() + "/rest/paymentController/") // migrated 2026-02-26 — was creditcardController
                 .header("MerchantSite", "GolfLC Merchant Site") // new 20-10-2025
                 .build();
      //   https://stackoverflow.com/questions/17493027/can-i-open-a-new-window-and-populate-it-with-a-string-variable
@@ -346,20 +374,38 @@ System.out.println(cert.getSubjectX500Principal());
         .withPath("creditcard/")
         .toUri();
         LOG.debug("uri from urlbuilder = " + uri.toString());
-    HttpRequest request = HttpRequest.newBuilder()
-                .GET() // default
-              //  .uri(URI.create("https://localhost:5000/creditcard/" + URLEncoder.encode(strJson,"utf-8")))  // 5000 = default Flask
-                .uri(URI.create(uri + URLEncoder.encode(strJson,"utf-8")))
+    // old GET — creditcard data was passed in URL path (PCI-DSS violation) — commented 2026-02-27
+    // HttpRequest request = HttpRequest.newBuilder()
+    //             .GET() // default
+    //             .uri(URI.create(uri + URLEncoder.encode(strJson,"utf-8")))
+    //             .setHeader("User-Agent", "Java 11 HttpClient Bot")
+    //             .header("Content-Type", "application/json")
+    //             .header("Accept", "application/json")
+    //             .version(HttpClient.Version.HTTP_1_1)
+    //             .timeout(Duration.ofSeconds(5))
+    //             .header("ReturnDirectory",  utils.LCUtil.firstPartUrl() + "/rest/paymentController/")
+    //             .header("MerchantSite", "GolfLC Merchant Site")
+    //             .build();
+    // new POST — creditcard data in request body (PCI-DSS compliant) — migrated 2026-02-27
+    // HMAC-SHA256 authentication — added 2026-02-27
+        String timestamp = String.valueOf(Instant.now().getEpochSecond());
+        String payload = timestamp + strJson;
+        Mac mac = Mac.getInstance("HmacSHA256"); // from claude
+        mac.init(new SecretKeySpec(System.getenv("PAYMENT_HMAC_SECRET").getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+        String signature = HexFormat.of().formatHex(mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(strJson))
+                .uri(URI.create("https://localhost:5000/creditcard"))
                 .setHeader("User-Agent", "Java 11 HttpClient Bot")
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .version(HttpClient.Version.HTTP_1_1) // default HTTP_2  Flask ne supporte que 1_1
                 .timeout(Duration.ofSeconds(5)) // time out si redis server not loaded
-              //  .header("key1", "value1") // on récupère le paramètre dans python  request.headers.get('key1')
-              //  .header("key2", "value2")
-               // .header("returnDirectory", "http://localhost:8080/GolfWfly-1.0-SNAPSHOT/rest/creditcardController/") 
-                .header("ReturnDirectory",  utils.LCUtil.firstPartUrl() + "/rest/creditcardController/")
+                .header("ReturnDirectory",  utils.LCUtil.firstPartUrl() + "/rest/paymentController/") // migrated 2026-02-26 — was creditcardController
                 .header("MerchantSite", "GolfLC Merchant Site") // new 20-10-2025
+                .header("X-Timestamp", timestamp) // HMAC auth — 2026-02-27
+                .header("X-Signature", signature) // HMAC auth — 2026-02-27
                 .build();
      //   https://stackoverflow.com/questions/17493027/can-i-open-a-new-window-and-populate-it-with-a-string-variable
 //     LOG.debug("just before send HttpRequest");

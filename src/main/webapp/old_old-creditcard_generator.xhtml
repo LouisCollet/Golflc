@@ -33,9 +33,9 @@
     columnClasses="col1, col2">
 
 <f:facet name="header">
-     <c:set var="type" value="#{creditcardType}"/>
+     <c:set var="type" value="#{appContext.creditcardType}"/>
  1= #{payC.creditcard.typePayment}
- 2=  creditcardType = #{creditcardType}
+ 2=  creditcardType = #{appContext.creditcardType}
  <!--<b><h:outputText style="margin-left:1.5rem;" value = "Browser:" /></b>
          #{header['user-agent']}" -->
   <b><h:outputText style="margin-left:1.5rem;" value = "Cookie Payment Reference :" /></b>

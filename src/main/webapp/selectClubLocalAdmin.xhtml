@@ -13,8 +13,8 @@
 <h:form id="form_select_club">
 <div class="card">
 
- <c:set var="select" value="#{inputSelectCourse}"/>
- <c:set var="selectClub" value="#{inputSelectClub}"/>
+ <c:set var="select" value="#{appContext.inputSelectCourse}"/>
+ <c:set var="selectClub" value="#{appContext.inputSelectClub}"/>
  
 <p:dataTable id="courses"
              value="#{memC.listLocalAdminClubsList()}"
@@ -31,46 +31,46 @@
     <h1>#{msg['message.selectclub']}
         <h:outputText
             id="Rnd"
-            rendered="#{inputSelectCourse eq 'CreateRound'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateRound'}" 
             value="#{msg['message.for.round']}">
         </h:outputText>
         <h:outputText
             id="tarif"
-            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}" 
             value="#{msg['message.for.tarif.greenfee']}">
         </h:outputText>
         <h:outputText
             id="tarifMembers"
-            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}" 
             value="#{msg['message.for.tarif.members']}">
         </h:outputText>
         <h:outputText
             id="createPro"
-            rendered="#{inputSelectCourse eq 'CreatePro'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreatePro'}" 
             value="#{msg['create.pro']}">
         </h:outputText>
         <h:outputText
             id="unavailableS"
-            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}" 
             value="#{msg['message.for.unavailable']}">
         </h:outputText>
         <h:outputText
             id="unavailableP"
-            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}" 
             value="#{msg['message.for.unavailable']}">
         </h:outputText>
         <h:outputText
             id="Det"
-            rendered="#{inputSelectCourse eq 'ChartRound'}" 
+            rendered="#{appContext.inputSelectCourse eq 'ChartRound'}" 
             value="#{msg['message.for.detail']}">
         </h:outputText>
         <h:outputText
             id="Avg"
-            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+            rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}" 
             value="#{msg['message.for.average']}">
         </h:outputText>
         </h1>
-        parameter from sessionMap = #{inputSelectCourse}
+        parameter from sessionMap = #{appContext.inputSelectCourse}
     
 </f:facet>
   
@@ -85,7 +85,7 @@
       	<p:column headerText="#{msg['round.create']}"
                   footerText="#{msg['round.create']}"
                   style="width:20%"
-                  rendered="#{inputSelectCourse eq 'CreateRound'}" >
+                  rendered="#{appContext.inputSelectCourse eq 'CreateRound'}" >
             <p:commandButton
                 id="selectButtonCreateRound"
                 action="#{clubC.selectClub(c, select)}"
@@ -97,7 +97,7 @@
      	<p:column headerText="#{msg['round.tarif']}"
                   footerText="#{msg['round.tarif']}"
                   width="20%"
-                  rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" >
+                  rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}" >
             <p:commandButton
                 id="selectButtonTarifGreenfee"
                 action="#{clubC.selectClub(c, select)}"
@@ -110,7 +110,7 @@
     	<p:column headerText="#{msg['member.tarif']}"
                   footerText="#{msg['member.tarif']}"
                   width="20%"
-                  rendered="#{inputSelectCourse eq 'CreateTarifMember'}" >
+                  rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}" >
             <p:commandButton
                 id="selectButtonTarifMembers"
                 action="#{clubC.selectClub(c, select)}"
@@ -122,7 +122,7 @@
         <p:column headerText="#{msg['create.pro']}"
                   footerText="#{msg['create.pro']}"
                   width="20%"
-                  rendered="#{inputSelectClub eq 'CreatePro'}" >
+                  rendered="#{appContext.inputSelectClub eq 'CreatePro'}" >
             <p:commandButton
                 id="selectButtonCreatePro"
                 action="#{clubC.selectClub(c, select)}"
@@ -137,7 +137,7 @@
      	<p:column headerText="#{msg['member.tarif.payment']}"
                   footerText="#{msg['member.tarif.payment']}"
                   style="width:20%"
-                  rendered="#{inputSelectCourse eq 'PaymentTarifMember'}" >
+                  rendered="#{appContext.inputSelectCourse eq 'PaymentTarifMember'}" >
             <p:commandButton
                 id="selectButtonPaymentTarifMembers"
                 action="#{clubC.selectClub(c, select)}"
@@ -149,7 +149,7 @@
       	<p:column headerText="#{msg['message.for.unavailable']}"
                   footerText="#{msg['message.for.unavailable']}"
                   style="width:20%"
-                  rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" >
+                  rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}" >
             <p:commandButton
                 id="selectButtonUnavailable"
                 action="#{clubC.selectClub(c, select)}"
@@ -161,7 +161,7 @@
        	<p:column headerText="#{msg['message.for.unavailable']} Period"
                   footerText="#{msg['message.for.unavailable']}"
                   style="width:20%"
-                  rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" >
+                  rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}" >
             <p:commandButton
                 id="selectButtonUnavailablePeriod"
                 action="#{clubC.selectClub(c, select)}"

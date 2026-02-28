@@ -68,7 +68,7 @@ public class ApplicationContext implements Serializable {
     /** Partagé entre : SubscriptionController, PaymentController */
     private Cotisation cotisation;
 
-    /** Partagé entre : PaymentController, CreditcardController */
+    /** Partagé entre : PaymentController */
     private Creditcard creditcard;
 
     /** Partagé entre : RoundController, CourseController, ClubController */
@@ -76,6 +76,9 @@ public class ApplicationContext implements Serializable {
 
     /** Partagé entre : CourseController (unavailable flow), ClubController */
     private EUnavailable unavailable;
+
+    /** Partagé entre : ClubController (professional.xhtml) */
+    private Professional professional;
 
     // ========================================
     // 👥 PLAYERS SPÉCIAUX
@@ -97,9 +100,23 @@ public class ApplicationContext implements Serializable {
     private boolean connected       = false;
 
     // ========================================
+    // 🗺️ NAVIGATION ROUTING — migré depuis sessionMap 2026-02-28
+    // ========================================
+
+    private String inputSelectCourse;
+    private String inputSelectClub;
+    private String inputSelectRound;
+    private String inputSelectPaiement;
+    private String inputSelectSubscriptions;
+    private String creditcardType;
+    private String adminType;
+    private String scoreType;
+    private int    competitionPlayerId;
+
+    // ========================================
     // 🎨 ÉTAT DE L'INTERFACE
     // ========================================
-    
+
     private String selectedMenuItem;
     private String lastVisitedPage;
     private String currentLanguage = "fr";
@@ -132,12 +149,25 @@ public class ApplicationContext implements Serializable {
         cotisation      = new Cotisation();
         creditcard      = new Creditcard();
         
+        professional     = new Professional();
+
         // Players spéciaux
         playerPro           = new Player();
         localAdmin          = new Player();
         playerTemp          = new Player();
         playerWithPassword  = null;
         
+        // Navigation routing
+        inputSelectCourse       = null;
+        inputSelectClub         = null;
+        inputSelectRound        = null;
+        inputSelectPaiement     = null;
+        inputSelectSubscriptions = null;
+        creditcardType          = null;
+        adminType               = null;
+        scoreType               = null;
+        competitionPlayerId     = 0;
+
         // Flags
         nextPlayer      = false;
         nextInscription = false;
@@ -294,6 +324,15 @@ public class ApplicationContext implements Serializable {
         LOG.debug("ApplicationContext: unavailable = {}", unavailable);
     }
 
+    public Professional getProfessional() {
+        return professional;
+    }
+
+    public void setProfessional(Professional professional) {
+        this.professional = professional;
+        LOG.debug("ApplicationContext: professional = {}", professional);
+    }
+
     // ========================================
     // 👥 GETTERS / SETTERS - Players spéciaux
     // ========================================
@@ -396,6 +435,37 @@ public class ApplicationContext implements Serializable {
     
     public String getCurrentLanguage() { return currentLanguage; }
     public void setCurrentLanguage(String language) { this.currentLanguage = language; }
+
+    // ========================================
+    // 🗺️ GETTERS / SETTERS - Navigation routing
+    // ========================================
+
+    public String getInputSelectCourse()                        { return inputSelectCourse; }
+    public void   setInputSelectCourse(String inputSelectCourse) { this.inputSelectCourse = inputSelectCourse; }
+
+    public String getInputSelectClub()                          { return inputSelectClub; }
+    public void   setInputSelectClub(String inputSelectClub)    { this.inputSelectClub = inputSelectClub; }
+
+    public String getInputSelectRound()                         { return inputSelectRound; }
+    public void   setInputSelectRound(String inputSelectRound)  { this.inputSelectRound = inputSelectRound; }
+
+    public String getInputSelectPaiement()                              { return inputSelectPaiement; }
+    public void   setInputSelectPaiement(String inputSelectPaiement)    { this.inputSelectPaiement = inputSelectPaiement; }
+
+    public String getInputSelectSubscriptions()                                 { return inputSelectSubscriptions; }
+    public void   setInputSelectSubscriptions(String inputSelectSubscriptions)  { this.inputSelectSubscriptions = inputSelectSubscriptions; }
+
+    public String getCreditcardType()                           { return creditcardType; }
+    public void   setCreditcardType(String creditcardType)      { this.creditcardType = creditcardType; }
+
+    public String getAdminType()                                { return adminType; }
+    public void   setAdminType(String adminType)                { this.adminType = adminType; }
+
+    public String getScoreType()                                { return scoreType; }
+    public void   setScoreType(String scoreType)                { this.scoreType = scoreType; }
+
+    public int  getCompetitionPlayerId()                            { return competitionPlayerId; }
+    public void setCompetitionPlayerId(int competitionPlayerId)     { this.competitionPlayerId = competitionPlayerId; }
 
     // ========================================
     // 🔍 MÉTHODES UTILITAIRES

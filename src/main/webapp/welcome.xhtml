@@ -103,7 +103,7 @@
                         <p:menuitem value="Password Forgotten"
                                     icon="pi pi-question"
                                     update="growl-msg"
-                                    action="#{courseC.forgetPassword}"/>
+                                    action="#{playerC.forgetPassword}"/>
                         <p:menuitem value="Password modify"
                                     icon="pi pi-pencil"
                                     outcome="password_modify.xhtml?faces-redirect=true"/>
@@ -135,7 +135,7 @@
                          immediate="true"
                          icon="pi p-fw pi-question"
                          style="float: left;"
-                         action="#{courseC.forgetPassword}" />
+                         action="#{playerC.forgetPassword}" />
          <p:commandButton 
                          value="#{msg['button.password.modify']}"
                          id="buttonPasswordModify"

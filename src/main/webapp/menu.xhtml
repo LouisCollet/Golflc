@@ -55,7 +55,7 @@
         
              <!-- commented Phase 3B — method already commented in CourseController
              <p:menuitem value ="Selenium Test Create Club"
-                      action="#{courseC.to_selenium_createClub('SELENIUM')}"
+                      action="#{navC.to_selenium_createClub('SELENIUM')}"
                       icon="pi pi-pencil" /> -->
     </p:submenu>    
         
@@ -63,8 +63,10 @@
         <p:submenu label="#{msg['menu.local.admin']}"
                rendered="#{playerC.isLocalAdmin()}">
           <p:menuitem value ="#{msg['menu.create.round']}"
-                         action="#{clubC.to_selectCourseLA_xhtml('CreateRound')}"
-                         icon="pi pi-list" />
+                       
+                      action="#{clubC.to_selectPurpose_xhtml('CreateRound')}"
+                      icon="pi pi-list" />
+          <!-- old   action="#{clubC.to_selectCourseLA_xhtml('CreateRound')}" -->
           <p:menuitem value ="#{msg['menu.create.tarif.greenfee']}"
                       action="#{clubC.to_selectCourseLA_xhtml('CreateTarifGreenfee')}"
                       icon="pi pi-check" />
@@ -167,16 +169,23 @@ url="show_played_rounds.xhtml?cmd=ini"
                icon="pi pi-check"
                />
    <!-- url="stableford_playing_hcp.xhtml?cmd=ini"  -->
-   <p:menuitem value ="Scramble Playing Hcp"    url="scramble_playing_hcp.xhtml?cmd=ini" icon="pi pi-arrow-left" />
-   <p:menuitem value ="Other Games Playing Hcp" url="othergames_playing_hcp.xhtml?cmd=ini" icon="pi pi-arrow-left" />
+   <p:menuitem value ="Scramble Playing Hcp"
+               action="#{roundC.to_scramble_playing_hcp_xhtml('ini')}"
+               icon="pi pi-check" />
+   <!-- url="scramble_playing_hcp.xhtml?cmd=ini"  -->
+   <p:menuitem value ="Other Games Playing Hcp"
+               action="#{roundC.to_othergames_playing_hcp_xhtml('ini')}"
+               icon="pi pi-check" />
+   <!-- url="othergames_playing_hcp.xhtml?cmd=ini"  -->
 </p:submenu>
 
 <p:submenu label="PAYMENTS" >
    <p:menuitem value ="Subscription = #{memC.subscription.endDate}"
-               url="subscription.xhtml"
+               action="#{memC.to_subscription_xhtml('ini')}"
                icon="pi pi-check" />
+   <!-- url="subscription.xhtml"  -->
 <!--   <p:menuitem value ="Payment Cotisation Member old "
-               action="#{courseC.to_selectClub_xhtml('PaymentCotisationSpontaneous')}"
+               action="#{navC.to_selectClub_xhtml('PaymentCotisationSpontaneous')}"
                icon="pi pi-check" /> -->
    
    <p:menuitem value ="Payment Spontané Cotisation Member"
@@ -193,8 +202,9 @@ url="show_played_rounds.xhtml?cmd=ini"
 
     <p:submenu label="STATS">
         <p:menuitem value ="Stats Round"
-                    url="selectCourse.xhtml?cmd=ChartRound"
-                    icon="pi pi-arrow-right" />
+                    action="#{clubC.to_selectCourse_xhtml('ChartRound')}"
+                    icon="pi pi-chart-bar" />
+        <!-- url="selectCourse.xhtml?cmd=ChartRound" -->
         <p:menuitem value ="Chart Course   "
                     action="#{clubC.to_selectCourse_xhtml('ChartCourse')}" 
                     icon="pi pi-chart-line" />
@@ -202,14 +212,17 @@ url="show_played_rounds.xhtml?cmd=ini"
 
     <p:submenu label="HELP">
         <p:menuitem value ="Technical info Version 1"
-                    url="technical_info.xhtml"
+                    action="#{techC.to_page_xhtml('technical_info')}"
                     icon="pi pi-info-circle" />
+        <!-- url="technical_info.xhtml" -->
         <p:menuitem value ="Technical info Version 2"
-                    url="technical_info2.xhtml"
+                    action="#{techC.to_page_xhtml('technical_info2')}"
                     icon="pi pi-info-circle" />
+        <!-- url="technical_info2.xhtml" -->
         <p:menuitem value ="Advanced Diagnostic"
-                    url="admin_advanced.xhtml"
+                    action="#{techC.to_page_xhtml('admin_advanced')}"
                     icon="pi pi-cog" />
+        <!-- url="admin_advanced.xhtml" -->
     </p:submenu>
 
 
@@ -222,8 +235,9 @@ url="show_played_rounds.xhtml?cmd=ini"
                      action="#{batchC.importPlayers()}"
                      icon="pi pi-check" />
          <p:menuitem value ="Batch Imports Players/Rounds/inscriptions JEE8"
-                     url="jobSubmitter.xhtml"
+                     action="#{batchC.to_jobSubmitter_xhtml()}"
                      icon="pi pi-check" />
+         <!-- url="jobSubmitter.xhtml" -->
     </p:submenu>
     
     <p:submenu label="TOOLS/TESTS"
@@ -234,18 +248,23 @@ In this case you should either
 2.Set ajax=false in your menuitems,  
   -->
 
-   <p:menuitem value ="Club and Course Selector via include" 
-               url="selectClubCourse2.xhtml" 
+   <p:menuitem value ="Club and Course Selector via include"
+               action="#{techC.to_page_xhtml('selectClubCourse2')}"
                icon="pi pi-book" />
-  
-  
-  <p:menuitem value ="Math Calculator"    url="calculator_css.xhtml" icon="pi pi-book" />
-   <p:menuitem value ="Flex Form Layout" 
-               url="flex_formlayout.xhtml" 
+   <!-- url="selectClubCourse2.xhtml" -->
+
+  <p:menuitem value ="Math Calculator"
+              action="#{techC.to_page_xhtml('calculator_css')}"
+              icon="pi pi-book" />
+  <!-- url="calculator_css.xhtml" -->
+   <p:menuitem value ="Flex Form Layout"
+               action="#{techC.to_page_xhtml('flex_formlayout')}"
                icon="pi pi-book" />
-    <p:menuitem value ="PanelGrid responsive test" 
-               url="panelGrid_responsive.xhtml" 
+   <!-- url="flex_formlayout.xhtml" -->
+    <p:menuitem value ="PanelGrid responsive test"
+               action="#{techC.to_page_xhtml('panelGrid_responsive')}"
                icon="pi pi-book" />
+   <!-- url="panelGrid_responsive.xhtml" -->
    
    <p:menuitem value ="MongoChangeStreamSample Test"
                 action="#{streamC.main()}"
@@ -268,10 +287,13 @@ In this case you should either
                      icon="pi pi-check" />
             <!-- commented Phase 3B — test only
             <p:menuitem value ="test SendEmail"
-                     action="#{courseC.SendEmailTest()}"
+                     action="#{techC.SendEmailTest()}"
                      icon="pi pi-check" /> -->
             
-            <p:menuitem value ="Cell and Row editor"  url="editingRow.xhtml?cmd=ini&amp;operation=restart"   icon="pi pi-flag" />
+            <p:menuitem value ="Cell and Row editor"
+                        action="#{techC.to_editingRow_xhtml('ini','restart')}"
+                        icon="pi pi-flag" />
+            <!-- url="editingRow.xhtml?cmd=ini&amp;operation=restart" -->
          
       <!--       <p:menuitem value ="Restart Course"  url="courseRestart.xhtml?cmd=ini&amp;operation=restart" icon="pi pi-flag" />
             
@@ -284,7 +306,7 @@ In this case you should either
                        action="#{payC.Testpayment()}"
                      icon="pi pi-check" />
 <!--     <p:menuitem value ="test tarif members for club 101"
-                     action="#{courseC.to_select_tarifMembers_xhtml(101)}"
+                     action="#{navC.to_select_tarifMembers_xhtml(101)}"
                      icon="pi pi-check" />
 -->
          <p:menuitem value ="test match play   "
@@ -306,17 +328,47 @@ In this case you should either
                      icon="pi pi-envelope" />
           
 
-          <p:menuitem value ="Picklist     " url="picklist.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Media Flash  " url="media_flash.xhtml" icon="pi pi-check" />
-          
-          <p:menuitem value ="Text directions" url="maps_text_directions.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Travel modes" url="maps_travel_modes.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Geocoding" url="maps_geocoding.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Distance" url="maps_distance_matrix.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Autocomplete" url="autocomplete.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Search Golf Courses" url="search_golf.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Autocomplete Address" url="autocomplete_address.xhtml" icon="pi pi-check" />
-          <p:menuitem value ="Player Autocomplete" url="player_autocomplete.xhtml" icon="pi pi-check" />
+          <p:menuitem value ="Picklist"
+                     action="#{techC.to_page_xhtml('picklist')}"
+                     icon="pi pi-check" />
+          <!-- url="picklist.xhtml" -->
+          <p:menuitem value ="Media Flash"
+                     action="#{techC.to_page_xhtml('media_flash')}"
+                     icon="pi pi-check" />
+          <!-- url="media_flash.xhtml" -->
+
+          <p:menuitem value ="Text directions"
+                     action="#{techC.to_page_xhtml('maps_text_directions')}"
+                     icon="pi pi-check" />
+          <!-- url="maps_text_directions.xhtml" -->
+          <p:menuitem value ="Travel modes"
+                     action="#{techC.to_page_xhtml('maps_travel_modes')}"
+                     icon="pi pi-check" />
+          <!-- url="maps_travel_modes.xhtml" -->
+          <p:menuitem value ="Geocoding"
+                     action="#{techC.to_page_xhtml('maps_geocoding')}"
+                     icon="pi pi-check" />
+          <!-- url="maps_geocoding.xhtml" -->
+          <p:menuitem value ="Distance"
+                     action="#{techC.to_page_xhtml('maps_distance_matrix')}"
+                     icon="pi pi-check" />
+          <!-- url="maps_distance_matrix.xhtml" -->
+          <p:menuitem value ="Autocomplete"
+                     action="#{techC.to_page_xhtml('autocomplete')}"
+                     icon="pi pi-check" />
+          <!-- url="autocomplete.xhtml" -->
+          <p:menuitem value ="Search Golf Courses"
+                     action="#{techC.to_page_xhtml('search_golf')}"
+                     icon="pi pi-check" />
+          <!-- url="search_golf.xhtml" -->
+          <p:menuitem value ="Autocomplete Address"
+                     action="#{techC.to_page_xhtml('autocomplete_address')}"
+                     icon="pi pi-check" />
+          <!-- url="autocomplete_address.xhtml" -->
+          <p:menuitem value ="Player Autocomplete"
+                     action="#{techC.to_page_xhtml('player_autocomplete')}"
+                     icon="pi pi-check" />
+          <!-- url="player_autocomplete.xhtml" -->
                    <p:menuitem value ="Thumbnails"
                      action="#{thumbnailsC.thumbs('from menu')}"
                      icon="pi pi-check" />
@@ -326,10 +378,13 @@ In this case you should either
         
         <!-- commented Phase 3B — test only
         <p:menuitem value ="numbertext Test"
-                action="#{courseC.numberText('creditcard')}"
+                action="#{techC.numberText('creditcard')}"
                 icon="pi pi-check" /> -->
         
-           <p:menuitem value ="Download "    url="download.xhtml"/>
+           <p:menuitem value ="Download"
+                      action="#{techC.to_page_xhtml('download')}"
+                      icon="pi pi-download" />
+           <!-- url="download.xhtml" -->
            <p:menuitem value="Demo"     url="http://www.primefaces.org/showcase-labs/ui/home.jsf" icon="pi pi-external-link" />
            <p:menuitem value="Documentation" url="http://www.primefaces.org/documentation.html" icon="pi pi-external-link" />
            <p:menuitem value="Forum"    url="http://forum.primefaces.org/" icon="pi pi-external-link" />

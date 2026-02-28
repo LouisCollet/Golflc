@@ -8,17 +8,11 @@
       xmlns:of="omnifaces"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<!-- old solution 
 <ui:define name="metadata">
     <f:metadata>
-        <f:viewAction action="#{courseC.logout(param['cmd'])}"/>
+        <f:viewAction action="#{playerC.logout(param['cmd'])}"/>
     </f:metadata>
 </ui:define>
-  -->  
-    <!-- METADATA en direct -->
-<f:metadata>
-    <f:viewAction action="#{courseC.logout(param['cmd'])}"/>
-</f:metadata>
     
     
     

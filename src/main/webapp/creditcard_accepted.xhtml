@@ -63,7 +63,7 @@
     columnClasses="col1, col2">
 
 <f:facet name="header">
-     <c:set var="type" value="#{creditcardType}"/>
+     <c:set var="type" value="#{appContext.creditcardType}"/>
  <h2>
     <h:outputText
             id="subscription"
@@ -74,7 +74,7 @@
     <h:outputText
             id="inscription"
             escape="false"
-            rendered="#{payC.creditcard.typePayment = 'GREENFEE'}" 
+            rendered="#{payC.creditcard.typePayment eq 'GREENFEE'}"
             value="#{msg['title.payment.round']}">
     </h:outputText>
     <h:outputText
@@ -116,8 +116,8 @@
  <!-- https://www.primefaces.org/showcase/ui/misc/progressBar.xhtml?jfwid=85a80 -->
     <h:outputText  id="taskResult" value=" "/> 
     <p:progressBar id="progressBar2"
-                   widgetVar="pbAjax" 
-                    
+                   widgetVar="pbAjax"
+                   ajax="true"
                    value="#{payC.progress1}"
                    labelTemplate="{value}%"
                    styleClass="animated"
@@ -135,15 +135,13 @@
    </p:progressBar>
 <f:facet name="footer">
     <p:commandButton id="startButton"
-                     widgetVar="startButton2" 
+                     widgetVar="startButton2"
                      value="#{msg['creditcard.payment']} :"
                      type="button"
                      icon="pi pi-credit-card"
                      style="float: left;"
                      rendered="#{payC.creditcard.paymentOK eq false}"
-                     update="taskResult,growl-msg"
-                     onclick="PF('pbAjax').start();"
-                     oncomplete="window.scrollTo(0,0); return false;" />
+                     onclick="PF('startButton2').disable();PF('pbAjax').start();" />
 
 <!-- enlevé 04-01-2023 onclick="PF('startButton').disable();" remplacé par oncomplete de p:ajax -->
     <p:commandButton id="cmdCancel"

@@ -19,13 +19,13 @@
 <!--
    sessionMap.get("inputSelectCourse")  -->
    
-<c:set var="select" value="#{inputSelectPaiement}"/> 
+<c:set var="select" value="#{appContext.inputSelectPaiement}"/> 
  
    <p:dataTable id="TableSubscriptions"
                 var="c"
                 widgetVar="subscriptionTable"
                 value="#{memC.listSystemAdminSubscription(select)}"
-                filteredValue="#{courseC.filteredCars}"
+                filteredValue="#{memC.filteredCars}"
                 multiViewState="true" >
 
  <f:facet name="header">

@@ -21,13 +21,13 @@
                 var="c"
                 widgetVar="proTable"
                 value="#{memC.listProfessionalPayments()}"
-                filteredValue="#{courseC.filteredCars}"
+                filteredValue="#{memC.filteredCars}"
                 sortBy="#{c.club.idclub}" >
  <f:facet name="header">
     <h1>
         <h:outputText
             id="Rnd"
-            rendered="#{inputSelectPaiement eq 'Lessons'}" 
+            rendered="#{appContext.inputSelectPaiement eq 'Lessons'}" 
             value="#{msg['message.for.paiement.lesson']}">
         </h:outputText>
     </h1>

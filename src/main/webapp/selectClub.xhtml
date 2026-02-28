@@ -13,58 +13,58 @@
 <h:form id="form_select_club">
 <div class="card">
 
- <c:set var="select" value="#{inputSelectCourse}"/>
+ <c:set var="select" value="#{appContext.inputSelectCourse}"/>
  
 <p:dataTable id="courses"
-             value="#{courseC.listClubsDialog()}"
+             value="#{clubC.listClubsDialog()}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              rowKey="#{c.idclub}"
              rowHover="true"  >
-<!--  filteredValue="#{courseC.filteredCourses}"
+<!--  filteredValue="#{navC.filteredCourses}"
              stickyHeader="true"
              stickyTopAt=".layout-topbar"  -->
 <f:facet name="header">
     <h1>#{msg['message.selectclub']}
         <h:outputText
             id="Rnd"
-            rendered="#{inputSelectCourse eq 'CreateRound'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateRound'}" 
             value="#{msg['message.for.round']}">
         </h:outputText>
         <h:outputText
             id="tarif"
-            rendered="#{inputSelectCourse eq 'CreateTarifGreenfee'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}" 
             value="#{msg['message.for.tarif.greenfee']}">
         </h:outputText>
         <h:outputText
             id="tarifMembers"
-            rendered="#{inputSelectCourse eq 'CreateTarifMember'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}" 
             value="#{msg['message.for.tarif.members']}">
         </h:outputText>
         <h:outputText
             id="createPro"
-            rendered="#{inputSelectCourse eq 'CreatePro'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreatePro'}" 
             value="#{msg['create.pro']}">
         </h:outputText>
         <h:outputText
             id="unavailableS"
-            rendered="#{inputSelectCourse eq 'CreateUnavailableStructure'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}" 
             value="#{msg['message.for.unavailable']}">
         </h:outputText>
         <h:outputText
             id="unavailableP"
-            rendered="#{inputSelectCourse eq 'CreateUnavailablePeriod'}" 
+            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}" 
             value="#{msg['message.for.cotisation.spontaneous']}">
         </h:outputText>
         <h:outputText
             id="Det"
-            rendered="#{inputSelectCourse eq 'PaymentCotisationSpontaneous'}" 
+            rendered="#{appContext.inputSelectCourse eq 'PaymentCotisationSpontaneous'}" 
             value="#{msg['message.for.cotisation.spontaneous']}">
         </h:outputText>
         <h:outputText
             id="Avg"
-            rendered="#{inputSelectCourse eq 'ChartCourse'}" 
+            rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}" 
             value="#{msg['message.for.average']}">
         </h:outputText>
         </h1>

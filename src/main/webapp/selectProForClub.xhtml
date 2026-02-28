@@ -15,17 +15,17 @@
 <h:form id="form_selectProWithClub">
 <div class="card">
 
-<!-- <c:set var="select" value="#{inputSelectCourse}"/> -->
+<!-- <c:set var="select" value="#{appContext.inputSelectCourse}"/> -->
  <c:set var="idplayer" value="#{playerC.player.idplayer}"/>
 <p:dataTable id="courses"
-             value="#{courseC.listProfessionalForClub()}"
+             value="#{clubC.listProfessionalForClub()}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              rowKey="#{c.player.idplayer}"
              
              >
-<!-- 30-09-2021 PF11 ajouté rowKey et enlevé   filteredValue="#{courseC.filteredInscriptions}"-->
+<!-- 30-09-2021 PF11 ajouté rowKey et enlevé   filteredValue="#{navC.filteredInscriptions}"-->
 <f:facet name="header">
     <h1>#{msg['message.selectclub']} pour un pro</h1>
 </f:facet>
@@ -79,7 +79,7 @@
                   icon="pi pi-check">
              </p:commandButton>
             
-            <!-- action="#{schedulerC.loadEventsPro(c)}courseC.loadEventsPro(c)"  -->
+            <!-- action="#{schedulerC.loadEventsPro(c)}navC.loadEventsPro(c)"  -->
 	</p:column>
 </p:dataTable>
     </div>

@@ -20,19 +20,19 @@
 <!--
    sessionMap.get("inputSelectCourse")  -->
    
- <c:set var="select" value="#{inputSelectPaiement}"/> 
+ <c:set var="select" value="#{appContext.inputSelectPaiement}"/> 
    <p:dataTable id="TableLocalAdmin"
                 var="c"
                 widgetVar="customersTable"
                 value="#{memC.listLocalAdminGreenfee(select)}"
                 sortBy="#{c.club.idclub}"
-                filteredValue="#{courseC.filteredCars}" >
+                filteredValue="#{memC.filteredCars}" >
 
  <f:facet name="header">
     <h1>
         <h:outputText
             id="Rnd"
-            rendered="#{inputSelectPaiement eq 'Greenfees'}" 
+            rendered="#{appContext.inputSelectPaiement eq 'Greenfees'}" 
             value="#{msg['message.for.paiement.greenfee']}">
         </h:outputText>
     </h1>

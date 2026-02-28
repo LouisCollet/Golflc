@@ -17,7 +17,7 @@
 
 <ui:define name="metadata">
     <f:metadata>
-        <f:viewAction action="#{courseC.initInputPlayingHcp(0)}"/>
+        <f:viewAction action="#{roundC.initInputPlayingHcp(0)}"/>
     </f:metadata>
 </ui:define>
 
@@ -39,12 +39,12 @@
       <h:outputText value="Hcp #{msg['player.message']} #{i}" />
    </c:forEach>
         
-    <!-- value="#{courseC.playingHcp.hcpScr[i-1]}"  -->
+    <!-- value="#{roundC.playingHcp.hcpScr[i-1]}"  -->
     
     <c:forEach var="i" begin="1" end="2" step="1">
       <p:inputNumber  id="LCcpScr1${i}"
                     label="Hcp"
-                    value="#{courseC.playingHcp.hcpScr[i-1]}"
+                    value="#{roundC.playingHcp.hcpScr[i-1]}"
                     size="4"
                     required="true"
                     validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
@@ -64,7 +64,7 @@
     <c:forEach var="i" begin="3" end="4" step="1">
       <p:inputNumber  id="LCcpScr2${i}"
                     label="Hcp"
-                    value="#{courseC.playingHcp.hcpScr[i-1]}"
+                    value="#{roundC.playingHcp.hcpScr[i-1]}"
                     size="4"
                     decimalPlaces="0"
                     minValue="0"
@@ -78,7 +78,7 @@
     
 <!--  required="true"   -->
     <h:outputText value="#{msg['handicap.playing']}" />
-    <h:outputText value="#{courseC.playingHcp.playingHandicap}"
+    <h:outputText value="#{roundC.playingHcp.playingHandicap}"
                   style="font-size: 3em;"
                        />
 
@@ -90,7 +90,7 @@
                          ajax="false"
                           
                          icon="pi pi-database"
-                         action="#{courseC.calculateHcpScramble()}"/>
+                         action="#{roundC.calculateHcpScramble()}"/>
 
 </f:facet>
 </p:panelGrid>

@@ -5,6 +5,7 @@ import entite.*;
 import entite.composite.ECourseList;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.faces.annotation.SessionMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -54,11 +55,11 @@ public class MemberController implements Serializable {
     @Inject private lists.SystemAdminSubscriptionList    systemAdminSubscriptionList;
     @Inject private lists.LocalAdminCotisationList       localAdminCotisationList;
     @Inject private update.UpdateSubscription            updateSubscription;
-    @Inject private Controllers.CourseController         courseController;       // pour reset() — migrated 2026-02-25
+    @Inject private Controller.refact.NavigationController navigationController;  // renamed 2026-02-28
     @Inject private lists.ClubsListLocalAdmin            clubsListLocalAdmin;   // migrated 2026-02-25
     @Inject private lists.CoursesListLocalAdmin          coursesListLocalAdmin; // migrated 2026-02-25
     @Inject private lists.SubscriptionRenewalList        subscriptionRenewalList; // migrated 2026-02-25
-    @Inject @SessionMap private Map<String, Object>      sessionMap;
+    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
 
     // ========================================
     // ETAT UI LOCAL
@@ -73,6 +74,7 @@ public class MemberController implements Serializable {
     private Course course;
     private Round round;
     private List<ECourseList> subscriptionRenewal;
+    private List<?> filteredCars; // PrimeFaces dataTable filteredValue — migrated from navC 2026-02-28
 
     public MemberController() { }
 
@@ -89,6 +91,26 @@ public class MemberController implements Serializable {
     } // end method
 
     // ========================================
+    // CDI EVENT — ResetEvent observer — 2026-02-26
+    // ========================================
+
+    public void onReset(@Observes events.ResetEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " — source: " + event.getSource());
+        tarifMember         = new TarifMember();
+        tarifGreenfee       = new TarifGreenfee();
+        cotisation          = new Cotisation();
+        greenfee            = new Greenfee();
+        subscription        = new Subscription();
+        club                = null;
+        course              = null;
+        round               = null;
+        subscriptionRenewal = null;
+        filteredCars        = null;
+        LOG.debug(methodName + " — MemberController reset done");
+    } // end method
+
+    // ========================================
     // TARIF LOOKUP / FIND (5 methodes)
     // migrated from CourseController 2026-02-25
     // ========================================
@@ -99,7 +121,7 @@ public class MemberController implements Serializable {
         try {
             LOG.debug("player = " + appContext.getPlayer().toString());
             LOG.debug("course = " + course.toString());
-            sessionMap.put("inputSelectCourse", "createTarifGreenfee");
+            appContext.setInputSelectCourse("createTarifGreenfee");
             tarifGreenfee = findTarifGreenfeeData.find(round);
             if (tarifGreenfee == null) {
                 String err = "Tarif returned from findTarifdata is null ";
@@ -123,8 +145,8 @@ public class MemberController implements Serializable {
             LOG.debug(" for club = " + club);
             tarifMember = findTarifMembersData.find(club, round);
             LOG.debug("TarifMember found = " + tarifMember);
-            sessionMap.put("inputSelectCourse", "createTarifMember");
-            sessionMap.put("inputSelectClub", "createTarifMember");
+            appContext.setInputSelectCourse("createTarifMember");
+            appContext.setInputSelectClub("createTarifMember");
             if (tarifMember == null) {
                 String msgerr = prepareMessageBean("tarif.member.notfound");
                 LOG.error(msgerr);
@@ -412,7 +434,7 @@ public class MemberController implements Serializable {
         try {
             LOG.debug("for local admin = " + appContext.getPlayer());
             LOG.debug("with role = " + appContext.getPlayer().getPlayerRole());
-            if (sessionMap.get("inputSelectPaiement").equals("Greenfees")) {
+            if (appContext.getInputSelectPaiement().equals("Greenfees")) {
                 return localAdminGreenfeeList.list(appContext.getPlayer());
             }
             LOG.debug("error in inputSelectPaiement : INVALID");
@@ -442,10 +464,10 @@ public class MemberController implements Serializable {
         try {
             LOG.debug("for local admin = " + appContext.getPlayer());
             LOG.debug("with role = " + appContext.getPlayer().getPlayerRole());
-            if (sessionMap.get("inputSelectPaiement").equals("Greenfees")) {
+            if (appContext.getInputSelectPaiement().equals("Greenfees")) {
                 return localAdminCotisationList.list(appContext.getPlayer());
             }
-            if (sessionMap.get("inputSelectPaiement").equals("Members")) {
+            if (appContext.getInputSelectPaiement().equals("Members")) {
                 return localAdminCotisationList.list(appContext.getPlayer());
             }
             LOG.debug("error in inputSelectPaiement : INVALID");
@@ -532,16 +554,27 @@ public class MemberController implements Serializable {
     } // end method
 
     // ========================================
-    // NAVIGATION to_* (3 methodes)
+    // NAVIGATION to_* (4 methodes)
     // migrated from CourseController 2026-02-25
     // ========================================
+
+    /**
+     * Navigation vers subscription.xhtml
+     * Migré depuis menu.xhtml url= — 2026-02-28
+     */
+    public String to_subscription_xhtml(String s) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with string = " + s);
+        navigationController.reset(s);
+        return "subscription.xhtml?faces-redirect=true";
+    } // end method
 
     public String to_selectLocalAdmin_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
         try {
-            courseController.reset("Reset to_selectLocalAdmin" + s);
-            sessionMap.put("inputSelectPaiement", s);
+            navigationController.reset("Reset to_selectLocalAdmin" + s);
+            appContext.setInputSelectPaiement(s);
             if (s.equals("Members")) {
                 return "local_administrator_cotisations.xhtml?faces-redirect=true";
             }
@@ -559,8 +592,8 @@ public class MemberController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
         try {
-            courseController.reset("Reset to_selectSystemAdmin" + s);
-            sessionMap.put("inputSelectSubscriptions", s);
+            navigationController.reset("Reset to_selectSystemAdmin" + s);
+            appContext.setInputSelectSubscriptions(s);
             return "system_administrator_subscriptions.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -572,8 +605,8 @@ public class MemberController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with string = " + s);
         try {
-            courseController.reset("Reset to_selectPro" + s);
-            sessionMap.put("inputSelectPaiement", s);
+            navigationController.reset("Reset to_selectPro" + s);
+            appContext.setInputSelectPaiement(s);
             if (s.equals("Lessons")) {
                 return "professional_lessons_paid.xhtml?faces-redirect=true";
             }
@@ -665,6 +698,9 @@ public class MemberController implements Serializable {
     public void setSubscriptionRenewal(List<ECourseList> subscriptionRenewal) {
         this.subscriptionRenewal = subscriptionRenewal;
     } // end method
+
+    public List<?> getFilteredCars()                    { return filteredCars; }
+    public void    setFilteredCars(List<?> filteredCars) { this.filteredCars = filteredCars; }
 
     // ========================================
     // RESET

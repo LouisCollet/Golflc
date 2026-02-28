@@ -44,13 +44,13 @@
                 columns="2">
                 <h:outputText value="Username"/>
                 <p:inputText id="userName"
-                             value="#{courseC.login.username}"
+                             value="#{playerC.login.username}"
                              required="true"
                              />
 
                 <h:outputText value="Password"/>
                 <h:inputSecret id="password"
-                               value="#{courseC.login.password}"
+                               value="#{playerC.login.password}"
                                required="true"
                                />
             </p:panelGrid>
@@ -59,7 +59,7 @@
                          immediate="true"
                          ajax="false"
                          icon="pi pi-key"
-                         action="#{courseC.loginAPI}" 
+                         action="#{playerC.loginAPI}" 
                          />
 
  </h:form>

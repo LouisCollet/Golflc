@@ -39,6 +39,7 @@ public class BatchController implements Serializable{
     @Inject private Batch batch;
     @Inject private entite.Settings settings;        // ✅ injection CDI
     @Inject private create.CreatePlayer createPlayer;  // migrated 2026-02-24
+    @Inject private Controller.refact.NavigationController navigationController; // migrated 2026-02-28
     private static int recordWritten;
     private static int recordReaded;
 
@@ -450,4 +451,18 @@ public long getExecID() {
         }
  }
 */
+    // ========================================
+    // NAVIGATION — migrated 2026-02-28
+    // ========================================
+
+    /**
+     * Navigation vers jobSubmitter.xhtml
+     */
+    public String to_jobSubmitter_xhtml() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        navigationController.reset("Reset to_jobSubmitter");
+        return "jobSubmitter.xhtml?faces-redirect=true";
+    } // end method
+
 } //end class

@@ -25,7 +25,7 @@ import jakarta.ws.rs.core.Application;
      @Override
   public Set<Object> getSingletons() {
 	HashSet<Object> set = new HashSet<Object>();
-	set.add(new Controllers.CreditcardController());  // new 14-08-2025 sert à quoi ?? classes marqué avec @Path("creditcardController")
+	// set.add(new Controllers.CreditcardController());  // removed 2026-02-26 — merged into PaymentController
     return set;
   }
     */
