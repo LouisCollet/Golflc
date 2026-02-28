@@ -13,7 +13,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Connection; // still used by find() method signature
+// import java.sql.Connection; // removed 2026-02-28 — conn parameter was unused
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -47,7 +47,7 @@ private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))// default infinite
             .build();
 
- public String find(Club club, Connection conn) throws IOException {
+ public String find(Club club) throws IOException {
   try{
         LOG.debug("entering FindOpenweather with club =  =  " + club);
         System.setProperty("net.fortuna.ical4j.timezone.cache.impl", MapTimeZoneCache.class.getName());

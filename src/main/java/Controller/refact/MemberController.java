@@ -59,6 +59,7 @@ public class MemberController implements Serializable {
     @Inject private lists.ClubsListLocalAdmin            clubsListLocalAdmin;   // migrated 2026-02-25
     @Inject private lists.CoursesListLocalAdmin          coursesListLocalAdmin; // migrated 2026-02-25
     @Inject private lists.SubscriptionRenewalList        subscriptionRenewalList; // migrated 2026-02-25
+    @Inject private calc.CalcTarifGreenfee              calcTarifGreenfee; // migrated 2026-02-28
     // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
 
     // ========================================
@@ -129,7 +130,7 @@ public class MemberController implements Serializable {
                 return null;
             }
             LOG.debug("now tarifGreenfee found is = " + tarifGreenfee);
-            tarifGreenfee = new calc.CalcTarifGreenfee().calc(tarifGreenfee, round, club, appContext.getPlayer());
+            tarifGreenfee = calcTarifGreenfee.calc(tarifGreenfee, round, club, appContext.getPlayer()); // migrated 2026-02-28
             return "price_round_greenfee.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
