@@ -41,7 +41,7 @@ function setClickEvent()
     google.maps.event.addListener(map, 'click', function(event) {
         var requestUrl =
             'https://maps.googleapis.com/maps/api/timezone/json' + //https://maps.googleapis.com/maps/api/timezone/json?location=39.6034810,-119.6822510&timestamp=1331161200&key=YOUR_API_KEY
-            '?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc' +  // AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc
+            '?key=' + window.GOOGLE_MAPS_API_KEY +
             '&location=' + event.latLng.lat() + ',' + event.latLng.lng() +
             '&timestamp=' + getTimeStamp(new Date().getTime()) +
             '&language=' + 'en';

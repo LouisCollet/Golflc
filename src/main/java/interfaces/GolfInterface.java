@@ -25,7 +25,7 @@ String EMPTY_STRING = "";
  String CURRENT_PATH = ".";
  String DOT_SEPARATOR = ".";
  String DOT_SEPARATOR_SPLIT_REGEX = "\\.";    
- //String GoogleApiKey = "AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc";
+ //String GoogleApiKey = removed — now in env var GOOGLE_MAPS_API_KEY
  /*
  String RESET = "\u001B[0m";
  String RED = "\u001B[31m";

@@ -66,11 +66,11 @@
     <!--  & is a special/functional char in HTML/XML but you want to use it as a normal char.
     So you have to encode it correctly: Write &amp; instead of &
     si HTML alors & fonctionne !! 
-    https://maps.googleapis.com/maps/api/js?v=3.exp&amp;key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc"
+    https://maps.googleapis.com/maps/api/js?v=3.exp&amp;key=REMOVED_FROM_SOURCE"
     -->
     
     <script type="text/javascript"
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc"/>
+            src="https://maps.googleapis.com/maps/api/js?key=#{settings.getProperty('GOOGLE_MAPS_API_KEY')}"/>
     <script type="text/javascript" >
 var geocoder;
 var map;
