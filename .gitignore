@@ -73,6 +73,13 @@ out/
 .vscode/
 .history/
 
+# NetBeans
+nbproject/
+nb-configuration.xml
+
+# Claude Code
+.claude/
+
 ########################################
 # OS-specific
 ########################################
@@ -80,6 +87,29 @@ out/
 # Windows
 Thumbs.db
 Desktop.ini
+
+########################################
+# Selenium test screenshots
+########################################
+selenium-jupiter-*.html
+fullpage-screenshot-*.png
+
+########################################
+# JVM crash logs & javac args
+########################################
+hs_err_pid*.log
+javac.*.args
+
+########################################
+# MaxMind GeoIP database (binary, large)
+########################################
+GeoLite2-City.mmdb
+
+########################################
+# Scratch / working notes
+########################################
+*.txt
+!src/**/*.txt
 
 ########################################
 # Divers
