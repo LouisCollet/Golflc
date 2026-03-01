@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:p="primefaces"
+    xmlns:ui="jakarta.faces.facelets"
+    xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core">
+
+            <p:outputLabel for="@next" value="#{msg['round.id']}" />
+            <h:panelGroup layout="block"
+                          style="display:flex; align-items:center; gap:0.5rem;"
+                          id="containerRound">
+
+            <p:inputNumber id="inputRoundId"
+               label="inputRound"
+               value="#{roundC.round.idround}"
+               size="5"
+               lang="#{languageC.locale}"
+               decimalPlaces="0"
+               emptyValue="0"
+               required="true"
+               requiredMessage="#{msg['round.id']} - required"
+               validatorMessage="#{msg['round.id']}"
+               style="margin-left:1.5em; margin-right:1.5em;">
+                    <f:validateLongRange minimum="1"/>
+            </p:inputNumber>
+
+                <p:commandButton
+                         id="ButtonRound"
+                         immediate="true"
+                         value="#{msg['button.round.list']}"
+                         actionListener="#{dialogC.showSelectRound('round')}"
+                         icon="pi pi-search" >
+                    <p:ajax event="dialogReturn"
+                            update="inputRoundId,roundName,roundId">
+                    </p:ajax>
+                 </p:commandButton>
+
+                <h:outputText id="roundName"
+                              value="#{roundC.round.roundName}"
+                              style="font-style:italic;color:black"/>
+                <h:outputText id="roundId"
+                              value=" #{roundC.round.idround}"
+                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />
+            </h:panelGroup>
+</ui:composition>
