@@ -39,7 +39,7 @@ function initialize()
 script.type = 'text/javascript';
   script.async="async";
   script.defer="defer";
-  script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc&callback=initialize';
+  script.src = 'https://maps.googleapis.com/maps/api/js?key=' + window.GOOGLE_MAPS_API_KEY + '&callback=initialize';
   
 
     console.info("starting initialize of maps_travel_modes.js");

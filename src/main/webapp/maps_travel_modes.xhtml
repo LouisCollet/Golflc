@@ -13,7 +13,8 @@
 <ui:define name="title">Travel modes in directions</ui:define>
 <ui:define name="head"></ui:define>
 <ui:define name="content">
-<!--    target="head" --> 
+<!--    target="head" -->
+<script type="text/javascript">window.GOOGLE_MAPS_API_KEY = '#{settings.getProperty("GOOGLE_MAPS_API_KEY")}';</script>
 <h:outputScript library="js" name="maps_travel_modes.js"/>
     
     <style type="text/css">
@@ -61,11 +62,10 @@
       }
     </style>
 <h:body>
-<!--    on utilise mmasterTemplate !
+<!--    on utilise masterTemplate !
     <script type="text/javascript"
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACXDPdyVSXu-qCcvegAyoL2ykdbahQ3Lc"
+            src="https://maps.googleapis.com/maps/api/js?key=REMOVED_FROM_SOURCE"
             >
-        
     </script>
  -->   
     

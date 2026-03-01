@@ -90,6 +90,7 @@ public class Settings implements Serializable {
             settings.put("THUMBNAILS_LIBRARY",  resources + "images/thumbnails/");
             settings.put("WHS_CALCULATIONS",    resources + "calculations/");
             settings.put("TARGET",              userDir   + "/target");
+            settings.put("GOOGLE_MAPS_API_KEY", System.getenv("GOOGLE_MAPS_API_KEY"));
 
             LOG.debug(methodName + " - Settings initialized:");
             settings.forEach((k, v) -> LOG.debug(TAB + k + " = " + v));
