@@ -7,101 +7,84 @@
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Select Club Page </ui:define>
+<ui:define name="title">Select Club Page</ui:define>
 
 <ui:define name="content">
 <h:form id="form_select_club">
-<div class="card">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>#{msg['message.selectclub']}
+        <h:outputText
+            id="Rnd"
+            rendered="#{appContext.inputSelectCourse eq 'CreateRound'}"
+            value="#{msg['message.for.round']}" />
+        <h:outputText
+            id="tarif"
+            rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}"
+            value="#{msg['message.for.tarif.greenfee']}" />
+        <h:outputText
+            id="tarifMembers"
+            rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}"
+            value="#{msg['message.for.tarif.members']}" />
+        <h:outputText
+            id="createPro"
+            rendered="#{appContext.inputSelectCourse eq 'CreatePro'}"
+            value="#{msg['create.pro']}" />
+        <h:outputText
+            id="unavailableS"
+            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}"
+            value="#{msg['message.for.unavailable']}" />
+        <h:outputText
+            id="unavailableP"
+            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}"
+            value="#{msg['message.for.cotisation.spontaneous']}" />
+        <h:outputText
+            id="Det"
+            rendered="#{appContext.inputSelectCourse eq 'PaymentCotisationSpontaneous'}"
+            value="#{msg['message.for.cotisation.spontaneous']}" />
+        <h:outputText
+            id="Avg"
+            rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}"
+            value="#{msg['message.for.average']}" />
+    </h1>
+</f:facet>
 
  <c:set var="select" value="#{appContext.inputSelectCourse}"/>
- 
+
 <p:dataTable id="courses"
              value="#{clubC.listClubsDialog()}"
              var="c"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              rowKey="#{c.idclub}"
-             rowHover="true"  >
-<!--  filteredValue="#{navC.filteredCourses}"
-             stickyHeader="true"
-             stickyTopAt=".layout-topbar"  -->
-<f:facet name="header">
-    <h1>#{msg['message.selectclub']}
-        <h:outputText
-            id="Rnd"
-            rendered="#{appContext.inputSelectCourse eq 'CreateRound'}" 
-            value="#{msg['message.for.round']}">
-        </h:outputText>
-        <h:outputText
-            id="tarif"
-            rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}" 
-            value="#{msg['message.for.tarif.greenfee']}">
-        </h:outputText>
-        <h:outputText
-            id="tarifMembers"
-            rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}" 
-            value="#{msg['message.for.tarif.members']}">
-        </h:outputText>
-        <h:outputText
-            id="createPro"
-            rendered="#{appContext.inputSelectCourse eq 'CreatePro'}" 
-            value="#{msg['create.pro']}">
-        </h:outputText>
-        <h:outputText
-            id="unavailableS"
-            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}" 
-            value="#{msg['message.for.unavailable']}">
-        </h:outputText>
-        <h:outputText
-            id="unavailableP"
-            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}" 
-            value="#{msg['message.for.cotisation.spontaneous']}">
-        </h:outputText>
-        <h:outputText
-            id="Det"
-            rendered="#{appContext.inputSelectCourse eq 'PaymentCotisationSpontaneous'}" 
-            value="#{msg['message.for.cotisation.spontaneous']}">
-        </h:outputText>
-        <h:outputText
-            id="Avg"
-            rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}" 
-            value="#{msg['message.for.average']}">
-        </h:outputText>
-        </h1>
-        parameter from sessionMap = sessionMap.get("inputSelectCourse"));
-        parameter from sessionMap = sessionMap.get("inputSelectClub"));
-</f:facet>
-  
+             rowHover="true">
+
 <p:column
      headerText="#"
-     footerText="#"
      width="2%"
      id="colRow">
              #{row+1}
 </p:column>
 
- 	<p:column   id="colClubName"
-                    headerText="#{msg['club.name']}"
-                    footerText="#{msg['club.name']}"
-                    style="width:20%"
-                    filterMatchMode="contains"
-                    filterBy="#{c.clubName}"
-                    sortBy="#{c.clubName}" >
-            <h:outputText value="#{c.clubName} (#{c.idclub})" />
-	</p:column>
+    <p:column id="colClubName"
+              headerText="#{msg['club.name']}"
+              style="width:20%"
+              filterMatchMode="contains"
+              filterBy="#{c.clubName}"
+              sortBy="#{c.clubName}">
+        <h:outputText value="#{c.clubName} (#{c.idclub})" />
+    </p:column>
 
-        <p:column  id="courseTimeZone"
-                  headerText="#{msg['googletime.timezone']}"
-                  footerText="#{msg['googletime.timezone']}"
-                  style="width:15%" >
-            <h:outputText value="#{c.address.zoneId}">
-           
-            </h:outputText>
-        </p:column>
-<f:facet name="footer">
-</f:facet>
+    <p:column id="courseTimeZone"
+              headerText="#{msg['googletime.timezone']}"
+              style="width:15%">
+        <h:outputText value="#{c.address.zoneId}" />
+    </p:column>
+
 </p:dataTable>
-    </div>
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>

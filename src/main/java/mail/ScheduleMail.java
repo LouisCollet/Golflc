@@ -1,6 +1,6 @@
 package mail;
 
-import Controllers.LanguageController;
+// import Controllers.LanguageController; // removed — fix multi-user 2026-03-07
 import entite.Club;
 import entite.Creditcard;
 import entite.Greenfee;
@@ -17,6 +17,7 @@ import jakarta.mail.MessagingException;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
+import java.util.Locale;
 import manager.PlayerManager;
 
 @RequestScoped
@@ -72,10 +73,10 @@ public class ScheduleMail implements Serializable {
                 + " <br/>Email de votre pro" + "pro email"
                 + "<br/><br/> envoye le : " + LocalDateTime.now().format(ZDF_TIME);
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathQRC = null;
-            boolean b = mailSender.sendHtmlMail(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
-            LOG.debug("mail sent for lesson taker " + b);
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
+            LOG.debug("mail async dispatched for lesson taker");
 
             // mail 2 — to lesson giver
             sujet = "Lesson giver : Confirmation of a lesson via GolfLC";
@@ -85,7 +86,7 @@ public class ScheduleMail implements Serializable {
                 + " <br/> Nom du Club = " + c.getClubName()
                 + " <br/> Heure de debut = " + lesson.getEventStartDate().format(ZDF_TIME_HHmm)
                 + " = " + lesson.getEventStartDate().getDayOfWeek()
-                        .getDisplayName(TextStyle.FULL, new LanguageController().getLocale())
+                        .getDisplayName(TextStyle.FULL, Locale.of(giver.getPlayerLanguage())) // fix multi-user 2026-03-07
                 + " <br/> Heure de fin = " + lesson.getEventEndDate().format(ZDF_TIME_HHmm)
                 + " <br/> Professional = " + professional.getProPlayerId()
                 + " <br/>Nom  = " + giver.getPlayerLastName()
@@ -95,8 +96,8 @@ public class ScheduleMail implements Serializable {
                 + taker.getPlayerEmail()
                 + "<br/><br/> envoye le : " + LocalDateTime.now().format(ZDF_TIME);
 
-            b = mailSender.sendHtmlMail(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
-            LOG.debug("mail sent for lesson giver " + b);
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
+            LOG.debug("mail async dispatched for lesson giver");
 
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -120,9 +121,10 @@ public class ScheduleMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathQRC = null;
-            return mailSender.sendHtmlMail(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;
@@ -147,9 +149,10 @@ public class ScheduleMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathQRC = null;
-            return mailSender.sendHtmlMail(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;
@@ -178,11 +181,11 @@ public class ScheduleMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathQRC = null;
-            boolean b = mailSender.sendHtmlMail(sujet, mail, to, pathQRC, player.getPlayerLanguage());
-            LOG.debug("HTML Mail status = " + b);
-            return b;
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, player.getPlayerLanguage());
+            LOG.debug("HTML Mail async dispatched");
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;

@@ -22,6 +22,9 @@ import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.RowMapper;
 
+/**
+ * fix multi-user 2026-03-07 — cache supprimé (données per-admin dans singleton = fuite de données)
+ */
 @ApplicationScoped
 public class CoursesListLocalAdmin implements Serializable {
 
@@ -30,20 +33,11 @@ public class CoursesListLocalAdmin implements Serializable {
     @Resource(lookup = "java:jboss/datasources/golflc")
     private DataSource dataSource;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
-    private List<ECourseList> liste = null;
-
     public CoursesListLocalAdmin() { }
 
     public List<ECourseList> list(final Player localAdmin) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
-
-        // ✅ Early return — guard clause FIRST
-        if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
-            return liste;
-        }
 
         final String query = """
             SELECT *
@@ -60,7 +54,7 @@ public class CoursesListLocalAdmin implements Serializable {
             utils.LCUtil.logps(ps);
 
             try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
+                List<ECourseList> result = new ArrayList<>();
                 RowMapper<Club> clubMapper = new ClubRowMapper();
                 RowMapper<Course> courseMapper = new CourseRowMapper();
 
@@ -69,14 +63,14 @@ public class CoursesListLocalAdmin implements Serializable {
                             .club(clubMapper.map(rs))
                             .course(courseMapper.map(rs))
                             .build();
-                    liste.add(ecl);
+                    result.add(ecl);
                 }
-                if (liste.isEmpty()) {
+                if (result.isEmpty()) {
                     LOG.warn(methodName + " - empty result list");
                 } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
+                    LOG.debug(methodName + " - list size = " + result.size());
                 }
-                return liste;
+                return result;
             }
 
         } catch (SQLException e) {
@@ -88,16 +82,12 @@ public class CoursesListLocalAdmin implements Serializable {
         }
     } // end method
 
-    // ✅ Getters/setters d'instance
-    public List<ECourseList> getListe()              { return liste; }
-    public void setListe(List<ECourseList> liste)    { this.liste = liste; }
-
-    // ✅ Invalidation explicite
+    /**
+     * No-op — cache removed (fix multi-user 2026-03-07)
+     */
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        LOG.debug("entering " + methodName + " - no-op (cache removed)");
     } // end method
 
     /*
@@ -106,7 +96,7 @@ public class CoursesListLocalAdmin implements Serializable {
         LOG.debug("entering " + methodName);
         Player localAdmin = new Player();
         localAdmin.setIdplayer(324715);
-        List<ECourseList> lp = new CoursesListLocalAdmin().list(localAdmin);
+        List<ECourseList> lp = list(localAdmin);
         LOG.debug("from main, after lp = " + lp);
     } // end main
     */

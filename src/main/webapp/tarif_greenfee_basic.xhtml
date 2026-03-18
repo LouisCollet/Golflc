@@ -6,32 +6,24 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:o="omnifaces"
-      xmlns:c="jakarta.tags.core"
-      template="templates/masterTemplate.xhtml"
->
-    <!--       xmlns:o="http://omnifaces.org/ui"
-      xmlns:of="http://omnifaces.org/functions"  -->
+      template="templates/masterTemplate.xhtml">
+
 <ui:define name="title">Tarif Greenfee Page</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/greenfee1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/greenfee2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
-<h:form id="tarifGreenfee" enctype="application/x-www-form-urlencoded" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['title.greenfee.tarif']} BASIC</h1></f:facet>
+<h:form id="tarifGreenfee">
 
 <ui:include src="include/include_summary_greenfee.xhtml"/>
 
 <p:panelGrid
     id="panel1"
-    layout="tabular"
+    layout="flex"
     columns="2"
-    columnClasses="col1,col2" >
+    columnClasses="col1Flex,col2Flex">
 
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['title.greenfee.tarif']} BASIC" />
-</f:facet>
-
-    
-    <h:panelGroup id="panelSeason" layout="block" >
+    <h:panelGroup id="panelSeason" layout="block">
             <h:outputText value="#{msg['tarif.season']} " />
                 <i class="pi pi-cloud"></i>
                 <i class="pi pi-sun"></i>
@@ -39,28 +31,28 @@
             </h:panelGroup>
             <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{memC.tarifGreenfee.workSeason}" >
+                          value="#{memC.tarifGreenfee.workSeason}">
                 <f:selectItem itemLabel="#{msg['tarif.all']}"     itemValue="A" />
                 <f:selectItem itemLabel="#{msg['tarif.high']}"    itemValue="H" />
                 <f:selectItem itemLabel="#{msg['tarif.medium']}"  itemValue="M" />
                 <f:selectItem itemLabel="#{msg['tarif.low']}"     itemValue="L" />
             </p:selectOneButton>
-    
-      <h:panelGroup id="panelItem" layout="block" >
+
+      <h:panelGroup id="panelItem" layout="block">
          <h:outputText value="#{msg['tarif.members.item']} " />
-         <i class="pi pi-list"   ></i>
-         <i class="pi pi-pencil" ></i>
+         <i class="pi pi-list"></i>
+         <i class="pi pi-pencil"></i>
          #{memC.tarifGreenfee.basicList.size()}
       </h:panelGroup>
      <p:inputText  id="BasicText"
                    size="20"
                    title="#{msg['tarif.item']}"
-	           value="#{memC.tarifGreenfee.workItem}" 
+                   value="#{memC.tarifGreenfee.workItem}"
                    placeholder="Enter basic item "/>
-     
-        <h:panelGroup id="BasicPriceGroup" layout="block" >
+
+        <h:panelGroup id="BasicPriceGroup" layout="block">
            <h:outputText value="#{msg['tarif.members.price']} " />
-           <i class="pi pi-euro" ></i>
+           <i class="pi pi-euro"></i>
         </h:panelGroup>
         <p:inputNumber id="BasicPrice"
                        value="#{memC.tarifGreenfee.workPrice}"
@@ -71,14 +63,13 @@
                        decimalPlaces="1"
                        placeholder="999.9"
                        maxValue="300">
-        </p:inputNumber> 
+        </p:inputNumber>
 
 <f:facet name="footer">
         <p:commandButton value="#{msg['tarif.greenfee.create']}"
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                          
                          icon="pi pi-database"
                          action="#{memC.inputTarifGreenfee('BA')}"/>
          <p:commandButton value="#{msg['tarif.back']}"
@@ -87,10 +78,11 @@
                          update="growl-msg"
                          immediate="true"
                          icon="pi pi-undo"
-                         style="float: right;"
                          action="tarif_greenfee_menu.xhtml?faces-redirect=true" />
 </f:facet>
 </p:panelGrid>
 </h:form>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

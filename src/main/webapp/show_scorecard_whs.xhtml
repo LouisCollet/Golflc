@@ -12,7 +12,11 @@
 <ui:define name="title">Show Scorecard Page </ui:define>
 <ui:define name="content">
 
-<h:form id="form_show_scorecard" enctype="application/x-www-form-urlencoded" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header"><h1>#{msg['message.scorecard.detailed']} WHS</h1></f:facet>
+
+<h:form id="form_show_scorecard">
 <p:outputPanel id="outputpanelOne"
                deferred="true">
  <p:dataTable id="scorecard1"
@@ -22,32 +26,31 @@
              var="c" >
 
 <f:facet name="header">
-         <h1>#{msg['player.message']}</h1>
+         #{msg['player.message']}
 </f:facet>
 
 <p:column headerText="#{msg['player.first']}" style="width:20%" >
     <h:outputText value="#{playerC.player.playerFirstName}"
-                  styleClass="classFire"  /> 
+                  styleClass="classFire"  />
 </p:column>
 
 <p:column headerText="#{msg['player.lastname']}" style="width:20%" >
-    <h:outputText value="#{playerC.player.playerLastName} (#{playerC.player.idplayer})"/> 
+    <h:outputText value="#{playerC.player.playerLastName} (#{playerC.player.idplayer})"/>
 </p:column>
 
 <p:column headerText="#{msg['player.gender']}"
           width="20%">
-    <h:outputText value="#{playerC.player.playerGender}"/> 
+    <h:outputText value="#{playerC.player.playerGender}"/>
 </p:column>
 
 <p:column headerText="#{msg['player.birth']}" style="width:20%" >
-    <h:outputText value="#{playerC.player.playerBirthDate}"> 
+    <h:outputText value="#{playerC.player.playerBirthDate}">
           <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
     </h:outputText>
 </p:column>
 
   <ui:include src="include/include_thumbnails_scorecard.xhtml"/>
 
-   
 <p:column headerText="#{msg['handicap.player']}" width="20%" >
     <h:outputText value="#{c.handicapWHS}"/>
 </p:column>
@@ -61,10 +64,9 @@
         <f:convertDateTime type="localDate" pattern="dd-MM-yyyy" />
    </h:outputText>
 </p:column>
- 
+
 </p:dataTable>
 
-<!--                                                                              -->
 <p:divider layout="horizontal" type="solid" />
 <p:spacer height="30" />
 
@@ -73,7 +75,7 @@
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
-       <h1>#{msg['message.scorecard.course']}</h1>
+       #{msg['message.scorecard.course']}
 </f:facet>
 
 <p:column headerText="#{msg['round.competition']}" style="width:10%" >
@@ -85,7 +87,7 @@
 </p:column>
 
 <p:column headerText="#{msg['round.date']}" style="width:10%" >
-   <h:outputText value="#{c.round.roundDate}"> 
+   <h:outputText value="#{c.round.roundDate}">
       <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
    </h:outputText>
 </p:column>
@@ -107,9 +109,7 @@
              value="#{roundC.ScoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
-<!--<f:facet name="header">
-                  <h1>#{msg['message.scorecard.result']}</h1>
-</f:facet> -->
+
 <p:column headerText="#{msg['course.holes']}" style="width:10%" >
    <h:outputText value="#{c.round.roundHoles}"/>
 </p:column>
@@ -128,14 +128,12 @@
 
 <p:column headerText="#{msg['tee.master']}" style="width:10%" >
     <h:outputText value="#{c.tee.teeMasterTee}"/>
-</p:column> 
+</p:column>
 
-<!--  new 12-08-2023 insertion distance tee -->
 <p:column headerText="#{msg['tee.distance']}"
           style="width:10%" >
     <h:outputText value="#{c.tee.teeDistanceTee}"/>
-</p:column>    
-
+</p:column>
 
 <p:column headerText="#{msg['tee.start']}" style="width:10%" >
     <h:outputText value="#{c.inscription.inscriptionTeeStart} (idtee=#{c.tee.idtee})" />
@@ -144,12 +142,7 @@
 <p:column headerText="#{msg['hole.start']}" style="width:10%" >
    <h:outputText value="#{c.round.roundStart}"/>
 </p:column>
-<!-- à modifier : afficher uniquement si 9 holes value="#{c.teeStart} rendered="#{c.teeStart eq 'F'}"-->
-   
-   <f:facet name="footer-header">
-         <h1>#{msg['message.scorecard.detailed']} WHS</h1>
-   </f:facet>
-   
+
 </p:dataTable>
 
 </p:outputPanel>
@@ -162,91 +155,53 @@
                deferred="true"
                deferredMode="visible"   >
 <hr/>
-<!--            detail     -->
+
 <c:if test="#{c.round.roundHoles eq 9}">
      <p style="page-break-before: always"/>
 </c:if>
 
-<!--  a faire les résultats statistiques  -->
-
 <p:dataTable id="table4"
-             var="c" 
+             var="c"
              value="#{roundC.ScoreCardList4()}"
              emptyMessage="#{msg['message.table.empty']}"
              rowIndexVar="row"
              rowStyleClass="#{(row+1 == 9 or row+1 == 18) ? 'highlight' : null}"
              stripedRows="true">
 <f:facet name="header">
-         <h1>#{msg['message.scorecard.detailed']} WHS version 4 </h1>
+         #{msg['message.scorecard.detailed']} WHS version 4
 </f:facet>
 
  <p:spacer height="30" rendered="#{row+1 == 9}" />
- <!--  https://stackoverflow.com/questions/4731622/insert-a-new-row-into-datatable  -->
+
 <p:column headerText="#{msg['score.hole']}"
           width="3%" >
     <h:outputText value="#{c.hole}"/>
 </p:column>
 
-<p:column headerText="#{msg['score.par']}" 
-          footerText="#{msg['score.par']} = #{roundC.ScoreCardList4().stream().map(o->o.getPar()).sum()}"
+<p:column headerText="#{msg['score.par']}"
           width="3%" >
     <h:outputText value="#{c.par}"
                   style="text-align:center;font-size: 1.5em;font-weight: bold"/>
+    <f:facet name="footer">#{msg['score.par']} = #{roundC.ScoreCardList4().stream().map(o->o.getPar()).sum()}</f:facet>
 </p:column>
 
 <p:column headerText="#{msg['hole.index']}"
-          footerText="#{msg['hole.index']}"
           width="3%"
           style="white-space:pre-line" >
         <h:outputText value="#{c.index}"/>
 </p:column>
- 
-<p:column headerText="#{msg['score.extra']}" 
-          footerText="#{msg['score.extra']} = #{roundC.ScoreCardList4().stream().map(o->o.getExtra()).sum()}"
+
+<p:column headerText="#{msg['score.extra']}"
           style="text-align:center;font-size: 1.5rem;font-weight: bold;"
           width="3%">
       <h:outputText value="*"    rendered="#{c.extra eq 1}"/>
       <h:outputText value="**"   rendered="#{c.extra eq 2}"/>
       <h:outputText value="***"  rendered="#{c.extra eq 3}"/>
       <h:outputText value="****" rendered="#{c.extra eq 4}"/>
-</p:column>
-<!--
-<p:column headerText="#{msg['score.fairway']}" 
-          footerText="#{msg['score.fairway']} = #{roundC.ScoreCardList4().stream().map(o->o.getScoreStableford().getScoreFairway()).sum()}"
-          style="white-space:pre-line;"
-          width="3%" >
-       <h:outputText value="#{c.scoreStableford.scoreFairway}"/>
-</p:column>
-    
-<p:column headerText="#{msg['score.green']}"
-          footerText="#{msg['score.green']} = #{roundC.ScoreCardList4().stream().map(o->o.getScoreStableford().getScoreGreen()).sum()}"
-          style="white-space:pre-line;"
-          width="3%" >
-       <h:outputText value="#{c.scoreStableford.scoreGreen}"/>
-</p:column>
-    
-<p:column headerText="#{msg['score.putts']}" 
-          footerText="#{msg['score.putts']} = #{roundC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScorePutts()).sum()}"
-          style="white-space:pre-line"
-          width="3%" >
-       <h:outputText value="#{c.scoreStableford.scorePutts}"/>
+      <f:facet name="footer">#{msg['score.extra']} = #{roundC.ScoreCardList4().stream().map(o->o.getExtra()).sum()}</f:facet>
 </p:column>
 
-<p:column headerText="#{msg['score.bunker']}"
-          footerText="#{msg['score.bunker']} = #{roundC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScoreBunker()).sum()}"
-          style="white-space:pre-line"
-          width="3%" >
-       <h:outputText value="#{c.scoreStableford.scoreBunker}"/>
-</p:column> 
-    
- <p:column headerText="#{msg['score.penalty']}"
-          footerText="#{msg['score.penalty']} = #{roundC.ScoreCardList3().stream().map(o->o.getScoreStableford().getScorePenalty()).sum()}"
-          style="white-space:pre-line"
-          width="3%" >
-       <h:outputText value="#{c.scoreStableford.scorePenalty}"/>
-</p:column> 
- -->
-<c:set var="TotalDistanceOut" value="#{roundC.ScoreCardList4().stream().limit(9).map(o->o.getDistances()).sum()}"/> 
+<c:set var="TotalDistanceOut" value="#{roundC.ScoreCardList4().stream().limit(9).map(o->o.getDistances()).sum()}"/>
 <c:set var="TotalDistance" value="#{roundC.ScoreCardList4().stream().map(o->o.getDistances()).sum()}"/>
 <c:set var="break" value='&lt;BR/&gt;'/>
 <p:column headerText="#{msg['hole.distance']}"
@@ -256,7 +211,6 @@
           <h:outputText value="#{TotalDistance}">
               <f:convertNumber pattern="#.###" />
           </h:outputText>
-         
       </f:facet>
           <h:outputText value="#{c.distances}" />
           <h:outputText
@@ -276,12 +230,11 @@
         </h:outputText>
 </p:column>
 
- <p:divider layout="horizontal" type="solid" 
+ <p:divider layout="horizontal" type="solid"
            style="width:500px;height:20px"
            rendered="#{row+1 == 9}"/>
- 
-<p:column headerText="#{msg['score.gross']}" 
-          footerText="#{msg['score.gross']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes()).sum()}"
+
+<p:column headerText="#{msg['score.gross']}"
           style="white-space:pre-line;"
           width="5%" >
         <h:outputText
@@ -311,29 +264,27 @@
         <h:outputText
             value="EAGLE"
             rendered="#{c.strokes == c.par - 2}"
-            style="white-space: nowrap;float: right; color: red; font-weight: bold;width:10%"/>
+            style="white-space: nowrap; color: red; font-weight: bold;width:10%"/>
         <h:graphicImage
             name="images/eagle.png"
             title="Eagle Title"
             style="width:60%"
             rendered="#{c.strokes == c.par - 2}" />
+        <f:facet name="footer">#{msg['score.gross']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes()).sum()}</f:facet>
 </p:column>
 
- <p:column headerText="#{msg['score.net']}" 
-          footerText="#{msg['score.net']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes() - o.getExtra()).sum()}"
+ <p:column headerText="#{msg['score.net']}"
           width="3%">
-
      <h:outputText value="#{c.strokes - c.extra}"
                    rendered="#{c.strokes != 0 and c.strokes != 10}"
                    style="white-space: nowrap;" />
- 
      <h:outputText value=" "
                    rendered="#{c.strokes == 10}"
                    style="white-space: nowrap;" />
+     <f:facet name="footer">#{msg['score.net']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes() - o.getExtra()).sum()}</f:facet>
 </p:column>
- 
- <p:column headerText="#{msg['score.points']}" 
-           footerText="#{msg['score.points']} = #{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()} "
+
+ <p:column headerText="#{msg['score.points']}"
            style="white-space:nowrap;"
            width="10%" >
         <h:outputText
@@ -348,36 +299,36 @@
             rendered="#{row+1 == 9}"
             style="font-size: 1.5rem" />
 
-    <c:set var="TotalPoints" value="#{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()}"/> 
+    <c:set var="TotalPoints" value="#{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()}"/>
         <h:outputText
             value="#{break} Points IN = #{TotalPoints - TotalPointsOut}"
             escape="false"
             rendered="#{row+1 == 18}"
             style="font-size: 1.5em;" />
 
+        <f:facet name="footer">#{msg['score.points']} = #{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()}</f:facet>
 </p:column>
 
 </p:dataTable>
 
-
 </p:outputPanel>
 </h:form>
 
-<p:spacer height="30" /> 
-<h:form id="form_scorecard_noprint" enctype="application/x-www-form-urlencoded" >
+<p:spacer height="30" />
+<h:form id="form_scorecard_noprint">
  <p:panel id="panelExportPF"
          header="Primefaces Solutions">
    <p:commandButton id="btnExportPdf"
                     value="Export as PDF">
         <p:dataExporter id="exporterPF"
-                        type="pdf" 
+                        type="pdf"
                         target="form_show_scorecard:scorecard1,form_show_scorecard:scorecard2a,
-                                form_show_scorecard:scorecard2b,form_show_scorecard:table4" 
+                                form_show_scorecard:scorecard2b,form_show_scorecard:table4"
                         fileName="ScoreCardDetails"
                         pageOnly="false"
                         encoding="windows-1252" />
  </p:commandButton>
-     
+
        <p:commandButton icon="pi pi-file-excel"
                     value="Export as Pdf (PDF) with preprocess"
                     >
@@ -391,15 +342,15 @@
                        fileName="ScoreCard"
                        />
    </p:commandButton>
-     
+
     <p:commandButton id="btnExportExcel"
                      value="Export as Excel">
         <p:dataExporter id="exporterXLS"
-                        type="xls" 
+                        type="xls"
                         target="form_show_scorecard:scorecard1,form_show_scorecard:scorecard2a,
-                                form_show_scorecard:scorecard2b,form_show_scorecard:table4" 
+                                form_show_scorecard:scorecard2b,form_show_scorecard:table4"
                         fileName="ScoreCardMessagesAndDetails"
-                        pageOnly="false" 
+                        pageOnly="false"
                         encoding="UTF8"
                 />
  </p:commandButton>
@@ -408,12 +359,11 @@
                   value="#{msg['button.print']}"
                   type="button"
                   icon="pi pi-print">
-     <!-- configuration is new   --> 
         <p:printer id="printerForm"
                    configuration="title: 'Print Score Card', timeout: 1000"
                    target="form_show_scorecard" />
  </p:commandButton>
-     
+
   <p:commandButton id="btnPrint2"
                    value="#{msg['button.print']} Detail only"
                    type="button"
@@ -421,10 +371,14 @@
         <p:printer id="printerDetailOnly"
                    configuration="title: 'Print Detail Score Card', timeout: 1000"
                    target="form_show_scorecard:table4" />
- </p:commandButton>    
- 
+ </p:commandButton>
+
  </p:panel>
 
 </h:form>
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

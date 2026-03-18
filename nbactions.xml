@@ -111,7 +111,26 @@ ne fonctionne pas !!!    -->
     <!-- ============ INTEGRATION TESTS (IT) ============= -->
     <!-- ================================================= -->
 
-    <!-- Run Single IT (clic droit fichier *IT.java) 
+    <!-- Run Single UT (No Compile) — même approche que IT qui fonctionne bien -->
+    <action>
+        <actionName>CUSTOM-UT-fast-single</actionName>
+        <displayName>Run Single UT (No Compile)</displayName>
+        <packagings>
+            <packaging>*</packaging>
+        </packagings>
+        <goals>
+            <goal>surefire:test</goal>
+        </goals>
+        <properties>
+            <test>${className}</test>
+            <surefire.useFile>false</surefire.useFile>
+        </properties>
+        <activatedProfiles>
+            <activatedProfile>fast-ut</activatedProfile>
+        </activatedProfiles>
+    </action>
+
+    <!-- Run Single IT (clic droit fichier *IT.java)
     fonctionne bien !!-->
     <action>
         <actionName>CUSTOM-IT-run-single</actionName>

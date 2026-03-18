@@ -10,9 +10,11 @@
 <ui:define name="title">List Start Competition Page </ui:define>
 <ui:define name="content">
 
-<h:form id="competition_list_start"  >
-<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header"><h1>#{msg['competition.startinglist.title']}</h1></f:facet>
+
+<h:form id="competition_list_start">
 <ui:include src="include/include_summary_competition.xhtml"/>
 
 <p:dataTable id="competition"
@@ -21,36 +23,32 @@
              resizableColumns="true"
              var="c"
              emptyMessage="#{msg['message.table.start.competition.empty']}"
-             style="border:solid 3px" 
-             > 
+             >
  <f:facet name="header">
     <h:outputText escape="false" value="#{msg['competition.startinglist.title'] }" />
     <h2>#{c.competitionDescription.competitionName} </h2>
     execution = #{roundC.competition.competitionDescription.competitionExecution}
 </f:facet>
-    
+
          <p:column id="compFlight"
                    headerText="#{msg['competition.flight']}"
-                  footerText="#{msg['competition.flight']}"
                   width="5%"
                   groupRow="true"
                   filterMatchMode="equals"
                   filterBy="#{c.competitionData.cmpDataFlightNumber}"
                   >
-            <h:outputText value="#{c.competitionData.cmpDataFlightNumber}" /> 
+            <h:outputText value="#{c.competitionData.cmpDataFlightNumber}" />
 	</p:column>
-    
+
         <p:column headerText="#{msg['competition.start']}"
-                  footerText="#{msg['competition.start']}"
                   width="8%"
                   groupRow="true"
                   id="rdateasked">
-            <h:outputText value="#{c.competitionData.cmpDataFlightStart}" /> 
+            <h:outputText value="#{c.competitionData.cmpDataFlightStart}" />
 	</p:column>
 
         <p:column id="rdate"
                   headerText="#{msg['competition.start.asked']}"
-                  footerText="#{msg['competition.start.asked']}"
                   width="12%"
                   rendered="#{c.competitionDescription.competitionStatus ne '3'}"
                   >
@@ -61,7 +59,6 @@
 
         <p:column id="PlayerId"
                   headerText="#{msg['button.score.create']}"
-                  footerText="#{msg['button.score.create']}"
                   width="15%"
                   >
             <p:commandButton
@@ -70,82 +67,64 @@
                 rendered="#{c.competitionDescription.competitionStatus eq '3'}"
                 action="#{roundC.selectedCompetitionScoreStableford(c)}"
                 value="#{c.competitionData.cmpDataPlayerId}-Score"
-                style="float:right;"
                 title="#{msg['tooltip.competition.score']}"
                 icon="pi pi-pencil">
             </p:commandButton>
 	</p:column>
 
-            <p:column 
+            <p:column
                   id="idRegisterScore"
                   headerText="#{msg['score.register']}"
-                  footerText="#{msg['score.register']}"
                   width="15%"
                   rendered="#{c.competitionDescription.competitionStatus eq '3'}"
                   >
-   <!--         <h:outputText value="#{c.competitionData.cmpDataPlayerId}" /> -->
             <p:commandButton
                 id="registerScore1"
                 ajax="false"
                 rendered="#{c.competitionDescription.competitionStatus eq '3'}"
                 action="#{roundC.selectedCompetitionScoreStableford(c)}"
                 value="#{c.competitionData.cmpDataPlayerId}-Score"
-                style="float:right;"
                 title="#{msg['tooltip.competition.score']}"
                 icon="pi pi-pencil">
             </p:commandButton>
 	</p:column>
-    
+
         <p:column id="FirstLastName"
                   headerText="#{msg['player.first.last']}"
-                  footerText="#{msg['player.first.last']}"
                   width="12%"
                   filterMatchMode="contains"
                   filterBy="#{c.competitionData.cmpDataPlayerFirstLastName}"
                   >
-            <h:outputText value="#{c.competitionData.cmpDataPlayerFirstLastName}" /> 
+            <h:outputText value="#{c.competitionData.cmpDataPlayerFirstLastName}" />
 	</p:column>
-    
+
         <p:column id="DataId"
                   headerText="#{msg['competition.data.id']}"
-                  footerText="#{msg['competition.data.id']}"
                   width="10%"
                   >
              <h:outputText value="
                            id=#{c.competitionData.cmpDataId}
                           ,ro=#{c.competitionData.cmpDataRoundId}
                           ,fl=#{c.competitionData.cmpDataFlightNumber}
-                          "   /> 
+                          "   />
 	</p:column>
-    
+
        <p:column headerText="#{msg['handicap.whs']}"
-                 footerText="#{msg['handicap.whs']}"
                  width="12%"
                  id="Handicap">
-           <h:outputText value="#{c.competitionData.cmpDataHandicap}" /> 
+           <h:outputText value="#{c.competitionData.cmpDataHandicap}" />
 	</p:column>
 
 <f:facet name="footer">
-<!-- 
-
- https://stackoverflow.com/questions/20456143/auto-calculate-total-sum-of-a-column-with-numeric-data-in-datatable-footer/
-h:dataTable value="#{bean.items}" var="item">
-    <h:column>
-        #{item.number}
-    </h:column>
-    <f:facet name="footer">
-        Total: #{bean.items.stream().map(item->item.number).sum()}
-    </f:facet> #{c.competitionData.cmpDataId}
-</h:dataTable>
-/> value="#{roundC.listStartCompetition()}"
-total des Id = #{roundC.listStartCompetition().stream().c.map(item->c.competitionData.cmpDataId).sum()}
--->
 Nombre d'inscrits : #{roundC.listStartCompetition().size()}
-
 </f:facet>
-<br/>
+
 </p:dataTable>
 
 </h:form>
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

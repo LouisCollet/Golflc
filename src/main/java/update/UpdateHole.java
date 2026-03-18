@@ -10,6 +10,8 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 import static interfaces.Log.LOG;
 import utils.LCUtil;
@@ -81,7 +83,7 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
             // Query pour batch update
             // ========================================
             // Structure SQL réelle: HolePar TINYINT, HoleDistance SMALLINT, HoleStrokeIndex TINYINT
-            String query = """
+            String updateQuery = """
                 UPDATE hole
                 SET HolePar = ?,
                     HoleDistance = ?,
@@ -89,21 +91,28 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
                 WHERE tee_idtee = ?
                   AND HoleNumber = ?
                 """;
-            
-            LOG.debug("query UpdateHolesGlobal = {}", query);
-            
-            int successCount = 0;
-            int failCount = 0;
-            
+
+            String insertQuery = """
+                INSERT INTO hole (idhole, HoleNumber, HolePar, HoleDistance, HoleStrokeIndex,
+                                  tee_idtee, tee_course_idcourse, HoleModificationDate)
+                VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)
+                """;
+
+            LOG.debug("query UpdateHolesGlobal = {}", updateQuery);
+
+            int updateCount = 0;
+            int insertCount = 0;
+
             // ========================================
-            // Boucle sur tous les holes
+            // Boucle sur tous les holes — upsert
             // ========================================
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
-                
+            try (PreparedStatement psUpdate = conn.prepareStatement(updateQuery);
+                 PreparedStatement psInsert = conn.prepareStatement(insertQuery)) {
+
                 for (int i = 0; i < totalHoles; i++) {
-                    
+
                     int[] holeData = holesGlobal.getDataHoles()[i];
-                    
+
                     // Structure du tableau : [holeNumber, par, strokeIndex, distance]
                     // Index 0 = holeNumber (1-18)
                     // Index 1 = par (3-5)
@@ -113,43 +122,62 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
                     byte par = (byte) holeData[1];              // TINYINT en SQL
                     byte strokeIndex = (byte) holeData[2];      // TINYINT en SQL
                     short distance = (short) holeData[3];       // SMALLINT en SQL
-                    
+
                     LOG.debug(" i = {}", i);
                     LOG.debug("Processing hole #{}: Par={}, Index={}, Distance={}",
                              holeNumber, par, strokeIndex, distance);
-                    
+
                     // ========================================
-                    // Mapper les données (TYPES CORRECTS)
+                    // Tenter l'UPDATE d'abord
                     // ========================================
+                    // HoleDistance toujours 0 — trigger MySQL exige HoleDistance=0
+                    // (distances réelles stockées dans table distances depuis 19-08-2023)
                     int index = 0;
-                    
-                    // Updated fields
-                    ps.setByte(++index, par);                   // HolePar TINYINT
-                    ps.setShort(++index, distance);             // HoleDistance SMALLINT
-                    ps.setByte(++index, strokeIndex);           // HoleStrokeIndex TINYINT
-                    
-                    // WHERE clause
-                    ps.setInt(++index, tee.getIdtee());         // WHERE tee_idtee = ?
-                    ps.setByte(++index, (byte) holeNumber);     // AND HoleNumber = ? (TINYINT)
-                    
-                    LCUtil.logps(ps);
-                    
-                    // Exécuter l'update
-                    int row = ps.executeUpdate();
-                    
+                    psUpdate.setByte(++index, par);                   // HolePar TINYINT
+                    psUpdate.setShort(++index, (short) 0);            // HoleDistance = 0 (trigger constraint)
+                    psUpdate.setByte(++index, strokeIndex);           // HoleStrokeIndex TINYINT
+                    psUpdate.setInt(++index, tee.getIdtee());         // WHERE tee_idtee = ?
+                    psUpdate.setByte(++index, (byte) holeNumber);     // AND HoleNumber = ? (TINYINT)
+
+                    LCUtil.logps(psUpdate);
+                    int row = psUpdate.executeUpdate();
+
                     if (row != 0) {
-                        successCount++;
-                        LOG.debug("-- Successful update Hole for hole : {} for tee = {} row = {}",
+                        updateCount++;
+                        LOG.debug("-- Successful UPDATE hole #{} for tee = {} row = {}",
                                  holeNumber, tee.getIdtee(), row);
                     } else {
-                        failCount++;
-                        msg = "-- ERROR update Hole for hole : " + holeNumber;
-                        LOG.error(msg);
-                        LCUtil.showMessageFatal(msg);
-                        
-                        // Comportement comme l'ancien code : retourne false au premier échec
-                        conn.rollback();
-                        return false;
+                        // ========================================
+                        // Hole n'existe pas — INSERT automatique
+                        // ========================================
+                        LOG.info("Hole #{} not found for tee {} — inserting new row",
+                                 holeNumber, tee.getIdtee());
+
+                        // INSERT avec distance=0 (trigger MySQL exige HoleDistance=0 à l'insertion)
+                        index = 0;
+                        psInsert.setShort(++index, (short) holeNumber);  // HoleNumber
+                        psInsert.setByte(++index, par);                   // HolePar
+                        psInsert.setShort(++index, (short) 0);            // HoleDistance = 0 (trigger constraint)
+                        psInsert.setByte(++index, strokeIndex);           // HoleStrokeIndex
+                        psInsert.setInt(++index, tee.getIdtee());         // tee_idtee
+                        psInsert.setInt(++index, tee.getCourse_idcourse()); // tee_course_idcourse
+                        psInsert.setTimestamp(++index, Timestamp.from(Instant.now())); // HoleModificationDate
+
+                        LCUtil.logps(psInsert);
+                        int inserted = psInsert.executeUpdate();
+
+                        if (inserted != 0) {
+                            insertCount++;
+                            LOG.debug("-- Successful INSERT hole #{} for tee = {}", holeNumber, tee.getIdtee());
+                            // Distance non mise à jour ici — trigger MySQL exige HoleDistance=0
+                            // sur INSERT ET UPDATE. Distances gérées dans table distances.
+                        } else {
+                            msg = "-- ERROR insert Hole for hole : " + holeNumber;
+                            LOG.error(msg);
+                            LCUtil.showMessageFatal(msg);
+                            conn.rollback();
+                            return false;
+                        }
                     }
                 }
             }
@@ -157,8 +185,8 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
             // ========================================
             // Vérification et commit
             // ========================================
-            msg = String.format("Batch update completed: %d/%d holes updated for tee %d",
-                               successCount, totalHoles, tee.getIdtee());
+            msg = String.format("Batch upsert completed: %d updated, %d inserted (%d total) for tee %d",
+                               updateCount, insertCount, totalHoles, tee.getIdtee());
             LOG.info(msg);
             LCUtil.showMessageInfo(msg);
             

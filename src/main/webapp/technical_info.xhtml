@@ -7,7 +7,6 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:c="jakarta.tags.core"
       xmlns:p="primefaces"
-      xmlns:o="omnifaces"
       xmlns:of="http://omnifaces.org/functions"
       template="templates/masterTemplate.xhtml">
 
@@ -17,43 +16,36 @@
 
 <h:form id="technical_info">
 
-<!-- Images d'en-tête -->
-<h:graphicImage id="graphic1" name="images/technical02.jpg" 
-                alt="image missing :golf_club.jpg" 
-                style="float: left;"/>
-<h:graphicImage id="graphic2" name="images/technical04.jpg" 
-                alt="image missing :golf_club.jpg" 
-                style="float: right;"/>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>Technical Information</h1>
+</f:facet>
 
-<!-- Panel Grid Principal en 3 colonnes -->
-<p:panelGrid id="panel" 
+<p:panelGrid id="panel"
              columns="3"
-             layout="tabular"
-             columnClasses="col-label,col-value,col-icon"
+             layout="flex"
+             columnClasses="col1Flex,col2Flex,col1Flex"
              styleClass="tech-info-grid">
-
-    <f:facet name="header">
-        <h1>Technical Information</h1>
-    </f:facet>
 
     <!-- MySQL -->
     <h:outputText value="MySQL" styleClass="tech-label"/>
-    <h:outputText value="#{infoC2.mySQLInfo}"/>
+    <h:outputText value="#{infoC.mySQLInfo}"/>
     <h:graphicImage name="images/mymySqlInfosql-logo.jpg" alt="MySQL" styleClass="tech-icon"/>
 
     <!-- MongoDB -->
     <h:outputText value="MongoDB" styleClass="tech-label"/>
-    <h:outputText value="#{infoC2.mongoInfo}"/>
+    <h:outputText value="#{infoC.mongoInfo}"/>
     <h:graphicImage name="images/MongoDB.png" alt="MongoDB" styleClass="tech-icon"/>
 
     <!-- IP -->
     <h:outputText value="IP" styleClass="tech-label"/>
-    <h:outputText value="#{infoC2.ipDescription}"/>
+    <h:outputText value="#{infoC.ipDescription}"/>
     <h:outputText value=""/>
 
     <!-- Ville -->
     <h:outputText value="GeoLocation" styleClass="tech-label"/>
-    <h:outputText value="#{infoC2.geoDescription}"/>
+    <h:outputText value="#{infoC.geoDescription}"/>
     <h:outputText value=""/>
 
     <!-- Application version -->
@@ -68,7 +60,7 @@
 
     <!-- Date Last Deploy -->
     <h:outputText value="Date Last Deploy" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.DeployVersion()}" escape="false"/>
+    <h:outputText value="#{infoC.deployVersion()}" escape="false"/>
     <h:outputText value=""/>
 
     <!-- Browser -->
@@ -83,7 +75,7 @@
 
     <!-- Copyright -->
     <h:outputText value="Copyright" styleClass="tech-label"/>
-    <h:outputText value="&#169;2012-#{of:formatDate(now,'yyyy')} Application GolfLC by Louis Collet v3.0" 
+    <h:outputText value="&#169;2012-#{of:formatDate(now,'yyyy')} Application GolfLC by Louis Collet v3.0"
                   escape="false" styleClass="copyright-text"/>
     <h:outputText value=""/>
 
@@ -112,18 +104,16 @@
     <h:outputText value="#{startup}"/>
     <h:outputText value=""/>
 
- <!-- JVM Startup -->
+    <!-- JVM Startup -->
     <h:outputText value="JVM Startup" styleClass="tech-label"/>
-    <h:outputText value="#{infoC2.jvmStartup()}"/>
-    <h:outputText value=""/>   
-    
-  <!-- JVM uptime -->
+    <h:outputText value="#{infoC.jvmStartup()}"/>
+    <h:outputText value=""/>
+
+    <!-- JVM uptime -->
     <h:outputText value="JVM Uptime" styleClass="tech-label"/>
-    <h:outputText value="#{infoC2.jvmUptime()}"/>
-    <h:outputText value=""/>   
-    
-    
-    
+    <h:outputText value="#{infoC.jvmUptime()}"/>
+    <h:outputText value=""/>
+
     <!-- Server Address -->
     <h:outputText value="Server Address" styleClass="tech-label"/>
     <h:outputText value="#{infoC.clientIpAddress}"/>
@@ -146,7 +136,7 @@
 
     <!-- GitHub -->
     <h:outputText value="GitHub" styleClass="tech-label"/>
-    <h:outputLink value="https://github.com/LouisCollet/Golflc.git" 
+    <h:outputLink value="https://github.com/LouisCollet/Golflc.git"
                   target="_blank"
                   styleClass="tech-link">
         Go to GitHub site!
@@ -197,7 +187,6 @@
     <h:outputText value="jQuery" styleClass="tech-label"/>
     <h:panelGroup layout="block">
     <span id="jqueryVersion"></span>
-
     <h:outputScript target="body">
         (function () {
             var el = document.getElementById('jqueryVersion');
@@ -211,20 +200,9 @@
             }
         })();
     </h:outputScript>
-</h:panelGroup>
-
+    </h:panelGroup>
     <h:graphicImage name="images/jquery.png" alt="jQuery" styleClass="tech-icon"/>
 
-    <!-- MySQL Version 
-    <h:outputText value="MySQL Version - infoC" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.mySql}"/>
-    <h:graphicImage name="images/mysql-logo.jpg" alt="MySQL" styleClass="tech-icon"/>
--->
-    <!-- MongoDB Version 
-    <h:outputText value="MongoDB Version - infoC" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.mongoDB}"/>
-    <h:graphicImage name="images/MongoDB.png" alt="MongoDB" styleClass="tech-icon"/>
--->
     <!-- Log4j2 -->
     <h:outputText value="Log4j2" styleClass="tech-label"/>
     <h:outputText value="#{infoC.log4j2Version}"/>
@@ -256,35 +234,16 @@
     </p:dataTable>
 </p:panel>
 
+</p:panel>
+</div>
+
 </h:form>
 
-<!-- CSS personnalisé -->
+<!-- CSS personnalise -->
 <h:outputStylesheet>
     .tech-info-grid {
         width: 100%;
         margin: 2rem auto;
-    }
-
-    .col-label {
-        width: 25%;
-        font-weight: bold;
-        text-align: right;
-        padding-right: 1rem;
-        vertical-align: middle;
-        color: #495057;
-    }
-
-    .col-value {
-        width: 55%;
-        padding-left: 1rem;
-        vertical-align: middle;
-        word-wrap: break-word;
-    }
-
-    .col-icon {
-        width: 20%;
-        text-align: center;
-        vertical-align: middle;
     }
 
     .tech-icon {
@@ -312,20 +271,6 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-        .col-label {
-            width: 30%;
-            font-size: 0.9rem;
-        }
-        
-        .col-value {
-            width: 50%;
-            font-size: 0.85rem;
-        }
-        
-        .col-icon {
-            width: 20%;
-        }
-        
         .tech-icon {
             max-width: 50px;
             max-height: 35px;

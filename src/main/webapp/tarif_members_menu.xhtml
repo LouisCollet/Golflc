@@ -2,39 +2,33 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="title">Tarif Members Menu Page </ui:define>
-<ui:define name="head"> </ui:define>
+<ui:define name="title">Tarif Members Menu Page</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
-<div class="card">
-<h:form id="tarif_members_menu" enctype="application/x-www-form-urlencoded" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['title.equipments.tarif']}</h1></f:facet>
+<h:form id="tarif_members_menu">
 
 <ui:include src="include/include_summary_cotisation.xhtml"/>
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['title.equipments.tarif']}" />
-</f:facet>
 
 <p:panelMenu id="panel_menu_members"
              style="width:400px;margin:auto;">
-    <p:submenu label="Input Data Members Tarif" 
+    <p:submenu label="Input Data Members Tarif"
                expanded="true"
                icon="pi pi-check"
-               style="font-size: 1.5em;" >
+               style="font-size: 1.5em;">
         <p:menuitem value ="Members Tarif Periods = #{memC.tarifMember.basicList.size()}"
                      outcome="tarif_members_cotisation.xhtml"
                      icon="pi pi-calendar" />
-         <!--  rendered="#{memC.tarifMember.basicList.size() > 0}  -->
          <p:menuitem value="Members Equipments = #{memC.tarifMember.equipmentsList.size()}"
                      icon="pi pi-cog"
                      outcome="tarif_members_equipments.xhtml" />
-         <!--   rendered="#{memC.tarifMember.equipmentsList.size() }" -->
          <p:menuitem value="Members Discount"
                      icon="pi pi-dollar">
                 <p:outputLabel for="@next"
@@ -53,15 +47,14 @@
                     </f:facet>
                 </p:selectOneMenu>
         </p:menuitem>
-         
 
     </p:submenu>
 
-    <p:submenu label="Create Members Tarif "
+    <p:submenu label="Create Members Tarif"
                icon="pi pi-check"
                expanded="true"
                rendered="#{memC.tarifMember.basicList.size() gt 0}"
-               style="font-size: 1.5em;" >
+               style="font-size: 1.5em;">
          <p:menuitem  value="#{msg['tarif.print']}"
                      icon="pi pi-list"
                      action="#{memC.showTarifMembers()}"/>
@@ -71,28 +64,28 @@
          <p:menuitem value="#{msg['tarif.create']}"
                      icon="pi pi-database"
                      action="#{memC.createTarifMembers}"/>
-    </p:submenu> 
-  
-     <p:submenu label="Delete Member Cotisation Tarif "
+    </p:submenu>
+
+     <p:submenu label="Delete Member Cotisation Tarif"
                 icon="pi pi-check"
-                style="font-size: 1.0em"  >
-        <p:menuitem value="Delete tarifs in one shot" 
-                     icon="pi pi-trash" >
+                style="font-size: 1.0em">
+        <p:menuitem value="Delete tarifs in one shot"
+                     icon="pi pi-trash">
              <p:commandButton
                 id="deleteButton"
                 style="color:red"
                 action="#{memC.deleteTarifMember()}"
                 value="#{msg['button.delete']} #{clubC.club.clubName} (#{clubC.club.idclub})"
-                icon="pi pi-trash" >
+                icon="pi pi-trash">
                 <p:confirm icon="pi pi-exclamation-triangle" />
            </p:commandButton>
         </p:menuitem>
     </p:submenu>
-  
-  
+
 </p:panelMenu>
 <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
- </div>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

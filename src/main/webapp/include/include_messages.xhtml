@@ -1,53 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces" >
- <h:body>   
-<!--   aussi growl dans mastertemplate 
-https://primefaces.github.io/primefaces/8_0/#/components/growl?id=getting-started-with-growl
+      xmlns:p="primefaces">
+    <h:body>
+        <p:growl id="growl-msg"
+                 escape="false"
+                 sticky="true"
+                 showDetail="true"
+                 severity="error"
+                 skipDetailIfEqualsSummary="true"
+                 keepAlive="true">
+            <p:autoUpdate/>
+        </p:growl>
 
-Messages escapes HTML content in messages, disable escape option to display content as HTML.
--->
-
-<!--  Growl is based on the Mac’s growl notification widget and used for displaying FacesMessages in an overlay 
-you can control Growl message to be sticky, that’s meaning it’ll never be hidden automatically.
-You can also control the position that Growl message has seen into.
-By default Growl is positioned at the top right corner,
-position can be controlled with CSS selector called ui-growl.
-For all of Primefaces messages components (message, messages and growl),
-they are defaulted to escape all of the html content. 
-In case you need to display html via Primefaces messages components set escape to false
-used in templates !!-->
-<p:growl
-     id="growl-msg"
-     escape="false"
-     sticky="true"
-     showDetail="true"
-     severity="error"
-     skipDetailIfEqualsSummary="true"
-     keepAlive="true"
-     >
-    <p:autoUpdate/> <!-- for="MessageId"-for="MessageId" new 14-12-2020  on pourrait enlever tous les update des commandButton ?-->
-</p:growl>
-<!-- growl : erreurs de validation only -->
-
-<p:messages
-     id="messages"
-     redisplay="true"
-     escape="false"
-     skipDetailIfEqualsSummary=""
-     showDetail="true"
-     globalOnly ="true"
-     closable="true"
-     severity="info,warn,error,fatal">
-<!-- https://www.journaldev.com/3851/primefaces-message-messages-growl-components-example 
-eveloped command action hasn’t provided update attribute. Even though update attribute isn’t there,
-yet the message has been displayed cause the autoUpdate is used by the messages component itself.
--->
-   <p:autoUpdate/>
-</p:messages>
-</h:body>
-</ui:composition> 
+        <p:messages id="messages"
+                    redisplay="true"
+                    escape="false"
+                    skipDetailIfEqualsSummary=""
+                    showDetail="true"
+                    globalOnly="true"
+                    closable="true"
+                    severity="info,warn,error,fatal">
+            <p:autoUpdate/>
+        </p:messages>
+    </h:body>
+</ui:composition>

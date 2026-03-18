@@ -7,78 +7,75 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-    
-<ui:define name="title">Unavailable Menu Page </ui:define>
+
+<ui:define name="title">Unavailable Menu Page</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
 
-<h:form id="start_unavailable_menu" enctype="application/x-www-form-urlencoded" >
-<!--
-<ui:include src="include/include_summary_greenfee.xhtml"/>
--->
-<f:facet name="header">
-     <h:outputText escape="false" value="#{msg['title.unavailable.structure']}" />
-</f:facet>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card">
+        <f:facet name="header">
+            <h1>#{msg['title.unavailable.structure']}</h1>
+        </f:facet>
 
+        <h:form id="start_unavailable_menu">
+        </h:form>
 
-</h:form>
-    <ui:include src="/include/include_dialog_club_course.xhtml"/>
-  
-<!-- https://stackoverflow.com/questions/18703704/conditionally-rendering-an-uiinclude -->
-<h:panelGroup id="wrapperPanel">
-    <h:panelGroup id="tableRenderPanel"
-                  rendered="#{clubC.unavailable.structure.menuLaunched eq true}">
-        <ui:include src="include/include_summary_club.xhtml"/>
-    </h:panelGroup>
-</h:panelGroup>
+        <ui:include src="/include/include_dialog_club_course.xhtml"/>
 
-<h:form id="unavailable_menu" enctype="application/x-www-form-urlencoded" >
-    
-    
-<p:panelMenu id="panel_menu"
-             style="font-size: 1.0em; width:400px; margin:auto;"
-             rendered="#{clubC.unavailable.structure.menuLaunched eq true}"
-             statefulGlobal="true"  >
-    <p:submenu label="Input Etat du terrain" 
-               icon="ui-icon-wrench"
-               expanded="true"
-               style="font-size: .8em;font-weight:bold;"  >
-         <p:submenu label="1. Create Structure Etat du terrain"
-                    expanded="true"
-                    style="font-size: 1.2em;font-weight:bold;" >
-             <p:menuitem value ="Structure = "
-                    icon="pi pi-calendar"  
-                    outcome="unavailable_structure.xhtml" />
-         </p:submenu>
-        
-         <p:submenu label="2. Create Periods Etat du terrain"
-                    expanded="true"
-                    style="font-size: 1.2em;"
-                    rendered="#{clubC.unavailable.structure.structureExists eq true}">
-             <p:menuitem value="Periods = "
-                    icon="pi pi-cog"
-                    outcome="unavailable_period.xhtml" />
-         </p:submenu>
+        <h:panelGroup id="wrapperPanel">
+            <h:panelGroup id="tableRenderPanel"
+                          rendered="#{clubC.unavailable.structure.menuLaunched eq true}">
+                <ui:include src="include/include_summary_club.xhtml"/>
+            </h:panelGroup>
+        </h:panelGroup>
 
-       <p:submenu label="3. Delete Structure Etat du terrain"
-                  expanded="true"
-                  style="font-size: 1.2em;  margin:auto;color:red" >
-       <p:menuitem value="Delete tarifs in one shot">
+        <h:form id="unavailable_menu">
+            <p:panelMenu id="panel_menu"
+                         style="font-size: 1.0em; width:400px; margin:auto;"
+                         rendered="#{clubC.unavailable.structure.menuLaunched eq true}"
+                         statefulGlobal="true">
+                <p:submenu label="Input Etat du terrain"
+                           icon="ui-icon-wrench"
+                           expanded="true"
+                           style="font-size: .8em;font-weight:bold;">
+                    <p:submenu label="1. Create Structure Etat du terrain"
+                               expanded="true"
+                               style="font-size: 1.2em;font-weight:bold;">
+                        <p:menuitem value="Structure = "
+                                    icon="pi pi-calendar"
+                                    outcome="unavailable_structure.xhtml"/>
+                    </p:submenu>
 
-    <p:commandButton
-                id="deleteButton"
-                style="color:red"
-                action="#{clubC.modifyClubUnavailableStructure('delete')}"
-                value="#{msg['button.delete']} #{clubC.club.clubName}"
-                icon="pi pi-trash" >
-                <p:confirm icon="pi pi-exclamation-triangle" />
-    </p:commandButton>
-        </p:menuitem>
-       </p:submenu>
-   </p:submenu>
-</p:panelMenu>
-</h:form>
-<ui:include src="include/include_confirmDialog.xhtml"/>
+                    <p:submenu label="2. Create Periods Etat du terrain"
+                               expanded="true"
+                               style="font-size: 1.2em;"
+                               rendered="#{clubC.unavailable.structure.structureExists eq true}">
+                        <p:menuitem value="Periods = "
+                                    icon="pi pi-cog"
+                                    outcome="unavailable_period.xhtml"/>
+                    </p:submenu>
+
+                    <p:submenu label="3. Delete Structure Etat du terrain"
+                               expanded="true"
+                               style="font-size: 1.2em; margin:auto;color:red">
+                        <p:menuitem value="Delete tarifs in one shot">
+                            <p:commandButton
+                                id="deleteButton"
+                                style="color:red"
+                                action="#{clubC.modifyClubUnavailableStructure('delete')}"
+                                value="#{msg['button.delete']} #{clubC.club.clubName}"
+                                icon="pi pi-trash">
+                                <p:confirm icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                        </p:menuitem>
+                    </p:submenu>
+                </p:submenu>
+            </p:panelMenu>
+        </h:form>
+
+        <ui:include src="include/include_confirmDialog.xhtml"/>
+    </p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

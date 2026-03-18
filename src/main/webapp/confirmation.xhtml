@@ -8,42 +8,42 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="title">Confirmation Page </ui:define>
+<ui:define name="title">Confirmation Page</ui:define>
 
 <ui:define name="content">
 
-<h:form id="confirmation"  >
-<p:panelGrid 
-    id="panel1"
-    columns="2"
-    layout="tabular"
-    columnClasses="col1, col2"
-     >
+<div class="login-container">
+    <p:panel styleClass="login-card">
+        <f:facet name="header">
+            <h1>#{msg['message.confirmation']}</h1>
+        </f:facet>
 
-<f:facet name="header">
-    <h1>#{msg['message.confirmation']}</h1>
-</f:facet>
-        <h:outputText value="#{playerC.player.playerFirstName}" style="font-weight:bold" />
-        <h:outputText value="#{playerC.player.playerLastName}" style="font-weight:bold" />
-        <h:graphicImage library="images"
-                name="#{playerC.player.playerPhotoLocation}"
-                style="float: right;">
-<!--  alt="image missing :#{playerC.player.playerLastName}" -->
-        </h:graphicImage>
-        <b>A confirmation mail has been sent to #{playerC.player.playerEmail}"... </b> 
-       <br/>
-       Click on the confirmation link in this  email to activate your account !!!!!!
-<f:facet name="footer">
-        <p:commandButton
-             id="button01"
-             value="#{msg['button.player.restart']}"
-             ajax="false"
-             immediate="true"
-             icon="pi pi-power-off"
-             action="#{playerC.logout('from confirmation.xhtml')}"
-        />
-</f:facet>
-</p:panelGrid>
-</h:form>
+        <div class="info-grid">
+            <div class="info-row">
+                <span class="info-label">#{playerC.player.playerFirstName}</span>
+                <span class="info-value">#{playerC.player.playerLastName}</span>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin:1rem 0;">
+            <b>A confirmation mail has been sent to #{playerC.player.playerEmail}"...</b>
+            <br/>
+            Click on the confirmation link in this email to activate your account !!!!!!
+        </div>
+
+        <f:facet name="footer">
+            <h:form id="confirmation">
+                <p:commandButton
+                    id="button01"
+                    value="#{msg['button.player.restart']}"
+                    ajax="false"
+                    immediate="true"
+                    icon="pi pi-power-off"
+                    action="#{playerC.logout('from confirmation.xhtml')}"/>
+            </h:form>
+        </f:facet>
+    </p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

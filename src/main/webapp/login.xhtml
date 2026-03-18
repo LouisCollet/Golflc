@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition 
+<ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
@@ -19,28 +19,44 @@
 <ui:define name="content">
 
     <h:form id="loginForm">
-        <p:panelGrid id="panelGridLogin" layout="flex" columns="2" columnClasses="col1Flex, col2Flex">
-            <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['login.welcome']}" />
-            </f:facet>
+        <div class="login-container">
+            <p:panel styleClass="login-card">
+                <f:facet name="header">
+                    <h:outputText escape="false" value="#{msg['login.welcome']}" />
+                </f:facet>
 
-            <h:outputText value="Jakarta version"/>
-            <h:outputText id="fmd" escape="false" value="#{infoC.DeployVersion()}" />
+                <!-- Returning User -->
+                <h:link id="linkReturning" outcome="selectPlayer.xhtml" styleClass="login-option"
+                        title="#{msg['login.user.old']}">
+                    <span class="login-option-icon returning">
+                        <i class="pi pi-user"/>
+                    </span>
+                    <span class="login-option-text">
+                        <span class="login-option-title">#{msg['login.user.old']}</span>
+                        <span class="login-option-desc">#{msg['login.welcome.back']}</span>
+                    </span>
+                    <i class="pi pi-arrow-right login-option-arrow"/>
+                </h:link>
 
-            <h:outputText value="Returning User" />
-            <h:outputText value="New User" style="float:right;"/>
+                <!-- New User -->
+                <h:link id="linkNew" outcome="player.xhtml?cmd=new" styleClass="login-option"
+                        title="#{msg['login.user.new']}">
+                    <span class="login-option-icon newuser">
+                        <i class="pi pi-user-plus"/>
+                    </span>
+                    <span class="login-option-text">
+                        <span class="login-option-title">#{msg['login.user.new']}</span>
+                        <span class="login-option-desc">#{msg['login.user.new']}</span>
+                    </span>
+                    <i class="pi pi-arrow-right login-option-arrow"/>
+                </h:link>
 
-            <h:link id="linkReturning" title="#{msg['login.user.old']}" outcome="selectPlayer.xhtml">
-                <h:graphicImage name="images/arrow-left-3D.jpg"/>
-            </h:link>
-
-            <h:link id="linkNew" title="#{msg['login.user.new']}" outcome="player.xhtml?cmd=new">
-                <h:graphicImage name="images/arrow-right-3D.jpg"/>
-            </h:link>
-        </p:panelGrid>
-
-        <h:graphicImage name="images/welcome3.jpg" />
-        <i class="pi pi-check"></i>
+                <f:facet name="footer">
+                    <h:outputText value="GolfLC" />
+                    <h:outputText id="fmd" styleClass="login-version" value="#{infoC.deployVersion()}" />
+                </f:facet>
+            </p:panel>
+        </div>
     </h:form>
 </ui:define>
 

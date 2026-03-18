@@ -2,90 +2,66 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
-      template="templates/masterTemplate.xhtml"
->
+      template="templates/masterTemplate.xhtml">
 <ui:define name="title">Score Scramble Page </ui:define>
 <ui:define name="content">
 
-<h:graphicImage 
-                name="images/golfcard.png"
-                alt="image missing :golfcard.jpg"
-                style="float: left;">
-</h:graphicImage>
+<h:form id="score_scramble">
 
-<h:graphicImage 
-                name="images/golfcard.png"
-                alt="image missing :golfcard.jpg"
-                style="float: right;">
-</h:graphicImage>
-<h:form id="score_scramble" enctype="application/x-www-form-urlencoded" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>#{msg['title.score.results']} scramble</h1>
+</f:facet>
 
 <p:panelGrid
     id="panelgrid1"
-    layout="tabular"
-    columnClasses="col1,col2"
-    columns="2" >
+    layout="flex"
+    columnClasses="col1Flex, col2Flex"
+    columns="2">
 
-<f:facet name="header">
-    <h1>#{msg['title.score.results']} scramble</h1>
-    
-         idclub = #{clubC.club.idclub}
-         , cmd = #{param.cmd}
-         , operation = #{param.operation}
-         , inputClubOperation = #{roundC.inputClubOperation}
-         , nextScorecard = #{roundC.nextScorecard}
-    
-</f:facet>
       <h:outputText value="#{msg['round.id']} :" />
       <h:outputText
-            id="idround" 
+            id="idround"
             value="#{roundC.round.Roundname} (#{roundC.round.idround})"
             title="This tooltip is displayed when input gets the focus" />
 
       <h:outputText value="#{msg['player.id']} :" />
       <h:outputText
-            id="idplayer1" 
+            id="idplayer1"
             value="#{playerC.player.playerLastName} (#{playerC.player.idplayer})"
             title="This tooltip is displayed when input gets the focus" />
 
-      <h:outputText value="#{msg['club.name']} :"   />
-	<h:outputText
-            id="clubn" 
+      <h:outputText value="#{msg['club.name']} :" />
+      <h:outputText
+            id="clubn"
             value="#{clubC.club.clubName} (#{clubC.club.idclub})" />
 
       <h:outputText value="#{msg['course.name']} :" />
       <h:outputText
-            id="idcourse" 
+            id="idcourse"
             value="#{clubC.course.courseName} (#{clubC.course.idcourse})" />
 
       <h:outputText value="#{msg['round.date']} :" />
       <h:outputText
-            id="rounddate" 
-            value="#{roundC.round.roundDate}"
-            
-            >
+            id="rounddate"
+            value="#{roundC.round.roundDate}">
               <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
       </h:outputText>
 
 </p:panelGrid>
 <p:divider layout="horizontal" type="solid" />
-<!--
-
--->
 
 <p:panelGrid id="panelgrid2"
              columns="10"
-             layout="tabular"
+             layout="flex"
              style="text-align:center;"
-             columnClasses="className"
-             rendered="#{roundC.round.roundHoles eq 18 or roundC.round.roundStart eq 1}"
-             >
-<!-- first line : hole  style="font-size: 3em;" -->    
+             rendered="#{roundC.round.roundHoles eq 18 or roundC.round.roundStart eq 1}">
     <h:outputText value="  #{msg['score.aller']}"
               style="background-color: lightskyblue;" />
    <c:forEach var="i" begin="01" end="09" step="1">
@@ -93,20 +69,14 @@
               style="font-size:1.5em;" />
    </c:forEach>
 
-<!-- second line : par -->    
     <h:outputText value="  #{msg['par.par']}"
-              style="background-color: lightskyblue;"
-              />
+              style="background-color: lightskyblue;" />
    <c:forEach var="i" begin="01" end="09" step="1">
        <h:outputText value="#{roundC.parArray[i-1]}"
                      style="font-style: italic" />
    </c:forEach>
 
-<!-- third line :score -->    
-    <h:outputText value="#{msg['score.gross']}"   />
- <!-- on enregistre les résultats dans une table style="font-style:italic"
- on doit utiliser les validations locales car autres validations ne fonctionnent que
- avec String et non avec une table !! -->
+    <h:outputText value="#{msg['score.gross']}" />
     <c:forEach var="i" begin="01" end="09" step="1">
         <h:inputText  id="score01-09${i}"
                 label="ScoreLC"
@@ -115,37 +85,33 @@
                 onchange="repl(this);"
                 required="true"
                 requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
-                    >
+                validatorMessage="#{msg['score.hole.minMAX']} : #{i}">
             <f:validateLongRange minimum="0" maximum="12" />
         </h:inputText>
     </c:forEach>
 
-</p:panelGrid >
+</p:panelGrid>
 
 <p/>
 <p:panelGrid id="panelgrid3"
              columns="10"
-             layout="tabular"
-             columnClasses="className"
+             layout="flex"
              style="text-align:center;"
-             rendered="#{roundC.round.roundHoles eq 18 or roundC.round.roundStart eq 10}"
-             >
-    <h:outputText value="#{msg['score.return']}"   />
+             rendered="#{roundC.round.roundHoles eq 18 or roundC.round.roundStart eq 10}">
+    <h:outputText value="#{msg['score.return']}" />
     <c:forEach var="i" begin="10" end="18" step="1">
          <h:outputText value="${i}"
                        style="font-size:1.5em;" />
     </c:forEach>
-<!-- second line : par new 18/06/2014 -->    
-<h:outputText value="  #{msg['par.par']}"
-              style="background-color: lightskyblue;"
-              />
+
+    <h:outputText value="  #{msg['par.par']}"
+              style="background-color: lightskyblue;" />
    <c:forEach var="i" begin="10" end="18" step="1">
        <h:outputText value="${roundC.parArray[i-1]}"
                      style="font-style: italic"/>
    </c:forEach>
 
-<h:outputText value="#{msg['score.gross']}" />
+    <h:outputText value="#{msg['score.gross']}" />
     <c:forEach var="i" begin="10" end="18" step="1">
             <h:inputText  id="score10-18${i}"
                     label="ScoreLC"
@@ -154,42 +120,17 @@
                     onchange="repl(this);"
                     required="true"
                     requiredMessage="#{msg['score.hole.notnull']} : #{i}"
-                    validatorMessage="#{msg['score.hole.minMAX']} : #{i}"
-                    >
+                    validatorMessage="#{msg['score.hole.minMAX']} : #{i}">
             <f:validateLongRange minimum="0" maximum="12" />
       </h:inputText>
     </c:forEach>
 
 </p:panelGrid>
 
-<p:panelGrid 
-    id="panelgrid4" 
-    layout="tabular"
-    columnClasses="className"
-    columns="2">
 <f:facet name="footer">
-        <!-- createScoreScramble + showButtonCreateStatistics — commented 2026-02-28
-             Methods never existed. CreateScoreScramble service needs to be created first.
-        <p:commandButton id="button01"
-                         value="#{msg['button.score.create']}"
-                         update="growl-msg" ajax="false"
-                         icon="pi pi-database"
-                         action="#{roundC.createScoreScramble()}"/>
-        <p:commandButton id="button02"
-                         value="#{msg['button.score.statistics']}"
-                         update="growl-msg" immediate="true" ajax="false"
-                         rendered="#{roundC.showButtonCreateStatistics}"
-                         icon="pi pi-pencil" style="float: right;"
-                         action="score_statistics.xhtml?faces-redirect=true"/>
-        -->
 </f:facet>
-
-    <!-- 
-     rendered="#{navC.showButtonCreateStatistics}"
-    rendered="#{not roundC.nextScorecard}"
-                          rendered="#{roundC.nextScorecard}"   --> 
-    
-</p:panelGrid>
+</p:panel>
+</div>
 
 </h:form>
 </ui:define>

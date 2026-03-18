@@ -6,8 +6,8 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:my="jakarta.faces.composite/components"
       template="templates/masterTemplate.xhtml">
+
 <ui:define name="metadata">
     <f:metadata>
         <f:viewParam
@@ -17,51 +17,53 @@
             requiredMessage="You did not specify a cmd. (The - activationKey - parameter is missing)"
             converterMessage="Invalid cmd. (The - activationKey - parameter is not a number)"
             validatorMessage="Invalid cmd. (The - activationKey - parameter is not a positive number, minimum 3 length, maximum 40 length)">
-            <f:validateLength minimum="3" maximum="40" />
+            <f:validateLength minimum="3" maximum="40"/>
         </f:viewParam>
         <f:viewAction action="#{languageC.setLanguage(param.language)}"/>
         <f:viewAction action="#{playerC.completeActivation(param.uuid)}"/>
-     </f:metadata>    
-    <!-- https://stackoverflow.com/questions/6377798/what-can-fmetadata-fviewparam-and-fviewaction-be-used-for -->
+    </f:metadata>
 </ui:define>
-<ui:define name="title">Activation check </ui:define>
+
+<ui:define name="title">Activation check</ui:define>
 
 <ui:define name="content">
-<h:graphicImage name="images/activate1.jpg" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
-<h:graphicImage name="images/activate2.jpg" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>
-    <!-- -->
-<h:form id="activation_check" >
-<!--<c:set var="uuidLC" value="#{param.uuid}"/>  -->
 
-<p:panelGrid
-    id="panel"
-    columns="2"
-    layout="tabular"
-    columnClasses="col1, col2">
-<f:facet name="header">
-    <h1>#{msg['message.for.activation']}</h1>
-</f:facet>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card">
+        <f:facet name="header">
+            <h1>#{msg['message.for.activation']}</h1>
+        </f:facet>
 
-   <h:outputText value="#{msg['player.first']}" />
-   <h:outputText value="#{param.firstname}" />
+        <h:form id="activation_check">
+            <p:panelGrid
+                id="panel"
+                columns="2"
+                layout="flex"
+                columnClasses="col1Flex, col2Flex">
 
-   <h:outputText value="#{msg['player.lastname']}"   />
-   <h:outputText value="#{param.lastname}" /> 
+                <h:outputText value="#{msg['player.first']}"/>
+                <h:outputText value="#{param.firstname}"/>
 
-   <h:outputText value="#{msg['player.language']}"   />
-   <h:outputText value="#{param.language}" /> 
-   
-   <h:outputText value="uuid ="   />
-   <h:outputText value="#{param.uuid}" /> 
+                <h:outputText value="#{msg['player.lastname']}"/>
+                <h:outputText value="#{param.lastname}"/>
 
-<f:facet name="footer">
-        <p:commandButton value="#{msg['button.activate']}"
-                         update="growl-msg"
-                         immediate="true"
-                         icon="pi pi-pencil"
-                         action="#{playerC.activateNewPlayer()}"/>
-</f:facet>
-</p:panelGrid>
-</h:form>
+                <h:outputText value="#{msg['player.language']}"/>
+                <h:outputText value="#{param.language}"/>
+
+                <h:outputText value="uuid ="/>
+                <h:outputText value="#{param.uuid}"/>
+            </p:panelGrid>
+
+            <f:facet name="footer">
+                <p:commandButton value="#{msg['button.activate']}"
+                                 update="growl-msg"
+                                 immediate="true"
+                                 icon="pi pi-pencil"
+                                 action="#{playerC.activateNewPlayer()}"/>
+            </f:facet>
+        </h:form>
+    </p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

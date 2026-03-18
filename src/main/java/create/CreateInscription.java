@@ -193,20 +193,20 @@ public class CreateInscription implements Serializable {
             LOG.debug(methodName + " - club = " + club.getIdclub());
             LOG.debug(methodName + " - round date = " + round.getRoundDate());
 
+            // check duplicate BEFORE admin bypass — admin can also be already inscribed
+            if (findInscriptionRound.find(round, player)) {  // déjà inscrit
+                v.setStatus0(ValidationStatus.REJECTED.toString());
+                String msg = LCUtil.prepareMessageBean("inscription.duplicate");
+                v.setStatus1(msg);
+                v.setStatus2("04");
+                return v;
+            }
+
             if (player.getPlayerRole().equals("ADMIN")) {
                 v.setStatus0(ValidationStatus.APPROVED.toString());
                 String msg = LCUtil.prepareMessageBean("inscription.administrator");
                 v.setStatus1(msg);
                 v.setStatus2("00");
-                return v;
-            }
-
-            // new 12-11-2021
-            if (findInscriptionRound.find(round, player)) {  // déjà inscrit
-                v.setStatus0(ValidationStatus.REJECTED.toString());
-                String msg = LCUtil.prepareMessageBean("inscription.duplicate");
-                v.setStatus1("inscription.duplicate");
-                v.setStatus2("04");
                 return v;
             }
 

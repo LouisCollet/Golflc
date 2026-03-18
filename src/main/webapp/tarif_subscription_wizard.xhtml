@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Tarif Subscription Wizard Page</ui:define>
+<ui:define name="content">
+<div class="card">
+<h:form id="tarif_subscription_wizard" enctype="application/x-www-form-urlencoded">
+
+<p:wizard id="wizardTarifSubscription"
+          widgetVar="tarifSubscriptionWizard"
+          styleClass="tarif-wizard"
+          flowListener="#{memC.onTarifSubscriptionFlow}"
+          onnext="$('.ui-growl-item').remove(); $('.ui-messages').empty();"
+          onback="$('.ui-growl-item').remove(); $('.ui-messages').empty();">
+
+    <!-- =================== TAB 1: MONTHLY =================== -->
+    <p:tab id="MonthlyTab"
+           title="Monthly"
+           titletip="Define monthly subscription tarif">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h:outputText value="Monthly Subscription"/>
+            </f:facet>
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.members.price']} :"/>
+                    <i class="pi pi-euro"/>
+                </h:panelGroup>
+                <p:inputNumber id="monthlyPrice"
+                               value="#{memC.tarifSubscription.workPrice}"
+                               size="6"
+                               decimalPlaces="1"
+                               decimalSeparator="."
+                               placeholder="9.9"
+                               minValue="0"
+                               maxValue="500.0"
+                               required="false">
+                    <f:validateBean disabled="true"/>
+                </p:inputNumber>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.period.start']} :"/>
+                    <i class="pi pi-calendar"/>
+                </h:panelGroup>
+                <p:datePicker id="monthlyStartDate"
+                              value="#{memC.tarifSubscription.workStartDate}"
+                              size="10"
+                              showIcon="true"
+                              showTime="false"
+                              locale="#{languageC.locale}"
+                              lang="#{languageC.locale}"
+                              pattern="dd-MM-yyyy"
+                              yearNavigator="true"
+                              monthNavigator="true"
+                              yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(2)}"
+                              readonlyInput="true"
+                              required="false">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.period.end']} :"/>
+                    <i class="pi pi-calendar"/>
+                </h:panelGroup>
+                <p:datePicker id="monthlyEndDate"
+                              value="#{memC.tarifSubscription.workEndDate}"
+                              size="10"
+                              showIcon="true"
+                              showTime="false"
+                              locale="#{languageC.locale}"
+                              lang="#{languageC.locale}"
+                              pattern="dd-MM-yyyy"
+                              yearNavigator="true"
+                              monthNavigator="true"
+                              yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(2)}"
+                              readonlyInput="true"
+                              required="false">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+            </p:panelGrid>
+            <f:facet name="footer">
+                <p:commandButton value="Add tarif"
+                                 id="btnAddMonthly"
+                                 icon="pi pi-plus"
+                                 action="#{memC.inputTarifSubscriptionWizard('MONTHLY')}"
+                                 update="tarif_subscription_wizard"
+                                 styleClass="p-button-outlined"/>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+    <!-- =================== TAB 2: YEARLY =================== -->
+    <p:tab id="YearlyTab"
+           title="Yearly"
+           titletip="Define yearly subscription tarif">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h:outputText value="Yearly Subscription"/>
+            </f:facet>
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.members.price']} :"/>
+                    <i class="pi pi-euro"/>
+                </h:panelGroup>
+                <p:inputNumber id="yearlyPrice"
+                               value="#{memC.tarifSubscription.workPrice}"
+                               size="6"
+                               decimalPlaces="1"
+                               decimalSeparator="."
+                               placeholder="99.9"
+                               minValue="0"
+                               maxValue="5000.0"
+                               required="false">
+                    <f:validateBean disabled="true"/>
+                </p:inputNumber>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.period.start']} :"/>
+                    <i class="pi pi-calendar"/>
+                </h:panelGroup>
+                <p:datePicker id="yearlyStartDate"
+                              value="#{memC.tarifSubscription.workStartDate}"
+                              size="10"
+                              showIcon="true"
+                              showTime="false"
+                              locale="#{languageC.locale}"
+                              lang="#{languageC.locale}"
+                              pattern="dd-MM-yyyy"
+                              yearNavigator="true"
+                              monthNavigator="true"
+                              yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(2)}"
+                              readonlyInput="true"
+                              required="false">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.period.end']} :"/>
+                    <i class="pi pi-calendar"/>
+                </h:panelGroup>
+                <p:datePicker id="yearlyEndDate"
+                              value="#{memC.tarifSubscription.workEndDate}"
+                              size="10"
+                              showIcon="true"
+                              showTime="false"
+                              locale="#{languageC.locale}"
+                              lang="#{languageC.locale}"
+                              pattern="dd-MM-yyyy"
+                              yearNavigator="true"
+                              monthNavigator="true"
+                              yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(2)}"
+                              readonlyInput="true"
+                              required="false">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+            </p:panelGrid>
+            <f:facet name="footer">
+                <p:commandButton value="Add tarif"
+                                 id="btnAddYearly"
+                                 icon="pi pi-plus"
+                                 action="#{memC.inputTarifSubscriptionWizard('YEARLY')}"
+                                 update="tarif_subscription_wizard"
+                                 styleClass="p-button-outlined"/>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+    <!-- =================== TAB 3: CONFIRMATION =================== -->
+    <p:tab id="ConfirmationTab"
+           title="Confirm"
+           titletip="Review and manage tarif subscriptions">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h:outputText value="Confirmation"/>
+            </f:facet>
+
+            <p:dataTable var="t"
+                         value="#{memC.tarifSubscription.tarifList}"
+                         emptyMessage="No tarif subscription found"
+                         styleClass="compact-table"
+                         rows="10">
+                <p:column headerText="Code">
+                    <h:outputText value="#{t.code}"/>
+                </p:column>
+                <p:column headerText="Price">
+                    <h:outputText value="#{t.price}"/>
+                </p:column>
+                <p:column headerText="Start Date">
+                    <h:outputText value="#{t.startDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="End Date">
+                    <h:outputText value="#{t.endDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Creation Date">
+                    <h:outputText value="#{t.creationDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                
+                
+            </p:dataTable>
+
+            <f:facet name="footer">
+                <p:commandButton value="Create"
+                                 id="btnCreate"
+                                 icon="pi pi-check"
+                                 action="#{memC.confirmTarifSubscription()}"
+                                 styleClass="p-button-success ui-button-flat"
+                                 style="margin-right: 10px;"/>
+                <p:commandButton value="#{msg['button.delete']} all"
+                                 id="btnDeleteAll"
+                                 icon="pi pi-trash"
+                                 action="#{memC.deleteTarifSubscription()}"
+                                 update="tarif_subscription_wizard"
+                                 styleClass="p-button-danger">
+                    <p:confirm icon="pi pi-exclamation-triangle"/>
+                </p:commandButton>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</p:wizard>
+
+<ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+</div>
+</ui:define>
+</ui:composition>

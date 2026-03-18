@@ -9,162 +9,88 @@ import java.io.Serializable;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageInfo;
 
+/**
+ * fix multi-user 2026-03-07 — replaced static String with ThreadLocal
+ * Each user/request gets its own text buffer (no cross-user data leakage)
+ */
 @Named("loggingUserC")
 @ApplicationScoped
 public class LoggingUserController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject private Controllers.MongoCalculationsController mongoCalculationsController; // migrated 2026-02-26
+    @Inject private Controllers.MongoCalculationsController mongoCalculationsController;
 
-    private static String text = "start text";
+    // fix multi-user 2026-03-07 — ThreadLocal instead of shared static String
+    private static final ThreadLocal<StringBuilder> textBuffer =
+            ThreadLocal.withInitial(() -> new StringBuilder("start text"));
 
     public LoggingUserController() { }
 
- public static void write(String text){
-   //  <p style="font-size:14px; "> Any text whose font we want to change </p>
-   // mod 21-04-2025
-    writeText(
-           // "<br/>" +
-             "<p" 
-            + "style='fontsize:1.5em;color:black;>'"
-            + text
-            + "</p>");
- }
+    public static void write(String text) {
+        writeText("<p"
+                + "style='fontsize:1.5em;color:black;>'"
+                + text
+                + "</p>");
+    } // end method
 
- public static void write(String text, String param){
-     if(param.equalsIgnoreCase("b")){
-         text = "<b>" + text + "</b>";
-     }
-     if(param.equalsIgnoreCase("i")){
-       //  text = "<br/>" + "<i>" + text + "</i>";
-         text = "<i>" + text + "</i>"; // mod 21-09-2024
-     }
-     if(param.equalsIgnoreCase("u")){
-         text = "<u>" + text + "</u>";
-     }
-     if(param.equalsIgnoreCase("t")){  // titre
-         text = "<p>" + "<h1>" + "<b>" + text.toUpperCase() + "</b>" + "</h1>" + "</p>";
-     }
-     if(param.equalsIgnoreCase("c")){  // color
-         text = "<h1>" + "<p style='color:red;'>" +  "<b>" + text.toUpperCase() + "</b>" + "</h1>" + "</p>";
-     }
-      writeText("<br/>" + text);
- }   
+    public static void write(String text, String param) {
+        if (param.equalsIgnoreCase("b")) {
+            text = "<b>" + text + "</b>";
+        }
+        if (param.equalsIgnoreCase("i")) {
+            text = "<i>" + text + "</i>";
+        }
+        if (param.equalsIgnoreCase("u")) {
+            text = "<u>" + text + "</u>";
+        }
+        if (param.equalsIgnoreCase("t")) {
+            text = "<p>" + "<h1>" + "<b>" + text.toUpperCase() + "</b>" + "</h1>" + "</p>";
+        }
+        if (param.equalsIgnoreCase("c")) {
+            text = "<h1>" + "<p style='color:red;'>" + "<b>" + text.toUpperCase() + "</b>" + "</h1>" + "</p>";
+        }
+        writeText("<br/>" + text);
+    } // end method
 
- 
-  public static void writeText(String newText){
-    text = text + newText;
- 
-  }
-  /*
- public static void writeToFile(String text){
-   //  Path path = null;
- //try{
- //               path = Paths.get(Settings.getProperty("RESOURCES") + "calculations/", FILE_NAME);
-// }catch (java.lang.NoClassDefFoundError e){ // no JSF Session test with RUN
-        //       LOG.error(msg);
- //              path = Paths.get("c:/log", FILE_NAME);
-        //       LOG.debug("saved path = " + path);
-//            }
- try (BufferedWriter writer = Files.newBufferedWriter(
-            path,
-            StandardCharsets.UTF_8,
-            StandardOpenOption.CREATE,
-            StandardOpenOption.APPEND)) {
-        writer.write(text);
- //       writer.flush(); // bien utile 
-//        LOG.debug("success write!! " + text);
-    } catch (IOException e) {
-        LOG.error("exception in writeTextFile !!" + e);
-    }
-}
- */
+    public static void writeText(String newText) {
+        textBuffer.get().append(newText);
+    } // end method
 
-  public boolean createUpdateLoggingUser(LoggingUser logging) {
-  try{
-      // new Controllers.MongoCalculationsController().create(logging)
-      boolean b = mongoCalculationsController.create(logging); // migrated 2026-02-26
-      return false;
-  } catch (Exception e) {
-        String msg = "exception in read !!" + e + "No calculations available !";
-        LOG.info(msg);
-        write(msg);
-        showMessageInfo(msg);
-        return false;
-    }
-}
-    /*
-  public boolean old_createUpdateLoggingUser(LoggingUser logging, Connection conn) {
-  try{
-//     Path path = Paths.get(Settings.getProperty("RESOURCES") + "calculations/", FILE_NAME);
-    //return Files.readString(path, StandardCharsets.UTF_8);
-       logging.setLoggingCalculations(text);
-       LOG.debug("entering createUpdateLoggingUser with logging = " + logging);
- //      LOG.debug("entering createUpdateLoggingUser with text = " + text);
-  //  var v = new read.ReadLoggingUser().read(logging, conn);
-    int v = new find.FindLoggingUser().find(logging, conn);
-       LOG.debug("result readLoggingUser = " + v);
- //   logging.setLoggingCalculations(text);
-    if(v == 0){
-          String msg = LCUtil.prepareMessageBean("logging.notfound");
-          LOG.debug(msg);
-           if(new create.CreateLoggingUser().create(logging, conn)){
-               LOG.debug("create LoggingUser OK " + v);
-               return true;
-           }
- //         LCUtil.showMessageInfo(msg);
-     }else{
-          String msg = LCUtil.prepareMessageBean("logging.found")+ logging;
-          LOG.debug(msg);
-          if(new update.UpdateLoggingUser().update(logging, conn)){
-              LOG.debug("Updte LoggingUser OK" + v);
-              return true;
-          }
- //         LCUtil.showMessageInfo(msg);
-     }
-  return false;
-  } catch (Exception e) {
-        String msg = "exception in read !!" + e + "No calculations available !";
-        LOG.info(msg);
-        write(msg);
-        showMessageInfo(msg);
-        return false;
-    }
-}
-  */
-/*
-public String read(LoggingUser logging) {
-  // ⚠️ cette méthode nécessite CDI — @Inject private read.ReadLoggingUser readLoggingUser
-  try{
-    return null; // TODO: injecter readLoggingUser via CDI
-  } catch (Exception e) {
-        String msg = "exception in read !!" + e + "No calculations available !";
-        LOG.info(msg);
-        write(msg);
-        showMessageInfo(msg);
-        return null;
-    }
-}
-*/
+    public boolean createUpdateLoggingUser(LoggingUser logging) {
+        try {
+            boolean b = mongoCalculationsController.create(logging);
+            return false;
+        } catch (Exception e) {
+            String msg = "exception in read !!" + e + "No calculations available !";
+            LOG.info(msg);
+            write(msg);
+            showMessageInfo(msg);
+            return false;
+        }
+    } // end method
+
     public static String getText() {
-        return text;
-    }
+        return textBuffer.get().toString();
+    } // end method
 
     public static void setText(String text) {
-        LoggingUserController.text = text;
-    }
-/*
+        textBuffer.get().setLength(0);
+        textBuffer.get().append(text);
+    } // end method
+
+    /**
+     * Call at the end of each request to prevent ThreadLocal memory leak
+     */
+    public static void clearText() {
+        textBuffer.remove();
+    } // end method
+
+    /*
     void main() throws Exception {
- //public static void main(String[] args){
-    LOG.debug("line 0");
-// ne fonctionne pas !!!
-//       setFILE_NAME("temp3.txt");
-       LOG.debug("line 1");
-  //     write("19-08-2021 from method Welcome to Java 8" + NEW_LINE + " again louis " 
-  //             + System.lineSeparator() + " after lineSeparator");
-//       String s = read();
-  //     LOG.debug("string readed = " + System.lineSeparator() + s);
+        LOG.debug("line 0");
+        LOG.debug("line 1");
     } // end main
-*/
+    */
+
 } // end class

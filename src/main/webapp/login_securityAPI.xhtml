@@ -12,23 +12,18 @@
     </ui:define>
 
     <ui:define name="content">
-        <h:graphicImage 
-            rendered="true"
-            name="images/login.jpg"
-            alt="image missing : login.jpg"
-            style="float:left;">
-        </h:graphicImage>
-
-        <h:graphicImage 
-            rendered="true"
-            name="images/register.jpg"
-            alt="image missing :golf_register.jpg"
-            style="float:right;">
-        </h:graphicImage>
 
         <h:form id="login_security" >
-            <p:panelGrid columns="2" 
-                         layout="tabular">
+
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+        <p:panel styleClass="login-card form-card">
+        <f:facet name="header">
+            <h1>Login Soteria</h1>
+        </f:facet>
+
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex,col2Flex">
                 <h:outputText value="Username"/>
                 <p:inputText id="userName"
                              value="#{loginBacking.username}"
@@ -41,11 +36,14 @@
             </p:panelGrid>
             <p:commandButton value="#{msg['login.user.old']}"
                              update="growl-msg"
-                              
                              ajax="false"
                              icon="pi pi-key"
                              action="#{loginBacking.submit}"
                              />
+
+        </p:panel>
+        </div>
+
         </h:form>
     </ui:define>
 </ui:composition>

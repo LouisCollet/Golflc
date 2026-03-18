@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:c="jakarta.tags.core"
       xmlns:p="primefaces"
-            
-      >
-<ui:composition template="templates/masterTemplate.xhtml">
+      template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Travel modes in directions</ui:define>
 <ui:define name="head"></ui:define>
 <ui:define name="content">
 
-  <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
-   
-    <title>Displaying text directions with setPanel()</title>
     <style type="text/css">
       html, body, #map-canvas {
         height: 100%;
@@ -35,14 +29,6 @@
         padding: 5px;
         border: 1px solid #999;
       }
-
-      /*
-      Provide the following styles for both ID and class,
-      where ID represents an actual existing "panel" with
-      JS bound to its name, and the class is just non-map
-      content that may already have a different ID with
-      JS bound to its name.
-      */
 
       #panel, .panel {
         font-family: 'Roboto','sans-serif';
@@ -62,8 +48,6 @@
         font-size: 12px;
       }
 
-
-       
       #directions-panel {
         height: 100%;
         float: right;
@@ -97,15 +81,14 @@
         }
       }
      </style>
-     
+
 <script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?key=#{settings.getProperty('GOOGLE_MAPS_API_KEY')}"
->        
-    </script>    
-    
+        src="https://maps.googleapis.com/maps/api/js?key=#{settings.getProperty('GOOGLE_MAPS_API_KEY')}">
+    </script>
+
 <script type="text/javascript">
 var directionsDisplay;
-var google; // fake
+var google;
 var directionsService = new google.maps.DirectionsService();
 
 function initialize() {
@@ -122,7 +105,7 @@ function initialize() {
   var control = document.getElementById('control');
   control.style.display = 'block';
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(control);
-}   //end initialize
+}
 
 function calcRoute() {
   var start = document.getElementById('start').value;
@@ -137,52 +120,54 @@ function calcRoute() {
       directionsDisplay.setDirections(response);
     }
   });
-} //end calcroute
+}
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
 </script>
-    
-</head>
-    
-  <body>
-    <div id="control" class="panel">
-      <strong>Start:</strong>
-      <select id="start" onchange="calcRoute();">
-        <option value="chicago, il">Chicago</option>
-        <option value="st louis, mo">St Louis</option>
-        <option value="joplin, mo">Joplin, MO</option>
-        <option value="oklahoma city, ok">Oklahoma City</option>
-        <option value="amarillo, tx">Amarillo</option>
-        <option value="gallup, nm">Gallup, NM</option>
-        <option value="flagstaff, az">Flagstaff, AZ</option>
-        <option value="winona, az">Winona</option>
-        <option value="kingman, az">Kingman</option>
-        <option value="barstow, ca">Barstow</option>
-        <option value="san bernardino, ca">San Bernardino</option>
-        <option value="los angeles, ca">Los Angeles</option>
-      </select>
-      <strong>End:</strong>
-      <select id="end" onchange="calcRoute();">
-        <option value="chicago, il">Chicago</option>
-        <option value="st louis, mo">St Louis</option>
-        <option value="joplin, mo">Joplin, MO</option>
-        <option value="oklahoma city, ok">Oklahoma City</option>
-        <option value="amarillo, tx">Amarillo</option>
-        <option value="gallup, nm">Gallup, NM</option>
-        <option value="flagstaff, az">Flagstaff, AZ</option>
-        <option value="winona, az">Winona</option>
-        <option value="kingman, az">Kingman</option>
-        <option value="barstow, ca">Barstow</option>
-        <option value="san bernardino, ca">San Bernardino</option>
-        <option value="los angeles, ca">Los Angeles</option>
-      </select>
+
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+        <p:panel styleClass="login-card form-card" style="max-width:100%;">
+            <f:facet name="header">
+                <h1>Displaying text directions with setPanel()</h1>
+            </f:facet>
+
+            <div id="control" class="panel">
+                <strong>Start:</strong>
+                <select id="start" onchange="calcRoute();">
+                    <option value="chicago, il">Chicago</option>
+                    <option value="st louis, mo">St Louis</option>
+                    <option value="joplin, mo">Joplin, MO</option>
+                    <option value="oklahoma city, ok">Oklahoma City</option>
+                    <option value="amarillo, tx">Amarillo</option>
+                    <option value="gallup, nm">Gallup, NM</option>
+                    <option value="flagstaff, az">Flagstaff, AZ</option>
+                    <option value="winona, az">Winona</option>
+                    <option value="kingman, az">Kingman</option>
+                    <option value="barstow, ca">Barstow</option>
+                    <option value="san bernardino, ca">San Bernardino</option>
+                    <option value="los angeles, ca">Los Angeles</option>
+                </select>
+                <strong>End:</strong>
+                <select id="end" onchange="calcRoute();">
+                    <option value="chicago, il">Chicago</option>
+                    <option value="st louis, mo">St Louis</option>
+                    <option value="joplin, mo">Joplin, MO</option>
+                    <option value="oklahoma city, ok">Oklahoma City</option>
+                    <option value="amarillo, tx">Amarillo</option>
+                    <option value="gallup, nm">Gallup, NM</option>
+                    <option value="flagstaff, az">Flagstaff, AZ</option>
+                    <option value="winona, az">Winona</option>
+                    <option value="kingman, az">Kingman</option>
+                    <option value="barstow, ca">Barstow</option>
+                    <option value="san bernardino, ca">San Bernardino</option>
+                    <option value="los angeles, ca">Los Angeles</option>
+                </select>
+            </div>
+            <div id="directions-panel" class="panel"></div>
+            <div id="map-canvas"></div>
+        </p:panel>
     </div>
-    <div id="directions-panel" class="panel"></div>
-    <div id="map-canvas"></div>
-  </body>
-    
-</ui:define> <!-- content -->
+
+</ui:define>
 </ui:composition>
-    
-</html>

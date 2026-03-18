@@ -1,7 +1,7 @@
 
 package contexte;
 
-import enumeration.ClubSelectionPurpose;
+import enumeration.SelectionPurpose;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -10,13 +10,13 @@ import java.io.Serializable;
 @SessionScoped
 public class ClubSelectionContextBean implements Serializable {
 
-    private ClubSelectionPurpose purpose;
+    private SelectionPurpose purpose;
 
-    public void open(ClubSelectionPurpose purpose) {
+    public void open(SelectionPurpose purpose) {
         this.purpose = purpose;
     }
 
-    public ClubSelectionPurpose getPurpose() {
+    public SelectionPurpose getPurpose() {
         return purpose;
     }
 

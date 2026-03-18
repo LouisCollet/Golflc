@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Modify Holes Page</ui:define>
+<ui:define name="content">
+<script>document.addEventListener('DOMContentLoaded', hideMenuFullWidth);</script>
+<style>
+    /* Grille 19 colonnes — compromis lisibilité / tout visible */
+    #form_holes_global .ui-panelgrid { width: 100%; font-size: 0.75rem; }
+    #form_holes_global .ui-inputnumber { width: 100%; }
+    #form_holes_global .ui-inputfield { font-size: 0.75rem; padding: 0.25rem; text-align: center; }
+    #form_holes_global #panelgrid2 .ui-button { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    #form_holes_global .form-card-footer .ui-button { font-size: 1.0rem; }
+</style>
+
+<h:form id="form_holes_global">
+
+    <ui:include src="include/include_summary_club.xhtml"/>
+
+    <p:panel styleClass="login-card form-card" style="max-width:100%; border-radius:12px;">
+        <f:facet name="header">
+            <h1>#{msg['title.summary.club']} — Holes</h1>
+        </f:facet>
+
+        <p:panelGrid id="panelgrid2"
+                     layout="tabular"
+                     columns="19"
+                     style="text-align:center;">
+
+            <!-- Ligne 1 : numéros de trou -->
+            <h:outputText value="#{msg['hole.number']}" style="font-weight:bold;" />
+            <c:forEach var="i" begin="01" end="18" step="1">
+                <h:outputText id="holenumber${i}"
+                              style="font-weight:bold;"
+                              value="#{clubC.holesGlobal.dataHoles[i-1][0]}" />
+            </c:forEach>
+
+            <!-- Ligne 2 : par -->
+            <h:outputText id="output01"
+                          value="#{msg['hole.par']}" style="font-weight:bold;" />
+            <c:forEach var="i" begin="01" end="18" step="1">
+                <p:inputNumber id="par${i}"
+                               label="Hole Par"
+                               value="#{clubC.holesGlobal.dataHoles[i-1][1]}"
+                               size="1"
+                               minValue="1"
+                               maxValue="5"
+                               emptyValue="0"
+                               decimalPlaces="0"
+                               required="true"
+                               requiredMessage="#{msg['hole.par.notnull']} : #{i}"
+                               validatorMessage="#{msg['hole.par.minMAX']} : #{i}" >
+                    <f:validateLongRange minimum="1" maximum="5" />
+                </p:inputNumber>
+            </c:forEach>
+
+            <!-- Ligne 3 : stroke index -->
+            <h:outputText id="output02"
+                          value="#{msg['hole.index']}" style="font-weight:bold;" />
+            <c:forEach var="i" begin="01" end="18" step="1">
+                <p:inputNumber id="holeindex${i}"
+                               label="Stroke Index"
+                               value="#{clubC.holesGlobal.dataHoles[i-1][2]}"
+                               size="2"
+                               minValue="1"
+                               maxValue="18"
+                               emptyValue="0"
+                               decimalPlaces="0"
+                               required="true"
+                               requiredMessage="#{msg['hole.strokeindex.notnull']} : #{i}"
+                               validatorMessage="#{msg['hole.strokeindex.minMAX']} : #{i}" >
+                    <f:validateLongRange minimum="1" maximum="18" />
+                </p:inputNumber>
+            </c:forEach>
+
+            <!-- Ligne 4 : distance -->
+            <h:outputText id="output3"
+                          value="#{msg['hole.distance']}" style="font-weight:bold;" />
+            <c:forEach var="i" begin="01" end="18" step="1">
+                <p:inputNumber id="distance${i}"
+                               label="Hole Distance"
+                               value="#{clubC.holesGlobal.dataHoles[i-1][3]}"
+                               size="3"
+                               maxValue="550"
+                               emptyValue="0"
+                               decimalPlaces="0"
+                               required="true"
+                               requiredMessage="#{msg['hole.distance.notnull']} : #{i}"
+                               validatorMessage="#{msg['hole.distance.minMAX']} : #{i}" >
+                    <f:validateLongRange minimum="70" maximum="550" />
+                </p:inputNumber>
+            </c:forEach>
+
+        </p:panelGrid>
+
+        <f:facet name="footer">
+            <h:panelGroup layout="block" styleClass="form-card-footer">
+                <p:commandButton id="buttonModify"
+                                 value="#{msg['button.holes.modify']}"
+                                 update="growl-msg"
+                                 ajax="false"
+                                 action="#{clubC.createHolesGlobal('global')}" />
+
+                <p:commandButton id="buttonBack"
+                                 value="#{msg['welcome.back']}"
+                                 immediate="true"
+                                 ajax="false"
+                                 style="float:right;"
+                                 action="modify_ClubCourseTee.xhtml?faces-redirect=true" />
+            </h:panelGroup>
+        </f:facet>
+
+    </p:panel>
+
+</h:form>
+</ui:define>
+</ui:composition>

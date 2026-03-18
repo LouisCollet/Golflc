@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:c="jakarta.tags.core"
       xmlns:p="primefaces"
-            
-      >
-<ui:composition template="templates/masterTemplate.xhtml">
+      template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Travel modes in directions</ui:define>
 <ui:define name="head"></ui:define>
 <ui:define name="content">
-<!--    target="head" -->
+
 <script type="text/javascript">window.GOOGLE_MAPS_API_KEY = '#{settings.getProperty("GOOGLE_MAPS_API_KEY")}';</script>
 <h:outputScript library="js" name="maps_travel_modes.js"/>
-    
+
     <style type="text/css">
       html, body, #map-canvas {
         height: 100%;
@@ -34,14 +32,6 @@
         padding: 5px;
         border: 1px solid #999;
       }
-
-      /*
-      Provide the following styles for both ID and class,
-      where ID represents an actual existing "panel" with
-      JS bound to its name, and the class is just non-map
-      content that may already have a different ID with
-      JS bound to its name.
-      */
 
       #panel, .panel {
         font-family: 'Roboto','sans-serif';
@@ -61,51 +51,46 @@
         font-size: 12px;
       }
     </style>
-<h:body>
-<!--    on utilise masterTemplate !
-    <script type="text/javascript"
-            src="https://maps.googleapis.com/maps/api/js?key=REMOVED_FROM_SOURCE"
-            >
-    </script>
- -->   
-    
-    
+
 <script type="text/javascript" charset="UTF-8">
-//  document.addEventListener("DOMContentLoaded", function(event) {
-//    console.log("DOM fully loaded and parsed");
    console.info("before onload");
-  //  window.onload = loadScript(); // asynchronous loading
-    window.onload = initialize(); // asynchronous loading
+    window.onload = initialize();
    console.info("after onload");
-  
 </script>
 
-    <div id="panel">
-    <b>Mode of Travel: </b>
-    <select id="mode" onchange="calcRoute();"> 
-        
-      <option value="DRIVING">Driving</option>
-      <option value="WALKING">Walking</option>
-      <option value="BICYCLING">Bicycling</option>
-      <option value="TRANSIT">Transit</option>
-    </select>
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+        <p:panel styleClass="login-card form-card" style="max-width:100%;">
+            <f:facet name="header">
+                <h1>Travel Modes</h1>
+            </f:facet>
+
+            <div id="panel">
+                <b>Mode of Travel: </b>
+                <select id="mode" onchange="calcRoute();">
+                    <option value="DRIVING">Driving</option>
+                    <option value="WALKING">Walking</option>
+                    <option value="BICYCLING">Bicycling</option>
+                    <option value="TRANSIT">Transit</option>
+                </select>
+            </div>
+            <div id="map-canvas" style="height: 80%; top:10px; border: 1px solid black;"></div>
+
+            <div id="divlc">
+                <p:outputLabel value="Enter latitude" />
+                <p:inputText id="latitude" type="text" value="#{playerC.player.idplayer}" size="10"/>
+            </div>
+
+            <h:form id="travel_modes">
+                <p:panelGrid columns="2"
+                             layout="flex">
+                    <p:outputLabel value="Enter latitude" />
+                    <p:inputText id="latitude2" type="text" value="#{playerC.player.playerFirstName}" size="20"/>
+                    <p:outputLabel value="Enter longitude" />
+                    <p:inputText id="longitude" type="text" value="#{playerC.player.playerLastName}" size="20"/>
+                </p:panelGrid>
+            </h:form>
+        </p:panel>
     </div>
-    <div id="map-canvas" style="height: 80%; top:10px; border: 1px solid black;"></div>
-<div id="divlc">
-  <p:outputLabel value="Enter latitude" />
-  <p:inputText id="latitude" type="text" value="#{playerC.player.idplayer}" size="10"/>
-</div>
-    <h:form id="travel_modes">
-        <p:panelGrid columns="2"
-                     layout="tabular"> 
-            <p:outputLabel value="Enter latitude" />
-            <p:inputText id="latitude2" type="text" value="#{playerC.player.playerFirstName}" size="20"/>
-            <p:outputLabel value="Enter longitude" />
-            <p:inputText id="longitude" type="text" value="#{playerC.player.playerLastName}" size="20"/>
-        </p:panelGrid>
-    </h:form>
-    </h:body>
-</ui:define> <!-- content -->
+
+</ui:define>
 </ui:composition>
-  
-</html>

@@ -39,12 +39,12 @@ public class SubscriptionMail implements Serializable {
 
             LOG.debug("mail to be sended = " + msg);
             String sujet = "Renouvellement de votre souscription a GolfLC";
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathQRC = null;
-            boolean b = mailSender.sendHtmlMail(sujet, msg, to, pathQRC, player.getPlayerLanguage());
-            LOG.debug("HTML Mail status = " + b);
+            mailSender.sendHtmlMailAsync(sujet, msg, to, pathQRC, player.getPlayerLanguage());
+            LOG.debug("HTML Mail async dispatched");
             LCUtil.showDialogInfo("sending one subscription Renewal Mail !!");
-            return b;
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;

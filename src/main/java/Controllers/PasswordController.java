@@ -41,6 +41,8 @@ public PasswordController() {
     private update.UpdatePassword updatePassword;           // migrated 2026-02-24
     @Inject
     private mail.ResetPasswordMail resetPasswordMail;       // migrated 2026-02-26
+    @Inject
+    private lists.PlayersList playersListService;            // fix password cache bug 2026-03-07
 // new 02-03-2024
 public Password isExists(EPlayerPassword epp){
 //public EPlayerPassword resetPassword(EPlayerPassword epp, Activation activation, final Connection conn) throws SQLException, Throwable {
@@ -191,6 +193,7 @@ public EPlayerPassword resetPassword(Activation activation) throws Exception{
           }else{
                  String msg = "Sucessfull ModifyPassword/RESET  in Table player = ";
                     LOG.debug(msg);
+                    playersListService.invalidateCache(); // fix password cache bug 2026-03-07
             //        LCUtil.showMessageInfo(msg);
                 // send mail to user
                 // new mail.ResetPasswordMail().sendMailResetOK(...)

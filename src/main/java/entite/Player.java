@@ -1,7 +1,7 @@
 package entite;
 
 import entite.composite.EPlayerPassword;
-import Controllers.LanguageController;
+// import Controllers.LanguageController; // removed — fix multi-user 2026-03-07 (POJO cannot use CDI)
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -335,8 +335,8 @@ public void playerLanguageListener(ValueChangeEvent e) {
   //      LOG.debug("playerLanguage OldValue = " + e.getOldValue());
         LOG.debug("playerLanguage NewValue = " + e.getNewValue());
         setPlayerLanguage(e.getNewValue().toString() );
-    //new 06-08-2023 = changer langue pendant encodage player data sur le next tab
-       LanguageController.setLanguage(getPlayerLanguage());
+    // LanguageController.setLanguage removed — fix multi-user 2026-03-07
+    // Language change must be handled by the controller (PlayerController), not the POJO
 }
 public void playerCityListener(ValueChangeEvent e) {
 //        LOG.debug("playerCity OldValue = " + e.getOldValue());

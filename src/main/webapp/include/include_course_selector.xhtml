@@ -18,12 +18,11 @@
             decimalPlaces="0"
             emptyValue="0"
             style="margin-left:1.5em;margin-right:1.5em;" />
-        <p:commandButton 
+        <p:commandButton
             id="ButtonCourse"
             immediate="true"
             value="#{msg['button.course.list']}"
             actionListener="#{dialogC.showSelectCourse('general',clubC.club.idclub)}"
-            style="float:left;"
             icon="pi pi-search">
             <p:ajax event="dialogReturn"
                     update="inputCourseId, courseName,courseId, growl-msg" />

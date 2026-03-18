@@ -2,19 +2,20 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      template="templates/masterTemplate.xhtml"
-    >
+      template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">List Inscriptions Competition Page </ui:define>
 <ui:define name="content">
 
-<h:form id="competition_list_inscriptions"  >
-<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/OK.png" alt="image missing :golf_round.jpg" style="float: right;"></h:graphicImage>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header"><h1>#{msg['competition.inscriptions.title']}</h1></f:facet>
+
+<h:form id="competition_list_inscriptions">
 <ui:include src="include/include_summary_competition.xhtml"/>
 
 <p:dataTable id="competition"
@@ -23,47 +24,41 @@
              resizableColumns="true"
              var="c"
              emptyMessage="#{msg['message.table.inscriptions.competition.empty']}"
-            
-             style="border:solid 3px" 
              >
-<!-- mod 18-03-2022  filteredValue="#{navC.filteredInscriptions}" -->
-        <p:column headerText="#{msg['competition.start.asked']}"
-                  footerText="#{msg['competition.start.asked']}"
-                  width="12%"
-                  id="rdate">
-            <h:outputText value="#{c.competitionData.cmpDataAskedStartTime}" /> 
-	</p:column>
 
  <f:facet name="header">
     <h:outputText escape="false" value="#{msg['competition.inscriptions.title']}"/>
     <h2>#{roundC.competition.competitionDescription.competitionName} </h2>
 </f:facet>
+
+        <p:column headerText="#{msg['competition.start.asked']}"
+                  width="12%"
+                  id="rdate">
+            <h:outputText value="#{c.competitionData.cmpDataAskedStartTime}" />
+	</p:column>
+
         <p:column headerText="#{msg['competition.data.id']}"
-                  footerText="#{msg['competition.data.id']}"
                   width="12%"
                   id="DataId">
             <h:outputText value="
                            id=#{c.competitionData.cmpDataId}
                           ,ro=#{c.competitionData.cmpDataRoundId}
                           ,fl=#{c.competitionData.cmpDataFlightNumber}
-                          "   /> 
+                          "   />
 	</p:column>
 
         <p:column headerText="#{msg['player.id']}"
-                  footerText="#{msg['player.id']}"
                   width="12%"
                   id="PlayerId">
-            <h:outputText value="#{c.competitionData.cmpDataPlayerId}" /> 
+            <h:outputText value="#{c.competitionData.cmpDataPlayerId}" />
 	</p:column>
 
         <p:column headerText="#{msg['player.first.last']}"
-                  footerText="#{msg['player.first.last']}"
                   width="12%"
                   id="FirstLastName">
-            <h:outputText value="#{c.competitionData.cmpDataPlayerFirstLastName}" /> 
+            <h:outputText value="#{c.competitionData.cmpDataPlayerFirstLastName}" />
 	</p:column>
         <p:column headerText="#{msg['competition.inscription.canceled']}"
-                  footerText="#{msg['competition.inscription.canceled']}"
                   width="18%"
                   style="color:red"
                   id="cancelCompetition">
@@ -76,48 +71,33 @@
                 style="color:red"
                 >
                 <p:confirm  header="#{msg['message.confirm.delete']}"
-                           message="#{msg['message.cancel']}" 
-                           icon="pi pi-exclamation-triangle"
-                           />
+                           message="#{msg['message.confirm.delete']} #{c.competitionData.cmpDataPlayerId}"
+                           icon="pi pi-exclamation-triangle" />
            </p:commandButton>
-            <p:commandButton 
+            <p:commandButton
                 id="cancelButtonempty"
                 rendered="#{playerC.player.idplayer ne c.competitionData.cmpDataPlayerId}"
-                style="color:red;float:left"
+                style="color:red"
                 icon="pi pi-ban"
                 >
            </p:commandButton>
-            
-            
 	</p:column>
        <p:column headerText="#{msg['handicap.whs']}"
-                 footerText="#{msg['handicap.whs']}"
                  width="12%"
                  id="Handicap">
-           <h:outputText value="#{c.competitionData.cmpDataHandicap}" /> 
+           <h:outputText value="#{c.competitionData.cmpDataHandicap}" />
 	</p:column>
-
-<!--
-    	<p:column headerText="#{msg['competition.date']}"
-                  footerText="#{msg['competition.date']}"
-                  width="12%"
-                  id="Competitiondate">
-            <h:outputText value="#{c.competitionDescription.competitionDate}"
-                                > 
-                      <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-                  </h:outputText>
-	</p:column>
- -->   
-    
 
 <f:facet name="footer">
-
 Nombre d'inscrits : #{roundC.listInscriptionsCompetition().size()}
-
 </f:facet>
-<br/>
+
 </p:dataTable>
 <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

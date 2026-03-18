@@ -2,38 +2,17 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">textEditor Help Files </ui:define>
 <ui:define name="head"> </ui:define>
 <ui:define name="content">
-<!-- treeBean removed 2026-02-28 — TreeBeanController was deleted, entire page non-functional
-<h:form id="editor_help" >
-    <p:panelGrid id="panel" layout="tabular" columns="1">
-     <f:facet name="header">
-         <h:outputText escape="false" value="#{navC.treeBean.fileName}" />
-    </f:facet>
-    <p:textEditor id="help_editor" secure="false" widgetVar="editor"
-                  value="#{navC.treeBean.content}" height="250px"
-                  style="width:800px;font-weight: normal;background-color: whitesmoke;"
-                  placeholder="Enter here your content" />
- <f:facet name="footer">
-         <p:commandButton value="Save to File" id="buttonModify"
-                         update="help_editor, growl-msg" icon="pi pi-database"
-                         style="float:left;" action="#{navC.treeBean.writeToHelpFile()}" />
-         <p:commandButton id="ButtonClear" value="Clear"
-                         onclick="PF('editor').clear();" icon="pi pi-times" />
-         <p:commandButton value="Back Node" id="commandButtonback" ajax="false"
-                         update="growl-msg" icon="pi pi-undo"
-                         action="treenode.xhtml?faces-redirect=true" />
- </f:facet>
-</p:panelGrid>
-</h:form>
--->
-<h3>Page disabled — TreeBeanController removed</h3>
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<h3>Page disabled -- TreeBeanController removed</h3>
+</div>
+
 </ui:define>
 </ui:composition>

@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition 
+<ui:composition
       template="templates/masterTemplate.xhtml"
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces"
-      xmlns:c="jakarta.tags.core">
+      xmlns:p="primefaces">
 <ui:define name="title">Score Statistics Page </ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/stroke_stats.jpg" alt="image missing :stroke_stats.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/stroke_stats.jpg" alt="image missing :stroke_stats.jpg" style="float: right;"></h:graphicImage>
-<h:form id="score_statistics" enctype="application/x-www-form-urlencoded" >
+
+<h:form id="score_statistics">
 <ui:include src="include/include_summary_round.xhtml"/>
-<!--<ui:include src="include/include_statistics.xhtml" />-->
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+
  <p:dataTable id="statisticsTable"
                var="var"
                rowIndexVar="row"
@@ -23,7 +24,7 @@
                editable="true"
                editMode="cell"
                lazy="false"
-               style="margin: 0 auto;width:60%;text-align:center;" >
+               style="margin: 0 auto;width:60%;text-align:center;">
             <p:ajax event="cellEdit"
                     listener="#{roundC.scoreStableford.onCellEdit}"
                     update="growl-msg"/>
@@ -37,44 +38,44 @@
                   style="color:blue;font-size:1.5em;font-weight:bold">
             <h:outputText value="#{var.hole}" />
         </p:column>
- 
+
         <p:column headerText="#{msg['hole.par']} "
-                  width="12%" 
+                  width="12%"
                   style="color:blue;">
             <h:outputText value="#{var.par}" />
         </p:column>
- 
+
         <p:column headerText="#{msg['score.gross']} "
                   width="12%"
                   style="color:blue;">
             <h:outputText value="#{var.stroke}" />
         </p:column>
- 
+
             <p:column headerText="#{msg['score.fairway']}"
-                      width="12%"
-                      >
-   <!-- The cellEditor element contains a facet to output the field and a facet for collecting input, when we are editing. 
-   -->
-                <p:cellEditor>
+                      width="12%">
+                <p:cellEditor rendered="#{var.par ne 3}">
                     <f:facet name="output">
                         <h:outputText value="#{var.fairway}"/>
                     </f:facet>
                     <f:facet name="input">
-                        <p:inputNumber 
+                        <p:inputNumber
                             id="fairways${row}"
                             label="fairway"
                             value="#{var.fairway}"
                             size="1"
                             decimalPlaces="0"
                             minValue="0"
-                            maxValue="1"  >
+                            maxValue="1">
                         </p:inputNumber>
                     </f:facet>
                 </p:cellEditor>
+                <h:outputText value="0" rendered="#{var.par eq 3}"
+                              style="color:gray;font-style:italic;"
+                              title="Par 3: no fairway"/>
             </p:column>
 
             <p:column headerText="#{msg['score.green']}"
-                      width="12%" >
+                      width="12%">
                 <p:cellEditor>
                     <f:facet name="output">
                         <h:outputText value="#{var.green}"/>
@@ -86,14 +87,14 @@
                             size="1"
                             decimalPlaces="0"
                             minValue="0"
-                            maxValue="7" >
+                            maxValue="7">
                         </p:inputNumber>
                     </f:facet>
                 </p:cellEditor>
             </p:column>
-            
+
             <p:column headerText="#{msg['score.putts']}"
-                      width="12%" >
+                      width="12%">
                 <p:cellEditor>
                     <f:facet name="output">
                         <h:outputText value="#{var.putt}"/>
@@ -106,8 +107,8 @@
                             size="1"
                             decimalPlaces="0"
                             minValue="0"
-                            maxValue="5"  >
-                        </p:inputNumber> 
+                            maxValue="5">
+                        </p:inputNumber>
                     </f:facet>
                 </p:cellEditor>
             </p:column>
@@ -125,14 +126,14 @@
                             size="1"
                             decimalPlaces="0"
                             minValue="0"
-                            maxValue="5" >
+                            maxValue="5">
                         </p:inputNumber>
                     </f:facet>
                 </p:cellEditor>
             </p:column>
- 
+
              <p:column headerText="#{msg['score.penalty']}"
-                       width="12%" >
+                       width="12%">
                 <p:cellEditor>
                     <f:facet name="output">
                         <h:outputText value="#{var.penalty}"/>
@@ -144,19 +145,17 @@
                             size="1"
                             decimalPlaces="0"
                             minValue="0"
-                            maxValue="5" >
+                            maxValue="5">
                        </p:inputNumber>
                     </f:facet>
                 </p:cellEditor>
             </p:column>
-            
+
     <f:facet name="footer">
-        <p:commandButton 
+        <p:commandButton
             id="button01"
             value="#{msg['button.score.statistics']}"
-            update="growl-msg"
-            ajax="false"
-             
+            update="growl-msg statisticsTable"
             icon="pi pi-database"
             action="#{roundC.createStatisticsStableford()}"/>
         <p:commandButton value="Back Score screen"
@@ -168,6 +167,10 @@
                          action="score_stableford.xhtml?faces-redirect=true" />
      </f:facet>
   </p:dataTable>
+
+</p:panel>
+</div>
+
 </h:form>
 </ui:define>
 </ui:composition>

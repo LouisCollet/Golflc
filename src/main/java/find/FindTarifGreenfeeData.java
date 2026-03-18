@@ -34,6 +34,13 @@ public class FindTarifGreenfeeData implements Serializable, interfaces.GolfInter
         LOG.debug("entering " + methodName);
         LOG.debug(methodName + " - for round = " + round);
 
+        if (round == null || round.getCourseIdcourse() == null) {
+            String msg = LCUtil.prepareMessageBean("tarif.greenfee.notfound") + " (no course selected)";
+            LOG.warn(methodName + " - " + msg);
+            LCUtil.showMessageFatal(msg);
+            return null;
+        }
+
         final String query = """
             SELECT TarifJson
             FROM tarif_greenfee
@@ -57,9 +64,9 @@ public class FindTarifGreenfeeData implements Serializable, interfaces.GolfInter
                 }
                 if (i == 0) {
                     String msg = LCUtil.prepareMessageBean("tarif.greenfee.notfound") + round.getCourseIdcourse();
-                    LOG.debug(msg);
-                    LCUtil.showMessageInfo(msg);
-                    throw new Exception(msg);
+                    LOG.warn(msg);
+                    LCUtil.showMessageFatal(msg);
+                    return null;
                 } else {
                     LOG.debug(methodName + " - ResultSet has " + i + " lines.");
                 }

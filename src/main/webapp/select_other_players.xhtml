@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition
-      xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
-      template="templates/masterTemplate.xhtml"   >
+      template="templates/masterTemplate.xhtml">
 <ui:define name="title">Inscription Other Players</ui:define>
 <ui:define name="content">
 <h:form id="selectPlayers">
 
 <ui:include src="include/include_summary_round.xhtml"/>
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1><h:outputText escape="false" value="#{msg['message.playerslist']}" /></h1>
+</f:facet>
+
 <p:dataTable id="table_players"
              value="#{playerC.listPlayers()}"
              var="c"
@@ -20,98 +26,84 @@
              emptyMessage="#{msg['message.table.empty']}"
              selection="#{playerC.player.draggedPlayers}"
              rowKey="#{c.player.idplayer}">
-    <!-- PF13 selectionMode="multiple"  -->
  <c:set var="s0" value="#{v.inscriptionTeam}"/>
-    
-<f:facet name="header">
-            <p:commandButton
-                id="cmd01Button"
-                action="#{roundC.otherPlayers()}"
-                icon="pi pi-external-link"
-                value="#{msg['button.selectotherplayers']} #{4 - roundC.roundPlayersList().size()} joueurs"
-               
-                style="float:left">
-            </p:commandButton>
 
-    <p:commandButton id="toggler" 
+<f:facet name="header">
+    <p:commandButton
+        id="cmd01Button"
+        action="#{roundC.otherPlayers()}"
+        ajax="false"
+        icon="pi pi-external-link"
+        value="#{msg['button.selectotherplayers']} #{4 - roundC.roundPlayersList().size()} joueurs" />
+
+    <p:commandButton id="toggler"
                      type="button"
                      value="Columns"
-                     style="float:right"
-                     icon="pi pi -arrow-left" />
-        <p:columnToggler id="colToggler"
+                     icon="pi pi-arrow-left" />
+    <p:columnToggler id="colToggler"
                      datasource="table_players"
                      trigger="toggler" />
-        <h:outputText escape="false" value="#{msg['message.playerslist']}" />
 </f:facet>
 
 <p:column
      headerText="#"
-     footerText="#"
      width="2%"
      id="rrow">
              #{row+1}
 </p:column>
- <!-- selectionMode="multiple" -->
-<p:column 
+
+<p:column
      id="rowMultiple"
      toggleable="false"
-     
      selectionBox="true"
      width="3%"
      style="text-align:center"
-     headerText="Select"
-     footerText="Select" />
-  <p:ajax event="rowSelectCheckbox" 
+     headerText="Select" />
+  <p:ajax event="rowSelectCheckbox"
              listener="#{playerC.rowPlayerSelect}"
-             update=":selectPlayers:table_players"
-       />
+             update=":selectPlayers:table_players" />
 
-	<p:column id="colPlayerSelected"
-                  toggleable="false"
-                  headerText="#{msg['player.other.selected']}"
-                  footerText="#{msg['player.other.selected']}"
-                  style="width:5%" >
-            <h:outputText value="#{c.player.idplayer}" />
-         </p:column>
+    <p:column id="colPlayerSelected"
+              toggleable="false"
+              headerText="#{msg['player.other.selected']}"
+              style="width:5%">
+        <h:outputText value="#{c.player.idplayer}" />
+    </p:column>
 
-	<p:column toggleable="false"
-            headerText="#{msg['player.first']}"
-            footerText="#{msg['player.first']}"
-            style="width:15%" >
-                    <h:outputText value="#{c.player.playerFirstName}" />
-	</p:column>
+    <p:column toggleable="false"
+              headerText="#{msg['player.first']}"
+              style="width:15%">
+        <h:outputText value="#{c.player.playerFirstName}" />
+    </p:column>
 
-	<p:column toggleable="false"
-            headerText="#{msg['player.lastname']}"
-            footerText="#{msg['player.lastname']}"
-            style="width:15%"
-            filterMatchMode="contains"
-            filterBy="#{c.player.playerLastName}"
-            >
-                  <h:outputText value="#{c.player.playerLastName}" />
-	</p:column>
+    <p:column toggleable="false"
+              headerText="#{msg['player.lastname']}"
+              style="width:15%"
+              filterMatchMode="contains"
+              filterBy="#{c.player.playerLastName}">
+        <h:outputText value="#{c.player.playerLastName}" />
+    </p:column>
 
-	<p:column headerText="#{msg['address.city']}"
-                  footerText="#{msg['address.city']}"
-                  style="width:15%" >
-            <h:outputText value="#{c.player.address.city}" />
-	</p:column>
+    <p:column headerText="#{msg['address.city']}"
+              style="width:15%">
+        <h:outputText value="#{c.player.address.city}" />
+    </p:column>
 
-	<p:column headerText="#{msg['address.country.code']}"
-                  footerText="#{msg['address.country.code']}"
-                  style="width:15%" >
-            <h:outputText value="#{c.player.address.country.code}" />
-	</p:column>
+    <p:column headerText="#{msg['address.country.code']}"
+              style="width:15%">
+        <h:outputText value="#{c.player.address.country.code}" />
+    </p:column>
 
-        <p:column headerText="#{msg['message.modification']}"
-                  footerText="#{msg['message.modification']}"
-                  style="width:10%" >
-                        <h:outputText value="#{c.player.playerModificationDate}">
-                            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
-                        </h:outputText>
-        </p:column>
+    <p:column headerText="#{msg['message.modification']}"
+              style="width:10%">
+        <h:outputText value="#{c.player.playerModificationDate}">
+            <f:convertDateTime type="date" pattern="dd-MM-yyyy HH:mm:ss"/>
+        </h:outputText>
+    </p:column>
 </p:dataTable>
 
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>

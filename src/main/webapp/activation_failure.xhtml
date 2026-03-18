@@ -8,38 +8,38 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="title">Activation failure </ui:define>
+<ui:define name="title">Activation failure</ui:define>
 
 <ui:define name="content">
-<h:graphicImage name="images/thumbDown.png" alt="image missing :golf_register.jpg" style="float:left;"></h:graphicImage>
-<h:graphicImage name="images/thumbDown.png" alt="image missing :golf_register.jpg" style="float:right;"></h:graphicImage>    
-    <!-- -->
-<h:form id="activation_failure"  >
 
-<p:panelGrid
-    id="panel"
-    layout="tabular"
-    columns="2"
-    columnClasses="col1, col2">
-<f:facet name="header">
-    <h1>#{msg['message.for.activation.failure']}</h1>
-</f:facet>
-    
-   <h:outputText value="#{msg['player.first']}" />
-   <h:outputText value="#{playerC.player.playerFirstName}" style="font-style:italic"/>
-   <h:outputText value="#{msg['player.lastname']}"   />
-   <h:outputText value="#{playerC.player.playerLastName}" style="font-style:italic" />
+<div class="login-container">
+    <p:panel styleClass="login-card">
+        <f:facet name="header">
+            <h1>#{msg['message.for.activation.failure']}</h1>
+        </f:facet>
 
+        <div class="info-grid">
+            <div class="info-row">
+                <span class="info-label">#{msg['player.first']}</span>
+                <span class="info-value">#{playerC.player.playerFirstName}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">#{msg['player.lastname']}</span>
+                <span class="info-value">#{playerC.player.playerLastName}</span>
+            </div>
+        </div>
 
-<f:facet name="footer">
-        <p:commandButton value="#{msg['button.logout']}"
-                         update="growl-msg"
-                         immediate="true"
-                        icon="pi pi-pencil"
-                         action="#{playerC.logout("from activation_failure.xhtml")}"
-           />
-</f:facet>
-</p:panelGrid>
-</h:form>
+        <f:facet name="footer">
+            <h:form id="activation_failure">
+                <p:commandButton value="#{msg['button.logout']}"
+                                 update="growl-msg"
+                                 immediate="true"
+                                 icon="pi pi-pencil"
+                                 action="#{navC.logout('from activation_failure.xhtml')}"/>
+            </h:form>
+        </f:facet>
+    </p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

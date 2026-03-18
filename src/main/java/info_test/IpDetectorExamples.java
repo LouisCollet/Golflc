@@ -3,6 +3,7 @@ package info_test;
 import info_test.IpAddressDetector;
 import info_test.IpAddressDetector.IpInfo;
 import info_test.IpAddressDetector.IpVersion;
+import jakarta.annotation.security.DenyAll;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -135,6 +136,7 @@ public class IpDetectorExamples {
     // ========================================================================
     
     @Path("/api/ip")
+    @DenyAll // security audit 2026-03-09 — info/debug endpoints disabled in production
     public static class IpInfoResource {
         
         @Inject

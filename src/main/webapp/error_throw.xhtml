@@ -9,89 +9,75 @@
       template="templates/errorTemplate.xhtml">
 
 <ui:define name="title">Technical Error</ui:define>
+
 <ui:define name="content">
-<h:graphicImage name="images/bug.jpg" alt="image missing :bug.jpg" style="float:left;">  </h:graphicImage>
-<h:graphicImage name="images/technical_difficulties.jpg" alt="image missing :technical_difficulties.jpg" style="float:right;">  </h:graphicImage> 
-
-<h:form id="form_error_throw"  >
-    <!--layout 29-05-2023 PF 13 #{msg['login.welcome.back']} 
-       web.xml ==>    <location>/error_throw.xhtml</location> -->
+    <!-- web.xml ==> <location>/error_throw.xhtml</location> -->
     <!-- https://primefaces.github.io/primefaces/16_0_0/#/core/errorhandling -->
-<p:panelGrid id="panelGrid1"
-             layout="tabular"
-             columns="1" >
-<f:facet name="header">
-    <h1>Primefaces Exception handler</h1>
-</f:facet>
-    
-    <p:panelGrid id="panelGrid2" layout="tabular" columns="2" 
-             styleClass="ui-panelgrid-blank">
+    <h:form id="form_error_throw">
 
-    
-    <!-- Colonne 1: Label | Colonne 2: Valeur -->
-    
-    <h:outputText value="🔴 View:" style="font-weight:bold;"/>
-    <h:outputText value="#{view.viewId}" 
-                  style="color:orange;font-family:monospace;"/>
-    
-    <h:outputText value="⚠️ Exception:" style="font-weight:bold;"/>
-    <h:outputText value="#{pfExceptionHandler.exception}" 
-                  style="color:red;"/>
-    
-    <h:outputText value="💬 Message:" style="font-weight:bold;"/>
-    <h:outputText value="#{pfExceptionHandler.message}"/>
-    
-    <h:outputText value="📍 Type:" style="font-weight:bold;"/>
-    <h:outputText value="#{pfExceptionHandler.type}"/>
-    
-    <h:outputText value="📅 Timestamp:" style="font-weight:bold;"/>
-    <h:outputText value="#{pfExceptionHandler.formattedTimestamp}"/>
-    
-    <h:outputText value="📚 Stack Trace:" style="font-weight:bold;"/>
-    <h:outputText value="#{pfExceptionHandler.formattedStackTrace}" 
-                  escape="false" 
-                  style="font-family:monospace;font-size:0.9em;"/>
-    
-    <f:facet name="footer">
-        <p:commandButton value="Back to Welcome"
-                         immediate="true"
-                         ajax="false"
-                         icon="pi pi-home"
-                         action="welcome.xhtml?faces-redirect=true"/>
-    </f:facet>
-</p:panelGrid>
-```
+        <div class="login-container">
+            <p:panel styleClass="login-card">
+                <f:facet name="header">
+                    <h:outputText value="Primefaces Exception Handler"/>
+                </f:facet>
 
-<!--
+                <div style="text-align:center; margin-bottom:1rem;">
+                    <i class="pi pi-exclamation-triangle"
+                       style="font-size:3rem; color:var(--red-500);"/>
+                    <h2 style="margin:0.5rem 0; color:var(--red-500);">Technical Error</h2>
+                </div>
 
-## ✅ **Résultat attendu**
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">View</span>
+                        <span class="info-value" style="font-family:monospace;">
+                            #{view.viewId}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Exception</span>
+                        <span class="info-value" style="color:var(--red-500);">
+                            #{pfExceptionHandler.exception}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Message</span>
+                        <span class="info-value">#{pfExceptionHandler.message}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Type</span>
+                        <span class="info-value">#{pfExceptionHandler.type}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Timestamp</span>
+                        <span class="info-value">#{pfExceptionHandler.formattedTimestamp}</span>
+                    </div>
+                </div>
 
-Maintenant, quand une erreur se produit, vous verrez :
-```
-View ID: /login.xhtml
-Exception: jakarta.el.PropertyNotFoundException
-Message: Property 'idplayer' not found on type entite.Player
-    -->
-    
-    
-    
-    <h:outputText value="Exception:#{pfExceptionHandler.exception}" style="font-size: 1.5rem;color:red;background-color: whitesmoke;"/>
-    <h:outputText value="Message:#{pfExceptionHandler.message}" style="font-size: 1.0rem;"/>
-    <h:outputText value="Type :#{pfExceptionHandler.type}" style="font-size: 1.0rem;"/>
-    <h:outputText value="at :#{pfExceptionHandler.stackTrace[0]}" style="font-size: 1.5rem;color:blue" escape="false" />
-    <h:outputText value="Timestamp : #{pfExceptionHandler.formattedTimestamp}"/><br/>
-    <h:outputText value="Formatted StackTrace :#{pfExceptionHandler.formattedStackTrace}" style="font-size: 1.0em;" escape="false" />
+                <p:divider layout="horizontal" type="solid"/>
 
-    
-<f:facet name="footer">
-    <p:commandButton value="#{msg['login.user.old']}"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         icon="pi pi-user"
-                         action="welcome.xhtml?faces-redirect=true"/>
-</f:facet>
-</p:panelGrid>
-</h:form>
+                <div style="max-height:300px; overflow:auto; padding:0.5rem;
+                            background:var(--surface-ground); border-radius:6px;">
+                    <h:outputText value="#{pfExceptionHandler.formattedStackTrace}"
+                                  escape="false"
+                                  style="font-family:monospace; font-size:0.8rem;"/>
+                </div>
+
+                <f:facet name="footer">
+                    <h:link outcome="login.xhtml" styleClass="login-option">
+                        <span class="login-option-icon returning">
+                            <i class="pi pi-home"/>
+                        </span>
+                        <span class="login-option-text">
+                            <span class="login-option-title">Back to Login</span>
+                            <span class="login-option-desc">#{msg['login.welcome.back']}</span>
+                        </span>
+                        <i class="pi pi-arrow-right login-option-arrow"/>
+                    </h:link>
+                </f:facet>
+            </p:panel>
+        </div>
+
+    </h:form>
 </ui:define>
 </ui:composition>

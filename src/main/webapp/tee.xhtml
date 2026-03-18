@@ -7,132 +7,116 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
+
 <ui:define name="title">Tee Page</ui:define>
 
 <ui:define name="content">
-<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
 
-<h:form id="form_tee" >
+    <h:form id="form_tee">
 
-<ui:include src="include/include_summary_club.xhtml"/>
+        <ui:include src="include/include_summary_club.xhtml"/>
 
-<p:panelGrid
-    id="panel"
-    layout="tabular"
-    columns="2"
-    columnClasses="col1, col2">
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card">
+                <f:facet name="header">
+                    <h1>#{msg['tee.data']} #{request.getParameter('operation')}</h1>
+                </f:facet>
 
-<f:facet name="header">
-    <h1>#{msg['tee.data']} #{request.getParameter('operation')}</h1>
-</f:facet>
-                <p:outputLabel value="#{msg['tee.gender']} :"   />
-                <p:selectOneButton id="select_gender"
-                                   label="label_tee_gender"
-                                   value="#{clubC.tee.teeGender}" >
-                    <f:selectItem id="select_gent" itemLabel="#{msg['player.gent']}"   itemValue="M" />
-                    <f:selectItem id="select_lady" itemLabel="#{msg['player.lady']}"   itemValue="L" />
-                </p:selectOneButton>
+                <p:panelGrid id="panel"
+                             layout="flex"
+                             columns="2"
+                             columnClasses="col1Flex, col2Flex">
 
-                <p:outputLabel for="@next" value="#{msg['tee.start']} :"   />
-                <p:selectOneButton id="select_start"
-                                  
-                                   value="#{clubC.tee.teeStart}">
-                    <f:selectItems value="#{clubC.tee.StartType()}"
-                                   var="v"
-                                   itemLabel="#{v}"
-                                   itemValue="#{v}"/>
-                </p:selectOneButton>
- 
-                <p:outputLabel for="@next" value="#{msg['tee.holes.played']} :"   />
-   <!--
-                <p:selectOneButton  id="select_holes"
-                                 tabindex="ti"
-                                 value="#{clubC.tee.teeHolesPlayed}"
-                                 styleClass="selectOneRadioColumn" >
-                    <f:selectItems value="#{clubC.availableHoles}" />
-                </p:selectOneButton>
--->
-                
-                <!-- ✅ Plus de getAvailableHoles() dans le controller -->
-<p:selectOneButton id="select_holes"
-                   value="#{clubC.tee.teeHolesPlayed}">
-    <f:selectItem itemLabel="18 Holes"    itemValue="01-18" />
-    <f:selectItem itemLabel="Holes 1-9"   itemValue="01-09" />
-    <f:selectItem itemLabel="Holes 10-18" itemValue="10-18" />
-</p:selectOneButton>
-                
-                 <p:outputLabel for="@next" value="#{msg['course.par']} :"  />
-                  <p:selectOneButton id="select_par"
-                                value="#{clubC.tee.teePar}">
-                   <f:selectItems value="#{clubC.tee.parList}"
-                           var="par" 
-                           itemLabel="#{par}"
-                           itemValue="#{par}" />
-                </p:selectOneButton>
+                    <p:outputLabel value="#{msg['tee.gender']} :"/>
+                    <p:selectOneButton id="select_gender"
+                                       label="label_tee_gender"
+                                       value="#{clubC.tee.teeGender}">
+                        <f:selectItem id="select_gent" itemLabel="#{msg['player.gent']}" itemValue="M" />
+                        <f:selectItem id="select_lady" itemLabel="#{msg['player.lady']}" itemValue="L" />
+                    </p:selectOneButton>
 
-                <p:outputLabel for="@next" value="#{msg['tee.slope']} :"   />
-                <p:inputNumber  
-                       id="input_slope"
-                       value="#{clubC.tee.teeSlope}"
-                       title="#{msg['tooltip.tee.teeslope']}"
-                       size="3"
-                       emptyValue="000"
-                   
-                       minValue="88"
-                       maxValue="138"
-                       decimalPlaces="0"
-                       placeholder="999" />
+                    <p:outputLabel for="@next" value="#{msg['tee.start']} :"/>
+                    <p:selectOneButton id="select_start"
+                                       value="#{clubC.tee.teeStart}">
+                        <f:selectItems value="#{clubC.tee.StartType()}"
+                                       var="v"
+                                       itemLabel="#{v}"
+                                       itemValue="#{v}"/>
+                    </p:selectOneButton>
 
-                <p:outputLabel for="@next" value="#{msg['tee.rating']} :"   />
-                <p:inputNumber  
-                       id="input_rating"
-                       value="#{clubC.tee.teeRating}"
-                       title="#{msg['tooltip.tee.teerating']}"
-                       size="4"
-                      
-                       emptyValue="00.0"
-                       minValue="28.0"
-                       maxValue="78.0"
-                       decimalPlaces="1"
-                       decimalSeparator="."
-                       placeholder="99.9" />
+                    <p:outputLabel for="@next" value="#{msg['tee.holes.played']} :"/>
+                    <p:selectOneButton id="select_holes"
+                                       value="#{clubC.tee.teeHolesPlayed}">
+                        <f:selectItem itemLabel="18 Holes"    itemValue="01-18" />
+                        <f:selectItem itemLabel="Holes 1-9"   itemValue="01-09" />
+                        <f:selectItem itemLabel="Holes 10-18" itemValue="10-18" />
+                    </p:selectOneButton>
 
-<f:facet name="footer">
-         <p:commandButton 
-                         id="ButtonCreateTee"
-                         value="#{msg['button.tee.create']}"
-                         update="growl-msg"
-                         ajax="false"
-                         rendered="#{clubC.tee.createModify eq true and clubC.hole.nextHole eq false}"
-                          
-                         icon="pi pi-database"
-                         style="float:left;"
-                         action="#{clubC.createTee()}"  />
+                    <p:outputLabel for="@next" value="#{msg['course.par']} :"/>
+                    <p:selectOneButton id="select_par"
+                                       value="#{clubC.tee.teePar}">
+                        <f:selectItems value="#{clubC.tee.parList}"
+                                       var="par"
+                                       itemLabel="#{par}"
+                                       itemValue="#{par}" />
+                    </p:selectOneButton>
 
-         <p:commandButton value="#{msg['button.tee.modify']}"
-                         id="buttonTeeModify"
-                         ajax="false"
-                         rendered="#{clubC.tee.createModify eq false}" 
-                         update="growl-msg"
-                          
-                         icon="pi pi-database"
-                         style="float:left;"
-                         action="#{clubC.modifyTee()}" />
+                    <p:outputLabel for="@next" value="#{msg['tee.slope']} :"/>
+                    <p:inputNumber id="input_slope"
+                                   value="#{clubC.tee.teeSlope}"
+                                   title="#{msg['tooltip.tee.teeslope']}"
+                                   size="3"
+                                   emptyValue="000"
+                                   minValue="88"
+                                   maxValue="138"
+                                   decimalPlaces="0"
+                                   placeholder="999" />
 
-         <p:commandButton 
-                          id="button02"
-                          value="#{msg['tee.next']}"
-                          update="growl-msg"
-                          immediate="true"
-                          ajax="false"
-                          rendered="#{clubC.hole.nextHole}"
-                          icon="pi pi-arrow-right"
-                          style="float: right;"
-                          action="hole.xhtml?faces-redirect=true" />
-</f:facet>
+                    <p:outputLabel for="@next" value="#{msg['tee.rating']} :"/>
+                    <p:inputNumber id="input_rating"
+                                   value="#{clubC.tee.teeRating}"
+                                   title="#{msg['tooltip.tee.teerating']}"
+                                   size="4"
+                                   emptyValue="00.0"
+                                   minValue="28.0"
+                                   maxValue="78.0"
+                                   decimalPlaces="1"
+                                   decimalSeparator="."
+                                   placeholder="99.9" />
 
-</p:panelGrid>
-</h:form>
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton id="ButtonCreateTee"
+                                     value="#{msg['button.tee.create']}"
+                                     update="growl-msg"
+                                     ajax="false"
+                                     rendered="#{clubC.tee.createModify eq true and clubC.hole.nextHole eq false}"
+                                     icon="pi pi-database"
+                                     action="#{clubC.createTee()}" />
+
+                    <p:commandButton value="#{msg['button.tee.modify']}"
+                                     id="buttonTeeModify"
+                                     ajax="false"
+                                     rendered="#{clubC.tee.createModify eq false}"
+                                     update="growl-msg"
+                                     icon="pi pi-database"
+                                     action="#{clubC.modifyTee()}" />
+
+                    <p:commandButton id="button02"
+                                     value="#{msg['tee.next']}"
+                                     update="growl-msg"
+                                     immediate="true"
+                                     ajax="false"
+                                     rendered="#{clubC.hole.nextHole}"
+                                     icon="pi pi-arrow-right"
+                                     style="float: right;"
+                                     action="hole.xhtml?faces-redirect=true" />
+                </f:facet>
+
+            </p:panel>
+        </div>
+
+    </h:form>
 </ui:define>
 </ui:composition>

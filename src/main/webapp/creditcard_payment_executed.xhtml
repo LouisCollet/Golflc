@@ -6,66 +6,55 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      template="templates/masterTemplate.xhtml" >
+      template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Credit Card Payment Executed</ui:define>
-<!-- new 27-10-2025 essai empechere retour page précédente : fonctionne pas  -->
-<!-- Empêche le cache du navigateur ?? -->
 <ui:define  name="meta">
         <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
         <meta http-equiv="Pragma" content="no-cache" />
         <meta http-equiv="Expires" content="0" />
 </ui:define>
 <script>
-    // Empêche le retour arrière ne fonctionne pas !!
     history.pushState(null, "", location.href);
     window.onpopstate = function () { history.go(1); };
 </script>
 
-
-
 <ui:define name="content">
-<h:graphicImage name="images/paid1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/paid2.png" alt="image missing :tarif2.jpg" style="float:right;"></h:graphicImage>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['title.payment.executed']}</h1></f:facet>
 
-<h:form id="creditcard_payment_executed" >
+<h:form id="creditcard_payment_executed">
 
  <p:panelGrid
     id="panelGrid1"
     columns="2"
-    layout="tabular"
-    columnClasses="col1,col2">
+    layout="flex"
+    columnClasses="col1Flex,col2Flex">
 
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['title.payment.executed']}" />
-</f:facet>
     <h:outputText  id="Total"
                 value="#{msg['creditcard.amountpaid']} :" />
     <h:outputText  id="TotalPrice"
                 value="#{payC.creditcard.totalPrice}"
                 style="font-size: 3rem;" />
-    
+
     <h:outputText value="#{msg['tarif.members.currency']} :" />
     <h:outputText value="#{payC.creditcard.creditcardCurrency}"
                   style="font-size: 2em;" />
-    
+
     <h:outputText value="#{msg['creditcard.communication']} :" />
     <h:outputText id="Communication"
                   value="#{payC.creditcard.communication}"
                   title="#{msg['tooltip.club.clubaddress']}" />
-    
+
     <h:outputText value="#{msg['creditcard.holder']} :" />
     <h:outputText  id="Holder"
                    value="#{payC.creditcard.creditcardHolder}" />
-    
+
     <h:outputText  value="#{msg['creditcard.number']} :"/>
     <h:outputText  id="creditcardNumber"
                    value="#{payC.creditcard.creditCardNumberSecret}" />
-  <!--  
-    <h:outputText value="#{msg['creditcard.type']} :"   />
-    <h:outputText  id="TypeCreditcard"
-                   value="#{payC.creditcard.creditcardType}" />
--->
+
     <h:outputText id="communication"
                   value="#{msg['creditcard.reference']} : "/>
     <h:outputText id="taskResult"
@@ -84,5 +73,7 @@
     </f:facet>
 </p:panelGrid>
 </h:form>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

@@ -180,7 +180,7 @@ public class icalservice_manual_test {
     private static void sendTestEmail(TestData data, byte[] icsFile) throws Exception {
         LOG.debug("Sending test email...");
         
-        String recipient = "louis.collet@skynet.be, louis.collet.onduty@gmail.com";
+        String recipient = System.getenv("SMTP_USERNAME") + "," + System.getenv("SMTP_USERNAME_ONDUTY");
         String subject = "Test Golf Invitation - IcalService";
         String body = "Ceci est un email de test pour l'invitation iCalendar";
         byte[] qrCode = null; // Pas de QR code pour ce test

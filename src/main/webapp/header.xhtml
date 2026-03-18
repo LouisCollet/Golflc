@@ -21,10 +21,12 @@
                                  value="Logout"
                                  icon="pi pi-power-off"
                                  immediate="true"
-                                 action="#{playerC.logout('from button Logout')}"
+                                 action="#{navC.logout('from button Logout')}"
                                  rendered="#{appContext.connected}" />
 
-                <p:selectOneMenu value="#{activeLocale.languageTag}">
+                <p:selectOneMenu id="selectOneMenu"
+                                 value="#{activeLocale.languageTag}">
+                    <f:selectItem itemLabel="#{msg['choose.language']}" itemValue="" noSelectionOption="true"/>
                     <f:selectItems value="#{activeLocale.availableLocales}"
                                    var="language"
                                    itemValue="#{language.toLanguageTag()}"
@@ -101,6 +103,11 @@
 
                 <div class="col-12 md:col-6">
                     <strong>Execution:</strong> #{settings.getProperty('EXECUTION')}
+                </div>
+
+               
+                <div id="sessionCount" class="col-12 md:col-6">
+                    <strong>Sessions:</strong> #{advancedAdmin.activeSessionCount}
                 </div>
 
             </div>

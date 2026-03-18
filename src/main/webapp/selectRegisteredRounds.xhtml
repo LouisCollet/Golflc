@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition
-      xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-     
       xmlns:p="primefaces"
-     
       template="templates/masterTemplate.xhtml">
-    
+
     <ui:define name="metadata">
     <f:metadata>
         <f:viewParam
@@ -23,99 +20,89 @@
         </f:viewParam>
     </f:metadata>
 </ui:define>
-    
-<ui:define name="title">Select Participants Round Page </ui:define>
+
+<ui:define name="title">Select Participants Round Page</ui:define>
 
 <ui:define name="content">
 
 <h:form id="form_select_participants">
-
-    <!--	<h1>Score Card for Registered Round list</h1> -->
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>#{msg['message.selectround']} #{msg['message.for.scorecard']}</h1>
+</f:facet>
 
 <p:dataTable id="player_has_played_round"
              value="#{roundC.listRecentRounds()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{roundC.filteredCars}"
-             >
+             filteredValue="#{roundC.filteredCars}">
 
-<f:facet name="header">
-     <h1>#{msg['message.selectround']} #{msg['message.for.scorecard']}</h1>
-</f:facet>
+    <p:column headerText="#{msg['round.selected']}"
+              width="10%">
+        <p:commandButton
+            id="selectButton"
+            action="#{roundC.scorecard(c)}"
+            value="#{c.round.idround} - #{msg['button.select']}"
+            icon="pi pi-map" />
+    </p:column>
 
-        <p:column headerText="#{msg['round.selected']}"
-                  width="10%" >
-            <p:commandButton
-                id="selectButton"
-                action="#{roundC.scorecard(c)}"
-                value="#{c.round.idround} - #{msg['button.select']}"
-                icon="pi pi-map">
-            </p:commandButton>
-	</p:column>
+    <p:column headerText="#{msg['round.date']}"
+              width="10%"
+              id="rdate">
+        <h:outputText value="#{c.round.roundDate}">
+            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
+        </h:outputText>
+    </p:column>
 
-	<p:column headerText="#{msg['round.date']}"
-                  width="10%"
-                  id="rdate">
-                  <h:outputText value="#{c.round.roundDate}" > 
-                 <f:convertDateTime type="localDate" pattern="dd/MM/yyyy HH:mm" />
-                  </h:outputText>
-	</p:column>
-    
-        <p:column headerText="#{msg['tee.start']}"
-                  footerText="#{msg['tee.start']}"
-                  width="10%"
-                  id="teestart" >
- #{c.tee.teeStart} - #{c.tee.teeHolesPlayed} - #{c.tee.idtee} MT=#{c.tee.teeMasterTee} 
-        </p:column>
+    <p:column headerText="#{msg['tee.start']}"
+              width="10%"
+              id="teestart">
+        #{c.tee.teeStart} - #{c.tee.teeHolesPlayed} - #{c.tee.idtee} MT=#{c.tee.teeMasterTee}
+    </p:column>
 
-	<p:column   id="colclubname"
-                    headerText="#{msg['club.name']}"
-                    width="10%"
-                    filterMatchMode="contains"
-                    filterBy="#{c.club.clubName}" >
-                        #{c.club.clubName}
-	</p:column>
+    <p:column id="colclubname"
+              headerText="#{msg['club.name']}"
+              width="10%"
+              filterMatchMode="contains"
+              filterBy="#{c.club.clubName}">
+        #{c.club.clubName}
+    </p:column>
 
-	<p:column id="colcoursename"
-                  headerText="#{msg['course.name']}"
-                  width="10%"
-                  filterMatchMode="contains"
-                  filterBy="#{c.course.courseName}" >
-                        #{c.course.courseName}
-	</p:column>
-<!-- width:50% : prend 50% de largeur écran
- style="width:40%; background-color: blue;"
--->
-        <p:column headerText="#{msg['round.name']}"
-                  width="10%"
-                  styleClass="red"
-                  id="compet" >
-                        #{c.round.roundName}
-        </p:column>
+    <p:column id="colcoursename"
+              headerText="#{msg['course.name']}"
+              width="10%"
+              filterMatchMode="contains"
+              filterBy="#{c.course.courseName}">
+        #{c.course.courseName}
+    </p:column>
 
-<!-- style="width:50px;text-align:right"   style="width:50px;text-align:right"  -->
-        <p:column headerText="#{msg['round.game']}"
-                  width="10%"
-                  id="game" >
-                        #{c.round.roundGame}
-        </p:column>
+    <p:column headerText="#{msg['round.name']}"
+              width="10%"
+              styleClass="red"
+              id="compet">
+        #{c.round.roundName}
+    </p:column>
 
-        <p:column headerText="#{msg['round.holes']}"
-                  width="6%" >
-            <h:outputText value="#{c.round.roundHoles}"/>
-        </p:column>
+    <p:column headerText="#{msg['round.game']}"
+              width="10%"
+              id="game">
+        #{c.round.roundGame}
+    </p:column>
 
-        <p:column headerText="#{msg['round.start']}"
-                  width="6%" >
-              <h:outputText value="#{c.round.roundStart}"/>
-        </p:column>
+    <p:column headerText="#{msg['round.holes']}"
+              width="6%">
+        <h:outputText value="#{c.round.roundHoles}"/>
+    </p:column>
 
-<f:facet name="footer">
-    There are #{roundC.listRecentRounds().stream().count()} rounds. 
-</f:facet>
+    <p:column headerText="#{msg['round.start']}"
+              width="6%">
+        <h:outputText value="#{c.round.roundStart}"/>
+    </p:column>
 
 </p:dataTable>
-
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>

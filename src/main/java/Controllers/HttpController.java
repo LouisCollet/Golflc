@@ -14,6 +14,7 @@ import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.ConnectException;
 import java.net.CookieManager;
@@ -27,14 +28,18 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.KeyStore;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.HexFormat;
 import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import static utils.LCUtil.showMessageFatal;
 
 @Named("httpC")
@@ -75,13 +80,19 @@ public class HttpController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            HttpClient client = HttpClient.newBuilder()
+            SSLContext sslContext = buildSSLContext(); // new 09/03/2026
+            HttpClient.Builder builder = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(50))
                 .followRedirects(HttpClient.Redirect.NORMAL)
-                .cookieHandler(cookieManager)
-                .build();
-            return client;
+                .cookieHandler(cookieManager);
+            if (sslContext != null) {
+                builder.sslContext(sslContext);
+                LOG.debug(methodName + " - custom SSLContext applied (ca.pem)");
+            } else {
+                LOG.warn(methodName + " - custom SSLContext not available, using JVM default");
+            }
+            return builder.build();
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;
@@ -116,10 +127,8 @@ public class HttpController implements Serializable {
             String timestamp = String.valueOf(Instant.now().getEpochSecond());
             String payload = timestamp + strJson;
             Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(
-                System.getenv("PAYMENT_HMAC_SECRET").getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            String signature = HexFormat.of().formatHex(
-                mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
+            mac.init(new SecretKeySpec(System.getenv("PAYMENT_HMAC_SECRET").getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            String signature = HexFormat.of().formatHex(mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
 
             HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(strJson))
@@ -146,7 +155,7 @@ public class HttpController implements Serializable {
                 showMessageFatal(msg);
                 return "ConnectException";
             } catch (HttpTimeoutException e) {
-                String msg = "Redis Server not available (request timed out) - start it: wsl sudo systemctl start redis";
+                String msg = "Payment server request timed out - check creditcardService.py and Memurai (net start Memurai)";
                 LOG.error(msg);
                 showMessageFatal(msg);
                 return e.getMessage();
@@ -158,10 +167,20 @@ public class HttpController implements Serializable {
 
             if (response.statusCode() != 200) {
                 LOG.debug(methodName + " - error code = " + response.statusCode());
-                ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-                Object jsonObject = mapper.readValue(response.body(), Object.class);
-                String msg = "Error from payment server: " + mapper.writeValueAsString(jsonObject);
-                LOG.error(msg);
+                String body = response.body();
+                String msg;
+                if (body != null && body.trim().startsWith("{")) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    java.util.Map<?, ?> map = mapper.readValue(body, java.util.Map.class);
+                    LOG.error(methodName + " - payment server error response: " + body);
+                    Object message = map.get("message");
+                    Object details = map.get("details");
+                    msg = (message != null ? message : "Unknown error")
+                        + "\n" + (details != null ? details : "");
+                } else {
+                    msg = "Error from payment server (HTTP " + response.statusCode() + "): " + body;
+                    LOG.error(msg);
+                }
                 showMessageFatal(msg);
                 return Integer.toString(response.statusCode());
             }
@@ -204,12 +223,13 @@ public class HttpController implements Serializable {
                 return "ServerUnavailable";
             }
             if ("request timed out".equals(e.getMessage())) {
-                String msg = "Redis Server not available (request timed out) - start it: wsl sudo systemctl start redis";
+                String msg = "Payment server request timed out - check creditcardService.py and Memurai (net start Memurai)";
                 LOG.error(msg);
                 showMessageFatal(msg);
                 return e.getMessage();
             }
             String msg = "Exception in " + methodName + " = " + e.getMessage() + " , response = " + response;
+            
             LOG.error(msg);
             showMessageFatal(msg);
             return e.getMessage();
@@ -265,31 +285,37 @@ public class HttpController implements Serializable {
         LOG.debug(methodName + " - Body    : " + response.body());
     } // end method
 
-    private boolean loadKeyStore() {
+    private SSLContext buildSSLContext() { // new 09/03/2026 pour ne plus utiliser cacerts et chipoter à chaque nouvelle version de JDK
+        // code généré claude code
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            LOG.debug(methodName + " - keyStore type = " + keyStore.getType());
-            LOG.debug(methodName + " - keyStore provider = " + keyStore.getProvider());
+            Path caPemPath = Path.of(System.getProperty("user.home"), ".ssl", "creditcard", "ca.pem");
+            LOG.debug(methodName + " - ca.pem path = " + caPemPath);
 
-            String relativeCacertsPath = "/lib/security/cacerts".replace("/", File.separator);
-            String filename = System.getProperty("java.home") + relativeCacertsPath;
-            LOG.debug(methodName + " - cacerts path = " + filename);
-
-            try (FileInputStream fis = new FileInputStream(filename)) {
-                keyStore.load(fis, "changeit".toCharArray());
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            X509Certificate caCert;
+            try (InputStream is = new FileInputStream(caPemPath.toFile())) {
+                caCert = (X509Certificate) cf.generateCertificate(is);
             }
+            LOG.debug(methodName + " - CA subject = " + caCert.getSubjectX500Principal());
+            LOG.debug(methodName + " - CA valid until = " + caCert.getNotAfter());
 
-            Date date = keyStore.getCreationDate("GolfLCCreditcardCertificate");
-            LOG.debug(methodName + " - certificate creation date = " + date);
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
+            trustStore.setCertificateEntry("GolfLCCreditcardCertificate", caCert);
+            LOG.debug(methodName + " - CA certificate loaded into trustStore");
 
-            boolean found = (date != null);
-            LOG.debug(methodName + " - certificate found = " + found);
-            return found;
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustStore);
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, tmf.getTrustManagers(), null);
+            LOG.debug(methodName + " - SSLContext initialized with custom trustStore");
+            return sslContext;
         } catch (Exception e) {
             handleGenericException(e, methodName);
-            return false;
+            return null;
         }
     } // end method
 

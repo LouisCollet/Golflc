@@ -2,7 +2,7 @@ package delete;
 
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
-import static interfaces.GolfInterface.SDF;
+import java.text.SimpleDateFormat;
 import static interfaces.Log.LOG;
 import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -28,7 +28,7 @@ public class DeleteHandicap implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         LOG.debug("Delete Handicap for idplayer = " + idplayer);
-        LOG.debug("Delete Handicap for date     = " + SDF.format(date));
+        LOG.debug("Delete Handicap for date     = " + new SimpleDateFormat("dd/MM/yyyy").format(date));
 
         final String deleteQuery = """
                 DELETE from handicap
@@ -68,7 +68,7 @@ public class DeleteHandicap implements Serializable {
 
             String msg = "<br/> <h1>Handicap deleted = "
                     + " <br/></h1>player = " + idplayer
-                    + " <br/>date = " + SDF.format(date)
+                    + " <br/>date = " + new SimpleDateFormat("dd/MM/yyyy").format(date)
                     + " <br/>deleted  = " + rowDelete
                     + " <br/>updated = " + rowUpdate;
             LOG.debug(msg);

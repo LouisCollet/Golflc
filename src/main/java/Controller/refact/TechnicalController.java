@@ -43,6 +43,7 @@ public class TechnicalController implements Serializable {
     // ✅ Injections SendEmailTest/numberText — migrated 2026-02-27
     @Inject private NavigationController        navigationController; // migrated 2026-02-28
     @Inject private ApplicationContext          appContext;
+    @Inject private Controllers.LanguageController languageController; // fix multi-user 2026-03-07
     @Inject private PlayerManager               playerManager;
     @Inject private read.ReadClub               readClubService;
     @Inject private ical.IcalService            icalService;
@@ -106,7 +107,7 @@ public class TechnicalController implements Serializable {
                     + "</br> now italic : "
                     + " </br> now <i> italiques </i>";
             String title = "Ceci est le sujet du mail, louis";
-            String recipient = "louis.collet@skynet.be,louis.collet.onduty@gmail.com";
+            String recipient = System.getenv("SMTP_USERNAME") + "," + System.getenv("SMTP_USERNAME_ONDUTY");
 
             String qrContent = "</br>this is the start of the content" + content + "</br>this is the end of the content";
 
@@ -188,11 +189,11 @@ public class TechnicalController implements Serializable {
         LOG.debug("entering " + methodName);
         try {
             LOG.debug(methodName + " - locale language = "
-                    + Controllers.LanguageController.getLanguage());
+                    + languageController.getLanguage()); // fix multi-user 2026-03-07
 
             String[] args = new String[3];
             args[0] = "-l";
-            args[1] = Controllers.LanguageController.getLanguage();
+            args[1] = languageController.getLanguage(); // fix multi-user 2026-03-07
             args[2] = s;
 
             String result = numbertextService.kernel(args);

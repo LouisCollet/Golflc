@@ -1,93 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces"
->
-<p:panelGrid
-    id="panelgridSummaryCompetition"
-    layout="tabular"
-    columnClasses="col1,col2,col3,col4"
-    columns="4" >
+      xmlns:p="primefaces" >
 
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['title.summary.competition']}" />
-</f:facet>
-      <h:outputText value="#{msg['competition.date']} :" />
-      <h:outputText
-            id="competitiondatesummary" 
-            value="#{roundC.competition.competitionDescription.competitionDate}"
-            >
-          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-      </h:outputText>
-      
-      <h:outputText value="#{msg['competition.name']} :" />
-      <h:outputText
-            id="idroundsummary" 
-            value="#{roundC.competition.competitionDescription.competitionName} (#{roundC.competition.competitionDescription.competitionId})"
-            /> 
-
-      <h:outputText value="#{msg['club.name']} :"   />
-	<h:outputText
-            id="clubsummary" 
-            value="#{roundC.competition.competitionDescription.competitionClubId} (#{clubC.club.idclub})" />
-
-      <h:outputText value="#{msg['course.name']} :" />
-      <h:outputText
-            id="coursesummary" 
-            value="#{roundC.competition.competitionDescription.competitionCourseIdName} - #{clubC.tee.teeHolesPlayed}" />
-
-     <h:outputText value="#{msg['competition.end.inscription']} :" />
-      <h:outputText
-            id="competitionenddatesummary" 
-            value="#{roundC.competition.competitionDescription.endInscriptionDate}" >
-          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-      </h:outputText>
-      
-      <h:outputText value="#{msg['round.game']} :" />
-      <h:outputText
-            id="roundgamesummary" 
-            value="#{roundC.competition.competitionDescription.competitionGame}"
-            />
-            <h:outputText value="#{msg['player.selected']} :"
-                     rendered="#{playerC.player.getDroppedPlayers().size() gt 0}">
-            </h:outputText>
-            <h:panelGroup id="panelGroupIncludeSummary"
-                    rendered="#{playerC.player.getDroppedPlayers().size() gt 0}" >
-                <h:outputText
-                 id="selectedPlayersSummarySize" 
-                 value="#{playerC.player.getDroppedPlayers().size()} = "/>
-                <h:outputText>
-                    <ui:repeat value="#{playerC.player.getDroppedPlayers()}"
-                               var="p">
-                        <h:outputText
-                             value="#{p.playerLastName} (#{p.idplayer}),">
-                        </h:outputText>
-                    </ui:repeat>
+    <h:panelGroup layout="block" styleClass="summary-bar">
+        <span class="summary-item">
+            <span class="summary-label">#{msg['competition.date']}</span>
+            <span class="summary-value">
+                <h:outputText value="#{roundC.competition.competitionDescription.competitionDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
                 </h:outputText>
-            </h:panelGroup>
+            </span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['competition.name']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionName} (#{roundC.competition.competitionDescription.competitionId})</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['club.name']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionClubId} (#{clubC.club.idclub})</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['course.name']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionCourseIdName} - #{clubC.tee.teeHolesPlayed}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['competition.end.inscription']}</span>
+            <span class="summary-value">
+                <h:outputText value="#{roundC.competition.competitionDescription.endInscriptionDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+                </h:outputText>
+            </span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['round.game']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionGame}</span>
+        </span>
+        <h:panelGroup rendered="#{playerC.player.getDroppedPlayers().size() gt 0}">
+            <span class="summary-sep">|</span>
+        </h:panelGroup>
+        <h:panelGroup styleClass="summary-item"
+                      rendered="#{playerC.player.getDroppedPlayers().size() gt 0}">
+            <span class="summary-label">#{msg['player.selected']}</span>
+            <span class="summary-value">
+                #{playerC.player.getDroppedPlayers().size()} =
+                <ui:repeat value="#{playerC.player.getDroppedPlayers()}" var="p">
+                    #{p.playerLastName} (#{p.idplayer}),
+                </ui:repeat>
+            </span>
+        </h:panelGroup>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['competition.gender']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionGender}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['competition.qualifying']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionQualifying}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['competition.status']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionStatus}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['competition.maxplayers']}</span>
+            <span class="summary-value">#{roundC.competition.competitionDescription.competitionMaximumPlayers}</span>
+        </span>
+    </h:panelGroup>
 
-         <h:outputText value="#{msg['competition.gender']}"/>
-         <h:outputText value="#{roundC.competition.competitionDescription.competitionGender}"/>
-
-         <h:outputText value="#{msg['competition.qualifying']}"/>
-         <h:outputText value="#{roundC.competition.competitionDescription.competitionQualifying}"/>
-
-         <h:outputText value="#{msg['competition.status']}"/>
-         <h:outputText value="#{roundC.competition.competitionDescription.competitionStatus}"/>
-<!--
-         <h:outputText value="#{msg['competition.series']}"/>
-         <h:outputText value="#{roundC.competition.competitionDescription.seriesHandicap}"/>
-  -->       
-         <h:outputText value="#{msg['competition.maxplayers']}"/>
-         <h:outputText value="#{roundC.competition.competitionDescription.competitionMaximumPlayers}"/>
-         
-</p:panelGrid>
-<p:divider layout="horizontal" type="solid" />
-<!-- https://stackoverflow.com/questions/21697024/cforeach-inside-primefacese-g-ppanelgrid-inside-uirepeat  
-https://stackoverflow.com/questions/3342984/jstl-in-jsf2-facelets-makes-sense/
--->
 </ui:composition>

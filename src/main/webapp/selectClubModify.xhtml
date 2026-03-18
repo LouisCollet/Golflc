@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition
-      xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
@@ -9,31 +8,34 @@
       template="templates/masterTemplate.xhtml">
 <ui:define name="title">Club Modify</ui:define>
 <ui:define name="content">
-<h:form id="form_selectClubModify" >
-<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="form_selectClubModify">
 
-<p:panelGrid 
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1><h:outputText escape="false" value="#{msg['message.selectclub.modify']}" /></h1>
+</f:facet>
+
+<p:panelGrid
     id="panel2"
-    layout="tabular"
+    layout="flex"
     columns="2"
-    columnClasses="col1, col2">
-    <f:facet name="header">
-        <h:outputText escape="false" value="#{msg['message.selectclub.modify']}" />
-    </f:facet>
-    
+    columnClasses="col1Flex, col2Flex">
+
    <!-- =================== INCLUDE CLUB SELECTOR =================== -->
    <ui:include src="/include/include_club_selector.xhtml" />
 
-<f:facet name="footer">
-        <p:commandButton
-                         value="#{msg['button.club.modify']}"
-                         id="clubModify"
-                         style="font-weight:normal "
-                         icon="pi pi-database"
-                         action="modify_ClubCourseTee.xhtml?faces-redirect=true"/>
-</f:facet>
 </p:panelGrid>
+
+<p:commandButton
+    value="#{msg['button.club.modify']}"
+    id="clubModify"
+    style="font-weight:normal"
+    icon="pi pi-database"
+    action="modify_ClubCourseTee.xhtml?faces-redirect=true"/>
+
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>

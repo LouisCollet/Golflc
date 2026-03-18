@@ -7,32 +7,32 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml" >
-    
+
 <ui:define name="title">Create Professional </ui:define>
 <ui:define name="content">
 
-<h:form id="form_professional" enctype="application/x-www-form-urlencoded" >
-<h:graphicImage id="graphic1" name="images/golf lesson2.jpg" alt="image missing :golf lesson2.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/golf lesson2.jpg" alt="image missing :golf lesson2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="form_professional">
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['message.select.pro']}</h1></f:facet>
+
 <ui:include src="include/include_summary_player.xhtml"/>
 <ui:include src="include/include_summary_club.xhtml"/>
-<p:panelGrid 
+
+<p:panelGrid
     id="panelGrid2"
-    layout="tabular"
+    layout="flex"
     columns="2"
-    columnClasses="col1, col2"
-    style="width:70%">
-    
-       <f:facet name="header">
-        <h1>#{msg['message.select.pro']}</h1>
-    </f:facet>
-        <!-- =================== INCLUDE CLUB SELECTOR =================== -->
-                <ui:include src="/include/include_player_selector.xhtml" >
-                    <ui:param name="clubLabel" value="Club 1" />
-                </ui:include>
-        <!-- =================== INCLUDE COURSE SELECTOR =================== -->
-                <ui:include src="/include/include_club_selector.xhtml" />
- 
+    columnClasses="col1Flex, col2Flex">
+
+        <ui:include src="/include/include_player_selector.xhtml" >
+            <ui:param name="playerPurpose" value="professional"/>
+            <ui:param name="playerLabel" value="#{msg['professional.title']}"/>
+        </ui:include>
+
+        <ui:include src="/include/include_club_selector.xhtml" />
+
     <h:outputText  value="#{msg['unavailable.period.start']} :"/>
     <p:datePicker value="#{appContext.professional.proStartDate}"
                   id="startDatePro"
@@ -45,9 +45,7 @@
                   showButtonBar="true"
                   yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(1)}"
                   yearNavigator="true"
-                  monthNavigator="true"
-                  >
-    </p:datePicker>
+                  monthNavigator="true" />
 
       <h:outputText  value="#{msg['unavailable.period.end']} :"/>
       <p:datePicker value="#{appContext.professional.proEndDate}"
@@ -62,9 +60,8 @@
                   showButtonBar="true"
                   yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(10)}"
                   yearNavigator="true"
-                  monthNavigator="true"
-                  >
-    </p:datePicker>
+                  monthNavigator="true" />
+
          <h:outputText  value="#{msg['professional.amount']} :"/>
          <p:inputNumber  label="lesson"
                        id="monday${i}"
@@ -74,21 +71,21 @@
                        lang="#{languageC.locale}"
                        decimalPlaces="1"
                        decimalSeparator="."
-                       placeholder="99.9" >
-          </p:inputNumber>
+                       placeholder="99.9" />
 
 <f:facet name="footer">
         <p:commandButton
                          value="#{msg['button.professional.create']}"
                          id="createPlayer"
                          ajax="false"
-                         style="font-weight:normal "
                          update="growl-msg"
-                          
                          icon="pi pi-database"
                          action="#{clubC.createProfessional()}"/>
 </f:facet>
 </p:panelGrid>
+
+</p:panel>
+</div>
 
 </h:form>
 </ui:define>

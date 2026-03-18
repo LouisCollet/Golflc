@@ -6,7 +6,7 @@ import entite.*;
 import entite.composite.ECourseList;
 import entite.composite.EPlayerPassword;
 import entite.composite.EUnavailable;
-import enumeration.ClubSelectionPurpose;
+import enumeration.SelectionPurpose;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import jakarta.annotation.PostConstruct;
@@ -45,7 +45,7 @@ public class ClubController implements Serializable {
     @Inject private DialogController dialogController; // migration manuelle
     // ========== EN HAUT DE LA CLASSE (avec les autres @Inject) ==========
     @Inject private lists.CourseListForClub courseListForClubService; // migrated 2026-02-24
-    @Inject private jakarta.faces.context.ExternalContext externalContext;  // ✅ injecté    
+    // externalContext injection removed — fix multi-user 2026-03-07 (request-scoped, must not be cached in @SessionScoped)
     @Inject private CoordinatesService coordinatesService;
     @Inject private contexte.ClubSelectionContextBean clubSelectionContext; // migrated 2026-02-25
     @Inject private read.ReadClub readClubService; // migrated 2026-02-25
@@ -437,7 +437,7 @@ private EPlayerPassword selectedPlayerEPP = null;
                     tee.getTeeGender().equals("M") &&
                     tee.getTeeHolesPlayed().equals("01-18")) {
                     LOG.debug("master tee ==> 3 lignes avec par, index et distances : la totale");
-                    return "holes_global.xhtml?faces-redirect=true";
+                    return "hole.xhtml?faces-redirect=true";
 
                 } else if (!tee.getTeeStart().equals("YELLOW") &&
                            tee.getTeeGender().equals("M") &&
@@ -799,9 +799,7 @@ private EPlayerPassword selectedPlayerEPP = null;
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            holeListForTee = null;   // important à corriger !!!
-                //    clubManager.listHolesForTee(teeId);
-
+            holeListForTee = clubManager.listHolesForTee(teeId);
             LOG.debug("Loaded {} holes for tee {}", holeListForTee.size(), teeId);
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -996,7 +994,7 @@ public String findClubWebsite() {
         }
 
         LOG.debug(methodName + " - redirecting to = " + url);
-        externalContext.redirect(url);
+        FacesContext.getCurrentInstance().getExternalContext().redirect(url);
         return null;
 
     } catch (Exception e) {
@@ -1017,7 +1015,7 @@ public String findClubWebsite(){ //used in player.xhtml
                 club.setClubWebsite("Website must be completed !");
                 return null;
             }
-            externalContext.redirect("http://" + club.getClubWebsite());  // https ???
+            FacesContext.getCurrentInstance().getExternalContext().redirect("http://" + club.getClubWebsite());  // https ???
             return null;
   }catch (Exception e){
             String msg = "Â£ Exception in CourseController - findClubWebsite = " + e.getMessage();
@@ -1238,7 +1236,7 @@ public void convertYtoM() {
             LOG.debug("tee after loadHoles = " + tee);
             hole.setCreateModify(false);
             if ("global".equals(type)) {
-                return "holes_global.xhtml?faces-redirect=true&operation=modify holes Global";
+                return "hole.xhtml?faces-redirect=true&operation=modify holes Global";
             } else {
                 return "holes_distance.xhtml?faces-redirect=true&operation=modify holes Distance";
             }
@@ -1255,13 +1253,13 @@ public void convertYtoM() {
 
     /**
      * Action du bouton "Choix Club et Parcours" (selectClubCourse.xhtml)
-     * Navigue vers la page finale selon le ClubSelectionPurpose.
+     * Navigue vers la page finale selon le SelectionPurpose.
      */
     public String clubAndCourseAction() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
-        enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
+        enumeration.SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
+                .orElse(enumeration.SelectionPurpose.CREATE_PLAYER);
         LOG.debug(methodName + " with purpose = " + purpose);
         return purpose.navigationToFinal();
     } // end method
@@ -1274,10 +1272,10 @@ public void convertYtoM() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                    .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
+            enumeration.SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
+                    .orElse(enumeration.SelectionPurpose.CREATE_PLAYER);
             LOG.debug(methodName + " with purpose = " + purpose);
-            if (purpose == enumeration.ClubSelectionPurpose.PAYMENT_COTISATION) {
+            if (purpose == enumeration.SelectionPurpose.PAYMENT_COTISATION) {
                 LOG.debug("purpose is PAYMENT_COTISATION");
                 LOG.debug("pour le club = " + appContext.getClub().getIdclub());
                 return "cotisation.xhtml?faces-redirect=true";
@@ -1400,7 +1398,7 @@ public void convertYtoM() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         tee.setTeeHolesPlayed("01-18");
-        return "modify_holes_global.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectCourse();
+        return "modify_hole.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectCourse();
     } // end method
 
     /**
@@ -1501,12 +1499,12 @@ public void convertYtoM() {
                 return "round.xhtml?faces-redirect=true&cmd=ini";
             }
 
-            if (appContext.getInputSelectCourse().equals("CreateTarifGreenfee")) {
-                return "tarif_greenfee_menu.xhtml?faces-redirect=true";
+            if (appContext.getInputSelectCourse().equals("createTarifGreenfee")) {
+                return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
             }
 
-            if (appContext.getInputSelectCourse().equals("CreateTarifMember")) {
-                return "tarif_members_menu.xhtml?faces-redirect=true";
+            if (appContext.getInputSelectCourse().equals("createTarifMember")) {
+                return "tarif_member_wizard.xhtml?faces-redirect=true";
             }
 
             if (appContext.getInputSelectCourse().equals("CreateUnavailablePeriod")) {
@@ -1786,8 +1784,12 @@ public void convertYtoM() {
         LOG.debug("entering " + methodName + " with string = {}", menuSelection);
         navigationController.reset("Reset from to_selectPurpose_xhtml, with : " + menuSelection);
 
+        // 0.
+        appContext.setInputSelectCourse(menuSelection); // new 06/03/2026 utile ?
+        LOG.debug("appContext.setInputSelectCourse setted to" + appContext.getInputSelectCourse());
+        
         // 1. Résolution du purpose
-        enumeration.ClubSelectionPurpose purpose = enumeration.ClubSelectionPurpose.fromCode(menuSelection);
+        enumeration.SelectionPurpose purpose = enumeration.SelectionPurpose.fromCode(menuSelection);
         LOG.debug("purpose resolved = {}", purpose);
 
         // 2. Ouverture du contexte CDI
@@ -1958,8 +1960,8 @@ public void convertYtoM() {
         appContext.setClub(c);
         LOG.debug(methodName + " with club = " + appContext.getClub());
         try {
-            enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                    .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
+            enumeration.SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
+                    .orElse(enumeration.SelectionPurpose.CREATE_PLAYER);
             LOG.debug(methodName + " with purpose = " + purpose);
 
             return switch (purpose) {
@@ -2003,7 +2005,7 @@ public void convertYtoM() {
                     yield null;
                 }
                 default -> {
-                    LOG.warn("Unknown ClubSelectionPurpose: " + purpose);
+                    LOG.warn("Unknown SelectionPurpose: " + purpose);
                     appContext.getPlayer().setPlayerHomeClub(appContext.getClub().getIdclub());
                     if (appContext.getCompetition() != null) {
                         appContext.getCompetition().competitionDescription().setCompetitionClubId(appContext.getClub().getIdclub());
@@ -2029,8 +2031,8 @@ public void convertYtoM() {
         try {
             LOG.debug(methodName + " with course input parameter = " + c);
             LOG.debug(methodName + " for club = " + appContext.getClub());
-            enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                    .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
+            enumeration.SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
+                    .orElse(enumeration.SelectionPurpose.CREATE_PLAYER);
             LOG.debug(methodName + " with purpose = " + purpose);
             appContext.setCourse(c);
             LOG.debug(methodName + " course is now = " + appContext.getCourse());
@@ -2076,7 +2078,7 @@ public void convertYtoM() {
         }
     } // end method
 
-    public String selectClub(Club c, String select) {
+    public String selectClub(Club c, String select) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
@@ -2089,7 +2091,13 @@ public void convertYtoM() {
                     + " <br/> inputSelectCourse = " + select;
             LOG.debug(msg);
 
-            LOG.debug(methodName + " : inputSelectCourse = " + appContext.getInputSelectCourse());
+            SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose()).orElse(SelectionPurpose.CREATE_PLAYER);
+            LOG.debug(methodName + " with purpose = " + purpose);
+            
+            if (purpose == SelectionPurpose.LOCAL_ADMIN) {
+                   LOG.debug(methodName + " : inputSelectCourse = " + appContext.getInputSelectCourse());
+                   
+              }
             if (appContext.getInputSelectCourse() == null) {
                 msg = "No InputSelectCourse !";
                 LOG.error(msg);
@@ -2097,6 +2105,8 @@ public void convertYtoM() {
                 return null;
             }
             if (select.equals("CreatePro")) {
+                
+                // ici intervenir pour soution avec purpose
                 return "professional.xhtml?faces-redirect=true";
             }
 
@@ -2117,18 +2127,31 @@ public void convertYtoM() {
                 }
             }
 
-            if (select.equals("CreateTarifGreenfee")) {
-                return "tarif_greenfee_menu.xhtml?faces-redirect=true";
+            if (purpose == SelectionPurpose.CREATE_TARIF_GREENFEE) {
+                     LOG.debug("purpose is CREATE_TARIF_GREENFEE");
+                     LOG.debug(" return TO tarif_greenfee_wizard.xhtml");
+                     return purpose.navigationToFinal(); //
+                 }
+            if (select.equals("createTarifGreenfee")) { // old solution
+                return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
             }
 
-            if (select.equals("CreateTarifMember")) {
-                return "tarif_members_menu.xhtml?faces-redirect=true";
+                 if (purpose == SelectionPurpose.CREATE_TARIF_MEMBER) {
+                     LOG.debug("purpose is CREATE_TARIF_MEMBER");
+                       LOG.debug(" return TO tarif_member_wizard.xhtml");
+                     return purpose.navigationToFinal();
+                 }
+            
+            if (select.equals("createTarifMember")) { // old solution
+                LOG.debug("select.equals(createTarifMember"); // si équivalence, alors on n'a plus besoin de select
+                return "tarif_member_wizard.xhtml?faces-redirect=true";
             }
 
             if (select.equals("PaymentCotisationSpontaneous")) {
                 LOG.debug("entering PaymentCotisationSpontaneous");
                 LOG.debug("club = " + appContext.getClub());
                 LOG.debug("round = " + appContext.getRound());
+                
                 tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound()); // migrated 2026-02-26 navigationController.getRound() → appContext
                 if (tarifMember == null) {
                     String msgerr = LCUtil.prepareMessageBean("tarif.member.notfound");
@@ -2150,16 +2173,18 @@ public void convertYtoM() {
     public String selectCourseLA(ECourseList in_club, String select) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
+        LOG.debug("with  " + methodName);
         try {
             LOG.debug(methodName + " with select = " + select);
             LOG.debug(methodName + " with in_club = " + in_club);
             appContext.setClub(in_club.club());
             appContext.setCourse(in_club.course());
+            LOG.debug(methodName + " inputSelectCourse = " + appContext.getInputSelectCourse());
             String msg = "Select Club Successfull = "
                     + " <br/> Club name = " + appContext.getClub().getClubName()
                     + " <br/> inputSelectCourse = " + select;
             LOG.debug(msg);
-            LOG.debug(methodName + " inputSelectCourse = " + appContext.getInputSelectCourse());
+            
             if (appContext.getInputSelectCourse() == null) {
                 msg = "No InputSelectCourse !";
                 LOG.error(msg);
@@ -2168,11 +2193,13 @@ public void convertYtoM() {
             }
 
             if (select.equals("CreateTarifGreenfee")) {
-                return "tarif_greenfee_menu.xhtml?faces-redirect=true";
+          //      return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
+               // return "tarif_greenfee_menu_new.xhtml?faces-redirect=true";
+                return "tarif_greenfee_wizard.xhtml?faces-redirect=true"; // mod LC 06/03/2026
             }
 
             if (appContext.getInputSelectCourse().equals("CreateTarifMember")) {
-                return "tarif_members_menu.xhtml?faces-redirect=true";
+                return "tarif_member_wizard.xhtml?faces-redirect=true";
             }
 
             if (appContext.getInputSelectCourse().equals("CreateUnavailablePeriod")) {
@@ -2243,10 +2270,10 @@ public void convertYtoM() {
             LOG.debug("club = " + appContext.getClub());
             LOG.debug("course = " + appContext.getCourse());
             LOG.debug("sessionMap inputSelectCourse = " + appContext.getInputSelectCourse());
-            enumeration.ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                    .orElse(enumeration.ClubSelectionPurpose.CREATE_PLAYER);
+            enumeration.SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
+                    .orElse(enumeration.SelectionPurpose.CREATE_PLAYER);
             LOG.debug(methodName + " with purpose = " + purpose);
-            if (purpose == enumeration.ClubSelectionPurpose.CREATE_ROUND) {
+            if (purpose == enumeration.SelectionPurpose.CREATE_ROUND) {
                 LOG.debug(methodName + " return to " + purpose.navigationToFinal());
                 return purpose.navigationToFinal();
             }

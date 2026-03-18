@@ -6,7 +6,6 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:o="omnifaces"
       xmlns:of="http://omnifaces.org/functions"
       template="templates/masterTemplate.xhtml">
 
@@ -16,11 +15,11 @@
 
 <h:form id="technical_info">
 
-    <!-- Images -->
-    <h:graphicImage name="images/technical02.jpg" style="float:left"/>
-    <h:graphicImage name="images/technical04.jpg" style="float:right"/>
-
-    <p:panel header="Technical Information" styleClass="mb-3">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>Technical Information</h1>
+</f:facet>
 
         <div class="grid">
 
@@ -46,9 +45,9 @@
                         <h:panelGroup layout="block">
                             <h:panelGroup id="deployIcon" styleClass="tech-icon pi pi-upload" layout="inline"/>
                             Deploy Date
-                            <p:tooltip for="deployIcon" value="Date du dernier déploiement"/>
+                            <p:tooltip for="deployIcon" value="Date du dernier deploiement"/>
                         </h:panelGroup>
-                            <p:badge value="#{infoC.DeployVersion()}" severity="warning"/>
+                            <p:badge value="#{infoC.deployVersion()}" severity="warning"/>
 
                     </p:panelGrid>
                 </p:fieldset>
@@ -99,7 +98,7 @@
                         <h:panelGroup layout="block">
                             <h:panelGroup id="jsfIcon" styleClass="tech-icon pi pi-desktop" layout="inline"/>
                             JSF (Mojarra)
-                            <p:tooltip for="jsfIcon" value="Implémentation JSF"/>
+                            <p:tooltip for="jsfIcon" value="Implementation JSF"/>
                         </h:panelGroup>
                         <p:badge value="#{infoC.mojarraVersion}" severity="info"/>
 
@@ -116,16 +115,6 @@
                             <p:tooltip for="flexIcon" value="Utilitaires CSS PrimeFlex"/>
                         </h:panelGroup>
                         <p:badge value="#{infoC.primeflexVersion}" severity="secondary"/>
-
-                        <!-- jQuery dynamique 
-                        <h:panelGroup layout="block">
-                            <span id="jqueryVersion"></span>
-                            <p:tooltip for="jqueryVersion" value="Version jQuery chargée côté client"/>
-                            <h:outputScript>
-                                document.getElementById('jqueryVersion').textContent =
-                                     'jQuery version: ' + (window.jQuery &amp;&amp; jQuery.fn ? jQuery.fn.jquery : 'not loaded');
-                            </h:outputScript>
-                        </h:panelGroup>-->
 
                     </p:panelGrid>
                 </p:fieldset>
@@ -153,7 +142,7 @@
                         <h:panelGroup layout="block">
                             <h:panelGroup id="osIcon" styleClass="tech-icon pi pi-desktop" layout="inline"/>
                             OS
-                            <p:tooltip for="osIcon" value="Système d'exploitation du serveur"/>
+                            <p:tooltip for="osIcon" value="Systeme d'exploitation du serveur"/>
                         </h:panelGroup>
                         <p:badge value="#{infoC.osVersion}" severity="secondary"/>
 
@@ -169,16 +158,16 @@
                         <h:panelGroup layout="block">
                             <h:panelGroup id="mysqlIcon" styleClass="tech-icon pi pi-database" layout="inline"/>
                             MySQL
-                            <p:tooltip for="mysqlIcon" value="Base de données MySQL"/>
+                            <p:tooltip for="mysqlIcon" value="Base de donnees MySQL"/>
                         </h:panelGroup>
-                        <p:badge value="#{infoC2.mySQLInfo}" severity="success"/>
+                        <p:badge value="#{infoC.mySQLInfo}" severity="success"/>
 
                         <h:panelGroup layout="block">
                             <h:panelGroup id="mongoIcon" styleClass="tech-icon pi pi-database" layout="inline"/>
                             MongoDB
-                            <p:tooltip for="mongoIcon" value="Base de données MongoDB"/>
+                            <p:tooltip for="mongoIcon" value="Base de donnees MongoDB"/>
                         </h:panelGroup>
-                        <p:badge value="#{infoC2.mongoInfo}" severity="success"/>
+                        <p:badge value="#{infoC.mongoInfo}" severity="success"/>
 
                         <h:panelGroup layout="block">
                             <h:panelGroup id="logIcon" styleClass="tech-icon pi pi-file" layout="inline"/>
@@ -192,7 +181,6 @@
             </div>
 
         </div>
-    </p:panel>
 
     <h:panelGroup style="overflow-x:auto;">
     <table style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;">
@@ -210,20 +198,21 @@
                     <td style="padding: 8px;">#{entry.value}</td>
                     <td style="padding: 8px; font-weight:bold; text-align:center;">
                         <span style="color:#{entry.value eq 'absent' ? '#d9534f' : '#5cb85c'}; font-size:1.2em;">
-                            #{entry.value eq 'absent' ? '❌' : '✅'}
+                            #{entry.value eq 'absent' ? '&#10060;' : '&#9989;'}
                         </span>
                     </td>
                 </tr>
             </ui:repeat>
         </tbody>
     </table>
-</h:panelGroup>
+    </h:panelGroup>
 
-    
-    
+</p:panel>
+</div>
+
 </h:form>
 
-<!-- CSS personnalisé -->
+<!-- CSS personnalise -->
 <h:outputStylesheet>
     .tech-grid .ui-panelgrid-cell {
         display: flex;

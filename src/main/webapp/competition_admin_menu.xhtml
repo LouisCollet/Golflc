@@ -11,20 +11,23 @@
 <ui:define name="title">Competition Menu </ui:define>
 <ui:define name="content">
 
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header"><h1>Competition Menu</h1></f:facet>
+
 <h:form id="competition_menu" >
- <!--  <ui:include src="include/include_summary_competition.xhtml"/> -->
 
  <my:summaryCompetition
     competition="#{roundC.competition.competitionDescription}"
     tee="#{clubC.tee}"
     droppedPlayers="#{playerC.player.droppedPlayers}" />
-  
+
 <p:panelMenu id="panel_menu"
-             style="font-size: 1.5rem;border:solid 5px">
+             style="font-size: 1.5rem;">
     <p:submenu
             id="submenu"
             expanded="true"
-            label="Choisissez l'action à exécuter" 
+            label="Choisissez l'action à exécuter"
             icon="pi pi-check"
             style="font-size: 1.5rem;"
        >
@@ -46,23 +49,18 @@
                      action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription, 'FINAL')}"
                      title="#{msg['tooltip.inscriptions.final']}"
                      icon="pi pi-sun"/>
-         <!--  disabled="#{roundC.competition.competitionDescription.competitionStatus ne '0'}"
-         style="font-size: 1.0em;"
-         -->
          <p:menuitem value ="#{msg['competition.rounds']}"
                      rendered="#{roundC.competition.competitionDescription.competitionStatus eq '1'}"
                      action="#{roundC.createRoundsCompetition(roundC.competition.competitionDescription)}"
                      style="font-size: 1.0rem;"
                      title="tooltip.competition.score"
                      icon="pi pi-clock" />
-         <!-- disabled="#{roundC.competition.competitionDescription.competitionStatus ne '1'}"   -->
          <p:menuitem value ="#{msg['competition.score']}"
                      action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription,'PROVISIONAL')}"
                      rendered="#{roundC.competition.competitionDescription.competitionStatus eq '3'}"
                      title="tooltip.competition.score"
                      style="font-size: 1.0rem;"
                      icon="pi pi-clock" />
-         <!-- disabled="#{roundC.competition.competitionDescription.competitionStatus ne '3'}"  -->
          <p:menuitem value ="#{msg['competition.classment.calculate']}"
                      action="#{roundC.listParticipantsStablefordCompetition(roundC.competition.competitionDescription)}"
                      rendered="#{roundC.competition.competitionDescription.competitionStatus eq '4'}"
@@ -70,11 +68,12 @@
                      style="font-size: 1.0rem;"
                      icon="pi pi-clock" />
         </p:submenu>
-    <!--  disabled="#{roundC.competition.competitionDescription.competitionStatus ne '4'}"  -->
 </p:panelMenu>
-<!--
- outcome="competition_show_participants_stableford.xhtml"
-action="#{navC.selectedCompetitionScoreStableford(roundC.competition)}"   -->
+
 </h:form>
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

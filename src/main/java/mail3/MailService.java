@@ -28,7 +28,7 @@ public class MailService {
                 Session session = Session.getInstance(props, new Authenticator() {
                     @Override
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication("louis.collet@skynet.be", System.getenv("SMTP_PASSWORD"));
+                        return new PasswordAuthentication(System.getenv("SMTP_USERNAME"), System.getenv("SMTP_PASSWORD"));
                     }
                 });
 

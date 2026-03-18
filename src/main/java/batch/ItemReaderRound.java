@@ -127,7 +127,7 @@ public class ItemReaderRound extends AbstractItemReader implements interfaces.Go
 
                 // ✅ Nouvelle instance Round par item — plus @Inject Round
                 Round round = new Round();
-                java.util.Date d = SDF_TIME.parse(values2D[count][0]);
+                java.util.Date d = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(values2D[count][0]);
                 round.setRoundDate(DatetoLocalDateTime(d));
                 round.setRoundGame(values2D[count][1]);
                 round.setRoundName(values2D[count][2]);
@@ -313,9 +313,9 @@ public Object readItem() throws Exception {     // à modifier voir example dans
   if(count < rows)  {
                    LOG.debug("length elem = " + values2D[count].length);
                    LOG.debug("parsing elem = " + Arrays.deepToString(values2D[count]) );
-       //          round.setRoundDate(SDF_TIME.parse(values2D[count][0]) );
+       //          round.setRoundDate(new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(values2D[count][0]) );
                  
-                 java.util.Date d = SDF_TIME.parse(values2D[count][0]);
+                 java.util.Date d = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(values2D[count][0]);
                  round.setRoundDate(DatetoLocalDateTime(d));
                  round.setRoundGame(values2D[count][1] );
                   round.setRoundName(values2D[count][2]);

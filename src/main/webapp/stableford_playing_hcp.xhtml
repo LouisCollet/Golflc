@@ -6,26 +6,25 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
 <ui:define name="title">Stableford Playing Handicap Page </ui:define>
 
 <ui:define name="content">
 
-<h:form id="stableford_playing_hcp" enctype="application/x-www-form-urlencoded" >
-<h:graphicImage id="graphic1" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
+<h:form id="stableford_playing_hcp">
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header">
+    <h1>#{msg['playinghcp.stableford.title']}</h1>
+</f:facet>
 
 <p:panelGrid
     id="panel"
-    layout="tabular"
+    layout="flex"
     columns="2"
-    columnClasses="col1, col2">
+    columnClasses="col1Flex, col2Flex">
 
-<f:facet name="header">
-    <h1>#{msg['playinghcp.stableford.title']}</h1>
-
-</f:facet>
                 <h:outputText value="#{msg['handicap.whs']}" />
                 <p:inputNumber  label="ExactHandicap"
                        id="hcp"
@@ -54,8 +53,8 @@
                        placeholder="99.9"
                        minValue="58.0"
                        maxValue="750" />
-                <h:outputText value="#{msg['course.par']} :"   />
-                
+                <h:outputText value="#{msg['course.par']} :" />
+
                 <p:selectOneRadio
                     id="OneMenuPar"
                     value="#{roundC.playingHcp.coursePar}">
@@ -64,37 +63,37 @@
                     <f:selectItem itemLabel="Par 72" itemValue="72" />
                     <f:selectItem itemLabel="Par 73" itemValue="73" />
                 </p:selectOneRadio>
-                
-        <h:outputText value="#{msg['round.holes']} *"   />
+
+        <h:outputText value="#{msg['round.holes']} *" />
         <p:selectOneButton id="holes"
-                value="#{roundC.playingHcp.roundHoles}"
-                styleClass="oneradio" >
+                value="#{roundC.playingHcp.roundHoles}">
                 <f:selectItem itemLabel="Holes 9 " itemValue="9" />
                 <f:selectItem itemLabel="Holes 18" itemValue="18" />
         </p:selectOneButton>
-                
-        <h:outputText value="#{msg['round.start']} *"   />
+
+        <h:outputText value="#{msg['round.start']} *" />
         <p:selectOneButton id="start"
-                value="#{roundC.playingHcp.roundStart}"
-                styleClass="oneradio" >
+                value="#{roundC.playingHcp.roundStart}">
                 <f:selectItem itemLabel="Start 1 " itemValue="1" />
                 <f:selectItem itemLabel="Start 10" itemValue="10" />
         </p:selectOneButton>
-                
+
                 <h:outputText value="#{msg['handicap.playing']}" />
                 <h:outputText value="#{roundC.playingHcp.playingHandicap}"
                               style="font-size: 3em;" />
+</p:panelGrid>
+
 <f:facet name="footer">
-         <p:commandButton 
+         <p:commandButton
                          id="button01"
                          value="#{msg['button.hcp.calculate']}"
                          update="growl-msg"
                          ajax="false"
-                          
                          icon="pi pi-database"
                          action="#{roundC.simulateHcpStb()}"/>
 </f:facet>
-</p:panelGrid>
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>

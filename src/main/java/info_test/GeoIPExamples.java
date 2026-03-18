@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 
 import static interfaces.Log.LOG;
+import jakarta.annotation.security.DenyAll;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
@@ -98,6 +99,7 @@ public class GeoIPExamples {
     // ========================================================================
     
     @Path("/api/location")
+    @DenyAll // security audit 2026-03-09 — info/debug endpoints disabled in production
     public static class LocationResource {
         
         @GET

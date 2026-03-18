@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
@@ -11,28 +11,26 @@
 <ui:define name="title">Job Submitter</ui:define>
 
 <ui:define name="content">
-<h:graphicImage library="images" name="BB.jpg" alt="image missing :file.png" style="float: left;"></h:graphicImage>
-<h:graphicImage library="images" name="GB.jpg" alt="image missing :text file.png" style="float: right;">
-</h:graphicImage>
-    <!-- -->
+
 <h:form id="jobsubmitter"  >
 
-<p:panelGrid
-    id="panel"
-    layout="tabular"
-    columns="2"
-    columnClasses="col1, col2">
-
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
 <f:facet name="header">
     <h1>Batch Job Submission</h1>
 </f:facet>
+
+<p:panelGrid
+    id="panel"
+    layout="flex"
+    columns="2"
+    columnClasses="col1Flex,col2Flex">
 
 <h:outputText value="Batch ID" />
 <h:outputText value="#{batchC.execID}" />
 
 <c:set var="myVar" value="#{batchC.execID}" scope="request" />
 
-<!-- #{myVar} comment sauver le id ??  rendered="#{jsfBean.completed==false}" -->
 <h:outputText value="Batch Status"/>
 <h:outputText value="#{batchC.jobStatus} - #{myVar}" />
 
@@ -61,9 +59,12 @@
                          ajax="false"
                          icon="pi pi-arrow-right"
                          action="#{batchC.startBatchJobInscriptions()}"/>
-        
+
 </f:facet>
 </p:panelGrid>
+
+</p:panel>
+</div>
 
 </h:form>
 </ui:define>

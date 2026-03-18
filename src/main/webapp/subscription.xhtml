@@ -3,56 +3,58 @@
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:h="jakarta.faces.html"
       template="templates/masterTemplate.xhtml">
-<ui:define name="head" />
 <ui:define name="title">Player Page </ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/subscribe1.jpg" alt="image missing :subscribe1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/subscribe2.jpg" alt="image missing :subscribe2.jpg" style="float: right;"></h:graphicImage>
 
-<h:form id="subscription" >
+<h:form id="subscription">
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['subscription.new']}</h1></f:facet>
+
 <ui:include src="include/include_subscription.xhtml"/>
 
-<p:panelGrid 
-    id="panelsub1" 
+<p:panelGrid
+    id="panelsub1"
     columns="2"
-    layout="tabular"
-    columnClasses="col1, col2">
+    layout="flex"
+    columnClasses="col1Flex, col2Flex">
 
-<f:facet name="header" >
-    <h1>#{msg['subscription.new']}</h1>
-</f:facet>
     <h:outputText value="#{msg['subscription.new']}" />
     <p:selectOneButton id="subscr5"
               value="#{memC.subscription.subCode}"
-              rendered="#{memC.subscription.trialCount le 5 
+              rendered="#{memC.subscription.trialCount le 5
                        or memC.subscription.trialCount eq null}" >
-        <f:selectItem itemLabel="#{msg['subscription.trial']}" itemValue="TRIAL">   </f:selectItem>
-        <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
-        <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
+        <f:selectItem itemLabel="#{msg['subscription.trial']}" itemValue="TRIAL" />
+        <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY" />
+        <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY" />
      </p:selectOneButton>
-                
+
     <p:selectOneButton id="subscr6"
               value="#{memC.subscription.subCode}"
               rendered="#{memC.subscription.trialCount gt 5}" >
-         <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY"> </f:selectItem>
-         <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY">  </f:selectItem>
+         <f:selectItem itemLabel="#{msg['subscription.month']}" itemValue="MONTHLY" />
+         <f:selectItem itemLabel="#{msg['subscription.year']}"  itemValue="YEARLY" />
     </p:selectOneButton>
-                
+
 <f:facet name="footer">
     <p:commandButton
          value="#{msg['button.subscription.create']}"
          id="button01"
          ajax="false"
          update="growl-msg"
-          
          icon="pi pi-database"
          action="#{payC.manageSubscription()}" />
 </f:facet>
 </p:panelGrid>
+
+</p:panel>
+</div>
+
 </h:form>
 </ui:define>
 </ui:composition>

@@ -2,32 +2,30 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Tee Restart Page </ui:define>
 
+<ui:define name="title">Tee Restart Page</ui:define>
 <ui:define name="content">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header"><h1>Bill Payment CDI Event Tutorial</h1></f:facet>
 
-<h:form id="form_debit_credit"  >
-<h:graphicImage id="graphic1" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
+<h:form id="form_debit_credit">
 <p:panelGrid
     id="panel1"
-    layout="tabular"
+    layout="flex"
     columns="2"
- >
- <f:facet name="header">
-  <h1>Bill Payment CDI Event Tutorial </h1>
- </f:facet>
+    columnClasses="col1Flex,col2Flex">
+
 	<p:outputLabel value="Amount: " for="amt" />
 	<p:inputText id="amt" value="#{paymentBean.amount}"
                      required="true"
 		requiredMessage="An amount is required."
-                maxlength="15"
-                />
+                maxlength="15" />
 
 	<h:outputLabel value="Payment Options:" for="opt" />
 	<p:selectOneRadio id="opt" value="#{paymentBean.paymentOption}"
@@ -39,54 +37,50 @@
 	</p:selectOneRadio>
 
 <f:facet name="footer">
-        <p:commandButton id="submit" 
+        <p:commandButton id="submit"
                          value="Pay"
-                          
-                         action="#{paymentBean.pay()}" 
-                         update="table1"
-                         style="float: left;" />
-	<p:commandButton value="Reset" 
-                          
-                         action="#{paymentHandler.setPaymentsNull()}"
-                         style="float: right;"  />
-	
+                         action="#{paymentBean.pay()}"
+                         update="table1" />
+	<p:commandButton value="Reset"
+                         action="#{paymentHandler.setPaymentsNull()}" />
 </f:facet>
 </p:panelGrid>
-        
+
  <p:panelGrid
     id="panel2"
-    layout="tabular"
-    columns="4"
-    >
+    layout="flex"
+    columns="4">
+
  <f:facet name="header">
-    <h1>Payment Handler Output</h1>
+    <h2>Payment Handler Output</h2>
  </f:facet>
  <p:dataTable id="table1"
               var="c"
               value="#{paymentHandler.payments}"
               emptyMessage="#{msg['message.table.empty']}"
-              rendered="#{not empty payments}"
-          >
-<p:column headerText="Date" >
-      <h:outputText value="#{c.datetime}"> 
+              rendered="#{not empty payments}">
+<p:column headerText="Date">
+      <h:outputText value="#{c.datetime}">
                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm:ss" />
       </h:outputText>
  </p:column>
 
-<p:column headerText="Movement"  >
-      <h:outputText value="#{c.type}"/> 
+<p:column headerText="Movement">
+      <h:outputText value="#{c.type}"/>
  </p:column>
 
- <p:column headerText="Amount" >     
-      <h:outputText value="#{c.amount}"/> 
+ <p:column headerText="Amount">
+      <h:outputText value="#{c.amount}"/>
  </p:column>
 
-<p:column headerText="TOTAL" >
-      <h:outputText value="#{c.total}"/> 
+<p:column headerText="TOTAL">
+      <h:outputText value="#{c.total}"/>
  </p:column>
 </p:dataTable>
 
 </p:panelGrid>
 </h:form>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

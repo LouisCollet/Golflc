@@ -1,72 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE html>
-<html
+<ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
->
-
-<ui:composition template="templates/masterTemplate.xhtml">
+      template="templates/masterTemplate.xhtml">
 <ui:define name="title">Register </ui:define>
 
 <ui:define name="content">
-    
-<h:link title="#{msg['login.user.belgian']}"
-        outcome="register_eID_player.xhtml"
-        style="float:left;"
-        >
-    <h:graphicImage 
-                    rendered="true"
-                    name="images/eIDcard.jpg"
-                    alt="image missing : eIDcard.jpg"
-                    style="float:left;">
-    </h:graphicImage>
-</h:link>
 
-<h:link title="#{msg['login.user.nonbelgian']}"
-        outcome="player.xhtml"
-        style="float:right;"
-        >    
-<h:graphicImage 
-                rendered="true"
-                name="images/registration.jpg"
-                alt="image missing :registration.jpg"
-                style="float:right;">
-</h:graphicImage>
-    
-    <!--  outcome="#{navC.to_player_xhtml('non_belgian')}"  -->
-</h:link>
-    
-<h:form id="register" enctype="application/x-www-form-urlencoded" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header">
+    <h1>#{msg['login.welcome']}</h1>
+</f:facet>
+
+<h:form id="register">
 <p:panelGrid id="panel"
              columns="2"
-             layout="tabular"
-             columnClasses="col1, col2"
-             >
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['login.welcome']}" />
-</f:facet>
+             layout="flex"
+             columnClasses="col1Flex, col2Flex">
+
      <h:outputText value="eID card holder" />
      <h:outputText value="Manual registration" />
      <h:link title="#{msg['login.user.belgian']}"
-             outcome="register_eID_player.xhtml"
-             style="float:left;"
-        >
-        <h:graphicImage name="images/arrow-left-3D.jpg" style="float:left;"/>
+             outcome="register_eID_player.xhtml">
+        <h:graphicImage name="images/arrow-left-3D.jpg"/>
      </h:link>
      <h:link title="#{msg['login.user.nonbelgian']}"
-             outcome="player.xhtml}"
-             style="float:right;"
-        >
-     <h:graphicImage name="images/arrow-right-3D.jpg" style="float:right;"/>
-   </h:link>
-     <!--  outcome="#{navC.to_player_xhtml('non_belgian')}"   -->
- </p:panelGrid>
+             outcome="player.xhtml}">
+        <h:graphicImage name="images/arrow-right-3D.jpg"/>
+     </h:link>
+</p:panelGrid>
 
 </h:form>
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>
-</html>

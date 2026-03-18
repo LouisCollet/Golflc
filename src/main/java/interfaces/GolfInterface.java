@@ -89,13 +89,20 @@ String DATE_END_HANDICAP = "2099-12-31";
 // in Belgium !
 LocalDateTime START_DATE_WHS = LocalDateTime.of(2020,Month.NOVEMBER,03,0,0);
 
-java.text.DateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
-java.text.DateFormat SDF_HH_MM = new SimpleDateFormat("HH:mm");
-java.text.DateFormat SDF_YYYY = new SimpleDateFormat("yyyy/MM/dd");
-java.text.DateFormat SDF_YYYY_MM = new SimpleDateFormat("yyyy/MM");
-java.text.DateFormat SDF_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.getDefault());
-java.text.DateFormat sdf_timeHHmm  = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-java.text.DateFormat sdf_timeHHmmss  = new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS");
+// fix multi-user 2026-03-07 — SimpleDateFormat is NOT thread-safe
+// Removed shared instances. Use local new SimpleDateFormat(...) in each method instead.
+// java.text.DateFormat SDF = new SimpleDateFormat("dd/MM/yyyy");
+// java.text.DateFormat SDF_HH_MM = new SimpleDateFormat("HH:mm");
+// java.text.DateFormat SDF_YYYY = new SimpleDateFormat("yyyy/MM/dd");
+// java.text.DateFormat SDF_YYYY_MM = new SimpleDateFormat("yyyy/MM");
+// java.text.DateFormat SDF_TIME = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss",Locale.getDefault());
+// java.text.DateFormat sdf_timeHHmm  = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+// java.text.DateFormat sdf_timeHHmmss  = new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS");
+
+// Thread-safe replacements (DateTimeFormatter is immutable)
+DateTimeFormatter DTF_DAY_SLASH = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+DateTimeFormatter DTF_TIME_FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+DateTimeFormatter DTF_TIME_HHMM_SSS = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:SSS");
 DateTimeFormatter ZDF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm a");
 DateTimeFormatter ZDF_DAY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 DateTimeFormatter ZDF_YEAR_MONTH_DAY = DateTimeFormatter.ofPattern("yyyy-MM-dd");

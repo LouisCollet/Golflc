@@ -1,34 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui:composition
     xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="jakarta.faces.core"
     xmlns:p="primefaces"
     xmlns:ui="jakarta.faces.facelets"
     xmlns:h="jakarta.faces.html">
-    
-        <p:outputLabel for="@next" value="#{msg['professional.title']}" />
+
+        <!-- ui:param defaults : playerLabel = msg['player.id'], playerPurpose = 'login' -->
+        <p:outputLabel for="@next" value="#{empty playerLabel ? msg['player.id'] : playerLabel}" />
         <h:panelGroup layout="block"
                       style="display:flex; align-items:center; gap:0.5rem;"
                       id="containerPlayer"  >
                 <p:inputNumber
                        id="inputPlayerId"
                        label="inputPlayer"
-                       value="#{playerC.playerTemp.idplayer}" 
+                       value="#{playerC.playerTemp.idplayer}"
                        size="7"
                        decimalPlaces="0"
+                       thousandSeparator=""
                        emptyValue="0"
-                       style="margin-left:1.5em; margin-right:1.5em;" />
-                <p:commandButton 
+                       onkeyup="var v=this.value.replace(/\D/g,'');
+                                var btn=this.closest('[id$=containerPlayer]').querySelector('[id$=wrapperButtonSelect]');
+                                if(btn) btn.style.display=(v.length&gt;0 &amp;&amp; v!=='0')?'':'none';"
+                       style="margin-left:1.5em; margin-right:1.5em;" >
+                    <f:validateBean disabled="true"/>
+                </p:inputNumber>
+                <p:commandButton
                         id="ButtonPro"
                         immediate="true"
                         value="#{msg['button.player.list']}"
-                        actionListener="#{dialogC.showSelectPlayer('professional')}"
+                        actionListener="#{dialogC.showSelectPlayer(empty playerPurpose ? 'login' : playerPurpose)}"
                         icon="pi pi-search" >
                     <p:ajax event="dialogReturn"
-                            update="inputPlayerId,playerName,playerId,growl-msg" />
+                            listener="#{playerC.onPlayerDialogReturn}"
+                            update="inputPlayerId,playerName,playerId,wrapperButtonSelect,growl-msg" />
                 </p:commandButton>
+                <h:panelGroup id="wrapperButtonSelect"
+                              style="display:#{(empty playerPurpose or playerPurpose eq 'login') and playerC.playerTemp.idplayer gt 0 ? '' : 'none'};">
+                    <p:commandButton
+                            id="ButtonSelect"
+                            value="#{msg['button.select']}"
+                            action="#{playerC.selectPlayerById()}"
+                            icon="pi pi-sign-in"
+                            rendered="#{empty playerPurpose or playerPurpose eq 'login'}" />
+                </h:panelGroup>
 
                 <h:outputText id="playerName"
-                              value="#{playerC.playerTemp.playerLastName}" 
+                              value="#{playerC.playerTemp.playerLastName}"
                               style="font-style:italic;margin-right: 10px;" />
                 <h:outputText id="playerId"
                               value="#{playerC.playerTemp.idplayer}"

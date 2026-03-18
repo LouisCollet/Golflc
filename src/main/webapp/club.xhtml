@@ -12,203 +12,175 @@
 <ui:define name="title">Club Page</ui:define>
 
 <ui:define name="content">
-<h:graphicImage library="images" name="golf_club.jpg" alt="image missing :golf_club.jpg" style="float: left;"/>
-<h:graphicImage library="images" name="golf_club.jpg" alt="image missing :golf_club.jpg" style="float: right;"/>
 
-<h:outputStylesheet library="styles" name="flags/flags.css" />
+    <h:outputStylesheet library="styles" name="flags/flags.css" />
 
-<h:form id="form_club" style="border:solid 3px">
+    <h:form id="form_club">
 
-<p:focus for="ClubName" />  <!-- ✅ décommenté -->
+        <p:focus for="ClubName" />
 
-<p:panelGrid id="panel"
-             columns="2"
-             style="width:70%"
-             layout="tabular"
-             columnClasses="col1, col2">
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card">
+                <f:facet name="header">
+                    <h1>#{msg['club.data']} #{request.getParameter('operation')}</h1>
+                </f:facet>
 
-    <f:facet name="header">
-        <h1>#{msg['club.data']} #{request.getParameter('operation')}</h1>
-    </f:facet>
+                <p:panelGrid id="panel"
+                             columns="2"
+                             layout="flex"
+                             columnClasses="col1Flex, col2Flex">
 
-    <!-- ✅ Listeners supprimés — binding direct suffit -->
-    <p:outputLabel for="@next" value="#{msg['club.name']} :"/>
-    <p:inputText id="ClubName"
-                 size="45"
-                 title="#{msg['tooltip.club.clubname']}"
-                 value="#{clubC.club.clubName}"/>
+                    <p:outputLabel for="@next" value="#{msg['club.name']} :"/>
+                    <p:inputText id="ClubName"
+                                 size="45"
+                                 title="#{msg['tooltip.club.clubname']}"
+                                 value="#{clubC.club.clubName}"/>
 
-    <p:outputLabel for="@next" value="#{msg['address.street']} :"/>
-    <p:inputText id="ClubAddress"
-                 value="#{clubC.club.address.street}"
-                 title="#{msg['tooltip.club.clubaddress']}"
-                 size="45"/>
+                    <p:outputLabel for="@next" value="#{msg['address.street']} :"/>
+                    <p:inputText id="ClubAddress"
+                                 value="#{clubC.club.address.street}"
+                                 title="#{msg['tooltip.club.clubaddress']}"
+                                 size="45"/>
 
-    <p:outputLabel for="@next" value="#{msg['address.zipcode']}"/>
-    <p:inputText id="ClubZip"
-                 value="#{clubC.club.address.zipCode}"
-                 title="#{msg['tooltip.club.clubcity']}"
-                 size="6"/>
+                    <p:outputLabel for="@next" value="#{msg['address.zipcode']}"/>
+                    <p:inputText id="ClubZip"
+                                 value="#{clubC.club.address.zipCode}"
+                                 title="#{msg['tooltip.club.clubcity']}"
+                                 size="6"/>
 
-    <p:outputLabel for="@next" value="#{msg['address.city']}"/>
-    <p:inputText id="ClubCity"
-                 value="#{clubC.club.address.city}"
-                 title="#{msg['tooltip.club.clubcity']}"
-                 size="45"/>
+                    <p:outputLabel for="@next" value="#{msg['address.city']}"/>
+                    <p:inputText id="ClubCity"
+                                 value="#{clubC.club.address.city}"
+                                 title="#{msg['tooltip.club.clubcity']}"
+                                 size="45"/>
 
-    <!-- ✅ Corrigé : value et itemValue cohérents sur country.code -->
-    <p:outputLabel value="#{msg['address.country.code']}"/>
-    <p:autoComplete id="ClubCountry"
-                    value="#{clubC.club.address.country.code}"
-                    completeMethod="#{countryC.completeCountry}"
-                    required="true"
-                    var="country"
-                    itemLabel="#{country}"
-                    itemValue="#{country.code}"
-                    forceSelection="false"
-                    dropdown="true"
-                    dropdownMode="current"
-                    scrollHeight="150"
-                    showEmptyMessage="false"
-                    title="#{msg['tooltip.club.clubcountry']}">
-        <p:column>
-            <span class="flag flag-#{country.code}"
-                  style="width: 30px; height: 20px"/>
-            <h:outputText style="vertical-align: middle; margin-left: .5rem"
-                          value="#{country.name} - #{country.code} - #{country.locale}"/>
-        </p:column>
-        <p:ajax event="itemSelect"
-                listener="#{countryC.onCountrySelect}"
-                update="growl-msg"/>
-    </p:autoComplete>
+                    <p:outputLabel value="#{msg['address.country.code']}"/>
+                    <p:autoComplete id="ClubCountry"
+                                    value="#{clubC.club.address.country.code}"
+                                    completeMethod="#{countryC.completeCountry}"
+                                    required="true"
+                                    var="country"
+                                    itemLabel="#{country}"
+                                    itemValue="#{country.code}"
+                                    forceSelection="false"
+                                    dropdown="true"
+                                    dropdownMode="current"
+                                    scrollHeight="150"
+                                    showEmptyMessage="false"
+                                    title="#{msg['tooltip.club.clubcountry']}">
+                        <p:column>
+                            <span class="flag flag-#{country.code}"
+                                  style="width: 30px; height: 20px"/>
+                            <h:outputText style="vertical-align: middle; margin-left: .5rem"
+                                          value="#{country.name} - #{country.code} - #{country.locale}"/>
+                        </p:column>
+                        <p:ajax event="itemSelect"
+                                listener="#{countryC.onCountrySelect}"
+                                update="growl-msg"/>
+                    </p:autoComplete>
 
-    <p:outputLabel for="ClubWebsite" value="#{msg['club.web']} :"/>
-    <h:panelGroup id="panelWebsite">
-    <p:inputText id="ClubWebsite"
-                 value="#{clubC.club.clubWebsite}"
-                 title="#{msg['tooltip.club.clubwebsite']}"
-                 size="45">
-        <!-- ✅ Met à jour le panelGroup à chaque frappe -->
-        <p:ajax event="keyup"
-                update="panelWebsite"
-                partialSubmit="true"/>
-    </p:inputText>
-    <p:commandButton value="#{msg['button.club.testwebsite']}"
-                     id="ButtonClubWebsite"
-                     ajax="false"
-                     immediate="true"
-                     style="margin-left:1.5em;"
-                     icon="pi pi-external-link"
-                     iconPos="right"
-                     rendered="#{not empty clubC.club.clubWebsite}"
-                     action="#{clubC.findClubWebsite()}"/>
-</h:panelGroup>
-    
-    
-    
-  <!--  <h:panelGroup>
-        <p:inputText id="ClubWebsite"
-                     value="#{clubC.club.clubWebsite}"
-                     title="#{msg['tooltip.club.clubwebsite']}"
-                     size="45"/>
-          <p:commandButton value="#{msg['button.club.testwebsite']}"
-                         id="ButtonClubWebsite"
-                         ajax="false"
-                         immediate="true"
-                         style="margin-left:1.5em;"
-                         icon="pi pi-external-link"
-                         iconPos="right"
-                         action="#{clubC.findClubWebsite()}"/>
-    </h:panelGroup>
-    -->
-    
-    
-    
+                    <p:outputLabel for="ClubWebsite" value="#{msg['club.web']} :"/>
+                    <h:panelGroup id="panelWebsite" layout="block"
+                                  style="display:flex; align-items:center; gap:0.5rem;">
+                        <p:inputText id="ClubWebsite"
+                                     value="#{clubC.club.clubWebsite}"
+                                     title="#{msg['tooltip.club.clubwebsite']}"
+                                     size="30">
+                            <p:ajax event="keyup"
+                                    update="panelWebsite"
+                                    partialSubmit="true"/>
+                        </p:inputText>
+                        <p:commandButton value="#{msg['button.club.testwebsite']}"
+                                         id="ButtonClubWebsite"
+                                         ajax="false"
+                                         immediate="true"
+                                         icon="pi pi-external-link"
+                                         iconPos="right"
+                                         rendered="#{not empty clubC.club.clubWebsite}"
+                                         action="#{clubC.findClubWebsite()}"/>
+                    </h:panelGroup>
 
-    <h:outputText value="#{msg['club.coordinates']} :"/>
-    <!-- ✅ immediate supprimé — binding direct suffit pour lire city/zip -->
-    <p:commandButton value="#{msg['button.club.findlatlng']}"
-                     id="ButtonGPSCoordinates"
-                     action="#{clubC.updateCoordinates()}"
-                     update="panelGridCoordinates:ClubLatitude,ClubLongitude,growl-msg"
-                     ajax="false"
-                     style="margin-right: 10px;"
-                     icon="pi pi-search"
-                     title="Find Latitude Longitude"/>
+                    <h:outputText value="#{msg['club.coordinates']} :"/>
+                    <p:commandButton value="#{msg['button.club.findlatlng']}"
+                                     id="ButtonGPSCoordinates"
+                                     action="#{clubC.updateCoordinates()}"
+                                     update="panelGridCoordinates:ClubLatitude,ClubLongitude,growl-msg"
+                                     ajax="false"
+                                     style="margin-right: 10px;"
+                                     icon="pi pi-search"
+                                     title="Find Latitude Longitude"/>
 
-    <h:outputText value="#{msg['player.zoneid']}"
-                  rendered="#{clubC.club.address.zoneId ne null}"/>
-    <h:outputText id="ClubZoneId"
-                  style="margin-right: 20px;"
-                  value="#{clubC.club.address.zoneId}"
-                  rendered="#{clubC.club.showCoordinatesManual eq true}"/>
+                    <h:outputText value="#{msg['player.zoneid']}"
+                                  rendered="#{clubC.club.address.zoneId ne null}"/>
+                    <h:outputText id="ClubZoneId"
+                                  style="margin-right: 20px;"
+                                  value="#{clubC.club.address.zoneId}"
+                                  rendered="#{clubC.club.showCoordinatesManual eq true}"/>
 
-    <h:outputText value="#{msg['club.coordinates.manual']} :"
-                  rendered="#{clubC.club.showCoordinatesManual eq true}"/>
-    <p:panelGrid id="panelGridCoordinates"
-                 columns="2"
-                 layout="flex"
-                 columnClasses="col1Flex, col2Flex"
-                 rendered="#{clubC.club.showCoordinatesManual eq true}">
-        <p:outputLabel for="@next" value="#{msg['club.latitude']} :"/>
-        <p:inputNumber id="ClubLatitude"
-                       value="#{clubC.club.address.latLng.lat}"
-                       size="10"
-                       lang="#{languageC.locale}"
-                       minValue="-90.000000"
-                       maxValue="+90.000000"
-                       decimalSeparator="."
-                       decimalPlaces="6"
-                       title="#{msg['tooltip.club.clublatitude']}"
-                       placeholder="99.999999"/>
-        <p:outputLabel for="@next" value="#{msg['club.longitude']} :"/>
-        <p:inputNumber id="ClubLongitude"
-                       value="#{clubC.club.address.latLng.lng}"
-                       minValue="-180.000000"
-                       maxValue="+180.000000"
-                       decimalSeparator="."
-                       decimalPlaces="6"
-                       size="10"
-                       title="#{msg['tooltip.club.clublongitude']}"
-                       lang="#{languageC.locale}"
-                       placeholder="999.999999"/>
-    </p:panelGrid>
+                    <h:outputText value="#{msg['club.coordinates.manual']} :"
+                                  rendered="#{clubC.club.showCoordinatesManual eq true}"/>
+                    <h:panelGroup id="panelGridCoordinates" layout="block"
+                                  rendered="#{clubC.club.showCoordinatesManual eq true}"
+                                  style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                        <p:outputLabel for="ClubLatitude" value="#{msg['club.latitude']} :"
+                                       style="font-size:0.8rem;"/>
+                        <p:inputNumber id="ClubLatitude"
+                                       value="#{clubC.club.address.latLng.lat}"
+                                       size="10"
+                                       lang="#{languageC.locale}"
+                                       minValue="-90.000000"
+                                       maxValue="+90.000000"
+                                       decimalSeparator="."
+                                       decimalPlaces="6"
+                                       title="#{msg['tooltip.club.clublatitude']}"
+                                       placeholder="99.999999"/>
+                        <p:outputLabel for="ClubLongitude" value="#{msg['club.longitude']} :"
+                                       style="font-size:0.8rem; margin-left:0.5rem;"/>
+                        <p:inputNumber id="ClubLongitude"
+                                       value="#{clubC.club.address.latLng.lng}"
+                                       minValue="-180.000000"
+                                       maxValue="+180.000000"
+                                       decimalSeparator="."
+                                       decimalPlaces="6"
+                                       size="10"
+                                       title="#{msg['tooltip.club.clublongitude']}"
+                                       lang="#{languageC.locale}"
+                                       placeholder="999.999999"/>
+                    </h:panelGroup>
 
-    <f:facet name="footer">
-        <!-- ✅ parenthèses ajoutées -->
-        <p:commandButton value="#{msg['club.create']}"
-                         id="ButtonCreateClub"
-                         update="growl-msg ClubLatitude ClubLongitude"
-                         ajax="false"
-                         rendered="#{clubC.club.createModify eq true and clubC.course.nextCourse eq false}"
-                         icon="pi pi-database"
-                         style="width:140px"
-                         pt:data-tooltip="Update components"
-                         action="#{clubC.createClub()}"/>
+                </p:panelGrid>
 
-        <p:commandButton value="#{msg['button.club.modify']}"
-                         id="cb3"
-                         update="growl-msg"
-                         ajax="false"
-                         rendered="#{clubC.club.createModify eq false}"
-                         icon="pi pi-database"
-                         style="width:140px"
-                         action="#{clubC.modifyClub()}"/>
+                <f:facet name="footer">
+                    <p:commandButton value="#{msg['club.create']}"
+                                     id="ButtonCreateClub"
+                                     update="growl-msg ClubLatitude ClubLongitude"
+                                     ajax="false"
+                                     rendered="#{clubC.club.createModify eq true and clubC.course.nextCourse eq false}"
+                                     icon="pi pi-database"
+                                     pt:data-tooltip="Update components"
+                                     action="#{clubC.createClub()}"/>
 
-        <p:commandButton value="#{msg['club.next']}"
-                         id="cb2"
-                         ajax="false"
-                         rendered="#{clubC.course.nextCourse eq true}"
-                         update="growl-msg"
-                         immediate="true"
-                         style="float: right;"
-                         action="course.xhtml?faces-redirect=true"/>
-    </f:facet>
+                    <p:commandButton value="#{msg['button.club.modify']}"
+                                     id="cb3"
+                                     update="growl-msg"
+                                     ajax="false"
+                                     rendered="#{clubC.club.createModify eq false}"
+                                     icon="pi pi-database"
+                                     action="#{clubC.modifyClub()}"/>
 
-</p:panelGrid>
+                    <p:commandButton value="#{msg['club.next']}"
+                                     id="cb2"
+                                     ajax="false"
+                                     rendered="#{clubC.course.nextCourse eq true}"
+                                     update="growl-msg"
+                                     immediate="true"
+                                     style="float: right;"
+                                     action="course.xhtml?faces-redirect=true"/>
+                </f:facet>
 
-<!-- ✅ ClubId supprimé — était probablement pour debug -->
+            </p:panel>
+        </div>
 
-</h:form>
+    </h:form>
 </ui:define>
 </ui:composition>

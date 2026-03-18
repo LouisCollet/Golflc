@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
@@ -7,44 +6,37 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces" >
 
-<p:panelGrid
-    id="panelgridSummaryClub"
-    layout="tabular"
-    columnClasses="col1,col2,col3,col4"
-    columns="4" >
+    <h:panelGroup layout="block" styleClass="summary-bar">
+        <span class="summary-item">
+            <span class="summary-label">#{msg['club.name']}</span>
+            <span class="summary-value">#{clubC.club.clubName} (#{clubC.club.idclub})</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <h:panelGroup styleClass="summary-item"
+                      rendered="#{clubC.course.courseName ne null}">
+            <span class="summary-label">#{msg['course.name']}</span>
+            <span class="summary-value">#{clubC.course.courseName} (#{clubC.course.idcourse})</span>
+        </h:panelGroup>
+        <h:panelGroup rendered="#{clubC.course.courseName ne null}">
+            <span class="summary-sep">|</span>
+        </h:panelGroup>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['club.zoneid']}</span>
+            <span class="summary-value">#{clubC.club.address.zoneId}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['address.city']}</span>
+            <span class="summary-value">#{clubC.club.address.city} - #{clubC.club.address.country.code}</span>
+        </span>
+        <h:panelGroup rendered="#{clubC.tee.idtee != null}">
+            <span class="summary-sep">|</span>
+        </h:panelGroup>
+        <h:panelGroup styleClass="summary-item"
+                      rendered="#{clubC.tee.idtee != null}">
+            <span class="summary-label">#{msg['tee.id']}</span>
+            <span class="summary-value">(#{clubC.tee.idtee}) S=#{clubC.tee.teeGender}, START=#{clubC.tee.teeStart}, HP=#{clubC.tee.teeHolesPlayed}, MT=#{clubC.tee.teeMasterTee}, DT=#{clubC.tee.teeDistanceTee}</span>
+        </h:panelGroup>
+    </h:panelGroup>
 
-<f:facet name="header">
-    <h1>#{msg['title.summary.club']}</h1>
-</f:facet>
-      <h:outputText value="#{msg['club.name']} :"   />
-	<h:outputText
-            id="clubsummary" 
-            value="#{clubC.club.clubName} (#{clubC.club.idclub})" />
-
-      <h:outputText value="#{msg['course.name']} :"
-            rendered="#{clubC.course.courseName ne null}"/>
-      <h:outputText
-            id="coursesummary"
-            value="#{clubC.course.courseName} (#{clubC.course.idcourse})" 
-            rendered="#{clubC.course.courseName ne null}"/>
-
-      <h:outputText value="#{msg['club.zoneid']} :"   />
-	<h:outputText
-            id="clubszoneId" 
-            value="#{clubC.club.address.zoneId}" />
-        
-        <h:outputText value="#{msg['address.city']} :"   />
-	<h:outputText id="clubsCity" 
-            value="#{clubC.club.address.city} - #{clubC.club.address.country.code}" />  
-
-      <h:outputText value="#{msg['tee.id']} :" 
-                    rendered="#{clubC.tee.idtee != null}"/>
-      <h:outputText
-            id="teesummary"
-            value="(#{clubC.tee.idtee}) S=#{clubC.tee.teeGender} ,START=#{clubC.tee.teeStart} ,HP=#{clubC.tee.teeHolesPlayed} ,MT=#{clubC.tee.teeMasterTee} 
-                    ,DT=#{clubC.tee.teeDistanceTee} "
-            title="#{msg['title.hole.holenumber']}"
-            rendered="#{clubC.tee.idtee != null}"/>
-</p:panelGrid>
-<p:divider layout="horizontal" type="solid" />
 </ui:composition>

@@ -108,6 +108,21 @@ public class MailSender implements Serializable {
     } // end method
 
     // ========================================
+    // SEND ASYNC — surcharge sans QRCode
+    // ========================================
+
+    public CompletableFuture<Void> sendHtmlMailAsync(
+            String title,
+            String content,
+            String recipient,
+            byte[] pathICS,
+            String targetLanguage) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " - async without pathQRC");
+        return sendHtmlMailAsync(title, content, recipient, pathICS, null, targetLanguage);
+    } // end method
+
+    // ========================================
     // SEND — méthode principale
     // ========================================
 
@@ -252,7 +267,7 @@ public class MailSender implements Serializable {
         props.put("mail.password",              System.getenv("SMTP_PASSWORD"));
         props.put("mail.smtp.host",             "relay.proximus.be");
         props.put("mail.user",                  System.getenv("SMTP_USERNAME"));
-        props.put("mail.smtp.from",             "louis.collet@skynet.be");
+        props.put("mail.smtp.from",             System.getenv("SMTP_USERNAME"));
         props.put("mail.smtp.port",             "587");
         props.put("mail.smtp.debug",            "false");
         props.put("mail.debug.auth",            "true");
@@ -285,7 +300,7 @@ public class MailSender implements Serializable {
         try {
             String content = "Ceci est le texte du mail <b> gras </b>";
             String title   = "Ceci est le sujet du mail";
-            String to      = "louis.collet@skynet.be";
+            String to      = System.getenv("SMTP_USERNAME");
 
             Player player = new Player();
             player.setIdplayer(456783);
@@ -688,10 +703,8 @@ public static Properties buildProperties() {
     props.put("mail.password", System.getenv("SMTP_PASSWORD")); // mod 31-12-2025
         LOG.debug("after Settings SMTP_PASSWORD line 02");
     props.put("mail.smtp.host", "relay.proximus.be");
-  //  props.put("mail.user", "louis.collet@skynet.be");
-    props.put("mail.user", System.getenv("SMTP_USERNAME"));  // mod 31-12-2025
-  //  props.put("mail.user", "louis.collet@skynet.be");
-    props.put("mail.smtp.from", "louis.collet@skynet.be");
+    props.put("mail.user", System.getenv("SMTP_USERNAME"));
+    props.put("mail.smtp.from", System.getenv("SMTP_USERNAME"));
     props.put("mail.smtp.port", "587");
     // set to false on 05-08-2018
     props.put("mail.smtp.debug", "false"); // mettre aussi session.setDebug(true); voir plus loin, debug dans console only
@@ -736,7 +749,7 @@ void main(String[] args) throws Exception{ // for testing purposes
         + "</br> now italic : " 
         + " </br> now <i> italiques </i>";
    String title = "Ceci est le sujet du mail, louis";
-   String to = "louis.collet@skynet.be,louis.collet.onduty@gmail.com"; // comma = separator
+   String to = System.getenv("SMTP_USERNAME") + "," + System.getenv("SMTP_USERNAME_ONDUTY");
    // a faire : envoi QRC
    
    //byte[] pathQRC = qrService.generateQR(content, 200);   because "this.qrService" is null

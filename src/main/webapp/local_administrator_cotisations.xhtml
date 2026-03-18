@@ -11,16 +11,26 @@
 <ui:define name="title">Local Administrator Cotisations</ui:define>
 <ui:define name="content">
 
-<div class="card">
-<h:form id="form_local_admin_cotisations" enctype="application/x-www-form-urlencoded" >
-<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>
+        <h:outputText
+            id="RndHeader"
+            rendered="#{appContext.inputSelectPaiement eq 'Greenfees'}"
+            value="#{msg['message.for.paiement.greenfee']}"/>
+        <h:outputText
+            id="tarifHeader"
+            rendered="#{appContext.inputSelectPaiement eq 'Members'}"
+            value="#{msg['message.for.paiement.cotisation']}"/>
+    </h1>
+</f:facet>
+
+<h:form id="form_local_admin_cotisations">
    <ui:include src="/include/include_summary_player.xhtml"/>
-<!--
-   sessionMap.get("inputSelectCourse")  -->
-   
-<c:set var="select" value="#{appContext.inputSelectPaiement}"/> 
- 
+
+<c:set var="select" value="#{appContext.inputSelectPaiement}"/>
+
    <p:dataTable id="TableLocalAdmin"
                 var="c"
                 widgetVar="customersTable"
@@ -29,23 +39,7 @@
                 filteredValue="#{memC.filteredCars}"
                 multiViewState="true"
                 >
-       <!--   -->
-       
- <f:facet name="header">
-    <h1>
-        <h:outputText
-            id="Rnd"
-            rendered="#{appContext.inputSelectPaiement eq 'Greenfees'}" 
-            value="#{msg['message.for.paiement.greenfee']}">
-        </h:outputText>
-        <h:outputText
-            id="tarif"
-            rendered="#{appContext.inputSelectPaiement eq 'Members'}" 
-            value="#{msg['message.for.paiement.cotisation']}">
-        </h:outputText>
-    </h1>
- </f:facet>
-       
+
       <p:headerRow  field="club.clubName"
                     expandable="true"
                     expanded="false">
@@ -53,11 +47,7 @@
                         <h:outputText value="#{c.club.clubName} - #{c.club.idclub}"/>
                  </p:column>
        </p:headerRow>
-<!--
-            <p:column headerText="#{msg['club.name']}">
-                <h:outputText value="#{c.club.clubName} -  #{c.club.idclub}" />
-            </p:column>
--->
+
             <p:column headerText="#{msg['player.lastname']}"
                       field="player.playerLastName" />
 
@@ -85,7 +75,6 @@
                         readonlyInput="false">
                        <f:convertDateTime type="localDateTime"/>
                     </p:datePicker>
-<!-- hideOnRangeSelection new PF14 07-06-2024  -->
                 </f:facet>
             </p:column>
 
@@ -98,7 +87,7 @@
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                  </h:outputText>
                 <f:facet name="filter">
-                    <p:datePicker 
+                    <p:datePicker
                         selectionMode="range"
                         rangeSeparator=":"
                         size="20"
@@ -124,7 +113,7 @@
                     <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
                 </h:outputText>
             </p:column>
-            
+
             <p:column headerText="#{msg['creditcard.communication']}"
                       field="cotisation.communication"
                       sortable="false"
@@ -145,31 +134,27 @@
                               .map(o->o.getCotisation().getPrice())
                               .sum()}" >
                          <f:convertNumber locale="es" type="currency" currencySymbol="€" maxFractionDigits="1"/>
-                         <!--  forcer la locale es car fr donne blanc ipv point suite bug java -->
-                         
                     </h:outputText>
-                    
                 </p:column>
                 <p:column colspan="3">
                     <h:outputText value=""/>
-                </p:column> 
+                </p:column>
   </p:summaryRow>
 
  <f:facet name="footer">
    <p:commandButton icon="pi pi-file-excel"
                     value="Export as Excel (XLSX)" >
- <!-- for XLS exporting Apache POI libraries are required in the classpath.   -->
        <p:dataExporter type="xlsx"
-                       
                        target="TableLocalAdmin"
                        fileName="Cotisations"
                       />
    </p:commandButton>
-     
-        
 </f:facet>
 </p:dataTable>
 </h:form>
-  </div>  
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

@@ -3,80 +3,89 @@ package Controllers;
 
 import static interfaces.Log.LOG;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-//import org.apache.maven.shared.utils.StringUtils;
 import org.omnifaces.util.Faces;
 import org.primefaces.PrimeFaces;
 
 @Named("activeLocale")
-@ApplicationScoped //@SessionScoped // mod 09/05/2022
+@SessionScoped // fix multi-user 2026-03-07 — was @ApplicationScoped (shared locale bug)
 
 public class ActiveLocale implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Inject private LanguageController languageController; // fix multi-user 2026-03-07
+
     private Locale currentLocale;
- //   private List<Locale> availableLocales;
     private List<Locale> supportedLocales;
 
-@PostConstruct
-public void init() {
-  //     LOG.debug("entering ActiveLocale.init");
-    supportedLocales = Faces.getSupportedLocales(); // from faces-config  <locale-config>
-      LOG.debug("supportedLocales = " + supportedLocales);
-    currentLocale =  supportedLocales.get(0); // first one
- //     LOG.debug("First currentLocale from supportedLocales = " + currentLocale);
- //   supportedLocales.forEach(item -> LOG.debug("list of languages in the currentLocale= " + item.getDisplayLanguage(currentLocale)));
- //   supportedLocales.forEach(item -> {
-  //      LOG.debug("list of languages in the currentLocale= " + item);
-  
+    public ActiveLocale() { } // constructeur public obligatoire
 
-   // });
-}
+    @PostConstruct
+    public void init() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        supportedLocales = Faces.getSupportedLocales();
+        LOG.debug(methodName + " - supportedLocales = " + supportedLocales);
+        currentLocale = supportedLocales.get(0);
+    } // end method
 
-public void reload() {     // starts javascript
-  //   mod 23-05-2024 PrimeFaces.current().executeScript("location.replace(location);");
-     PrimeFaces.current().executeScript("window.location.reload(true);");  // Force a reload, bypassing the browser cache
-        LOG.debug("page reloaded ! " ); //+ PrimeFaces.current().executeScript('location.replace(location);'));
-}
-
-
-
+    public void reload() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        PrimeFaces.current().executeScript("window.location.reload(true);");
+        LOG.debug(methodName + " - page reloaded");
+    } // end method
 
     public Locale getCurrentLocale() {
         return currentLocale;
-    }
+    } // end method
 
     public void setCurrentLocale(Locale currentLocale) {
         this.currentLocale = currentLocale;
-    }
+    } // end method
 
-public String getDisplayLanguage(Locale locale) {
- // LOG.debug("entering getDisplayLanguage swith String = " + locale);
- // correction bug java : français remplacé par Français, espanol par Espanol
-   return locale.getDisplayLanguage(locale).replace("fran", "Fran").replace("espa", "Espa");
+    public String getDisplayLanguage(Locale locale) {
+        return locale.getDisplayLanguage(locale).replace("fran", "Fran").replace("espa", "Espa");
+    } // end method
 
-}
+    public String getLanguageTag() {
+        return StringUtils.capitalize(currentLocale.getDisplayLanguage(currentLocale));
+    } // end method
 
-public String getLanguageTag() {
- ///   LOG.debug("getLanguageTag 1 = " + StringUtils.capitalise(currentLocale.getDisplayLanguage(currentLocale))); 
-///    LOG.debug("getLanguageTag 2 = " + currentLocale.getDisplayLanguage(currentLocale).toUpperCase()); 
-//   return current.toLanguageTag();
-// bug java : français remplacé par Français, espanol par Espanol ...
-   return StringUtils.capitalize(currentLocale.getDisplayLanguage(currentLocale));
-}
-public void setLanguageTag(String language) {
-         LOG.debug("entering setLanguaeTag with = " + language);
-   currentLocale = Locale.forLanguageTag(language);
-         LOG.debug("current Locale = " + currentLocale);
- // on modifie le Controller de base !!
-      LanguageController.setLanguage(language);
-}
-public List<Locale> getAvailableLocales() {
- //  return availableLocales;
-   return supportedLocales; // mod 30-12-2022
+    public void setLanguageTag(String language) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " with = " + language);
+        if (language == null || language.isBlank()) {
+            LOG.debug(methodName + " - empty language, ignoring");
+            return;
+        }
+        currentLocale = Locale.forLanguageTag(language);
+        LOG.debug(methodName + " - current Locale = " + currentLocale);
+        languageController.setLanguage(language); // fix multi-user 2026-03-07 — was static call
+    } // end method
 
-}
-} // end Class
+    public List<Locale> getAvailableLocales() {
+        return supportedLocales;
+    } // end method
+
+    private static final Map<String, String> LANG_TO_FLAG = Map.of(
+            "en", "gb",
+            "fr", "fr",
+            "nl", "nl",
+            "de", "de",
+            "es", "es",
+            "us", "us"
+    );
+
+    public String getFlagClass(Locale locale) {
+        String code = LANG_TO_FLAG.getOrDefault(locale.getLanguage(), locale.getLanguage());
+        return "flag flag-" + code + " ff-sm";
+    } // end method
+} // end class

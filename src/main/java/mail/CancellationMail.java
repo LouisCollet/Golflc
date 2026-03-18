@@ -78,12 +78,12 @@ public class CancellationMail implements Serializable {
                 + " <br/> The GolfLC team"
                 + " <br/>" + LocalDateTime.now().format(ZDF_TIME);
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathICS = icalService.generateIcs(player, invitedBy, round, club, course, true);
             LOG.debug("pathICS = " + pathICS);
-            boolean b = mailSender.sendHtmlMail(sujet, Smail, to, pathICS, player.getPlayerLanguage());
-            LOG.debug("HTML Mail status = " + b);
-            return b;
+            mailSender.sendHtmlMailAsync(sujet, Smail, to, pathICS, player.getPlayerLanguage());
+            LOG.debug("HTML Mail async dispatched");
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
@@ -10,55 +10,36 @@
 
 <ui:define name="title">Cascading Delete Player</ui:define>
 <ui:define name="content">
-        <h:graphicImage 
-                    rendered="true"
-                    name="images/Danger.jpg"
-                    alt="image missing : login.jpg"
-                    style="float:left;">
-        </h:graphicImage>
-
-        <h:graphicImage 
-                rendered="true"
-                name="images/RIP.jpg"
-                alt="image missing :golf_register.jpg"
-                style="float:right;">
-        </h:graphicImage>
-
-<h:form id="delete_cascading"  >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['login.welcome']} delete a player</h1></f:facet>
+<h:form id="delete_cascading">
 <p:panelGrid id="panel"
              columns="2"
-             layout="tabular"
-             columnClasses="col1, col2" >
-<f:facet name="header">
-        <h1>#{msg['login.welcome']} delete a player</h1>
-</f:facet>
+             layout="flex"
+             columnClasses="col1Flex, col2Flex" >
 
 <f:facet name="footer">
     <p:commandButton value="Delete Cascading Player"
                      action="#{playerC.deleteCascadingPlayer()}" update="messages">
-        <p:confirm 
+        <p:confirm
             header="Cascading delete of a player"
-            
             message="Are you sure you want to delete this player = #{playerC.deletePlayer}"
-            icon="pi pi-exclamation-triangle">
-        </p:confirm>
+            icon="pi pi-exclamation-triangle" />
     </p:commandButton>
     <p:commandButton value="Save Your Profile"
                      action="#{confirmDialog.save}" update="messages">
         <p:confirm
             header="Confirmation"
             message="Are you sure you want to save your profile?"
-            icon="pi pi-exclamation-triangle">
-        </p:confirm>
+            icon="pi pi-exclamation-triangle" />
     </p:commandButton>
- 
-    
     <ui:include src="include/include_confirmDialog.xhtml"/>
- 
 </f:facet>
 
 </p:panelGrid>
-
 </h:form>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

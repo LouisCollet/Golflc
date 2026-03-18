@@ -1,198 +1,193 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Select Competition Page </ui:define>
+
+<ui:define name="title">Select Competition Page</ui:define>
+
 <ui:define name="content">
 
-<h:form id="select_competition" enctype="application/x-www-form-urlencoded">
-<p:dataTable id="competition"
-             value="#{roundC.listCompetitions()}"
-             rowIndexVar="row"
-             resizableColumns="true"
-             var="c"
-             emptyMessage="#{msg['message.table.empty']}"
-             style="border:solid 5px"
-             rowKey="#{c.competitionId}"
-             >
-<p:ajax event="rowToggle" 
-        listener="#{roundC.onRowToggleCompetition}" />
+    <h:form id="select_competition">
 
-<f:facet name="header">
-    <h1>#{msg['message.selectcompetition']}  #{param.cmd}</h1>
-</f:facet>
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card" style="max-width:100%;">
+                <f:facet name="header">
+                    <h1>#{msg['message.selectcompetition']} #{param.cmd}</h1>
+                </f:facet>
 
-<p:column
-   headerText="#"      footerText="#"      width="4%"      id="rrow">
-             #{row+1}
-</p:column>
+                <p:dataTable id="competition"
+                             value="#{roundC.listCompetitions()}"
+                             rowIndexVar="row"
+                             resizableColumns="true"
+                             var="c"
+                             emptyMessage="#{msg['message.table.empty']}"
+                             rowKey="#{c.competitionId}">
 
-<p:column
-    headerText="T"     footerText="T"     width="4%">
-    <p:rowToggler />
-</p:column>
-	<p:column headerText="#{msg['competition.date']}"
-                  footerText="#{msg['competition.date']}"
-                  width="15%"
-                  id="competitionDate">
-            <h:outputText value="#{c.competitionDate}" > 
-                      <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-            </h:outputText>
-	</p:column>
+                    <p:ajax event="rowToggle"
+                            listener="#{roundC.onRowToggleCompetition}"/>
 
-        <p:column headerText="#{msg['competition.id']}"
-                  footerText="#{msg['competition.id']}"
-                  style="width:15%;text-align:left"
-                  id="competitionId"
-                  width="15%" >
-            <h:outputText value="#{c.competitionId}
-                          (,st=#{c.competitionStatus})"/>
-        </p:column>
+                    <p:column headerText="#"
+                              width="4%"
+                              id="rrow">
+                        #{row+1}
+                    </p:column>
 
-        <p:column headerText="#{msg['competition.name']}"
-                  footerText="#{msg['competition.name']}"
-                  style="width:10%;text-align:right"
-                  id="competitionName"
-                  width="20%" >
+                    <p:column headerText="T"
+                              width="4%">
+                        <p:rowToggler/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['competition.date']}"
+                              width="15%"
+                              id="competitionDate">
+                        <h:outputText value="#{c.competitionDate}">
+                            <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="#{msg['competition.id']}"
+                              width="15%"
+                              id="competitionId">
+                        <h:outputText value="#{c.competitionId} (,st=#{c.competitionStatus})"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['competition.name']}"
+                              width="20%"
+                              id="competitionName">
                         #{c.competitionName}
-        </p:column>
+                    </p:column>
 
-	<p:column   id="colclubname"
-                    headerText="#{msg['competition.club']}"
-                    footerText="#{msg['competition.club']}"
-                    width="10%" >
-            <h:outputText value="#{c.competitionClubId} - #{c.competitionCourseId}"/>    
-   	</p:column>
+                    <p:column id="colclubname"
+                              headerText="#{msg['competition.club']}"
+                              width="10%">
+                        <h:outputText value="#{c.competitionClubId} - #{c.competitionCourseId}"/>
+                    </p:column>
 
-    	<p:column headerText="#{msg['competition.inscription']}"
-                  footerText="#{msg['competition.inscription']}"
-                  width="20%" >
-            <p:commandButton
-                id="selectButtonInscription"
-                action="#{roundC.beforeInscriptionCompetition(c)}"
-                rendered="#{c.competitionStatus eq 0}"
-                value="#{c.competitionId}"
-                title="#{msg['tooltip.inscriptions.now']}"
-                icon="pi pi-user-edit">
-            </p:commandButton>
-            
-             <p:commandButton 
-                id="cancelButtonempty"
-                rendered="#{c.competitionStatus ne 0}"
-                style="color:red;float:left"
-                title="#{msg['tooltip.inscriptions.off']}"
-                value="#{msg['competition.inscriptions.closed']}"
-                icon="pi pi-ban" >
-           </p:commandButton>
-            
-	</p:column>
+                    <p:column headerText="#{msg['competition.inscription']}"
+                              width="20%">
+                        <p:commandButton id="selectButtonInscription"
+                                         action="#{roundC.beforeInscriptionCompetition(c)}"
+                                         rendered="#{c.competitionStatus eq 0}"
+                                         value="#{c.competitionId}"
+                                         title="#{msg['tooltip.inscriptions.now']}"
+                                         icon="pi pi-user-edit"/>
+                        <p:commandButton id="cancelButtonempty"
+                                         rendered="#{c.competitionStatus ne 0}"
+                                         title="#{msg['tooltip.inscriptions.off']}"
+                                         value="#{msg['competition.inscriptions.closed']}"
+                                         icon="pi pi-ban"
+                                         disabled="true"/>
+                    </p:column>
 
-    	<p:column headerText="#{msg['competition.inscriptionslist']}"
-                  footerText="#{msg['competition.inscriptionslist']}"
-                  width="20%" >
-            <p:commandButton
-                id="selectButtonStartingList"
-                action="#{roundC.beforeListInscriptionsCompetition(c)}"
-                value="#{c.competitionId}"
-                title="#{msg['tooltip.inscriptions.on']}"
-                icon="pi pi-forward">
-            </p:commandButton>
-	</p:column>
+                    <p:column headerText="#{msg['competition.inscriptionslist']}"
+                              width="20%">
+                        <p:commandButton id="selectButtonStartingList"
+                                         action="#{roundC.beforeListInscriptionsCompetition(c)}"
+                                         value="#{c.competitionId}"
+                                         title="#{msg['tooltip.inscriptions.on']}"
+                                         icon="pi pi-forward"/>
+                    </p:column>
 
-               
-    	<p:column headerText="#{msg['competition.startinglist']}"
-                  footerText="#{msg['competition.startinglist']}"
-                  width="20%" >
-           <h:panelGroup id="panelG2" layout="block" >
-            <p:commandButton
-                id="provisionalStartingList"
-                action="#{roundC.beforeListStartCompetition(c, 'PROVISIONAL')}"
-                value="#{c.competitionId}"
-                style="float:left;"
-                title="#{msg['tooltip.inscriptions.provisional']}"
-                icon="pi pi-sign-in">
-            </p:commandButton>
-           </h:panelGroup>
-	</p:column>
+                    <p:column headerText="#{msg['competition.startinglist']}"
+                              width="20%">
+                        <p:commandButton id="provisionalStartingList"
+                                         action="#{roundC.beforeListStartCompetition(c, 'PROVISIONAL')}"
+                                         value="#{c.competitionId}"
+                                         title="#{msg['tooltip.inscriptions.provisional']}"
+                                         icon="pi pi-sign-in"/>
+                    </p:column>
 
-<p:rowExpansion>
-            <p:panelGrid id="display"
-                         columns="2"
-                         layout="tabular"
-                         style="width:600px"
-                         columnClasses="col1,col2" >
+                    <p:rowExpansion>
+                        <div class="info-grid" style="max-width:600px;">
+                            <h3 style="margin:0 0 0.5rem 0;">#{msg['competition.detail']}</h3>
 
-    <f:facet name="header">
-       #{msg['competition.detail']}
-    </f:facet>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.end.inscription']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="competitionenddate" value="#{c.endInscriptionDate}">
+                                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.classment']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="reround" value="#{c.classmentDate}">
+                                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['round.game']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="regame" value="#{c.competitionGame}"/>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.players']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="reholes" value="#{c.flightNumberPlayers}"/>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.starthole']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="restart" value="#{c.competitionStartHole}"/>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.pricegiving']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="recompetition" value="#{c.priceGivingTime}">
+                                        <f:convertDateTime type="localTime" pattern="HH:mm"/>
+                                    </h:outputText>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.startinglist']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="startinglistdate" value="#{c.startingListDate}">
+                                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['player.gender']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="playergender" value="#{c.competitionGender}"/>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.status']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="competitionStatus" value="#{c.competitionStatus}"/>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.maximum.inscriptions']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="competitionMaxPlayers" value="#{c.competitionMaximumPlayers}"/>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">#{msg['competition.current.inscriptions']}</span>
+                                <span class="info-value">
+                                    <h:outputText id="competitionCurrentPlayers" value="#{roundC.listInscriptionsCompetition().size()}"/>
+                                </span>
+                            </div>
+                        </div>
+                    </p:rowExpansion>
 
-      <h:outputText value="#{msg['competition.end.inscription']} :" />
-      <h:outputText
-            id="competitionenddate"
-            value="#{c.endInscriptionDate}" >
-          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-      </h:outputText>
-                <h:outputText value="#{msg['competition.classment']} :" />
-                <h:outputText
-                      id="reround"
-                      value="#{c.classmentDate}" >
-                     <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-                </h:outputText>
-                <h:outputText value="#{msg['round.game']} :"/>
-                <h:outputText
-                      id="regame"
-                      value="#{c.competitionGame}"  >
-                </h:outputText>
-                
-                <h:outputText value="#{msg['competition.players']} :"/>
-                <h:outputText
-                      id="reholes"
-                      value="#{c.flightNumberPlayers}" />
+                </p:dataTable>
 
-                <h:outputText value="#{msg['competition.starthole']} :"/>
-                <h:outputText
-                      id="restart"
-                      value="#{c.competitionStartHole}" />
-                
-                <h:outputText value="#{msg['competition.pricegiving']} :"/>
-                <h:outputText
-                      id="recompetition"
-                      value="#{c.priceGivingTime}" >
-                    <f:convertDateTime type="localTime" pattern="HH:mm" />
-                </h:outputText>
-                <h:outputText value="#{msg['competition.startinglist']} :"/>
-                <h:outputText
-                      id="startinglistdate"
-                      value="#{c.startingListDate}" >
-                       <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-                 </h:outputText>
-                
-                <h:outputText value="#{msg['player.gender']} :"/>
-                <h:outputText
-                      id="playergender"
-                      value="#{c.competitionGender}" />
-                <h:outputText value="#{msg['competition.status']} :"/>
-                <h:outputText
-                      id="competitionStatus"
-                      value="#{c.competitionStatus}" />
-                <h:outputText value="#{msg['competition.maximum.inscriptions']} :" />
-                <h:outputText
-                      id="competitionMaxPlayers"
-                      value="#{c.competitionMaximumPlayers}"/>
-                
-                <h:outputText value="#{msg['competition.current.inscriptions']} :" />
-                <h:outputText
-                      id="competitionCurrentPlayers"
-                      value="#{roundC.listInscriptionsCompetition().size()}"/>
+            </p:panel>
+        </div>
 
-            </p:panelGrid>
-  </p:rowExpansion>
-</p:dataTable>
+    </h:form>
 
-</h:form>
 </ui:define>
 </ui:composition>

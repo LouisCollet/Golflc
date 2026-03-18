@@ -54,6 +54,7 @@ public final class DbUpsertEngine {
             DbMetadataCache metadata) {
 
         try {
+            utils.DBMeta.validateIdentifier(table); // security audit 2026-03-09
             LOG.debug("entering autoInsert");
             LOG.debug("with table = " + table);
             LOG.debug("with pojo = " + pojo);
@@ -106,6 +107,7 @@ public final class DbUpsertEngine {
             DbMetadataCache metadata) {
 
         try {
+            utils.DBMeta.validateIdentifier(table); // security audit 2026-03-09
             Set<String> dbColumns = metadata.getColumns(conn, table);
             List<String> pkColumns = metadata.getPrimaryKeys(conn, table);
             Field[] fields = getAllFields(pojo.getClass());
@@ -182,6 +184,7 @@ public final class DbUpsertEngine {
                 .reduce((a, b) -> a + " AND " + b)
                 .orElseThrow();
 
+        utils.DBMeta.validateIdentifier(table); // security audit 2026-03-09
         String sql = "SELECT 1 FROM " + table + " WHERE " + where;
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

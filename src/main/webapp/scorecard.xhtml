@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
@@ -10,25 +10,31 @@
 <ui:define name="title">Scorecard Page </ui:define>
 
 <ui:define name="content">
-<h:graphicImage name="images/golf_score_card.png" alt="image missing :golf_club.jpg" style="float:left;"></h:graphicImage>
-<h:graphicImage name="images/golf_score_card.png" alt="image missing :golf_club.jpg" style="float:right;"></h:graphicImage>
-
-<h:form id="scorecard" enctype="application/x-www-form-urlencoded" >
+<h:form id="scorecard">
 <ui:include src="include/include_summary_round.xhtml"/>
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header">
+    <h1>Scorecard</h1>
+</f:facet>
 
 <p:panelGrid
     id="panel"
-    layout="tabular"
-    columns="2" >
-
-     <f:facet name="footer">
-        <p:commandButton value="#{msg['button.scorecard']}"
-                         update="growl-msg"
-                         immediate="true"
-                         icon="pi pi-map"
-                         action="#{roundC.show_scorecard()}"/>
-     </f:facet>
+    layout="flex"
+    columns="2"
+    columnClasses="col1Flex, col2Flex">
 </p:panelGrid>
+
+<f:facet name="footer">
+    <p:commandButton value="#{msg['button.scorecard']}"
+                     update="growl-msg"
+                     immediate="true"
+                     icon="pi pi-map"
+                     action="#{roundC.show_scorecard()}"/>
+</f:facet>
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>

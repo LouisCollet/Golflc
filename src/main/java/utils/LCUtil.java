@@ -1,6 +1,6 @@
 package utils;
 
-import Controllers.LanguageController;
+// import Controllers.LanguageController; // removed — fix multi-user 2026-03-07
 import static com.google.api.client.util.Strings.isNullOrEmpty;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import jakarta.enterprise.inject.spi.CDI;
 import org.apache.commons.lang3.StringUtils;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 //import org.apache.maven.shared.utils.StringUtils;
@@ -53,10 +54,9 @@ import org.primefaces.PrimeFaces;
 
  public class LCUtil implements interfaces.GolfInterface{   
     
- private static long startTime;
- private static long stopTime;
- private static Locale locale = null;
- private static FacesContext context = null;
+ // startTime/stopTime removed — fix multi-user 2026-03-07 (static mutable, no callers)
+ // private static Locale locale — removed, fix multi-user 2026-03-07 (use local vars instead)
+ // private static FacesContext context — removed, fix multi-user 2026-03-07 (use local vars instead)
   // TODOhttps://blog.stackademic.com/99-of-java-utility-classes-are-wrong-heres-the-right-way-7871fee6b8c4
 //DateUtils → Date/time formatting & parsing.
 //CollectionUtils → List/Map/Set helpers.
@@ -71,6 +71,26 @@ import org.primefaces.PrimeFaces;
   // }
 
 
+
+/**
+ * Resolve current user locale via CDI LanguageController (session-scoped).
+ * Fallback to FacesContext viewRoot, then Locale.ENGLISH.
+ */
+private static Locale resolveLocale() {
+    try {
+        Controllers.LanguageController lc = CDI.current().select(Controllers.LanguageController.class).get();
+        if (lc != null && lc.getLocale() != null) {
+            return lc.getLocale();
+        }
+    } catch (Exception ignored) {
+        // outside CDI context (batch, run, tests)
+    }
+    FacesContext fc = FacesContext.getCurrentInstance();
+    if (fc != null && fc.getViewRoot() != null) {
+        return fc.getViewRoot().getLocale();
+    }
+    return Locale.ENGLISH;
+} // end method
 
 public static String capitalize(String input) {
         if (isNullOrEmpty(input)) { //google
@@ -295,7 +315,7 @@ public static String getFileLastModificationDate (String in_date)
 {
 // Create an instance of file object.
 File file = new File(in_date);
-return SDF_TIME.format(file.lastModified());
+return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(file.lastModified()); // fix multi-user 2026-03-07
 } // end
 
 public static Double[] doubleArrayToDoubleArray(double [] ddouble)
@@ -360,13 +380,14 @@ public static Double[] toObjectArray(double[] input) {
         return  dim ;
 }
   public static int generatedKey (Connection conn) throws SQLException{
-        Statement st = conn.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY,java.sql.ResultSet.CONCUR_UPDATABLE);
-        ResultSet rs = st.executeQuery("SELECT LAST_INSERT_ID()");
-        if(rs.next()){
-            return rs.getInt(1);//  // autoIncrementKey = rs.getInt(1);
-        }else{
-           LOG.error("error in Key returned from generatedKey()" ); //+ autoIncrementKey);
-           return 0;
+        try (Statement st = conn.createStatement(java.sql.ResultSet.TYPE_FORWARD_ONLY, java.sql.ResultSet.CONCUR_UPDATABLE);
+             ResultSet rs = st.executeQuery("SELECT LAST_INSERT_ID()")) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                LOG.error("error in Key returned from generatedKey()");
+                return 0;
+            }
         }
 }
 
@@ -440,31 +461,8 @@ public static void printArray3DInt(int [][][] t)
  */
 
 
-public static void startExecutionTimer()  {
-      reset();
-   //   startTime = System.currentTimeMillis();
-      Clock clock = Clock.systemDefaultZone();
-      startTime = clock.millis();
-  }
-
-
-public static void stopExecutionTimer()  {
-      Clock clock = Clock.systemDefaultZone();
-  //  stopTime = System.currentTimeMillis();
-      stopTime = clock.millis();
-  }
-
-
-public static long durationExecutionTimer()
-  {
-    return (stopTime - startTime);
-  }
-
-
-public static void reset() {
-    startTime = 0;
-    stopTime  = 0;
-  }
+// startExecutionTimer/stopExecutionTimer/durationExecutionTimer/reset removed
+// fix multi-user 2026-03-07 — static mutable fields, no callers anywhere in codebase
 
   public static void javaSpecs(){
    final java.util.Enumeration<?> liste = System.getProperties().propertyNames();
@@ -628,10 +626,7 @@ public static String prepareMessageBean_new(String message) {
             return msg;
         }
 
-        Locale locale = new LanguageController().getLocale();
-        if (locale == null) {
-            locale = Locale.getDefault(); // fallback US
-        }
+        Locale locale = resolveLocale();
 
         ResourceBundle bundle;
         try {
@@ -667,18 +662,15 @@ try{
        //  https://stackoverflow.com/questions/136555 40/read-resource-bundle-properties-in-a-managed-bean
   // normally for a JSF session !
   // issue if called from a Run execution !! or batch execution ??
+            FacesContext context; // fix multi-user 2026-03-07 — local var instead of static
             try{
                 context = FacesContext.getCurrentInstance();
             }catch (java.lang.NoClassDefFoundError e){ // no JSF Session
                String msg = " YOU CALLED FROM A RUN execution with message = " + message;
-    //           LOG.error(msg);
-               return msg; // mod was null 04-01-2023
+               return msg;
             }
-   locale = new LanguageController().getLocale();
-   if(locale == null){
-     locale = Locale.getDefault();  //US
-   }
-       ResourceBundle text = ResourceBundle.getBundle("/bundles/messagesBean", locale);
+   Locale locale = resolveLocale();
+       ResourceBundle text = ResourceBundle.getBundle("messagesBean", locale);
        if(text == null){
            return "message not translated" + message;
        }
@@ -704,17 +696,8 @@ try{
 public static String prepareMessageBean1(String message, Object[] arguments){ 
 // essai used in createCompetitionDescription()
 //https://murygin.wordpress.com/2010/04/23/parameter-substitution-in-resource-bundles/
+    FacesContext context = null; // fix multi-user 2026-03-07 — local var instead of static
     try{
-       //  https://stackoverflow.com/questions/13655540/read-resource-bundle-properties-in-a-managed-bean
-  // à adapter comme autre signature
-//  LOG.debug("entering prepareMessageBean with message = " + message 
-//          + " and arguments = " + Arrays.toString(arguments));
-  
-     locale = new LanguageController().getLocale();
-   if(locale == null){
-     locale = Locale.getDefault();  //US
-  }
- //    FacesContext context;
     try{
         context = getInstance();
     }catch (java.lang.NoClassDefFoundError e){
@@ -726,7 +709,7 @@ public static String prepareMessageBean1(String message, Object[] arguments){
             LOG.error(msg);
             return null;
     }
-       ResourceBundle text = ResourceBundle.getBundle("/messagesBean", context.getViewRoot().getLocale());
+       ResourceBundle text = ResourceBundle.getBundle("/messagesBean", resolveLocale());
   // new 22-11-2020 parameter substitution in Message format
        LOG.debug(" with parameter text language = " + text.getLocale().getLanguage());
             LOG.debug(" the are arguments = " + arguments.length);
@@ -760,9 +743,9 @@ formatter.format("Today is %tD and someNumber is %d %s", LocalDate.now(), someNu
 System.out.println(sb);
       */
  }catch (java.util.MissingResourceException mr){
+            String lang = resolveLocale().getLanguage();
             String msg =  message +  " / Doesn't exists - for language = "
-                    + new LanguageController().getLocale().getLanguage() + " / " + mr
-                    + " / " + arguments[0];
+                    + lang + " / " + mr + " / " + arguments[0];
             LOG.debug(msg);
             utils.LCUtil.showMessageInfo(msg);
             return null;
@@ -781,21 +764,19 @@ public static void showMessageFatal(String message){
       LOG.debug("summary == null");
     //  return false;
   }
+  FacesContext context; // fix multi-user 2026-03-07 — local var
   try{
      context = FacesContext.getCurrentInstance();
   }catch (java.lang.NoClassDefFoundError e){ // no JSF Session
       String msg = " YOU CALLED FROM A RUN execution with message = " + message;
-    //  LOG.error(msg);
+       context = null;
        }
-  
-     if(context != null){ //JSF session, 
+
+     if(context != null){ //JSF session,
          context.getExternalContext()
                 .getFlash()
                 .setKeepMessages(true);
-         message = "<h2>" + message + "</h2>";  // new 18-02-2019 // enlevé 04-02-2020
-    /* transféré dans Styles2022.css 
-    .ui-messages-fatal {
-    */// utiliser manière lc
+         message = "<h2>" + message + "</h2>";
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,message," (Application GolfLC)");
             context.addMessage(null, facesMsg);
        }
@@ -839,12 +820,7 @@ try{
       LOG.debug("summary == null");
       return false;
   }
-    Locale local = new LanguageController().getLocale(); // mod 23-09-2024 was locale
-   //  LOG.debug("locale = " + locale);
-  if(local == null){
-     local = Locale.getDefault();  //US
-  }
-     FacesContext context;
+     FacesContext context; // fix multi-user 2026-03-07 — local var
     try{
         context = getInstance();
     }catch (java.lang.NoClassDefFoundError e){
@@ -1033,6 +1009,7 @@ public static int CountRows(Connection conn, String tableName) throws SQLExcepti
     Statement st = null;
     ResultSet rs = null;
 try{
+      utils.DBMeta.validateIdentifier(tableName); // security audit 2026-03-09
       st = conn.createStatement();
       rs = st.executeQuery("SELECT COUNT(*) as count FROM " + tableName);
       // ajouter un where sur le id du player par exemple ?
@@ -1053,28 +1030,20 @@ finally{
   } // end method CountRows
 
 public static int getCountHoles(Connection conn, int tee) throws SQLException{
-    // count the number of rows in the table
-    Statement st = null;
-    ResultSet rs = null;
-try
-    {
-      st = conn.createStatement();
-      rs = st.executeQuery("select count(*) from hole where hole.tee_idtee = " + tee);
-      // get the number of rows from the result set
-      rs.last();
- //     int rowCount = rs.getRow(); réponses es n imbécile !
-      return rs.getRow();
-    }
-catch (SQLException e)
-{
-	LOG.error("SQLException in getCountRows : " + e);
+    // security audit 2026-03-09 — replaced Statement with PreparedStatement
+    final String query = "SELECT count(*) AS cnt FROM hole WHERE hole.tee_idtee = ?";
+    try (PreparedStatement ps = conn.prepareStatement(query)) {
+        ps.setInt(1, tee);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("cnt");
+            }
+            return 0;
+        }
+    } catch (SQLException e) {
+        LOG.error("SQLException in getCountHoles : " + e);
         return 0;
-}
-finally
-{
-    rs.close();
-    st.close();
-}
+    }
 
   } // end method CountRows
 
@@ -1112,7 +1081,50 @@ for (File file : files){
 } // end for
 } // end method
 
+private static final Map<String, String> DRIVER_MARKERS = Map.of(
+    "ClientPreparedStatement",  "Connector/J",
+    "WrappedPreparedStatement", "IronJacamar pooled"
+);
 
+public static void logps(PreparedStatement ps) {
+    if (ps == null) {
+        LOG.warn("logps : PreparedStatement est null");
+        return;
+    }
+    try {
+        // IronJacamar wraps the real driver PS.
+        // unwrap(PreparedStatement.class) returns the Connector/J ClientPreparedStatement
+        // whose toString() = "com.mysql.cj.jdbc.ClientPreparedStatement: SELECT ... actual values ..."
+        PreparedStatement realPs = ps;
+        try {
+            if (ps.isWrapperFor(PreparedStatement.class)) {
+                PreparedStatement unwrapped = ps.unwrap(PreparedStatement.class);
+                if (unwrapped != ps) {
+                    realPs = unwrapped;
+                }
+            }
+        } catch (Exception ignored) {
+            // unwrap not supported — use original
+        }
+
+        String psString    = realPs.toString();
+        int    colonIndex  = psString.indexOf(": ");
+
+        if (colonIndex >= 0) {
+            // Connector/J format: "com.mysql.cj.jdbc.ClientPreparedStatement: SELECT ..."
+            LOG.debug("SQL :{}{}", NEW_LINE, psString.substring(colonIndex + 2));
+        } else {
+            LOG.debug("SQL : {}", psString);
+        }
+
+    } catch (Exception e) {
+        LOG.error("logps : erreur inattendue sur [{}] : {}", ps.getClass().getSimpleName(), e.getMessage(), e);
+    }
+}
+
+
+
+/*
 public static void logps(PreparedStatement ps){
 try{
  ///       LOG.debug("entering logps");
@@ -1137,7 +1149,7 @@ try{
         LOG.error("logps Exception " + e);
       }
 }
-
+*/
 public static void logRs(ResultSet rs){
 try{
         LOG.debug("entering logRs");     
@@ -1274,15 +1286,16 @@ try{
    }
  } //end method
 public static String firstPartUrl(){
-try{   
+try{
+  FacesContext context; // fix multi-user 2026-03-07 — local var
   try{
      context = FacesContext.getCurrentInstance();
   }catch (java.lang.NoClassDefFoundError e){ // no JSF Session
       String msg = " YOU CALLED FROM A RUN execution, hard coded returned !";
-      LOG.debug(msg);   
+      LOG.debug(msg);
       return "http://localhost:8080/GolfWfly-1.0-SNAPSHOT";
   }
-       ExternalContext ec = context.getExternalContext(); // mod 02/11/2024
+       ExternalContext ec = context.getExternalContext();
      //       LOG.debug("** ExternalContext = " + ec.toString());   
         String host = ec.getRequestServerName();
    //       LOG.debug("** application host = " + host);   
@@ -2067,7 +2080,7 @@ public static void printWarnings(SQLWarning warning) throws SQLException {
 	} 
 
 public static String priceFormatted (Double price, int i) {
-    Locale local = new LanguageController().getLocale();
+    Locale local = resolveLocale();
       LOG.debug("locale for format = " + local);
  //       LOG.debug("double d = " + price);
     if(local.getLanguage().equals("fr")){  // bug java 16 !!  fr ne fonctionne pas !! donne des ? pour séparateur thousands

@@ -89,9 +89,8 @@ public class DeleteTee implements Serializable, interfaces.GolfInterface {
                 }
             }
             
-            msg = String.format("Tee deleted: %s (ID: %d)", 
-                              // tee.getTeeName(), 
-                               tee.getIdtee());
+            msg = String.format("Tee deleted: %s %s (ID: %d)",
+                               tee.getTeeStart(), tee.getTeeGender(), tee.getIdtee());
             LOG.info(msg);
             LCUtil.showMessageInfo(msg);
             

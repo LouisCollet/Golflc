@@ -31,12 +31,12 @@ public class ItemReaderInscription extends AbstractItemReader implements interfa
    // @Inject private StepContext stepContext;
   //  private static BufferedReader br = null;
  //   private static final Charset CS = Charset.forName("UTF-8");
-    private static String  [][] values2D;
+    private String[][] values2D; // fix multi-user 2026-03-07 — was static
     CSVReader reader = null;
     private int rows = 0;
     private int columns = 0;
     private int count = 0;
-    private static int errorsCSV = 0;
+    private int errorsCSV = 0; // fix multi-user 2026-03-07 — was static
     static final int NORMAL_INPUT_FIELDS = 3;
 /** 
 29 	 * Override this method if the ItemReader requires 

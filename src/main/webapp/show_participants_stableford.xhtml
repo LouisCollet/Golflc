@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition  xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
@@ -10,42 +11,42 @@
 
 <ui:define name="content">
 
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header"><h1>#{msg['round.result.stableford']}</h1></f:facet>
+
 <h:form id="participants_stableford">
     <ui:include src="include/include_summary_round.xhtml"/>
-<!--   mod 28/08/2022   was listStableford() vers une method  -->
+
 <p:dataTable id="stableford_table"
              value="#{roundC.listStableford}"
              rowIndexVar="rowIndex"
              emptyMessage="#{msg['message.table.empty']}"
              var="c" >
 <f:facet name="header">
-    
-     <p:commandButton 
+    <h:panelGroup layout="block" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+     <p:commandButton
                         id="handicapButton"
                         value="Résultats Matchplay"
                         action="show_participants_matchplay.xhtml?faces-redirect=true"
-                        icon="pi pi-external-link"
-                        style="float:left" >
+                        icon="pi pi-external-link" >
      </p:commandButton>
-
-    <h1>#{msg['round.result.stableford']}</h1>
+    <span style="margin:0; font-weight:bold;">#{msg['round.result.stableford']}</span>
+    </h:panelGroup>
 </f:facet>
-<!--       , cmd = #{param.cmd} -->
+
 <p:column
      headerText="#"
-     footerText="#"
      style="width:2%;text-align:center"
      id="rrow">
              #{rowIndex+1}
 </p:column>
 <p:column headerText="#{msg['player.id']}"
-          footerText="#{msg['player.id']}"
           style="width:10%" >
    #{c.player.idplayer}
 </p:column>
 
 <p:column headerText="#{msg['player.first']}"
-          footerText="#{msg['player.first']}"
           style="width:20%" >
     <h:outputText
          value = "#{c.player.playerFirstName} - #{c.player.playerLastName}"  >
@@ -53,7 +54,6 @@
 </p:column>
 
         <p:column headerText="#{msg['inscription.canceled']}"
-                  footerText="#{msg['inscription.canceled']}"
                   style="width:20%" >
             <p:commandButton
                 id="cancelButton"
@@ -62,42 +62,43 @@
                 value="#{msg['button.delete']} - #{c.player.idplayer} - #{c.round.idround}"
                 icon="pi pi-trash"
                 style="color:red;font-weight:bold;">
-                
+
                 <p:confirm header="#{msg['message.confirm.delete']}"
-                     message="#{msg['message.cancel']}" 
-                     icon="pi pi-exclamation-triangle"
-                     />
+                     message="#{msg['message.confirm.delete']} #{c.player.playerLastName} - Round #{c.round.idround}"
+                     icon="pi pi-exclamation-triangle" />
             </p:commandButton>
 
              <h:outputText value="No delete possible : score already registered"
                 rendered="#{c.classment.totalPoints gt 0}"
                 style="font-weight:bold;color:red" />
-            
+
 	</p:column>
 
 <p:column headerText="#{msg['score.extra']}"
-          footerText="#{msg['score.extra']}"
           style="width:5%" >
-   #{c.classment.totalExtraStrokes} 
+   #{c.classment.totalExtraStrokes}
 </p:column>
 
 <p:column headerText="#{msg['playerhasround.result']}"
-          footerText="#{msg['playerhasround.result']}"
           style="width:10%" >
      <h:outputText  id="TotalPointsrice"
                     value="  #{c.classment.totalPoints}"
                     style="font-size: 2.5em;"
               />
-    (#{c.classment.last9} 
-     #{c.classment.last6} 
-     #{c.classment.last3} 
+    (#{c.classment.last9}
+     #{c.classment.last6}
+     #{c.classment.last3}
      #{c.classment.last1})
 </p:column>
 
-<ui:include src="include/include_thumbnails_ecourselist.xhtml"/>    
+<ui:include src="include/include_thumbnails_ecourselist.xhtml"/>
 
 </p:dataTable>
    <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

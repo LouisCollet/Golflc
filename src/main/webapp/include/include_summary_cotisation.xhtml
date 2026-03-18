@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
@@ -9,78 +8,32 @@
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core" >
 
-  <ui:include src="/include/include_summary_club.xhtml"/>
-<!-- attention !!! starts with / if include within include !! -->  
-<p:panelGrid
-    id="panelgridSummarycotisation"
-    layout="tabular"
-    columnClasses="col1,col2,col3,col4"
-    columns="4" >
+    <ui:include src="/include/include_summary_club.xhtml"/>
 
-<f:facet name="header">
-    <h1>#{msg['title.summary.cotisation']}</h1>
-</f:facet>
+    <h:panelGroup layout="block" styleClass="summary-bar">
+        <span class="summary-item">
+            <span class="summary-label">#{msg['start.date']}</span>
+            <span class="summary-value">
+                <h:outputText value="#{memC.tarifMember.startDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+                </h:outputText>
+            </span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['end.date']}</span>
+            <span class="summary-value">
+                <h:outputText value="#{memC.tarifMember.endDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+                </h:outputText>
+            </span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['handicap.comment']}</span>
+            <c:set var="com" value="#{memC.tarifMember.comment}" />
+            <span class="summary-value">#{of:abbreviate(com, 30)}</span>
+        </span>
+    </h:panelGroup>
 
-      <h:outputText value="#{msg['start.date']} :"/>
-      <h:outputText
-            id="startDateCotisation" 
-            value="#{memC.tarifMember.startDate}" >
-          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-      </h:outputText>
-
-      <h:outputText value="#{msg['end.date']} :" />
-      <h:outputText
-            id="endDateCotisation" 
-            value="#{memC.tarifMember.endDate}" >
-          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-      </h:outputText>
-
-      <h:outputText value="#{msg['handicap.comment']} :" />
-      <c:set var="com" value="#{memC.tarifMember.comment}" />
-      <h:outputText
-            id="commentCotisation" 
-            value="#{of:abbreviate(com, 30)}">
-          <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-      </h:outputText>
-      
-      <!--
-  <c:forEach var="i" begin="0" end="#{memC.tarifMember.basicList.size()}">
-   <h:outputText value="#{msg['tarif.members.items']} :"
-                 rendered="#{memC.tarifMember.membersBase[i][0] ne null}"/>
-      
-   <h:panelGroup id="panelItemSummaryGreenfee" layout="block"
-                  rendered="#{memC.tarifMember.membersBase[i][0] ne null}">
-      <h:outputText value="#{memC.tarifMember.membersBase[i][0]}"/>
-      <h:outputText value=" - #{memC.tarifMember.membersBase[i][1]}"/>
-      <h:outputText value=" - #{memC.tarifMember.membersBase[i][2]}"/>
-   </h:panelGroup>
- </c:forEach>
--->
- <!--     
-      <ui:repeat var="item" value="#{memC.tarifMember.equipmentsList.size}"> 
-          <h:outputText value="#{item.startDate}">
-             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-          </h:outputText>
-          <h:outputText value=" - "/>
-          <h:outputText value="#{item.endDate}">
-             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-          </h:outputText>
-          <h:outputText value=" - #{item.season}  " />
-      </ui:repeat> 
-   -->   
-      
-  <!--    
-      <c:forEach var="i" begin="0" end="#{memC.tarifMember.EquipmentsList.size()}">
-   <h:outputText value="#{msg['tarif.members.equipments']} :"
-                 rendered="#{memC.tarifMember.priceEquipments[i][0] ne null}"/>
-   <h:panelGroup id="panelItemSummaryGreenfeeHours" layout="block"
-                  rendered="#{memC.tarifMember.priceEquipments[i][0] ne null}">
-      <h:outputText value="#{memC.tarifMember.priceEquipments[i][0]}"/>
-      <h:outputText value=" - #{memC.tarifMember.priceEquipments[i][1]}"/>
-      <h:outputText value=" - #{memC.tarifMember.priceEquipments[i][2]}"/>
-   </h:panelGroup>
- </c:forEach>
--->
-</p:panelGrid>
-<p:divider layout="horizontal" type="solid" />
 </ui:composition>

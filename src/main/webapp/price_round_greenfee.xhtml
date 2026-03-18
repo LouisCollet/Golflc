@@ -5,14 +5,15 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:c="jakarta.tags.core"
-      template="templates/masterTemplate.xhtml" >
+      template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Tarif Round</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
-
-<h:form id="form_price_round_greenfee" enctype="application/x-www-form-urlencoded" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card"
+         xmlns:p="primefaces">
+<f:facet name="header" xmlns:f="jakarta.faces.core"><h1>Tarif Round</h1></f:facet>
+<h:form id="form_price_round_greenfee">
 <ui:include src="include/include_summary_round.xhtml"/>
 <ui:include src="include/include_summary_greenfee.xhtml"/>
 
@@ -22,7 +23,7 @@
 <c:set var="courseId" value="#{clubC.course.idcourse}"/>
       <c:choose>
          <c:when test="#{greenfeeType eq 'BA'}">
-          <ui:include src="include/include_greenfee_basic.xhtml"/> 
+          <ui:include src="include/include_greenfee_basic.xhtml"/>
          </c:when>
          <c:when test="#{greenfeeType eq 'DA' }">
              <ui:include src="include/include_greenfee_days.xhtml"/>
@@ -38,5 +39,7 @@
 <ui:include src="include/include_greenfee_equipments.xhtml"/>
 
 </h:form>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

@@ -3,8 +3,11 @@ package Controllers;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.internal.build.MongoDriverVersion;
+import com.mongodb.MongoException;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import info_test.GeoDetector;
+import info_test.IpDetector;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -16,6 +19,15 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import java.lang.management.ManagementFactory;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.io.*;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -42,7 +54,7 @@ import org.primefaces.config.PrimeEnvironment; // new 04-12-2025
 
 public class InfoController implements Serializable, interfaces.GolfInterface{
    @Inject private entite.Settings settings;        // ✅ injection CDI
-    private static Attributes manifestAttributes = null;
+    private Attributes manifestAttributes = null; // fix multi-user 2026-03-07 — was static
 
 public InfoController() throws IOException { //  constructor ! le faire private ??
     //  LOG.debug("entering Infocontroller constructor");
@@ -67,11 +79,10 @@ public void login(){ // throws IOException, SQLException { // executed via actio
 }
 
 
-@Inject 
-private ExternalContext externalContext;
-public String DeployVersion() throws IOException{
+// externalContext injection removed — fix multi-user 2026-03-07 (request-scoped, must not be cached in @ApplicationScoped)
+public String deployVersion() throws IOException{
     // version deployment (affichée dans login.xhtml)
-  String acp = externalContext.getApplicationContextPath();
+  String acp = FacesContext.getCurrentInstance().getExternalContext().getApplicationContextPath();
 //     LOG.debug("ApplicationContextPath = " + acp); //    /GolfWfly-1.0-SNAPSHOT
   Path path = Paths.get(settings.getProperty("TARGET") + acp + ".war");// converts string to path  
   FileTime fileTime = Files.getLastModifiedTime(path);
@@ -300,4 +311,106 @@ try{
    }
  } //end method
 */
+
+// ========================================
+// Methods merged from InfoController2 — 2026-03-07
+// ========================================
+
+public String getMySQLInfo() {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+        Future<String> future = executor.submit(() -> {
+            try (Connection conn = dataSource.getConnection()) {
+                java.sql.DatabaseMetaData metaData = conn.getMetaData();
+                return "Driver " + metaData.getDriverVersion() + " / DB " + metaData.getDatabaseProductVersion();
+            }
+        });
+        return future.get(2, TimeUnit.SECONDS);
+    } catch (TimeoutException e) {
+        LOG.error(methodName + " - MySQL retrieval timed out");
+        return "MySQL version unavailable (timeout)";
+    } catch (Exception e) {
+        LOG.error(methodName + " - Error getting MySQL version", e);
+        return "MySQL version error";
+    } finally {
+        executor.shutdownNow();
+    }
+} // end method
+
+public String getMongoInfo() {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+        Future<String> future = executor.submit(() -> {
+            try (MongoClient mongoClient = MongoClients.create("mongodb://localhost/")) {
+                Document info = mongoClient.getDatabase("golflc").runCommand(new Document("buildInfo", 1));
+                return "Driver " + MongoDriverVersion.VERSION + " / DB " + info.getString("version");
+            }
+        });
+        return future.get(2, TimeUnit.SECONDS);
+    } catch (TimeoutException e) {
+        LOG.error(methodName + " - MongoDB retrieval timed out");
+        return "MongoDB version unavailable (timeout)";
+    } catch (MongoException e) {
+        LOG.error(methodName + " - MongoDB error", e);
+        return "MongoDB info non disponible: " + e.getMessage();
+    } catch (Exception e) {
+        LOG.error(methodName + " - Error getting MongoDB version", e);
+        return "MongoDB version error";
+    } finally {
+        executor.shutdownNow();
+    }
+} // end method
+
+public String getIpDescription() {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
+            .getExternalContext().getRequest();
+    String ip = IpDetector.getClientIp(request);
+    LOG.info(methodName + " - IP detected: {}", ip);
+    return IpDetector.getIpDescription(ip);
+} // end method
+
+public String getGeoDescription() {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering " + methodName);
+    HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
+            .getExternalContext().getRequest();
+    String ip = IpDetector.getClientIp(request);
+    return GeoDetector.getLocation(ip);
+} // end method
+
+public String getClientAddress() {
+    HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
+            .getExternalContext().getRequest();
+    return request.getRemoteAddr();
+} // end method
+
+public String jvmStartup() {
+    long startTimeMillis = ManagementFactory.getRuntimeMXBean().getStartTime();
+    return Instant.ofEpochMilli(startTimeMillis)
+            .atZone(ZoneId.systemDefault())
+            .format(ZDF_TIME);
+} // end method
+
+public String jvmUptime() {
+    long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+    return "JVM up since: " + uptime / 1000 + " secs";
+} // end method
+
+public String getUserAgent() {
+    return FacesContext.getCurrentInstance()
+            .getExternalContext()
+            .getRequestHeaderMap()
+            .get("user-agent");
+} // end method
+
+public String getPrimeflexVersion2() {
+    return manifestAttributes.getValue("primeflex");
+} // end method
+
 }// end class

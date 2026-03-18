@@ -7,52 +7,48 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-    
-<ui:define name="title">Local Administrator </ui:define>
+
+<ui:define name="title">Local Administrator</ui:define>
+
 <ui:define name="content">
-<h:form id="form_local_admin"  >
-<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
-<!--
-<ui:include src="include/include_subscription.xhtml"/>(for club = #{param.clubId}
--->
-<p:panelGrid 
-    id="panel2"
-    layout="tabular"
-    columns="2"
-    columnClasses="col1, col2"
-    style="width:70%">
 
-    <f:facet name="header">
-        <h1>#{msg['message.selectLA']}</h1>
-    </f:facet>
+    <h:form id="form_local_admin">
 
-            <!-- =================== INCLUDE CLUB SELECTOR =================== -->
-                <ui:include src="/include/include_player_selector.xhtml" >
-                
-                </ui:include>
-            <!-- =================== INCLUDE COURSE SELECTOR =================== -->
-                <ui:include src="/include/include_club_selector.xhtml" />
-                
-    
- <!-- 
- <ui:include src="/include/include_player_selector.xhtml">
-    <ui:param name="playerBean" value="#{appContext.playerPro}"/>
-    <ui:param name="playerLabel" value="#{msg['player.professional']}"/>
-    <ui:param name="dialogMode" value="professional"/>
-</ui:include>
- -->
- <f:facet name="footer">
-        <p:commandButton
-                         value="#{msg['button.localadmin.create']}"
-                         id="createPlayer"
-                         ajax="false"
-                         style="font-weight:normal "
-                         update="growl-msg"
-                         icon="pi pi-database"
-                         action="#{playerC.createLocalAdministrator()}"/>
-</f:facet>
-</p:panelGrid>
-</h:form>
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card">
+                <f:facet name="header">
+                    <h1>#{msg['message.selectLA']}</h1>
+                </f:facet>
+
+                <p:panelGrid id="panel2"
+                             layout="flex"
+                             columns="2"
+                             columnClasses="col1Flex, col2Flex">
+
+                    <!-- =================== INCLUDE PLAYER SELECTOR =================== -->
+                    <ui:include src="/include/include_player_selector.xhtml">
+                        <ui:param name="playerPurpose" value="local_admin"/>
+                        <ui:param name="playerLabel" value="#{msg['professional.title']}"/>
+                    </ui:include>
+
+                    <!-- =================== INCLUDE CLUB SELECTOR =================== -->
+                    <ui:include src="/include/include_club_selector.xhtml"/>
+
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="#{msg['button.localadmin.create']}"
+                                     id="createPlayer"
+                                     ajax="false"
+                                     update="growl-msg"
+                                     icon="pi pi-database"
+                                     action="#{playerC.createLocalAdministrator()}"/>
+                </f:facet>
+
+            </p:panel>
+        </div>
+
+    </h:form>
+
 </ui:define>
 </ui:composition>

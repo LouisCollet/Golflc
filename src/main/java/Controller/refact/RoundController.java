@@ -86,6 +86,7 @@ public class RoundController implements Serializable {
     // ✅ Injections Round/Inscription — migrated 2026-02-25
     @Inject private find.FindTeeStart                  findTeeStart;
     @Inject private find.FindOpenWeather               findOpenWeather;
+    @Inject private Controllers.LanguageController     languageController; // fix multi-user 2026-03-07
     @Inject private find.FindTarifGreenfeeData         findTarifGreenfeeData;
     @Inject private lists.RoundPlayersList             roundPlayersListService;
 
@@ -968,9 +969,9 @@ public class RoundController implements Serializable {
             tarifGreenfee = findTarifGreenfeeData.find(round);
             if (tarifGreenfee == null) {
                 String err = "Tarif returned from findTarifdata is null";
-                LOG.debug(err);
+                LOG.error(err);
                 showMessageFatal(err);
-                return "inscriptions_other_players.xhtml?faces-redirect=true";
+                return null;
             }
             LOG.debug(methodName + " - tarifGreenfee = " + tarifGreenfee);
             LOG.debug(methodName + " - roundPlayersList size = " + roundPlayersList().size());
@@ -982,9 +983,10 @@ public class RoundController implements Serializable {
             LOG.debug(methodName + " - total inscrits + candidats = " + tot);
 
             if (tot > max) {
-                String msg = LCUtil.prepareMessageBean("inscription.toomuchplayers") + " {max} = " + max + " /tot " + tot;
+                String msg = LCUtil.prepareMessageBean("inscription.toomuchplayers") + " max = " + max + " / total = " + tot;
                 LOG.error(msg);
                 showMessageFatal(msg);
+                return null;  // stay on current page to display the error message
             }
             return "inscriptions_other_players.xhtml?faces-redirect=true";
         } catch (Exception e) {
@@ -1135,7 +1137,7 @@ public class RoundController implements Serializable {
             LOG.debug(methodName + " - player = " + appContext.getPlayer());
             LOG.debug(methodName + " - round = " + appContext.getRound());
 
-            String weather = findOpenWeather.find(club);
+            String weather = findOpenWeather.find(club, languageController.getLanguage()); // fix multi-user 2026-03-07
             if (weather == null) {
                 LOG.debug(methodName + " - weather is null");
                 inscription.setWeather("Weather returned from findWeather is null");
@@ -1298,6 +1300,18 @@ public class RoundController implements Serializable {
             LOG.debug("round = " + round);
             LOG.debug("scoreStableford = " + score);
             LOG.debug("List statistics = " + score.getStatisticsList().toString());
+
+            // Validation métier avant SQL — règles du trigger update_score_trigger
+            for (ScoreStableford.Statistics stt : score.getStatisticsList()) {
+                if (stt.getPar() != null && stt.getPar() == 3
+                        && stt.getFairway() != null && stt.getFairway() > 0) {
+                    String msg = "Hole " + stt.getHole() + " : Par 3 — Fairway must be zero";
+                    LOG.error(methodName + " - " + msg);
+                    showMessageFatal(msg);
+                    stt.setFairway(0);
+                    return null;
+                }
+            } // end for validation
 
             if (createStatisticsStableford.create(appContext.getPlayer(), round, score)) {
                 String msg = "statistics created !!";

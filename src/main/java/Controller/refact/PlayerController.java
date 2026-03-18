@@ -39,12 +39,13 @@ import java.util.Map;
 import manager.PlayerManager;
 import manager.PlayerManager.SaveResult;
 import Controllers.DialogController;
-import enumeration.ClubSelectionPurpose;
+import enumeration.SelectionPurpose;
 import security.LoginBeanSecurity;
-import jakarta.faces.context.ExternalContext;
+// import jakarta.faces.context.ExternalContext; // removed — fix multi-user 2026-03-07 (request-scoped, use FacesContext.getCurrentInstance())
 import java.util.Optional;
 import org.primefaces.event.SelectEvent;
 import service.CoordinatesService;
+import jakarta.servlet.http.HttpServletRequest;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
@@ -66,6 +67,8 @@ public class PlayerController implements Serializable {
     @Inject private CoordinatesService coordinatesService;
     @Inject private ApplicationContext appContext;
     @Inject private find.FindLastLogin findLastLoginService; // migrated 2026-02-25
+    @Inject private Controllers.LanguageController         languageController; // fix multi-user 2026-03-07
+    @Inject private lists.PlayersList                     playersListService; // fix password cache bug 2026-03-07
 
     // ✅ Injections ajoutées — migration player methods 2026-02-25
     @Inject private Controllers.PasswordController                 passwordController;
@@ -85,6 +88,7 @@ public class PlayerController implements Serializable {
     private EPlayerPassword selectedPlayerEPP = null;
     private Blocking blocking; // migrated from CourseController 2026-02-25
     private boolean nextPanelPlayer = false; // migrated from CourseController 2026-02-25
+    private boolean showPlayerList = false;
     private String createModifyPlayer = "C"; // C=Create, M=Modify — migrated from CourseController 2026-02-25
     private int deletePlayer = 0; // migrated from CourseController 2026-02-25
     private Password password = new Password(); // migrated from CourseController 2026-02-25
@@ -101,7 +105,7 @@ public class PlayerController implements Serializable {
     // ✅ Injections logout/loginAPI/selectedPlayerFromDialog — migrated 2026-02-27
     @Inject private find.FindLastAudit                              findLastAudit;
     @Inject private update.UpdateAudit                              updateAudit;
-    @Inject private ExternalContext                                  externalContext;
+    // externalContext injection removed — fix multi-user 2026-03-07 (request-scoped, must not be cached in @SessionScoped)
     @Inject private DialogController                                 dialogController;
     @Inject private contexte.ClubSelectionContextBean                clubSelectionContext;
     @Inject private Controller.refact.NavigationController            navigationController; // renamed 2026-02-28
@@ -115,6 +119,19 @@ public class PlayerController implements Serializable {
      */
     public Player getPlayer()              { return appContext.getPlayer(); }
     public void   setPlayer(Player player) { appContext.setPlayer(player); }
+
+    /**
+     * Listener for player language change — fix multi-user 2026-03-07
+     * Moved from Player POJO (cannot call CDI from POJO)
+     */
+    public void playerLanguageListener(ValueChangeEvent e) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        String newLanguage = e.getNewValue().toString();
+        LOG.debug(methodName + " - playerLanguage NewValue = " + newLanguage);
+        appContext.getPlayer().setPlayerLanguage(newLanguage);
+        languageController.setLanguage(newLanguage);
+    } // end method
 
     public Player getPlayerPro()              { return appContext.getPlayerPro(); }
     public void   setPlayerPro(Player player) { appContext.setPlayerPro(player); }
@@ -636,6 +653,9 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
     public boolean isNextPanelPlayer() { return nextPanelPlayer; }
     public void setNextPanelPlayer(boolean nextPanelPlayer) { this.nextPanelPlayer = nextPanelPlayer; }
 
+    public boolean isShowPlayerList() { return showPlayerList; }
+    public void togglePlayerList() { this.showPlayerList = !this.showPlayerList; }
+
     public String getCreateModifyPlayer() { return createModifyPlayer; }
     public void setCreateModifyPlayer(String createModifyPlayer) { this.createModifyPlayer = createModifyPlayer; }
 
@@ -676,9 +696,9 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
             } else {
                 LOG.debug(methodName + " - current Player = " + appContext.getPlayer());
             }
-            Controllers.LanguageController.setLocale(Locale.of(appContext.getPlayer().getPlayerLanguage()));
+            languageController.setLocale(Locale.of(appContext.getPlayer().getPlayerLanguage())); // fix multi-user 2026-03-07
             LOG.debug(methodName + " - Language set = " + appContext.getPlayer().getPlayerLanguage());
-            LOG.debug(methodName + " - Language is now = " + Controllers.LanguageController.getLanguage());
+            LOG.debug(methodName + " - Language is now = " + languageController.getLanguage()); // fix multi-user 2026-03-07
 
             LOG.debug(methodName + " - 1. verifying if there is an existing password");
             Password p = passwordController.isExists(epp);
@@ -699,6 +719,13 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
                 LOG.debug(methodName + " - subscription is null ==> going to subscription.xhtml");
                 return "subscription.xhtml?faces-redirect=true";
             }
+            appContext.setSubscription(subscription); // fix subscription dates on welcome.xhtml 2026-03-07
+
+            // Session fixation protection — rotate JSESSIONID before granting access
+            HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
+                    .getExternalContext().getRequest();
+            request.changeSessionId();
+            LOG.debug(methodName + " - session rotated (anti session-fixation), new id = " + request.getSession(false).getId());
 
             LOG.debug(methodName + " - 4. initialisations diverses");
             // sessionMap.put("playerid/playerlastname/playerage") — removed 2026-02-28, now via appContext.getPlayer()
@@ -714,6 +741,36 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
 
             // everything controlled and initialized
             return "welcome.xhtml?faces-redirect=true";
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return null;
+        }
+    } // end method
+
+    /**
+     * Login raccourci via le player selector (include_player_selector.xhtml).
+     * Cherche l'EPlayerPassword correspondant à playerTemp.idplayer dans la liste,
+     * puis délègue à selectPlayer(epp) pour le flux login standard.
+     */
+    public String selectPlayerById() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            Integer id = appContext.getPlayerTemp().getIdplayer();
+            LOG.debug(methodName + " - looking up player id = " + id);
+            if (id == null || id == 0) {
+                showMessageFatal("Please enter a valid player ID");
+                return null;
+            }
+            EPlayerPassword epp = listPlayers().stream()
+                    .filter(e -> id.equals(e.getPlayer().getIdplayer()))
+                    .findFirst()
+                    .orElse(null);
+            if (epp == null) {
+                showMessageFatal("Player ID " + id + " not found");
+                return null;
+            }
+            return selectPlayer(epp);
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;
@@ -934,6 +991,7 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
             EPlayerPassword epp = new EPlayerPassword(appContext.getPlayer(), password);
             if (updatePassword.update(epp)) {
                 LOG.debug(methodName + " - boolean returned from modifyPassword is 'true'");
+                playersListService.invalidateCache(); // fix password cache bug 2026-03-07
                 return "login.xhtml?faces-redirect=true";
             } else {
                 LOG.debug(methodName + " - boolean returned from modifyPassword is 'false'");
@@ -1092,64 +1150,18 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         LOG.debug("password = " + login.getPassword());
     } // end method
 
-    public String logout(String lgt) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " for player = " + appContext.getPlayer().getIdplayer());
-        LOG.debug("entering " + methodName + " with parameter = " + lgt);
-        try {
-            appContext.getPlayer().setShowMenu(true);
-            if (appContext.getPlayer().getIdplayer() != null) {
-                Audit a = new Audit();
-                a.setAuditPlayerId(appContext.getPlayer().getIdplayer());
-                a = findLastAudit.find(a);
-                if (a != null) {
-                    String msg = "ending an audit which started at : " + a.getAuditStartDate().format(ZDF_TIME);
-                    LOG.debug(msg);
-                    showMessageInfo(msg);
-                    boolean ok = updateAudit.stop(a);
-                }
-            }
-            navigationController.reset("from logout");
-            LOG.debug("this session will be invalidated : " + externalContext.getSessionId(true));
-            externalContext.invalidateSession();
-            if (lgt != null) {
-                if (lgt.equals("from button Logout")) {
-                    String msg = "You asked a logout from the Logout button";
-                    LOG.info(msg);
-                    showMessageInfo(msg);
-                    return "login.xhtml?faces-redirect=true";
-                }
-                if (lgt.equals("Inactive Interval from masterTemplate")) {
-                    String msg = "Inactive Interval from masterTemplate - Time-out for inactivity from masterTemplate!";
-                    LOG.debug(msg);
-                    showMessageInfo(msg);
-                    return "session_expired.xhtml?faces-redirect=true";
-                } else {
-                    LOG.debug("unknown logout message : " + lgt);
-                    return null;
-                }
-            } else {
-                LOG.debug("lgt is null " + lgt);
-                return null;
-            }
-        } catch (Exception ex) {
-            String msg = "Exception in " + methodName + " " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-    } // end method
+    // logout() moved to NavigationController 2026-03-07 — session lifecycle action
 
     public String selectedPlayerFromDialog(EPlayerPassword epp) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " with player = " + epp.getPlayer());
         LOG.debug("entering " + methodName + " with playerTemp = " + appContext.getPlayerTemp());
         try {
-            ClubSelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
-                    .orElse(ClubSelectionPurpose.CREATE_PLAYER);
+            SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
+                    .orElse(SelectionPurpose.CREATE_PLAYER);
             LOG.debug(methodName + " with purpose = " + purpose);
 
-            if (purpose == ClubSelectionPurpose.LOCAL_ADMIN) {
+            if (purpose == SelectionPurpose.LOCAL_ADMIN) {
                 LOG.debug("we handle LA");
                 appContext.setPlayerTemp(epp.getPlayer());
                 LOG.debug("selected local administrator = " + appContext.getPlayerTemp());
@@ -1157,9 +1169,15 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
                 dialogController.closeDialog(null);
                 return null;
             }
-            if (purpose == ClubSelectionPurpose.CREATE_PRO) {
+            if (purpose == SelectionPurpose.CREATE_PRO) {
                 appContext.setPlayerTemp(epp.getPlayer());
                 dialogController.closeDialog(null);
+                return null;
+            }
+            // login (selectPlayer.xhtml) — close dialog, pass epp back to parent page
+            if (purpose == SelectionPurpose.CREATE_PLAYER) {
+                appContext.setPlayerTemp(epp.getPlayer());
+                dialogController.closeDialog(epp);
                 return null;
             }
             return null;
@@ -1168,6 +1186,28 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
             LOG.error(msg);
             showMessageFatal(msg);
             return null;
+        }
+    } // end method
+
+    /**
+     * Listener pour dialogReturn du player selector.
+     * Si le dialog renvoie un EPlayerPassword (mode login), lance le flux login complet
+     * et redirige la page parent vers welcome.xhtml (ou password_create, subscription...).
+     */
+    public void onPlayerDialogReturn(org.primefaces.event.SelectEvent<Object> event) throws java.io.IOException, SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        Object obj = event.getObject();
+        if (obj instanceof EPlayerPassword epp) {
+            LOG.debug(methodName + " - received EPlayerPassword, launching login flow for player = " + epp.getPlayer());
+            String outcome = selectPlayer(epp);
+            if (outcome != null) {
+                String url = outcome.replace("?faces-redirect=true", "");
+                jakarta.faces.context.ExternalContext ec2 = FacesContext.getCurrentInstance().getExternalContext();
+                ec2.redirect(ec2.getRequestContextPath() + "/" + url);
+            }
+        } else {
+            LOG.debug(methodName + " - dialogReturn object is not EPlayerPassword: " + obj);
         }
     } // end method
 

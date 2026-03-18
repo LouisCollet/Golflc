@@ -143,7 +143,7 @@ public String toString(){
 //
     return 
         (NEW_LINE + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEW_LINE 
-             + " ,Handicap Start : "   + Handicap.SDF.format(getHandicapStart() )
+             + " ,Handicap Start : "   + new java.text.SimpleDateFormat("dd/MM/yyyy").format(getHandicapStart())
              + " ,Player Handicap : " + this.getHandicapPlayerEGA() 
      //        + " ,Playing Handicap : " + this.getPlayingHandicap()
              + " ,Handicap End : " + this.getHandicapEnd()

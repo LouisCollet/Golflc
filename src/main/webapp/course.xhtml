@@ -8,78 +8,82 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml" >
 
-<ui:define name="title">Course Page </ui:define>
+<ui:define name="title">Course Page</ui:define>
 
 <ui:define name="content">
-<h:graphicImage name="images/golf_course.jpg" alt="image missing : golf_course.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/golf_course.jpg" alt="image missing : golf_course.jpg" style="float: right;"></h:graphicImage>
-<!--    <h:body onload="startupSubmit();">  -->
-    
-<h:form id="form_course"  >
 
-<ui:include src="include/include_summary_club.xhtml"/>
-<p:focus for="CourseName" />
-<p:panelGrid id="panel"
-             columns="2"
-             layout="tabular"
-             columnClasses="col1,col2">
+    <h:form id="form_course">
 
-<f:facet name="header">
-    <h1>#{msg['course.data']} #{request.getParameter('operation')}   </h1>
-</f:facet>
-                <p:outputLabel for="@next" value="#{msg['course.name']} :"   />
-                <p:inputText  label="Coursename"
-                       id="CourseName"
-                       title="#{msg['tooltip.course.coursename']}"
-                       value="#{clubC.course.courseName}"
-                       size="45" />
-    <p:outputLabel for="@next"  value="#{msg['course.enddate']} :"/>
-    <p:datePicker value="#{clubC.course.courseEndDate}"
-                  id="picker_endDate"
-                  locale="#{languageC.locale}"
-                  pattern="dd/MM/yyyy"
-                  showTime="true"
-                  showIcon="true"
-                  size="18"
-                  readonlyInput="false"
-                  showButtonBar="true"
-                  yearRange="#{utilsC.dateYear(-1)}:#{utilsC.dateYear(50)}"
-                  yearNavigator="true"
-                  monthNavigator="true" >
-    </p:datePicker>
-<f:facet name="footer">
-        <p:commandButton value="#{msg['button.course.create']}"
-                         id="ButtonCreateCourse"
-                         ajax="false"
-                         rendered="#{clubC.course.createModify eq true and clubC.tee.nextTee eq false}"
-                         update="growl-msg"
-                        
-                         icon="pi pi-database"
-                         style="float:left;"
-                         action="#{clubC.createCourse()}" />
-         <p:commandButton value="#{msg['button.course.modify']}"
-                         id="buttonModify"
-                         ajax="false"
-                         rendered="#{clubC.course.createModify eq false}" 
-                         update="growl-msg"
-                         
-                         icon="pi pi-database"
-                         style="float:left;"
-                         action="#{clubC.modifyCourse()}" />
-         <!--    rendered="#{(not clubC.tee.nextTee) and (param.operation eq 'modify') }"  -->
-        <p:commandButton value="#{msg['course.next']}"
-                         id="buttonNext"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         rendered="#{clubC.tee.nextTee}"
-                         icon="pi pi-arrow-right"
-                         style="float:right;"
-                         action="tee.xhtml?faces-redirect=true"/>
-</f:facet>
-</p:panelGrid>
-<br/>
-</h:form>
+        <ui:include src="include/include_summary_club.xhtml"/>
+
+        <p:focus for="CourseName" />
+
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card">
+                <f:facet name="header">
+                    <h1>#{msg['course.data']} #{request.getParameter('operation')}</h1>
+                </f:facet>
+
+                <p:panelGrid id="panel"
+                             columns="2"
+                             layout="flex"
+                             columnClasses="col1Flex, col2Flex">
+
+                    <p:outputLabel for="@next" value="#{msg['course.name']} :"/>
+                    <p:inputText label="Coursename"
+                                 id="CourseName"
+                                 title="#{msg['tooltip.course.coursename']}"
+                                 value="#{clubC.course.courseName}"
+                                 size="45" />
+
+                    <p:outputLabel for="@next" value="#{msg['course.enddate']} :"/>
+                    <p:datePicker value="#{clubC.course.courseEndDate}"
+                                  id="picker_endDate"
+                                  locale="#{languageC.locale}"
+                                  pattern="dd/MM/yyyy"
+                                  showTime="true"
+                                  showIcon="true"
+                                  size="18"
+                                  readonlyInput="false"
+                                  showButtonBar="true"
+                                  yearRange="#{utilsC.dateYear(-1)}:#{utilsC.dateYear(50)}"
+                                  yearNavigator="true"
+                                  monthNavigator="true" />
+
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="#{msg['button.course.create']}"
+                                     id="ButtonCreateCourse"
+                                     ajax="false"
+                                     rendered="#{clubC.course.createModify eq true and clubC.tee.nextTee eq false}"
+                                     update="growl-msg"
+                                     icon="pi pi-database"
+                                     action="#{clubC.createCourse()}" />
+
+                    <p:commandButton value="#{msg['button.course.modify']}"
+                                     id="buttonModify"
+                                     ajax="false"
+                                     rendered="#{clubC.course.createModify eq false}"
+                                     update="growl-msg"
+                                     icon="pi pi-database"
+                                     action="#{clubC.modifyCourse()}" />
+
+                    <p:commandButton value="#{msg['course.next']}"
+                                     id="buttonNext"
+                                     update="growl-msg"
+                                     immediate="true"
+                                     ajax="false"
+                                     rendered="#{clubC.tee.nextTee}"
+                                     icon="pi pi-arrow-right"
+                                     style="float:right;"
+                                     action="tee.xhtml?faces-redirect=true"/>
+                </f:facet>
+
+            </p:panel>
+        </div>
+
+    </h:form>
 
 </ui:define>
 </ui:composition>

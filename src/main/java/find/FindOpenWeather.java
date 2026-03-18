@@ -2,7 +2,6 @@ package find;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import Controllers.LanguageController;
 import entite.Club;
 import entite.OpenWeather;
 import static exceptions.LCException.handleGenericException;
@@ -45,15 +44,14 @@ public class FindOpenWeather implements Serializable {
      * @param club the club (must have address with lat/lng and zoneId)
      * @return HTML-formatted weather string, or null on error
      */
-    public String find(Club club) {
+    public String find(Club club, String language) { // fix multi-user 2026-03-07 — language as parameter
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " with club = " + club);
+        LOG.debug("entering " + methodName + " with club = " + club + ", language = " + language);
         try {
-            String language = LanguageController.getLanguage();
             String string_url = "https://api.openweathermap.org/data/2.5/weather"
                     + "?lat=" + String.valueOf(club.getAddress().getLatLng().getLat())
                     + "&lon=" + String.valueOf(club.getAddress().getLatLng().getLng())
-                    + "&appid=6c7ad5efe2fef5799fb0277381f5ec7e"
+                    + "&appid=" + System.getenv("OPENWEATHER_API_KEY")
                     + "&units=metric"
                     + "&lang=" + language;
 

@@ -2,88 +2,79 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:c="jakarta.tags.core"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
+
 <ui:define name="title">Travel domicile vers Club</ui:define>
 <ui:define name="head"></ui:define>
 <ui:define name="content">
 
-<h:head>
-    <title>Calculate Distance</title>
-<script  async="async"
-         defer="defer"
-         type="text/javascript"
-         src="https://maps.googleapis.com/maps/api/js?key=#{settings.getProperty('GOOGLE_MAPS_API_KEY')}&amp;language=#{languageC.locale}"
->        
-  //  setTimeout(GetRoute, 1000); // 1 sec utile ?
+<script async="async"
+        defer="defer"
+        type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=#{settings.getProperty('GOOGLE_MAPS_API_KEY')}&amp;language=#{languageC.locale}">
 </script>
-    <h:outputScript library="js" name="maps_home_club.js"/>    
-</h:head>
+<h:outputScript library="js" name="maps_home_club.js"/>
 
-<h:form id="calculate_distance"
-         >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card" style="max-width:100%;">
+        <f:facet name="header">
+            <h1>Calculate Distance</h1>
+        </f:facet>
 
-  <p:panelGrid id="panelgrid1"
-               layout="tabular"
-               columns="2"
-               style="width:100px" 
-               columnClasses="col1, col2"
-               > 
-      <!-- columnClasses="forty-percent top-alignment, sixty-percent top-alignment"
-      https://stackoverflow.com/questions/16776631/how-can-i-change-column-width-of-panel-grid-in-primefaces  -->
+        <h:form id="calculate_distance">
+            <p:panelGrid id="panelgrid1"
+                         layout="flex"
+                         columns="2"
+                         columnClasses="col1Flex, col2Flex">
 
-        <h:outputText value="Départ" 
-                      style="width: 100px;"/>
-        <h:inputText id="txtSource" 
-                     value="#{playerC.player.address.city}" size="40"/>
+                <h:outputText value="D\u00e9part"
+                              style="width: 100px;"/>
+                <h:inputText id="txtSource"
+                             value="#{playerC.player.address.city}" size="40"/>
 
-        <h:outputText value="Destination" 
-                      style="width: 100px;"/>
-        <h:inputText id="txtDestination" 
-                     value="#{clubC.club.address.street},#{clubC.club.address.city},#{clubC.club.address.country.code}" size="60"/>
+                <h:outputText value="Destination"
+                              style="width: 100px;"/>
+                <h:inputText id="txtDestination"
+                             value="#{clubC.club.address.street},#{clubC.club.address.city},#{clubC.club.address.country.code}" size="60"/>
 
-        <p:outputLabel for="@next" value="#{msg['club.latitude']} :"   />
-        <p:inputText   id="ClubLatitude"
-                       value="#{clubC.club.clubLatitude}"/>
-    
-        <p:outputLabel for="@next" value="#{msg['club.longitude']} :"   />
-        <p:inputText   id="ClubLongitude"
-                       value="#{clubC.club.clubLongitude}"/>
- <!--       
-        getRoute se trouve dans un fichier.js externe 
-        <h:button value="Back to selectCourse" outcome="selectCourse.xhtml"/
-      -->
- <f:facet name="footer">       
-        <p:commandButton value="GetRoute"
-                         id="buttonCreate"
-                         type="submit"
-                         icon="pi pi-shopping-cart"
-                         style="float:left;"
-                         onclick="GetRoute()"
-              />
- </f:facet>     
-  </p:panelGrid>
+                <p:outputLabel for="@next" value="#{msg['club.latitude']} :"/>
+                <p:inputText id="ClubLatitude"
+                             value="#{clubC.club.clubLatitude}"/>
 
-<p:panelGrid id="panelgrid2" 
-              columns="2"
-              layout="tabular"
-              columnClasses="col1, col2"
-              style="width:300px" > 
-    <h:outputText value="#{msg['google.distance']} :"
-                  id="distance01"/>
-    <h:inputText  id="distance02"/>
-    <h:outputText value="#{msg['google.duration']} :"
-                  id="duration01"/>
-    <h:inputText id="duration02"/>
+                <p:outputLabel for="@next" value="#{msg['club.longitude']} :"/>
+                <p:inputText id="ClubLongitude"
+                             value="#{clubC.club.clubLongitude}"/>
 
-</p:panelGrid>
+                <f:facet name="footer">
+                    <p:commandButton value="GetRoute"
+                                     id="buttonCreate"
+                                     type="submit"
+                                     icon="pi pi-shopping-cart"
+                                     onclick="GetRoute()"/>
+                </f:facet>
+            </p:panelGrid>
 
-<div id="dvMap" style="width: 1000px; height: 1000px;float: left;border:solid 2px;border-style:double;"/>
-<div id="dvPanel" style="width: 500px; height: 100%;float: right;border:solid 1px;background-color: lightblue;"/>
-</h:form>
+            <p:panelGrid id="panelgrid2"
+                         columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+                <h:outputText value="#{msg['google.distance']} :"
+                              id="distance01"/>
+                <h:inputText id="distance02"/>
+                <h:outputText value="#{msg['google.duration']} :"
+                              id="duration01"/>
+                <h:inputText id="duration02"/>
+            </p:panelGrid>
+
+            <div id="dvMap" style="width: 1000px; height: 1000px;"/>
+            <div id="dvPanel" style="width: 500px; height: 100%; background-color: lightblue;"/>
+        </h:form>
+    </p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

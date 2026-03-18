@@ -11,32 +11,25 @@
 <ui:define name="metadata"> </ui:define>
 <ui:define name="title">Upload Photo Player Page </ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/upload01.jpg" alt="image missing :upload01.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/upload03.jpg" alt="image missing :upload03.jpg" style="float: right;"></h:graphicImage>
 
-<h:form id="form_upload" 
-        enctype="multipart/form-data">
-<ui:include src="include/include_summary_player.xhtml"/>
-
- <p:panelGrid 
-    id="panel2"
-    layout="tabular"
-    columns="2"
-    style="width:70%"
-    columnClasses="col1,col2" >
-
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
 <f:facet name="header">
      <h1>#{msg['player.upload.photo']}</h1>
 </f:facet>
-     
-<!-- <style>
-    body .ui-inputfield.ui-state-drag {
-        background: red;
-    }
-</style> Upload File -->
-     
-    
-    <h:outputText value="Upload file" /> 
+
+<h:form id="form_upload"
+        enctype="multipart/form-data">
+<ui:include src="include/include_summary_player.xhtml"/>
+
+ <p:panelGrid
+    id="panel2"
+    layout="flex"
+    columns="2"
+    style="width:70%"
+    columnClasses="col1Flex, col2Flex">
+
+    <h:outputText value="Upload file" />
     <p:fileUpload id="uploader1"
                label="Choose the photo to upload, #{playerC.player.playerFirstName}"
                auto="false"
@@ -48,7 +41,6 @@
                onupload="return confirm('Are you sure?')"
                displayFilename="true"
                uploadLabel="Upload this file !" >
-  <!-- auto must be false was auto="true" version 14.8 dropzone https://primefaces.github.io/primefaces/14_0_0/#/validators/validateFile?id=validatefile -->
          <p:validateFile
              allowTypes="/(\.|\/)(gif|jpe?g|png|pdf)$/"
              contentType="true"
@@ -56,7 +48,7 @@
              fileLimit="3" >
          </p:validateFile>
     </p:fileUpload>
-      
+
     <p:outputPanel id="tooltipsPanel">
             <p:tooltip id="uploaderChooseFileBeforeUploadToolTip"
                        widgetVar="chooseWV"
@@ -74,10 +66,7 @@
                        for="@(#form_upload\:uploader1 > .ui-fileupload-buttonbar > .ui-fileupload-cancel)"
                        value="Cancel button tooltip"/>
     </p:outputPanel>
-      
 
-
- <!-- new 26-11-2024    --> 
   <h:outputText value="" />
   <h:outputText value="Drop Zone" />
        <p:inputTextarea id="customDropZone"
@@ -105,5 +94,8 @@
 
 </p:panelGrid>
 </h:form>
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

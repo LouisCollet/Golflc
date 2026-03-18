@@ -97,7 +97,7 @@ public Path create(){
             LOG.debug(String.format("%,d bytes", bytes));
             LOG.debug(String.format("%,d kilobytes", bytes / 1024));
 /*
-    String to = "louis.collet@skynet.be";
+    String to = System.getenv("SMTP_USERNAME");
     Path path = null;
     boolean b = new mail.SendEmail().sendHtmlMail("sujet de test from main","message du mail",to,"INSCRIPTION",
             path, "en");

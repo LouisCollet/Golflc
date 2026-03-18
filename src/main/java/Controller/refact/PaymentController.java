@@ -101,7 +101,7 @@ public class PaymentController implements Serializable {
     private List<Lesson>  listLessons = new ArrayList<>();
     private Lesson        selectedLesson;
     private Player        playerPro;
-
+    private boolean running = false;  // new 09-03-2026
     public PaymentController() { }
 
     @PostConstruct
@@ -112,6 +112,7 @@ public class PaymentController implements Serializable {
         greenfee = new Greenfee();
         tarifGreenfee = new TarifGreenfee();
         tarifMember = new TarifMember();
+        progress1 = 0; // new 09-03-2026
         LOG.debug("PaymentController initialized");
     } // end method
 
@@ -365,6 +366,8 @@ public class PaymentController implements Serializable {
     public void onCompletePayment() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName + " coming from creditcard_accepted.xhtml");
+        progress1 = 0;  // ← reset pour la prochaine visite
+        running = false; // new 09-03-2026
         try {
             creditcard.setTypePayment(appContext.getCreditcardType());
             savedType = creditcard.getTypePayment();
@@ -398,6 +401,7 @@ public class PaymentController implements Serializable {
     @jakarta.ws.rs.Path("payment_handle/{isbn}")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_HTML)
+    // @PaymentSecured removed — all payment endpoints are reached via redirect chain, session not available in JAX-RS context
 public jakarta.ws.rs.core.Response handlePayments(
             @PathParam("isbn") String uuid,
             @Context HttpServletRequest request,
@@ -420,7 +424,16 @@ public jakarta.ws.rs.core.Response handlePayments(
             LOG.debug("Payment reference = " + reference);
             LOG.debug("Path parameters = " + context.getPathParameters());
             LOG.debug("Absolute URI = " + context.getAbsolutePath());
-            LOG.debug("Amount = " + amount);
+            LOG.debug("Amount from cookie = " + amount);
+
+            // security audit 2026-03-09 — log warning if cookie amount differs from server amount
+            if (amount != null && creditcard.getTotalPrice() > 0) {
+                double cookieAmt = Double.parseDouble(amount);
+                if (Math.abs(cookieAmt - creditcard.getTotalPrice()) > 0.01) {
+                    LOG.warn("SECURITY: amount mismatch in handlePayments! Server=" + creditcard.getTotalPrice()
+                            + " Cookie=" + cookieAmt + " for player=" + appContext.getPlayer().getIdplayer());
+                }
+            }
 
             creditcard.setCreditcardPaymentReference(reference);
             creditcard.setTypePayment(getSavedType());
@@ -464,6 +477,8 @@ public jakarta.ws.rs.core.Response handlePayments(
     //  utilisé dans creditcard_accepted.xhtml
     public void onStart() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
+        running = true;
+        progress1 = 0;
         LOG.debug("entering " + methodName + ", progress1 = " + progress1);
         showMessageInfo("entering onStart, progress1 = " + progress1);
     } // end method
@@ -479,7 +494,8 @@ public jakarta.ws.rs.core.Response handlePayments(
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         LOG.debug("Payment canceled by User");
-        progress1 = null;
+        progress1 = 0;  // était null
+        running = false; // new 09-03-2026
         creditcard.setPaymentOK(false);
         String msg = "Creditcard payment canceled by user";
         LOG.error(msg);
@@ -866,6 +882,7 @@ public jakarta.ws.rs.core.Response handlePayments(
 
     @jakarta.ws.rs.GET
     @jakarta.ws.rs.Path("payment_choice/{isbn}")
+    // @PaymentSecured removed — callback endpoint from Python payment server redirect, session not guaranteed in JAX-RS context
     public jakarta.ws.rs.core.Response paymentChoice(
             @PathParam("isbn") String param,
             @Context HttpServletRequest servletRequest,
@@ -933,6 +950,7 @@ public jakarta.ws.rs.core.Response handlePayments(
 
     @jakarta.ws.rs.GET
     @jakarta.ws.rs.Path("payment_canceled/{isbn}")
+    // @PaymentSecured removed — callback endpoint from Python payment server redirect
     public Response paymentCancel(
             @PathParam("isbn") String id,
             @Context HttpServletRequest request,
@@ -976,6 +994,7 @@ public jakarta.ws.rs.core.Response handlePayments(
 
     @jakarta.ws.rs.GET
     @jakarta.ws.rs.Path("payment_confirmed")
+    // @PaymentSecured removed — callback endpoint from Python payment server redirect
     public Response paymentConfirmed(
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
@@ -998,8 +1017,23 @@ public jakarta.ws.rs.core.Response handlePayments(
             LOG.debug("creditcard = " + creditcard);
             LOG.debug("browser = " + whichBrowser);
             LOG.debug("User = " + user);
-            LOG.debug("Amount = " + amount);
-            creditcard.setTotalPrice(Double.valueOf(amount));
+            LOG.debug("Amount from cookie = " + amount);
+
+            // security audit 2026-03-09 — validate amount against server-side value
+            // creditcard.totalPrice was set server-side before payment (preparePayment methods)
+            // NEVER trust the client cookie amount — compare and reject if tampered
+            double cookieAmount = Double.valueOf(amount);
+            double serverAmount = creditcard.getTotalPrice();
+            LOG.debug("Server-side amount = " + serverAmount + ", cookie amount = " + cookieAmount);
+            if (Math.abs(cookieAmount - serverAmount) > 0.01) {
+                LOG.warn("SECURITY: payment amount mismatch! Server=" + serverAmount + " Cookie=" + cookieAmount
+                        + " for player=" + appContext.getPlayer().getIdplayer());
+                creditcard.setPaymentOK(false);
+                creditcard.setCommunication("Payment rejected: amount tampered");
+                response.sendRedirect(request.getContextPath() + "/creditcard_payment_canceled.xhtml?faces-redirect=true&message=Amount mismatch");
+                return Response.status(Response.Status.FORBIDDEN).entity("Payment amount mismatch").build();
+            }
+            // amount validated — keep server-side value (do NOT overwrite with cookie)
             creditcard.setCreditcardPaymentReference(reference);
             LOG.debug("going to /creditcard_payment_executed.xhtml");
             response.sendRedirect(request.getContextPath() + "/creditcard_payment_executed.xhtml");
@@ -1033,11 +1067,21 @@ public jakarta.ws.rs.core.Response handlePayments(
         this.savedType = savedType;
     } // end method
 
-    public Integer getProgress1() {
-        progress1 = updateProgress(progress1);
-        return progress1;
-    } // end method
+  //  public Integer getProgress1() {
+  //      progress1 = updateProgress(progress1);
+  //      return progress1;
+  //  } // end method
 
+    public Integer getProgress1() {  // new 09-06-2023
+    if (running) {
+        progress1 = updateProgress(progress1);
+    }
+    return progress1;
+}
+    
+    
+    
+    
     public void setProgress1(Integer progress1) {
         this.progress1 = progress1;
     } // end method

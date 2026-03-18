@@ -6,114 +6,100 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Select Stableford Round Page </ui:define>
+<ui:define name="title">Select Stableford Round Page</ui:define>
 <ui:define name="content">
 
 <h:form id="form_selectStablefordRounds">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>#{msg['message.selectround']} #{msg['message.for.score']}</h1>
+</f:facet>
+
 <p:dataTable id="player_has_played_round"
              rowIndexVar="row"
              value="#{roundC.registerStablefordResult()}"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
-             filteredValue="#{roundC.filteredCars}" >
+             filteredValue="#{roundC.filteredCars}">
 
-<f:facet name="header">
-            <h1>#{msg['message.selectround']} #{msg['message.for.score']}</h1>
-</f:facet>
+    <p:column headerText="#"
+              width="5%"
+              id="rowColumn">
+        #{row+1}
+    </p:column>
 
-	<p:column headerText="#"
-                  width="5%"
-                  id="rowColumn">
-             #{row+1}
-	</p:column>
+    <p:column headerText="#{msg['round.selected']}"
+              width="12%">
+        <p:commandButton
+            id="selectButtonColumn"
+            action="#{roundC.selectedScoreToRegister(c, 'individual')}"
+            value="#{c.round.idround} - #{msg['button.select']}"
+            icon="pi pi-pencil" />
+    </p:column>
 
-        <p:column headerText="#{msg['round.selected']}"
-                  width="12%" >
-            <p:commandButton
-                id="selectButtonColumn"
-                action="#{roundC.selectedScoreToRegister(c, 'individual')}"
-                value="#{c.round.idround} - #{msg['button.select']}"
-                icon="pi pi-pencil">
-             </p:commandButton>
-	</p:column>
-
-    <!-- DEBUG VISIBLE -->
-    <h:outputText value="TYPE: #{c.round.roundDate.class.name} | " 
-                  style="color:red; font-weight:bold;"/>
-    <h:outputText value="VALEUR: #{c.round.roundDate} | " 
-                  style="color:red; font-weight:bold;"/>
-    
-    
-    
-	<p:column headerText="#{msg['round.date']}"
-                  width="12%"
-                  id="dateColumn">
-                  <h:outputText value="#{c.round.roundDate}" > 
-                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-                  </h:outputText>
-	</p:column>
+    <p:column headerText="#{msg['round.date']}"
+              width="12%"
+              id="dateColumn">
+        <h:outputText value="#{c.round.roundDate}">
+            <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+        </h:outputText>
+    </p:column>
 
     <p:column headerText="#{msg['round.name']}"
-                  width="10%"
-                  styleClass="red"
-                  id="roundName" >
-                        #{c.round.roundName}
-        </p:column>
-	<p:column   id="colclubname"
-                    headerText="#{msg['club.name']}"
-                    width="15%"
-                    filterMatchMode="contains"
-                    filterBy="#{c.club.clubName}" >
-            #{c.club.clubName} (#{c.club.idclub})
-	</p:column>
+              width="10%"
+              styleClass="red"
+              id="roundName">
+        #{c.round.roundName}
+    </p:column>
 
-     <!-- DEBUG VISIBLE -->
-    <h:outputText value="TYPE: #{c.course.courseBeginDate.class.name} | " 
-                  style="color:red; font-weight:bold;"/>
-    <h:outputText value="VALEUR: #{c.course.courseBeginDate} | " 
-                  style="color:red; font-weight:bold;"/>
-    
-      
-	<p:column id="coursenameColumn"
-                  headerText="#{msg['course.name']}"
-                  width="15%"
-                  filterMatchMode="contains"
-                  filterBy="#{c.course.courseName}" >
-            <b>#{c.course.courseName} </b>(#{c.course.idcourse})
-             <h:outputText value="#{c.course.courseBeginDate}">
-                  <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-             </h:outputText>
-             <h:outputText value=" - "/>
-             <h:outputText value="#{c.course.courseEndDate}">
-                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-            </h:outputText>
-	</p:column>
+    <p:column id="colclubname"
+              headerText="#{msg['club.name']}"
+              width="15%"
+              filterMatchMode="contains"
+              filterBy="#{c.club.clubName}">
+        #{c.club.clubName} (#{c.club.idclub})
+    </p:column>
 
-        <p:column headerText="#{msg['round.game']}"
-                  width="15%"
-                  id="gameColumn" >
-                        #{c.round.roundGame}
-        </p:column>
+    <p:column id="coursenameColumn"
+              headerText="#{msg['course.name']}"
+              width="15%"
+              filterMatchMode="contains"
+              filterBy="#{c.course.courseName}">
+        <b>#{c.course.courseName} </b>(#{c.course.idcourse})
+        <h:outputText value="#{c.course.courseBeginDate}">
+            <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+        </h:outputText>
+        <h:outputText value=" - "/>
+        <h:outputText value="#{c.course.courseEndDate}">
+            <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
+        </h:outputText>
+    </p:column>
 
-        <p:column headerText="#{msg['round.result.stableford']}"
-                  width="5%"
-                  id="FinalResultColumn" >
-                        #{c.inscription.inscriptionFinalResult}
-        </p:column>
+    <p:column headerText="#{msg['round.game']}"
+              width="15%"
+              id="gameColumn">
+        #{c.round.roundGame}
+    </p:column>
 
-        <p:column headerText="#{msg['round.holes']}"
-                  width="5%"
-                  id="RoundHoles" >
-            <h:outputText value= "#{c.round.roundHoles} (start = #{c.round.roundStart})"
-                          rendered="#{c.round.roundHoles eq 9}"/>
-            <h:outputText value= "#{c.round.roundHoles}"
-                          rendered="#{c.round.roundHoles eq 18}"/>
-        </p:column>
+    <p:column headerText="#{msg['round.result.stableford']}"
+              width="5%"
+              id="FinalResultColumn">
+        #{c.inscription.inscriptionFinalResult}
+    </p:column>
 
-       <f:facet name="footer">
-       </f:facet>
+    <p:column headerText="#{msg['round.holes']}"
+              width="5%"
+              id="RoundHoles">
+        <h:outputText value="#{c.round.roundHoles} (start = #{c.round.roundStart})"
+                      rendered="#{c.round.roundHoles eq 9}"/>
+        <h:outputText value="#{c.round.roundHoles}"
+                      rendered="#{c.round.roundHoles eq 18}"/>
+    </p:column>
 
 </p:dataTable>
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>

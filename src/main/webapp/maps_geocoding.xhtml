@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:c="jakarta.tags.core"
       xmlns:p="primefaces"
-            
-      >
-<ui:composition template="templates/masterTemplate.xhtml">
+      template="templates/masterTemplate.xhtml">
 
-<ui:define name="title">Travel modes in directions</ui:define>
+<ui:define name="title">Geocoding service</ui:define>
 <ui:define name="head"></ui:define>
 <ui:define name="content">
-  <h:head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
-   
-    <title>Geocoding service</title>
+
     <style type="text/css">
       html, body, #map-canvas {
         height: 100%;
@@ -35,14 +30,6 @@
         border: 1px solid #999;
       }
 
-      /*
-      Provide the following styles for both ID and class,
-      where ID represents an actual existing "panel" with
-      JS bound to its name, and the class is just non-map
-      content that may already have a different ID with
-      JS bound to its name.
-      */
-
       #panel, .panel {
         font-family: 'Roboto','sans-serif';
         line-height: 30px;
@@ -60,21 +47,14 @@
       #panel i, .panel i {
         font-size: 12px;
       }
-
     </style>
-    
-    <!--  & is a special/functional char in HTML/XML but you want to use it as a normal char.
-    So you have to encode it correctly: Write &amp; instead of &
-    si HTML alors & fonctionne !! 
-    https://maps.googleapis.com/maps/api/js?v=3.exp&amp;key=REMOVED_FROM_SOURCE"
-    -->
-    
+
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?key=#{settings.getProperty('GOOGLE_MAPS_API_KEY')}"/>
-    <script type="text/javascript" >
+    <script type="text/javascript">
 var geocoder;
 var map;
-var google; // fake
+var google;
 function initialize() {
   geocoder = new google.maps.Geocoder();
   var latlng = new google.maps.LatLng(-34.397, 150.644);
@@ -103,30 +83,28 @@ function codeAddress() {
 google.maps.event.addDomListener(window, 'load', initialize);
 
     </script>
-  </h:head>
-  <h:body>
-    <div id="panel">
-      <input id="address" type="text" value="Sydney, NSW"/>
-      <input type="button" value="Geocode" onclick="codeAddress()"/>
-    </div>
-    <div id="map-canvas"></div>
-    
-    <p:panelGrid
-        id="panelgrid1"
-        layout="tabular"
-        columnClasses="col1,col2,col3,col4"
-        columns="4" >
 
-<f:facet name="header">
-    <h1>#{msg['title.score.results']}</h1>
-</f:facet>
-    <h:outputText value="#{msg['round.competition']} :" />
-    </p:panelGrid>
-    
-    
-    
-  </h:body>
-    
-    </ui:define> <!-- content -->
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+        <p:panel styleClass="login-card form-card" style="max-width:100%;">
+            <f:facet name="header">
+                <h1>#{msg['title.score.results']}</h1>
+            </f:facet>
+
+            <div id="panel">
+                <input id="address" type="text" value="Sydney, NSW"/>
+                <input type="button" value="Geocode" onclick="codeAddress()"/>
+            </div>
+            <div id="map-canvas"></div>
+
+            <p:panelGrid
+                id="panelgrid1"
+                layout="flex"
+                columnClasses="col1Flex,col2Flex,col3,col4"
+                columns="4">
+                <h:outputText value="#{msg['round.competition']} :" />
+            </p:panelGrid>
+        </p:panel>
+    </div>
+
+</ui:define>
 </ui:composition>
-</html>

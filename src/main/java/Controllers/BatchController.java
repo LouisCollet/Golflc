@@ -1,7 +1,7 @@
 package Controllers;
 
 import entite.Batch;
-import static interfaces.GolfInterface.sdf_timeHHmmss;
+import java.text.SimpleDateFormat;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -267,10 +267,10 @@ public String getJobExecutionDetails(long executionId){
         LOG.debug("jobInstance job name = " + jn);
         LOG.debug("jobInstance id = " + iid );
         JobExecution je = jobOperator.getJobExecution(executionId);
-        String startd = sdf_timeHHmmss.format(je.getCreateTime());
+        String startd = new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS").format(je.getCreateTime());
             LOG.debug("jobExecution create time = " + startd );
             LOG.debug("jobExecution name = " + je.getJobName());
-            LOG.debug("jobExecution end time = " + sdf_timeHHmmss.format(je.getCreateTime()));
+            LOG.debug("jobExecution end time = " + new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS").format(je.getCreateTime()));
             LOG.debug("jobExecution batch status = " + je.getBatchStatus());
             LOG.debug("jobExecution batch executionId = " + je.getExecutionId());
             LOG.debug("jobExecution batch ExitStatus = " + je.getExitStatus());
@@ -300,7 +300,7 @@ public String getJobExecutionDetails(long executionId){
             LOG.debug("Executed Steps 2 = " + Arrays.deepToString(executedSteps.toArray()));
       //  return je;
         return je.getExecutionId() + "-" + je.getJobName() + " = " + je.getExitStatus() + " " 
-                + sdf_timeHHmmss.format(je.getCreateTime()) + " / " + duration + " millisec "
+                + new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS").format(je.getCreateTime()) + " / " + duration + " millisec "
                 ;
     }
  catch (Exception e) {

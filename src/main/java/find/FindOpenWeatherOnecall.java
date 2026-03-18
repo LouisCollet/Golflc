@@ -56,7 +56,7 @@ private final HttpClient httpClient = HttpClient.newBuilder()
         String string_url = "https://api.openweathermap.org/data/2.5/onecall"
    ///    to be modified       + "?lat="  + club.getClubLatitude().toString()
    ///           + "&lon="  + club.getClubLongitude().toString()
-              + "&appid=6c7ad5efe2fef5799fb0277381f5ec7e"
+              + "&appid=" + System.getenv("OPENWEATHER_API_KEY")
               + "&units=metric"
               + "&lang=" + language
       ;

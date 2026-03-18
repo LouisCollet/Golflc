@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition 
+<ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml" >
-    
+
     <ui:define name="title">PanelGrid responsive </ui:define>
 
 <ui:define name="content">
@@ -15,8 +15,6 @@
 <style type="text/css">
    .customPanelGrid .ui-panelgrid-content {
             align-items: center;
-            border:1px;
-            border-color: red
     }
     .ui-panelgrid.showcase-text-align-center .ui-grid-responsive .ui-panelgrid-cell {
         text-align: center;
@@ -24,6 +22,12 @@
 </style>
 
 <h:form id="panelgrid_test" >
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>PanelGrid Responsive Demo</h1>
+</f:facet>
 
  <p:divider layout="horizontal" type="solid" />
     <div>
@@ -45,7 +49,7 @@
 		     value="#{clubC.club.clubName}"
                       />
 
-        <p:outputLabel for="@next" 
+        <p:outputLabel for="@next"
                        value="Text 2"
                        class="font-bold text-xs"/>
         <p:inputText id="textA22"/>
@@ -58,7 +62,7 @@
         <p:outputLabel for="@next" value="Checkbox2"/>
         <p:selectBooleanCheckbox id="checkboxA2" itemLabel="CheckboxLabel"/>
 
-        <p:outputLabel for="@next" value="Text 3" 
+        <p:outputLabel for="@next" value="Text 3"
                        class="text-primary border-round bg-yellow-400"/>
         <p:inputText id="text3A23"/>
 
@@ -82,11 +86,10 @@
         </f:facet>
 
     </p:panelGrid>
-</div>   
- */
-<p:divider layout="horizontal" type="solid" />       
-    
-<div class="card">
+</div>
+
+<p:divider layout="horizontal" type="solid" />
+
     <h5>Advanced</h5>
     <div class="formgrid grid">
         <div class="field col-12 md:col-6">
@@ -95,7 +98,7 @@
         </div>
         <div class="field col-12 md:col-6">
             <label for="lastname6">Lastname</label>
-            <input id="lastname6" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+            <input id="lastname6" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                    appearance-none outline-none focus:border-primary w-full"/>
         </div>
         <div class="field col-12">
@@ -104,7 +107,7 @@
         </div>
         <div class="field col-12 md:col-6">
             <label for="city">City</label>
-            <input id="city" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+            <input id="city" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                    appearance-none outline-none focus:border-primary w-full"/>
         </div>
         <div class="field col-12 md:col-3">
@@ -123,55 +126,48 @@
                    surface-border border-round appearance-none outline-none focus:border-primary w-full"/>
         </div>
     </div>
-</div>
 
-<div class="card">
     <h5>Vertical</h5>
     <div class="field">
         <label for="firstname1">Firstname</label>
-        <input id="firstname1" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+        <input id="firstname1" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                appearance-none outline-none focus:border-primary w-full"/>
     </div>
     <div class="field">
         <label for="lastname1">Lastname</label>
-        <input id="lastname1" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+        <input id="lastname1" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                appearance-none outline-none focus:border-primary w-full"/>
     </div>
-</div>
 
-<div class="card">
     <h5>Vertical and Grid</h5>
     <div class="formgrid grid">
         <div class="field col">
             <label for="firstname2">Firstname</label>
-            <input id="firstname2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+            <input id="firstname2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                    appearance-none outline-none focus:border-primary w-full"/>
         </div>
         <div class="field col">
             <label for="lastname2">Lastname</label>
-            <input id="lastname2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+            <input id="lastname2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                    appearance-none outline-none focus:border-primary w-full"/>
         </div>
     </div>
-</div>
 
 <div class="field grid">
     <label for="firstname3" class="col-fixed" style="width:100px">Firstname</label>
     <div class="col">
-        <input id="firstname3" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+        <input id="firstname3" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                appearance-none outline-none focus:border-primary"/>
     </div>
 </div>
 <div class="field grid">
     <label for="lastname3" class="col-fixed" style="width:100px">Lastname</label>
     <div class="col">
-        <input id="lastname3" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+        <input id="lastname3" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                appearance-none outline-none focus:border-primary"/>
     </div>
 </div>
 
-
-<div class="card">
     <h5>Horizontal</h5>
     <div class="field grid">
         <label for="firstname4" class="col-12 mb-2 md:col-2 md:mb-0">Firstname</label>
@@ -183,28 +179,25 @@
     <div class="field grid">
         <label for="lastname4" class="col-12 mb-2 md:col-2 md:mb-0">Lastname</label>
         <div class="col-12 md:col-10">
-            <input id="lastname4" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+            <input id="lastname4" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                    appearance-none outline-none focus:border-primary w-full"/>
         </div>
     </div>
-</div>
 
 <div class="formgroup-inline">
     <div class="field">
         <label for="firstname5" class="p-sr-only">Firstname</label>
-        <input id="firstname5" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+        <input id="firstname5" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                appearance-none outline-none focus:border-primary" placeholder="Firstname"/>
     </div>
     <div class="field">
         <label for="lastname5" class="p-sr-only">Lastname</label>
-        <input id="lastname5" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+        <input id="lastname5" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                appearance-none outline-none focus:border-primary" placeholder="Lastname"/>
     </div>
     <button type="button" class="text-white bg-primary-500 border-primary-500 px-3 py-2 text-base border-1 border-solid border-round cursor-pointer transition-all transition-duration-200 hover:bg-primary-600 hover:border-primary-600 active:bg-primary-700 active:border-primary-700">Submit</button>
 </div>
 
-
-<div class="card">
     <h5>Vertical Checkbox</h5>
     <div class="field-checkbox">
         <input type="checkbox" id="city1"/>
@@ -226,9 +219,7 @@
             <label for="city4">Los Angeles</label>
         </div>
     </div>
-</div>
 
-<div class="card">
     <h5>Vertical RadioButton</h5>
     <div class="field-radiobutton">
         <input type="radio" name="vcity" id="city5"/>
@@ -250,26 +241,15 @@
             <label for="city8">Los Angeles</label>
         </div>
     </div>
-</div>
 
-<div class="card">
     <h5>Help Text</h5>
     <div class="field">
         <label for="username">Username</label>
-        <input id="username" type="username" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round 
+        <input id="username" type="username" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round
                appearance-none outline-none focus:border-primary w-full" aria-describedby="username-help"/>
         <small id="username-help">Enter your username to reset your password.</small>
     </div>
-</div>
 
-
-
-
-
-
-
-
-<div class="card">
     <h1>Responsive (PrimeFlex, Basic)</h1>
     <p:panelGrid columns="3"
                  layout="flex"
@@ -287,9 +267,7 @@
         <h:outputText value="Content"/>
         <h:outputText value="Content"/>
     </p:panelGrid>
-</div>
 
-<div class="card">
     <h5>Responsive (PrimeFlex, ColumnClasses)</h5>
     <p:panelGrid columns="4"
                  layout="flex"
@@ -313,502 +291,37 @@
         <h:outputText value="Content 3.3"/>
         <h:outputText value="Content 3.4"/>
     </p:panelGrid>
-</div>
-<!-- https://www.primefaces.org/primeflex/display  -->
-display =
-<div class="card">
-    <div class="card-container blue-container flex align-items-center justify-content-start">
-        <div class="hidden w-4rem h-4rem bg-blue-500 text-white font-bold p-4 border-round mr-3">display 1</div>
-        <div class="w-4rem h-4rem bg-blue-500 text-white font-bold flex align-items-center justify-content-center p-4 border-round mr-3">display 2</div>
-        <div class="w-4rem h-4rem bg-blue-500 text-white font-bold flex align-items-center justify-content-center p-4 border-round">display 3</div>
-    </div>
-</div>
-<!--ui-g
-<div class="ui-g">
-    <div class="ui-g-4">Col1</div>
-    <div class="ui-g-4">Col2</div>
-    <div class="ui-g-4">Col3</div>
-</div>
--->
-
-
-Lorem ipsum dolor sit amet
-
-
-<div class="card">
-    <div class="flex flex-wrap align-items-center justify-content-center">
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-xs</p>
-            <p class="text-xs w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-sm</p>
-            <p class="text-sm w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-base</p>
-            <p class="text-base w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-lg</p>
-            <p class="text-lg w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-xl</p>
-            <p class="text-xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-2xl</p>
-            <p class="text-2xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-3xl</p>
-            <p class="text-3xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-4xl</p>
-            <p class="text-4xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-5xl</p>
-            <p class="text-5xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-6xl</p>
-            <p class="text-6xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-7xl</p>
-            <p class="text-7xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-        <div class="flex align-items-center border-bottom-1 surface-border surface-overlay w-full">
-            <p class="w-2 text-left font-bold text-blue-500 mr-3">text-8xl</p>
-            <p class="text-8xl w-10">Lorem ipsum dolor sit amet</p>
-        </div>
-    </div>
-</div>
-italic
-<div class="card">
-    <div class="flex flex-wrap align-items-center justify-content-center card-container">
-        <p class="font-italic border-round border-1 surface-overlay p-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
-    </div>
-</div>
-
-
-<div class="card">
-    <div class="flex flex-wrap md:justify-content-between justify-content-center card-container">
-        <div class="text-500 w-12rem h-6rem surface-overlay border-round border-1 border-gray-500 font-bold m-2 flex align-items-center justify-content-center">text-500</div>
-        <div class="text-cyan-500 w-12rem h-6rem surface-overlay border-round border-1 border-gray-500 font-bold m-2 flex align-items-center justify-content-center">text-cyan-500</div>
-        <div class="text-orange-500 w-12rem h-6rem surface-overlay border-round border-1 border-gray-500 font-bold m-2 flex align-items-center justify-content-center">text-orange-500</div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="flex flex-wrap md:justify-content-between justify-content-center card-container">
-        <div class="text-500 hover:text-700 w-12rem h-6rem surface-overlay border-round border-1 border-gray-500 font-bold m-2 flex align-items-center justify-content-center">hover:text-700</div>
-        <div class="text-cyan-500 hover:text-cyan-700 w-12rem h-6rem surface-overlay border-round border-1 border-gray-500 font-bold m-2 flex align-items-center justify-content-center">hover:text-cyan-700</div>
-        <div class="text-orange-500 hover:text-orange-700 w-12rem h-6rem surface-overlay border-round border-1 border-gray-500 font-bold m-2 flex align-items-center justify-content-center">hover:text-orange-700</div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="flex flex-wrap align-items-center justify-content-center md:justify-content-between card-container blue-container">
-        <div class="h-6rem w-6rem bg-blue-500 border-round-left">
-            <img src="./assets/images/product-placeholder-blue.svg" class="translate-x-100 h-6rem w-6rem" alt="primeflex"/>
-        </div>
-        <div class="h-6rem w-6rem bg-blue-500">
-            <img src="./assets/images/product-placeholder-blue.svg" class="translate-x-0 h-6rem w-6rem" alt="primeflex"/>
-        </div>
-        <div class="h-6rem w-6rem bg-blue-500 border-round-right">
-            <img src="./assets/images/product-placeholder-blue.svg" class="-translate-x-100 h-6rem w-6rem" alt="primeflex"/>
-        </div>
-    </div>
-</div>
-appearence
-<div class="card">
-    <div class="flex flex-column justify-content-center">
-        <div class="m-3 flex">
-            <select>
-                <option>Yes</option>
-                <option>No</option>
-                <option>Maybe</option>
-            </select>
-            <input class="mx-3"/>
-            <div class="mx-3">Default browser styles applied</div>
-           
-        </div>
-        <div class="m-3 flex">
-            <select class="appearance-none">
-                <option>Yes</option>
-                <option>No</option>
-                <option>Maybe</option>
-            </select>
-            <input class="appearance-none mx-3"/>
-            <div class="mx-3">Default styles removed</div>
-        </div>
-    </div>
-</div>
-
-cursor
-<div class="card">
-    <div class="flex align-items-center justify-content-center card-container blue-container">
-        <div class="cursor-auto flex align-items-center justify-content-center border-round bg-blue-500 text-white p-3 m-3 font-bold">auto</div>
-        <div class="cursor-pointer flex align-items-center justify-content-center border-round bg-blue-500 text-white p-3 m-3 font-bold">pointer</div>
-        <div class="cursor-wait flex align-items-center justify-content-center border-round bg-blue-500 text-white p-3 m-3 font-bold">wait</div>
-        <div class="cursor-move flex align-items-center justify-content-center border-round bg-blue-500 text-white p-3 m-3 font-bold">move</div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="flex flex-wrap align-items-center justify-content-center card-container blue-container">
-        <div class="relative bg-blue-200 w-9rem h-9rem mx-3 my-3 md:my-0 border-round">
-            <div class="absolute top-0 left-0 bg-blue-500 text-white font-bold flex align-items-center justify-content-center w-4rem h-4rem border-round">1</div>
-        </div>
-        <div class="relative bg-blue-200 w-9rem h-9rem mx-3 my-3 md:my-0 border-round">
-            <div class="absolute top-0 right-0 bg-blue-500 text-white font-bold flex align-items-center justify-content-center w-4rem h-4rem border-round">2</div>
-        </div>
-        <div class="relative bg-blue-200 w-9rem h-9rem mx-3 my-3 md:my-0 border-round">
-            <div class="absolute bottom-0 right-0 bg-blue-500 text-white font-bold flex align-items-center justify-content-center w-4rem h-4rem border-round">3</div>
-        </div>
-        <div class="relative bg-blue-200 w-9rem h-9rem mx-3 my-3 md:my-0 border-round">
-            <div class="absolute bottom-0 left-0 bg-blue-500 text-white font-bold flex align-items-center justify-content-center w-4rem h-4rem border-round">4</div>
-        </div>
-    </div>
-</div>
-
-
-<div class="card">
-    <div class="flex flex-wrap md:justify-content-between justify-content-center card-container blue-container">
-        <div class="border-none w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-none</div>
-        <div class="border-1 border-blue-500 w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-1</div>
-        <div class="border-2 border-blue-500 w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-2</div>
-        <div class="border-3 border-blue-500 w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-3</div>
-    </div>
-</div>
-
-
-<div class="card">
-    <div class="flex flex-wrap md:justify-content-between justify-content-center card-container blue-container">
-        <div class="border-solid border-blue-500 w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-solid</div>
-        <div class="border-dashed border-blue-500 w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-dashed</div>
-        <div class="border-dotted border-blue-500 w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-dotted</div>
-        <div class="border-double border-blue-500 w-12rem h-6rem m-2 surface-overlay font-bold flex align-items-center justify-content-center">border-double</div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="flex flex-wrap align-items-center justify-content-center card-container blue-container">
-        <div class="border-round bg-blue-100 w-12rem p-3 m-3">
-            <div class="flex min-w-full   border-round bg-blue-500 text-white font-bold p-3  align-items-center justify-content-center">min-w-full</div>
-            <div class="min-w-min    border-round bg-blue-500 text-white font-bold p-3 flex align-items-center justify-content-center">min-w-min</div>
-            <div class="min-w-screen border-round bg-blue-500 text-white font-bold p-3 flex align-items-center justify-content-center">min-w-screen</div>
-            <div class="min-w-1 border-round bg-blue-500 text-white font-bold p-3 flex align-items-center justify-content-center">min-w1</div>
-            <div class="min-w-2 border-round bg-blue-500 text-white font-bold p-3 flex align-items-center justify-content-center">min-w2</div>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <div class="flex flex-row flex-wrap align-items-center justify-content-center card-container yellow-container">
-        <div class="h-6rem border-round bg-yellow-500 text-gray-900 font-bold p-3 m-3 flex align-items-center justify-content-center">h-6rem</div>
-        <div class="h-11rem border-round bg-yellow-500 text-gray-900 font-bold p-3 m-3 flex align-items-center justify-content-center">h-11rem</div>
-        <div class="h-20rem border-round bg-yellow-500 text-gray-900 font-bold p-3 m-3 flex align-items-center justify-content-center">h-20rem</div>
-        <div class="h-24rem border-round bg-yellow-500 text-gray-900 font-bold p-3 m-3 flex align-items-center justify-content-center">h-24rem</div>
-    </div>
-</div>
-
-
-
-zlign
-
-
-  <div class="card">
-    <div class="flex flex-wrap md:justify-content-between justify-content-center card-container">
-        <div class="surface-500 text-white font-bold border-round m-2 flex align-items-center justify-content-center" style="min-width: 200px; min-height: 100px">surface-500</div>
-        <div class="bg-cyan-500 text-white font-bold border-round m-2 flex align-items-center justify-content-center" style="min-width: 200px; min-height: 100px">bg-cyan-500</div>
-        <div class="bg-orange-500 text-white font-bold border-round m-2 flex align-items-center justify-content-center" style="min-width: 200px; min-height: 100px">bg-orange-500</div>
-    </div>
-</div>
 
 layout=flex
-<div class="card">
-    <p:panelGrid 
+    <p:panelGrid
              id="panelGrid2"
-             columns="4" 
-             layout="flex" 
-             columnClasses="col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4, col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4" 
+             columns="4"
+             layout="flex"
+             columnClasses="col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4, col-12 md:col-3 xl:col-2, col-12 md:col-9 xl:col-4"
              styleClass="customPanelGrid"
              contentStyleClass="ui-fluid">
  <p:outputLabel for="textA11" value="Louis 1"/>
         <p:inputText id="textA11"/>
       </p:panelGrid>
-</div>
-after flex    
+
 <h5>Horizontal and Fixed Width</h5>
 <div class="field grid">
-    
     <label for="firstname3" class="col-fixed" style="width:100px">Firstname</label>
     <div class="col">
-        <input id="firstname3" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary">
-     </input>
-    </div>
-</div>
-<div class="field grid">
-    <label for="lastname3"
-           class="col-fixed"
-           style="width:100px">Lastname</label>
-    <div class="col">
-        <input id="lastname3"
-               type="text"
-               class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary">
-        </input>
-    </div>
-</div>
-
-<div class="field grid">
-    <label for="firstname3" class="col-fixed" style="width:100px">Firstname</label>
-    <div class="col">
-        <input id="firstname3"
-               type="text"
-               class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary">
-        </input>
+        <input id="firstname3" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary"/>
     </div>
 </div>
 <div class="field grid">
     <label for="lastname3" class="col-fixed" style="width:100px">Lastname</label>
     <div class="col">
-        <input id="lastname3" 
-               type="text" 
-               class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary">
-        </input>
+        <input id="lastname3" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary"/>
     </div>
 </div>
 
-
-
-<div class="formgroup-inline">
-     <h5>Inline</h5>
-    <div class="field">
-        <label for="firstname5" class="p-sr-only">Firstname</label>
-        <input id="firstname5" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary" placeholder="Firstname">
-     </input>
-    </div>
-    <div class="field">
-        <label for="lastname5" class="p-sr-only">Lastname</label>
-        <input id="lastname5" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary" placeholder="Lastname">
-     </input>
-    </div>
-    <button type="button" class="text-white bg-primary-500 border-primary-500 px-3 py-2 text-base border-1 border-solid border-round cursor-pointer transition-all transition-duration-200 hover:bg-primary-600 hover:border-primary-600 active:bg-primary-700 active:border-primary-700">Submit</button>
-</div>
-
-
-
-
-
-<div class="formgroup-inline">
-    <div class="field">
-        <label for="firstname5" class="p-sr-only">Firstname</label>
-        <input id="firstname5" type="text"
-               class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary"
-               placeholder="Firstname" />
-    </div>
-    <div class="field">
-        <label for="lastname5" class="p-sr-only">Lastname</label>
-        <input id="lastname5"
-               type="text"
-               class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary"
-               placeholder="Lastname" />
-    </div>
-    <button type="button" class="text-white bg-primary-500 border-primary-500 px-3 py-2 text-base border-1 border-solid border-round cursor-pointer transition-all transition-duration-200 hover:bg-primary-600 hover:border-primary-600 active:bg-primary-700 active:border-primary-700">Submit</button>
-</div>
-
-<div class="card">
-    <h5>Vertical Checkbox</h5>
-    <div class="field-checkbox">
-        <input type="checkbox" id="city1"></input>
-        <label for="city1">Chicago</label>
-    </div>
-    <div class="field-checkbox">
-        <input type="checkbox" id="city2"></input>
-        <label for="city2">Los Angeles</label>
-    </div>
-
-    <h5>Horizontal Checkbox</h5>
-    <div class="formgroup-inline">
-        
-        <div class="field-checkbox">
-            <input type="checkbox" id="city3"></input>
-            <label for="city3">Chicago</label>
-        </div>
-        <div class="field-checkbox">
-            <input type="checkbox" id="city4"></input>
-            <label for="city4">Los Angeles</label>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h5>Vertical RadioButton</h5>
-    <div class="field-radiobutton">
-        <input type="radio" name="vcity" id="city5"></input>
-        <label for="city5">Chicago</label>
-    </div>
-    <div class="field-radiobutton">
-        <input type="radio" name="vcity" id="city6"></input>
-        <label for="city6">Los Angeles</label>
-    </div>
-
-    
-    <div class="formgroup-inline">
-        <h5>Horizontal RadioButton</h5>
-        <div class="field-radiobutton">
-            <input type="radio" name="hcity" id="city7"></input>
-            <label for="city7">Chicago</label>
-        </div>
-        <div class="field-radiobutton">
-            <input type="radio" name="hcity" id="city8"></input>
-            <label for="city8">Los Angeles</label>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h5>Help Text</h5>
-    <div class="field">
-        <label for="username">Username</label>
-        <input id="username" type="username" 
-               class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
-               aria-describedby="username-help">
-        </input>    
-        <small id="username-help">Enter your username to reset your password.</small>
-    </div>
-</div>
-
-
-State
-Zip
-
-
-<div class="card">
-    <h5>Advanced</h5>
-    <div class="formgrid grid">
-        <div class="field col-12 md:col-6">
-            <label for="firstname6">Firstname</label>
-            <input id="firstname6" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-        <div class="field col-12 md:col-6">
-            <label for="lastname6">Lastname</label>
-            <input id="lastname6" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-        <div class="field col-12">
-            <label for="address">Address</label>
-            <textarea id="address" type="text" rows="4" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"></textarea>
-        </div>
-        <div class="field col-12 md:col-6">
-            <label for="city">City</label>
-            <input id="city" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-        <div class="field col-12 md:col-3">
-            <label for="state">State</label>
-            <select id="state" class="w-full text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round outline-none focus:border-primary" style="appearance: auto">
-                <option>Arizona</option>
-                <option>California</option>
-                <option>Florida</option>
-                <option>Ohio</option>
-                <option>Washington</option>
-            </select>
-        </div>
-        <div class="field col-12 md:col-3">
-            <label for="zip">Zip</label>
-            <input id="zip" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-       </input>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h5>Horizontal</h5>
-    <div class="field grid">
-        <label for="firstname4" class="col-12 mb-2 md:col-2 md:mb-0">Firstname</label>
-        <div class="col-12 md:col-10">
-            <input id="firstname4" type="text"
-                   class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-    </div>
-    <div class="field grid">
-        <label for="lastname4" class="col-12 mb-2 md:col-2 md:mb-0">Lastname</label>
-        <div class="col-12 md:col-10">
-            <input id="lastname4" type="text"
-                   class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-    </div>
-</div>
-
-
-dehors form ??
-<div class="card">
-    <h5>Vertical and Grid 1</h5>
-    <div class="formgrid grid">
-        <div class="field col">
-            <label for="firstname2">Firstname</label>
-            <input id="firstname2" type="text" 
-                   class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-        <div class="field col">
-            <label for="lastname2">Lastname</label>
-            <input id="lastname2" type="text"
-                   class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h5>Vertical and Grid 2 </h5>
-    <div class="formgrid grid">
-        <div class="field col">
-            <label for="firstname2">Firstname</label>
-            <input id="firstname2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-        <div class="field col">
-            <label for="lastname2">Lastname</label>
-            <input id="lastname2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-            </input>
-        </div>
-    </div>
-</div>
-FormLayout
-An extension to Grid System with fine tuning to create forms.
-<div class="card">
-    <h5>Vertical</h5>
-    <div class="field">
-        <label for="firstname1">Firstname</label>
-        <input id="firstname1" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-     </input>
-    </div>
-    <div class="field">
-        <label for="lastname1">Lastname</label>
-        <input id="lastname1" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full">
-    </input>
-    </div>
-</div>
-https://www.primefaces.org/primeflex/gridsystem
-Getting Started
-FlexGrid is a CSS utility based on flexbox. For more information about Flex, visit A Complete Guide to Flexbox.
-A basic grid is defined by giving a container grid class and children the col class. 
-Children of the grid will have the same width and scale according to the width of the parent.
 <div class="grid">
     <div class="col">col 1#{playerC.player.playerFirstName}</div>
     <div class="col">
-        <input id="lastname1" type="text" value="#{playerC.player.playerFirstName}">
-        </input>
+        <input id="lastname1" type="text" value="#{playerC.player.playerFirstName}"/>
     </div>
     <div class="col">col 3#{playerC.player.playerFirstName}</div>
     <div class="col">col 2
@@ -834,23 +347,10 @@ Children of the grid will have the same width and scale according to the width o
     <div class="col-4">4</div>
 </div>
 
-Fixed Width Column
-
-A column can have a fixed width while siblings having auto width. Apply col-fixed class to fix a column width.
-
-
 <div class="grid">
-    <div class="col-fixed" style="width:100px">Fixed
-    </div>
+    <div class="col-fixed" style="width:100px">Fixed</div>
     <div class="col">Auto</div>
 </div>
-
-100px
-auto
-Offset
-
-Offset classes allow defining a left margin on a column to avoid adding empty columns for spacing.
-
 
 <div class="grid">
     <div class="col-6 col-offset-3">6</div>
@@ -861,63 +361,22 @@ Offset classes allow defining a left margin on a column to avoid adding empty co
     <div class="col-4 col-offset-4">4</div>
 </div>
 
-6
-4
-4
-Nested
-
-Columns can be nested to create more complex layouts.
-
-
 <div class="grid">
     <div class="col-8">
         <div class="grid">
-            <div class="col-6">
-                6
-            </div>
-            <div class="col-6">
-                6
-            </div>
-            <div class="col-12">
-                12
-            </div>
+            <div class="col-6">6</div>
+            <div class="col-6">6</div>
+            <div class="col-12">12</div>
         </div>
     </div>
-    <div class="col-4">
-        4
-    </div>
+    <div class="col-4">4</div>
 </div>
-
-6
-6
-12
-4
-Gutter
-
-A .5rem padding is applied to each column along with negative margins on the container element, in case you'd like to remove these gutters, apply .grid-nogutter class to the container. Gutters can also be removed on an individual columns with the same class name.
-
 
 <div class="grid grid-nogutter">
     <div class="col">1</div>
     <div class="col grid-nogutter">2</div>
     <div class="col">3</div>
 </div>
-
-Responsive
-
-Breakpoints define how the display property should be defined depending on the screen size. Design is mobile first so smaller values can also apply to larger values e.g. md also applies to lg or xl if they are not explicitly defined.
-
-    sm: small screens e.g. phones
-    md: medium screens e.g. tablets
-    lg: large screens e.g. notebooks
-    xl: larger screens .e.g monitors
-
-Resize to change boxes width.
-col-12 md:col-6 lg:col-3
-col-12 md:col-6 lg:col-3
-col-12 md:col-6 lg:col-3
-col-12 md:col-6 lg:col-3
-
 
 <div class="grid">
     <div class="col-12 md:col-6 lg:col-3">A</div>
@@ -926,7 +385,8 @@ col-12 md:col-6 lg:col-3
     <div class="col-12 md:col-6 lg:col-3">D</div>
 </div>
 
-prime 
+</p:panel>
+</div>
 
    </h:form>
 </ui:define>

@@ -6,114 +6,93 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
-    
+
 <ui:define name="title">Unavailable Show</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
-<h:form id="form_unavailable_show" enctype="application/x-www-form-urlencoded" >
-<ui:include src="include/include_summary_club.xhtml"/>
-<p:panelGrid
-    id="panelGrid1"
-    layout="tabular"
-    columns="2"
-    columnClasses="col1, col2">
 
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['title.unavailable.show']}" />
-</f:facet>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card">
+        <f:facet name="header">
+            <h1>#{msg['title.unavailable.show']}</h1>
+        </f:facet>
 
-     <h:panelGroup id="panelStartP" layout="block" >
-        <h:outputText  value="#{msg['unavailable.period.start']} : "/>
-        <i class="pi pi-calendar"></i>
-    </h:panelGroup>
-    <h:outputText value="#{clubC.unavailable.period.startDate}">
-         <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-    </h:outputText>
+        <h:form id="form_unavailable_show">
+            <ui:include src="include/include_summary_club.xhtml"/>
 
-<h:panelGroup id="panelEndP" layout="block" >
-    <h:outputText  value="#{msg['unavailable.period.end']} : "/>
-          <i class="pi pi-calendar"></i>
-</h:panelGroup>
-    
-    <h:outputText value="#{clubC.unavailable.period.endDate}">
-         <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
-    </h:outputText>
-    
- <h:outputText value="Comment : " />
-<h:outputText value="#{clubC.unavailable.period.comment}"
-               escape="false" />
-    
-    </p:panelGrid>
-    
-    <!--
-<h:panelGroup id="panelItem" layout="block" >
-     <h:outputText value="#{msg['tarif.members.item']} "
-                   style="font-size: 1.5em;" />
-      <i class="pi pi-list" style="font-size: 2rem"></i>
-</h:panelGroup>  
+            <p:panelGrid
+                id="panelGrid1"
+                layout="flex"
+                columns="2"
+                columnClasses="col1Flex, col2Flex">
 
-<h:panelGroup id="panelChoice" layout="block" >
-     <h:outputText value="#{msg['tarif.members.choice']} "
-                   style="font-size: 1.5em;"
-                   />
-     <i class="pi pi-question" style="font-size: 1.5em"></i>
-     <i class="pi pi-shopping-cart" style=" font-size: 1.5em;"></i>
-     <i class="pi pi-cloud" style="font-size: 1.5em;"></i>
-     <i class="pi pi-cloud" style="font-size:1.5em"> </i>
-</h:panelGroup>
+                <h:panelGroup id="panelStartP" layout="block">
+                    <h:outputText value="#{msg['unavailable.period.start']} : "/>
+                    <i class="pi pi-calendar"></i>
+                </h:panelGroup>
+                <h:outputText value="#{clubC.unavailable.period.startDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                </h:outputText>
 
--->
- <p:dataTable id="tableShow"
-             value="#{clubC.unavailable.structure.structureList}"
-             var="var"
-             style="margin: 0 auto;width:400px"
-             rowIndexVar="row"
-             emptyMessage="#{msg['message.table.inscriptions.competition.empty']}" >
-    <p:column headerText="#{msg['course.id']}"
-              width="10%">
-        <h:outputText value="#{var.courseId}"/>
-    </p:column>
-    
-    <p:column headerText="#{msg['unavailable.structure.cause']}"
-              width="15%">
-        <h:outputText value="#{var.item}"/>
-    </p:column>
+                <h:panelGroup id="panelEndP" layout="block">
+                    <h:outputText value="#{msg['unavailable.period.end']} : "/>
+                    <i class="pi pi-calendar"></i>
+                </h:panelGroup>
+                <h:outputText value="#{clubC.unavailable.period.endDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                </h:outputText>
 
-<p:column headerText="#{msg['unavailable.title']}"
-              width="15%">
-   <h:panelGroup 
-              rendered="#{clubC.unavailable.period.itemPeriod[row] eq true}">
-      <h:outputText id="PeriodItemY${i}"
-	              value="#{clubC.unavailable.period.itemPeriod[row]}"> 
-      </h:outputText> 
-      <i class="pi pi-check"     style="font-size:30px;color:green"> </i>
-      <i class="pi pi-thumbs-up" style="font-size:30px;color:green;"> </i>
-   </h:panelGroup> 
-   <h:panelGroup id="panelN${i}"
-              rendered="#{clubC.unavailable.period.itemPeriod[row] eq false}">
-      <h:outputText id="PeriodItemN${i}"
-	              value="#{clubC.unavailable.period.itemPeriod[row]}"> 
-      </h:outputText> 
-      <i class="pi pi-times"       style="font-size:30px;color:red;"> </i>
-      <i class="pi pi-thumbs-down" style="font-size:3px;color:red;"> </i>
-   </h:panelGroup>
-</p:column>
-     
-     <f:facet name="footer">
-         <p:commandButton value="Back"
-                         id="commandButtonBack"
-                         ajax="false"
-                         update="growl-msg"
-                          
-                         icon="pi pi-undo"
-                         action="unavailable_period.xhtml?faces-redirect=true"/>
-</f:facet>
-     
-</p:dataTable>
+                <h:outputText value="Comment : "/>
+                <h:outputText value="#{clubC.unavailable.period.comment}"
+                              escape="false"/>
+            </p:panelGrid>
 
-</h:form>
+            <p:dataTable id="tableShow"
+                         value="#{clubC.unavailable.structure.structureList}"
+                         var="var"
+                         style="margin: 0 auto;width:400px"
+                         rowIndexVar="row"
+                         emptyMessage="#{msg['message.table.inscriptions.competition.empty']}">
+                <p:column headerText="#{msg['course.id']}"
+                          width="10%">
+                    <h:outputText value="#{var.courseId}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['unavailable.structure.cause']}"
+                          width="15%">
+                    <h:outputText value="#{var.item}"/>
+                </p:column>
+
+                <p:column headerText="#{msg['unavailable.title']}"
+                          width="15%">
+                    <h:panelGroup
+                        rendered="#{clubC.unavailable.period.itemPeriod[row] eq true}">
+                        <h:outputText id="PeriodItemY${i}"
+                                      value="#{clubC.unavailable.period.itemPeriod[row]}"/>
+                        <i class="pi pi-check" style="font-size:30px;color:green"> </i>
+                        <i class="pi pi-thumbs-up" style="font-size:30px;color:green;"> </i>
+                    </h:panelGroup>
+                    <h:panelGroup id="panelN${i}"
+                        rendered="#{clubC.unavailable.period.itemPeriod[row] eq false}">
+                        <h:outputText id="PeriodItemN${i}"
+                                      value="#{clubC.unavailable.period.itemPeriod[row]}"/>
+                        <i class="pi pi-times" style="font-size:30px;color:red;"> </i>
+                        <i class="pi pi-thumbs-down" style="font-size:3px;color:red;"> </i>
+                    </h:panelGroup>
+                </p:column>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Back"
+                                     id="commandButtonBack"
+                                     ajax="false"
+                                     update="growl-msg"
+                                     icon="pi pi-undo"
+                                     action="unavailable_period.xhtml?faces-redirect=true"/>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

@@ -1,91 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-       xmlns:f="jakarta.faces.core">
-    
-    <!-- est réutilisable TODO dans competition et dans player  -->    
-<h:form id="form_club_course"  >
-    <p:panelGrid
-        layout="tabular"
-        id="panel1"
-        columns="2"
-        columnClasses="col1, col2" >
-<!-- binding=""    -->
-         <h:outputText value="#{msg['club.club']}" />
-            <h:panelGroup layout="block" id="containerClub">
-                <p:inputNumber
-                       id="inputClub"
-                       label="HomeClub"
-                      
-                       value="#{clubC.club.idclub}"
-                       size="5"
-                       decimalPlaces="0"
-                       emptyValue="0"
-                       style="margin-left:1.5rem;margin-right:1.5rem;" />
-                <p:commandButton 
-                         id="ButtonHomeClub"
-                          
-                         immediate="true"
-                         value="#{msg['button.player.homeclub']}"
-                         actionListener="#{dialogC.showSelectClub('unavailable')}"
-                         style="float:left;"
-                         icon="pi pi-search" >
+      xmlns:f="jakarta.faces.core">
+
+    <h:form id="form_club_course">
+        <p:panelGrid layout="flex"
+                     id="panel1"
+                     columns="2"
+                     columnClasses="col1Flex, col2Flex">
+
+            <h:outputText value="#{msg['club.club']}"/>
+            <h:panelGroup layout="block" id="containerClub"
+                          style="display:flex; align-items:center; gap:0.5rem;">
+                <p:inputNumber id="inputClub"
+                               label="HomeClub"
+                               value="#{clubC.club.idclub}"
+                               size="5"
+                               decimalPlaces="0"
+                               emptyValue="0"/>
+                <p:commandButton id="ButtonHomeClub"
+                                 immediate="true"
+                                 value="#{msg['button.player.homeclub']}"
+                                 actionListener="#{dialogC.showSelectClub('unavailable')}"
+                                 icon="pi pi-search">
                     <p:ajax event="dialogReturn"
-                            update=":form_club_course:inputClub,clubName,ClubId" />
-                 </p:commandButton>
+                            update=":form_club_course:inputClub,clubName,ClubId"/>
+                </p:commandButton>
                 <h:outputText id="clubName"
                               value="#{clubC.club.clubName}"
                               style="font-style:italic"/>
                 <h:outputText id="ClubId"
                               value=" #{clubC.club.idclub}"
-                              style="font-weight:bold;font-size: 2rem;font-style:italic;color: red" />  
+                              style="font-weight:bold;font-size:2rem;font-style:italic;color:red"/>
             </h:panelGroup>
 
-          <h:outputText value="#{msg['course.course']}" />
-          <h:panelGroup layout="block" id="containerCourse">
-           <p:inputNumber
-               id="inputCourse"
-               value="#{clubC.course.idcourse}"
-               size="5"
-               decimalPlaces="0"
-               emptyValue="0"
-               style="margin-left:1.5rem;margin-right:1.5rem;" />
-           <p:commandButton 
-                id="ButtonCourse"
-                 
-                immediate="true"
-                value="#{msg['button.course.list']}"
-                actionListener="#{dialogC.showSelectCourse('include',clubC.club.idclub)}"
-                style="float:left;"
-                icon="pi pi-search" >
+            <h:outputText value="#{msg['course.course']}"/>
+            <h:panelGroup layout="block" id="containerCourse"
+                          style="display:flex; align-items:center; gap:0.5rem;">
+                <p:inputNumber id="inputCourse"
+                               value="#{clubC.course.idcourse}"
+                               size="5"
+                               decimalPlaces="0"
+                               emptyValue="0"/>
+                <p:commandButton id="ButtonCourse"
+                                 immediate="true"
+                                 value="#{msg['button.course.list']}"
+                                 actionListener="#{dialogC.showSelectCourse('include',clubC.club.idclub)}"
+                                 icon="pi pi-search">
                     <p:ajax event="dialogReturn"
-                           
-                            update=":form_club_course:inputCourse, courseName,courseId" />
-           </p:commandButton>
-<!--  listener="#{dialogC.handleReturnCourse}"  -->
-           <h:outputText id="courseName"
-                          value=" #{clubC.course.courseName}"
-                          style="font-style:italic"/>
-            <h:outputText id="courseId"
-                          value=" #{clubC.course.idcourse}"
-                          style="font-weight:bold;font-size: 2rem;font-style:italic;color: red"/>
-       </h:panelGroup>
-          
-     <f:facet name="footer">   
-           <p:commandButton value="Continue and Refresh"
-                         id="buttonNext"
-                         update="growl-msg"
-                         immediate="true"
-                         ajax="false"
-                         icon="pi pi-arrow-right"
-                         style="float:right;"
-                         action="unavailable_menu.xhtml?faces-redirect=true"/>
-</f:facet> 
-          
-          </p:panelGrid>
-</h:form>
+                            update=":form_club_course:inputCourse,courseName,courseId"/>
+                </p:commandButton>
+                <h:outputText id="courseName"
+                              value=" #{clubC.course.courseName}"
+                              style="font-style:italic"/>
+                <h:outputText id="courseId"
+                              value=" #{clubC.course.idcourse}"
+                              style="font-weight:bold;font-size:2rem;font-style:italic;color:red"/>
+            </h:panelGroup>
+
+            <f:facet name="footer">
+                <p:commandButton value="Continue and Refresh"
+                                 id="buttonNext"
+                                 update="growl-msg"
+                                 immediate="true"
+                                 ajax="false"
+                                 icon="pi pi-arrow-right"
+                                 style="float:right;"
+                                 action="unavailable_menu.xhtml?faces-redirect=true"/>
+            </f:facet>
+
+        </p:panelGrid>
+    </h:form>
+
 </ui:composition>

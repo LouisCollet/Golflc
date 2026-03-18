@@ -26,6 +26,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
     @Inject private find.FindCurrentSubscription findCurrentSubscription;
     @Inject private find.FindSubscriptionStatus findSubscriptionStatus;
     @Inject private create.CreatePaymentSubscription createPaymentSubscription;
+    @Inject private find.FindTarifSubscription findTarifSubscription;
 
     public PaymentSubscriptionController() {}
 
@@ -198,11 +199,24 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
 
     /**
      * Retourne le tarif d’un abonnement selon son type.
+     * Lit le prix depuis la table tarif_subscription (tarif actif pour le code).
+     * Fallback sur le fichier subscription.properties si pas trouvé en DB.
      */
-    public static double findTarif(Subscription subscription) throws Exception {
+    public double findTarif(Subscription subscription) throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
         return switch (subscription.getSubCode()) {
-            case "MONTHLY" -> Double.parseDouble(utils.LCUtil.findProperties("subscription", "month"));
-            case "YEARLY" -> Double.parseDouble(utils.LCUtil.findProperties("subscription", "year"));
+            case "MONTHLY", "YEARLY" -> {
+                entite.TarifSubscription tarif = findTarifSubscription.findActive(subscription.getSubCode());
+                if (tarif != null) {
+                    LOG.debug(methodName + " - tarif found in DB: " + tarif);
+                    yield tarif.getPrice();
+                }
+                LOG.error(methodName + " - no active tarif in DB for " + subscription.getSubCode());
+                showMessageFatal("No active tarif found for " + subscription.getSubCode());
+                yield 0.0;
+            }
             case "TRIAL", "INITIAL" -> 0.0;
             default -> 99.0;
         };

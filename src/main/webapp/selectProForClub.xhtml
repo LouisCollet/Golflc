@@ -1,89 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
-      template="templates/masterTemplate.xhtml" >
+      template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Select Professional With Club</ui:define>
+
 <ui:define name="content">
-    
-<p:panel style="width: 70%;margin: 0 auto;" >    
-<h:form id="form_selectProWithClub">
-<div class="card">
 
-<!-- <c:set var="select" value="#{appContext.inputSelectCourse}"/> -->
- <c:set var="idplayer" value="#{playerC.player.idplayer}"/>
-<p:dataTable id="courses"
-             value="#{clubC.listProfessionalForClub()}"
-             var="c"
-             rowIndexVar="row"
-             emptyMessage="#{msg['message.table.empty']}"
-             rowKey="#{c.player.idplayer}"
-             
-             >
-<!-- 30-09-2021 PF11 ajouté rowKey et enlevé   filteredValue="#{navC.filteredInscriptions}"-->
-<f:facet name="header">
-    <h1>#{msg['message.selectclub']} pour un pro</h1>
-</f:facet>
-   
-<p:column
-     headerText="#"
-     footerText="#"
-     width="2%"
-     id="colRow">
-             #{row+1}
-</p:column>
+    <h:form id="form_selectProWithClub">
 
-    <p:column   id="colClubName"
-                    headerText="#{msg['club.name']}"
-                    footerText="#{msg['club.name']}"
-                    width="20%"
-                    filterMatchMode="contains"
-                    filterBy="#{c.club.clubName}"
-                    sortBy="#{c.club.clubName}"
-                    groupRow="true"
-                  >
-            <h:outputText value="#{c.club.clubName} (#{c.club.idclub})" />
-	</p:column>
-    
-	<p:column id="colProName"
-                  toggleable="false"
-                  headerText="#{msg['professional.name']}"
-                  footerText="#{msg['professional.name']}"
-                  width="20%"
-                  filterMatchMode="contains"
-                  sortBy="#{c.player.playerLastName}"
-                  filterBy="#{c.player.playerLastName}" >
-            <h:outputText value="#{c.player.playerLastName}, #{c.player.playerFirstName} (#{c.player.idplayer})" />
-	</p:column>
+        <c:set var="idplayer" value="#{playerC.player.idplayer}"/>
 
-    	<p:column id="colProAmount"
-                  toggleable="false"
-                  headerText="#{msg['professional.amount']}"
-                  footerText="#{msg['professional.amount']}"
-                  width="8%" >
-            <h:outputText value="#{c.professional.proAmount}" />
-	</p:column>
-    
-      	<p:column headerText="#{msg['professional.select']}"
-                  footerText="#{msg['professional.select']}"
-                  width="15%" >
-            <p:commandButton
-                  id="selectButtonProCreate"
-                  action="#{schedulerC.readLessons(c, idplayer)}"
-                  value="#{c.professional.proId} - #{msg['button.select']}"
-                  icon="pi pi-check">
-             </p:commandButton>
-            
-            <!-- action="#{schedulerC.loadEventsPro(c)}navC.loadEventsPro(c)"  -->
-	</p:column>
-</p:dataTable>
-    </div>
-</h:form>
-     </p:panel>
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card" style="max-width:100%;">
+                <f:facet name="header">
+                    <h1>#{msg['message.selectclub']} pour un pro</h1>
+                </f:facet>
+
+                <p:dataTable id="courses"
+                             value="#{clubC.listProfessionalForClub()}"
+                             var="c"
+                             rowIndexVar="row"
+                             emptyMessage="#{msg['message.table.empty']}"
+                             rowKey="#{c.player.idplayer}">
+
+                    <p:column headerText="#"
+                              width="2%"
+                              id="colRow">
+                        #{row+1}
+                    </p:column>
+
+                    <p:column id="colClubName"
+                              headerText="#{msg['club.name']}"
+                              width="20%"
+                              filterMatchMode="contains"
+                              filterBy="#{c.club.clubName}"
+                              sortBy="#{c.club.clubName}"
+                              groupRow="true">
+                        <h:outputText value="#{c.club.clubName} (#{c.club.idclub})"/>
+                    </p:column>
+
+                    <p:column id="colProName"
+                              toggleable="false"
+                              headerText="#{msg['professional.name']}"
+                              width="20%"
+                              filterMatchMode="contains"
+                              sortBy="#{c.player.playerLastName}"
+                              filterBy="#{c.player.playerLastName}">
+                        <h:outputText value="#{c.player.playerLastName}, #{c.player.playerFirstName} (#{c.player.idplayer})"/>
+                    </p:column>
+
+                    <p:column id="colProAmount"
+                              toggleable="false"
+                              headerText="#{msg['professional.amount']}"
+                              width="8%">
+                        <h:outputText value="#{c.professional.proAmount}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg['professional.select']}"
+                              width="15%">
+                        <p:commandButton id="selectButtonProCreate"
+                                         action="#{schedulerC.readLessons(c, idplayer)}"
+                                         value="#{c.professional.proId} - #{msg['button.select']}"
+                                         icon="pi pi-check"/>
+                    </p:column>
+
+                </p:dataTable>
+
+            </p:panel>
+        </div>
+
+    </h:form>
+
 </ui:define>
 </ui:composition>

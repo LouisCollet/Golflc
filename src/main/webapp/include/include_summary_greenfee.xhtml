@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
@@ -8,44 +7,43 @@
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core">
 
-<p:panelGrid
-    id="panelgridSummaryGreenfee"
-    layout="tabular"
-    columnClasses="col1,col2,col3,col4"
-    columns="4" >
+    <h:panelGroup layout="block" styleClass="summary-bar">
+        <span class="summary-item">
+            <span class="summary-label">#{msg['club.name']}</span>
+            <span class="summary-value">#{clubC.club.clubName} (#{clubC.club.idclub})</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['course.name']}</span>
+            <span class="summary-value">#{clubC.course.courseName} (#{clubC.course.idcourse})</span>
+        </span>
+        <h:panelGroup rendered="#{memC.tarifGreenfee.greenfeeType ne null}">
+            <span class="summary-sep">|</span>
+        </h:panelGroup>
+        <h:panelGroup styleClass="summary-item"
+                      rendered="#{memC.tarifGreenfee.greenfeeType ne null}">
+            <span class="summary-label">#{msg['tarif.type']}</span>
+            <span class="summary-value">#{memC.tarifGreenfee.greenfeeType}</span>
+        </h:panelGroup>
+        <h:panelGroup rendered="#{memC.tarifGreenfee.datesSeasonsList.size() gt 0}">
+            <span class="summary-sep">|</span>
+        </h:panelGroup>
+        <h:panelGroup styleClass="summary-item"
+                      rendered="#{memC.tarifGreenfee.datesSeasonsList.size() gt 0}">
+            <span class="summary-label">#{msg['tarif.period']}</span>
+            <span class="summary-value">
+                <ui:repeat var="item" value="#{memC.tarifGreenfee.datesSeasonsList}">
+                    <h:outputText value="#{item.startDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                    -
+                    <h:outputText value="#{item.endDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                    - #{item.season}
+                </ui:repeat>
+            </span>
+        </h:panelGroup>
+    </h:panelGroup>
 
-<f:facet name="header">
-    <h1>#{msg['title.summary.greenfee']}</h1>
-</f:facet>
-      
-      <h:outputText value="#{msg['club.name']} :"   />
-	<h:outputText
-            id="clubsummaryGreenfee" 
-            value="#{clubC.club.clubName} (#{clubC.club.idclub})" />
-
-      <h:outputText value="#{msg['course.name']} :" />
-      <h:outputText
-            id="coursesummaryGreenfee" 
-            value="#{clubC.course.courseName} (#{clubC.course.idcourse})" />
-
-      <h:outputText value="#{msg['tarif.type']} :" 
-                    rendered="#{clubC.tarifGreenfee.greenfeeType ne null}"/>
-      <h:outputText id="GreenfeeInputType" 
-                    value="#{memC.tarifGreenfee.greenfeeType}"/>
-
-      <h:outputText value="#{msg['tarif.period']} :"
-                    rendered="#{memC.tarifGreenfee.datesSeasonsList.size() gt 0}"/>
-      <ui:repeat var="item" value="#{memC.tarifGreenfee.datesSeasonsList}"> 
-          <h:outputText value="#{item.startDate}">
-             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-          </h:outputText>
-          <h:outputText value=" - "/>
-          <h:outputText value="#{item.endDate}">
-             <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
-          </h:outputText>
-          <h:outputText value=" - #{item.season}  " />
-      </ui:repeat> 
-      
-</p:panelGrid>
-<p:divider layout="horizontal" type="solid" />
 </ui:composition>

@@ -32,8 +32,8 @@ public class CreateCreditcard implements Serializable {
         LOG.debug("creditcard  = " + creditcard);
 
         try (Connection conn = dataSource.getConnection()) {
-            final String query = LCUtil.generateInsertQuery(conn, "creditcard");
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
+      //      final String query = LCUtil.generateInsertQuery(conn, "creditcard");
+            try (PreparedStatement ps = conn.prepareStatement(LCUtil.generateInsertQuery(conn, "creditcard"))) {
                 ps.setNull(1, java.sql.Types.INTEGER);
                 ps.setInt(2, creditcard.getCreditCardIdPlayer());
                 ps.setString(3, creditcard.getCreditcardHolder());

@@ -75,8 +75,7 @@ public class CreateRound implements Serializable {
 
         // ✅ try-with-resources : Connection et PreparedStatement fermés automatiquement
         try (Connection conn        = dataSource.getConnection();
-             PreparedStatement ps   = conn.prepareStatement(
-                     utils.LCUtil.generateInsertQuery(conn, "round"))) {
+             PreparedStatement ps   = conn.prepareStatement(utils.LCUtil.generateInsertQuery(conn, "round"))) {
 
             LOG.debug(methodName + " - ZoneId = " + club.getAddress().getZoneId());
 
@@ -159,6 +158,13 @@ public class CreateRound implements Serializable {
         LOG.debug("entering " + methodName);
 
         try {
+            if (round.getRoundDate() == null) {
+                String msg = utils.LCUtil.prepareMessageBean("round.date.required");
+                LOG.error(methodName + " - roundDate is null");
+                showMessageFatal(msg);
+                return false;
+            } // end guard clause
+
             LOG.debug("course begin date = " + course.getCourseBeginDate()); // format localdatetime
             LocalDateTime cb = course.getCourseBeginDate();
             LOG.debug(methodName + " - courseBegin = " + cb);

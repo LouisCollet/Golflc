@@ -8,26 +8,20 @@
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
-<!-- based on https://fullcalendar.io/ -->
- <div class="card">
+
 <ui:define name="title">Schedule Pro Page</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/tarif1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/tarif2.jpg" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
 
-<!-- see tweeking for arya in Styles2022.css lines 235 and following  --> 
 <h:form id="schedule_form" >
 <ui:include src="include/include_summary_pro.xhtml"/>
 
-<p:panel id="panelId"
-         header="Settings"
-         footer="settings footer" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel id="panelId" styleClass="login-card form-card" style="max-width:100%;">
     <f:facet name="header">
         <h1>#{msg['message.lesson']} </h1>
     </f:facet>
     <c:set var="idplayer" value="#{playerC.player.idplayer}"/>
     <p:outputPanel id="schedulePanel"
-                   
                    style="font-size:0.8rem;">
         <p:schedule id="schedule"
                     value="#{schedulerC.scheduleModel}"
@@ -45,48 +39,42 @@
                     extender="initSchedule"
                     clientTimeZone="Europe/Brussels"
                     timeZone="Europe/Brussels" >
-            <p:ajax event="dateSelect" 
+            <p:ajax event="dateSelect"
                     listener="#{schedulerC.dateSelect}"
                     update=":schedule_form:panelId,growl-msg,messages, panelId"
                     oncomplete="PF('eventDialog').show();"/>
-            <p:ajax event="eventSelect" 
+            <p:ajax event="eventSelect"
                     listener="#{schedulerC.eventSelect}"
                     update=":schedule_form:panelId,growl-msg,messages,panelId"
                     oncomplete="PF('eventDialog').show();"/>
             <p:ajax event="eventMove"
                     listener="#{schedulerC.moveLesson}"
                     update=":schedule_form:panelId,growl-msg,messages,panelId"/>
-  <!--         <p:ajax event="viewChange"
-                    listener="#{schedulerC.viewChange}"
-                    update=":schedule_form:panelId,growl-msg,messages, panelId"/>
- -->
         </p:schedule>
     </p:outputPanel>
 
  <script type="text/javascript">
 function initSchedule() {
         this.cfg.options.buttonText = { today : 'Current Date'};
- } // endInitSchedule
-
+ }
 </script>
-<!--  https://github.com/primefaces/primefaces/issues/6451 - -->
+
   <p:staticMessage severity="info" summary="Summary INFO" detail="staticMessage detail Content" style="width: 100%"/>
-  
+
         <p:dialog id="dialog1"
-                  widgetVar="eventDialog" 
+                  widgetVar="eventDialog"
                   header="Lesson Details"
-                  footer="dialog Footer Text"
                   width="30%"
                   modal="true"
                   minimizable="true"
                   maximizable="true"
-                  showEffect="fade" 
+                  showEffect="fade"
                   responsive="true"
                   hideEffect="fade"  >
         <p:panelGrid id="eventDetails"
                      layout="flex"
                      columns="2"
-                     columnClasses="col1Flex, col2Flex"
+                     columnClasses="col1Flex,col2Flex"
                      style="font-size:0.8rem; width:90%" >
                 <p:outputLabel for="@next" value="Title" />
                 <p:inputText id="titleEvent"
@@ -95,34 +83,16 @@ function initSchedule() {
                              style="margin-right:1px;"
                              placeholder="Please complete the lessons's title" />
                 <p:outputLabel for="@next" value="Description" />
-                <h:outputText id="descriptionEvent" 
+                <h:outputText id="descriptionEvent"
                               value="#{schedulerC.scheduleEvent.description}"/>
-                
+
                 <p:outputLabel for="@next" value="From" />
-                <!-- on pourrait utiliser une simple input zone ? -->
-                
+
                 <p:calendar id="from"
                             value="#{schedulerC.scheduleEvent.startDate}"
                             pattern="dd/MM/yyyy HH:mm"
-                            
                             />
-      <!--    
-            <p:calendar id="to" value="#{bean.event.endDate}" timeZone="GMT+2" pattern="dd/MM/yyyy HH:mm" />
-                
-                
-                
-                
-                <p:datePicker id="dateStart"
-                              value="#{schedulerC.scheduleEvent.startDate}"
-                              pattern="dd/MM/yyyy"
-                              showTime="true"
-                              
-                              appendTo="@(body)"
-                              mindate="#{utilsC.localTime(9,00)}"
-                              maxdate="#{utilsC.localTime(18,30)}" 
-                              timeInput="false"
-                              stepMinute="30" />
--->
+
                 <p:outputLabel for="@next" value="To" />
                 <p:datePicker id="dateEnd"
                               value="#{schedulerC.scheduleEvent.endDate}"
@@ -130,7 +100,7 @@ function initSchedule() {
                               showTime="true"
                               appendTo="@(body)"
                               mindate="#{utilsC.localTime(9,30)}"
-                              maxdate="#{utilsC.localTime(19,00)}" 
+                              maxdate="#{utilsC.localTime(19,00)}"
                               timeInput="false"
                               stepMinute="30" />
 
@@ -138,51 +108,48 @@ function initSchedule() {
                 <h:selectBooleanCheckbox id="allDay"
                                          value="#{schedulerC.scheduleEvent.allDay}"
                                          disabled="#{schedulerC.isNotProfessional()}"/>
- 
-             <f:facet name="footer"> 
-                <p:commandButton id="createButton" 
+
+             <f:facet name="footer">
+                <p:commandButton id="createButton"
                                  icon="pi pi-check"
-                                 value="Réservation Leçon" 
+                                 value="Reservation Lecon"
                                  process="@form"
                                  action="#{schedulerC.createLesson()}"
                                  update="panelId,growl-msg,messages"
-                                  
                                  ajax="false"
-                                 style="float: left;"
                                  oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
                 <p:commandButton id="deleteButton"
                                  icon="pi pi-times"
-                                 value="Annulation leçon"
+                                 value="Annulation lecon"
                                  action="#{schedulerC.deleteLesson(idplayer)}"
                                  update="panelId,growl-msg,messages"
-                                 style="float: right;"
                                  ajax="false"
                                  oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
               </f:facet>
-                
-           </p:panelGrid>      
-                
+
+           </p:panelGrid>
+
              <p:contextMenu for="schedule">
-               <p:menuitem value="Annuler cette leçon"
+               <p:menuitem value="Annuler cette lecon"
                            update="messages, growl-msg"
                            action="#{schedulerC.deleteLesson(idplayer)}"
                            oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
             </p:contextMenu>
         </p:dialog>
-  
+
       <f:facet name="footer">
            <p:commandButton value="#{msg['payment.selected']}"
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
-                          
-                         style="float: right;"
                          icon="pi pi-credit-card"
                          action="#{payC.manageLesson()}" >
            </p:commandButton>
     </f:facet>
-  </p:panel>
+
+</p:panel>
+</div>
+
 </h:form>
 </ui:define>
- </div>
 </ui:composition>

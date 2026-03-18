@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import jakarta.annotation.security.DenyAll;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -25,6 +26,7 @@ import jakarta.ws.rs.core.UriInfo;
 // accès via http://localhost:8080/rest-demo-1.0/rest/tutorial/helloworld
 //The @Path annotation at class level is used to specify the base URL of the Web service
 @Path("tutorial")
+@DenyAll // security audit 2026-03-09 — test/demo endpoints disabled in production
 public class PaymentService{
   
   /*/  **

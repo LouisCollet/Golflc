@@ -29,6 +29,9 @@ import rowmappers.RowMapper;
 import rowmappers.RowMapperRound;
 import rowmappers.TeeRowMapper;
 
+/**
+ * fix multi-user 2026-03-07 — cache supprimé (données per-user dans singleton = fuite de données)
+ */
 @Named
 @ApplicationScoped
 public class RecentRoundList implements Serializable {
@@ -38,19 +41,12 @@ public class RecentRoundList implements Serializable {
     @Resource(lookup = "java:jboss/datasources/golflc")
     private DataSource dataSource;
 
-    private List<ECourseList> liste = null;
-
     public RecentRoundList() { }
 
     public List<ECourseList> list(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
-        LOG.debug("with player = " + player);
-
-        if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
-            return liste;
-        }
+        LOG.debug(methodName + " - player = " + player);
 
         final String query = """
             WITH selection AS (
@@ -77,7 +73,7 @@ public class RecentRoundList implements Serializable {
             utils.LCUtil.logps(ps);
 
             try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
+                List<ECourseList> result = new ArrayList<>();
                 RowMapper<Club> clubMapper = new ClubRowMapper();
                 RowMapper<Course> courseMapper = new CourseRowMapper();
                 RowMapper<Tee> teeMapper = new TeeRowMapper();
@@ -92,14 +88,14 @@ public class RecentRoundList implements Serializable {
                             .round(roundMapper.map(rs, club))
                             .tee(teeMapper.map(rs))
                             .build();
-                    liste.add(ecl);
-                } // end while
-                if (liste.isEmpty()) {
+                    result.add(ecl);
+                }
+                if (result.isEmpty()) {
                     LOG.warn(methodName + " - empty result list for player=" + player.getIdplayer());
                 } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
+                    LOG.debug(methodName + " - list size = " + result.size());
                 }
-                return liste;
+                return result;
             }
 
         } catch (SQLException e) {
@@ -111,14 +107,12 @@ public class RecentRoundList implements Serializable {
         }
     } // end method
 
-    public List<ECourseList> getListe()                       { return liste; }
-    public void              setListe(List<ECourseList> liste) { this.liste = liste; }
-
+    /**
+     * No-op — cache removed (fix multi-user 2026-03-07)
+     */
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        LOG.debug("entering " + methodName + " - no-op (cache removed)");
     } // end method
 
     /*

@@ -10,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
-
 import static interfaces.Log.LOG;
 import java.util.List;
 
@@ -26,8 +25,6 @@ import java.util.List;
 public class ApplicationContext implements Serializable {
     
     private static final long serialVersionUID = 1L;
-
-    
     
     /** Partagé entre : PlayerController, RoundController, SubscriptionController */
     private Player player;

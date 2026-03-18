@@ -5,27 +5,25 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces">
 <h:body>
-
 <p:confirmDialog global="true"
                  showEffect="fade"
                  hideEffect="fade"
+                 styleClass="danger-confirm"
+                 closable="true"
                  width="250"
-                 height="50"
+                 height="150"
                  header="#{msg['message.confirm.delete']}"
-                 message="#{msg['message.cancel']}" >
-        <p:commandButton value="Yes"
-                         style="color:red;font-size: 1.5em;"
-                         type="button" 
-                         styleClass="ui-confirmdialog-yes"
+                 message="#{msg['message.confirm.cancel']}" >
+        <p:commandButton value="#{msg['button.yes']}"
+                         type="button"
+                         styleClass="ui-confirmdialog-yes ui-button-danger"
+                         icon="pi pi-trash" />
+        <p:commandButton value="#{msg['button.no']}"
+                         type="button"
+                         styleClass="ui-confirmdialog-no ui-button-secondary"
                          icon="pi pi-times" />
-        <p:commandButton value="No" 
-                         style="color:green;font-size: 1.5rem;"
-                         type="button" 
-                         styleClass="ui-confirmdialog-no ui-button-flat"
-                         icon="pi pi-check" />
 </p:confirmDialog>
-    
-   <!-- new Primefaces X -->
+
 <p:confirmPopup global="true"
                 showEffect="fade" 
                 hideEffect="fade"

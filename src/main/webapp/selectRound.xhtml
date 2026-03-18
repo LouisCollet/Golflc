@@ -7,110 +7,62 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="title">Select Round Page </ui:define>
+<ui:define name="title">Select Round Page</ui:define>
+
 <ui:define name="content">
- 
-<h:form id="select_round">
 
-<p:divider layout="horizontal" type="solid" />
-<p:panelGrid
-    id="panelGrid1"
-    layout="tabular"
-    columns="2"
-    columnClasses="col1,col2"
-    style="width:70%" >
+    <h:form id="select_round">
 
-<f:facet name="header">
-     <f:facet name="header">
-    <h1>#{msg['message.selectcourse']}
-        <h:outputText
-            id="Rnd"
-            rendered="#{appContext.inputSelectRound eq 'INSCRIPTION'}" 
-            value="#{msg['message.for.round']}">
-        </h:outputText>
-        <h:outputText
-            id="tarif"
-            rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}" 
-            value="#{msg['message.for.tarif']}">
-        </h:outputText>
-        <h:outputText
-            id="tarifMembers"
-            rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}" 
-            value="#{msg['message.for.tarif.members']}">
-        </h:outputText>
-        <h:outputText
-            id="unavailableS"
-            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}" 
-            value="#{msg['message.for.unavailable']}">
-        </h:outputText>
-        <h:outputText
-            id="unavailableP"
-            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}" 
-            value="#{msg['message.for.unavailable']}">
-        </h:outputText>
-        <h:outputText
-            id="Det"
-            rendered="#{appContext.inputSelectCourse eq 'ChartRound'}" 
-            value="#{msg['message.for.detail']}">
-        </h:outputText>
-        <h:outputText
-            id="Avg"
-            rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}" 
-            value="#{msg['message.for.average']}">
-        </h:outputText>
-        </h1>
-        parameter from sessionMap = #{appContext.inputSelectRound}
-    
-</f:facet>
-</f:facet>
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card">
+                <f:facet name="header">
+                    <h1>#{msg['message.selectcourse']}
+                        <h:outputText id="Rnd"
+                                      rendered="#{appContext.inputSelectRound eq 'INSCRIPTION'}"
+                                      value="#{msg['message.for.round']}"/>
+                        <h:outputText id="tarif"
+                                      rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}"
+                                      value="#{msg['message.for.tarif']}"/>
+                        <h:outputText id="tarifMembers"
+                                      rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}"
+                                      value="#{msg['message.for.tarif.members']}"/>
+                        <h:outputText id="unavailableS"
+                                      rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}"
+                                      value="#{msg['message.for.unavailable']}"/>
+                        <h:outputText id="unavailableP"
+                                      rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}"
+                                      value="#{msg['message.for.unavailable']}"/>
+                        <h:outputText id="Det"
+                                      rendered="#{appContext.inputSelectCourse eq 'ChartRound'}"
+                                      value="#{msg['message.for.detail']}"/>
+                        <h:outputText id="Avg"
+                                      rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}"
+                                      value="#{msg['message.for.average']}"/>
+                    </h1>
+                </f:facet>
 
-         <p:outputLabel for="inputRound" value="#{msg['round.id']}" />
-            <h:panelGroup layout="block" id="containerRound">
-                <p:inputNumber
-                       id="inputRound"
-                       value="#{roundC.round.idround}"
-                       size="5"
-                       decimalPlaces="0"
-                       emptyValue="0"
-                       style="margin-left:1.5em; margin-right:1.5em;" />
-                <p:commandButton 
-                         id="ButtonRound"
-                          
-                         immediate="true"
-                         value="#{msg['button.round.list']}"
-                         actionListener="#{dialogC.showSelectRound('round')}"
-                         style="float:left;"
-                         icon="pi pi-search" >
-    <!--  dialogReturn gets triggered when the dialog is being closed. by dialogClose in courseC !! essentiel  -->
-                    <p:ajax event="dialogReturn"
-                         update="inputRound,roundName,IdRound" />
-                 </p:commandButton>
-      
-                <h:outputText id="roundName"
-                              value="#{roundC.round.roundName}"
-                              style="font-style:italic"/>
-                <h:outputText id="IdRound"
-                              value=" #{roundC.round.idround}"
-                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
-            </h:panelGroup>
-         
-        <f:facet name="footer">
-         <p:commandButton value="Choix Round"
-                         id="selectButtonRound"
-                         update="growl-msg"
-                         ajax="false"
-                          
-                         icon="pi pi-question"
-                         style="width:140px"
-                         action="#{roundC.selectRound()}" > 
-         </p:commandButton>
-             <!--  c enleve entre paranthèses
-              -->
- </f:facet> 
-         
-         
-</p:panelGrid>
+                <p:panelGrid id="panelGrid1"
+                             layout="flex"
+                             columns="2"
+                             columnClasses="col1Flex, col2Flex">
 
-</h:form>
+                    <ui:include src="include/include_round_selector.xhtml"/>
+
+                </p:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Choix Round"
+                                     id="selectButtonRound"
+                                     update="growl-msg"
+                                     ajax="false"
+                                     icon="pi pi-question"
+                                     action="#{roundC.selectRound()}"/>
+                </f:facet>
+
+            </p:panel>
+        </div>
+
+    </h:form>
+
 </ui:define>
 </ui:composition>

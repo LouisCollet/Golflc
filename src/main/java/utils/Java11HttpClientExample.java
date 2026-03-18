@@ -3,6 +3,7 @@ package utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entite.Creditcard;
 import static interfaces.Log.LOG;
+import jakarta.annotation.security.DenyAll;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -23,6 +24,7 @@ import rest.Item;
 import static utils.LCUtil.showMessageFatal;
 
 @Path("tutorialJava11")
+@DenyAll // security audit 2026-03-09 — test endpoint disabled in production
 // à transférer à CreditcardController apeès tests
 public class Java11HttpClientExample {
 

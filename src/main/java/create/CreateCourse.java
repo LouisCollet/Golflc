@@ -42,7 +42,6 @@ public class CreateCourse implements Serializable {
         String msg;
         
         try (Connection conn = dataSource.getConnection()) {
-            
             conn.setAutoCommit(false);
             LOG.info("AutoCommit set to false");
             

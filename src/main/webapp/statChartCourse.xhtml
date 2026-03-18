@@ -7,29 +7,18 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<!--
-<script type="text/javascript">
-//<![CDATA[
-    function exportChart() {
-        //export image
-        $('#output').empty().append(PF('chart').exportAsImage());
-        //show the dialog
-        PF('dlg').show();
-    }
-//]]>
-</script>
--->
+
 <ui:define name="title">Statistics Chart Course</ui:define>
 <ui:define name="content">
+
 <h:form id="stat_course_form" >
- <!--   
-<style>
-    .ui-chart {
-        margin-bottom: 50px;
-    }
-</style>
- -->
-  <!-- 9-12-2024 - PF15  remplacé par software.xdev p:chart wrapper java de chartjs chartjs-java-model-->
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>Statistics Chart Course</h1>
+</f:facet>
+
           <p:chart
               value="#{clubC.getLineModelCourse()}"
               style="width: 100%;height: 500px;margin-top:20px">
@@ -38,6 +27,9 @@
                       update="growl-msg">
               </p:ajax>
           </p:chart>
+
+</p:panel>
+</div>
 
 </h:form>
 </ui:define>

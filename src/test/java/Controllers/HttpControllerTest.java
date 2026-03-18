@@ -2,18 +2,29 @@ package Controllers;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpCookie;
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class HttpControllerTest {
 
@@ -213,6 +224,149 @@ class HttpControllerTest {
             Object result = method.invoke(controller);
             assertNotNull(result);
             assertInstanceOf(Boolean.class, result);
+        } // end test
+
+    } // end nested class
+
+    // ===== sendPaymentServer(Creditcard) =====
+
+    @Nested
+    class SendPaymentServerTests {
+
+        private HttpClient mockHttpClient;
+
+        @BeforeEach
+        void setUpSendPayment() throws Exception {
+            // Injecter un mock HttpClient via réflexion
+            mockHttpClient = mock(HttpClient.class);
+            Field hcField = HttpController.class.getDeclaredField("httpClient");
+            hcField.setAccessible(true);
+            hcField.set(controller, mockHttpClient);
+            // Pas de mockStatic — showMessageFatal() et firstPartUrl()
+            // gèrent l'absence de FacesContext en interne (try-catch)
+        } // end setUp
+
+        private entite.Creditcard createValidCreditcard() {
+            entite.Creditcard cc = new entite.Creditcard();
+            cc.setCreditCardExpirationDateLdt(LocalDateTime.of(2027, 6, 1, 0, 0));
+            cc.setCreditcardHolder("TEST HOLDER");
+            cc.setCreditcardType("VISA");
+            cc.setCreditcardVerificationCode((short) 123);
+            cc.setTotalPrice(100.0);
+            cc.setCommunication("test-comm");
+            cc.setCreditCardIdPlayer(1);
+            return cc;
+        } // end method
+
+        private void assumeHmacSecretSet() {
+            assumeTrue(System.getenv("PAYMENT_HMAC_SECRET") != null,
+                "Skipped: PAYMENT_HMAC_SECRET environment variable required");
+        } // end method
+
+        // --- Tests ne nécessitant PAS PAYMENT_HMAC_SECRET ---
+
+        @Test
+        void nullExpirationDate_returnsExceptionMessage() throws Exception {
+            entite.Creditcard cc = createValidCreditcard();
+            cc.setCreditCardExpirationDateLdt(null);
+
+            String result = controller.sendPaymentServer(cc);
+            // NPE avec message enrichi Java 25 → outer catch → retourne e.getMessage()
+            assertNotNull(result);
+            assertFalse(result.isEmpty());
+        } // end test
+
+        // --- Tests nécessitant PAYMENT_HMAC_SECRET ---
+
+        @Test
+        void connectException_returnsConnectException() throws Exception {
+            assumeHmacSecretSet();
+            when(mockHttpClient.send(any(), any()))
+                .thenThrow(new ConnectException("Connection refused"));
+
+            String result = controller.sendPaymentServer(createValidCreditcard());
+            assertEquals("ConnectException", result);
+        } // end test
+
+        @Test
+        void httpTimeoutException_returnsMessage() throws Exception {
+            assumeHmacSecretSet();
+            when(mockHttpClient.send(any(), any()))
+                .thenThrow(new HttpTimeoutException("request timed out"));
+
+            String result = controller.sendPaymentServer(createValidCreditcard());
+            assertEquals("request timed out", result);
+        } // end test
+
+        @SuppressWarnings("unchecked")
+        @Test
+        void nonOkStatus_returnsStatusCode() throws Exception {
+            assumeHmacSecretSet();
+            HttpResponse<String> mockResponse = mock(HttpResponse.class);
+            when(mockResponse.statusCode()).thenReturn(400);
+            when(mockResponse.body()).thenReturn("{\"error\":\"bad request\"}");
+            when(mockResponse.uri()).thenReturn(URI.create("https://localhost:5000/creditcard"));
+            when(mockResponse.version()).thenReturn(HttpClient.Version.HTTP_1_1);
+            when(mockResponse.headers()).thenReturn(
+                HttpHeaders.of(Map.of(), (k, v) -> true));
+            doReturn(mockResponse).when(mockHttpClient).send(any(), any());
+
+            String result = controller.sendPaymentServer(createValidCreditcard());
+            assertEquals("400", result);
+        } // end test
+
+        @SuppressWarnings("unchecked")
+        @Test
+        void okStatus_returns200() throws Exception {
+            assumeHmacSecretSet();
+            HttpResponse<String> mockResponse = mock(HttpResponse.class);
+            when(mockResponse.statusCode()).thenReturn(200);
+            when(mockResponse.body()).thenReturn("{\"status\":\"ok\"}");
+            when(mockResponse.uri()).thenReturn(URI.create("https://localhost:5000/creditcard"));
+            when(mockResponse.version()).thenReturn(HttpClient.Version.HTTP_1_1);
+            when(mockResponse.sslSession()).thenReturn(Optional.empty());
+            HttpHeaders headers = HttpHeaders.of(
+                Map.of(
+                    "set-cookie", List.of("c0=v0; Path=/", "c1=v1; Path=/", "Amount=135.0; Path=/"),
+                    "Currency", List.of("EUR")
+                ),
+                (k, v) -> true);
+            when(mockResponse.headers()).thenReturn(headers);
+            doReturn(mockResponse).when(mockHttpClient).send(any(), any());
+
+            String result = controller.sendPaymentServer(createValidCreditcard());
+            assertEquals("200", result);
+        } // end test
+
+        @Test
+        void exceptionNullMessage_returnsServerUnavailable() throws Exception {
+            assumeHmacSecretSet();
+            // RuntimeException non captée par le inner catch → outer catch (Exception e)
+            when(mockHttpClient.send(any(), any()))
+                .thenThrow(new RuntimeException((String) null));
+
+            String result = controller.sendPaymentServer(createValidCreditcard());
+            assertEquals("ServerUnavailable", result);
+        } // end test
+
+        @Test
+        void exceptionRequestTimedOut_returnsTimedOutMessage() throws Exception {
+            assumeHmacSecretSet();
+            when(mockHttpClient.send(any(), any()))
+                .thenThrow(new RuntimeException("request timed out"));
+
+            String result = controller.sendPaymentServer(createValidCreditcard());
+            assertEquals("request timed out", result);
+        } // end test
+
+        @Test
+        void generalException_returnsExceptionMessage() throws Exception {
+            assumeHmacSecretSet();
+            when(mockHttpClient.send(any(), any()))
+                .thenThrow(new RuntimeException("unexpected error"));
+
+            String result = controller.sendPaymentServer(createValidCreditcard());
+            assertEquals("unexpected error", result);
         } // end test
 
     } // end nested class

@@ -61,11 +61,11 @@ public class ParticipantsRoundList implements Serializable {
             throw new IllegalArgumentException("Round cannot be null");
         }
 
-        // Validation : 18 trous requis
-        if (round.getRoundHoles() != 18) {
-            LOG.warn("Round {} has {} holes, expected 18", round.getIdround(), round.getRoundHoles());
+        // Validation : 9 ou 18 trous requis
+        if (round.getRoundHoles() != 9 && round.getRoundHoles() != 18) {
+            LOG.warn("Round {} has {} holes, expected 9 or 18", round.getIdround(), round.getRoundHoles());
             throw new InvalidRoundException(
-                "Le round doit avoir exactement 18 trous. Trouvé : " + round.getRoundHoles()
+                "Le round doit avoir 9 ou 18 trous. Trouvé : " + round.getRoundHoles()
             );
         }
 
@@ -120,11 +120,11 @@ public class ParticipantsRoundList implements Serializable {
                 }
                 LOG.debug("ending with liste = {}", Arrays.deepToString(liste.toArray()));
                 // https://stackoverflow.com/questions/369512/how-to-compare-objects-by-multiple-fields
-                liste.sort(Comparator.comparingInt((ECourseList p) -> p.classment().getTotalPoints()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast9()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast6()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast3()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast1()).reversed());
+                liste.sort(Comparator.comparingInt((ECourseList p) -> p.classment().getTotalPoints() != null ? p.classment().getTotalPoints() : 0).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast9() != null ? p.classment().getLast9() : 0).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast6() != null ? p.classment().getLast6() : 0).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast3() != null ? p.classment().getLast3() : 0).reversed()
+                        .thenComparingInt((ECourseList p) -> p.classment().getLast1() != null ? p.classment().getLast1() : 0).reversed());
                 liste.forEach(item -> LOG.debug("liste AFTER sort = " + item.player().getPlayerFirstName()
                         + " / " + item.player().getIdplayer() + " / " + item.classment()));
                 return liste;

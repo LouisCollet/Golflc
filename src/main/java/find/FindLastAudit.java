@@ -49,9 +49,7 @@ public class FindLastAudit implements Serializable {
                     a = entite.Audit.mapAudit(rs);
                 }
                 if (i == 0) {
-                    String msg = "Empty Result Table in " + methodName + " for player = " + audit.getAuditPlayerId();
-                    LOG.error(msg);
-                    utils.LCUtil.showMessageFatal(msg);
+                    LOG.debug(methodName + " - no audit record for player = " + audit.getAuditPlayerId());
                 } else {
                     LOG.debug("ResultSet FindLastAudit has " + i + " lines.");
                 }

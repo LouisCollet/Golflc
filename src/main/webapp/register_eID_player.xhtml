@@ -1,48 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE html>
-<html
+<ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
->
-<ui:composition template="templates/masterTemplate.xhtml">
+      template="templates/masterTemplate.xhtml">
 <ui:define name="title">Register Page </ui:define>
 
 <ui:define name="content">
-<h:graphicImage 
-                name="images/eIDreader.jpg"
-                alt="image missing :golf_reader_eid.jpg"
-                style="float: left;">
-</h:graphicImage>
 
-<h:graphicImage 
-                name="images/golf_chrono.jpg"
-                alt="image missing :golf_tee.jpg"
-                style="float: right;">
-</h:graphicImage>
-    <!-- -->
-    
 <ui:define name="metadata">
     <f:metadata>
         <f:viewAction action="#{playerC.registereIDPlayer()}" />
     </f:metadata>
-</ui:define>    
-    
-<h:form id="register" enctype="application/x-www-form-urlencoded" >
+</ui:define>
 
-<p:panelGrid
-    id="panel"
-    layout="tabular"
-    columns="1"
-    >
-    
-
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
 <f:facet name="header">
     <h1>#{msg['player.register']}</h1>
 </f:facet>
+
+<h:form id="register">
+
+<p:panelGrid
+    id="panel"
+    layout="flex"
+    columns="1">
 
 <h:outputText value="Please Register ! " style="font-weight:bold"/>
 
@@ -64,6 +50,8 @@
 </p:panelGrid>
 
 </h:form>
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>
-</html>

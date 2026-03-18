@@ -12,15 +12,21 @@
 <ui:define name="title">Local Administrator Greenfees</ui:define>
 <ui:define name="content">
 
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>
+        <h:outputText
+            id="RndHeader"
+            rendered="#{appContext.inputSelectPaiement eq 'Greenfees'}"
+            value="#{msg['message.for.paiement.greenfee']}"/>
+    </h1>
+</f:facet>
 
-<h:form id="form_local_admin_greenfee"  >
-<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<h:form id="form_local_admin_greenfee">
    <ui:include src="/include/include_summary_player.xhtml"/>
-<!--
-   sessionMap.get("inputSelectCourse")  -->
-   
- <c:set var="select" value="#{appContext.inputSelectPaiement}"/> 
+
+ <c:set var="select" value="#{appContext.inputSelectPaiement}"/>
    <p:dataTable id="TableLocalAdmin"
                 var="c"
                 widgetVar="customersTable"
@@ -28,16 +34,6 @@
                 sortBy="#{c.club.idclub}"
                 filteredValue="#{memC.filteredCars}" >
 
- <f:facet name="header">
-    <h1>
-        <h:outputText
-            id="Rnd"
-            rendered="#{appContext.inputSelectPaiement eq 'Greenfees'}" 
-            value="#{msg['message.for.paiement.greenfee']}">
-        </h:outputText>
-    </h1>
- </f:facet>
-       
       <p:headerRow  field="club.clubName"
                     expandable="true"
                     expanded="false">
@@ -45,16 +41,11 @@
                         <h:outputText value="#{c.club.clubName} - #{c.club.idclub}"/>
                  </p:column>
        </p:headerRow>
-<!--
-            <p:column headerText="#{msg['club.name']}"
-                      groupRow="true">
-                <h:outputText value="#{c.club.clubName} -  #{c.club.idclub}" />
-            </p:column>
--->
+
             <p:column headerText="#{msg['player.lastname']}">
                       <h:outputText value="#{c.player.playerLastName}" />
               </p:column>
-<!--  field="player.playerLastName"  -->
+
             <p:column id="CustomerStartDateColumn"
                   field="greenfee.roundDate"
                   headerText="#{msg['start.date']}"
@@ -99,7 +90,7 @@
             <p:column headerText="#{msg['cotisation.item']}">
                 <h:outputText value="#{c.greenfee.items}" />
             </p:column>
-<!--  @Named("LAGreenfee") -->
+
     <p:summaryRow>
                 <p:column colspan="2"
                           style="text-align:right">
@@ -112,33 +103,21 @@
                               .map(o->o.getGreenfee().getPrice())
                               .sum()}" >
                          <f:convertNumber locale="es" type="currency" currencySymbol="€" maxFractionDigits="1"/>
-                         <!--  forcer la locale es car fr donne blanc ipv point suite bug java -->
                     </h:outputText>
                 </p:column>
                 <p:column colspan="3">
                     <h:outputText value=""/>
-                </p:column> 
+                </p:column>
     </p:summaryRow>
 
  <f:facet name="footer">
-  <!-- enlevé 24-08-2025 donne deprecation in com.lowagie
-   <p:commandButton icon="pi pi-file-excel"
-                    value="Export as Excel (XLSX)" >
-       <p:dataExporter type="xlsxstream"
-                       postProcessor="#{customizedDocumentsView.postProcessXLS}"
-                       target="TableLocalAdmin"
-                       fileName="GreenfeesPaid" />
-   </p:commandButton>
-   <p:commandButton value="PDF" styleClass="mr-2 mb-2">
-            <p:dataExporter type="pdf"
-                            target="TableLocalAdmin"
-                            fileName="GreenfeesPaid"
-                            preProcessor="#{customizedDocumentsView.preProcessPDF}"/>
-        </p:commandButton>
-    --> 
+  <!-- enlevé 24-08-2025 donne deprecation in com.lowagie -->
 </f:facet>
 </p:dataTable>
 </h:form>
- 
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

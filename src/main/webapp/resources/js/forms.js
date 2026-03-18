@@ -171,6 +171,14 @@ function __reset() {
  function handleMsg(msg){
         alert(msg);
     }
+
+// 04-03-2026 — Cache le menu latéral et passe le contenu en pleine largeur
+function hideMenuFullWidth() {
+    var menuCol = document.querySelector('.col-2');
+    var contentCol = document.querySelector('.col-10');
+    if (menuCol) menuCol.style.display = 'none';
+    if (contentCol) { contentCol.classList.remove('col-10'); contentCol.classList.add('col-12'); }
+}
 function PrintElem(elem){
     alert("PrintElem" + elem );
     var jsPrintSetup = document.getElementById("form_scorecard");

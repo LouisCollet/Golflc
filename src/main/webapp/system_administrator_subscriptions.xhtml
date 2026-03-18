@@ -11,16 +11,19 @@
 <ui:define name="title">System Administrator Subscriptions</ui:define>
 <ui:define name="content">
 
-<div class="card">
-<h:form id="form_local_admin_cotisations" enctype="application/x-www-form-urlencoded" >
-<h:graphicImage id="graphic1" name="images/administrator1.png" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/administrator2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>
+        <h:outputText value="#{msg['message.for.paiement.subscription']}"/>
+    </h1>
+</f:facet>
+
+<h:form id="form_local_admin_cotisations">
    <ui:include src="/include/include_summary_player.xhtml"/>
-<!--
-   sessionMap.get("inputSelectCourse")  -->
-   
-<c:set var="select" value="#{appContext.inputSelectPaiement}"/> 
- 
+
+<c:set var="select" value="#{appContext.inputSelectPaiement}"/>
+
    <p:dataTable id="TableSubscriptions"
                 var="c"
                 widgetVar="subscriptionTable"
@@ -28,25 +31,9 @@
                 filteredValue="#{memC.filteredCars}"
                 multiViewState="true" >
 
- <f:facet name="header">
-    <h1>        <h:outputText
-            value="#{msg['message.for.paiement.subscription']}">
-        </h:outputText>    </h1>
- </f:facet>
- <!--     
-      <p:headerRow  field="club.clubName"
-                    expandable="true"
-                    expanded="false">
-                <p:column colspan="7">
-                    <h:outputText value="#{c.player.playerLastName} - #{c.player.idplayer}"/>
-                 </p:column>
-       </p:headerRow>
- 
-
--->
             <p:column headerText="#{msg['player.lastname']}"
                       width="20%">
-                       <h:outputText value="#{c.player.playerLastName} (#{c.player.idplayer})" /> 
+                       <h:outputText value="#{c.player.playerLastName} (#{c.player.idplayer})" />
             </p:column>
 
             <p:column id="StartDate"
@@ -58,7 +45,7 @@
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                  </h:outputText>
                 <f:facet name="filter">
-                    <p:datePicker 
+                    <p:datePicker
                         selectionMode="range"
                         rangeSeparator=":"
                         size="20"
@@ -84,7 +71,7 @@
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
                 </h:outputText>
                 <f:facet name="filter">
-                    <p:datePicker 
+                    <p:datePicker
                         selectionMode="range"
                         rangeSeparator=":"
                         size="20"
@@ -108,39 +95,21 @@
                       width="20%"/>
 
             <p:column headerText="#{msg['subscription.amount']}"
-                      footerText="TOTAL #{msg['subscription.amount']} = #{SASubscription.getListe().stream().map(o->o.getSubscription().getSubscriptionAmount()).sum()}"
                       field="subscription.subscriptionAmount"
                       sortable="false"
                       filterable="false"
-                      width="5%"/>
-          
+                      width="5%">
+                <f:facet name="footer">
+                    TOTAL #{msg['subscription.amount']} = #{SASubscription.getListe().stream().map(o->o.getSubscription().getSubscriptionAmount()).sum()}
+                </f:facet>
+            </p:column>
+
             <p:column headerText="#{msg['subscription.paymentdate']}">
                     <h:outputText value="#{c.subscription.paymentDate}" >
                         <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
                     </h:outputText>
             </p:column>
-            
- <!-- 
 
-  <p:summaryRow>
-                <p:column colspan="3" style="text-align:right">
-                    <h:outputText value="Total Recettes:"/>
-                </p:column>
-                <p:column>
-                    <h:outputText value="#{SASubscription.getListe()
-                              .stream()
-                              
-                              .map(o->o.getSubscription().getSubscriptionAmount())
-                              .sum()}" >
-                         <f:convertNumber locale="es" type="currency" currencySymbol="€" maxFractionDigits="1"/>
-                    </h:outputText>
-
-                </p:column>
-                <p:column colspan="3">
-                    <h:outputText value=""/>
-                </p:column> 
-  </p:summaryRow>
--->
  <f:facet name="footer">
    <p:commandButton icon="pi pi-file-excel"
                     value="Export as Excel (XLSX)" >
@@ -151,6 +120,9 @@
 </f:facet>
 </p:dataTable>
 </h:form>
-  </div>  
+
+</p:panel>
+</div>
+
 </ui:define>
 </ui:composition>

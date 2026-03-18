@@ -1,23 +1,13 @@
 @charset "UTF-8";
 /* https://www.w3schools.com/css/default.asp */
 
-
-/*  The universal selector (*) selects all HTML elements on the page.  
-https://www.w3schools.com/css/css_rwd_grid.asp*/
 * {
      box-sizing: border-box;
 }
-/*  HTML element new 20-06-2023
-https://refine.dev/blog/rem-vs-em/#what-is-css-rem*/
-/* Root font-size on the document level 
-Do note that it is often considered a bad idea to explicitly set the root font-size to a px value.
-This is because it overrides the user’s browser setting.
-A recommended method is to use % unit or avoid setting the root font-size explicitly.
-This sets the font-size to 100% of the browser’s default font-size, which is 16px for most browsers.*/
+
 html{
     font-size: 100%;
- }
-
+}
 
 body {
     font-size: 1.1rem;
@@ -25,29 +15,27 @@ body {
     font-family: Verdana, sans-serif;
 }
 
-/* The element selector selects HTML elements based on the element name.  */
-/*  HTML element déplacé 17-04-2022 */
 h1{
-    font-size: 2.0rem;   /* 40px/16=2.5em */
+    font-size: 2.0rem;
     color: green;
     font-weight: bold;
     font-family: Georgia, sans-serif;
     text-align: center;
 }
 h2{
-    font-size: 1.5rem;   /* 40px/16=2.5em */
+    font-size: 1.5rem;
     color: blue;
     font-weight: bold;
     font-family: Georgia, serif;
 }
 h3{
-    font-size: 1.5rem;   /* 40px/16=2.5em */
+    font-size: 1.5rem;
     color: red;
     font-weight: bold;
     font-family: Georgia, serif;
 }
 h4{
-    font-size: 0.5rem;   /* 40px/16=2.5em */
+    font-size: 0.5rem;
     color: yellow;
     font-weight: bold;
     font-family: Georgia, serif;
@@ -57,24 +45,18 @@ th, td {
 }
 table{
    margin-left: auto;
-   margin-right: auto; /* center the table */
-   border-collapse:collapse;  /* table borders should be collapsed into a single border:  */
+   margin-right: auto;
+   border-collapse:collapse;
    border: 1px;
    background-color: springgreen;
 }
-/*  To select an element with a specific id, write a hash (#) character, followed by the id of the element. */
-/* To select elements with a specific class, write a period (.) character, followed by the class name.  */
 
-/* dans selectPlayer.xhtml and show_scorecard_whs.xhtml*/
 .highlight {
     background-color: skyblue !important;
     background-image: none !important;
     color: #ffffff !important;
 }
 
-
-/*https://dzone.com/articles/how-customize-growl-primefaces
- message positionné à gauche (default = droite)  left: 37%;   */
 .ui-growl {
     left: 5%;
     position:fixed;
@@ -91,7 +73,7 @@ table{
     font-size: 1.0em;
     letter-spacing: -1px;
 }
-/*https://searchcode.com/codesearch/view/2686073/*/
+
 .ui-messages-info-summary, .ui-messages-warn-summary, .ui-messages-error-summary, .ui-messages-fatal-summary{
     text-align:left;
     font-family: Verdana;
@@ -101,7 +83,7 @@ table{
     margin: 0;
     padding: 0;
 }
-/*   gouping selector */*
+
 .ui-messages-info,.ui-messages-warn,.ui-messages-error{
         text-align:left;
         min-height: 20px;
@@ -116,7 +98,7 @@ table{
     margin: 1px;
     padding: 5px 0px 5px 0px;
     background-color: black ;
-    font-size: 2rem;   /* 40px/16=2.5em */
+    font-size: 2rem;
     color: red; 
     font-weight: bold;
     font-style: italic;
@@ -124,88 +106,86 @@ table{
     border-color: yellow;
     border : 3px;
 }
-/*  17-04-2022 footer et help overlay  */
 
 .header-footer {
   font-size:13px;
-  color:graytext; /* mod 25-11-2025  */
+  color:graytext;
   border: 1px solid #333;
   box-shadow: 8px 8px 5px #444;
   padding: 8px 12px;
   background-image: linear-gradient(180deg, #fff, #ddd 40%, #ccc);
 }
 
-/* The grouping selector selects all the HTML elements with the same style definitions.
-It will be better to group the selectors, to minimize the code.
-To group selectors, separate each selector with a comma.
-dans html = columnClasses="col1,col2"
-fonctionne pour layout="tabular"
-*/
-/* mod 19-10-2023 compatibilité arya 
-mod 10-12-2024 pour compatibilité PF15*/
+/* ============================================================
+   PANELGRID COLUMNS — col1/col2 (layout tabular)
+   ============================================================ */
 td.ui-panelgrid-cell.col1, td.ui-panelgrid-cell.col3{
     font-style:normal;
     font-weight: bold;
     color:dodgerblue;
-    background-color:yellow; /* !important */
+    background-color:yellow;
 }
 td.ui-panelgrid-cell.col2, td.ui-panelgrid-cell.col4{
     font-style: italic;
     font-weight: normal;
     color:gray;
-    background-color:whitesmoke; /*  */
-}
-td.ui-panelgrid-cell.col1Flex{
-    font-style:normal;
-    font-weight: bold;
-    color: dodgerblue;
-    background-color:yellowgreen
-}
-td.ui-panelgrid-cell.col2Flex{
-    font-style: italic;
-    background-color:darkolivegreen;
-    font-weight: normal;
-    color:gray;
+    background-color:whitesmoke;
 }
 
-ui.fieldset.legend{  /* non !inscription_other_players.xhtml  */
+/* ============================================================
+   PANELGRID COLUMNS — col1Flex/col2Flex (layout flex)
+   FIX: col2Flex était darkolivegreen (fond trop sombre/gris)
+        → remplacé par whitesmoke pour une meilleure lisibilité
+   ============================================================ */
+td.ui-panelgrid-cell.col1Flex{
+    font-style: normal;
+    font-weight: bold;
+    color: dodgerblue;
+    background-color: #e8f4fd;   /* FIX: était yellowgreen → bleu très pâle, plus doux */
+    vertical-align: middle;
+    text-align: left;             /* ← NOUVEAU */
+    padding: 0.5rem 0.75rem;
+}
+td.ui-panelgrid-cell.col2Flex{
+    font-style: normal;          /* FIX: était italic → normal, plus lisible */
+    background-color: whitesmoke; /* FIX: était darkolivegreen (très sombre) → whitesmoke */
+    font-weight: normal;
+    color: #333;                 /* FIX: était gray → gris foncé plus lisible */
+    vertical-align: middle;
+    text-align: left;             /* ← NOUVEAU */
+    padding: 0.5rem 0.75rem;
+}
+
+ui.fieldset.legend{
     font-style:normal;
     font-weight: bold;
     color: blue !important;
     background-color:greenyellow !important;
 }
 
-
-/*  background color texte menu */
 span.ui-menuitem-text {   
-  /*  background-color: red; */
+  /* background-color: red; */
 }
 
-/*  background color texte menu */
 .ui-menuitem-text{
     background-color:green;
-    color:yellow;/* was white  */
+    color:yellow;
 }
 .ui-panelmenu-header{
     color:yellow;
 }
 
-/* 17-04-2022 used by schedule_pro.xhtml  */
 .ui-custompanelgrid, .ui-custompanelgrid td {
    font-weight:bold;
    background-color:whitesmoke;
    font-size: 1.25em;
- 
-   /*  22-12-2022 ne fonctionne pas   border : 3px;*/
 }
 
-/* pour le menu principal  */
 .ui-menuitem-link{
      font-size: 0.9rem;
      font-style: italic;
 }
 
-/* pour le menu principal ??*/
 .ui-menuitem-text{
      font-size: 0.8rem;
      font-style: italic;
@@ -214,99 +194,824 @@ span.ui-menuitem-text {
 .columnborder1{
     border-right-width:5px;color:red
 }
-/*  22-12-2022 ne fonctionne pas */
+
 .flag {
 	background: url("\#{resource['styles:flags/flags_responsive.png']}") no-repeat;
 	background-size: 100%;
 	vertical-align: middle;
 }
-/*  02-01-2023  */
+
+/* 04-03-2026 dataTable compacte */
+.compact-table {
+    font-size: 0.80rem;
+}
+.compact-table .ui-button {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+}
+.compact-table .ui-datatable-footer .ui-button {
+    font-size: 1.0rem;
+    padding: 0.5rem 1.0rem;
+}
+
 .ui-datatable-empty-message {
    font-size: 1.5rem;
    font-weight: bold;
    color: red; 
    font-style: italic;
 }
-/* 
-("\#{resource['styles/flags/flags_responsive.png']}")
-/*  12-06-2023  */
+
 .outputLabel{
     color:skyblue;
 }
 
-/* new 20-06-2023 centrer et size ALL panelgrids !!  */
+/* ============================================================
+   PANELGRID global
+   ============================================================ */
 .ui-panelgrid{
     margin: 0 auto;
     width: 50%;
-    background-color:gray ; /* was whitesmoke  */
+    background-color: gray;
 }
-/* new 22-06-2023 PF 13 panelgrid avec layout="flex" change la couleur !!  */
+
 .ui-panelgrid-cell{
     border:1px;
-    color:black /*  new 11-12-2024 */
-}   
-
-/* 21-10-2023 schedule_pro.xhtml 
-removed 15-12-2024 fin enlevé */
+    color:black;
+}
 
 .fc-timegrid-slot {
     height: 40px; 
 }
-
 .fc-timegrid-slot-label {
     height: 30px; 
     color:black; 
 }
-
 .fc-timegrid-axis-cushion {
     height: 100px; 
     color:blue; 
     font-size: 1rem;
 }
 
-/* 24-10-2023 datepicker  */
 .ui-datepicker-calendar{
     background-color:activeborder;
     color:black;
     font-weight: bold;
 }
 
-/*https://www.w3schools.com/css/css_table.asp 
-By default, the content of <th> elements are center-aligned and the content of <td> elements are left-aligned.
-By default, the vertical alignment of the content in a table is middle (for both <th> and <td> elements)*/
-
-/* s'applique d'office à tous les panelgrid */
 .ui-panelgrid-cell th{
     background-color:yellow !important;
     font-weight: bold;
     border: none;
 }
-
 .ui-panelgrid tr{
     border: none;
 }
 
-/* Fond jaune dans dialogTemplate.xhtml*/
-.bg-yellow {
-    background-color: #FFEB3B;
+/* ============================================================
+   BACKGROUNDS UTILITAIRES
+   ============================================================ */
+.bg-yellow        { background-color: #FFEB3B; }
+.bg-yellow-light  { background-color: #FFF9C4; }
+.bg-yellow-box    { background-color: #FFEB3B; padding: 1rem; border-radius: 4px; }
+.bg-warning       { background-color: #FFF3CD; border: 1px solid #FFE69C; color: #856404; }
+
+.danger-confirm .ui-dialog-content {
+    color: red;
+    font-weight: bold;
+    font-size: 1.1em;
 }
 
-/* Fond jaune pâle */
-.bg-yellow-light {
-    background-color: #FFF9C4;
+/* ============================================================
+   TARIF GREENFEE WIZARD — styles spécifiques
+   ============================================================ */
+
+/* Conteneur wizard — centré à 70% de la page */
+.tarif-wizard {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.tarif-wizard .ui-wizard-content {
+    display: flex;
+    justify-content: center;
 }
 
-/* Fond jaune avec padding */
-.bg-yellow-box {
-    background-color: #FFEB3B;
-    padding: 1rem;
+/* Titre des onglets — remplace titleStyle="font-size: 1.0rem;" inline sur chaque p:tab */
+.tarif-wizard .ui-wizard-step-titles li {
+    font-size: 1.0rem;
+}
+
+/* Conteneur wizard (ancien) */
+.tarif-steps {
+    max-width: 700px;
+    margin: 1.5rem auto;
+}
+
+/* Panel de chaque étape — centré */
+.tarif-step-panel {
+    width: 100%;
+    margin: 1rem auto;
+    border-radius: 6px;
+    overflow: hidden;
+    text-align: center;
+}
+.tarif-step-panel .ui-panelgrid {
+    margin: 0 auto;
+}
+.tarif-step-panel .ui-button {
+    display: inline-block;
+}
+
+/* FIX: en-tête du panel — supprime l'affichage brut des balises
+   Le <h1> du bundle est rendu via escape="false" dans le facet,
+   on le remet en ligne et on ajuste la taille */
+.tarif-step-panel .ui-panel-titlebar h1,
+.tarif-step-panel .ui-panel-titlebar h2,
+.tarif-step-panel .ui-panel-titlebar h3 {
+    display: inline;
+    font-size: 1.1rem;       /* réduit pour que ça tienne dans la barre */
+    font-family: Verdana, sans-serif;
+    color: inherit;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+/* Footer du panel : espace entre boutons */
+.tarif-step-panel .ui-panel-footer {
+    text-align: center;
+    padding: 0.75rem;
+}
+.tarif-step-panel .ui-panel-footer .ui-button {
+    margin: 0 0.3rem;
+}
+
+/* Panelgrid dans wizard : largeur 100% du panel parent */
+.tarif-step-panel .ui-panelgrid {
+    width: 100%;
+    background-color: transparent;
+}
+
+/* Suppression de la couleur de fond du panelgrid wizard
+   pour ne pas doubler avec le fond du panel */
+.tarif-step-panel td.ui-panelgrid-cell.col1Flex {
+    background-color: #deeeff;
+    border-radius: 3px 0 0 3px;
+}
+.tarif-step-panel td.ui-panelgrid-cell.col2Flex {
+    background-color: #f8f9fa;
+    border-radius: 0 3px 3px 0;
+}
+
+/* Boutons Basic / Hours / Days — fond bleu */
+.pricing-type-selector .ui-button {
+    background-color: #2196F3 !important;
+    border-color: #1976D2 !important;
+    color: #ffffff !important;
+}
+.pricing-type-selector .ui-button.ui-state-active {
+    background-color: #0D47A1 !important;
+    border-color: #0D47A1 !important;
+    color: #ffffff !important;
+}
+
+/* Panel de suppression — avertissement jaune */
+.tarif-delete-panel .ui-panel-titlebar {
+    background-color: #FFF3CD;
+    border-color: #FFE69C;
+    color: #856404;
+}
+.ui-badge {
+    margin-left: 0.4rem;
+}
+/* Wizard — remplace style="width:70%; margin:auto;" inline */
+.tarif-wizard {
+    width: 70%;
+    margin: auto;
+}
+
+/* Titres onglets — remplace titleStyle="font-size:1.0rem;" inline */
+.tarif-wizard .ui-wizard-step-titles li {
+    font-size: 1.0rem;
+}
+
+/* Badge — espace après le texte */
+.ui-badge {
+    margin-left: 0.4rem;
+}
+
+/* Panel de chaque étape */
+.tarif-step-panel {
+    max-width: 560px;
+    margin: 1rem auto;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Titre h1/h2/h3 dans le header du panel (escape="false") */
+.tarif-step-panel .ui-panel-titlebar h1,
+.tarif-step-panel .ui-panel-titlebar h2,
+.tarif-step-panel .ui-panel-titlebar h3 {
+    display: inline;
+    font-size: 1.1rem;
+    font-family: Verdana, sans-serif;
+    color: inherit;
+    font-weight: bold;
+    margin: 0; padding: 0;
+}
+
+/* Footer — boutons centrés et espacés */
+.tarif-step-panel .ui-panel-footer {
+    text-align: center;
+    padding: 0.75rem;
+}
+.tarif-step-panel .ui-panel-footer .ui-button {
+    margin: 0 0.3rem;
+}
+
+/* Panelgrid dans le panel : 100% largeur, fond transparent */
+.tarif-step-panel .ui-panelgrid {
+    width: 100%;
+    background-color: transparent;
+}
+
+/* Colonnes dans tarif-step-panel */
+.tarif-step-panel td.ui-panelgrid-cell.col1Flex {
+    background-color: #deeeff;
+    text-align: left;
+}
+.tarif-step-panel td.ui-panelgrid-cell.col2Flex {
+    background-color: #f8f9fa;
+    text-align: left;
+}
+
+/* Champs de saisie — fond blanc (écrase le noir du thème sombre) */
+.tarif-step-panel .ui-inputfield,
+.tarif-step-panel .ui-inputtext,
+.tarif-step-panel .ui-inputnumber-input {
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ced4da;
     border-radius: 4px;
 }
 
-/* Avertissement jaune */
-.bg-warning {
-    background-color: #FFF3CD;
-    border: 1px solid #FFE69C;
-    color: #856404;
+/* selectOneMenu — remplace style="font-weight:bold;" inline */
+.tarif-step-panel .ui-selectonemenu {
+    font-weight: bold;
 }
 
+/* textEditor — remplace style="width:100%;background-color:whitesmoke;..." inline */
+.tarif-step-panel .ui-editor-container {
+    width: 100%;
+    background-color: whitesmoke;
+    font-weight: normal;
+}
+
+/* Panel delete — avertissement jaune */
+.tarif-delete-panel .ui-panel-titlebar {
+    background-color: #FFF3CD;
+    border-color: #FFE69C;
+    color: #856404;
+}
+/* ─── Account Menu Cards (welcome.xhtml) ─────────────────────────── */
+
+.account-menu {
+    margin-top: 1.25rem;
+    width: 100%;
+}
+
+.account-menu-section-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+   
+    color: #1a2e1a;  /* était #6b7280 (gris) */
+    margin: 1rem 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.account-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+}
+
+/* Override PrimeFaces button reset pour nos cards */
+a.account-card {
+    background: var(--surface-ground, #f8f9fa);
+    border: 1.5px solid transparent;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;  /* était 0.85rem 1rem */
+    text-align: left;
+    width: 100%;
+    gap: 0.6rem;  /* espace entre icône et textes */
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
+}
+
+.account-card.p-button:enabled:hover {
+    border-color: var(--primary-color, #4a7c4a);
+    background: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.account-card .p-button-label {
+    width: 100%;
+}
+
+.account-card-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.85rem 1rem;
+}
+
+.account-card-icon {
+    font-size: 1.8rem;  /* était 1.3rem */
+    color: var(--primary-color, #4a7c4a);
+    margin-bottom: 0.15rem;
+}
+
+.account-card-label {
+    display: block;  /* ← essentiel */
+    font-size: 1rem;    /* était 0.83rem */
+    font-weight: 600;
+    color: var(--text-color, #1a1a1a);
+    line-height: 1.3;
+}
+
+.account-card-desc {
+    display: block;  /* ← essentiel */
+    font-size: 0.8rem;  /* était 0.7rem */
+    color: var(--text-color-secondary, #6b7280);
+    line-height: 1.4;
+}
+/* Supprimer le style lien par défaut */
+a.account-card,
+a.account-card:hover,
+a.account-card:visited {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Meilleur contraste avec le fond */
+a.account-card {
+    background: #ffffff;
+    border: 1.5px solid #d1d5db;
+    padding: 1.25rem 1.5rem;  /* était 0.85rem 1rem */
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+a.account-card:hover {
+    border-color: var(--primary-color, #4a7c4a);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+    transform: translateY(-1px);
+}
+.account-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+/* ================================================
+   PAYMENT PAGE — à coller à la fin de styles2022.css
+   ================================================ */
+
+/* p:card conteneur */
+.pay-card.ui-card {
+    max-width: 460px;
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+.pay-card.ui-card .ui-card-body,
+.pay-card.ui-card .ui-card-content { padding: 0; }
+
+/* Hero montant (header du p:card) */
+.pay-card.ui-card .ui-card-header { padding: 0; }
+.pay-hero {
+    background: #0f172a;
+    padding: 2rem 1.5rem 1.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+.pay-hero-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+.pay-hero-amount {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    line-height: 1.1;
+}
+.pay-hero-currency {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #60a5fa;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* p:panelGrid lignes de détails */
+.pay-grid.ui-panelgrid { width: 100%; }
+.pay-grid .ui-panelgrid-cell {
+    padding: 0.65rem 1.5rem !important;
+    border: none !important;
+    background: transparent !important;
+}
+.pay-grid .ui-panelgrid-row:not(:last-child) .ui-panelgrid-cell {
+    border-bottom: 1px solid #f1f5f9 !important;
+}
+.pay-grid-key { font-size: 0.85rem; color: #64748b; }
+.pay-grid-val { font-size: 0.85rem; font-weight: 500; color: #1e293b; text-align: right; }
+.pay-mono { font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
+
+/* Footer du p:card */
+.pay-card.ui-card .ui-card-footer {
+    padding: 0 !important;
+    border-top: 1px solid #f1f5f9;
+    background: transparent;
+}
+
+/* Barre de progression */
+.pay-progress-wrap { padding: 1rem 1.5rem 0.75rem; }
+/*
+.pay-progressbar .ui-progressbar-label {  mod 09-03-2026
+    display: block !important;
+    color: #1e293b !important;
+    font-weight: 600;
+    font-size: 0.78rem;
+}*/
+.pay-card .pay-progressbar .ui-progressbar-label {
+    display: block;
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-align: center;
+    line-height: 20px;
+}
+
+
+.pay-progressbar.ui-progressbar {
+    height: 20px !important;  /* était 6px */
+   
+    border-radius: 99px !important;
+    border: none !important;
+    background: #e2e8f0 !important;
+}
+.pay-progressbar .ui-progressbar-value {
+    border-radius: 99px !important;
+    background: #3b82f6 !important;
+}
+
+/* Boutons */
+.pay-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0 1.5rem 1.5rem;
+}
+.pay-btn-pay.ui-button {
+    flex: 1;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 0.75rem !important;
+}
+.pay-btn-pay.ui-button.ui-state-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.pay-btn-cancel.ui-button {
+    border-radius: 10px !important;
+    padding: 0.75rem 1.2rem !important;
+    color: #64748b !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* ============================================================
+   LOGIN PAGE — login.xhtml (refactored 2026-03-16)
+   ============================================================ */
+
+/* Conteneur centré */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem;
+}
+
+/* Card principale */
+.login-card {
+    width: 100%;
+    max-width: 80%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+.login-card.ui-panel {
+    border: none;
+}
+.login-card.ui-panel .ui-panel-titlebar {
+    background: linear-gradient(135deg, #1a5632, #2d7a45);
+    border: none;
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+.login-card.ui-panel .ui-panel-titlebar h1 {
+    display: block;
+    font-size: 1.4rem;
+    font-family: 'Segoe UI', Verdana, sans-serif;
+    color: white;
+    font-weight: 700;
+    margin: 0;
+}
+.login-card.ui-panel .ui-panel-content {
+    padding: 1.5rem 2rem;
+    background: white;
+}
+.login-card.ui-panel .ui-panel-footer {
+    padding: 0.75rem 2rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* Boutons de choix */
+.login-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: #1e293b;
+    cursor: pointer;
+}
+.login-option:hover {
+    border-color: #1a5632;
+    background: #f0fdf4;
+    text-decoration: none;
+    color: #1e293b;
+}
+.login-option-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.login-option-icon.returning {
+    background: #dbeafe;
+    color: #2563eb;
+}
+.login-option-icon.newuser {
+    background: #dcfce7;
+    color: #16a34a;
+}
+.login-option-text {
+    flex: 1;
+}
+.login-option-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+.login-option-desc {
+    font-size: 0.78rem;
+    color: #64748b;
+}
+.login-option-arrow {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    transition: transform 0.2s;
+}
+.login-option:hover .login-option-arrow {
+    color: #1a5632;
+    transform: translateX(4px);
+}
+
+/* Version tag */
+.login-version {
+    background: #f1f5f9;
+    padding: 0.15rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+/* ============================================================
+   WELCOME PAGE — welcome.xhtml (refactored 2026-03-16)
+   ============================================================ */
+
+/* Layout 2 colonnes: info à gauche, photo à droite */
+.welcome-layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+.welcome-left {
+    flex: 1;
+}
+.welcome-right {
+    flex-shrink: 0;
+    text-align: center;
+}
+
+/* Nom du joueur */
+.player-name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.player-firstname {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+}
+.player-lastname {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a5632;
+}
+
+/* Grille info joueur */
+.info-grid {
+    font-size: 0.85rem;
+}
+.info-row {
+    display: flex;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.info-row:last-child {
+    border-bottom: none;
+}
+.info-label {
+    width: 45%;
+    font-weight: 600;
+    color: #2563eb;
+}
+.info-value {
+    width: 55%;
+    color: #334155;
+}
+
+/* ============================================================
+   SUMMARY BAR — réutilisable pour tous les includes summary
+   (player, round, greenfee, etc.)
+   ============================================================ */
+.summary-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.6rem 1.2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.summary-label {
+    color: #1a5632;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.summary-value {
+    color: #334155;
+    font-weight: 500;
+}
+.summary-sep {
+    color: #e2e8f0;
+    margin: 0 0.15rem;
+    user-select: none;
+}
+
+/* ============================================================
+   FORM CARD — réutilisable pour tous les formulaires CRUD
+   (club, course, tee, hole, player, inscription, etc.)
+   ============================================================ */
+.form-card {
+    max-width: 80%;
+}
+.form-card.ui-panel {
+    border: none;
+}
+.form-card.ui-panel .ui-panel-titlebar {
+    background: linear-gradient(135deg, #1a5632, #2d7a45);
+    border: none;
+    padding: 1rem 1.5rem;
+    text-align: center;
+}
+.form-card.ui-panel .ui-panel-titlebar h1 {
+    display: block;
+    font-size: 1.15rem;
+    font-family: 'Segoe UI', Verdana, sans-serif;
+    color: white;
+    font-weight: 700;
+    margin: 0;
+}
+.form-card.ui-panel .ui-panel-content {
+    padding: 1.5rem;
+    background: white;
+}
+.form-card.ui-panel .ui-panel-footer {
+    padding: 0.75rem 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Surcharge des styles globaux dans form-card
+   Spécificité doublée (.ui-panel.form-card) pour battre le thème PrimeFaces */
+.ui-panel.form-card .ui-panelgrid,
+.ui-panel.form-card .ui-panel-content .ui-panelgrid {
+    background-color: transparent;
+    background: transparent;
+    width: 100%;
+    border: none;
+}
+.ui-panel.form-card .ui-panelgrid-cell,
+.ui-panel.form-card .ui-panelgrid .ui-panelgrid-cell {
+    border: none;
+    background: transparent;
+    background-color: transparent;
+}
+.ui-panel.form-card td.ui-panelgrid-cell.col1Flex,
+.ui-panel.form-card .ui-panelgrid-cell.col1Flex {
+    background-color: transparent;
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+    flex: 0 0 40%;
+    max-width: 40%;
+}
+.ui-panel.form-card td.ui-panelgrid-cell.col2Flex,
+.ui-panel.form-card .ui-panelgrid-cell.col2Flex {
+    background-color: transparent;
+    color: #334155;
+    font-weight: normal;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+    flex: 0 0 60%;
+    max-width: 60%;
+}
+.ui-panel.form-card .ui-panelgrid-cell th,
+.ui-panel.form-card .ui-panelgrid th {
+    background-color: transparent;
+}
+.ui-panel.form-card .ui-panelgrid tr {
+    border-bottom: 1px solid #f1f5f9;
+}
+.ui-panel.form-card .ui-panelgrid tr:last-child {
+    border-bottom: none;
+}
+
+/* Inputs dans form-card — style cohérent */
+.form-card .ui-inputfield,
+.form-card .ui-inputtext,
+.form-card .ui-inputnumber .ui-inputnumber-input {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+.form-card .ui-autocomplete .ui-autocomplete-input {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+.form-card .ui-selectonebutton .ui-button.ui-state-active {
+    background-color: #1a5632;
+    color: white;
+    border-color: #1a5632;
+}
+.form-card .ui-button {
+    border-radius: 6px;
+}

@@ -6,57 +6,46 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      template="templates/masterTemplate.xhtml" >
+      template="templates/masterTemplate.xhtml">
 
-<ui:define name="title">Credit Card Payment Executed</ui:define>
+<ui:define name="title">Credit Card Payment Canceled</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/paid1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/paid2.png" alt="image missing :tarif2.jpg" style="float:right;"></h:graphicImage>
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['title.payment.canceled']}</h1></f:facet>
 
-<h:form id="creditcard_payment_canceled" >
+<h:form id="creditcard_payment_canceled">
 
  <p:panelGrid
     id="panelGrid1"
     columns="2"
-    layout="tabular"
-    columnClasses="col1,col2">
+    layout="flex"
+    columnClasses="col1Flex,col2Flex">
 
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['title.payment.canceled']}" />
-</f:facet>
     <h:outputText  id="Total"
                 value="#{msg['creditcard.amountpaid']} :" />
-   
+
     <h:outputText  id="TotalPrice"
                 value="#{payC.creditcard.totalPrice}"
                 style="font-size: 3rem;text-decoration: line-through;" />
-   
+
     <h:outputText value="#{msg['tarif.members.currency']} :" />
     <h:outputText value="#{payC.creditcard.creditcardCurrency}"
-                  style="font-size: 2em; " />
-    
+                  style="font-size: 2em;" />
+
     <h:outputText value="#{msg['creditcard.communication']} :" />
     <h:outputText id="Communication"
                   value="#{payC.creditcard.communication}"
                   title="#{msg['tooltip.club.clubaddress']}" />
-    
+
     <h:outputText value="#{msg['creditcard.holder']} :" />
     <h:outputText  id="Holder"
                    value="#{payC.creditcard.creditcardHolder}" />
-    
+
     <h:outputText  value="#{msg['creditcard.number']} :"/>
     <h:outputText  id="creditcardNumber"
                    value="#{payC.creditcard.creditCardNumberSecret}" />
- <!--   
-    <h:outputText value="#{msg['creditcard.type']} :"   />
-    <h:outputText  id="TypeCreditcard"
-                   value="#{payC.creditcard.creditcardType}" />
 
-    <h:outputText id="communication"
-                  value="#{msg['creditcard.reference']} : "/>
-    <h:outputText id="taskResult"
-                  value="#{payC.creditcard.creditcardPaymentReference}"/>
--->
     <f:facet name="footer">
          <p:commandButton value="Back to Welcome screen"
                          id="commandButtonReturn"
@@ -66,9 +55,10 @@
                          icon="pi pi-database"
                          action="welcome.xhtml?faces-redirect=true" />
          <p:commandButton value="Back js" icon="pi pi-database" onclick="window.history.back();"/>
-   <!--      <p:commandButton value="Back from bean" action="#{httpC.goBack()}" /> -->
     </f:facet>
 </p:panelGrid>
 </h:form>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

@@ -1,40 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces">
-<h:body>
-<p:panelGrid
-    id="panelgridSummaryPlayerPro"
-    layout="tabular"
-    columnClasses="col1,col2,col1,col2"
-    columns="4" >
+      xmlns:p="primefaces" >
 
-<f:facet name="header">
-    <h1>#{msg['title.summary.player.pro']}</h1>
-</f:facet>
-        <h:outputText value="#{msg['player.id']}" />
-	<h:outputText value="#{playerC.player.idplayer}" />
-      
-        <h:outputText value="#{msg['player.first']}" />
-        <h:outputText value="#{playerC.player.playerFirstName}"/>
- 
-        <h:outputText value="#{msg['player.lastname']}"   />
-        <h:outputText value="#{playerC.player.playerLastName}"/>
-        
-        <h:outputText value="#{msg['club.name']} :"   />
-	<h:outputText value="#{schedulerC.club.clubName} (#{schedulerC.club.idclub})" />
-        
-        <h:outputText value="ProId : " />
-        <h:outputText value="#{schedulerC.getProfessional().proId}"/> <!-- getProfessional because professional is static !!   -->
-    
-        <h:outputText value="Pro First, Last name : "/>
-        <h:outputText value="#{schedulerC.playerPro.playerFirstName}, #{schedulerC.playerPro.playerLastName}" />
-        
-</p:panelGrid>
-<p:divider layout="horizontal" type="solid" />
-</h:body>
+    <h:panelGroup layout="block" styleClass="summary-bar">
+        <span class="summary-item">
+            <span class="summary-label">#{msg['player.id']}</span>
+            <span class="summary-value">#{playerC.player.idplayer}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['player.first']}</span>
+            <span class="summary-value">#{playerC.player.playerFirstName}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['player.lastname']}</span>
+            <span class="summary-value">#{playerC.player.playerLastName}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['club.name']}</span>
+            <span class="summary-value">#{schedulerC.club.clubName} (#{schedulerC.club.idclub})</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">ProId</span>
+            <span class="summary-value">#{schedulerC.getProfessional().proId}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">Pro Name</span>
+            <span class="summary-value">#{schedulerC.playerPro.playerFirstName}, #{schedulerC.playerPro.playerLastName}</span>
+        </span>
+    </h:panelGroup>
+
 </ui:composition>

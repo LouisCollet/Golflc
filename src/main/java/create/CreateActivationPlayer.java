@@ -1,6 +1,5 @@
 package create;
 
-import Controllers.LanguageController;
 import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
@@ -55,8 +54,8 @@ public class CreateActivationPlayer implements Serializable {
                             + "&lastname=" + player.getPlayerLastName().replaceAll(" ", "%20")
                             + "&language=" + player.getPlayerLanguage();
                     LOG.debug("** href for activation new player = " + href);
-                    LanguageController.setLanguage(player.getPlayerLanguage());
-                    // new mail.ActivationMail().sendMailAccountCreated(player, href)
+                    // LanguageController.setLanguage removed — fix multi-user 2026-03-07
+                    // Language is already available via player.getPlayerLanguage()
                     if (activationMail.sendMailAccountCreated(player, href)) { // migrated 2026-02-26
                         String msg = LCUtil.prepareMessageBean("create.registration.mail");
                         LOG.debug(msg);

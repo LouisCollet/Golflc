@@ -180,7 +180,7 @@ https://primefaces.github.io/primefaces/11_0_0/#/core/themes
 <context-param>
     <description>Primefaces Theming</description>
     <param-name>primefaces.THEME</param-name>
-    <param-value>mycooltheme</param-value> <!-- arya  avec primefaces-material-deeppurple-dark-->
+    <param-value>saga</param-value> <!-- was mycooltheme (dark) — switched to saga (light) 2026-03-16 -->
 </context-param>
     
 <!--  https://primefaces.github.io/primefaces/15_0_0/#/core/ajaxPartialsubmit -->

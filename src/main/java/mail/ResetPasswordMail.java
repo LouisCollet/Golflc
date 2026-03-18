@@ -41,11 +41,11 @@ public class ResetPasswordMail implements Serializable {
                 + " <br/> The GolfLC team";
 
             LOG.debug("mail to be sended = " + msg);
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathQRC = null;
-            boolean b = mailSender.sendHtmlMail(sujet, msg, to, pathQRC, player.getPlayerLanguage());
-            LOG.debug("HTML Mail status = " + b);
-            return b;
+            mailSender.sendHtmlMailAsync(sujet, msg, to, null, pathQRC, player.getPlayerLanguage());
+            LOG.debug("HTML Mail async sent (fire-and-forget)");
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;
@@ -73,10 +73,10 @@ public class ResetPasswordMail implements Serializable {
                 + " <br/> We hope to see you back soon!"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathQRC = null;
-            boolean b = mailSender.sendHtmlMail(sujet, msg, to, pathQRC, player.getPlayerLanguage());
-            LOG.debug("sendMailResetOK status = " + b);
+            mailSender.sendHtmlMailAsync(sujet, msg, to, pathQRC, player.getPlayerLanguage());
+            LOG.debug("sendMailResetOK async dispatched");
             return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);

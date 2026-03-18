@@ -116,7 +116,7 @@ boolean b = false;
                  player.setPlayerLanguage(values2D[i][9]);
                  player.setPlayerEmail(values2D[i][10]);
                      LOG.debug("player = " + player.toString());
-                 handicap.setHandicapStart(SDF.parse(values2D[i][11]) );
+                 handicap.setHandicapStart(new java.text.SimpleDateFormat("dd/MM/yyyy").parse(values2D[i][11]));
       //        ps.setBigDecimal(7, club.getClubLongitude().setScale(6,RoundingMode.CEILING) );
                  BigDecimal bd = new BigDecimal(values2D[i][12]);
                  handicap.setHandicapPlayerEGA(bd);

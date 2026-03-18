@@ -15,11 +15,32 @@ import java.util.stream.Collectors;
 
 public class DBMeta{
 
+/**
+ * Validates that a SQL identifier (table or column name) contains only safe characters.
+ * Prevents SQL injection via dynamic identifier concatenation.
+ * Security audit 2026-03-09
+ *
+ * @param identifier the table or column name to validate
+ * @return the validated identifier (unchanged)
+ * @throws IllegalArgumentException if the identifier contains unsafe characters
+ */
+public static String validateIdentifier(String identifier) {
+    if (identifier == null || identifier.isBlank()) {
+        throw new IllegalArgumentException("SQL identifier must not be null or blank");
+    }
+    // Allow only letters, digits, underscores — standard SQL identifier chars
+    if (!identifier.matches("[a-zA-Z_][a-zA-Z0-9_]*")) {
+        throw new IllegalArgumentException("Invalid SQL identifier: " + identifier);
+    }
+    return identifier;
+} // end method
+
 public static int CountColumns_old(Connection conn, String table) throws SQLException{
     Statement st = null;
     ResultSet rs = null;
     ResultSetMetaData rsmd = null;
 try{
+    validateIdentifier(table); // security audit 2026-03-09
     final String query = "SELECT * FROM " + table;
     st = conn.createStatement();
     st.executeQuery(query);
@@ -42,6 +63,7 @@ public static void showColumns(Connection conn, String table) throws SQLExceptio
     ResultSet rs = null;
     ResultSetMetaData rsmd = null;
 try{
+    validateIdentifier(table); // security audit 2026-03-09
     st = conn.createStatement();
     st.executeQuery("select * from " + table);
     rs = st.getResultSet();
@@ -456,6 +478,7 @@ public static String listMetaColumnsLoad (Connection conn, String table) throws 
     ResultSet rs = null;
 //https://docs.oracle.com/javase/8/docs/api/java/sql/DatabaseMetaData.html#getColumns-java.lang.String-java.lang.String-java.lang.String-java.lang.String-
 try{
+    validateIdentifier(table); // security audit 2026-03-09
 ///    LOG.debug("starting listMetaColumnsLoad for table = " + table );
     DatabaseMetaData meta = conn.getMetaData();
   rs = meta.getColumns(conn.getCatalog(), null, table, null);
@@ -634,6 +657,7 @@ private Set<String> readPrimaryKeys(
 public static String listMetaColumnsUpdate (final Connection conn, final String table) throws SQLException{
     ResultSet rs = null;
 try{
+    validateIdentifier(table); // security audit 2026-03-09
     DatabaseMetaData meta = conn.getMetaData();
   //  String   catalog          = null;
   //  String   schemaPattern    = null;

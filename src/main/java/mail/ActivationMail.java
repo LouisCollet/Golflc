@@ -1,21 +1,12 @@
 package mail;
 
-import entite.Club;
 import entite.Player;
-import entite.Round;
-import static interfaces.GolfInterface.SDF_TIME;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.ArrayList;
-import jakarta.mail.MessagingException;
-import static utils.LCUtil.showMessageFatal;
 
 @ApplicationScoped
 public class ActivationMail implements Serializable {
@@ -26,12 +17,12 @@ public class ActivationMail implements Serializable {
 
     public ActivationMail() { }
 
-    public Boolean sendMailAccountCreated(Player player, String href) throws MessagingException, Exception {
-        LOG.debug("entering sendMailAccountCreated for player = " + player);
-         LOG.debug("** href/url for activation = " + href);
+    public Boolean sendMailAccountCreated(Player player, String href) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName + " for player = " + player);
+        LOG.debug("** href/url for activation = " + href);
      String msg =
                   " <br/>Welcome to GolfLC! at "
-            //    + SDF_TIME.format(new java.util.Date() )
                 + LocalDateTime.now().format(ZDF_TIME)
                 + " <br/> Thanks for signing up!"
                 + " <br/> Your account has been created, but before you can login with the following credentials, you have to activate your account."
@@ -45,20 +36,20 @@ public class ActivationMail implements Serializable {
                 + " <a href=" + href + "> to activate your account</a>"
                 + " <br/> Thank you !"
                 + "<b><font color='red';size='12'> WITHIN THE 10 MINUTES</b></font>"
-              
+
                 + " <br/> The GolfLC team"
-                    ; 
-     //           LOG.debug(msg);
+                    ;
             String sujet = "Activate Your Account for GolfLC";
-            String to = "louis.collet@skynet.be";
-         //   Path path = null;
-         //   byte[] path = null;
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathICS = null;
-            boolean b = mailSender.sendHtmlMail(sujet,msg,to, pathICS, player.getPlayerLanguage());
-                LOG.debug("sendMailAccountCreated status = " + b);
-return b;
-}
-    public Boolean sendMailActivationOK(Player player) throws MessagingException, Exception {
+            // ✅ async — ne bloque plus le thread HTTP (fire-and-forget)
+            mailSender.sendHtmlMailAsync(sujet, msg, to, pathICS, null, player.getPlayerLanguage());
+            LOG.debug(methodName + " - async mail queued for " + to);
+            return true;
+    } // end method
+    public Boolean sendMailActivationOK(Player player) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
 
             String href = utils.LCUtil.firstPartUrl() + "/login.xhtml";
             String sujet = "Succesfull activation to golflc !!!";
@@ -75,17 +66,13 @@ return b;
                 + "Click for connection</a>"
                 + " <br/> The GolfLC team"
                 ;
-                    // à modifier utilier <href ....>
-                    //  msg = msg + "http://localhost:8080/GolfNew-1.0-SNAPSHOT/login.xhtml";
-                     
- // à mofifier             //       <a href=" + href + ">"
-                     String to = "louis.collet@skynet.be";
-                  //   Path path = null;
+                     String to = System.getenv("SMTP_USERNAME");
                      byte[] pathICS = null;
-                     boolean b = mailSender.sendHtmlMail(sujet,msg,to,pathICS, player.getPlayerLanguage());
-                        LOG.debug("HTML Mail status = " + b);
-     return b;
-    }
+                     // ✅ async — ne bloque plus le thread HTTP (fire-and-forget)
+                     mailSender.sendHtmlMailAsync(sujet, msg, to, pathICS, null, player.getPlayerLanguage());
+                     LOG.debug(methodName + " - async mail queued for " + to);
+            return true;
+    } // end method
     
     /*
     void main() throws IOException {

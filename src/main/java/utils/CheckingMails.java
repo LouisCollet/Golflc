@@ -104,12 +104,7 @@ public class CheckingMails {
          if(subject.equals("unsubscribe"))
          {
             LOG.debug("equals unsubscribe " + subject);
-            // envoyer un mail de confirmayion de réception
-            // mail.MailSender sm = new mail.MailSender(); // removed 2026-02-26 — unused, all send calls commented
-   // à modifier          
- //           boolean b = sm.sendHtmlMail("unsubscribe confirmation : " + from,
- //                   "mailbody = unsubscribe confirmation", "louis.collet@skynet.be","CHECKING",player.getPlayerLanguage());
- //              LOG.debug("HTML Mail status = " + b);
+            // envoyer un mail de confirmation de réception — TODO
                
             // delete logique du mail current
             message.setFlag(Flags.Flag.DELETED, true);
@@ -146,7 +141,7 @@ public class CheckingMails {
 
       String host = "pop.skynet.be";// change accordingly
       String mailStoreType = "pop3";
-      String username = "louis.collet@skynet.be";// change accordingly
+      String username = System.getenv("SMTP_USERNAME");
       String password = "*****";// change accordingly
       CheckingMails cm = new CheckingMails();
       cm.check(host, mailStoreType, username, password);

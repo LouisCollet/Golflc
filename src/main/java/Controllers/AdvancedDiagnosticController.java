@@ -29,13 +29,14 @@ public class AdvancedDiagnosticController {
     // Simple cache for resource checks to avoid repeated IO
     private final Map<String, Boolean> resourceExistsCache = new ConcurrentHashMap<>();
 
-    // last ajax test result
-    private volatile Map<String, String> lastAjaxTest = new LinkedHashMap<>();
+    // fix multi-user 2026-03-07 — per-user ajax test result via ThreadLocal (was shared across all users)
+    private static final ThreadLocal<Map<String, String>> lastAjaxTest =
+            ThreadLocal.withInitial(LinkedHashMap::new);
 
     @PostConstruct
     public void init() {
-        lastAjaxTest.put("status", "no-test-yet");
-        lastAjaxTest.put("timestamp", Instant.now().toString());
+        lastAjaxTest.get().put("status", "no-test-yet");
+        lastAjaxTest.get().put("timestamp", Instant.now().toString());
     }
 
     // ---------------- PRIMEFACES INFO ----------------
@@ -173,7 +174,7 @@ public class AdvancedDiagnosticController {
         result.put("thread", Thread.currentThread().getName());
         // sample small check: memory used
         result.put("heapUsed", String.valueOf(getJvmMemoryMetrics().get("heap.used")));
-        lastAjaxTest = result;
+        lastAjaxTest.set(result);
 
         // if page triggers PrimeFaces.ajax, we can update UI from server
         PrimeFaces.current().ajax().update("adminForm:ajaxTestPanel");
@@ -181,7 +182,7 @@ public class AdvancedDiagnosticController {
     }
 
     public Map<String, String> getLastAjaxTest() {
-        return lastAjaxTest;
+        return lastAjaxTest.get();
     }
 
     // ---------------- SESSIONS ----------------

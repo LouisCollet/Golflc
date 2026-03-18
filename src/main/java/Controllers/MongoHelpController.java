@@ -16,6 +16,7 @@ import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.FacesContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -38,7 +39,7 @@ public class MongoHelpController implements Serializable{
    final static private String DATABASE_NAME = "golflc";
    final static private MongoClient mongoClient = MongoClients.create();  // Creates a new client with the default connection string "mongodb://localhost:".
    final static private MongoCollection<Document> collection = mongoClient.getDatabase(DATABASE_NAME).getCollection(COLLECTION_NAME);
- //  private static @Inject ; 
+   @Inject private LanguageController languageController; // fix multi-user 2026-03-07
    private entite.HelpView helpView;
    public MongoHelpController() {   // constructor
   }
@@ -216,7 +217,7 @@ public static HelpView read(HelpView helpView) {
           LOG.debug("back to helpView " + helpView);
        // work around : changement vers 'en' se fait dans le process : pas trouvé pourquoi 
         //  ActiveLocale.setLanguageTag("fr");
-          LanguageController.setLanguage("fr");
+          languageController.setLanguage("fr"); // fix multi-user 2026-03-07
      return helpView.getId() + ".xhtml?faces-redirect=true";
 }catch (Exception ex){
          String msg = " <br/>££ Exception in BackCurrentHelpFileName() " + ex;
@@ -239,16 +240,15 @@ public String showHelpFile(){  // coming from header.xhtml pour HelpWrite (affic
 }    
 } // end method
  
-public static HelpView currentHelpFile(){
+public HelpView currentHelpFile() { // fix multi-user 2026-03-07 — removed static
  try{  // file.xhtml pour laquelle on est positionné
         HelpView helpView = new HelpView();
         String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();// is "/welcome.xhtml"
         viewId = utils.LCUtil.removeFileExtension(viewId.substring(1), true);  // substring(1) = remove first character "/"
             LOG.debug("viewId for xhtml file = " + viewId); // is "welcome"
         helpView.setId(viewId);
-//            LOG.debug("entering currentHelpFile for xhtml file = " + helpV);
-        helpView.setHelpViewLanguage(LanguageController.getLanguage());
-            LOG.debug("LanguageController.getLanguage() = " + LanguageController.getLanguage());
+        helpView.setHelpViewLanguage(languageController.getLanguage()); // fix multi-user 2026-03-07
+            LOG.debug("languageController.getLanguage() = " + languageController.getLanguage());
       //  helpView = Controllers.MongoHelpController.read(helpView);
       //     LOG.debug("helpView returned from read = " + helpView);
       //  return read(helpView);
@@ -261,7 +261,7 @@ public static HelpView currentHelpFile(){
 }    
 } // end method
 
-  public static String ReadHelpFile(){
+  public String ReadHelpFile() { // fix multi-user 2026-03-07 — removed static
  try{
      HelpView helpV = currentHelpFile();
      if(helpV.getHelpViewLanguage() == null){

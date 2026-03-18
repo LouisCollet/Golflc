@@ -49,9 +49,10 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathICS = null;
-            return mailSender.sendHtmlMail(sujet, mail, to, pathICS, player.getPlayerLanguage());
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;
@@ -78,9 +79,10 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathICS = null;
-            return mailSender.sendHtmlMail(sujet, mail, to, pathICS, player.getPlayerLanguage());
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;
@@ -110,9 +112,10 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathICS = null;
-            return mailSender.sendHtmlMail(sujet, mail, to, pathICS, player.getPlayerLanguage());
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;
@@ -141,11 +144,11 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathICS = null;
-            boolean b = mailSender.sendHtmlMail(sujet, mail, to, pathICS, player.getPlayerLanguage());
-            LOG.debug("HTML Mail status = " + b);
-            return b;
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
+            LOG.debug("HTML Mail async dispatched");
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;

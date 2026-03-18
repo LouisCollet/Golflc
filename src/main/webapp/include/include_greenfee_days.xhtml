@@ -1,62 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-       xmlns:f="jakarta.faces.core" >
- 
-<ui:composition>
-     <p:dataTable var="item" 
-                  value="#{memC.tarifGreenfee.dayChoosen}"
-                  
-                  emptyMessage="#{msg['message.table.empty']}"
-                  style="width:40%;text-align: center;margin-left:auto;margin-right:auto;" >
-          
-      <f:facet name="header">
-          <h:outputText escape="false" value="#{msg['title.greenfee.choice']}" />
-      </f:facet>
-          
-        <p:column headerText="#{msg['tarif.category']} "
-                  width="12%" >
-            <h:outputText value="#{item.category}" />
-        </p:column>
-        <p:column headerText="#{msg['tarif.day']} "
-                  width="12%" >
-            <h:outputText value="#{item.dayType}" />
-        </p:column>
-        <p:column headerText="#{msg['tarif.seasons']} "
-                  width="12%" >
-            <h:outputText value="#{item.season}" />
-        </p:column>
-  <!-- new 29/05/2022  plus rendered ?? -->       
-        <p:column headerText="#{msg['tarif.twilight.hour']} "
-                  width="12%" >
-            <h:outputText value="#{item.twilightStartTime}" />
-        </p:column>
-         
-        <p:column headerText="#{msg['tarif.members.price']} " 
+      xmlns:f="jakarta.faces.core">
+
+    <p:dataTable var="item"
+                 value="#{memC.tarifGreenfee.dayChoosen}"
+                 emptyMessage="#{msg['message.table.empty']}">
+        <f:facet name="header">
+            <h:outputText escape="false" value="#{msg['title.greenfee.choice']}"/>
+        </f:facet>
+
+        <p:column headerText="#{msg['tarif.category']}"
                   width="12%">
-                 <h:outputText value="#{item.price}" />
+            <h:outputText value="#{item.category}"/>
         </p:column>
+
+        <p:column headerText="#{msg['tarif.day']}"
+                  width="12%">
+            <h:outputText value="#{item.dayType}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['tarif.seasons']}"
+                  width="12%">
+            <h:outputText value="#{item.season}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['tarif.twilight.hour']}"
+                  width="12%">
+            <h:outputText value="#{item.twilightStartTime}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['tarif.members.price']}"
+                  width="12%">
+            <h:outputText value="#{item.price}"/>
+        </p:column>
+
         <p:column headerText="#{msg['tarif.members.choice']}"
                   width="12%"
                   id="ChoiceHours">
-            <!--   rendered="#{item.season eq memC.tarifGreenfee.season or item.season eq 'A'}" 
-           -->
-        <p:inputNumber 
-                        value="#{item.quantity}"
-			minValue="0"
-                        maxValue="4"
-                        required="true"
-                  
-                        size="1"
-                        emptyValue="0"
-                        title="#{msg['tooltip.tarif.choice']}"
-                        decimalPlaces="0" >  
-         </p:inputNumber>
+            <p:inputNumber value="#{item.quantity}"
+                           minValue="0"
+                           maxValue="4"
+                           required="true"
+                           size="1"
+                           emptyValue="0"
+                           title="#{msg['tooltip.tarif.choice']}"
+                           decimalPlaces="0"/>
         </p:column>
     </p:dataTable>
 
 </ui:composition>
-</html>

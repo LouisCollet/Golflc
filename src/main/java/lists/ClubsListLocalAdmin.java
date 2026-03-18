@@ -20,6 +20,9 @@ import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.RowMapper;
 
+/**
+ * fix multi-user 2026-03-07 — cache supprimé (données per-admin dans singleton = fuite de données)
+ */
 @Named
 @ApplicationScoped
 public class ClubsListLocalAdmin implements Serializable {
@@ -29,18 +32,11 @@ public class ClubsListLocalAdmin implements Serializable {
     @Resource(lookup = "java:jboss/datasources/golflc")
     private DataSource dataSource;
 
-    private List<Club> liste = null;
-
     public ClubsListLocalAdmin() { }
 
     public List<Club> list(final Player localAdmin) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
-
-        if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
-            return liste;
-        }
 
         final String query = """
                 SELECT *
@@ -55,18 +51,17 @@ public class ClubsListLocalAdmin implements Serializable {
             utils.LCUtil.logps(ps);
 
             try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
+                List<Club> result = new ArrayList<>();
                 RowMapper<Club> clubMapper = new ClubRowMapper();
                 while (rs.next()) {
-                    Club c = clubMapper.map(rs);
-                    liste.add(c);
-                } // end while
-                if (liste.isEmpty()) {
+                    result.add(clubMapper.map(rs));
+                }
+                if (result.isEmpty()) {
                     LOG.warn(methodName + " - empty result list");
                 } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
+                    LOG.debug(methodName + " - list size = " + result.size());
                 }
-                return liste;
+                return result;
             }
 
         } catch (SQLException e) {
@@ -78,14 +73,12 @@ public class ClubsListLocalAdmin implements Serializable {
         }
     } // end method
 
-    public List<Club> getListe()             { return liste; }
-    public void setListe(List<Club> liste)   { this.liste = liste; }
-
+    /**
+     * No-op — cache removed (fix multi-user 2026-03-07)
+     */
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        LOG.debug("entering " + methodName + " - no-op (cache removed)");
     } // end method
 
     /*

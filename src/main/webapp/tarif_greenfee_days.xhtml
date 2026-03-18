@@ -2,28 +2,26 @@
 <!DOCTYPE html>
 <ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
+
 <ui:define name="title">Tarif Page Days</ui:define>
 <ui:define name="content">
-<h:graphicImage name="images/days1.jpg" alt="image missing :tarif1.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage name="images/days2.png" alt="image missing :tarif2.jpg" style="float: right;"></h:graphicImage>
-<h:form id="tarifDays" enctype="application/x-www-form-urlencoded" >
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['title.days.tarif']} DAYS</h1></f:facet>
+<h:form id="tarifDays">
 <ui:include src="include/include_summary_greenfee.xhtml"/>
 <p:panelGrid
     id="panel1"
-    layout="tabular"
+    layout="flex"
     columns="2"
-    columnClasses="col1,col2"  >
+    columnClasses="col1Flex,col2Flex">
 
-<f:facet name="header">
-     <h:outputText escape="false" value="#{msg['title.days.tarif']} DAYS" />
-</f:facet>
-
-            <h:panelGroup id="panelSeason" layout="block" >
+            <h:panelGroup id="panelSeason" layout="block">
             <h:outputText value="#{msg['tarif.season']} " />
                 <i class="pi pi-cloud"></i>
                 <i class="pi pi-sun"></i>
@@ -31,7 +29,7 @@
             </h:panelGroup>
         <p:selectOneButton id="Season_High-Medium-Low"
                           required="true"
-                          value="#{memC.tarifGreenfee.workSeason}" >
+                          value="#{memC.tarifGreenfee.workSeason}">
             <f:selectItem itemLabel="#{msg['tarif.all']}"     itemValue="A" />
             <f:selectItem itemLabel="#{msg['tarif.high']}"    itemValue="H" />
             <f:selectItem itemLabel="#{msg['tarif.medium']}"  itemValue="M" />
@@ -43,7 +41,7 @@
                         size="20"
                         required="false"
                         title="#{msg['tooltip.tarif.item']}"
-	                value="#{memC.tarifGreenfee.workItem}"
+                        value="#{memC.tarifGreenfee.workItem}"
                         placeholder="Enter category " />
 
        <h:outputText  value="#{msg['tarif.days.monday']} :"/>
@@ -61,9 +59,9 @@
                        decimalSeparator="."
                        placeholder="999.9"
                        minValue="0"
-                       maxValue="300"  >
+                       maxValue="300">
           </p:inputNumber>
-  <!-- si minValue utilisé, placeHolder n'apparait pas  -->
+
          <h:outputText  value="#{msg['tarif.days.week']} :"/>
             <p:inputNumber  label="Week"
                        id="week"
@@ -78,7 +76,7 @@
                        decimalSeparator="."
                        placeholder="999.9"
                        minValue="0"
-                       maxValue="300"  >
+                       maxValue="300">
             </p:inputNumber>
 
        <h:outputText  value="#{msg['tarif.days.friday']} :"/>
@@ -95,9 +93,9 @@
                        decimalSeparator="."
                        placeholder="999.9"
                        minValue="0"
-                       maxValue="300"  >
+                       maxValue="300">
             </p:inputNumber>
-        
+
        <h:outputText  value="#{msg['tarif.days.weekend']} :"/>
        <p:inputNumber  label="Weekend Label"
                        id="weekend"
@@ -111,9 +109,9 @@
                        decimalSeparator="."
                        placeholder="999.9"
                        minValue="0"
-                       maxValue="300"  >
+                       maxValue="300">
          </p:inputNumber>
-     
+
        <h:outputText  value="#{msg['tarif.days.holidays']} :"/>
           <p:inputNumber  label="Holidays"
                        id="holidays"
@@ -127,25 +125,23 @@
                        decimalSeparator="."
                        placeholder="999.9"
                        minValue="0"
-                       maxValue="300" >
+                       maxValue="300">
           </p:inputNumber>
-<!-- new 27-05-2022    --> 
+
         <h:outputText  value="#{msg['tarif.twilight']} :"/>
         <p:selectOneButton id="ChoiceTwilight"
                           required="true"
-                          value="#{memC.tarifGreenfee.workTwilight}" >
+                          value="#{memC.tarifGreenfee.workTwilight}">
             <f:selectItem itemLabel="No"  itemValue="N" />
             <f:selectItem itemLabel="#{msg['tarif.twilight']}" itemValue="Y" />
             <f:selectItem itemLabel="Previous"  itemValue="P"/>
         </p:selectOneButton>
-       
+
 <f:facet name="footer">
         <p:commandButton value="#{msg['tarif.days.create']}"
                          id="commandButtonCreate"
                          ajax="false"
                          update="growl-msg"
-                          
-                         style="float: left;"
                          icon="pi pi-database"
                          action="#{memC.inputTarifGreenfee('DA')}"/>
          <p:commandButton value="#{msg['tarif.back']}"
@@ -153,11 +149,12 @@
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         style="float: right;"
                          icon="pi pi-undo"
                          action="tarif_greenfee_menu.xhtml?faces-redirect=true" />
 </f:facet>
 </p:panelGrid>
 </h:form>
+</p:panel>
+</div>
 </ui:define>
 </ui:composition>

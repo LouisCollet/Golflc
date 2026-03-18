@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 
 import static interfaces.Log.LOG;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -44,24 +45,20 @@ public class CreatePlayer implements Serializable {
     @Inject private payment.PaymentSubscriptionController paymentSubscriptionController; // migrated 2026-02-25
     /**
      * Crée un Player dans la base avec son Handicap et sa Subscription initiale.
+     * ✅ @Transactional — JTA coordonne la transaction sur toutes les connexions CDI
      */
+    @Transactional(rollbackOn = Exception.class)
     public boolean create(final Player player,
                           HandicapIndex handicapIndex,
                           final String batch) throws Exception {
         LOG.debug("entering CreatePlayer - create");
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
-        
-        LOG.debug("dataSource = {}", dataSource);
-        
-        try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(false);
-            msg = "AutoCommit set to false";
-            LOG.info(msg);
-            LCUtil.showMessageInfo(msg);
 
-            // ✅ PARTIE NON MODIFIÉE - DÉBUT
-            
+        LOG.debug("dataSource = {}", dataSource);
+
+        try (Connection conn = dataSource.getConnection()) {
+
             // Vérification email
             if (batch.equals("A")
                     && !player.getPlayerEmail()
@@ -96,8 +93,6 @@ public class CreatePlayer implements Serializable {
             handicapIndex.setHandicapPlayerId(player.getIdplayer());
             handicapIndex.setHandicapPlayedStrokes((short) 0);
 
-         //   handicapIndex = new CreateHandicapIndex().create(handicapIndex);
-            // ✅ APRÈS
             handicapIndex = createHandicapIndexService.create(handicapIndex);
 
             if (handicapIndex != null) {
@@ -105,26 +100,23 @@ public class CreatePlayer implements Serializable {
                 LOG.debug(msg);
                 LCUtil.showMessageInfo(msg);
             } else {
-                msg = "create Initial Handicap failed => rollback";
+                msg = "create Initial Handicap failed";
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
-                conn.rollback();
-                throw new SQLException(msg);
+                throw new SQLException(msg); // JTA rollback automatique
             }
 
             // Initial Subscription
             Subscription subscription = new Subscription();
             subscription.setIdplayer(player.getIdplayer());
             subscription.setSubCode(etypeSubscription.INITIAL.toString());
-           
-            // if (!new PaymentSubscriptionController().createPayment(subscription, conn)) {
+
             if (!paymentSubscriptionController.createPayment(subscription)) { // migrated 2026-02-25
 
-                msg = "Initial Subscription creation failed => rollback";
+                msg = "Initial Subscription creation failed";
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
-                conn.rollback();
-                throw new SQLException(msg);
+                throw new SQLException(msg); // JTA rollback automatique
 
             } else {
                 msg = "Initial Subscription created until: "
@@ -136,11 +128,10 @@ public class CreatePlayer implements Serializable {
             // Activation non batch
             if (!batch.equals("B")) {
                 if (!createActivationPlayer.create(player)) {
-                    msg = "Activation failed => rollback";
+                    msg = "Activation failed";
                     LOG.error(msg);
                     LCUtil.showMessageFatal(msg);
-                    conn.rollback();
-                    throw new SQLException(msg);
+                    throw new SQLException(msg); // JTA rollback automatique
                 } else {
                     msg = "Activation created for " + player;
                     LOG.debug(msg);
@@ -148,13 +139,10 @@ public class CreatePlayer implements Serializable {
                 }
             }
 
-            conn.commit();
             msg = "All records committed successfully";
             LOG.debug(msg);
-            
-            // ✅ PARTIE NON MODIFIÉE - FIN
-            
-            return true;
+
+            return true; // JTA commit automatique au retour normal
 
         } catch (SQLException sqle) {
             LCUtil.printSQLException(sqle);
@@ -162,14 +150,14 @@ public class CreatePlayer implements Serializable {
                     + sqle.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            throw sqle;
+            throw sqle; // JTA rollback automatique via rollbackOn
 
         } catch (Exception e) {
             msg = "Exception in " + methodName + ": "
                     + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            throw e;
+            throw e; // JTA rollback automatique via rollbackOn
         }
     }
 

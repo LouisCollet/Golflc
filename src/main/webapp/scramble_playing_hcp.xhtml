@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!DOCTYPE html>
-<html
+<ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
-
->
-<ui:composition template="templates/masterTemplate.xhtml">
+      template="templates/masterTemplate.xhtml">
 <ui:define name="title">Scramble Playing Handicap Page </ui:define>
 
 <ui:define name="content">
@@ -21,26 +18,25 @@
     </f:metadata>
 </ui:define>
 
-<h:form id="scramble_playing_hcp" enctype="application/x-www-form-urlencoded" >
-<h:graphicImage id="graphic1" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: left;"></h:graphicImage>
-<h:graphicImage id="graphic2" name="images/golf_tee.jpg" alt="image missing :golf_tee.jpg" style="float: right;"></h:graphicImage>
-<p:panelGrid
-    id="panelG1"
-    layout="tabular"
-    columns="2"
-    style="text-align:center;"
->
+<h:form id="scramble_playing_hcp">
 
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
 <f:facet name="header">
     <h1>#{msg['playinghcp.scramble.title']}</h1>
 </f:facet>
-    
+
+<p:panelGrid
+    id="panelG1"
+    layout="flex"
+    columns="2"
+    columnClasses="col1Flex, col2Flex"
+    style="text-align:center;">
+
     <c:forEach var="i" begin="1" end="2" step="1">
       <h:outputText value="Hcp #{msg['player.message']} #{i}" />
    </c:forEach>
-        
-    <!-- value="#{roundC.playingHcp.hcpScr[i-1]}"  -->
-    
+
     <c:forEach var="i" begin="1" end="2" step="1">
       <p:inputNumber  id="LCcpScr1${i}"
                     label="Hcp"
@@ -51,16 +47,15 @@
                     requiredMessage="#{msg['handicap.player.notnull']} : #{i}"
                     decimalPlaces="0"
                     minValue="0"
-                    maxValue="36"
-                    >
+                    maxValue="36">
             <f:validateLongRange minimum="0" maximum="36" />
       </p:inputNumber>
     </c:forEach>
-<!--  required="true"   -->
+
     <c:forEach var="i" begin="3" end="4" step="1">
       <h:outputText value="Hcp #{msg['player.message']} #{i}" />
    </c:forEach>
-        
+
     <c:forEach var="i" begin="3" end="4" step="1">
       <p:inputNumber  id="LCcpScr2${i}"
                     label="Hcp"
@@ -70,31 +65,28 @@
                     minValue="0"
                     maxValue="36"
                     validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
-                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}"
-                    >
+                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}">
             <f:validateLongRange minimum="0" maximum="36" />
       </p:inputNumber>
     </c:forEach>
-    
-<!--  required="true"   -->
+
     <h:outputText value="#{msg['handicap.playing']}" />
     <h:outputText value="#{roundC.playingHcp.playingHandicap}"
-                  style="font-size: 3em;"
-                       />
+                  style="font-size: 3em;" />
+
+</p:panelGrid>
 
 <f:facet name="footer">
-         <p:commandButton 
+         <p:commandButton
                          id="button01"
                          value="#{msg['button.hcp.calculate']}"
                          update="growl-msg"
                          ajax="false"
-                          
                          icon="pi pi-database"
                          action="#{roundC.calculateHcpScramble()}"/>
-
 </f:facet>
-</p:panelGrid>
+</p:panel>
+</div>
 </h:form>
 </ui:define>
 </ui:composition>
-</html>

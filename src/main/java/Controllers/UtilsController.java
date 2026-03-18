@@ -6,10 +6,10 @@ package Controllers;
 //import com.lowagie.text.Image;
 //import com.lowagie.text.PageSize;
 
-import org.openpdf.text.BadElementException;
-import org.openpdf.text.Document;
-import org.openpdf.text.DocumentException;
-import org.openpdf.text.Image;
+//import org.openpdf.text.BadElementException;
+//import org.openpdf.text.Document;
+//import org.openpdf.text.DocumentException;
+//import org.openpdf.text.Image;
 import org.openpdf.text.PageSize;
 import entite.PlayingHandicap;
 import entite.Round;
@@ -154,7 +154,7 @@ public UtilsController() throws IOException {// constructor
 			cell.setCellStyle(cellStyle);
 		}
 	}
-
+/* enlevé 06/03/0206 mismatch entre versions enleve 3.0.0 en faveur 2.2.2
 public void preProcessPDF(Object document) throws IOException, BadElementException, DocumentException {
 try{
     Document pdf = (Document) document;
@@ -171,7 +171,7 @@ try{
        LOG.debug("preProcessPDF" + ex);
  }
 } //end preProcessPDF       
-
+*/
 
 // utilisé dans datePicker, yearRange
  public static int dateYear(int year){

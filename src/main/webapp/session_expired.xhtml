@@ -8,63 +8,63 @@
       xmlns:of="omnifaces"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
+
 <ui:define name="metadata">
     <f:metadata>
-        <f:viewAction action="#{playerC.logout(param['cmd'])}"/>
+        <f:viewAction action="#{navC.logout(param['cmd'])}"/>
     </f:metadata>
 </ui:define>
-    
-    
-    
-<ui:define name="title">Session Expired </ui:define>
+
+<ui:define name="title">Session Expired</ui:define>
+
 <ui:define name="content">
-<h:graphicImage 
-                name="images/expired.jpg"
-                alt="image missing :expired.jpg"
-                style="float:left;">
-</h:graphicImage>
-    
- 
-    
-<h:link value="New Connection : clic on Login Image !"
-        outcome="login.xhtml"
-        style="float:right;" >
-    <h:graphicImage name="images/golf_login.jpg" alt="image golf_login.jpg" style="float:right;"> </h:graphicImage>
-</h:link>
-    
-<h:form id="form_session_expired" >
-    <!-- -->
-<p:panelGrid id="panel"
-             columns="1"
-             layout="tabular"
-             columnClasses="col1" >
-<f:facet name="header">
-    <h1>Session Expired !! <br/>
-         #{msg['login.welcome.back']} <br/>
-         #{param['cmd']}
-        
-    </h1>
-</f:facet>
+    <h:form id="form_session_expired">
 
-       <ul>
-     <li>Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}</li>
-     <li>User agent: #{header['user-agent']}</li>
-     <li>User IP: #{request.remoteAddr}</li>
-     <li>Last access time: #{request.session.lastAccessedTime}</li>
-     <li>Max Inactive Interval : #{session.maxInactiveInterval}</li>
-     <li>Session Creation Time: #{session.creationTime}</li>
-     <li>Session Id: #{session.id}</li>
- </ul>
+        <div class="login-container">
+            <p:panel styleClass="login-card">
+                <f:facet name="header">
+                    <h:outputText escape="false"
+                                  value="#{msg['login.welcome.back']}"/>
+                </f:facet>
 
-<f:facet name="footer">
-    <p:commandButton value="#{msg['login.user.old']}"
-                     update="growl-msg"
-                     immediate="true"
-                     ajax="false"
-                     icon="pi pi-user"
-                     action="selectPlayer.xhtml?faces-redirect=true"/>
-</f:facet>
-</p:panelGrid>
-</h:form>
+                <div style="text-align:center; margin-bottom:1rem;">
+                    <i class="pi pi-clock" style="font-size:3rem; color:var(--primary-color);"/>
+                    <h2 style="margin:0.5rem 0;">Session Expired</h2>
+                    <h:outputText value="#{param['cmd']}"
+                                  rendered="#{not empty param['cmd']}"
+                                  style="color:var(--text-secondary-color);"/>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Date/time</span>
+                        <span class="info-value">#{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">User IP</span>
+                        <span class="info-value">#{request.remoteAddr}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Session Id</span>
+                        <span class="info-value">#{session.id}</span>
+                    </div>
+                </div>
+
+                <f:facet name="footer">
+                    <h:link outcome="login.xhtml" styleClass="login-option">
+                        <span class="login-option-icon returning">
+                            <i class="pi pi-sign-in"/>
+                        </span>
+                        <span class="login-option-text">
+                            <span class="login-option-title">#{msg['login.user.old']}</span>
+                            <span class="login-option-desc">#{msg['login.welcome.back']}</span>
+                        </span>
+                        <i class="pi pi-arrow-right login-option-arrow"/>
+                    </h:link>
+                </f:facet>
+            </p:panel>
+        </div>
+
+    </h:form>
 </ui:define>
 </ui:composition>

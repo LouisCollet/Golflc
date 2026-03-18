@@ -28,7 +28,7 @@ public class MemberManager implements Serializable {
     // ========================================
 
     // Create
-    @Inject private create.CreateTarifMember        createTarifMemberService;
+    @Inject private create.CreateTarifMember         createTarifMemberService;
     @Inject private create.CreateTarifGreenfee       createTarifGreenfeeService;
     @Inject private create.CreatePaymentCotisation   createPaymentCotisationService;
     @Inject private create.CreatePaymentGreenfee     createPaymentGreenfeeService;

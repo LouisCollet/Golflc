@@ -31,7 +31,7 @@ import java.util.List;
 public class PlayerItemReader extends AbstractItemReader {
     CSVReader reader = null;
     private int count = 0;
-    private static int errorsCSV = 0;
+    private int errorsCSV = 0; // fix multi-user 2026-03-07 — was static
     
     @Inject private JobContext jobCtx; // new 25-08-2023
     @Inject private entite.Settings settings;        // ✅ injection CDI

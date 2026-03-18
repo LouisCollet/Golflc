@@ -10,13 +10,12 @@ import jakarta.faces.annotation.SessionMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import manager.MemberManager;
-
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
+import exceptions.AppException;
 import static exceptions.LCException.handleGenericException;
 import static interfaces.GolfInterface.ZDF_DAY;
 import static interfaces.Log.LOG;
@@ -41,7 +40,6 @@ public class MemberController implements Serializable {
 
     @Inject private MemberManager memberManager;
     @Inject private ApplicationContext appContext;
-
     @Inject private Controllers.TarifMemberController    tarifMemberController;
     @Inject private Controllers.TarifGreenfeeController  tarifGreenfeeController;
     @Inject private find.FindTarifGreenfeeData           findTarifGreenfeeData;
@@ -60,7 +58,9 @@ public class MemberController implements Serializable {
     @Inject private lists.CoursesListLocalAdmin          coursesListLocalAdmin; // migrated 2026-02-25
     @Inject private lists.SubscriptionRenewalList        subscriptionRenewalList; // migrated 2026-02-25
     @Inject private calc.CalcTarifGreenfee              calcTarifGreenfee; // migrated 2026-02-28
-    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
+    @Inject private create.CreateTarifSubscription     createTarifSubscriptionService; // added 2026-03-06
+    @Inject private delete.DeleteTarifSubscription     deleteTarifSubscriptionService; // added 2026-03-06
+    @Inject private lists.TarifSubscriptionList        tarifSubscriptionList;          // added 2026-03-06
 
     // ========================================
     // ETAT UI LOCAL
@@ -76,6 +76,7 @@ public class MemberController implements Serializable {
     private Round round;
     private List<ECourseList> subscriptionRenewal;
     private List<?> filteredCars; // PrimeFaces dataTable filteredValue — migrated from navC 2026-02-28
+    private entite.TarifSubscription tarifSubscription; // added 2026-03-06
 
     public MemberController() { }
 
@@ -88,6 +89,7 @@ public class MemberController implements Serializable {
         cotisation    = new Cotisation();
         greenfee      = new Greenfee();
         subscription  = new Subscription();
+        tarifSubscription = new entite.TarifSubscription();
         LOG.debug("MemberController initialized");
     } // end method
 
@@ -108,6 +110,7 @@ public class MemberController implements Serializable {
         round               = null;
         subscriptionRenewal = null;
         filteredCars        = null;
+        tarifSubscription   = new entite.TarifSubscription();
         LOG.debug(methodName + " — MemberController reset done");
     } // end method
 
@@ -120,17 +123,17 @@ public class MemberController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            LOG.debug("player = " + appContext.getPlayer().toString());
-            LOG.debug("course = " + course.toString());
-            appContext.setInputSelectCourse("createTarifGreenfee");
-            tarifGreenfee = findTarifGreenfeeData.find(round);
+      //      LOG.debug("player = " + appContext.getPlayer().toString());
+      //      LOG.debug("course = " + appContext.getCourse());
+       // enlevé : pourquoi ??     appContext.setInputSelectCourse("createTarifGreenfee");
+            tarifGreenfee = findTarifGreenfeeData.find(appContext.getRound());
             if (tarifGreenfee == null) {
                 String err = "Tarif returned from findTarifdata is null ";
                 LOG.debug(err);
                 return null;
             }
             LOG.debug("now tarifGreenfee found is = " + tarifGreenfee);
-            tarifGreenfee = calcTarifGreenfee.calc(tarifGreenfee, round, club, appContext.getPlayer()); // migrated 2026-02-28
+            tarifGreenfee = calcTarifGreenfee.calc(tarifGreenfee, appContext.getRound(), appContext.getClub(), appContext.getPlayer()); // migrated 2026-02-28
             return "price_round_greenfee.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -142,12 +145,12 @@ public class MemberController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            LOG.debug(" for round = " + round);
-            LOG.debug(" for club = " + club);
-            tarifMember = findTarifMembersData.find(club, round);
+        //    LOG.debug(" for round = " + appContext.getRound());
+        //    LOG.debug(" for club = " + club);
+            tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound());
             LOG.debug("TarifMember found = " + tarifMember);
-            appContext.setInputSelectCourse("createTarifMember");
-            appContext.setInputSelectClub("createTarifMember");
+        //    appContext.setInputSelectCourse("createTarifMember");
+        //    appContext.setInputSelectClub("createTarifMember");
             if (tarifMember == null) {
                 String msgerr = prepareMessageBean("tarif.member.notfound");
                 LOG.error(msgerr);
@@ -167,10 +170,10 @@ public class MemberController implements Serializable {
         LOG.debug("entering " + methodName);
         try {
             LOG.debug(" findTarif with ecl = " + ecl.toString());
-            club = ecl.club();
-            course = ecl.course();
-            round = ecl.round();
-            tarifGreenfee = findTarifGreenfeeData.find(round);
+       //    club = ecl.club();
+       //     course = ecl.course();
+         //   round = ecl.round();
+            tarifGreenfee = findTarifGreenfeeData.find(ecl.getRound());
             if (tarifGreenfee == null) {
                 String msg = "No Tarif available for this course";
                 LOG.error(msg);
@@ -180,7 +183,7 @@ public class MemberController implements Serializable {
                 LOG.info(msg);
                 showMessageInfo(msg);
             }
-            return "tarif_greenfee_menu.xhtml?faces-redirect=true";
+            return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;
@@ -195,25 +198,28 @@ public class MemberController implements Serializable {
             club = ecl.club();
             course = ecl.course();
             round = ecl.round();
-            return "tarif_greenfee_menu.xhtml?faces-redirect=true";
+            return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;
         }
     } // end method
 
-    public String showTarifGreenfee(String idcourse) {
+    public void showTarifGreenfee(String idcourse) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            tarifGreenfee = findTarifGreenfeeData.find(round);
+            tarifGreenfee = findTarifGreenfeeData.find(appContext.getRound());
+            if (tarifGreenfee == null) {
+                // message already displayed by FindTarifGreenfeeData
+                return;
+            }
             String msg = prepareMessageBean("tarif.greenfee.show") + tarifGreenfee.showTarifGreenfee();
             LOG.info(msg);
             showMessageInfo(msg);
-            return null;
         } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
+            LOG.error(methodName + " - " + e.getMessage(), e);
+            showMessageFatal(e.getMessage());
         }
     } // end method
 
@@ -244,7 +250,7 @@ public class MemberController implements Serializable {
             LOG.debug("with tarif = " + tarifGreenfee);
             switch (param) {
                 case "PE" -> {
-                    tarifGreenfee.setTarifCourseId(course.getIdcourse());
+                    tarifGreenfee.setTarifCourseId(appContext.getCourse().getIdcourse()); // mod 06/03/2026
                     tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeePeriods(tarifGreenfee);
                     return "tarif_greenfee_periods.xhtml?faces-redirect=true";
                 }
@@ -305,23 +311,24 @@ public class MemberController implements Serializable {
     // migrated from CourseController 2026-02-25
     // ========================================
 
-    public String createTarifMembers() throws SQLException {
+    public String createTarifMember() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
             LOG.debug("with tarifMember = " + tarifMember);
-            LOG.debug("for club = " + club);
-            tarifMember.setTarifMemberIdClub(club.getIdclub());
+         //   LOG.debug("for club = " + club);
+          //  tarifMember.setTarifMemberIdClub(club.getIdclub());
+            tarifMember.setTarifMemberIdClub(appContext.getClub().getIdclub()); // mod LC 06/03/2026
             if (createTarifMemberService.create(tarifMember)) {
                 String msg = "Tarif is created ";
                 LOG.info(msg);
                 showMessageInfo(msg);
-                return "tarif_members_menu.xhtml?faces-redirect=true";
+                return "tarif_member_wizard.xhtml?faces-redirect=true";
             } else {
                 String msg = "Tarif is NOT created ";
                 LOG.error(msg);
                 showMessageFatal(msg);
-                return "tarif_members_menu.xhtml?faces-redirect=true";
+                return "tarif_member_wizard.xhtml?faces-redirect=true";
             }
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -334,8 +341,8 @@ public class MemberController implements Serializable {
         LOG.debug("entering " + methodName);
         try {
             LOG.debug("with tarifGreenfee = " + tarifGreenfee);
-            LOG.debug("with club = " + club);
-            if (createTarifGreenfeeService.create(tarifGreenfee, club)) {
+        //    LOG.debug("with club = " + club); // devrait être null
+            if (createTarifGreenfeeService.create(tarifGreenfee, appContext.getClub())) { // mod LC 06/03/2026
                 String msg = " TarifGreenfee Created ! ";
                 LOG.info(msg);
                 showMessageInfo(msg);
@@ -356,9 +363,9 @@ public class MemberController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            LOG.debug("with course = " + course);
+        //    LOG.debug("with course = " + appContext.getCourse());
             LOG.debug("with TarifGreenfee = " + tarifGreenfee);
-            tarifGreenfee.setTarifCourseId(course.getIdcourse());
+            tarifGreenfee.setTarifCourseId(appContext.getCourse().getIdcourse());
             if (deleteTarifGreenfeeService.delete(tarifGreenfee, year)) {
                 String msg = "TarifGreenfee deleted = " + tarifGreenfee;
                 LOG.info(msg);
@@ -366,7 +373,7 @@ public class MemberController implements Serializable {
                 String msg = "Result of deleteTarifGreenfee is NOT OK = " + tarifGreenfee;
                 LOG.error(msg);
             }
-            return "tarif_greenfee_menu.xhtml?faces-redirect=true";
+            return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;
@@ -392,9 +399,10 @@ public class MemberController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
         try {
-            LOG.debug("with club = " + club);
+        //    LOG.debug("with club = " + club);
             LOG.debug("with Tarifmember = " + tarifMember);
-            tarifMember.setTarifMemberIdClub(club.getIdclub());
+         //   tarifMember.setTarifMemberIdClub(club.getIdclub());
+            tarifMember.setTarifMemberIdClub(appContext.getClub().getIdclub()); // mod LC 06/03/2026
             if (deleteTarifMemberService.delete(tarifMember)) {
                 String msg = "TarifMember deleted = " + tarifMember;
                 LOG.info(msg);
@@ -704,6 +712,103 @@ public class MemberController implements Serializable {
     public void    setFilteredCars(List<?> filteredCars) { this.filteredCars = filteredCars; }
 
     // ========================================
+    // COMPUTED PROPERTIES
+    // ========================================
+
+    public int getTarifGreenfeeActiveStep() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        if (tarifGreenfee == null) return 0;
+        if (tarifGreenfee.getDatesSeasonsList() == null || tarifGreenfee.getDatesSeasonsList().isEmpty()) return 0;
+        if (!tarifGreenfee.isEquipmentsReady()) return 1;
+        if (!tarifGreenfee.isUpdateReady()) return 2;
+        if (!tarifGreenfee.isTwilightDone()) return 3;
+        return 4;
+    } // end method
+
+    // ========================================
+    // WIZARD — version ajax (retourne void, reste sur la page)
+    // ========================================
+
+    public void inputTarifGreenfeeWizard(String param) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("with param " + param);
+            LOG.debug("with tarif = " + tarifGreenfee);
+            switch (param) {
+                case "PE" -> {
+                    tarifGreenfee.setTarifCourseId(appContext.getCourse().getIdcourse());
+                    tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeePeriods(tarifGreenfee);
+                }
+                case "BA" -> tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeBasic(tarifGreenfee);
+                case "DA" -> tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeDays(tarifGreenfee);
+                case "EQ" -> tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeEquipments(tarifGreenfee);
+                case "HO" -> tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeHours(tarifGreenfee);
+                case "TW" -> {
+                    showMessageInfo(tarifGreenfee.toString());
+                    tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeTwilight(tarifGreenfee);
+                }
+                default -> {
+                    String msg = "failed in default switch";
+                    LOG.error(msg);
+                    showMessageFatal(msg);
+                }
+            } // end switch
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    // ========================================
+    // WIZARD FLOW LISTENER — GREENFEE
+    // ========================================
+
+    public String onTarifGreenfeeFlow(org.primefaces.event.FlowEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(methodName + " - oldStep = " + event.getOldStep());
+        LOG.debug(methodName + " - newStep = " + event.getNewStep());
+        return event.getNewStep();
+    } // end method
+
+    // ========================================
+    // WIZARD — TARIF MEMBER (version ajax, reste sur la page)
+    // ========================================
+
+    public void inputTarifMemberWizard(String param) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            LOG.debug("with param " + param);
+            LOG.debug("with tarifMember = " + tarifMember);
+            switch (param) {
+                case "CO" -> tarifMember = tarifMemberController.inputTarifMembersCotisation(tarifMember);
+                case "EQ" -> tarifMember = tarifMemberController.inputTarifMembersEquipments(tarifMember);
+                default -> {
+                    String msg = "failed in default switch";
+                    LOG.error(msg);
+                    showMessageFatal(msg);
+                }
+            } // end switch
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    // ========================================
+    // WIZARD FLOW LISTENER — MEMBER
+    // ========================================
+
+    public String onTarifMemberFlow(org.primefaces.event.FlowEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(methodName + " - oldStep = " + event.getOldStep());
+        LOG.debug(methodName + " - newStep = " + event.getNewStep());
+        return event.getNewStep();
+    } // end method
+
+    // ========================================
     // RESET
     // ========================================
 
@@ -715,7 +820,132 @@ public class MemberController implements Serializable {
         cotisation    = new Cotisation();
         greenfee      = new Greenfee();
         subscription  = new Subscription();
+        tarifSubscription = new entite.TarifSubscription();
         LOG.debug("MemberController reset complete");
     } // end method
+
+    // ========================================
+    // WIZARD — TARIF SUBSCRIPTION
+    // ========================================
+
+    public void inputTarifSubscriptionWizard(String code) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug("with code = " + code);
+        try {
+            LOG.debug("with tarifSubscription = " + tarifSubscription);
+
+            if (code == null || code.isBlank()) {
+                showMessageFatal("Subscription type is required");
+                return;
+            }
+            if (tarifSubscription.getWorkPrice() == null || tarifSubscription.getWorkPrice() <= 0) {
+                showMessageFatal("Price must be greater than 0");
+                return;
+            }
+            if (tarifSubscription.getWorkStartDate() == null) {
+                showMessageFatal("Start date is required");
+                return;
+            }
+            if (tarifSubscription.getWorkEndDate() == null) {
+                showMessageFatal("End date is required");
+                return;
+            }
+            if (tarifSubscription.getWorkEndDate().isBefore(tarifSubscription.getWorkStartDate())) {
+                showMessageFatal("End date must be after start date");
+                return;
+            }
+            if (tarifSubscription.getWorkEndDate().isEqual(tarifSubscription.getWorkStartDate())) {
+                showMessageFatal("End date must be different from start date");
+                return;
+            }
+
+            entite.TarifSubscription newTarif = new entite.TarifSubscription();
+            newTarif.setCode(code);
+            newTarif.setPrice(tarifSubscription.getWorkPrice());
+            newTarif.setStartDate(tarifSubscription.getWorkStartDate());
+            newTarif.setEndDate(tarifSubscription.getWorkEndDate());
+
+            if (createTarifSubscriptionService.create(newTarif)) {
+                tarifSubscriptionList.invalidateCache();
+                tarifSubscription.setTarifList(tarifSubscriptionList.list());
+                // reset work fields for next entry
+                tarifSubscription.setWorkPrice(null);
+                tarifSubscription.setWorkStartDate(null);
+                tarifSubscription.setWorkEndDate(null);
+                showMessageInfo("Tarif subscription added: " + newTarif.getCode() + " = " + newTarif.getPrice());
+            }
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    public void deleteTarifSubscription() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            if (deleteTarifSubscriptionService.deleteAll()) {
+                tarifSubscriptionList.invalidateCache();
+                tarifSubscription.setTarifList(tarifSubscriptionList.list());
+            }
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    public String onTarifSubscriptionFlow(org.primefaces.event.FlowEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        LOG.debug(methodName + " - oldStep = " + event.getOldStep());
+        LOG.debug(methodName + " - newStep = " + event.getNewStep());
+        try {
+            // reset work fields when switching between Monthly and Yearly tabs
+            String oldStep = event.getOldStep();
+            String newStep = event.getNewStep();
+            if ((oldStep.contains("Monthly") && newStep.contains("Yearly"))
+                    || (oldStep.contains("Yearly") && newStep.contains("Monthly"))) {
+                tarifSubscription.setWorkPrice(null);
+                tarifSubscription.setWorkStartDate(null);
+                tarifSubscription.setWorkEndDate(null);
+                LOG.debug(methodName + " - work fields reset for tab switch");
+            }
+            // load list when entering confirmation tab
+            if (newStep.contains("Confirmation")) {
+                tarifSubscription.setTarifList(tarifSubscriptionList.list());
+            }
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+        return event.getNewStep();
+    } // end method
+
+    public String confirmTarifSubscription() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            var list = tarifSubscriptionList.list();
+            if (list.isEmpty()) {
+                showMessageFatal("No tarif subscription to confirm");
+                return null;
+            }
+            showMessageInfo("Tarif subscriptions confirmed: " + list.size() + " entries");
+            tarifSubscription = new entite.TarifSubscription();
+            return "welcome.xhtml?faces-redirect=true";
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return null;
+        }
+    } // end method
+
+    // === Getter/Setter TarifSubscription ===
+
+    public entite.TarifSubscription getTarifSubscription() {
+        if (tarifSubscription == null) tarifSubscription = new entite.TarifSubscription();
+        return tarifSubscription;
+    }
+
+    public void setTarifSubscription(entite.TarifSubscription tarifSubscription) {
+        this.tarifSubscription = tarifSubscription;
+    }
 
 } // end class

@@ -12,6 +12,7 @@ import static interfaces.Log.NEW_LINE;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import jakarta.inject.Inject;
+import jakarta.annotation.security.DenyAll;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -25,6 +26,7 @@ import static utils.LCUtil.showMessageFatal;
 // http://www.mastertheboss.com/jboss-frameworks/resteasy/resteasy-tutorial
 
 @Path("smartcard") // was tutorial
+@DenyAll // security audit 2026-03-09 — test/demo endpoints disabled in production
 public class SmartcardBelgium{
     
     

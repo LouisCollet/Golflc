@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<ui:composition 
+<ui:composition
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
@@ -11,150 +11,154 @@
 
 <ui:define name="title">Welcome Page Wildfly</ui:define>
 <ui:define name="content">
-<h:form id="welcome"  >
+<h:form id="welcome">
     <ui:include src="/include/include_summary_player.xhtml"/>
-    
-    <!-- line 28 PF13  -->
-<p:panelGrid 
-    id="panelGrid1"
-    layout="flex"
-    columns="2"
-    columnClasses="col1Flex,col2Flex"
-    style="font-weight:bold;font-size: 1.1rem"  >
-<f:facet name="header">
-    <h:outputText escape="false" value="#{msg['message.welcome']}" />
-</f:facet>
-        <h:outputText value="#{playerC.player.playerFirstName}"
-                      style="font-weight:bold;" />
-        <h:outputText value="#{playerC.player.playerLastName}"
-                      style="font-weight:bold;font-size: 2rem" />
-      <c:set var="photo"
-             value="#{playerC.player.playerPhotoLocation}"/>
 
-   <p:graphicImage id="image_photo_found"
-                   value="#{imageView.getPhoto(photo)}"
-                   stream="false"
-                   rendered="#{photo ne 'no photo.jpeg'}"
-                   alt="There is no photo : #{playerC.player.playerLastName}"
-                   style="float: right;">
-   </p:graphicImage>
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+        <p:panel styleClass="login-card">
+            <f:facet name="header">
+                <h:outputText escape="false" value="#{msg['message.welcome']}" />
+            </f:facet>
 
-   <h:graphicImage id="image_photo_unknown"
-                   name="images/photos/unknown.jpg"
-                   rendered="#{photo eq 'no photo.jpeg'}"
-                   alt="no photo image missing :#{playerC.player.playerLastName}"
-                   style="float:right;">
-   </h:graphicImage>
+            <!-- Layout 2 colonnes: info + photo -->
+            <div class="welcome-layout">
+                <div class="welcome-left">
 
-<h:panelGroup layout="block" id="container">
-  <!-- line 51 PF13  -->
-<p:panelGrid 
-    id="panelintern1"
-    layout="flex"
-    
-    columnClasses="col1Flex,col2Flex"
-    style="width:70%"
-    columns="2" >
+                    <!-- Nom du joueur -->
+                    <div class="player-name-row">
+                        <span class="player-firstname">#{playerC.player.playerFirstName}</span>
+                        <span class="player-lastname">#{playerC.player.playerLastName}</span>
+                    </div>
 
-   <c:set var="pid" value="#{playerC.player.idplayer}"/>
- 
-    <h:outputText value="#{msg['message.last.session']}"  />
-        #{playerC.lastSession(pid)}
+                    <!-- Données joueur -->
+                    <c:set var="pid" value="#{playerC.player.idplayer}"/>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <span class="info-label">#{msg['message.last.session']}</span>
+                            <span class="info-value">#{playerC.lastSession(pid)}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">#{msg['subscription.startdate']}</span>
+                            <span class="info-value">
+                                <h:outputText value="#{memC.subscription.startDate}">
+                                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">#{msg['subscription.enddate']}</span>
+                            <span class="info-value">
+                                <h:outputText value="#{memC.subscription.endDate}">
+                                    <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Home Club</span>
+                            <span class="info-value">#{playerC.player.playerHomeClub}</span>
+                        </div>
+                        <h:panelGroup layout="block" styleClass="info-row"
+                                      rendered="#{playerC.blocking.blockingAttempts > 0}">
+                            <span class="info-label">Blocking Attempts</span>
+                            <span class="info-value">#{playerC.blocking.blockingAttempts}</span>
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="info-row"
+                                      rendered="#{playerC.professional}">
+                            <span class="info-label">Pro</span>
+                            <span class="info-value">#{playerC.professionalCount}</span>
+                        </h:panelGroup>
+                    </div>
 
-    <h:outputText value="#{msg['subscription.startdate']}" />
-    <h:outputText value="#{memC.subscription.startDate}">
-         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
-    </h:outputText>    
+                </div>
 
-     <h:outputText value="#{msg['subscription.enddate']}" />
-     <h:outputText value="#{memC.subscription.endDate}">
-         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy" />
-     </h:outputText>
- 
-     <h:outputText value="Home Club" />
-     <h:outputText value="#{playerC.player.playerHomeClub}"/>
-     
-     <h:outputText value="Blocking Attempts" 
-                   rendered="#{playerC.blocking.blockingAttempts > 0}"/>
-    <h:outputText value="#{playerC.blocking.blockingAttempts}"
-                   rendered="#{playerC.blocking.blockingAttempts > 0}"/>
-    <h:outputText value="Pro"
-                   rendered="#{playerC.professional}"/>
-    <h:outputText value="#{playerC.professionalCount}"
-                   rendered="#{playerC.professional}"/>
+                <!-- Photo -->
+                <div class="welcome-right">
+                    <c:set var="photo" value="#{playerC.player.playerPhotoLocation}"/>
+                    <p:graphicImage id="image_photo_found"
+                                    value="#{imageView.getPhoto(photo)}"
+                                    stream="false"
+                                    rendered="#{photo ne 'no photo.jpeg'}"
+                                    alt="Photo : #{playerC.player.playerLastName}"
+                                    style="max-width:140px; border-radius:10px;"/>
+                    <h:graphicImage id="image_photo_unknown"
+                                    name="images/photos/unknown.jpg"
+                                    rendered="#{photo eq 'no photo.jpeg'}"
+                                    alt="no photo"
+                                    style="max-width:140px; border-radius:10px;"/>
+                </div>
+            </div>
 
- </p:panelGrid>
+            <p:divider layout="horizontal" type="solid"/>
 
-    <p:megaMenu  id="megaMenu"
-                orientation="vertical"
-                autoDisplay="true"
-                 
-                style="width:100%" >
-        <f:facet name="start">
-                    this is the PF14 start facet
-        </f:facet>
-            <p:submenu label="Additional Menu"
-                       icon="pi pi-ellipsis-v"
-                       style="width:100%"
-                       expanded="true">
-                <p:column>
-                    <p:submenu label="Password Management"
-                               style="width:100%">
-                        <p:menuitem value="Password Forgotten"
-                                    icon="pi pi-question"
-                                    update="growl-msg"
-                                    action="#{playerC.forgetPassword}"/>
-                        <p:menuitem value="Password modify"
-                                    icon="pi pi-pencil"
-                                    outcome="password_modify.xhtml?faces-redirect=true"/>
-                    </p:submenu>
-                    <p:submenu label="Update Data"
-                               style="width:100%">
-                        <p:menuitem value="Modify Personal info"
-                                    icon="pi pi-pencil"
-                                    outcome="player_modify.xhtml?faces-redirect=true"/>
-                        <p:menuitem value="Upload Photo"
-                                    icon="pi pi-upload"
-                                    outcome="player_upload_file.xhtml?faces-redirect=true"/>
-                    </p:submenu>
-                </p:column>
-            </p:submenu> 
-         <f:facet name="end">
-                    end facet
-         </f:facet>
-</p:megaMenu>
+            <!-- ═══════════════════════════════════════════════
+                 Cards menu — inchangé sauf ajout section Golf
+                 ═══════════════════════════════════════════════ -->
+            <div class="account-menu">
 
-</h:panelGroup>
+                <!-- Section : Password Management -->
+                <div class="account-menu-section-label">
+                    <i class="pi pi-lock"/> #{msg['menu.section.password']}
+                </div>
+                <div class="account-menu-grid">
+                    <p:commandLink id="btnPasswordForgotten"
+                                   styleClass="account-card"
+                                   update="growl-msg"
+                                   action="#{playerC.forgetPassword()}">
+                        <i class="account-card-icon pi pi-question-circle"/>
+                        <span class="account-card-label">#{msg['button.password.forget']}</span>
+                        <span class="account-card-desc">#{msg['menu.card.password.forgotten.desc']}</span>
+                    </p:commandLink>
 
-<f:facet name="footer">
-         <p:commandButton
-                         value="#{msg['button.password.forget']}"
-                         id="buttonPasswordForget"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="true"
-                         icon="pi p-fw pi-question"
-                         style="float: left;"
-                         action="#{playerC.forgetPassword}" />
-         <p:commandButton 
-                         value="#{msg['button.password.modify']}"
-                         id="buttonPasswordModify"
-                         ajax="false"
-                         update="growl-msg"
-                         immediate="true"
-                         icon="pi pi-key"
-                         style="float: right;"
-                         action="password_modify.xhtml?faces-redirect=true"/>
-        <p:commandButton
-                         value="#{msg['unavailable.title']}"
-                         id="buttonUnavailable"
-                          
-                         update="growl-msg"
-                         icon="pi pi-sun"
-                         style="margin: 0 auto;"
-                         action="#{dialogC.showUnavailable()}" /> 
-</f:facet>
-</p:panelGrid>
+                    <h:link id="btnPasswordModify"
+                            styleClass="account-card"
+                            outcome="password_modify.xhtml?faces-redirect=true">
+                        <i class="account-card-icon pi pi-key"/>
+                        <span class="account-card-label">#{msg['button.password.modify']}</span>
+                        <span class="account-card-desc">#{msg['menu.card.password.modify.desc']}</span>
+                    </h:link>
+                </div>
+
+                <!-- Section : Personal Data -->
+                <div class="account-menu-section-label">
+                    <i class="pi pi-user"/> #{msg['menu.section.data']}
+                </div>
+                <div class="account-menu-grid">
+                    <h:link id="btnPersonalInfo"
+                            styleClass="account-card"
+                            outcome="player_modify.xhtml?faces-redirect=true">
+                        <i class="account-card-icon pi pi-user-edit"/>
+                        <span class="account-card-label">#{msg['menu.card.personal.info']}</span>
+                        <span class="account-card-desc">#{msg['menu.card.personal.info.desc']}</span>
+                    </h:link>
+
+                    <h:link id="btnUploadPhoto"
+                            styleClass="account-card"
+                            outcome="player_upload_file.xhtml?faces-redirect=true">
+                        <i class="account-card-icon pi pi-image"/>
+                        <span class="account-card-label">#{msg['menu.card.upload.photo']}</span>
+                        <span class="account-card-desc">#{msg['menu.card.upload.photo.desc']}</span>
+                    </h:link>
+                </div>
+
+                <!-- Section : Golf -->
+                <div class="account-menu-section-label">
+                    <i class="pi pi-sun"/> #{msg['menu.section.golf']}
+                </div>
+                <div class="account-menu-grid">
+                    <p:commandLink id="btnUnavailable"
+                                   styleClass="account-card"
+                                   update="growl-msg"
+                                   action="#{dialogC.showUnavailable()}">
+                        <i class="account-card-icon pi pi-sun"/>
+                        <span class="account-card-label">#{msg['menu.card.terrain']}</span>
+                        <span class="account-card-desc">#{msg['menu.card.terrain.desc']}</span>
+                    </p:commandLink>
+                </div>
+
+            </div>
+
+        </p:panel>
+    </div>
 </h:form>
 </ui:define>
 </ui:composition>

@@ -13,8 +13,10 @@ public class psCreateProfessional implements Serializable, interfaces.Log, inter
  public static PreparedStatement psMapCreate(PreparedStatement ps, Professional professional) throws Exception{
     final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
-        ps.setNull(1, java.sql.Types.INTEGER);  // auto generated
+        // ps.setInt(1, 0);  // auto generated — MySQL treats 0 as auto-increment claude code
+        ps.setNull(1, java.sql.Types.INTEGER); // mod lc 
         ps.setInt(2, professional.getProClubId());
+        
         ps.setTimestamp(3,Timestamp.valueOf(professional.getProStartDate()));
         ps.setTimestamp(4,Timestamp.valueOf(professional.getProEndDate()));
         ps.setInt(5, professional.getProPlayerId());

@@ -53,23 +53,17 @@ public class InscriptionMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = "louis.collet@skynet.be";
+            String to = System.getenv("SMTP_USERNAME");
             byte[] pathICS = icalService.generateIcs(player, invitedBy, round, club, course, true);
             String content = mail.replaceAll("<br/>", "\n").replaceAll("<b>", "").replaceAll("</b>", "");
             byte[] pathQRC = qrService.generateQR(content, 200);
             LOG.debug("reponse de qrService = " + Arrays.toString(pathQRC));
 
-            if (mailSender.sendHtmlMail(sujet, mail, to, pathICS, pathQRC, player.getPlayerLanguage())) {
-                String msg = "Vous allez recevoir un mail de confirmation de votre inscription ";
-                LOG.info(msg);
-                showMessageInfo(msg);
-                return true;
-            } else {
-                String msg = "mail de confirmation NOT sent !!";
-                LOG.error(msg);
-                showMessageFatal(msg);
-                return false;
-            }
+            mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, pathQRC, player.getPlayerLanguage());
+            String msg = "Vous allez recevoir un mail de confirmation de votre inscription ";
+            LOG.info(msg);
+            showMessageInfo(msg);
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;
@@ -104,10 +98,10 @@ public class InscriptionMail implements Serializable {
             byte[] pathQRC = qrService.generateQR(content, 200);
             LOG.debug("reponse de qrService = " + pathQRC.toString());
 
-            String to = "louis.collet@skynet.be";
-            boolean b = mailSender.sendHtmlMail(sujet, content, to, pathICS, pathQRC, player.getPlayerLanguage());
-            LOG.debug("HTML Mail status = " + b);
-            return b;
+            String to = System.getenv("SMTP_USERNAME");
+            mailSender.sendHtmlMailAsync(sujet, content, to, pathICS, pathQRC, player.getPlayerLanguage());
+            LOG.debug("HTML Mail async dispatched");
+            return true;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return false;

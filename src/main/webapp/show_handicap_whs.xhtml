@@ -6,133 +6,136 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Handicap WHS List</ui:define>
 
 <ui:define name="content">
-<h:form id="form_handicap_whs">
-    <p:dataTable id="table_handicap"
-                 scrollable="true"
-                 value="#{playerC.listHandicapWHS()}"
-                 var="c"
-                 selection="#{playerC.selectedHandicap}"
-                 rowKey="#{c.handicapIndex.handicapId}"
-                 rowIndexVar="row"
-                 resizableColumns="true"
-                 emptyMessage="#{msg['message.table.empty']}"
-                 filteredValue="#{playerC.filteredHandicaps}"
-                 rows="20"
-                 paginator="true"
-                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
-                 rowsPerPageTemplate="5,10,15"
-                 rowHover="true">
 
-        <f:facet name="header">
-            <p:commandButton id="handicapButton"
-                             value="Detail WHS"
-                             actionListener="#{dialogC.showHandicapIndex()}"
-                             icon="pi pi-question"
-                             style="float:left"/>
-            <h1>#{msg['handicap.whs.data']} : #{playerC.player.playerFirstName},
-                #{playerC.player.playerLastName} (#{playerC.player.idplayer})</h1>
-        </f:facet>
+    <h:form id="form_handicap_whs">
 
-        <p:columnGroup type="header">
-            <p:row>
-                <p:column colspan="2"
-                          headerText="Detail"
-                          width="10%"
-                          styleClass="columnborder1"/>
-                <p:column colspan="4"
-                          headerText="Handicap"
-                          width="45%"
-                          styleClass="columnborder2"/>
-                <p:column colspan="4"
-                          headerText="#{msg['round.result.stableford']}"
-                          width="45%"
-                          styleClass="columnborder1"/>
-            </p:row>
-            <p:row>
-                <p:column headerText="Detail"    selectionBox="true"/>
-                <p:column headerText="#"          style="border-right-width:5px"/>
-                <p:column headerText="#{msg['handicap.player']}"  style="white-space:pre-line;"/>
-                <p:column headerText="#{msg['handicap.sd']}"      style="white-space:pre-line;"/>
-                <p:column headerText="#{msg['handicap.low']}"     style="border-right-width:5px;white-space:pre-line;"/>
-                <p:column headerText="#{msg['handicap.date']}"    style="white-space:pre-line;"/>
-                <p:column headerText="#{msg['round.date']}"       style="white-space:pre-line;"/>
-                <p:column headerText="#{msg['playerhasround.result']}" style="white-space:pre-line;"/>
-                <p:column headerText="#{msg['round.name']}"       style="white-space:pre-line;"/>
-            </p:row>
-        </p:columnGroup>
+        <div class="login-container" style="min-height:auto; align-items:flex-start;">
+            <p:panel styleClass="login-card form-card" style="max-width:100%;">
+                <f:facet name="header">
+                    <h:panelGroup layout="block"
+                                  style="display:flex; align-items:center; gap:0.5rem;">
+                        <p:commandButton id="handicapButton"
+                                         value="Detail WHS"
+                                         actionListener="#{dialogC.showHandicapIndex()}"
+                                         icon="pi pi-question"/>
+                        <h1 style="margin:0;">#{msg['handicap.whs.data']} : #{playerC.player.playerFirstName},
+                            #{playerC.player.playerLastName} (#{playerC.player.idplayer})</h1>
+                    </h:panelGroup>
+                </f:facet>
 
-        <!-- ✅ Colonne sélection -->
-        <p:column width="1%"
-                  id="singlerow"
-                  selectionBox="true"
-                  style="text-align:center;"/>
+                <p:dataTable id="table_handicap"
+                             scrollable="true"
+                             value="#{playerC.listHandicapWHS()}"
+                             var="c"
+                             selection="#{playerC.selectedHandicap}"
+                             rowKey="#{c.handicapIndex.handicapId}"
+                             rowIndexVar="row"
+                             resizableColumns="true"
+                             emptyMessage="#{msg['message.table.empty']}"
+                             filteredValue="#{playerC.filteredHandicaps}"
+                             rows="20"
+                             paginator="true"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             rowsPerPageTemplate="5,10,15"
+                             rowHover="true">
 
-        <!-- ✅ Numéro de ligne -->
-        <p:column>
-            <h:outputText id="rrow"
-                          value="#{row+1}"
-                          style="text-align:center;"/>
-        </p:column>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column colspan="2"
+                                      headerText="Detail"
+                                      width="10%"
+                                      styleClass="columnborder1"/>
+                            <p:column colspan="4"
+                                      headerText="Handicap"
+                                      width="45%"
+                                      styleClass="columnborder2"/>
+                            <p:column colspan="4"
+                                      headerText="#{msg['round.result.stableford']}"
+                                      width="45%"
+                                      styleClass="columnborder1"/>
+                        </p:row>
+                        <p:row>
+                            <p:column headerText="Detail" selectionBox="true"/>
+                            <p:column headerText="#"/>
+                            <p:column headerText="#{msg['handicap.player']}" style="white-space:pre-line;"/>
+                            <p:column headerText="#{msg['handicap.sd']}" style="white-space:pre-line;"/>
+                            <p:column headerText="#{msg['handicap.low']}" style="white-space:pre-line;"/>
+                            <p:column headerText="#{msg['handicap.date']}" style="white-space:pre-line;"/>
+                            <p:column headerText="#{msg['round.date']}" style="white-space:pre-line;"/>
+                            <p:column headerText="#{msg['playerhasround.result']}" style="white-space:pre-line;"/>
+                            <p:column headerText="#{msg['round.name']}" style="white-space:pre-line;"/>
+                        </p:row>
+                    </p:columnGroup>
 
-        <!-- ✅ Handicap WHS -->
-        <p:column width="5%">
-            <b><h:outputText value="#{c.handicapIndex.handicapWHS}"/></b>
-        </p:column>
+                    <p:column width="1%"
+                              id="singlerow"
+                              selectionBox="true"
+                              style="text-align:center;"/>
 
-        <!-- ✅ Score Differential -->
-        <p:column width="5%">
-            <h:outputText value="#{c.handicapIndex.handicapScoreDifferential}"/>
-        </p:column>
+                    <p:column>
+                        <h:outputText id="rrow"
+                                      value="#{row+1}"
+                                      style="text-align:center;"/>
+                    </p:column>
 
-        <!-- ✅ Low Handicap -->
-        <p:column width="5%">
-            <h:outputText value="#{c.handicapIndex.lowHandicapIndex}"/>
-        </p:column>
+                    <p:column width="5%">
+                        <b><h:outputText value="#{c.handicapIndex.handicapWHS}"/></b>
+                    </p:column>
 
-        <!-- ✅ Handicap Date — LocalDateTime -->
-        <p:column width="12%">
-            <h:outputText value="#{c.handicapIndex.handicapDate}">
-                <f:convertDateTime type="localDateTime" pattern="dd-MM-yyyy"/>
-            </h:outputText>
-        </p:column>
+                    <p:column width="5%">
+                        <h:outputText value="#{c.handicapIndex.handicapScoreDifferential}"/>
+                    </p:column>
 
-        <!-- ✅ Round Date — LocalDateTime -->
-        <p:column width="15%">
-            <h:outputText value="#{c.round.roundDate}">
-                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
-            </h:outputText>
-            (#{c.round.idround})
-        </p:column>
+                    <p:column width="5%">
+                        <h:outputText value="#{c.handicapIndex.lowHandicapIndex}"/>
+                    </p:column>
 
-        <!-- ✅ Résultat inscription -->
-        <p:column width="3%">
-            <h:outputText value="#{c.inscription.inscriptionFinalResult}"/>
-        </p:column>
+                    <p:column width="12%">
+                        <h:outputText value="#{c.handicapIndex.handicapDate}">
+                            <f:convertDateTime type="localDateTime" pattern="dd-MM-yyyy"/>
+                        </h:outputText>
+                    </p:column>
 
-        <!-- ✅ Nom du round -->
-        <p:column width="15%">
-            <h:outputText value="#{c.round.roundName}"/>
-        </p:column>
+                    <p:column width="15%">
+                        <h:outputText value="#{c.round.roundDate}">
+                            <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                        (#{c.round.idround})
+                    </p:column>
 
-    </p:dataTable>
+                    <p:column width="3%">
+                        <h:outputText value="#{c.inscription.inscriptionFinalResult}"/>
+                    </p:column>
 
-    <ui:include src="include/include_confirmDialog.xhtml"/>
-</h:form>
+                    <p:column width="15%">
+                        <h:outputText value="#{c.round.roundName}"/>
+                    </p:column>
 
-<h:form id="form_noprint" enctype="application/x-www-form-urlencoded">
-    <p:commandButton id="btn"
-                     value="#{msg['button.print']}"
-                     type="button"
-                     icon="pi pi-print">
-        <p:printer target="form_handicap_whs"/>
-    </p:commandButton>
-</h:form>
+                </p:dataTable>
+
+                <ui:include src="include/include_confirmDialog.xhtml"/>
+
+            </p:panel>
+        </div>
+
+    </h:form>
+
+    <h:form id="form_noprint">
+        <div style="text-align:center; margin-top:1rem;">
+            <p:commandButton id="btn"
+                             value="#{msg['button.print']}"
+                             type="button"
+                             icon="pi pi-print">
+                <p:printer target="form_handicap_whs"/>
+            </p:commandButton>
+        </div>
+    </h:form>
+
 </ui:define>
 </ui:composition>

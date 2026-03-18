@@ -62,8 +62,8 @@ public class CreateTarifMember implements Serializable {
         LOG.debug("Tarif Member converted in json format = " + NEW_LINE + tarifJson);
 
         try (Connection conn = dataSource.getConnection()) {
-            final String query = LCUtil.generateInsertQuery(conn, "tarif_members");
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
+        //    final String query = LCUtil.generateInsertQuery(conn, "tarif_members");
+            try (PreparedStatement ps = conn.prepareStatement(sql.SqlFactory.generateInsertQuery(conn, "tarif_members"))) {
                 ps.setNull(1, java.sql.Types.INTEGER);  // autoincrement
                 ps.setTimestamp(2, Timestamp.valueOf(tarif.getStartDate()));
                 ps.setTimestamp(3, Timestamp.valueOf(tarif.getEndDate()));
