@@ -22,8 +22,8 @@
             
             <property name="managementAddress">127.0.0.1</property>
             <property name="managementPort">9990</property>
-            <property name="username">LouisCollet</property>
-            <property name="password">***REMOVED***</property>
+            <property name="username">???</property>
+            <property name="password">???</property>
             
             <property name="managementProtocol">http-remoting</property>
             <property name="javaVmArguments">-Dfile.encoding=UTF-8</property>
