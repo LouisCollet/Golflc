@@ -31,31 +31,26 @@ public class ItemWriterRound extends AbstractItemWriter {
     }
 
     @Override
-    public void writeItems(List<Object> items) throws Exception
-    { LOG.debug("ItemWriter - writeItems method started for " + items.size());
-    try{
-        LOG.debug("items to be treated =  " + items.size() );
-        LOG.debug("Print List items = " + Arrays.deepToString(items.toArray()));
-         for(int i = 0; i < items.size(); i++) {
-            Round inputRecord = (Round) items.get(i);
-                LOG.debug("input Record " + items.get(i));
-            boolean bo = insertDB(inputRecord);
-                LOG.debug("resultat input Record " + bo + " for " + i);
-            if(bo == true)
-            {
-                recordsOK++;
-                LOG.debug("records written = " + inputRecord.getRoundDate() );
-            }else{
-                recordsKO++;
-                LOG.debug("records NOT written = " + inputRecord.getRoundDate() );
+    public void writeItems(List<Object> items) throws Exception {
+        final String methodName = "ItemWriterRound.writeItems";
+        LOG.debug("entering " + methodName + " - items to process: " + items.size());
+        try {
+            for (Object item : items) {
+                Round inputRecord = (Round) item;
+                LOG.debug(methodName + " - processing round: " + inputRecord.getRoundDate());
+                if (insertDB(inputRecord)) {
+                    recordsOK++;
+                    LOG.debug(methodName + " - record written: " + inputRecord.getRoundDate());
+                } else {
+                    recordsKO++;
+                    LOG.debug(methodName + " - record NOT written: " + inputRecord.getRoundDate());
+                }
             }
+            LOG.debug(methodName + " - batch complete: OK=" + recordsOK + ", KO=" + recordsKO);
+        } catch (Exception ex) {
+            LOG.error(methodName + " - Exception in writeItems: " + ex.getMessage());
+            LOG.error(ex);
         }
-
-    } //end try
-    catch (Exception ex)
-    { LOG.error(" -- Exception in ItemWriter !");
-   	     LOG.error(ex);
-    }
     } // end method
 
 @Override

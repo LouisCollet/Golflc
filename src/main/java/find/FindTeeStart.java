@@ -6,8 +6,8 @@ import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,15 +17,13 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class FindTeeStart implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<String> liste = null;
@@ -55,7 +53,7 @@ public class FindTeeStart implements Serializable {
                      AND SUBSTR(TeeHolesPlayed, 4, 2) = ?
                  """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, course.getIdcourse());

@@ -9,8 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
+import jakarta.inject.Inject;
 import sql.SqlFactory;
 
 import sql.preparedstatement.psCreateUpdatePlayer;
@@ -21,11 +20,8 @@ public class UpdatePlayer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * DataSource injecté par WildFly
-     */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject
+    private dao.GenericDAO dao;
 
     /**
      * Mise à jour d’un Player
@@ -34,7 +30,7 @@ public class UpdatePlayer implements Serializable {
 
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             conn.setAutoCommit(false);
             LOG.debug("AutoCommit set to false");
           // String query = utils.DBMeta.listMetaColumnsUpdate(conn, "player"); // enlève playerpassword

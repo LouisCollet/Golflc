@@ -21,10 +21,10 @@
                deferred="true"
                style="text-align:center;">
    <p:panelGrid  columns="2"
-                 layout="tabular"
-                 columnClasses="col1, col2">
+                 layout="flex"
+                 columnClasses="col1Flex,col2Flex">
      <f:facet name="header">
-                    this is the header facet
+         <h2>#{msg['handicap.player']}</h2>
      </f:facet>
  <!--  rendered="#{not empty appContext.selectedHandicap}"   on travaille sur un ECourseList -->
                 <h:outputText id="date_handicap" value="#{msg['handicap.start']}" />

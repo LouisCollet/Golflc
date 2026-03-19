@@ -988,9 +988,21 @@ public String findClubWebsite() {
         }
 
         // ✅ Ajouter https:// si pas déjà présent
-        String url = club.getClubWebsite();
+        String url = club.getClubWebsite().trim();
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "https://" + url;
+        }
+
+        // ✅ Security: validate URL to prevent open redirect
+        java.net.URI uri = new java.net.URI(url);
+        String scheme = uri.getScheme();
+        if (scheme == null || (!scheme.equals("http") && !scheme.equals("https"))) {
+            showMessageFatal("Invalid website URL");
+            return null;
+        }
+        if (uri.getHost() == null || uri.getHost().isBlank()) {
+            showMessageFatal("Invalid website URL");
+            return null;
         }
 
         LOG.debug(methodName + " - redirecting to = " + url);

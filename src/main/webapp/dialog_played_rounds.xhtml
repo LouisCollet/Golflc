@@ -24,10 +24,10 @@
 <p:outputPanel id="playedroundsDetail"
                style="text-align:center;">
  <p:panelGrid  columns="2"
-               layout="tabular"
-               columnClasses="col1, col2">
+               layout="flex"
+               columnClasses="col1Flex,col2Flex">
     <f:facet name="header">
-                    this is the header facet
+        <h2>#{msg['round.game']}</h2>
     </f:facet>
 
                 <h:outputText value="Date Round:" />

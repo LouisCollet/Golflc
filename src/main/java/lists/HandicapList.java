@@ -5,11 +5,9 @@ import entite.Course;
 import entite.Player;
 import entite.Round;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,26 +16,33 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.RoundRowMapper;
 import rowmappers.RowMapper;
 import rowmappers.RowMapperRound;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+
 @ApplicationScoped
 public class HandicapList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<ECourseList> liste = null;
 
     public HandicapList() { }
 
+    /**
+     * Note: This method cannot use dao.queryList() because the original logic
+     * calls clubMapper.map(rs) BEFORE the while loop (on first row position),
+     * then iterates with rs.next() using that club for RoundRowMapper.
+     * This requires direct ResultSet control.
+     */
     public List<ECourseList> list(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
@@ -60,41 +65,25 @@ public class HandicapList implements Serializable {
             ORDER by idhandicap DESC
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        RowMapper<Course> courseMapper = new CourseRowMapper();
+        RowMapperRound<Round> roundMapper = new RoundRowMapper();
+        RowMapper<Club> clubMapper = new ClubRowMapper();
 
-            ps.setInt(1, player.getIdplayer());
-            utils.LCUtil.logps(ps);
+        // Use dao.queryList with a lambda that maps club per-row
+        liste = new ArrayList<>(dao.queryList(query, rs -> {
+            Club club = clubMapper.map(rs);
+            return ECourseList.builder()
+                    .course(courseMapper.map(rs))
+                    .round(roundMapper.map(rs, club))
+                    .build();
+        }, player.getIdplayer()));
 
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Course> courseMapper = new CourseRowMapper();
-                RowMapperRound<Round> roundMapper = new RoundRowMapper();
-                RowMapper<Club> clubMapper = new ClubRowMapper();
-                Club club = new Club();
-                club = clubMapper.map(rs);
-                while (rs.next()) {
-                    ECourseList ecl = ECourseList.builder()
-                            .course(courseMapper.map(rs))
-                            .round(roundMapper.map(rs, club))
-                            .build();
-                    liste.add(ecl);
-                }
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (liste.isEmpty()) {
+            LOG.warn(methodName + " - empty result list");
+        } else {
+            LOG.debug(methodName + " - list size = " + liste.size());
         }
+        return liste;
     } // end method
 
     // ✅ Getters/setters d'instance

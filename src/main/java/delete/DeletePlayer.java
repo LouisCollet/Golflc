@@ -2,8 +2,7 @@ package delete;
 
 import entite.Player;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
+import jakarta.inject.Inject;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -16,7 +15,7 @@ import utils.LCUtil;
 /**
  * Service de suppression de Player et ses enfants
  * ✅ @ApplicationScoped - Stateless, partagé
- * ✅ @Resource DataSource - Connection pooling
+ * ✅ @Inject GenericDAO - Connection pooling
  * ✅ Gestion transactionnelle avec commit/rollback
  */
 @ApplicationScoped
@@ -24,29 +23,25 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * DataSource injecté par WildFly (connection pooling)
-     */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     /**
      * Supprime un Player et tous ses enfants (cascading delete)
-     * 
+     *
      * @param player Le player à supprimer
      * @return true si succès
      * @throws Exception en cas d'erreur
      */
     public boolean deletePlayerAndChilds(final Player player) throws Exception {
-        
+
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
-        
-        try (Connection conn = dataSource.getConnection()) {
-            
+
+        try (Connection conn = dao.getConnection()) {
+
             conn.setAutoCommit(false);
             LOG.debug("AutoCommit set to false");
-            
+
             // Validation
             if (player == null || player.getIdplayer() == null || player.getIdplayer() == 0) {
                 msg = "Player ID is required for deletion";
@@ -54,11 +49,11 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 LCUtil.showMessageFatal(msg);
                 throw new IllegalArgumentException(msg);
             }
-            
+
             // ✅ PARTIE NON MODIFIÉE - DÉBUT
-            
+
             /* encore à faire : payments-cotisation, greenfee, creditcard, activation
-            
+
              prb si player a un PlayerRole admin (local administrateur)
             SQL Exception in delete.DeletePlayer.deletePlayerAndChilds / java.sql.SQLIntegrityConstraintViolationException:
             Cannot delete or update a parent row: a foreign key constraint fails
@@ -68,7 +63,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
             */
             LOG.debug("starting " + methodName);
             // on commende par le niveau le plus bas !
-            
+
             try (PreparedStatement ps = conn.prepareStatement("""
                     DELETE from score
                     WHERE score.player_has_round_player_idplayer = ?
@@ -159,7 +154,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 LOG.debug("deleted player = " + row_player);
             }
 
-        /*   String msg = "<br/> <h1>Records deleted = " 
+        /*   String msg = "<br/> <h1>Records deleted = "
                             + " <br/></h1>player = " + player.getIdplayer()
                             + " <br/>score = " + row_score
                             + " <br/>inscription = " + row_inscription
@@ -170,24 +165,24 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                LOG.debug(msg);
             //    LCUtil.showMessageInfo(msg);
         */
-            
+
             // ✅ PARTIE NON MODIFIÉE - FIN
-            
+
             conn.commit();
             msg = "Player and all childs deleted successfully: ID " + player.getIdplayer();
             LOG.debug(msg);
             LCUtil.showMessageInfo(msg);
-            
+
             return true;
-            
+
         } catch (SQLException e) {
-            msg = "SQL Exception in " + methodName + e.toString() 
+            msg = "SQL Exception in " + methodName + e.toString()
                 + ", SQLState = " + e.getSQLState()
                 + ", ErrorCode = " + e.getErrorCode();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             throw e;
-            
+
         } catch (Exception ex) {
             msg = "Exception in " + methodName + ex;
             LOG.error(msg);
@@ -204,10 +199,10 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
             // seule méthode utilisée !! pas accessible via application
             Player player = new Player();
             player.setIdplayer(111111);
-            
+
             LOG.debug("Main ready (CDI required for execution)");
             LOG.debug("Test player ID: {}", player.getIdplayer());
-            
+
         } catch (Exception e) {
             // ££ Exception in main
             String msg = "££ Exception in main = " + e.getMessage();

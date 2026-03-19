@@ -4,22 +4,17 @@ import entite.Activation;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class ReadActivation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public ReadActivation() { }
 
@@ -35,34 +30,15 @@ public class ReadActivation implements Serializable {
                 WHERE activationkey = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setString(1, activation.getActivationKey());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                Activation a = new Activation();
-                while (rs.next()) {
-                    a = entite.Activation.map(rs);
-                }
-                if (a.getActivationKey() == null) {
-                    String msg = "Votre enregistrement à Golflc ou votre demande de password reset n'ont pas été trouvés !!";
-                    LOG.error(methodName + " - " + msg);
-                    utils.LCUtil.showMessageFatal(msg);
-                    return null;
-                }
-                LOG.debug(methodName + " - activation found = " + a);
-                return a;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
+        Activation a = dao.querySingle(query, rs -> entite.Activation.map(rs), activation.getActivationKey());
+        if (a == null || a.getActivationKey() == null) {
+            String msg = "Votre enregistrement à Golflc ou votre demande de password reset n'ont pas été trouvés !!";
+            LOG.error(methodName + " - " + msg);
+            utils.LCUtil.showMessageFatal(msg);
             return null;
         }
+        LOG.debug(methodName + " - activation found = " + a);
+        return a;
     } // end method
 
     /*

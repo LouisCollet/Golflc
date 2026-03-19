@@ -5,8 +5,8 @@ import entite.Player;
 import entite.Subscription;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.RowMapper;
 import rowmappers.SubscriptionRowMapper;
 
@@ -24,8 +23,7 @@ public class FindCurrentSubscription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public FindCurrentSubscription() { }
 
@@ -54,7 +52,7 @@ public class FindCurrentSubscription implements Serializable {
                 """;
         }
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, player.getIdplayer());

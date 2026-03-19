@@ -10,8 +10,8 @@ import entite.composite.ECourseList;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.InscriptionRowMapper;
@@ -35,8 +34,7 @@ public class FindCancellation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public FindCancellation() { }
 
@@ -44,7 +42,7 @@ public class FindCancellation implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
 
             String cl = utils.DBMeta.listMetaColumnsLoad(conn, "club");
             String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");

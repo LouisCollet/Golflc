@@ -2,8 +2,7 @@ package update;
 
 import entite.Course;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
+import jakarta.inject.Inject;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -24,18 +23,15 @@ public class UpdateCourse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * DataSource injecté par WildFly (connection pooling)
-     */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject
+    private dao.GenericDAO dao;
 
     public boolean update(final Course course) throws Exception {
         
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
         
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             
             conn.setAutoCommit(false);
             

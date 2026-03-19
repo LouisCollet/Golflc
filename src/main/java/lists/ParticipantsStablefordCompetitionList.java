@@ -9,23 +9,15 @@ import entite.Inscription;
 import entite.Player;
 import entite.Round;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.InscriptionRowMapper;
@@ -34,14 +26,15 @@ import rowmappers.RoundRowMapper;
 import rowmappers.RowMapper;
 import rowmappers.RowMapperRound;
 
+import static exceptions.LCException.handleGenericException;
+
 @Named
 @ApplicationScoped
 public class ParticipantsStablefordCompetitionList implements Serializable, interfaces.Log {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject private read.ReadClassment            readClassment;
     @Inject private find.FindHandicapIndexAtDate  findHandicapIndexAtDate;
@@ -77,67 +70,55 @@ public class ParticipantsStablefordCompetitionList implements Serializable, inte
             ORDER BY player_has_round.InscriptionFinalResult DESC
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        try {
+            RowMapper<Club> clubMapper = new ClubRowMapper();
+            RowMapper<Course> courseMapper = new CourseRowMapper();
+            RowMapper<Player> playerMapper = new PlayerRowMapper();
+            RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
+            RowMapperRound<Round> roundMapper = new RoundRowMapper();
 
-            ps.setInt(1, competition.getCompetitionId());
-            utils.LCUtil.logps(ps);
+            liste = dao.queryList(query, rs -> {
+                Player player = playerMapper.map(rs);
+                Club club = clubMapper.map(rs);
+                Round round = roundMapper.map(rs, club);
+                Classment classment = readClassment.read(player, round);
+                LOG.debug(methodName + " - classment in while = " + classment);
+                HandicapIndex handicapIndex = new HandicapIndex();
+                handicapIndex.setHandicapPlayerId(player.getIdplayer());
+                handicapIndex.setHandicapDate(round.getRoundDate());
+                handicapIndex = findHandicapIndexAtDate.find(handicapIndex);
+                LOG.debug(methodName + " - handicapIndex in while = " + handicapIndex);
+                return ECourseList.builder()
+                        .club(club)
+                        .course(courseMapper.map(rs))
+                        .handicapIndex(handicapIndex)
+                        .inscription(inscriptionMapper.map(rs))
+                        .round(round)
+                        .player(player)
+                        .classment(classment)
+                        .build();
+            }, competition.getCompetitionId());
 
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                int i = 0;
-                RowMapper<Club> clubMapper = new ClubRowMapper();
-                RowMapper<Course> courseMapper = new CourseRowMapper();
-                RowMapper<Player> playerMapper = new PlayerRowMapper();
-                RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
-                RowMapperRound<Round> roundMapper = new RoundRowMapper();
-                while (rs.next()) {
-                    i++;
-                    Player player = playerMapper.map(rs);
-                    Club club = clubMapper.map(rs);
-                    Round round = roundMapper.map(rs, club);
-                    Classment classment = readClassment.read(player, round);
-                    LOG.debug(methodName + " - classment in while = " + classment);
-                    HandicapIndex handicapIndex = new HandicapIndex();
-                    handicapIndex.setHandicapPlayerId(player.getIdplayer());
-                    handicapIndex.setHandicapDate(round.getRoundDate());
-                    handicapIndex = findHandicapIndexAtDate.find(handicapIndex);
-                    LOG.debug(methodName + " - handicapIndex in while = " + handicapIndex);
-                    ECourseList ecl = ECourseList.builder()
-                            .club(club)
-                            .course(courseMapper.map(rs))
-                            .handicapIndex(handicapIndex)
-                            .inscription(inscriptionMapper.map(rs))
-                            .round(round)
-                            .player(player)
-                            .classment(classment)
-                            .build();
-                    liste.add(ecl);
-                } // end while
-                if (i == 0) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-
-                liste.forEach(item -> LOG.debug("liste BEFORE sort" + NEW_LINE
-                        + item.player().getPlayerLastName() + item.classment().getTotalPoints()));
-
-                liste.sort(Comparator.comparingInt((ECourseList p) -> p.classment().getTotalPoints()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast9()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast6()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast3()).reversed()
-                        .thenComparingInt((ECourseList p) -> p.classment().getLast1()).reversed());
-
-                liste.forEach(item -> LOG.debug("liste AFTER sort = " + NEW_LINE
-                        + item.player().getPlayerFirstName() + " / "
-                        + item.player().getIdplayer() + " /" + item.classment()));
-                return liste;
+            if (liste.isEmpty()) {
+                LOG.warn(methodName + " - empty result list");
+            } else {
+                LOG.debug(methodName + " - list size = " + liste.size());
             }
 
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
+            liste.forEach(item -> LOG.debug("liste BEFORE sort" + NEW_LINE
+                    + item.player().getPlayerLastName() + item.classment().getTotalPoints()));
+
+            liste.sort(Comparator.comparingInt((ECourseList p) -> p.classment().getTotalPoints()).reversed()
+                    .thenComparingInt((ECourseList p) -> p.classment().getLast9()).reversed()
+                    .thenComparingInt((ECourseList p) -> p.classment().getLast6()).reversed()
+                    .thenComparingInt((ECourseList p) -> p.classment().getLast3()).reversed()
+                    .thenComparingInt((ECourseList p) -> p.classment().getLast1()).reversed());
+
+            liste.forEach(item -> LOG.debug("liste AFTER sort = " + NEW_LINE
+                    + item.player().getPlayerFirstName() + " / "
+                    + item.player().getIdplayer() + " /" + item.classment()));
+            return liste;
+
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return Collections.emptyList();

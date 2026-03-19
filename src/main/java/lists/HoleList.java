@@ -1,23 +1,15 @@
 package lists;
 
 import entite.Hole;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.HoleRowMapper;
-import rowmappers.RowMapper;
 
 @Named
 @ApplicationScoped
@@ -25,8 +17,7 @@ public class HoleList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<Hole> liste = null;
@@ -55,35 +46,14 @@ public class HoleList implements Serializable {
                 ORDER BY HoleNumber
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        liste = new ArrayList<>(dao.queryList(query, new HoleRowMapper(), teeId));
 
-            ps.setInt(1, teeId);
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Hole> holeMapper = new HoleRowMapper();
-
-                while (rs.next()) {
-                    liste.add(holeMapper.map(rs));
-                }
-
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list for teeId = " + teeId);
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (liste.isEmpty()) {
+            LOG.warn(methodName + " - empty result list for teeId = " + teeId);
+        } else {
+            LOG.debug(methodName + " - list size = " + liste.size());
         }
+        return liste;
     } // end method
 
     public List<Hole> getListe()                { return liste; }

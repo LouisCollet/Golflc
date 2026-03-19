@@ -10,8 +10,8 @@ import entite.Tee;
 import entite.composite.ECourseList;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.InscriptionRowMapper;
@@ -38,8 +37,7 @@ public class FindSlopeRating implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<ECourseList> liste = null;
@@ -76,7 +74,7 @@ public class FindSlopeRating implements Serializable {
              AND player_has_round.InscriptionIdTee = tee.idtee
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, player.getIdplayer());

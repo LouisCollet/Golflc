@@ -7,9 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 
 @ApplicationScoped
@@ -17,8 +16,7 @@ public class FindCountScore implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public int find(Player player, Round round, String operation) throws SQLException { // ✅ conn supprimé
         LOG.debug("entering find");
@@ -42,7 +40,7 @@ public class FindCountScore implements Serializable {
                     """;
         }
 
-        try (Connection conn = dataSource.getConnection()) {                    // ✅ try-with-resources niveau 1
+        try (Connection conn = dao.getConnection()) {                    // ✅ try-with-resources niveau 1
             try (PreparedStatement ps = conn.prepareStatement(query)) {         // ✅ try-with-resources niveau 2
                 ps.setInt(1, player.getIdplayer());
                 ps.setInt(2, round.getIdround());
@@ -69,7 +67,7 @@ public class FindCountScore implements Serializable {
     } // end method
 
     void main() throws Exception {
-        // ⚠️ Sans CDI container : dataSource sera null → à tester via WildFly uniquement
+        // ⚠️ Sans CDI container : dao sera null → à tester via WildFly uniquement
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();
@@ -90,7 +88,7 @@ import connection_package.DBConnection;
 import utils.LCUtil;
 
 public class FindCountScore{
- 
+
 
   public int find(Connection conn, Player player, Round round, String operation) throws SQLException{
     PreparedStatement ps = null;
@@ -122,7 +120,7 @@ try{
     ps.setInt(2,round.getIdround());
     utils.LCUtil.logps(ps);
     rs = ps.executeQuery();
-    if(rs.next()){ 
+    if(rs.next()){
         // LOG.debug("resultat : getCountScore = " + rs.getInt(1) );
        return rs.getInt(1);
     }else{
@@ -130,13 +128,13 @@ try{
         return 99;  //error code
     }
 } catch(SQLException sqle){
-    String msg = "Â£Â£Â£ SQLException in FindCountScore = " + sqle.getMessage() + " ,SQLState = " +
+    String msg = "£££ SQLException in FindCountScore = " + sqle.getMessage() + " ,SQLState = " +
             sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
         LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return 99;
 }catch(Exception nfe){
-    String msg = "Â£Â£Â£ Exception in FindCountScore = " + nfe.getMessage();
+    String msg = "£££ Exception in FindCountScore = " + nfe.getMessage();
         LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return 99;
@@ -144,7 +142,7 @@ try{
       DBConnection.closeQuietly(null, null, rs, ps);
 }
 } //end method
-    
+
 void main() throws Exception , Exception{
     Connection conn = new DBConnection().getConnection();
     Player player = new Player();

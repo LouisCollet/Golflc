@@ -23,7 +23,8 @@
                              value="#{roundC.listRecentRounds()}"
                              var="c"
                              emptyMessage="#{msg['message.table.empty']}"
-                             rowKey="#{c.round.idround}">
+                             rowKey="#{c.round.idround}"
+                             styleClass="compact-table">
 
                     <p:column headerText="#{msg['round.selected']}"
                               width="10%">

@@ -3,11 +3,10 @@ package create;
 
 import entite.Course;
 import entite.Flight;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import utils.LCUtil;
 
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,9 +30,7 @@ public class CreateTableFlights implements interfaces.GolfInterface, Serializabl
 
     private static final long serialVersionUID = 1L;
 
-    // ✅ Injection DataSource WildFly
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ========================================
     // MÉTHODE PRINCIPALE
@@ -54,7 +51,7 @@ public class CreateTableFlights implements interfaces.GolfInterface, Serializabl
         LOG.debug("{} - course={}", methodName, course);
 
         // ✅ try-with-resources : Connection et Statement fermés automatiquement
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              Statement stm = conn.createStatement()) {
 
             // Suppression de tous les records existants

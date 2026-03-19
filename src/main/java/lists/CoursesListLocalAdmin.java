@@ -4,20 +4,12 @@ import entite.Club;
 import entite.Course;
 import entite.Player;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.RowMapper;
@@ -30,8 +22,7 @@ public class CoursesListLocalAdmin implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public CoursesListLocalAdmin() { }
 
@@ -47,39 +38,21 @@ public class CoursesListLocalAdmin implements Serializable {
                AND course.CourseEndDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        RowMapper<Club> clubMapper = new ClubRowMapper();
+        RowMapper<Course> courseMapper = new CourseRowMapper();
 
-            ps.setInt(1, localAdmin.getIdplayer());
-            utils.LCUtil.logps(ps);
+        List<ECourseList> result = dao.queryList(query, rs -> ECourseList.builder()
+                .club(clubMapper.map(rs))
+                .course(courseMapper.map(rs))
+                .build(),
+                localAdmin.getIdplayer());
 
-            try (ResultSet rs = ps.executeQuery()) {
-                List<ECourseList> result = new ArrayList<>();
-                RowMapper<Club> clubMapper = new ClubRowMapper();
-                RowMapper<Course> courseMapper = new CourseRowMapper();
-
-                while (rs.next()) {
-                    ECourseList ecl = ECourseList.builder()
-                            .club(clubMapper.map(rs))
-                            .course(courseMapper.map(rs))
-                            .build();
-                    result.add(ecl);
-                }
-                if (result.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + result.size());
-                }
-                return result;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (result.isEmpty()) {
+            LOG.warn(methodName + " - empty result list");
+        } else {
+            LOG.debug(methodName + " - list size = " + result.size());
         }
+        return result;
     } // end method
 
     /**

@@ -79,11 +79,9 @@
                                        interval="1000">
                             <p:ajax event="complete"
                                     listener="#{payC.onCompletePayment()}"
-                                    update="progressBar2"
                                     oncomplete="PF('startButton2').disable()"/>
                             <p:ajax event="start"
-                                    listener="#{payC.onStart}"
-                                    update="taskResult growl-msg"/>
+                                    listener="#{payC.onStart}"/>
                         </p:progressBar>
                     </div>
 

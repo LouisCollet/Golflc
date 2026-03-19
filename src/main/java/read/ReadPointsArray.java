@@ -7,23 +7,21 @@ import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class ReadPointsArray implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public ReadPointsArray() { }
 
@@ -56,7 +54,7 @@ public class ReadPointsArray implements Serializable {
                 + "   GROUP by hole.HoleNumber"
                 + "   ORDER by hole.HoleNumber";
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, player.getIdplayer());

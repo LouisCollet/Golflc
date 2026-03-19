@@ -17,7 +17,7 @@
     <div class="login-container">
       <p:panel styleClass="login-card">
         <f:facet name="header">
-            <h:outputText value="#{msg['message.playerslist']}" />
+            <h1>#{msg['message.playerslist']}</h1>
         </f:facet>
 
         <!-- =================== INCLUDE PLAYER SELECTOR =================== -->
@@ -54,7 +54,8 @@
                  rowHover="true"
                  rowKey="#{c.player.idplayer}"
                  selectionMode="single"
-                 selection="#{playerC.selectedPlayerEPP}" >
+                 selection="#{playerC.selectedPlayerEPP}"
+                 styleClass="compact-table" >
 
         <p:ajax event="rowSelect"
                 update=":selectPlayer_form:playerDetail"
@@ -82,7 +83,7 @@
                              style="float:right"
                              icon="pi pi-table"
                              global="true"/>
-            <h:outputText escape="false" value="#{msg['message.playerslist']}" />
+            <h1 style="display:inline;">#{msg['message.playerslist']}</h1>
             <p:columnToggler
                 id="id001"
                 datasource="table_players"
@@ -124,7 +125,10 @@
             <h:outputText value="#{c.player.playerLastName}" />
         </p:column>
 
-        <ui:include src="include/include_thumbnails.xhtml"/>
+        <ui:include src="include/include_thumbnail.xhtml">
+            <ui:param name="th_photo" value="#{c.player.playerPhotoLocation}"/>
+            <ui:param name="th_name"  value="#{c.player.playerLastName}"/>
+        </ui:include>
 
         <p:column id="col004"
                   headerText="#{msg['address.country.code']}"
@@ -145,9 +149,9 @@
               resizable="false">
         <p:outputPanel id="playerDetail" style="text-align:center;">
             <p:panelGrid columns="2"
-                         layout="tabular"
+                         layout="flex"
                          style="font-size:0.8rem;"
-                         columnClasses="col1,col2">
+                         columnClasses="col1Flex,col2Flex">
                 <h:outputText value="First Name:"/>
                 <h:outputText value="#{playerC.selectedPlayerEPP.player.playerFirstName}" />
                 <h:outputText value="Last Name:"/>

@@ -19,9 +19,7 @@
                        decimalPlaces="0"
                        thousandSeparator=""
                        emptyValue="0"
-                       onkeyup="var v=this.value.replace(/\D/g,'');
-                                var btn=this.closest('[id$=containerPlayer]').querySelector('[id$=wrapperButtonSelect]');
-                                if(btn) btn.style.display=(v.length&gt;0 &amp;&amp; v!=='0')?'':'none';"
+                       onkeyup="togglePlayerSelectButton(this)"
                        style="margin-left:1.5em; margin-right:1.5em;" >
                     <f:validateBean disabled="true"/>
                 </p:inputNumber>

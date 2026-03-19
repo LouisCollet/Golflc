@@ -8,9 +8,10 @@
 
     <p:dataTable var="item"
                  value="#{memC.tarifGreenfee.equipmentsList}"
-                 emptyMessage="#{msg['message.table.empty']}">
+                 emptyMessage="#{msg['message.table.empty']}"
+                 styleClass="compact-table">
         <f:facet name="header">
-            <h:outputText escape="false" value="#{msg['title.equipments.choice']}"/>
+            <h1>#{msg['title.equipments.choice']}</h1>
         </f:facet>
 
         <p:column headerText="#{msg['tarif.members.item']}"

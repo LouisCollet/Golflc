@@ -4,14 +4,13 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces">
-<h:body>
+
 <p:confirmDialog global="true"
                  showEffect="fade"
                  hideEffect="fade"
                  styleClass="danger-confirm"
                  closable="true"
-                 width="250"
-                 height="150"
+                 responsive="true"
                  header="#{msg['message.confirm.delete']}"
                  message="#{msg['message.confirm.cancel']}" >
         <p:commandButton value="#{msg['button.yes']}"
@@ -25,17 +24,16 @@
 </p:confirmDialog>
 
 <p:confirmPopup global="true"
-                showEffect="fade" 
+                showEffect="fade"
                 hideEffect="fade"
-                message="this is the message"
-                icon="pi pi-power-off"
+                icon="pi pi-exclamation-triangle"
                 dismissable="true" >
-            <p:commandButton value="No"
-                             type="button" 
+            <p:commandButton value="#{msg['button.no']}"
+                             type="button"
                              styleClass="ui-confirm-popup-no ui-button-flat" />
-            <p:commandButton value="Yes"
+            <p:commandButton value="#{msg['button.yes']}"
                              type="button"
                              styleClass="ui-confirm-popup-yes" />
 </p:confirmPopup>
-</h:body>
+
 </ui:composition>

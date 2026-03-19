@@ -7,8 +7,8 @@ import entite.composite.ECourseList;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.RoundRowMapper;
 import rowmappers.RowMapperRound;
@@ -29,10 +28,9 @@ public class ScoreCardList1EGA implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    // Cache d'instance — @ApplicationScoped garantit le singleton
     private List<ECourseList> liste = null;
 
     public ScoreCardList1EGA() { }
@@ -49,7 +47,8 @@ public class ScoreCardList1EGA implements Serializable {
         LOG.debug(methodName + " with player = " + player);
         LOG.debug(methodName + " for round = " + round);
 
-        try (Connection conn = dataSource.getConnection()) {
+        // Needs raw Connection for DBMeta.listMetaColumnsLoad (dynamic column list)
+        try (Connection conn = dao.getConnection()) {
 
             // Dynamic column list via DBMeta (requires same connection)
             String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
@@ -104,11 +103,11 @@ public class ScoreCardList1EGA implements Serializable {
         }
     } // end method
 
-    // ✅ Getters/setters d'instance
+    // Getters/setters d'instance
     public List<ECourseList> getListe()                 { return liste; }
     public void setListe(List<ECourseList> liste)       { this.liste = liste; }
 
-    // ✅ Invalidation explicite
+    // Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);

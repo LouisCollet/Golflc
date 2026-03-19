@@ -4,13 +4,10 @@ import entite.TarifSubscription;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -18,8 +15,7 @@ public class DeleteTarifSubscription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public DeleteTarifSubscription() { }
 
@@ -33,29 +29,15 @@ public class DeleteTarifSubscription implements Serializable {
                 WHERE TarifSubscriptionCode = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setString(1, tarif.getCode());
-            LCUtil.logps(ps);
-
-            int rowDeleted = ps.executeUpdate();
-            String msg = "There are " + rowDeleted + " TarifSubscription deleted for code = " + tarif.getCode();
-            if (rowDeleted != 0) {
-                LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
-                return true;
-            } else {
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
-                return false;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return false;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
+        int rowDeleted = dao.execute(query, tarif.getCode());
+        String msg = "There are " + rowDeleted + " TarifSubscription deleted for code = " + tarif.getCode();
+        if (rowDeleted != 0) {
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
+            return true;
+        } else {
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
             return false;
         }
     } // end method
@@ -66,27 +48,15 @@ public class DeleteTarifSubscription implements Serializable {
 
         final String query = "DELETE FROM tarif_subscription";
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            LCUtil.logps(ps);
-            int rowDeleted = ps.executeUpdate();
-            String msg = "There are " + rowDeleted + " TarifSubscription deleted (all)";
-            if (rowDeleted != 0) {
-                LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
-                return true;
-            } else {
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
-                return false;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return false;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
+        int rowDeleted = dao.execute(query);
+        String msg = "There are " + rowDeleted + " TarifSubscription deleted (all)";
+        if (rowDeleted != 0) {
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
+            return true;
+        } else {
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
             return false;
         }
     } // end method

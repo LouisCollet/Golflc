@@ -4,14 +4,13 @@ import entite.Professional;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import javax.sql.DataSource;
 import static utils.LCUtil.generatedKey;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
@@ -21,8 +20,7 @@ public class CreateProfessional implements Serializable, interfaces.Log, interfa
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public CreateProfessional() { }
 
@@ -31,7 +29,7 @@ public class CreateProfessional implements Serializable, interfaces.Log, interfa
         LOG.debug("entering " + methodName);
         LOG.debug("with Professional  = " + professional);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             final String query = utils.LCUtil.generateInsertQuery(conn, "professional");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 sql.preparedstatement.psCreateProfessional.psMapCreate(ps, professional);

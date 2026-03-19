@@ -24,7 +24,8 @@
              var="c"
              rowIndexVar="rowIndex"
              emptyMessage="#{msg['message.table.empty']}"
-             style="margin: 0 auto;width:40%;text-align:center;" >
+             style="margin: 0 auto;width:40%;text-align:center;"
+             styleClass="compact-table" >
 
  <c:set var="get"         value="#{calcMatchplayResult.getFinalResult().getFirst()}"/>
  <c:set var="player1Id"   value="#{get.getPlayer1().getPlayerId()}"/>

@@ -5,13 +5,14 @@ import entite.Club;
 import org.jboss.weld.junit5.EnableWeld;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import read.ReadClub2;
+import read.ReadClub;
+
 
 @EnableWeld
 public class ReadClub2IT {
 
     @Inject
-    ReadClub2 readClub;  // Injection CDI via constructeur @TestDB
+    ReadClub readClub;  // Injection CDI via constructeur @TestDB
 
     @Test
     void testReadClub() throws Exception {

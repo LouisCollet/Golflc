@@ -1,22 +1,13 @@
 package lists;
 
 import entite.TarifSubscription;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
-import rowmappers.RowMapper;
 import rowmappers.TarifSubscriptionRowMapper;
 
 @Named
@@ -25,8 +16,7 @@ public class TarifSubscriptionList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     private List<TarifSubscription> liste = null;
 
@@ -49,32 +39,8 @@ public class TarifSubscriptionList implements Serializable {
                 ORDER BY TarifSubscriptionCode, TarifSubscriptionStartDate
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<TarifSubscription> mapper = new TarifSubscriptionRowMapper();
-                while (rs.next()) {
-                    liste.add(mapper.map(rs));
-                }
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
-        }
+        liste = dao.queryList(query, new TarifSubscriptionRowMapper());
+        return liste;
     } // end method
 
     public List<TarifSubscription> getListe() { return liste; }

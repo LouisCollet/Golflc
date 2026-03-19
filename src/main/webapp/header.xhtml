@@ -17,6 +17,14 @@
             <!-- LEFT -->
             <div class="col-12 md:col-6 flex align-items-center gap-3">
 
+                <!-- Hamburger menu — visible only on mobile (hidden on md+) -->
+                <p:commandButton icon="pi pi-bars"
+                                 type="button"
+                                 styleClass="md:hidden"
+                                 style="font-size:1.3rem;"
+                                 aria-label="Menu"
+                                 onclick="PF('sidebarMenu').show()" />
+
                 <p:commandButton id="buttonLogout"
                                  value="Logout"
                                  icon="pi pi-power-off"
@@ -58,7 +66,15 @@
                 <p:commandButton value="Footer"
                                  icon="pi pi-arrow-down"
                                  type="button"
+                                 rendered="#{settings.getProperty('EXECUTION') eq 'Development'}"
                                  onclick="PF('sidebarDown').show()" />
+
+                <!-- Dark/Light mode toggle -->
+                <p:commandButton id="themeToggle"
+                                 icon="pi pi-moon"
+                                 type="button"
+                                 aria-label="Toggle dark mode"
+                                 onclick="toggleDarkMode(this)" />
 
                 <!-- screenShot removed 2026-02-28 — method was dead (Selenium test-only, removed 2026-01-10)
                 <p:commandButton value="Screenshot"
@@ -71,47 +87,35 @@
         </div>
 
         <!-- ===================== -->
-        <!-- 2️⃣ DEBUG / RUNTIME INFO -->
-        <!-- Visible only ADMIN -->
+        <!-- 2️⃣ DEBUG BAR — 1 ligne, admin + connected only -->
         <!-- ===================== -->
-        <div class="mt-3 text-sm text-600"
-
-             rendered="#{playerC != null and playerC.player != null and playerC.isAdmin()}">
-            <div class="grid">
-                new
-<h:outputText value="#{playerC.player}" />
-  <!--              end
-   <h:outputText value="DEBUG playerC = #{playerC}" /><br/>
-<h:outputText value="DEBUG player = #{playerC.player}" /><br/>
-<h:outputText value="DEBUG id = #{playerC.player.idplayer()}" />             
-                -->
-                <div class="col-12 md:col-6">
-                    <strong>Player:</strong>
-                    #{playerC.player.idplayer}
-                    #{playerC.player.playerFirstName}
-                    #{playerC.player.playerLastName}
-                    (#{playerC.player.playerRole})
-                </div>
-
-                <div class="col-12 md:col-6">
-                    <strong>View:</strong> #{view.viewId}
-                </div>
-
-                <div class="col-12 md:col-6">
-                    <strong>Locale:</strong> #{languageC.locale}
-                </div>
-
-                <div class="col-12 md:col-6">
-                    <strong>Execution:</strong> #{settings.getProperty('EXECUTION')}
-                </div>
-
-               
-                <div id="sessionCount" class="col-12 md:col-6">
-                    <strong>Sessions:</strong> #{advancedAdmin.activeSessionCount}
-                </div>
-
-            </div>
-        </div>
+        <h:panelGroup layout="block" styleClass="summary-bar mt-2"
+                      rendered="#{appContext.connected and playerC.isAdmin()}">
+            <span class="summary-item">
+                <span class="summary-label">Player</span>
+                <span class="summary-value">#{playerC.player.idplayer} #{playerC.player.playerFirstName} #{playerC.player.playerLastName} (#{playerC.player.playerRole})</span>
+            </span>
+            <span class="summary-sep">|</span>
+            <span class="summary-item">
+                <span class="summary-label">View</span>
+                <span class="summary-value">#{view.viewId}</span>
+            </span>
+            <span class="summary-sep">|</span>
+            <span class="summary-item">
+                <span class="summary-label">Locale</span>
+                <span class="summary-value">#{languageC.locale}</span>
+            </span>
+            <span class="summary-sep">|</span>
+            <span class="summary-item">
+                <span class="summary-label">Exec</span>
+                <span class="summary-value">#{settings.getProperty('EXECUTION')}</span>
+            </span>
+            <span class="summary-sep">|</span>
+            <span class="summary-item">
+                <span class="summary-label">Sessions</span>
+                <span class="summary-value">#{advancedAdmin.activeSessionCount}</span>
+            </span>
+        </h:panelGroup>
 
         <!-- ===================== -->
         <!-- 3️⃣ AJAX STATUS -->
@@ -126,9 +130,11 @@
                       draggable="false"
                       closable="false"
                       resizable="false"
-                      showHeader="false">
-                <div class="text-center">
-                    <i class="pi pi-spin pi-spinner" style="font-size:2rem"></i>
+                      showHeader="false"
+                      style="border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
+                <div style="text-align:center; padding:1.5rem 2rem;">
+                    <i class="pi pi-spin pi-spinner" style="font-size:2.5rem; color:var(--golf-primary);"></i>
+                    <div style="margin-top:0.75rem; font-size:0.85rem; color:var(--golf-text-light);">Loading...</div>
                 </div>
             </p:dialog>
 

@@ -6,27 +6,20 @@ import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClassmentRowMapper;
 import rowmappers.RowMapper;
-import java.sql.Connection;
 
 @ApplicationScoped
 public class ReadClassment implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public ReadClassment() { }
 
@@ -73,35 +66,14 @@ public class ReadClassment implements Serializable {
             LOG.debug("query9Holes chosen!");
         }
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, player.getIdplayer());
-            ps.setInt(2, round.getIdround());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                List<Classment> liste = new ArrayList<>();
-                RowMapper<Classment> classmentMapper = new ClassmentRowMapper();
-                while (rs.next()) {
-                    liste.add(classmentMapper.map(rs));
-                }
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list for player=" + player.getIdplayer()
-                            + " round=" + round.getIdround());
-                    return null;
-                }
-                LOG.debug(methodName + " - returning classment = " + liste.getFirst());
-                return liste.getFirst();
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
+        Classment result = dao.querySingle(query, new ClassmentRowMapper(), player.getIdplayer(), round.getIdround());
+        if (result == null) {
+            LOG.warn(methodName + " - empty result list for player=" + player.getIdplayer()
+                    + " round=" + round.getIdround());
             return null;
         }
+        LOG.debug(methodName + " - returning classment = " + result);
+        return result;
     } // end method
 
     // ===========================================================================================

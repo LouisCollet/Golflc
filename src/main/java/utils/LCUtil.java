@@ -124,10 +124,8 @@ public static String getCurrentTimeWithZoneOffset(String lzt){
     String offset = zdt.getOffset().toString();
          LOG.debug("Offset = " + offset);
     if (zoneId.getRules().isDaylightSavings(zdt.toInstant())) {
-        System.out.printf("  (%s daylight saving time will be in effect.)%n", zoneId);
         LOG.debug("DAYLIGHT saving time will be in effect for " + zoneId);}
     else {
-        System.out.printf("  (%s standard time will be in effect.)%n", zoneId);
         LOG.debug("Standard time will be in effect for " + zoneId);}
     return zdt.toString();
    // return zdt.format(ZDF) + " Offset = " + offset;
@@ -416,12 +414,10 @@ public static Double[] toObjectArray(double[] input) {
     LOG.debug("[ ");
     for (int row=0; row<a.length; row++) {
       if (row > 0) {
-          System.out.print("  ");
-          System.out.print("[");}
+          LOG.debug("  [");}
       for (int col=0; col<a[0].length; col++) {
         if (col > 0)
-        {System.out.print(", ");
-        System.out.format("%3d",a[row][col]);} // field-width = 3
+        {LOG.debug(String.format(", %3d", a[row][col]));} // field-width = 3
       }
       LOG.debug("]");
     }
@@ -477,7 +473,7 @@ public static void printArray3DInt(int [][][] t)
             LOG.debug("Charset "+nom);
             Charset charset = charsets.get(nom);
         for(String alias : charset.aliases()){
-            System.out.print(" "+alias+",");
+            LOG.debug(" " + alias + ",");
    }
    LOG.debug("");
 }
@@ -521,7 +517,7 @@ static public String dumpJavaProperties(){
       p = System.getProperties();
     }
     catch(Exception e) {
-      e.printStackTrace();
+      LOG.error("Error getting system properties: " + e.getMessage(), e);
       return "";
     }
     final java.util.Enumeration<?> en = p.propertyNames();
@@ -575,8 +571,8 @@ public static long DiskSpace() {
         File file = new File("C:");
            LOG.debug(" -- Free Disk Space (Bytes) on C:\\ = " + file.getFreeSpace() );
         return lc;
-    } catch (IOException e)    { 
-        e.printStackTrace();
+    } catch (IOException e)    {
+        LOG.error("IOException in disk space check: " + e.getMessage(), e);
         return 0;
     }
 }
@@ -1275,10 +1271,10 @@ try{
         }
     }
 } catch (IOException e) {
-    e.printStackTrace();
+    LOG.error("IOException reading manifest: " + e.getMessage(), e);
 }
-    
-    
+
+
     
     
    } catch (Exception ex) {
@@ -2209,7 +2205,7 @@ public static String mask(String input, int visible) {
 public void listAllProperties() {
     System.getProperties().forEach((key, value) -> {
         if (key.toString().contains("jboss") || key.toString().contains("wildfly")) {
-            System.out.println(key + " = " + value);
+            LOG.debug(key + " = " + value);
         }
     });
 }

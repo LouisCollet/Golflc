@@ -4,7 +4,6 @@ import entite.TarifSubscription;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -13,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -21,8 +19,7 @@ public class CreateTarifSubscription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject
     private find.FindTarifSubscriptionOverlapping findTarifSubscriptionOverlapping;
@@ -38,7 +35,7 @@ public class CreateTarifSubscription implements Serializable {
             return false; // rejected for dates overlapping
         }
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(utils.LCUtil.generateInsertQuery(conn, "tarif_subscription"))) {
 
             ps.setNull(1, java.sql.Types.INTEGER);                // TarifSubscriptionId auto-increment

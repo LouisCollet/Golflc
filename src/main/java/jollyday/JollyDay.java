@@ -272,12 +272,12 @@ try{
 
 CalendarHierarchy root = manager.getCalendarHierarchy();
 
-System.out.println("ROOT ID = " + root.getId());
+LOG.debug("ROOT ID = " + root.getId());
 
 Object children = root.getChildren();
 
-System.out.println("Children object = " + children);
-System.out.println("Children class  = " +
+LOG.debug("Children object = " + children);
+LOG.debug("Children class  = " +
         (children != null ? children.getClass() : "null"));
         
    //     Object children = root.getChildren();
@@ -285,7 +285,7 @@ System.out.println("Children class  = " +
 if (children instanceof Iterable<?> iterable) {
     for (Object o : iterable) {
         CalendarHierarchy region = (CalendarHierarchy) o;
-        System.out.println("REGION = " + region.getId());
+        LOG.debug("REGION = " + region.getId());
     }
 } else {
     LOG.debug("Aucune région disponible for " + HolidayCalendar.BELGIUM);

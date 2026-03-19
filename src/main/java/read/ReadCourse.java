@@ -2,24 +2,19 @@ package read;
 
 import entite.Course;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
+import jakarta.inject.Inject;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static interfaces.Log.LOG;
 import rowmappers.CourseRowMapper;
-import rowmappers.RowMapper;
 import utils.LCUtil;
 
 /**
  * Service de lecture de Course
  * ✅ @ApplicationScoped - Stateless, partagé
- * ✅ @Resource DataSource - Connection pooling
+ * ✅ @Inject GenericDAO - Connection pooling
  * ✅ Pattern RowMapper conservé
  */
 @ApplicationScoped
@@ -27,73 +22,37 @@ public class ReadCourse implements Serializable, interfaces.GolfInterface {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * DataSource injecté par WildFly (connection pooling)
-     */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     /**
      * Lit un Course par ID
-     * 
+     *
      * @param course Course avec l'ID à rechercher
      * @return Course complet
      * @throws Exception en cas d'erreur
      */
     public Course read(Course course) throws SQLException, Exception {
-        
+
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
-        
-        try (Connection conn = dataSource.getConnection()) {
-            
-            // Validation
-            if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
-                msg = "Valid course ID is required";
-                LOG.error(msg);
-                throw new IllegalArgumentException(msg);
-            }
-            
-            LOG.debug("entering new version {}", methodName);
-            LOG.debug("with Course {}", course);
-            
-            final String query = """
-                SELECT *
-                FROM Course
-                WHERE idcourse = ?
-                """;
-            
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setInt(1, course.getIdcourse());
-                LCUtil.logps(ps);
-                
-                try (ResultSet rs = ps.executeQuery()) {
-                    
-                    // ✅ PARTIE NON MODIFIÉE (comme demandé)
-                    RowMapper<Course> courseMapper = new CourseRowMapper();
-                    while(rs.next()){
-                        //course = Course.dtoMapper(rs);
-                        course = courseMapper.map(rs);
-                    }  //end while
-                    //   LOG.debug("ResultSet " + methodName + " has " + i + " lines.");
-                    return course;
-                }
-            }
-            
-        } catch (SQLException e) {
-            msg = "SQLException in " + methodName + ": " + e.getMessage() 
-                + ", SQLState = " + e.getSQLState() 
-                + ", ErrorCode = " + e.getErrorCode();
+
+        // Validation
+        if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
+            msg = "Valid course ID is required";
             LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
-            
-        } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            throw new IllegalArgumentException(msg);
         }
+
+        LOG.debug("entering new version {}", methodName);
+        LOG.debug("with Course {}", course);
+
+        final String query = """
+            SELECT *
+            FROM Course
+            WHERE idcourse = ?
+            """;
+
+        return dao.querySingle(query, new CourseRowMapper(), course.getIdcourse());
     }
 
     /**
@@ -103,10 +62,10 @@ public class ReadCourse implements Serializable, interfaces.GolfInterface {
         try {
             Course course = new Course();
             course.setIdcourse(90); // english la tournette
-            
+
             LOG.debug("Main ready (CDI required for execution)");
             LOG.debug("Test course ID: {}", course.getIdcourse());
-            
+
         } catch (Exception e) {
             LOG.error("Exception in main: " + e.getMessage(), e);
         }
@@ -127,10 +86,10 @@ import connection_package.DBConnection;
 import utils.LCUtil;
 
 public class ReadCourse{
-   
-        
+
+
 public Course read(Course course,Connection conn) throws SQLException, Exception, Exception{
-   final String methodName = utils.LCUtil.getCurrentMethodName(); 
+   final String methodName = utils.LCUtil.getCurrentMethodName();
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -143,7 +102,7 @@ try{
      """;
     ps = conn.prepareStatement(query);
     ps.setInt(1, course.getIdcourse());
-    utils.LCUtil.logps(ps); 
+    utils.LCUtil.logps(ps);
     rs = ps.executeQuery();
     RowMapper<Course> courseMapper = new CourseRowMapper();
      while(rs.next()){

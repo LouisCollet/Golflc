@@ -101,6 +101,7 @@ public class PlayerController implements Serializable {
     @Inject private read.ReadActivation                             readActivation;
     @Inject private create.CreateActivationPassword                 createActivationPassword;
     @Inject private Controllers.ActivationController                activationController;
+    @Inject private read.ReadClub                                   readClubService;      // added 2026-03-19 for homeClubName
 
     // ✅ Injections logout/loginAPI/selectedPlayerFromDialog — migrated 2026-02-27
     @Inject private find.FindLastAudit                              findLastAudit;
@@ -836,7 +837,7 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
             club.setClubLocalAdmin(localAdmin.getIdplayer());
             if (updateClub.update(club)) {
                 String msg = "Club updated local administrator created <br> = "
-                        + appContext.getLocalAdmin().getIdplayer() + " / " + appContext.getLocalAdmin().getPlayerLastName()
+                        + localAdmin.getIdplayer() + " / " + localAdmin.getPlayerLastName()
                         + "<br> for club = " + club.getIdclub() + " / " + club.getClubName();
                 LOG.info(msg);
                 showMessageInfo(msg);
@@ -1208,6 +1209,28 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
             }
         } else {
             LOG.debug(methodName + " - dialogReturn object is not EPlayerPassword: " + obj);
+        }
+    } // end method
+
+    /**
+     * Retourne le nom du home club du joueur connecté.
+     * Utilisé dans welcome.xhtml.
+     */
+    public String getHomeClubName() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        try {
+            Integer homeClubId = appContext.getPlayer().getPlayerHomeClub();
+            if (homeClubId == null || homeClubId <= 0) {
+                return "";
+            }
+            entite.Club club = new entite.Club();
+            club.setIdclub(homeClubId);
+            club = readClubService.read(club);
+            return club != null ? club.getClubName() : "";
+        } catch (Exception e) {
+            LOG.debug(methodName + " - could not resolve home club name");
+            return "";
         }
     } // end method
 

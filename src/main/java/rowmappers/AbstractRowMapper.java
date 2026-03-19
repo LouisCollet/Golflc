@@ -35,7 +35,7 @@ public abstract class AbstractRowMapper<T> implements RowMapper<T> {
         //    LOG.debug("column found = " + column);
             return true;
         } catch (SQLException e) {
-            LOG.debug("column not found = " + column + " exception = " + e);
+            LOG.trace("column not found = " + column);
             return false;
         }
     }

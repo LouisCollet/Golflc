@@ -4,13 +4,10 @@ import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -18,8 +15,7 @@ public class DeleteBlocking implements Serializable, interfaces.GolfInterface {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public DeleteBlocking() { }
 
@@ -33,30 +29,17 @@ public class DeleteBlocking implements Serializable, interfaces.GolfInterface {
                 WHERE BlockingPlayerId = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, player.getIdplayer());
-            LCUtil.logps(ps);
-            int rowDeleted = ps.executeUpdate();
-            LOG.debug(methodName + " - deleted Blocking = " + rowDeleted);
-            if (rowDeleted > 0) {
-                String msg = "End of Blocking for 15 min for = " + player.getIdplayer();
-                LOG.debug(msg);
-                LCUtil.showMessageInfo(msg);
-                return true;
-            } else {
-                String msg = "NOT success for unblocking 15 min for = " + player.getIdplayer();
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
-                return false;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return false;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
+        int rowDeleted = dao.execute(query, player.getIdplayer());
+        LOG.debug(methodName + " - deleted Blocking = " + rowDeleted);
+        if (rowDeleted > 0) {
+            String msg = "End of Blocking for 15 min for = " + player.getIdplayer();
+            LOG.debug(msg);
+            LCUtil.showMessageInfo(msg);
+            return true;
+        } else {
+            String msg = "NOT success for unblocking 15 min for = " + player.getIdplayer();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
             return false;
         }
     } // end method

@@ -6,30 +6,53 @@
       xmlns:of="omnifaces"
       xmlns:p="primefaces">
 
-    <h:form id="form_footer"  >
- <div class="header-footer">
-<!-- voir la description de la classe header-footer dans /css/Styles2022.css"http://omnifaces.org/ui" xmlns:of="omnifaces"  xmlns:o="omnifaces"
- -->
+    <h:form id="form_footer">
 
-<b>View : </b> #{view.viewId} 
-<h:outputText style="margin-left:20px;" escape="false" value="#{utilsC.ViewModificationDate()}"></h:outputText>
-<h:outputText style="margin-left:1.5em;margin-right:2.5rem;" escape="false" value="#{infoC.deployVersion()}"></h:outputText>
-<h:outputText style="font-weight:bold;margin-left:1.5rem;" value="Copyright &#169;2012-#{of:formatDate(now, 'yyyy')}" escape="false" />
-<b><h:outputText style="font-weight:bold;margin-left:1.5rem;" value="Application:"/> </b>
-         #{infoC.getApplicationVersion()}
-<b><h:outputText style="margin-left:1.5rem;" value = "Browser:" /></b>
-         #{header['user-agent']}"
-<b><h:outputText style="margin-left:1.5rem;" value = "Server Info:" /></b>
-         #{faces.serverInfo}
-<b><h:outputText style="font-weight:bold;margin-left:1.5rem;" value="Primefaces Version:" /></b>
-         #{infoC.primefacesVersion}
+        <!-- Production footer — always visible -->
+        <div class="header-footer" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>
+                <i class="pi pi-shield" style="margin-right:0.3rem;"/>
+                <h:outputText value="Copyright &#169;2012-#{of:formatDate(now, 'yyyy')} GolfLC" escape="false" />
+                <span style="margin-left:1rem;">
+                    <i class="pi pi-tag" style="margin-right:0.2rem;"/>
+                    #{infoC.applicationVersion}
+                </span>
+            </span>
+            <span>
+                <i class="pi pi-upload" style="margin-right:0.2rem;"/>
+                <h:outputText value="#{infoC.deployVersion()}" escape="false" />
+            </span>
+        </div>
 
-<!-- Encodage Html Entité Décimal 	&#169; | © context path = #{request.contextPath}
-port = #{request.localPort}
-name = #{request.localName} -->
-base url = #{faces.requestBaseURL}
-#{faces.requestURLWithQueryString}
+        <!-- Dev footer — visible only in Development mode -->
+        <h:panelGroup rendered="#{settings.getProperty('EXECUTION') eq 'Development'}">
+            <div class="header-footer summary-bar" style="margin-top:2px; font-size:0.68rem; padding:0.3rem 1rem;">
+                <span class="summary-item">
+                    <span class="summary-label">View</span>
+                    <span class="summary-value">#{view.viewId}</span>
+                </span>
+                <span class="summary-sep">|</span>
+                <span class="summary-item">
+                    <span class="summary-label">Modified</span>
+                    <span class="summary-value"><h:outputText escape="false" value="#{utilsC.ViewModificationDate()}" /></span>
+                </span>
+                <span class="summary-sep">|</span>
+                <span class="summary-item">
+                    <span class="summary-label">Server</span>
+                    <span class="summary-value">#{faces.serverInfo}</span>
+                </span>
+                <span class="summary-sep">|</span>
+                <span class="summary-item">
+                    <span class="summary-label">PF</span>
+                    <span class="summary-value">#{infoC.primefacesVersion}</span>
+                </span>
+                <span class="summary-sep">|</span>
+                <span class="summary-item">
+                    <span class="summary-label">URL</span>
+                    <span class="summary-value">#{faces.requestBaseURL}</span>
+                </span>
+            </div>
+        </h:panelGroup>
 
- </div>
- </h:form>
+    </h:form>
 </ui:composition>

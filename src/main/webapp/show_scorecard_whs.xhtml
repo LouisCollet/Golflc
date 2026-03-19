@@ -23,7 +23,8 @@
              filteredValue="#{roundC.filteredCars}"
              value="#{roundC.ScoreCardList1WHS()}"
              emptyMessage="#{msg['message.table.empty']}"
-             var="c" >
+             var="c"
+             styleClass="compact-table" >
 
 <f:facet name="header">
          #{msg['player.message']}
@@ -49,7 +50,10 @@
     </h:outputText>
 </p:column>
 
-  <ui:include src="include/include_thumbnails_scorecard.xhtml"/>
+  <ui:include src="include/include_thumbnail.xhtml">
+      <ui:param name="th_photo" value="#{playerC.player.playerPhotoLocation}"/>
+      <ui:param name="th_name"  value="#{playerC.player.playerLastName}"/>
+  </ui:include>
 
 <p:column headerText="#{msg['handicap.player']}" width="20%" >
     <h:outputText value="#{c.handicapWHS}"/>
@@ -73,7 +77,8 @@
 <p:dataTable id="scorecard2a"
              value="#{roundC.ScoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
-             var="c" >
+             var="c"
+             styleClass="compact-table" >
 <f:facet name="header">
        #{msg['message.scorecard.course']}
 </f:facet>
@@ -108,7 +113,8 @@
 <p:dataTable id="scorecard2b"
              value="#{roundC.ScoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
-             var="c" >
+             var="c"
+             styleClass="compact-table" >
 
 <p:column headerText="#{msg['course.holes']}" style="width:10%" >
    <h:outputText value="#{c.round.roundHoles}"/>
@@ -166,7 +172,8 @@
              emptyMessage="#{msg['message.table.empty']}"
              rowIndexVar="row"
              rowStyleClass="#{(row+1 == 9 or row+1 == 18) ? 'highlight' : null}"
-             stripedRows="true">
+             stripedRows="true"
+             styleClass="compact-table">
 <f:facet name="header">
          #{msg['message.scorecard.detailed']} WHS version 4
 </f:facet>

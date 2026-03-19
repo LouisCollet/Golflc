@@ -29,7 +29,7 @@
            titletip="Define tarif periods (seasons)">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['title.period.tarif']}"/>
+                <h1>#{msg['title.period.tarif']}</h1>
                 <p:badge value="#{memC.tarifGreenfee.datesSeasonsList.size()}" severity="info"/>
             </f:facet>
             <p:panelGrid columns="2"
@@ -102,7 +102,7 @@
            titletip="Define equipment items and prices">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['title.equipments.tarif']}"/>
+                <h1>#{msg['title.equipments.tarif']}</h1>
                 <p:badge value="#{memC.tarifGreenfee.equipmentsList.size()}" severity="info"/>
             </f:facet>
             <p:panelGrid columns="2"
@@ -169,7 +169,7 @@
            titletip="Define greenfee pricing (choose one type)">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['title.greenfee.tarif']}"/>
+                <h1>#{msg['title.greenfee.tarif']}</h1>
                 <span> — Pricing</span>
             </f:facet>
 
@@ -432,7 +432,7 @@
            titletip="Define twilight pricing">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['title.hours.tarif']}"/>
+                <h1>#{msg['title.hours.tarif']}</h1>
                 <span> — Twilight</span>
                 <p:badge value="#{memC.tarifGreenfee.twilightList.size()}" severity="info"/>
             </f:facet>

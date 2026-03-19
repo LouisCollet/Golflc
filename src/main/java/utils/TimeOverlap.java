@@ -2,6 +2,7 @@
 package utils;
 import java.time.LocalTime;
 import static java.util.Objects.*;
+import static interfaces.Log.LOG;
 
 public class TimeOverlap {
     public static class LocalTimeRange {
@@ -50,7 +51,7 @@ public class TimeOverlap {
         LocalTimeRange range1 = new LocalTimeRange(LocalTime.of(from1, 0), LocalTime.of(to1, 0));
         LocalTimeRange range2 = new LocalTimeRange(LocalTime.of(from2, 0), LocalTime.of(to2, 0));
         boolean test = (range1.overlaps(range2)) == overlap;
-        System.out.printf("[%2d-%2d] - [%2d-%2d] -> %-5b: %s%n", from1, to1, from2, to2, overlap, test?"OK":"Not OK");
+        LOG.debug(String.format("[%2d-%2d] - [%2d-%2d] -> %-5b: %s", from1, to1, from2, to2, overlap, test?"OK":"Not OK"));
     }
     
 }

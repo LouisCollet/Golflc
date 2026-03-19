@@ -8,9 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import javax.sql.DataSource;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 
 @ApplicationScoped
@@ -18,8 +17,7 @@ public class ReadParAndStrokeIndex implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     /**
      * Lit les PAR et Stroke Index depuis le master tee (YELLOW, M, 01-18)
@@ -50,7 +48,7 @@ public class ReadParAndStrokeIndex implements Serializable {
                WHERE selection1.tee_idtee = selection2.idtee
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, course.getIdcourse());
@@ -191,7 +189,7 @@ void main() throws SQLException, Exception{
 //    tee.setIdtee(98);
     ScoreStableford scoreStableford = new ScoreStableford();
   //  scoreStableford.setgsetGlobalArray([0][0]);
-   
+
     scoreStableford = new read.ReadParAndStrokeIndex().read(conn, course, scoreStableford);
        LOG.info("scoreStableford with arrays par and stroke index = " +  scoreStableford);
     DBConnection.closeQuietly(conn, null, null, null);

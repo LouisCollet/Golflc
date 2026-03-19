@@ -86,6 +86,7 @@ public class PaymentController implements Serializable {
     @Inject private Controllers.HttpController                  httpController;
     // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
     @Inject private mail.CreditcardMail                         creditcardMail;  // migrated 2026-02-26
+    @Inject private entite.Settings                              settings;        // security audit 2026-03-18
 
     // ========================================
     // ETAT UI LOCAL
@@ -381,7 +382,7 @@ public class PaymentController implements Serializable {
                 LOG.debug("creditcardType in onCompletePayment = " + appContext.getCreditcardType());
                 LOG.debug("before going with context to 5000/about");
                 FacesContext context = FacesContext.getCurrentInstance();
-                context.getExternalContext().redirect("https://localhost:5000/about");
+                context.getExternalContext().redirect(settings.getProperty("PAYMENT_SERVICE_URL") + "/about");
                 context.responseComplete();
                 LOG.debug("after redirect with context to 5000/about");
             } else {
@@ -463,7 +464,7 @@ public jakarta.ws.rs.core.Response handlePayments(
 
             return jakarta.ws.rs.core.Response
                     .status(Response.Status.FOUND)
-                    .location(java.net.URI.create("https://localhost:5000/payment_generator"))
+                    .location(java.net.URI.create(settings.getProperty("PAYMENT_SERVICE_URL") + "/payment_generator"))
                     .build();
 
         } catch (Exception e) {
@@ -610,7 +611,7 @@ public jakarta.ws.rs.core.Response handlePayments(
             LOG.debug("creditcard data converted in json format = " + "\n" + strJson);
 
             jakarta.ws.rs.client.Client client = ClientBuilder.newClient();
-            ws = "http://localhost:8083/creditcard/" + URLEncoder.encode(strJson, "utf-8");
+            ws = settings.getProperty("CREDITCARD_SERVICE_URL") + "/creditcard/" + URLEncoder.encode(strJson, "utf-8");
             LOG.debug("going to Webservice creditcard escaped \n" + ws);
             WebTarget webTarget = client.target(ws);
             Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
@@ -910,7 +911,7 @@ public jakarta.ws.rs.core.Response handlePayments(
             LOG.debug("Amount = " + amount);
             LOG.debug("PaymentReference = " + reference);
             LOG.debug("ServletContext getContextPath = " + servletContext.getContextPath());
-            String href = "http://localhost:8080" + servletContext.getContextPath();
+            String href = settings.getProperty("APP_BASE_URL") + servletContext.getContextPath();
             String location = href + "/rest/paymentController";
             LOG.debug("location = " + location);
 

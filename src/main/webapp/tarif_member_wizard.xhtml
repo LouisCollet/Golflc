@@ -29,7 +29,7 @@
            titletip="Define member cotisation periods and items">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['title.members.tarif']}"/>
+                <h1>#{msg['title.members.tarif']}</h1>
                 <p:badge value="#{memC.tarifMember.basicList.size()}" severity="info"/>
             </f:facet>
             <p:panelGrid columns="2"
@@ -130,7 +130,7 @@
            titletip="Define equipment items and prices">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['title.equipments.tarif']}"/>
+                <h1>#{msg['title.equipments.tarif']}</h1>
                 <p:badge value="#{memC.tarifMember.equipmentsList.size()}" severity="info"/>
             </f:facet>
             <p:panelGrid columns="2"
@@ -210,7 +210,7 @@
            titletip="Add a comment to the tarif">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['title.cotisation.comment']}"/>
+                <h1>#{msg['title.cotisation.comment']}</h1>
             </f:facet>
 
             <p:textEditor id="textEditor"

@@ -7,8 +7,8 @@ import entite.Inscription;
 import entite.Player;
 import entite.Round;
 import entite.composite.ECourseList;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
@@ -17,25 +17,19 @@ import rowmappers.InscriptionRowMapper;
 import rowmappers.RowMapper;
 import rowmappers.RowMapperRound;
 import rowmappers.RoundRowMapper;
-import utils.LCUtil;
 
-import javax.sql.DataSource;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 
 /**
  * Liste des HandicapIndex pour un joueur
- * fix multi-user 2026-03-07 — cache supprimé (données per-user dans singleton = fuite de données)
+ * fix multi-user 2026-03-07 — cache supprime (donnees per-user dans singleton = fuite de donnees)
+ * Migre vers GenericDAO (2026-03-18)
  */
 @Named
 @ApplicationScoped
@@ -43,8 +37,7 @@ public class HandicapIndexList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public HandicapIndexList() { }
 
@@ -74,45 +67,30 @@ public class HandicapIndexList implements Serializable {
                         LIMIT 30
                     """;
 
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(query)) {
+            RowMapper<Club>          clubMapper          = new ClubRowMapper();
+            RowMapper<Course>        courseMapper         = new CourseRowMapper();
+            RowMapper<Inscription>   inscriptionMapper   = new InscriptionRowMapper();
+            RowMapperRound<Round>    roundMapper         = new RoundRowMapper();
+            RowMapper<HandicapIndex> handicapIndexMapper = new HandicapIndexRowMapper();
 
-                ps.setInt(1, player.getIdplayer());
-                LCUtil.logps(ps);
+            List<ECourseList> result = dao.queryList(query, rs -> {
+                Club club = clubMapper.map(rs);
+                return ECourseList.builder()
+                        .club(club)
+                        .course(courseMapper.map(rs))
+                        .handicapIndex(handicapIndexMapper.map(rs))
+                        .inscription(inscriptionMapper.map(rs))
+                        .round(roundMapper.map(rs, club))
+                        .build();
+            }, player.getIdplayer());
 
-                try (ResultSet rs = ps.executeQuery()) {
-                    List<ECourseList> result = new ArrayList<>();
-
-                    RowMapper<Club>          clubMapper          = new ClubRowMapper();
-                    RowMapper<Course>        courseMapper         = new CourseRowMapper();
-                    RowMapper<Inscription>   inscriptionMapper   = new InscriptionRowMapper();
-                    RowMapperRound<Round>    roundMapper         = new RoundRowMapper();
-                    RowMapper<HandicapIndex> handicapIndexMapper = new HandicapIndexRowMapper();
-
-                    while (rs.next()) {
-                        Club club = clubMapper.map(rs);
-                        ECourseList ecl = ECourseList.builder()
-                                .club(club)
-                                .course(courseMapper.map(rs))
-                                .handicapIndex(handicapIndexMapper.map(rs))
-                                .inscription(inscriptionMapper.map(rs))
-                                .round(roundMapper.map(rs, club))
-                                .build();
-                        result.add(ecl);
-                    }
-
-                    if (result.isEmpty()) {
-                        LOG.warn(methodName + " - empty result list for idplayer = " + player.getIdplayer());
-                    } else {
-                        LOG.debug(methodName + " - list size = " + result.size());
-                    }
-                    return result;
-                }
+            if (result.isEmpty()) {
+                LOG.warn(methodName + " - empty result list for idplayer = " + player.getIdplayer());
+            } else {
+                LOG.debug(methodName + " - list size = " + result.size());
             }
+            return result;
 
-        } catch (SQLException sqle) {
-            handleSQLException(sqle, methodName);
-            return Collections.emptyList();
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return Collections.emptyList();

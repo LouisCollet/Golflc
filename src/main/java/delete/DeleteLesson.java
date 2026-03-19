@@ -4,15 +4,12 @@ import entite.Lesson;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import javax.sql.DataSource;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
@@ -21,8 +18,7 @@ public class DeleteLesson implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public DeleteLesson() { }
 
@@ -37,30 +33,18 @@ public class DeleteLesson implements Serializable {
                 AND EventStartDate = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, lesson.getEventProId());
-            ps.setTimestamp(2, Timestamp.valueOf(lesson.getEventStartDate()));
-            utils.LCUtil.logps(ps);
-            int row = ps.executeUpdate();
-            if (row != 0) {
-                String msg = "ScheduleEvent Deleted = " + lesson;
-                LOG.info(msg);
-                showMessageInfo(msg);
-                return true;
-            } else {
-                String msg = "ERROR ScheduleEvent NOT Deleted !!: " + lesson;
-                LOG.debug(msg);
-                showMessageFatal(msg);
-                return false;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return false;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
+        int row = dao.execute(query,
+                lesson.getEventProId(),
+                Timestamp.valueOf(lesson.getEventStartDate()));
+        if (row != 0) {
+            String msg = "ScheduleEvent Deleted = " + lesson;
+            LOG.info(msg);
+            showMessageInfo(msg);
+            return true;
+        } else {
+            String msg = "ERROR ScheduleEvent NOT Deleted !!: " + lesson;
+            LOG.debug(msg);
+            showMessageFatal(msg);
             return false;
         }
     } // end method

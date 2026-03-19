@@ -4,8 +4,8 @@ import entite.CompetitionData;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -21,8 +20,7 @@ public class CreateCompetitionData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public CreateCompetitionData() { }
 
@@ -31,7 +29,7 @@ public class CreateCompetitionData implements Serializable {
         LOG.debug("entering " + methodName);
         LOG.debug(methodName + " - with competitionData = " + data);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
 
             final String query = LCUtil.generateInsertQuery(conn, "competition_data");
             int index = 0;

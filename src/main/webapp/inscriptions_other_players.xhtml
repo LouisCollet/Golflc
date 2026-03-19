@@ -35,7 +35,8 @@
                  value="#{playerC.player.draggedPlayers}"
                  var="c"
                  escapeText="false"
-                 emptyMessage="#{msg['message.table.empty']}" >
+                 emptyMessage="#{msg['message.table.empty']}"
+                 styleClass="compact-table" >
             <p:column width="5%"
                       headerText="Drag #{msg['player.id']}">
             <h:panelGroup id="panelG332" layout="block" >
@@ -89,7 +90,8 @@
                <p:dataTable id="selectedCarsTable"
                          value="#{playerC.player.droppedPlayers}"
                          var="c"
-                         rendered="#{not empty playerC.player.droppedPlayers}">
+                         rendered="#{not empty playerC.player.droppedPlayers}"
+                         styleClass="compact-table">
                 <p:column headerText="#{msg['player.id']}" >
                     <h:outputText value="#{c.idplayer}" />
                 </p:column>

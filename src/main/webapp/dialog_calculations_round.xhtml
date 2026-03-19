@@ -16,12 +16,12 @@
         style="border:solid 3px"  >
 
  <p:panelGrid
-        layout="tabular"
+        layout="flex"
         id="panelGrid"
         columns="1">
 
      <f:facet name="header">
-         <h:outputText escape="false" value="this is the header !!" />
+         <h1>#{msg['title.round.data']}</h1>
     </f:facet> 
 
     <p:textEditor id="editor"

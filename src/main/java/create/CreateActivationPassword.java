@@ -4,7 +4,6 @@ import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -17,7 +16,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 import jakarta.inject.Inject;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -25,8 +23,7 @@ public class CreateActivationPassword implements Serializable, interfaces.GolfIn
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject private mail.ResetPasswordMail resetPasswordMail;  // migrated 2026-02-26
 
@@ -36,7 +33,7 @@ public class CreateActivationPassword implements Serializable, interfaces.GolfIn
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "activation");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 String uuid = UUID.randomUUID().toString();

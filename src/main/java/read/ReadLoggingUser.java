@@ -4,22 +4,17 @@ import entite.LoggingUser;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class ReadLoggingUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public ReadLoggingUser() { }
 
@@ -36,34 +31,14 @@ public class ReadLoggingUser implements Serializable {
                 AND LoggingType = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, logging.getLoggingIdPlayer());
-            ps.setInt(2, logging.getLoggingIdRound());
-            ps.setString(3, logging.getLoggingType().toUpperCase());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                LoggingUser result = logging;
-                while (rs.next()) {
-                    result = LoggingUser.map(rs);
-                }
-                if (result == null) {
-                    LOG.debug(methodName + " - " + utils.LCUtil.prepareMessageBean("logging.notfound"));
-                } else {
-                    LOG.debug(methodName + " - " + utils.LCUtil.prepareMessageBean("logging.found") + result);
-                }
-                return result;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
+        LoggingUser result = dao.querySingle(query, rs -> LoggingUser.map(rs),
+                logging.getLoggingIdPlayer(), logging.getLoggingIdRound(), logging.getLoggingType().toUpperCase());
+        if (result == null) {
+            LOG.debug(methodName + " - " + utils.LCUtil.prepareMessageBean("logging.notfound"));
+        } else {
+            LOG.debug(methodName + " - " + utils.LCUtil.prepareMessageBean("logging.found") + result);
         }
+        return result;
     } // end method
 
     /*

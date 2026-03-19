@@ -6,7 +6,6 @@ import entite.ScoreStableford;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -15,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -23,8 +21,7 @@ public class CreateScoreStableford implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject private update.UpdateInscriptionFinalResult updateInscriptionFinalResult;
 
@@ -37,7 +34,7 @@ public class CreateScoreStableford implements Serializable {
         LOG.debug("for Round = " + round);
         LOG.debug("for Player = " + player);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
 
             final String query = LCUtil.generateInsertQuery(conn, "score");
             try (PreparedStatement ps = conn.prepareStatement(query)) {

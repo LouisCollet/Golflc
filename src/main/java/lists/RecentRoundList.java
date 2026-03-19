@@ -6,21 +6,13 @@ import entite.Player;
 import entite.Round;
 import entite.Tee;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.PlayerRowMapper;
@@ -38,8 +30,7 @@ public class RecentRoundList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public RecentRoundList() { }
 
@@ -66,45 +57,29 @@ public class RecentRoundList implements Serializable {
                 LIMIT 30;
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        RowMapper<Club> clubMapper = new ClubRowMapper();
+        RowMapper<Course> courseMapper = new CourseRowMapper();
+        RowMapper<Tee> teeMapper = new TeeRowMapper();
+        RowMapperRound<Round> roundMapper = new RoundRowMapper();
+        RowMapper<Player> playerMapper = new PlayerRowMapper();
 
-            ps.setInt(1, player.getIdplayer());
-            utils.LCUtil.logps(ps);
+        List<ECourseList> result = dao.queryList(query, rs -> {
+            Club club = clubMapper.map(rs);
+            return ECourseList.builder()
+                    .club(club)
+                    .course(courseMapper.map(rs))
+                    .player(playerMapper.map(rs))
+                    .round(roundMapper.map(rs, club))
+                    .tee(teeMapper.map(rs))
+                    .build();
+        }, player.getIdplayer());
 
-            try (ResultSet rs = ps.executeQuery()) {
-                List<ECourseList> result = new ArrayList<>();
-                RowMapper<Club> clubMapper = new ClubRowMapper();
-                RowMapper<Course> courseMapper = new CourseRowMapper();
-                RowMapper<Tee> teeMapper = new TeeRowMapper();
-                RowMapperRound<Round> roundMapper = new RoundRowMapper();
-                RowMapper<Player> playerMapper = new PlayerRowMapper();
-                while (rs.next()) {
-                    Club club = clubMapper.map(rs);
-                    ECourseList ecl = ECourseList.builder()
-                            .club(club)
-                            .course(courseMapper.map(rs))
-                            .player(playerMapper.map(rs))
-                            .round(roundMapper.map(rs, club))
-                            .tee(teeMapper.map(rs))
-                            .build();
-                    result.add(ecl);
-                }
-                if (result.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list for player=" + player.getIdplayer());
-                } else {
-                    LOG.debug(methodName + " - list size = " + result.size());
-                }
-                return result;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (result.isEmpty()) {
+            LOG.warn(methodName + " - empty result list for player=" + player.getIdplayer());
+        } else {
+            LOG.debug(methodName + " - list size = " + result.size());
         }
+        return result;
     } // end method
 
     /**

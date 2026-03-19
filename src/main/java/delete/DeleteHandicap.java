@@ -4,14 +4,13 @@ import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import java.text.SimpleDateFormat;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -19,8 +18,7 @@ public class DeleteHandicap implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public DeleteHandicap() { }
 
@@ -43,7 +41,7 @@ public class DeleteHandicap implements Serializable {
                 ORDER BY idhandicap DESC LIMIT 1
                 """;
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
 
             int rowDelete = 0;
             int rowUpdate = 0;

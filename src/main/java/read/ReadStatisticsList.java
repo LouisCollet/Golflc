@@ -9,9 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.sql.DataSource;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 
 @ApplicationScoped
@@ -19,8 +18,7 @@ public class ReadStatisticsList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     /**
      * Charge les statistiques d'un score pour un joueur et un round
@@ -38,7 +36,7 @@ public class ReadStatisticsList implements Serializable {
               AND round.idround = score.player_has_round_round_idround
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, player.getIdplayer());
@@ -84,7 +82,7 @@ public class ReadStatisticsList implements Serializable {
         Round round = new Round();
         player.setIdplayer(324713);
         round.setIdround(676);
-        
+
         var v = new read.ReadStatisticsList().load(player, round);
         LOG.debug("result main size = " + v.size());
         LOG.debug("result main = " + v.toString());
@@ -104,13 +102,13 @@ import connection_package.DBConnection;
 import utils.LCUtil;
 import static interfaces.Log.LOG;
 public class ReadStatisticsList {
-     public ArrayList<ScoreStableford.Statistics> load(Connection conn, final Player player, final Round round) throws SQLException{     
+     public ArrayList<ScoreStableford.Statistics> load(Connection conn, final Player player, final Round round) throws SQLException{
         ResultSet rs = null;
         PreparedStatement ps = null;
         ArrayList<ScoreStableford.Statistics> statisticsList = new ArrayList<>();
 try{
     LOG.debug("starting ReadStatisticsList.load ");
-  //  with player = " + player.getIdplayer() 
+  //  with player = " + player.getIdplayer()
   //          + " round = " + round.getIdround());
      final String query = """
           SELECT *
@@ -158,7 +156,7 @@ return statisticsList;
 void main() throws SQLException, Exception {
     Connection conn = new DBConnection().getConnection();
     Player player = new Player();
-    Round round = new Round(); 
+    Round round = new Round();
     player.setIdplayer(324713);
     round.setIdround(676);
     var v = new read.ReadStatisticsList().load(conn, player, round);

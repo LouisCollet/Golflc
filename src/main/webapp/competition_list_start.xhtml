@@ -23,9 +23,10 @@
              resizableColumns="true"
              var="c"
              emptyMessage="#{msg['message.table.start.competition.empty']}"
+             styleClass="compact-table"
              >
  <f:facet name="header">
-    <h:outputText escape="false" value="#{msg['competition.startinglist.title'] }" />
+    <h1>#{msg['competition.startinglist.title']}</h1>
     <h2>#{c.competitionDescription.competitionName} </h2>
     execution = #{roundC.competition.competitionDescription.competitionExecution}
 </f:facet>

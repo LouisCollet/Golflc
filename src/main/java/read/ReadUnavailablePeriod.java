@@ -6,16 +6,11 @@ import entite.UnavailablePeriod;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import javax.sql.DataSource;
-import rowmappers.RowMapper;
 import rowmappers.UnavailablePeriodRowMapper;
 
 @ApplicationScoped
@@ -23,8 +18,7 @@ public class ReadUnavailablePeriod implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public ReadUnavailablePeriod() { }
 
@@ -42,36 +36,14 @@ public class ReadUnavailablePeriod implements Serializable {
                 AND DATE(UnavailableEndDate) >= DATE(?)
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, club.getIdclub());
-            ps.setTimestamp(2, Timestamp.valueOf(round.getRoundDate()));
-            ps.setTimestamp(3, Timestamp.valueOf(round.getRoundDate()));
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                RowMapper<UnavailablePeriod> periodMapper = new UnavailablePeriodRowMapper();
-                UnavailablePeriod period = new UnavailablePeriod();
-                while (rs.next()) {
-                    period = periodMapper.map(rs);
-                }
-                LOG.debug(methodName + " - unavailable period = " + period);
-                if (period.getIdclub() == null) {
-                    LOG.debug(methodName + " - no unavailable period found for club = " + club.getIdclub());
-                    return null;
-                }
-                LOG.debug(methodName + " - found period = " + period);
-                return period;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
+        UnavailablePeriod period = dao.querySingle(query, new UnavailablePeriodRowMapper(),
+                club.getIdclub(), Timestamp.valueOf(round.getRoundDate()), Timestamp.valueOf(round.getRoundDate()));
+        if (period == null || period.getIdclub() == null) {
+            LOG.debug(methodName + " - no unavailable period found for club = " + club.getIdclub());
             return null;
         }
+        LOG.debug(methodName + " - found period = " + period);
+        return period;
     } // end method
 
     /*

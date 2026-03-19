@@ -1,6 +1,6 @@
 package filters;
 
-// dont!t forget web.xml !!
+// dont't forget web.xml !!
 
 import java.io.IOException;
 import jakarta.servlet.Filter;
@@ -22,7 +22,7 @@ public class SecurityFilter implements Filter
    {
       fc = filterConfig;
    }
-   
+
 @Override
       public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
    throws IOException, ServletException
@@ -30,6 +30,13 @@ public class SecurityFilter implements Filter
       HttpServletRequest req = (HttpServletRequest)request;
       HttpServletResponse resp = (HttpServletResponse) response;
       HttpSession session = req.getSession(true);
+
+      // ✅ Security headers — prevent clickjacking, MIME sniffing, XSS
+      resp.setHeader("X-Content-Type-Options", "nosniff");
+      resp.setHeader("X-Frame-Options", "SAMEORIGIN");
+      resp.setHeader("X-XSS-Protection", "1; mode=block");
+      resp.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+      resp.setHeader("Permissions-Policy", "geolocation=(self), camera=(), microphone=()");
 
       String pageRequested = req.getRequestURI().toString();
       if(session.getAttribute("user") == null && !pageRequested.contains("login.xhtml"))
@@ -39,7 +46,7 @@ public class SecurityFilter implements Filter
         chain.doFilter(request, response);
       }
 } //end method
-   
+
 
 @Override
    public void destroy()

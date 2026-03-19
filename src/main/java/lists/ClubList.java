@@ -2,30 +2,20 @@
 package lists;
 
 import entite.Club;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.sql.DataSource;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.List;
 import rowmappers.ClubRowMapper;
-import rowmappers.RowMapper;
 
 @ApplicationScoped
 public class ClubList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<Club> liste = null;
@@ -36,6 +26,7 @@ public class ClubList implements Serializable {
      */
     public List<Club> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
 
         // ✅ EARLY RETURN - Guard clause
         if (liste != null) {
@@ -51,37 +42,16 @@ public class ClubList implements Serializable {
             FROM club
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        liste = dao.queryList(query, new ClubRowMapper());
 
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Club> clubMapper = new ClubRowMapper();
-
-                while (rs.next()) {
-                    Club c = clubMapper.map(rs);
-                    liste.add(c);
-                }
-
-                if (liste.isEmpty()) {
-                    String msg = "Empty Result List ClubList in " + methodName;
-                    LOG.warn(msg); // ✅ warn au lieu de error
-                } else {
-                    LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-                }
-
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (liste.isEmpty()) {
+            String msg = "Empty Result List ClubList in " + methodName;
+            LOG.warn(msg);
+        } else {
+            LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
         }
+
+        return liste;
     } // end method
 
     // ✅ Getters/setters d'instance
@@ -147,7 +117,7 @@ final String query = """
     ps = conn.prepareStatement(query);
     utils.LCUtil.logps(ps);
     rs =  ps.executeQuery();
-//   utils.LCUtil.logRs(rs); // testing 
+//   utils.LCUtil.logRs(rs); // testing
     liste = new ArrayList<>();
     RowMapper<Club> clubMapper = new ClubRowMapper();
 	while(rs.next()){
@@ -157,7 +127,7 @@ final String query = """
   //     LOG.debug(" -- before forEach " );
  //      liste.forEach(item -> LOG.debug("Course list " + item + "/"));  // java 8 lambda
       //if(liste == null){ // mod 22-04-2025
-       if(liste.isEmpty()){   
+       if(liste.isEmpty()){
          String msg = "££ Empty Result List ClubList in " + methodName;
          LOG.error(msg);
          LCUtil.showMessageFatal(msg);
@@ -165,7 +135,7 @@ final String query = """
          LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
      }
  return liste;
-}catch (SQLException e){ 
+}catch (SQLException e){
     handleSQLException(e, methodName);
     return null;
 }catch (Exception e){
@@ -187,7 +157,7 @@ final String query = """
     public static void setListe(List<Club> liste) {
         ClubList.liste = liste;
     }
-    
+
  void main() throws SQLException, Exception{
      Connection conn = new DBConnection().getConnection();
   try{
@@ -198,7 +168,7 @@ final String query = """
             String msg = "££ Exception in main = " + e.getMessage();
             LOG.error(msg);
    }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
+         DBConnection.closeQuietly(conn, null, null , null);
           }
    } // end main//
 } //end class

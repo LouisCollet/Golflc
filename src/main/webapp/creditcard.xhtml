@@ -20,26 +20,10 @@
    <c:set var="type" value="#{appContext.creditcardType}"/>
 
 <f:facet name="header">
-    <h:outputText
-            id="subscription"
-            escape="false"
-            rendered="#{type eq 'SUBSCRIPTION'}"
-            value="#{msg['title.payment.subscription']}" />
-    <h:outputText
-            id="greenfee"
-            escape="false"
-            rendered="#{type eq 'GREENFEE'}"
-            value="#{msg['title.payment.round']}" />
-    <h:outputText
-            id="membership"
-            escape="false"
-            rendered="#{type eq 'COTISATION'}"
-            value="#{msg['title.payment.cotisation']}" />
-    <h:outputText
-            id="lesson"
-            escape="false"
-            rendered="#{type eq 'LESSON'}"
-            value="#{msg['title.payment.lesson']}" />
+    <c:if test="#{type eq 'SUBSCRIPTION'}"><h1>#{msg['title.payment.subscription']}</h1></c:if>
+    <c:if test="#{type eq 'GREENFEE'}"><h1>#{msg['title.payment.round']}</h1></c:if>
+    <c:if test="#{type eq 'COTISATION'}"><h1>#{msg['title.payment.cotisation']}</h1></c:if>
+    <c:if test="#{type eq 'LESSON'}"><h1>#{msg['title.payment.lesson']}</h1></c:if>
 </f:facet>
 
      <c:if test="#{type eq 'GREENFEE'}">
@@ -107,24 +91,30 @@
 </f:facet>
 
 <p:panelGrid id="pnlCreditCard"
-                columns="4"
+                columns="2"
                 layout="flex"
-                columnClasses="col1Flex,col2Flex,col3Flex,col4Flex">
+                columnClasses="col1Flex,col2Flex">
+
+        <h:outputText value="#{msg['creditcard.number']} :"/>
         <p:inputText id="number"
-                             value="#{payC.creditcard.creditcardNumber}"
-                             placeholder="Card number"
-                             inputmode="numeric"
-                             required="true" />
+                     value="#{payC.creditcard.creditcardNumber}"
+                     placeholder="Card number"
+                     inputmode="numeric"
+                     required="true"/>
+
+        <h:outputText value="#{msg['creditcard.holder']} :"/>
         <p:inputText id="name"
-                             value="#{payC.creditcard.creditcardHolder}"
-                             placeholder="Full name"
-                             required="true"/>
-         <p:outputPanel id="expiration">
+                     value="#{payC.creditcard.creditcardHolder}"
+                     placeholder="Full name"
+                     required="true"/>
+
+        <h:outputText value="#{msg['creditcard.expirationdate']} :"/>
+        <p:outputPanel id="expiration">
             <p:datePicker id="CreditcardExpirationDate"
                           showIcon="true"
                           required="true"
-                          requiredMessage="Expiration Date must be completed (à traduire)"
-                          placeholder="YY/MM"
+                          requiredMessage="Expiration Date must be completed"
+                          placeholder="MM/YY"
                           size="6"
                           showButtonBar="true"
                           widgetVar="monthPicker"
@@ -140,30 +130,35 @@
                          inputmode="numeric"
                          style="display:none"/>
         </p:outputPanel>
-        <p:inputText id="cvc"
-                             value="#{payC.creditcard.creditcardVerificationCode}"
-                             placeholder="CVC"
-                             size="5"
-                             inputmode="numeric"
-                             required="true"/>
 
-   <f:facet name="footer">
-            <p:commandButton value="#{msg['inscription.back']}"
+        <h:outputText value="CVC :"/>
+        <p:inputText id="cvc"
+                     value="#{payC.creditcard.creditcardVerificationCode}"
+                     placeholder="CVC"
+                     size="5"
+                     inputmode="numeric"
+                     required="true"/>
+
+</p:panelGrid>
+
+<f:facet name="footer">
+    <div class="flex justify-content-center gap-2">
+        <p:commandButton value="#{msg['inscription.back']}"
                          id="commandButtonback"
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
                          icon="pi pi-undo"
                          rendered="#{payC.creditcard.typePayment eq 'GREENFEE'}"
-                         action="inscription.xhtml?faces-redirect=true" />
-           <p:commandButton value="#{msg['payment.selected']}"
+                         action="inscription.xhtml?faces-redirect=true"/>
+        <p:commandButton value="#{msg['payment.selected']}"
                          id="commandButtonPayment"
                          ajax="false"
                          update="growl-msg"
                          icon="pi pi-credit-card"
-                         action="creditcard_accepted.xhtml?faces-redirect=true" />
-   </f:facet>
-</p:panelGrid>
+                         action="creditcard_accepted.xhtml?faces-redirect=true"/>
+    </div>
+</f:facet>
 
 </p:panel>
 </div>

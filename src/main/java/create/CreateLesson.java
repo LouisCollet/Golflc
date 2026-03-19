@@ -5,7 +5,6 @@ import entite.Lesson;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -14,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import javax.sql.DataSource;
 import manager.PlayerManager;
 import static utils.LCUtil.showMessageFatal;
 
@@ -23,8 +21,7 @@ public class CreateLesson implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject
     private PlayerManager playerManager;
@@ -37,7 +34,7 @@ public class CreateLesson implements Serializable {
         LOG.debug("with Lesson = " + lesson);
         LOG.debug("with Player = " + player);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             final String query = utils.LCUtil.generateInsertQuery(conn, "lesson");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 ps.setNull(1, java.sql.Types.INTEGER);

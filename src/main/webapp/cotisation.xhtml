@@ -21,10 +21,11 @@
 <p:dataTable var="item"
              value="#{memC.tarifMember.basicList}"
              rowIndexVar="row"
-             emptyMessage="#{msg['message.table.empty']}">
+             emptyMessage="#{msg['message.table.empty']}"
+             styleClass="compact-table">
      <f:facet name="header">
-         <h:outputText escape="false" value="#{msg['title.cotisation.choice']}" />
-     </f:facet>
+         <h1>#{msg['title.cotisation.choice']}</h1>
+</f:facet>
 
        <p:column headerText="#{msg['tarif.members.item']} "
                  width="12%" >
@@ -56,11 +57,12 @@
 <p:dataTable var="item"
              value="#{memC.tarifMember.equipmentsList}"
              rowIndexVar="row"
-             emptyMessage="#{msg['message.table.empty']}" >
+             emptyMessage="#{msg['message.table.empty']}"
+             styleClass="compact-table" >
 
       <f:facet name="header">
-         <h:outputText escape="false" value="#{msg['title.equipments.choice']}" />
-     </f:facet>
+         <h1>#{msg['title.equipments.choice']}</h1>
+</f:facet>
 
        <p:column headerText="#{msg['tarif.members.item']} "
                  width="12%" >

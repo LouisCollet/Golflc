@@ -8,8 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import javax.sql.DataSource;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -21,8 +19,7 @@ public class FindHandicapIndexAtDate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject
     private create.CreateHandicapIndex createHandicapIndexService;
@@ -46,7 +43,7 @@ public class FindHandicapIndexAtDate implements Serializable {
             LIMIT 1
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, handicapIndex.getHandicapPlayerId());
@@ -69,13 +66,13 @@ public class FindHandicapIndexAtDate implements Serializable {
 
                     // ✅ Service injecté sans conn
                     var hi = createHandicapIndexService.create(handicapIndex);
-                    
+
                     msg = "Compléter manuellement la situation de départ // created = " + hi;
                     LOG.info(msg);
-                    
+
                     // ⚠️ Retourne null pour indiquer qu'il faut compléter manuellement
                     return null;
-                    
+
                 } else {
                     LOG.debug("Handicap Index found = " + handicapIndex.getHandicapWHS());
                 }
@@ -102,10 +99,10 @@ public class FindHandicapIndexAtDate implements Serializable {
         handicapIndex.setHandicapPlayerId(324713);
         Round round = new Round();
         round.setIdround(590);
-        
+
         handicapIndex.setHandicapDate(round.getRoundDate());
         HandicapIndex hi = new find.FindHandicapIndexAtDate().find(handicapIndex);
-        
+
         if (hi != null) {
             LOG.debug("FindHandicapIndexAtDate = " + hi.getHandicapWHS());
         } else {
@@ -130,10 +127,10 @@ import rowmappers.RowMapper;
 import utils.LCUtil;
 
 public class FindHandicapIndexAtDate {
-    
 
-public HandicapIndex find(HandicapIndex handicapIndex, final Connection conn) throws SQLException{    
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
+
+public HandicapIndex find(HandicapIndex handicapIndex, final Connection conn) throws SQLException{
+    final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering : " + methodName);
   //      LOG.debug("starting " + methodName + " for HandicapIndex = " + handicapIndex); //.getHandicapPlayerId());
     PreparedStatement ps = null;

@@ -24,10 +24,11 @@
              resizableColumns="true"
              var="c"
              emptyMessage="#{msg['message.table.inscriptions.competition.empty']}"
+             styleClass="compact-table"
              >
 
  <f:facet name="header">
-    <h:outputText escape="false" value="#{msg['competition.inscriptions.title']}"/>
+    <h1>#{msg['competition.inscriptions.title']}</h1>
     <h2>#{roundC.competition.competitionDescription.competitionName} </h2>
 </f:facet>
 

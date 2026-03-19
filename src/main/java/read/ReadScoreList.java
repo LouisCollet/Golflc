@@ -10,8 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.sql.DataSource;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -21,8 +19,7 @@ public class ReadScoreList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject
     private find.FindDistances findDistancesService;
@@ -46,7 +43,7 @@ public class ReadScoreList implements Serializable {
                AND score.player_has_round_player_idplayer = ?
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, round.getIdround());
@@ -67,7 +64,7 @@ public class ReadScoreList implements Serializable {
                 // ✅ Ajouter les distances (20-08-2023)
                 if (!scoreList.isEmpty()) {
                     var distance = findDistancesService.find(tee);
-                    
+
                     for (i = 0; i < scoreList.size(); i++) {
                         if (tee.getTeeHolesPlayed().equals("10-18")) {
                             scoreList.get(i).setDistances(distance.getDistanceArray()[i + 9]); // note the +9
@@ -124,8 +121,8 @@ import utils.LCUtil;
 public class ReadScoreList {
 
 public  ArrayList<ScoreStableford.Score> read(final Player player, final Round round, final Tee tee,final Connection conn) throws SQLException{
-// complete l'array strokes des strokes bruts joués 
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
+// complete l'array strokes des strokes bruts joués
+    final String methodName = utils.LCUtil.getCurrentMethodName();
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -162,7 +159,7 @@ try{
             }
         } //end for
      } // end if
-      
+
 return scoreList;
 }catch (SQLException e){
     String msg = "SQL Exception in " + methodName + e.toString() + ", SQLState = " + e.getSQLState()
@@ -196,7 +193,7 @@ void main() throws SQLException, Exception{
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
   }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
+         DBConnection.closeQuietly(conn, null, null , null);
   }
 }// end main
 } // end class

@@ -36,6 +36,6 @@ public static String getCountryCode(String countryName) {
     public static void main(String[] args) {
         String country = "BELGIUM";
         String code = getCountryCode(country);
-        System.out.println(country + " -> " + code); // Belgium -> be
+        LOG.debug(country + " -> " + code); // Belgium -> be
     }
 }

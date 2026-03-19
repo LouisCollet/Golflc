@@ -67,7 +67,8 @@
              var="var"
              style="margin: 0 auto;width:50%"
              rowIndexVar="row"
-             emptyMessage="#{msg['message.table.inscriptions.competition.empty']}" >
+             emptyMessage="#{msg['message.table.inscriptions.competition.empty']}"
+             styleClass="compact-table" >
     <p:column headerText="#{msg['course.id']}"
               width="10%">
         <h:outputText value="#{var.courseId}"/>

@@ -26,8 +26,9 @@
     columns="1">
 
      <h2>Help File Handled =
-         <h:outputText escape="false" value="#{mongoHelpC.helpView.id}.xhtml" />
-          <br/>Last modified =
+         <h:outputText escape="false"
+                       value="#{mongoHelpC.helpView.id}.xhtml" />
+          Last modified =
          <h:outputText value="#{mongoHelpC.helpView.helpViewModificationDate}">
                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm:ss" />
          </h:outputText>
@@ -36,7 +37,7 @@
     <p:textEditor id="help_editor"
                   widgetVar="editor"
                   value="#{mongoHelpC.helpView.helpViewText}"
-                  height="250px"
+                  height="450px"
                   style="width:800px;font-weight: normal;background-color: whitesmoke;" />
 
     <f:facet name="footer">

@@ -4,13 +4,10 @@ import entite.TarifGreenfee;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -18,8 +15,7 @@ public class DeleteTarifGreenfee implements Serializable, interfaces.GolfInterfa
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public DeleteTarifGreenfee() { }
 
@@ -34,30 +30,16 @@ public class DeleteTarifGreenfee implements Serializable, interfaces.GolfInterfa
                 AND TarifYear = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, tarif.getTarifCourseId());
-            ps.setInt(2, Integer.valueOf(year));
-            LCUtil.logps(ps);
-            int rowDeleted = ps.executeUpdate();
-            if (rowDeleted != 0) {
-                String msg = "TarifGreenfee deleted ! for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
-                LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
-                return true;
-            } else {
-                String msg = "Error delete TarifGreenfee for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
-                return false;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return false;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
+        int rowDeleted = dao.execute(query, tarif.getTarifCourseId(), Integer.valueOf(year));
+        if (rowDeleted != 0) {
+            String msg = "TarifGreenfee deleted ! for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
+            return true;
+        } else {
+            String msg = "Error delete TarifGreenfee for year = " + year + " , for courseId = " + tarif.getTarifCourseId();
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
             return false;
         }
     } // end method

@@ -23,7 +23,7 @@ import static interfaces.Log.LOG;
 @ApplicationScoped
 public class GeoDetector {
     
-    private static final String DEFAULT_DB_PATH = "/opt/geo/GeoLite2-City.mmdb";
+    private static final String DEFAULT_DB_PATH = "C:/opt/geo/GeoLite2-City.mmdb";
     private static DatabaseReader reader;
     
     @PostConstruct
@@ -310,4 +310,25 @@ public class GeoDetector {
             return sb.toString();
         }
     }
+
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        initDatabase(DEFAULT_DB_PATH);
+        LOG.debug("DB available = " + isAvailable());
+        // Google DNS (Mountain View, CA)
+        LOG.debug("8.8.8.8       = " + getLocation("8.8.8.8"));
+        // Cloudflare (San Francisco)
+        LOG.debug("1.1.1.1       = " + getLocation("1.1.1.1"));
+        // Belgian IP (Proximus)
+        LOG.debug("91.183.100.1  = " + getLocation("91.183.100.1"));
+        // French IP
+        LOG.debug("82.64.0.1     = " + getLocation("82.64.0.1"));
+        // Private IP
+        LOG.debug("192.168.1.1   = " + getLocation("192.168.1.1"));
+        // Loopback
+        LOG.debug("127.0.0.1     = " + getLocation("127.0.0.1"));
+    } // end main
+    */
 }

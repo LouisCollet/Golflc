@@ -4,26 +4,24 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces">
-    <h:body>
-        <p:growl id="growl-msg"
-                 escape="false"
-                 sticky="true"
-                 showDetail="true"
-                 severity="error"
-                 skipDetailIfEqualsSummary="true"
-                 keepAlive="true">
-            <p:autoUpdate/>
-        </p:growl>
+    <p:growl id="growl-msg"
+             escape="false"
+             sticky="true"
+             showDetail="true"
+             severity="error"
+             skipDetailIfEqualsSummary="true"
+             keepAlive="true">
+        <p:autoUpdate/>
+    </p:growl>
 
-        <p:messages id="messages"
-                    redisplay="true"
-                    escape="false"
-                    skipDetailIfEqualsSummary=""
-                    showDetail="true"
-                    globalOnly="true"
-                    closable="true"
-                    severity="info,warn,error,fatal">
-            <p:autoUpdate/>
-        </p:messages>
-    </h:body>
+    <p:messages id="messages"
+                redisplay="true"
+                escape="false"
+                skipDetailIfEqualsSummary=""
+                showDetail="true"
+                globalOnly="true"
+                closable="true"
+                severity="info,warn,error,fatal">
+        <p:autoUpdate/>
+    </p:messages>
 </ui:composition>

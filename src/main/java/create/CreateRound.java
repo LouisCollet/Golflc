@@ -5,10 +5,9 @@ import entite.Club;
 import entite.Course;
 import entite.Round;
 import entite.UnavailablePeriod;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.JDBCType;
@@ -41,9 +40,7 @@ public class CreateRound implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // ✅ Injection DataSource WildFly
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ========================================
     // CREATE
@@ -74,7 +71,7 @@ public class CreateRound implements Serializable {
         }
 
         // ✅ try-with-resources : Connection et PreparedStatement fermés automatiquement
-        try (Connection conn        = dataSource.getConnection();
+        try (Connection conn        = dao.getConnection();
              PreparedStatement ps   = conn.prepareStatement(utils.LCUtil.generateInsertQuery(conn, "round"))) {
 
             LOG.debug(methodName + " - ZoneId = " + club.getAddress().getZoneId());

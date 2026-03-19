@@ -4,20 +4,13 @@ import entite.Club;
 import entite.Course;
 import entite.Tee;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
-
 import static interfaces.Log.LOG;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import rowmappers.ClubRowMapper;
@@ -29,7 +22,7 @@ import utils.LCUtil;
 /**
  * Liste complète des clubs/courses/tees
  * ✅ @ApplicationScoped - Stateless, partagé
- * ✅ @Resource DataSource - Connection pooling
+ * ✅ @Inject GenericDAO — plus de DataSource/Connection manuelle
  * ✅ Lazy loading : si liste != null, retourne le cache
  */
 @ApplicationScoped
@@ -40,17 +33,13 @@ public class CourseList implements Serializable {
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<ECourseList> liste = null;
 
-    /**
-     * DataSource injecté par WildFly (connection pooling)
-     */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     /**
      * Liste complète clubs/courses/tees
-     * 
-     * @return Liste des ECourseList2
-     * @throws Exception en cas d'erreur
+     *
+     * @return Liste des ECourseList
+     * @throws SQLException en cas d'erreur
      */
     public List<ECourseList> list() throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
@@ -63,9 +52,7 @@ public class CourseList implements Serializable {
 
         LOG.debug(" ... entering {}", methodName);
 
-        try (Connection conn = dataSource.getConnection()) {
-
-            final String query = """
+        final String query = """
                 SELECT *
                 FROM club, course, tee
                 WHERE club.idclub = course.club_idclub
@@ -75,52 +62,31 @@ public class CourseList implements Serializable {
                 ORDER by clubname, coursename, idtee, teestart
                 """;
 
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
+        RowMapper<Club>   clubMapper   = new ClubRowMapper();
+        RowMapper<Course> courseMapper = new CourseRowMapper();
+        RowMapper<Tee>    teeMapper    = new TeeRowMapper();
 
-                LCUtil.logps(ps);
+        List<ECourseList> rows = dao.queryList(query, rs -> {
+            //ECourseList ecl = new ECourseList();
+            //   ecl.setClub(entite.Club.dtoMapper(rs)); // mod
+            return ECourseList.builder()
+                .club(clubMapper.map(rs))
+                .course(courseMapper.map(rs))
+                .tee(teeMapper.map(rs))
+                .build();
+        });
 
-                try (ResultSet rs = ps.executeQuery()) {
-
-                    // ✅ PARTIE NON MODIFIÉE - DÉBUT
-                    liste = new ArrayList<>();
-                    RowMapper<Club>   clubMapper   = new ClubRowMapper();
-                    RowMapper<Course> courseMapper = new CourseRowMapper();
-                    RowMapper<Tee>    teeMapper    = new TeeRowMapper();
-                    while(rs.next()){
-                        //ECourseList ecl = new ECourseList();
-                        //   ecl.setClub(entite.Club.dtoMapper(rs)); // mod 
-                        ECourseList ecl = ECourseList.builder()
-                            .club(clubMapper.map(rs))
-                            .course(courseMapper.map(rs))
-                            .tee(teeMapper.map(rs))
-                            .build();
-                        //   ecl.setClub(clubMapper.map(rs));   
-                        //   ecl.setCourse(courseMapper.map(rs));
-                        //   ecl.setTee(teeMapper.map(rs));
-                        liste.add(ecl);
-                    } // end while
-                    if(liste.isEmpty()){
-                        String msg = "££ Empty Result List in " + methodName;
-                        LOG.error(msg);
-                        LCUtil.showMessageFatal(msg);
-              //          return null;
-                    }else{
-                        LOG.debug("ResultSet {} has {} lines.", methodName, liste.size());
-                    }
-                    //     liste.forEach(item -> LOG.debug("Course list " + item + "/"));  // java 8 lambda
-                    // return liste;
-                    return List.copyOf(liste); // new 02-12-2025 non testé immutable eviter erreur modification ??
-                    // ✅ PARTIE NON MODIFIÉE - FIN
-                }
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        liste = new ArrayList<>(rows);
+        if (liste.isEmpty()) {
+            String msg = "££ Empty Result List in " + methodName;
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+        } else {
+            LOG.debug("ResultSet {} has {} lines.", methodName, liste.size());
         }
+        //     liste.forEach(item -> LOG.debug("Course list " + item + "/"));  // java 8 lambda
+        // return liste;
+        return List.copyOf(liste); // new 02-12-2025 non testé immutable eviter erreur modification ??
     } // end method
 
     // ✅ Getters/setters d'instance
@@ -169,11 +135,11 @@ import entite.composite.ECourseList2;
 import utils.LCUtil;
 import static interfaces.Log.LOG;
 public class CourseList {
-    
+
     static List<ECourseList2> liste = null;
 
 public List<ECourseList2> list(final @NotNull Connection conn) throws SQLException, Exception{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
+    final String methodName = utils.LCUtil.getCurrentMethodName();
 if(liste == null){
         LOG.debug(" ... entering " + methodName);
     PreparedStatement ps = null;
@@ -197,14 +163,14 @@ try{
     RowMapper<Tee>    teeMapper    = new TeeRowMapper();
 	while(rs.next()){
 		//ECourseList ecl = new ECourseList();
-             //   ecl.setClub(entite.Club.dto Mapper(rs)); // mod 
+             //   ecl.setClub(entite.Club.dto Mapper(rs)); // mod
                   ECourseList2 ecl = ECourseList2.builder()
                     .club(clubMapper.map(rs))
                     .course(courseMapper.map(rs))
                     .tee(teeMapper.map(rs))
                 .build();
 
-             //   ecl.setClub(clubMapper.map(rs));   
+             //   ecl.setClub(clubMapper.map(rs));
              //   ecl.setCourse(courseMapper.map(rs));
              //   ecl.setTee(teeMapper.map(rs));
 	 liste.add(ecl);
@@ -217,10 +183,10 @@ try{
      }else{
          LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
      }
- //      liste.forEach(item -> LOG.debug("Course list " + item + "/"));  // java 8 lambda                   
+ //      liste.forEach(item -> LOG.debug("Course list " + item + "/"));  // java 8 lambda
    // return liste;
     return List.copyOf(liste); // new 02-12-2025 non testé immutable eviter erreur modification ??
-}catch (SQLException e){ 
+}catch (SQLException e){
     handleSQLException(e, methodName);
     return null;
 }catch (Exception e){
@@ -253,7 +219,7 @@ try{
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
    }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
+         DBConnection.closeQuietly(conn, null, null , null);
           }
    } // end main//
 } //end class

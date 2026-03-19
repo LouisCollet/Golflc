@@ -22,7 +22,8 @@
              value="#{roundC.listStableford}"
              rowIndexVar="rowIndex"
              emptyMessage="#{msg['message.table.empty']}"
-             var="c" >
+             var="c"
+             styleClass="compact-table" >
 <f:facet name="header">
     <h:panelGroup layout="block" style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
      <p:commandButton
@@ -91,7 +92,10 @@
      #{c.classment.last1})
 </p:column>
 
-<ui:include src="include/include_thumbnails_ecourselist.xhtml"/>
+<ui:include src="include/include_thumbnail.xhtml">
+    <ui:param name="th_photo" value="#{c.player.playerPhotoLocation}"/>
+    <ui:param name="th_name"  value="#{c.player.playerLastName}"/>
+</ui:include>
 
 </p:dataTable>
    <ui:include src="include/include_confirmDialog.xhtml"/>

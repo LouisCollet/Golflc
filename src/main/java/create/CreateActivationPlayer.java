@@ -4,7 +4,6 @@ import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -14,7 +13,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
-import javax.sql.DataSource;
 import utils.LCUtil;
 import static utils.LCUtil.printSQLException;
 
@@ -23,8 +21,7 @@ public class CreateActivationPlayer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject private mail.ActivationMail activationMail; // migrated 2026-02-26
 
@@ -35,7 +32,7 @@ public class CreateActivationPlayer implements Serializable {
         LOG.debug("entering " + methodName);
         LOG.debug("-- Inserting initial Activation for new player = " + player.getIdplayer());
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "activation");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 String uuid = UUID.randomUUID().toString();

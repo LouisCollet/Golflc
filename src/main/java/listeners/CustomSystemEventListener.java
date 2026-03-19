@@ -41,7 +41,7 @@ public void processEvent(final SystemEvent event) throws AbortProcessingExceptio
     //     java 19 console est en cp
          System.setOut(new PrintStream(System.out, true, "UTF8"));
          LOG.debug("new printStreamApplication Started hé hé àà: Bootstrap occurred!");
-         System.out.println("direct out Application Started hé hé àà: Bootstrap occurred!");
+         LOG.debug("direct out Application Started: Bootstrap occurred!");
     }
  
  private void TearDown(final PreDestroyApplicationEvent event){

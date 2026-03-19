@@ -53,7 +53,7 @@ public class SchedulerProController implements Serializable {
 
     private Professional professional;
     private List<Lesson> listLessons = new ArrayList<>();
-    private ScheduleModel scheduleModel;
+    private ScheduleModel scheduleModel = new org.primefaces.model.DefaultScheduleModel();
 
     private ScheduleEvent<Object> scheduleEvent = new DefaultScheduleEvent<>();
     //private ScheduleEvent<Object> scheduleEvent;
@@ -239,4 +239,8 @@ public class SchedulerProController implements Serializable {
 
     public List<Lesson> getListLessons() { return listLessons; }
     public void setListLessons(List<Lesson> l) { listLessons = l; }
+
+    public boolean isNotProfessional() {
+        return professional == null || professional.getProId() == null;
+    } // end method
 } // end class

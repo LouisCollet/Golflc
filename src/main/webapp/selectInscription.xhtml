@@ -23,7 +23,8 @@
              resizableColumns="true"
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
-             rowKey="#{c.round.idround}">
+             rowKey="#{c.round.idround}"
+             styleClass="compact-table">
 
 <p:ajax event="rowToggle"
         listener="#{roundC.onRowToggleCompetition}" />

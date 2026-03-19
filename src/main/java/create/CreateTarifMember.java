@@ -8,7 +8,6 @@ import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -17,7 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -25,8 +23,7 @@ public class CreateTarifMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject
     private find.FindTarifMembersOverlapping findTarifMembersOverlapping;
@@ -61,7 +58,7 @@ public class CreateTarifMember implements Serializable {
         }
         LOG.debug("Tarif Member converted in json format = " + NEW_LINE + tarifJson);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
         //    final String query = LCUtil.generateInsertQuery(conn, "tarif_members");
             try (PreparedStatement ps = conn.prepareStatement(sql.SqlFactory.generateInsertQuery(conn, "tarif_members"))) {
                 ps.setNull(1, java.sql.Types.INTEGER);  // autoincrement

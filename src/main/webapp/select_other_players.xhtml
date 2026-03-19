@@ -16,7 +16,7 @@
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
 <p:panel styleClass="login-card form-card" style="max-width:100%;">
 <f:facet name="header">
-    <h1><h:outputText escape="false" value="#{msg['message.playerslist']}" /></h1>
+    <h1>#{msg['message.playerslist']}</h1>
 </f:facet>
 
 <p:dataTable id="table_players"
@@ -25,7 +25,8 @@
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              selection="#{playerC.player.draggedPlayers}"
-             rowKey="#{c.player.idplayer}">
+             rowKey="#{c.player.idplayer}"
+             styleClass="compact-table">
  <c:set var="s0" value="#{v.inscriptionTeam}"/>
 
 <f:facet name="header">

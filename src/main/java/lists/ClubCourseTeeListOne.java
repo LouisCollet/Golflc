@@ -4,43 +4,32 @@ import entite.Club;
 import entite.Course;
 import entite.Tee;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.RowMapper;
 import rowmappers.TeeRowMapper;
 import utils.LCUtil;
-import javax.sql.DataSource;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static interfaces.Log.LOG;
 
 /**
- * Liste Club/Course/Tee pour un club donné
- * ✅ Migré vers CDI + DataSource (plus de Connection en paramètre)
- * ✅ try-with-resources (plus de finally/closeQuietly)
- * ✅ Cache statique conservé (compatible avec ClubManager.setListe)
+ * Liste Club/Course/Tee pour un club donne
+ * Migre vers GenericDAO (2026-03-18)
  */
 @ApplicationScoped
 public class ClubCourseTeeListOne implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // ✅ Injection DataSource WildFly - plus de conn en paramètre
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    // Cache d'instance — @ApplicationScoped garantit le singleton
     private List<ECourseList> liste = null;
 
     private static final String QUERY = """
@@ -53,17 +42,9 @@ public class ClubCourseTeeListOne implements Serializable {
         """;
 
     // ========================================
-    // MÉTHODE PRINCIPALE
+    // METHODE PRINCIPALE
     // ========================================
 
-    /**
-     * Liste toutes les courses et tees pour un club donné.
-     * ✅ Plus de Connection en paramètre
-     * ✅ Cache invalidé par ClubManager via setListe(null)
-     *
-     * @param club le club dont on veut les courses/tees
-     * @return liste de ECourseList2, jamais null
-     */
     public List<ECourseList> list(Club club) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -78,62 +59,33 @@ public class ClubCourseTeeListOne implements Serializable {
             return liste;
         }
 
-        // ✅ try-with-resources : Connection, PreparedStatement, ResultSet fermés automatiquement
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(QUERY)) {
+        RowMapper<Club>   clubMapper   = new ClubRowMapper();
+        RowMapper<Course> courseMapper = new CourseRowMapper();
+        RowMapper<Tee>    teeMapper    = new TeeRowMapper();
 
-            ps.setInt(1, club.getIdclub());
-            LCUtil.logps(ps);
+        liste = dao.queryList(QUERY, rs -> ECourseList.builder()
+                .club(clubMapper.map(rs))
+                .course(courseMapper.map(rs))
+                .tee(teeMapper.map(rs))
+                .build(),
+                club.getIdclub());
 
-            try (ResultSet rs = ps.executeQuery()) {
-
-                RowMapper<Club>   clubMapper   = new ClubRowMapper();
-                RowMapper<Course> courseMapper = new CourseRowMapper();
-                RowMapper<Tee>    teeMapper    = new TeeRowMapper();
-
-                List<ECourseList> result = new ArrayList<>();
-
-                while (rs.next()) {
-                    ECourseList ecl = ECourseList.builder()
-                        .club(clubMapper.map(rs))
-                        .course(courseMapper.map(rs))
-                        .tee(teeMapper.map(rs))
-                        .build();
-                    result.add(ecl);
-                }
-
-                if (result.isEmpty()) {
-                    String msg = "Empty Result List in " + methodName + " for club " + club.getIdclub();
-                    LOG.warn(msg);
-           //         LCUtil.showMessageFatal(msg);
-                } else {
-                    LOG.debug("{} - ResultSet has {} lines for club {}",
-                             methodName, result.size(), club.getIdclub());
-                }
-
-                liste = result;                             // ✅ mise en cache
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (liste.isEmpty()) {
+            LOG.warn("Empty Result List in {} for club {}", methodName, club.getIdclub());
+        } else {
+            LOG.debug("{} - ResultSet has {} lines for club {}",
+                     methodName, liste.size(), club.getIdclub());
         }
+        return liste;
     } // end method
 
     // ========================================
-    // CACHE - Getters / Setters statiques
+    // CACHE - Getters / Setters
     // ========================================
-    // Conservés tels quels — utilisés par ClubManager pour invalider le cache
 
-    // ✅ Getters/setters d'instance
     public List<ECourseList> getListe()               { return liste; }
     public void setListe(List<ECourseList> liste)     { this.liste = liste; }
 
-    // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
@@ -165,15 +117,15 @@ import static interfaces.Log.LOG;
 
 public class ClubCourseTeeListOne {
     private static List<ECourseList2> liste = null;
-     
-    
+
+
 public List<ECourseList2> list(Club club,final Connection conn) throws SQLException, Exception{
 if(liste == null){
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
+    final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug(" ... entering " + methodName);
     PreparedStatement ps = null;
     ResultSet rs = null;
-try{ 
+try{
     final String query = """
         SELECT *
         FROM club, course, tee
@@ -192,7 +144,7 @@ try{
     RowMapper<Tee> teeMapper = new TeeRowMapper();
 	while(rs.next()){
 		// ecl = new ECourseList();
-                
+
                 ECourseList2 ecl = ECourseList2.builder()
                 .club(clubMapper.map(rs))
                 .course(courseMapper.map(rs))
@@ -201,24 +153,24 @@ try{
              //   .round(roundMapper.map(rs,club))
                 .tee(teeMapper.map(rs))
             .build();
-                
-                
+
+
             //    ecl.setClub(clubMapper.map(rs));
             //    ecl.setCourse(courseMapper.map(rs));
             //    ecl.setTee(teeMapper.map(rs));
 	liste.add(ecl);
 	} // end while
      if(liste.isEmpty()){
-         String msg = "££ Empty Result List in " + methodName;
+         String msg = "Pound Pound Empty Result List in " + methodName;
          LOG.error(msg);
          LCUtil.showMessageFatal(msg);
    //      return null;
      }else{
          LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
      }
- //      liste.forEach(item -> LOG.debug("Course list " + item));  // java 8 lambda                   
+ //      liste.forEach(item -> LOG.debug("Course list " + item));  // java 8 lambda
     return liste;
-}catch (SQLException e){ 
+}catch (SQLException e){
     handleSQLException(e, methodName);
     return null;
 }catch (Exception e){
@@ -241,7 +193,7 @@ try{
     public static void setListe(List<ECourseList2> liste) {
         ClubCourseTeeListOne.liste = liste;
     }
-    
+
   void main() throws SQLException, Exception{
      Connection conn = new DBConnection().getConnection();
   try{
@@ -250,10 +202,10 @@ try{
     List<ECourseList2> lp = new ClubCourseTeeListOne().list(club, conn);
         LOG.debug("from main, after lp = " + lp);
  } catch (Exception e) {
-            String msg = "Â£Â£ Exception in main = " + e.getMessage();
+            String msg = "Exception in main = " + e.getMessage();
             LOG.error(msg);
    }finally{
-         DBConnection.closeQuietly(conn, null, null , null); 
+         DBConnection.closeQuietly(conn, null, null , null);
           }
    } // end main//
 } //end class

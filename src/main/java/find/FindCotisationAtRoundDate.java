@@ -7,8 +7,8 @@ import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +18,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.CotisationRowMapper;
 import rowmappers.RowMapper;
 import utils.LCUtil;
@@ -28,8 +27,7 @@ public class FindCotisationAtRoundDate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public FindCotisationAtRoundDate() { }
 
@@ -56,7 +54,7 @@ public class FindCotisationAtRoundDate implements Serializable {
               AND CotisationStatus = 'Y'
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, player.getIdplayer());
@@ -99,7 +97,7 @@ public class FindCotisationAtRoundDate implements Serializable {
         LOG.debug("for round = " + round);
         LOG.debug("for club = " + club);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
 
             String c = utils.DBMeta.listMetaColumnsLoad(conn, "payments_cotisation");
             final String query =

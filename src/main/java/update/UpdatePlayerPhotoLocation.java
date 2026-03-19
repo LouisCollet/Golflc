@@ -1,11 +1,10 @@
 package update;
 
 import entite.Player;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import utils.LCUtil;
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,9 +24,8 @@ public class UpdatePlayerPhotoLocation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // ✅ DataSource injecté — plus de Connection en paramètre
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject
+    private dao.GenericDAO dao;
 
     /**
      * Met à jour la photo location d'un joueur
@@ -45,7 +43,7 @@ public class UpdatePlayerPhotoLocation implements Serializable {
                     + "WHERE idplayer = ?";
 
             // ✅ try-with-resources — plus de finally/closeQuietly
-            try (Connection conn = dataSource.getConnection();
+            try (Connection conn = dao.getConnection();
                  PreparedStatement ps = conn.prepareStatement(query)) {
 
                 ps.setString(1, player.getPlayerPhotoLocation());

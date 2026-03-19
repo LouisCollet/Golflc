@@ -6,8 +6,6 @@ import entite.Player;
 import entite.Subscription;
 import entite.Subscription.etypeSubscription;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
 
 import static interfaces.Log.LOG;
 import jakarta.inject.Inject;
@@ -38,8 +36,7 @@ public class CreatePlayer implements Serializable {
     /**
      * DataSource injecté par WildFly (connection pooling)
      */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
     @Inject private create.CreateHandicapIndex createHandicapIndexService;  // ✅ ajouter
     @Inject private create.CreateActivationPlayer createActivationPlayer;   // migrated 2026-02-24
     @Inject private payment.PaymentSubscriptionController paymentSubscriptionController; // migrated 2026-02-25
@@ -55,9 +52,9 @@ public class CreatePlayer implements Serializable {
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
 
-        LOG.debug("dataSource = {}", dataSource);
+        LOG.debug("dao = {}", dao);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
 
             // Vérification email
             if (batch.equals("A")

@@ -91,6 +91,9 @@ public class Settings implements Serializable {
             settings.put("WHS_CALCULATIONS",    resources + "calculations/");
             settings.put("TARGET",              userDir   + "/target");
             settings.put("GOOGLE_MAPS_API_KEY", System.getenv("GOOGLE_MAPS_API_KEY"));
+            settings.put("PAYMENT_SERVICE_URL",    System.getenv("PAYMENT_SERVICE_URL"));
+            settings.put("CREDITCARD_SERVICE_URL", System.getenv("CREDITCARD_SERVICE_URL"));
+            settings.put("APP_BASE_URL",           System.getenv("APP_BASE_URL"));
 
             LOG.debug(methodName + " - Settings initialized:");
             settings.forEach((k, v) -> LOG.debug(TAB + k + " = " + v));

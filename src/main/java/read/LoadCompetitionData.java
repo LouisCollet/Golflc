@@ -4,22 +4,17 @@ import entite.CompetitionData;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class LoadCompetitionData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public LoadCompetitionData() { }
 
@@ -34,27 +29,7 @@ public class LoadCompetitionData implements Serializable {
                 WHERE CmpDataId = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, competition.getCmpDataId());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                CompetitionData cd = new CompetitionData();
-                while (rs.next()) {
-                    cd = CompetitionData.map(rs);
-                }
-                return cd;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
+        return dao.querySingle(query, rs -> CompetitionData.map(rs), competition.getCmpDataId());
     } // end method
 
     /*

@@ -6,8 +6,8 @@ import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 /**
@@ -27,8 +26,8 @@ public class UpdateDistances implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject
+    private dao.GenericDAO dao;
 
     public UpdateDistances() { }
 
@@ -37,7 +36,7 @@ public class UpdateDistances implements Serializable {
         LOG.debug("entering " + methodName);
         LOG.debug(" with distances = " + distance);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
 
             String distances = utils.DBMeta.listMetaColumnsUpdate(conn, "distances");
             final String query = """

@@ -6,23 +6,18 @@ import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class LoadHandicap implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public LoadHandicap() { }
 
@@ -40,28 +35,8 @@ public class LoadHandicap implements Serializable {
                     AND handicap.handicapend
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, player.getIdplayer());
-            ps.setTimestamp(2, Timestamp.valueOf(round.getRoundDate()));
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                Handicap h = new Handicap();
-                while (rs.next()) {
-                    h = entite.Handicap.map(rs);
-                }
-                return h;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
+        return dao.querySingle(query, rs -> entite.Handicap.map(rs),
+                player.getIdplayer(), Timestamp.valueOf(round.getRoundDate()));
     } // end method
 
     /*

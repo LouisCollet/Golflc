@@ -8,8 +8,8 @@ import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
-import javax.sql.DataSource;
 import utils.LCUtil;
 import static utils.LCUtil.LocalDateTimeToDate;
 
@@ -26,8 +25,7 @@ public class CreateCompetitionDescription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     ValidationsLC vlc = new ValidationsLC();
 
@@ -49,7 +47,7 @@ public class CreateCompetitionDescription implements Serializable {
                 return false;
             }
 
-            try (Connection conn = dataSource.getConnection()) {
+            try (Connection conn = dao.getConnection()) {
 
                 final String query = LCUtil.generateInsertQuery(conn, "competition_description");
                 int index = 0;

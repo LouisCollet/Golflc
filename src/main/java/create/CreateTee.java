@@ -2,8 +2,7 @@ package create;
 
 import entite.Tee;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
+import jakarta.inject.Inject;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -28,15 +27,14 @@ public class CreateTee implements Serializable {
     /**
      * DataSource injecté par WildFly (connection pooling)
      */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public boolean create(final Tee tee) throws Exception {
         
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
         
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             
             conn.setAutoCommit(false);
             

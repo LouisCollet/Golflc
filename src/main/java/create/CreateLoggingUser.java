@@ -4,15 +4,14 @@ import entite.LoggingUser;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import javax.sql.DataSource;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
@@ -21,8 +20,7 @@ public class CreateLoggingUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public CreateLoggingUser() { }
 
@@ -31,7 +29,7 @@ public class CreateLoggingUser implements Serializable {
         LOG.debug("entering " + methodName);
         LOG.debug("with LoggingUser  = " + logging);
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             final String query = utils.LCUtil.generateInsertQuery(conn, "logging_user");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 ps.setInt(1, logging.getLoggingIdPlayer());

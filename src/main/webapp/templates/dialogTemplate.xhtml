@@ -26,6 +26,16 @@ au mot clé refresh et à la précision URL=chemin-vers-ma-page.-->
     <h:outputScript library="js" name="forms.js" target="head"/>
     <!-- https://printjs.crabbly.com/  -->
     <h:outputScript library="js" name="print.min.js" target="head"/>
+
+    <!-- Anti-FOUC: apply saved theme before first paint -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('golf-theme');
+        if (saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    })();
+    </script>
 </h:head>
 
 <h:body id="body_master_template"> 
@@ -40,7 +50,7 @@ will thus ensure that the stylesheet is loaded after the PrimeFaces' default sty
 
 <ui:insert name="metadata" />
 <h:outputStylesheet library="styles" name="print.min.css" />
-<h:outputStylesheet library="styles" name="Styles2022.css" />
+<h:outputStylesheet library="styles" name="Styles2026.css" />
  <!--<h:outputStylesheet library="styles" name="primeflex/331/primeflex.min.css" /> 
  <h:outputStylesheet library="styles" name="primeflex/331/primeone-light.css" /> -->
 

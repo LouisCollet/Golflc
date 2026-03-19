@@ -4,22 +4,14 @@ import entite.Club;
 import entite.Cotisation;
 import entite.Player;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import manager.PlayerManager;
 import rowmappers.ClubRowMapper;
 import rowmappers.CotisationRowMapper;
@@ -32,8 +24,7 @@ public class LocalAdminCotisationList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject
     private PlayerManager playerManager;
@@ -62,41 +53,23 @@ public class LocalAdminCotisationList implements Serializable {
             ORDER BY cotisationIdclub, playerlastname
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        RowMapper<Club> clubMapper = new ClubRowMapper();
+        RowMapper<Player> playerMapper = new PlayerRowMapper();
+        RowMapper<Cotisation> cotisationMapper = new CotisationRowMapper();
 
-            ps.setInt(1, localAdmin.getIdplayer());
-            utils.LCUtil.logps(ps);
+        liste = new ArrayList<>(dao.queryList(query, rs -> ECourseList.builder()
+                .club(clubMapper.map(rs))
+                .player(playerMapper.map(rs))
+                .cotisation(cotisationMapper.map(rs))
+                .build(),
+                localAdmin.getIdplayer()));
 
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Club> clubMapper = new ClubRowMapper();
-                RowMapper<Player> playerMapper = new PlayerRowMapper();
-                RowMapper<Cotisation> cotisationMapper = new CotisationRowMapper();
-
-                while (rs.next()) {
-                    ECourseList ecl = ECourseList.builder()
-                            .club(clubMapper.map(rs))
-                            .player(playerMapper.map(rs))
-                            .cotisation(cotisationMapper.map(rs))
-                            .build();
-                    liste.add(ecl);
-                }
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (liste.isEmpty()) {
+            LOG.warn(methodName + " - empty result list");
+        } else {
+            LOG.debug(methodName + " - list size = " + liste.size());
         }
+        return liste;
     } // end method
 
     // ✅ Getters/setters d'instance

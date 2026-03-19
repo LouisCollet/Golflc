@@ -158,7 +158,14 @@ provided by wildfly  -->
     <groupId>org.primefaces</groupId>
     <artifactId>primefaces</artifactId>
     <version>${primefaces.version}</version>
-    <classifier>jakarta</classifier> 
+    <classifier>jakarta</classifier>
+</dependency>
+
+<!-- OWASP HTML Sanitizer — required by PrimeFaces 15 p:textEditor secure="true" -->
+<dependency>
+    <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+    <artifactId>owasp-java-html-sanitizer</artifactId>
+    <version>20240325.1</version>
 </dependency>
 
 <dependency>

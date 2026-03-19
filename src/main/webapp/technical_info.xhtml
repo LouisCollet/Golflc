@@ -5,7 +5,6 @@
       xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:c="jakarta.tags.core"
       xmlns:p="primefaces"
       xmlns:of="http://omnifaces.org/functions"
       template="templates/masterTemplate.xhtml">
@@ -22,217 +21,310 @@
     <h1>Technical Information</h1>
 </f:facet>
 
-<p:panelGrid id="panel"
-             columns="3"
-             layout="flex"
-             columnClasses="col1Flex,col2Flex,col1Flex"
-             styleClass="tech-info-grid">
+        <div class="grid">
 
-    <!-- MySQL -->
-    <h:outputText value="MySQL" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.mySQLInfo}"/>
-    <h:graphicImage name="images/mymySqlInfosql-logo.jpg" alt="MySQL" styleClass="tech-icon"/>
+            <!-- APPLICATION -->
+            <div class="col-12 md:col-6">
+                <p:fieldset legend="Application">
+                    <p:panelGrid columns="2" layout="grid" styleClass="tech-grid">
 
-    <!-- MongoDB -->
-    <h:outputText value="MongoDB" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.mongoInfo}"/>
-    <h:graphicImage name="images/MongoDB.png" alt="MongoDB" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="appVersionIcon" styleClass="tech-icon pi pi-tag" layout="inline"/>
+                            Version
+                            <p:tooltip for="appVersionIcon" value="Application version"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.applicationVersion}" severity="info"/>
 
-    <!-- IP -->
-    <h:outputText value="IP" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.ipDescription}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="buildIcon" styleClass="tech-icon pi pi-calendar" layout="inline"/>
+                            Build Date
+                            <p:tooltip for="buildIcon" value="Date du dernier build"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.buildVersion}" severity="success"/>
 
-    <!-- Ville -->
-    <h:outputText value="GeoLocation" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.geoDescription}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="deployIcon" styleClass="tech-icon pi pi-upload" layout="inline"/>
+                            Deploy Date
+                            <p:tooltip for="deployIcon" value="Date du dernier deploiement"/>
+                        </h:panelGroup>
+                            <p:badge value="#{infoC.deployVersion()}" severity="warning"/>
 
-    <!-- Application version -->
-    <h:outputText value="Application version" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.getApplicationVersion()}"/>
-    <h:outputText value=""/>
+                    </p:panelGrid>
+                </p:fieldset>
+            </div>
 
-    <!-- Date Last Build -->
-    <h:outputText value="Date Last Build" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.buildVersion}"/>
-    <h:outputText value=""/>
+            <!-- SERVER -->
+            <div class="col-12 md:col-6">
+                <p:fieldset legend="Server / Runtime">
+                    <p:panelGrid columns="2" layout="grid" styleClass="tech-grid">
 
-    <!-- Date Last Deploy -->
-    <h:outputText value="Date Last Deploy" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.deployVersion()}" escape="false"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="wfIcon" styleClass="tech-icon pi pi-server" layout="inline"/>
+                            WildFly
+                            <p:tooltip for="wfIcon" value="Version du serveur WildFly"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.serverVersion}" severity="info"/>
 
-    <!-- Browser -->
-    <h:outputText value="Browser" styleClass="tech-label"/>
-    <h:outputText value="#{request.getHeader('user-agent')}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="javaIcon" styleClass="tech-icon pi pi-code" layout="inline"/>
+                            Java
+                            <p:tooltip for="javaIcon" value="Version de la JVM"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.javaVersion()}" severity="success"/>
 
-    <!-- Host -->
-    <h:outputText value="Host" styleClass="tech-label"/>
-    <h:outputText value="#{header['host']}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="jakartaIcon" styleClass="tech-icon pi pi-box" layout="inline"/>
+                            Jakarta EE
+                            <p:tooltip for="jakartaIcon" value="Version Jakarta EE"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.jakartaEEVersion}" severity="info"/>
 
-    <!-- Copyright -->
-    <h:outputText value="Copyright" styleClass="tech-label"/>
-    <h:outputText value="&#169;2012-#{of:formatDate(now,'yyyy')} Application GolfLC by Louis Collet v3.0"
-                  escape="false" styleClass="copyright-text"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="weldIcon" styleClass="tech-icon pi pi-cog" layout="inline"/>
+                            Weld
+                            <p:tooltip for="weldIcon" value="CDI implementation"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.weldVersion}" severity="secondary"/>
 
-    <!-- IPv4 Address -->
-    <h:outputText value="IPv4 Address" styleClass="tech-label"/>
-    <h:outputText value="#{request.getRemoteAddr()}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="startupIcon" styleClass="tech-icon pi pi-play" layout="inline"/>
+                            Server Startup
+                            <p:tooltip for="startupIcon" value="Date de demarrage du serveur"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.jvmStartup()}" severity="info"/>
 
-    <!-- IPv6 Address -->
-    <h:outputText value="IPv6 Address" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.clientIPv6Address}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="jvmStartIcon" styleClass="tech-icon pi pi-clock" layout="inline"/>
+                            JVM Startup
+                            <p:tooltip for="jvmStartIcon" value="Date de demarrage de la JVM"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.jvmStartup()}" severity="info"/>
 
-    <!-- IP Address 3 -->
-    <h:outputText value="IP Address 3" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.globalAddress}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="jvmUptimeIcon" styleClass="tech-icon pi pi-stopwatch" layout="inline"/>
+                            JVM Uptime
+                            <p:tooltip for="jvmUptimeIcon" value="Temps de fonctionnement de la JVM"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.jvmUptime()}" severity="success"/>
 
-    <!-- Server Mac Address -->
-    <h:outputText value="Server Mac Address" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.clientMacAddress}"/>
-    <h:outputText value=""/>
+                    </p:panelGrid>
+                </p:fieldset>
+            </div>
 
-    <!-- Server Startup -->
-    <h:outputText value="Server Startup" styleClass="tech-label"/>
-    <h:outputText value="#{startup}"/>
-    <h:outputText value=""/>
+            <!-- FRONTEND -->
+            <div class="col-12 md:col-6">
+                <p:fieldset legend="Frontend">
+                    <p:panelGrid columns="2" layout="grid" styleClass="tech-grid">
 
-    <!-- JVM Startup -->
-    <h:outputText value="JVM Startup" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.jvmStartup()}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="jsfIcon" styleClass="tech-icon pi pi-desktop" layout="inline"/>
+                            JSF (Mojarra)
+                            <p:tooltip for="jsfIcon" value="Implementation JSF"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.mojarraVersion}" severity="info"/>
 
-    <!-- JVM uptime -->
-    <h:outputText value="JVM Uptime" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.jvmUptime()}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="pfIcon" styleClass="tech-icon pi pi-star" layout="inline"/>
+                            PrimeFaces
+                            <p:tooltip for="pfIcon" value="Framework UI PrimeFaces"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.primefacesVersion}" severity="success"/>
 
-    <!-- Server Address -->
-    <h:outputText value="Server Address" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.clientIpAddress}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="flexIcon" styleClass="tech-icon pi pi-th-large" layout="inline"/>
+                            PrimeFlex
+                            <p:tooltip for="flexIcon" value="Utilitaires CSS PrimeFlex"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.primeflexVersion}" severity="secondary"/>
 
-    <!-- Operating System -->
-    <h:outputText value="Operating System" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.osVersion}"/>
-    <h:outputText value=""/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="pfExtIcon" styleClass="tech-icon pi pi-star-fill" layout="inline"/>
+                            PF Extensions
+                            <p:tooltip for="pfExtIcon" value="PrimeFaces Extensions"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.primefacesExtensionVersion}" severity="info"/>
 
-    <!-- OmniFaces -->
-    <h:outputText value="OmniFaces" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.omnifacesVersion}"/>
-    <h:graphicImage name="images/omnifaces.png" alt="OmniFaces" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="omniIcon" styleClass="tech-icon pi pi-bolt" layout="inline"/>
+                            OmniFaces
+                            <p:tooltip for="omniIcon" value="Utilitaires JSF OmniFaces"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.omnifacesVersion}" severity="success"/>
 
-    <!-- Maven -->
-    <h:outputText value="Maven" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.mavenVersion}"/>
-    <h:graphicImage name="images/maven.png" alt="Maven" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="jqueryIcon" styleClass="tech-icon pi pi-code" layout="inline"/>
+                            jQuery
+                            <p:tooltip for="jqueryIcon" value="Version jQuery chargee"/>
+                        </h:panelGroup>
+                        <h:panelGroup layout="block">
+                            <span id="jqueryVersion2"></span>
+                            <h:outputScript target="body">
+                                (function() {
+                                    var el = document.getElementById('jqueryVersion2');
+                                    if (el) el.textContent = window.jQuery ? jQuery.fn.jquery : 'not loaded';
+                                })();
+                            </h:outputScript>
+                        </h:panelGroup>
 
-    <!-- GitHub -->
-    <h:outputText value="GitHub" styleClass="tech-label"/>
-    <h:outputLink value="https://github.com/LouisCollet/Golflc.git"
-                  target="_blank"
-                  styleClass="tech-link">
-        Go to GitHub site!
-    </h:outputLink>
-    <h:graphicImage name="images/GitHub.jpg" alt="GitHub" styleClass="tech-icon"/>
+                    </p:panelGrid>
+                </p:fieldset>
+            </div>
 
-    <!-- NetBeans -->
-    <h:outputText value="NetBeans" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.netbeansVersion}"/>
-    <h:graphicImage name="images/netbeans.png" alt="NetBeans" styleClass="tech-icon"/>
+            <!-- TOOLS -->
+            <div class="col-12 md:col-6">
+                <p:fieldset legend="Tools">
+                    <p:panelGrid columns="2" layout="grid" styleClass="tech-grid">
 
-    <!-- PrimeFlex -->
-    <h:outputText value="PrimeFlex" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.primeflexVersion}"/>
-    <h:graphicImage name="images/primeflex.png" alt="PrimeFlex" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="mavenIcon" styleClass="tech-icon pi pi-wrench" layout="inline"/>
+                            Maven
+                            <p:tooltip for="mavenIcon" value="Version Apache Maven"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.mavenVersion}" severity="info"/>
 
-    <!-- Mojarra (JSF) -->
-    <h:outputText value="JSF (Mojarra)" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.mojarraVersion}"/>
-    <h:graphicImage name="images/Mojarra.JPG" alt="Mojarra" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="nbIcon" styleClass="tech-icon pi pi-pencil" layout="inline"/>
+                            NetBeans
+                            <p:tooltip for="nbIcon" value="Version NetBeans IDE"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.netbeansVersion}" severity="secondary"/>
 
-    <!-- Java -->
-    <h:outputText value="Java" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.javaVersion()}"/>
-    <h:graphicImage name="images/java.jpg" alt="Java" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="ghIcon" styleClass="tech-icon pi pi-github" layout="inline"/>
+                            GitHub
+                            <p:tooltip for="ghIcon" value="Repository GitHub"/>
+                        </h:panelGroup>
+                        <h:outputLink value="https://github.com/LouisCollet/Golflc.git"
+                                      target="_blank" style="color:var(--golf-accent);">
+                            Go to GitHub
+                        </h:outputLink>
 
-    <!-- Jakarta EE -->
-    <h:outputText value="Jakarta EE" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.jakartaEEVersion}"/>
-    <h:graphicImage name="images/jakartaee.png" alt="Jakarta EE" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="copyrightIcon" styleClass="tech-icon pi pi-shield" layout="inline"/>
+                            Copyright
+                            <p:tooltip for="copyrightIcon" value="Copyright"/>
+                        </h:panelGroup>
+                        <h:outputText value="&#169;2012-#{of:formatDate(now,'yyyy')} GolfLC by Louis Collet"
+                                      escape="false" style="font-weight:600;"/>
 
-    <!-- WildFly -->
-    <h:outputText value="WildFly" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.serverVersion}"/>
-    <h:graphicImage name="images/wildfly.png" alt="WildFly" styleClass="tech-icon"/>
+                    </p:panelGrid>
+                </p:fieldset>
+            </div>
 
-    <!-- PrimeFaces -->
-    <h:outputText value="PrimeFaces" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.primefacesVersion}"/>
-    <h:graphicImage name="images/primefaces.png" alt="PrimeFaces" styleClass="tech-icon"/>
+            <!-- CLIENT / NETWORK -->
+            <div class="col-12 md:col-6">
+                <p:fieldset legend="Client / Network">
+                    <p:panelGrid columns="2" layout="grid" styleClass="tech-grid">
 
-    <!-- PrimeFaces Extensions -->
-    <h:outputText value="PrimeFaces Extensions" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.primefacesExtensionVersion}"/>
-    <h:graphicImage name="images/primefaces_extensions.png" alt="PrimeFaces Extensions" styleClass="tech-icon"/>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="browserIcon" styleClass="tech-icon pi pi-globe" layout="inline"/>
+                            Browser
+                            <p:tooltip for="browserIcon" value="Navigateur du client"/>
+                        </h:panelGroup>
+                        <p:badge value="#{request.getHeader('user-agent')}" severity="info"/>
 
-    <!-- jQuery -->
-    <h:outputText value="jQuery" styleClass="tech-label"/>
-    <h:panelGroup layout="block">
-    <span id="jqueryVersion"></span>
-    <h:outputScript target="body">
-        (function () {
-            var el = document.getElementById('jqueryVersion');
-            if (!el) {
-                return;
-            }
-            if (window.jQuery) {
-                el.textContent = 'jQuery version: ' + jQuery.fn.jquery;
-            } else {
-                el.textContent = 'jQuery not loaded';
-            }
-        })();
-    </h:outputScript>
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="hostIcon" styleClass="tech-icon pi pi-home" layout="inline"/>
+                            Host
+                            <p:tooltip for="hostIcon" value="Host header"/>
+                        </h:panelGroup>
+                        <p:badge value="#{header['host']}" severity="secondary"/>
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="ipv4Icon" styleClass="tech-icon pi pi-sitemap" layout="inline"/>
+                            IPv4
+                            <p:tooltip for="ipv4Icon" value="Adresse IPv4 du client"/>
+                        </h:panelGroup>
+                        <p:badge value="#{request.remoteAddr}" severity="warning"/>
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="ipv6Icon" styleClass="tech-icon pi pi-sitemap" layout="inline"/>
+                            IPv6
+                            <p:tooltip for="ipv6Icon" value="Adresse IPv6 du client"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.clientIPv6Address}" severity="warning"/>
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="geoIcon" styleClass="tech-icon pi pi-map-marker" layout="inline"/>
+                            GeoLocation
+                            <p:tooltip for="geoIcon" value="Geolocalisation IP"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.geoDescription}" severity="info"/>
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="macIcon" styleClass="tech-icon pi pi-wifi" layout="inline"/>
+                            MAC Address
+                            <p:tooltip for="macIcon" value="Adresse MAC du serveur"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.clientMacAddress}" severity="secondary"/>
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="osIcon" styleClass="tech-icon pi pi-desktop" layout="inline"/>
+                            OS
+                            <p:tooltip for="osIcon" value="Systeme d'exploitation du serveur"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.osVersion}" severity="secondary"/>
+
+                    </p:panelGrid>
+                </p:fieldset>
+            </div>
+
+            <!-- BACKEND -->
+            <div class="col-12">
+                <p:fieldset legend="Backend Services">
+                    <p:panelGrid columns="2" layout="grid" styleClass="tech-grid">
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="mysqlIcon" styleClass="tech-icon pi pi-database" layout="inline"/>
+                            MySQL
+                            <p:tooltip for="mysqlIcon" value="Base de donnees MySQL"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.mySQLInfo}" severity="success"/>
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="mongoIcon" styleClass="tech-icon pi pi-database" layout="inline"/>
+                            MongoDB
+                            <p:tooltip for="mongoIcon" value="Base de donnees MongoDB"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.mongoInfo}" severity="success"/>
+
+                        <h:panelGroup layout="block">
+                            <h:panelGroup id="logIcon" styleClass="tech-icon pi pi-file" layout="inline"/>
+                            Log4j2
+                            <p:tooltip for="logIcon" value="Framework de logging"/>
+                        </h:panelGroup>
+                        <p:badge value="#{infoC.log4j2Version}" severity="secondary"/>
+
+                    </p:panelGrid>
+                </p:fieldset>
+            </div>
+
+        </div>
+
+    <h:panelGroup style="overflow-x:auto;">
+    <table style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+        <thead>
+            <tr style="background-color:#007acc; color:white; text-align:left;">
+                <th style="padding: 8px;">Specification</th>
+                <th style="padding: 8px;">Version</th>
+                <th style="padding: 8px;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ui:repeat value="#{jakartaEEVersionDashboard.versions.entrySet().toArray()}" var="entry">
+                <tr style="background-color:#f9f9f9; border-bottom:1px solid #ddd;">
+                    <td style="padding: 8px;">#{entry.key}</td>
+                    <td style="padding: 8px;">#{entry.value}</td>
+                    <td style="padding: 8px; font-weight:bold; text-align:center;">
+                        <span style="color:#{entry.value eq 'absent' ? '#d9534f' : '#5cb85c'}; font-size:1.2em;">
+                            #{entry.value eq 'absent' ? '&#10060;' : '&#9989;'}
+                        </span>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </tbody>
+    </table>
     </h:panelGroup>
-    <h:graphicImage name="images/jquery.png" alt="jQuery" styleClass="tech-icon"/>
-
-    <!-- Log4j2 -->
-    <h:outputText value="Log4j2" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.log4j2Version}"/>
-    <h:graphicImage name="images/log4j2.jpg" alt="Log4j2" styleClass="tech-icon"/>
-
-    <!-- Weld -->
-    <h:outputText value="Weld" styleClass="tech-label"/>
-    <h:outputText value="#{infoC.weldVersion}"/>
-    <h:graphicImage name="images/weld_logo.png" alt="Weld" styleClass="tech-icon"/>
-
-</p:panelGrid>
-
-<!-- Panel avec DataTable -->
-<p:panel header="Technical Information Details" styleClass="mt-4">
-    <p:dataTable value="#{infoView.info.entrySet()}"
-                 var="e"
-                 styleClass="ui-datatable-sm"
-                 paginator="true"
-                 rows="10">
-
-        <p:column headerText="Property" sortBy="#{e.key}">
-            <h:outputText value="#{e.key}" />
-        </p:column>
-
-        <p:column headerText="Value">
-            <h:outputText value="#{e.value}" />
-        </p:column>
-
-    </p:dataTable>
-</p:panel>
 
 </p:panel>
 </div>
@@ -241,40 +333,17 @@
 
 <!-- CSS personnalise -->
 <h:outputStylesheet>
-    .tech-info-grid {
-        width: 100%;
-        margin: 2rem auto;
+    .tech-grid .ui-panelgrid-cell {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
     }
-
     .tech-icon {
-        max-width: 80px;
-        max-height: 50px;
-        object-fit: contain;
+        color: #495057;
+        font-size: 1.2rem;
     }
-
-    .tech-label {
-        font-weight: 600;
-    }
-
-    .tech-link {
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .tech-link:hover {
-        text-decoration: underline;
-    }
-
-    .copyright-text {
-        font-weight: bold;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .tech-icon {
-            max-width: 50px;
-            max-height: 35px;
-        }
+    .ui-badge {
+        font-size: .85rem;
     }
 </h:outputStylesheet>
 

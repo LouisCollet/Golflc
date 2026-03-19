@@ -3,8 +3,7 @@ package update;
 import entite.HolesGlobal;
 import entite.Tee;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.annotation.Resource;
-import javax.sql.DataSource;
+import jakarta.inject.Inject;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -28,11 +27,8 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * DataSource injecté par WildFly (connection pooling)
-     */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject
+    private dao.GenericDAO dao;
 
     /**
      * Met à jour plusieurs Holes en une seule transaction (batch)
@@ -48,7 +44,7 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
         final String methodName = LCUtil.getCurrentMethodName();
         String msg;
         
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             
             // ========================================
             // Configuration transaction

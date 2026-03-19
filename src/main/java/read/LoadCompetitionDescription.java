@@ -4,22 +4,17 @@ import entite.CompetitionDescription;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class LoadCompetitionDescription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public LoadCompetitionDescription() { }
 
@@ -34,33 +29,13 @@ public class LoadCompetitionDescription implements Serializable {
                 WHERE CompetitionId = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, competition.getCompetitionId());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                CompetitionDescription cd = new CompetitionDescription();
-                int i = 0;
-                while (rs.next()) {
-                    i++;
-                    cd = CompetitionDescription.map(rs);
-                }
-                if (i == 0) {
-                    LOG.warn(methodName + " - nothing found for CompetitionId = " + competition.getCompetitionId());
-                    return null;
-                }
-                return cd;
+        return dao.querySingle(query, rs -> {
+            try {
+                return CompetitionDescription.map(rs);
+            } catch (Exception e) {
+                throw new SQLException(e);
             }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
+        }, competition.getCompetitionId());
     } // end method
 
     /*

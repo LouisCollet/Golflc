@@ -5,8 +5,8 @@ import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -14,15 +14,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class FindHandicapEGA implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public FindHandicapEGA() { }
 
@@ -41,7 +39,7 @@ public class FindHandicapEGA implements Serializable {
             "        and date(?)" +
             "            between handicap.idhandicap and handicap.handicapend;";
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, player.getIdplayer());

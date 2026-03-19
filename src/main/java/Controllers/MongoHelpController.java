@@ -185,7 +185,7 @@ public static HelpView read(HelpView helpView) {
                 Document commandResult = database.runCommand(command);
                 LOG.debug("dbStats: " + commandResult.toJson());
             } catch (MongoException me) {
-                System.err.println("An error occurred in statistics: " + me);
+                LOG.error("An error occurred in statistics: " + me);
             }
         }
     } // end method

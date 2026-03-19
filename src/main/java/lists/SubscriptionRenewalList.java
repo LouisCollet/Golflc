@@ -1,22 +1,13 @@
 package lists;
 
-import entite.Player;
-import entite.Subscription;
 import entite.composite.ECourseList;
 import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.PlayerRowMapper;
 import rowmappers.RowMapper;
 import rowmappers.SubscriptionRowMapper;
@@ -27,10 +18,9 @@ public class SubscriptionRenewalList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
-    @jakarta.inject.Inject private mail.SubscriptionMail subscriptionMail;  // migrated 2026-02-26
+    @Inject private mail.SubscriptionMail subscriptionMail;  // migrated 2026-02-26
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<ECourseList> liste = null;
@@ -57,47 +47,27 @@ public class SubscriptionRenewalList implements Serializable {
               AND MONTH(SubscriptionEndDate) = MONTH(CURRENT_DATE()) + 1
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        RowMapper<ECourseList> compositeMapper = rs -> ECourseList.builder()
+                .player(new PlayerRowMapper().map(rs))
+                .subscription(new SubscriptionRowMapper().map(rs))
+                .build();
 
-            utils.LCUtil.logps(ps);
+        liste = dao.queryList(query, compositeMapper);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Player> playerMapper = new PlayerRowMapper();
-                RowMapper<Subscription> subscriptionMapper = new SubscriptionRowMapper();
+        liste.forEach(item -> LOG.debug("players candidates to renewal = " + item));
 
-                while (rs.next()) {
-                    ECourseList ecl = ECourseList.builder()
-                            .player(playerMapper.map(rs))
-                            .subscription(subscriptionMapper.map(rs))
-                            .build();
-                    liste.add(ecl);
-                }
-                liste.forEach(item -> LOG.debug("players candidates to renewal = " + item));
-
-                // partie 2 — envoi des mails de renouvellement
-                for (ECourseList item : liste) {
-                    LOG.debug("Player we send a Subscription Renewal mail = " + item.player().getPlayerLastName());
-                    // new mail.SubscriptionMail().sendMail(...)
-                    subscriptionMail.sendMail(item.player(), item.subscription()); // migrated 2026-02-26
-                } // end for
-
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
+        // partie 2 — envoi des mails de renouvellement
+        for (ECourseList item : liste) {
+            try {
+                LOG.debug("Player we send a Subscription Renewal mail = " + item.player().getPlayerLastName());
+                subscriptionMail.sendMail(item.player(), item.subscription()); // migrated 2026-02-26
+            } catch (Exception e) {
+                final String methodName2 = utils.LCUtil.getCurrentMethodName();
+                handleGenericException(e, methodName2);
             }
+        } // end for
 
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
-        }
+        return liste;
     } // end method
 
     // ✅ Getters/setters d'instance

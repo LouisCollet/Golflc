@@ -2,22 +2,14 @@ package lists;
 
 import entite.Player;
 import entite.Professional;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ProfessionalRowMapper;
-import rowmappers.RowMapper;
 
 // vérifier si un player est aussi un pro : retourner les liste des clubs où il est pro
 @ApplicationScoped
@@ -25,8 +17,7 @@ public class ProfessionalClubList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<Professional> liste = null;
@@ -51,34 +42,14 @@ public class ProfessionalClubList implements Serializable {
             AND DATE(NOW()) BETWEEN DATE(ProClubStartDate) AND DATE(ProClubEndDate)
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        liste = new ArrayList<>(dao.queryList(query, new ProfessionalRowMapper(), player.getIdplayer()));
 
-            ps.setInt(1, player.getIdplayer());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Professional> professionalMapper = new ProfessionalRowMapper();
-
-                while (rs.next()) {
-                    liste.add(professionalMapper.map(rs));
-                }
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (liste.isEmpty()) {
+            LOG.warn(methodName + " - empty result list");
+        } else {
+            LOG.debug(methodName + " - list size = " + liste.size());
         }
+        return liste;
     } // end method
 
     // ✅ Getters/setters d'instance

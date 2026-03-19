@@ -6,8 +6,8 @@ import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.GolfInterface.ZDF_DAY;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.sql.DataSource;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 
@@ -24,8 +23,7 @@ public class FindTarifMembersOverlapping implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     private List<TarifMember> liste = null;
 
@@ -42,7 +40,7 @@ public class FindTarifMembersOverlapping implements Serializable {
                 WHERE tarif_members.TarifMemberIdClub = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, tarif_new.getTarifMemberIdClub());
             utils.LCUtil.logps(ps);

@@ -163,6 +163,18 @@ public class MailSender implements Serializable {
             session.setDebug(false);
             LOG.debug(methodName + " - session created");
 
+            // ✅ Security: sanitize inputs — prevent email header injection
+            if (title != null && (title.contains("\r") || title.contains("\n"))) {
+                LOG.error(methodName + " - CRLF injection attempt in title");
+                showMessageFatal("Invalid email subject");
+                return false;
+            }
+            if (recipient != null && (recipient.contains("\r") || recipient.contains("\n"))) {
+                LOG.error(methodName + " - CRLF injection attempt in recipient");
+                showMessageFatal("Invalid email recipient");
+                return false;
+            }
+
             MimeMessage msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(username, "Application GolfLC"));
             msg.setRecipients(Message.RecipientType.TO,

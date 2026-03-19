@@ -27,7 +27,7 @@ import java.time.ZoneOffset;
 @ApplicationScoped
 public class GeoIpDatabase {
     
-    private static final String DEFAULT_DB_PATH = "/opt/geo/GeoLite2-City.mmdb";
+    private static final String DEFAULT_DB_PATH = "C:/opt/geo/GeoLite2-City.mmdb";
     private static final int DEFAULT_CACHE_SIZE = 4096;
     
     private DatabaseReader reader;

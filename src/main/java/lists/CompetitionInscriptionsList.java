@@ -3,22 +3,15 @@ package lists;
 import entite.CompetitionDescription;
 import entite.composite.ECompetition;
 import entite.HandicapIndex;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 @Named
 @ApplicationScoped
@@ -26,8 +19,7 @@ public class CompetitionInscriptionsList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     @Inject private find.FindHandicapIndexAtDate findHandicapIndexAtDate;
 
@@ -59,40 +51,32 @@ public class CompetitionInscriptionsList implements Serializable {
             ORDER BY CmpDataFlightNumber
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, cd.getCompetitionId());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                while (rs.next()) {
-                    var description = entite.CompetitionDescription.map(rs);
-                    var data = entite.CompetitionData.map(rs);
-                    ECompetition ec = new ECompetition(description, data);
-                    HandicapIndex handicapIndex = new HandicapIndex();
-                    handicapIndex.setHandicapPlayerId(ec.competitionData().getCmpDataPlayerId());
-                    handicapIndex.setHandicapDate(ec.competitionDescription().getCompetitionDate());
-                    handicapIndex = findHandicapIndexAtDate.find(handicapIndex);
-                    ec.competitionData().setCmpDataHandicap(handicapIndex.getHandicapWHS().doubleValue());
-                    liste.add(ec);
-                }
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
+        List<ECompetition> rows = dao.queryList(query, rs -> {
+            try {
+                var description = entite.CompetitionDescription.map(rs);
+                var data = entite.CompetitionData.map(rs);
+                return new ECompetition(description, data);
+            } catch (Exception e) {
+                throw new java.sql.SQLException(e);
             }
+        }, cd.getCompetitionId());
 
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        liste = new ArrayList<>();
+        for (ECompetition ec : rows) {
+            HandicapIndex handicapIndex = new HandicapIndex();
+            handicapIndex.setHandicapPlayerId(ec.competitionData().getCmpDataPlayerId());
+            handicapIndex.setHandicapDate(ec.competitionDescription().getCompetitionDate());
+            handicapIndex = findHandicapIndexAtDate.find(handicapIndex);
+            ec.competitionData().setCmpDataHandicap(handicapIndex.getHandicapWHS().doubleValue());
+            liste.add(ec);
         }
+
+        if (liste.isEmpty()) {
+            LOG.warn(methodName + " - empty result list");
+        } else {
+            LOG.debug(methodName + " - list size = " + liste.size());
+        }
+        return liste;
     } // end method
 
     public List<ECompetition> getListe()                          { return liste; }

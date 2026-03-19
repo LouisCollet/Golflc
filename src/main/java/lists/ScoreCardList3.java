@@ -7,21 +7,14 @@ import entite.Player;
 import entite.Round;
 import entite.ScoreStableford;
 import entite.composite.ECourseList;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.ClubRowMapper;
 import rowmappers.HoleRowMapper;
 import rowmappers.InscriptionRowMapper;
@@ -30,16 +23,17 @@ import rowmappers.RowMapper;
 import rowmappers.RowMapperRound;
 import rowmappers.ScoreStablefordRowMapper;
 
+import static exceptions.LCException.handleGenericException;
+
 @Named
 @ApplicationScoped
 public class ScoreCardList3 implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    // Cache d'instance — @ApplicationScoped garantit le singleton
     private List<ECourseList> liste = null;
 
     public ScoreCardList3() { }
@@ -87,32 +81,21 @@ public class ScoreCardList3 implements Serializable {
               ORDER by hole.HoleNumber
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        try {
+            RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
+            RowMapper<Hole> holeMapper = new HoleRowMapper();
+            RowMapper<ScoreStableford> scoreStablefordMapper = new ScoreStablefordRowMapper();
+            RowMapperRound<Round> roundMapper = new RoundRowMapper();
+            RowMapper<Club> clubMapper = new ClubRowMapper();
+            Club club = new Club(); // default empty club for roundMapper
 
-            ps.setInt(1, player.getIdplayer());
-            ps.setInt(2, round.getIdround());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Inscription> inscriptionMapper = new InscriptionRowMapper();
-                RowMapper<Hole> holeMapper = new HoleRowMapper();
-                RowMapper<ScoreStableford> scoreStablefordMapper = new ScoreStablefordRowMapper();
-                RowMapperRound<Round> roundMapper = new RoundRowMapper();
-                RowMapper<Club> clubMapper = new ClubRowMapper();
-                Club club = new Club();
-                club = clubMapper.map(rs); // ne va rien donner ?
-                while (rs.next()) {
-                    ECourseList ecl = ECourseList.builder()
-                            .inscription(inscriptionMapper.map(rs))
-                            .round(roundMapper.map(rs, club))
-                            .hole(holeMapper.map(rs))
-                            .scoreStableford(scoreStablefordMapper.map(rs))
-                            .build();
-                    liste.add(ecl);
-                }
-            }
+            liste = dao.queryList(query, rs -> ECourseList.builder()
+                    .inscription(inscriptionMapper.map(rs))
+                    .round(roundMapper.map(rs, club))
+                    .hole(holeMapper.map(rs))
+                    .scoreStableford(scoreStablefordMapper.map(rs))
+                    .build(),
+                    player.getIdplayer(), round.getIdround());
 
             if (liste.isEmpty()) {
                 LOG.warn(methodName + " - empty result list");
@@ -121,20 +104,17 @@ public class ScoreCardList3 implements Serializable {
             }
             return liste;
 
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return Collections.emptyList();
         }
     } // end method
 
-    // ✅ Getters/setters d'instance
+    // Getters/setters d'instance
     public List<ECourseList> getListe()                 { return liste; }
     public void setListe(List<ECourseList> liste)       { this.liste = liste; }
 
-    // ✅ Invalidation explicite
+    // Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);

@@ -22,7 +22,8 @@
              value="#{roundC.listParticipantsStablefordCompetition(roundC.competition)}"
              rowIndexVar="rowIndex"
              emptyMessage="#{msg['message.table.empty']}"
-             var="c" >
+             var="c"
+             styleClass="compact-table" >
 <f:facet name="header">
      #{msg['competition.ranking']}
      <h2>#{roundC.competition.competitionDescription.competitionName}
@@ -81,7 +82,10 @@
      #{c.classment.last3}
      #{c.classment.last1}
 </p:column>
-<ui:include src="include/include_thumbnails_ecourselist.xhtml"/>
+<ui:include src="include/include_thumbnail.xhtml">
+    <ui:param name="th_photo" value="#{c.player.playerPhotoLocation}"/>
+    <ui:param name="th_name"  value="#{c.player.playerLastName}"/>
+</ui:include>
 
 </p:dataTable>
    <ui:include src="include/include_confirmDialog.xhtml"/>

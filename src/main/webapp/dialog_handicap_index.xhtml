@@ -18,15 +18,14 @@
     </f:metadata>
 </ui:define>
 
-<h:form id="dialog_handicap_index"
-        style="border:solid 3px" >
+<h:form id="dialog_handicap_index">
 
    <p:panelGrid  columns="2"
                  style="width:70%"
-                 layout="tabular"
-                 columnClasses="col1,col2">
+                 layout="flex"
+                 columnClasses="col1Flex,col2Flex">
      <f:facet name="header">
-         <h2>Handicap WHS Header</h2>
+         <h2>#{msg['handicap.player']} WHS</h2>
      </f:facet>
 
      <h:outputText id="date_handicap" value="#{msg['handicap.start']}" />
@@ -87,7 +86,12 @@
                          action="dialog_calculations_index.xhtml" />
 
      <f:facet name="footer">
-         <h2> <h:outputText value="Handicap WHS Footer" style="text-align:center;" /></h2>
+         <p:commandButton value="#{msg['welcome.back']}"
+                          id="buttonBack"
+                          immediate="true"
+                          ajax="false"
+                          icon="pi pi-arrow-left"
+                          action="welcome.xhtml?faces-redirect=true" />
      </f:facet>
    </p:panelGrid>
 

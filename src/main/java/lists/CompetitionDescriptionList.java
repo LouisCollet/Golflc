@@ -1,21 +1,13 @@
 package lists;
 
 import entite.CompetitionDescription;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 @Named
 @ApplicationScoped
@@ -23,8 +15,7 @@ public class CompetitionDescriptionList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     private List<CompetitionDescription> liste = null;
 
@@ -44,31 +35,16 @@ public class CompetitionDescriptionList implements Serializable {
             FROM competition_description
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                while (rs.next()) {
-                    liste.add(entite.CompetitionDescription.map(rs));
-                }
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
+        liste = dao.queryList(query, rs -> {
+            try {
+                return entite.CompetitionDescription.map(rs);
+            } catch (SQLException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new SQLException("CompetitionDescription.map failed", e);
             }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
-        }
+        });
+        return liste;
     } // end method
 
     public List<CompetitionDescription> getListe()                                    { return liste; }

@@ -8,15 +8,14 @@ import entite.TarifGreenfee;
 import static interfaces.Log.LOG;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -24,8 +23,7 @@ public class FindTarifGreenfeeData implements Serializable, interfaces.GolfInter
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public FindTarifGreenfeeData() { }
 
@@ -48,7 +46,7 @@ public class FindTarifGreenfeeData implements Serializable, interfaces.GolfInter
             AND ? BETWEEN tarif_greenfee.TarifStartDate AND tarif_greenfee.TarifEndDate
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, round.getCourseIdcourse());

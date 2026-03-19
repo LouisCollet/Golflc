@@ -23,10 +23,7 @@
          content="text/html; charset=UTF-8"/>
    <meta name="viewport" 
          content="width=device-width, initial-scale=1.0"/>
-   <meta name="sessionTimeout"
-         http-equiv="refresh" 
-         content="#{session.maxInactiveInterval};
-         url=#{request.contextPath}/session_expired.xhtml?cmd=Inactive Interval from masterTemplate"/>
+   <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=#{request.contextPath}/session_expired.xhtml?cmd=Inactive Interval from masterTemplate"/>
    <title>
        <ui:insert name="title"></ui:insert>
    </title>
@@ -37,12 +34,23 @@
       
    <ui:insert name="description" />
 
-    <link href="#{resource['images/golfer.jpg']}" rel="icon" type="image/jpg" sizes="40x40"/>
-    <h:outputStylesheet library="styles" name="Styles2022.css" />
+    <link href="#{resource['images/golfer.jpg']}" rel="icon" type="image/jpeg" sizes="40x40"/>
+    <link href="#{resource['images/golfer.jpg']}" rel="apple-touch-icon"/>
+    <h:outputStylesheet library="styles" name="Styles2026.css" />
  <!--   adapter également dialogTemplate.xhtml -->
-    <h:outputStylesheet library="styles" name="primeflex/331/primeflex.min.css" /> 
-    <h:outputStylesheet library="styles" name="primeflex/331/primeone-light.css" /> 
+    <h:outputStylesheet library="styles" name="primeflex/331/primeflex.min.css" />
+    <h:outputStylesheet library="styles" name="primeflex/331/primeone-light.css" id="primeone-css"/>
     <h:outputScript library="js" name="forms.js" target="head"/>
+
+    <!-- Anti-FOUC: apply saved theme before first paint -->
+    <script>
+    (function() {
+        var saved = localStorage.getItem('golf-theme');
+        if (saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    })();
+    </script>
 
     <ui:insert name="head"> </ui:insert>
 </h:head>
@@ -80,8 +88,8 @@
     </p:sidebar>   
 
     <p:sidebar id="sidebarRight"
-        widgetVar="sidebarRight" 
-        position="right" 
+        widgetVar="sidebarRight"
+        position="right"
         baseZIndex="10000"
         dynamic="true"
         visible="false"
@@ -90,26 +98,45 @@
         <ui:include src="/help_read.xhtml"/>
      </p:sidebar>
 
-
+    <!-- Mobile menu sidebar — hidden on desktop, shown via hamburger button
+         Uses f:subview to avoid duplicate component ID (form_menu) with desktop menu -->
+    <p:sidebar id="sidebarMenu"
+        widgetVar="sidebarMenu"
+        position="left"
+        baseZIndex="10000"
+        dynamic="true"
+        visible="false"
+        style="overflow: auto; width: 280px;"
+        showCloseIcon="true">
+        <f:subview id="mobileMenu">
+            <ui:include src="/menu.xhtml"/>
+        </f:subview>
+    </p:sidebar>
 
     <div class="grid">
-<!--   North - Header, width = 12 col -->
-        <div class="col-12">
+<!--   North - Header, sticky at top -->
+        <div class="col-12" style="position:sticky; top:0; z-index:100; background:var(--surface-ground, #ffffff);">
             <ui:include src="/header.xhtml"/>
         </div>
 
-
-<!--   West - Menu -->
-        <div class="col-2">
+<!--   West - Menu (hidden on mobile, visible md+) -->
+        <div class="hidden md:block col-12 md:col-2">
          <ui:include src="/menu.xhtml"/>
         </div>
 
-<!--   Center - Contenu -->
-        <div class="col-10">
+<!--   Center - Contenu (full width on mobile, 10 cols on md+) -->
+        <div class="col-12 md:col-10">
+            <!-- Breadcrumb — shows current view name -->
+            <div style="font-size:0.72rem; color:var(--text-color-secondary, #6c757d); margin-bottom:0.5rem;">
+                <i class="pi pi-home" style="margin-right:0.3rem;"/>
+                <span>GolfLC</span>
+                <i class="pi pi-angle-right" style="margin:0 0.3rem; font-size:0.65rem;"/>
+                <span style="color:var(--text-color, #495057); font-weight:500;">#{view.viewId.replace('/', '').replace('.xhtml', '')}</span>
+            </div>
             <ui:include src="/include/include_messages.xhtml"/>
             <ui:insert name="content"></ui:insert>
         </div>
-    </div> <!-- class p-grid -->
+    </div> <!-- class grid -->
 </div>  <!-- class card -->
 <!--
 <p:ajaxExceptionHandler type="jakarta.faces.application.ViewExpiredException"

@@ -5,13 +5,10 @@ import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import javax.sql.DataSource;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -19,8 +16,7 @@ public class DeletePaymentGreenfee implements Serializable, interfaces.GolfInter
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public DeletePaymentGreenfee() { }
 
@@ -35,30 +31,16 @@ public class DeletePaymentGreenfee implements Serializable, interfaces.GolfInter
                 AND GreenfeeIdRound = ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, player.getIdplayer());
-            ps.setInt(2, round.getIdround());
-            LCUtil.logps(ps);
-            int rowDeleted = ps.executeUpdate();
-            if (rowDeleted != 0) {
-                String msg = "PaymentGreenfee deleted ! ";
-                LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
-                return true;
-            } else {
-                String msg = "PaymentGreenfee not found !";
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
-                return false;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return false;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
+        int rowDeleted = dao.execute(query, player.getIdplayer(), round.getIdround());
+        if (rowDeleted != 0) {
+            String msg = "PaymentGreenfee deleted ! ";
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
+            return true;
+        } else {
+            String msg = "PaymentGreenfee not found !";
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
             return false;
         }
     } // end method

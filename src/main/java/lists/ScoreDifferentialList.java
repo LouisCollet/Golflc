@@ -5,8 +5,8 @@ import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 import rowmappers.HandicapIndexRowMapper;
 import rowmappers.RowMapper;
 
@@ -24,8 +23,7 @@ public class ScoreDifferentialList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public ScoreDifferentialList() { }
 
@@ -35,7 +33,8 @@ public class ScoreDifferentialList implements Serializable {
         LOG.debug("for player = " + player.getIdplayer());
         LOG.debug("for type = " + type);
 
-        try (Connection conn = dataSource.getConnection()) {
+        // Needs raw Connection for temp table operations (CREATE/SELECT/DROP on same connection)
+        try (Connection conn = dao.getConnection()) {
             return listWithConnection(player, type, conn, methodName);
         } catch (SQLException e) {
             handleSQLException(e, methodName);
@@ -123,7 +122,7 @@ public class ScoreDifferentialList implements Serializable {
 
     // ===========================================================================================
     // BRIDGE — @Deprecated — pour les appelants legacy (new ScoreDifferentialList().list(player, type, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
+    // A supprimer quand tous les appelants seront migres en CDI
     // ===========================================================================================
     /** @deprecated Utiliser {@link #list(Player, String)} via injection CDI */
     /*

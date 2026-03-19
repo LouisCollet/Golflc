@@ -1,33 +1,19 @@
 package lists;
 
-import entite.Player;
 import entite.composite.EPlayerPassword;
-import jakarta.annotation.Resource;
+import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
-import javax.sql.DataSource;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
 import rowmappers.PlayerRowMapper;
 import rowmappers.RowMapper;
 import utils.LCUtil;
 
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
-import static interfaces.Log.LOG;
-
 /**
  * Liste tous les joueurs actifs avec leur mot de passe
- * ✅ Migré vers CDI (@ApplicationScoped)
- * ✅ Connection supprimée — gérée via DataSource injecté
- * ✅ try-with-resources (plus de finally/closeQuietly)
- * ✅ return null remplacé par Collections.emptyList()
+ * ✅ Migré vers GenericDAO
  * ✅ main() conservée commentée
  */
 @ApplicationScoped
@@ -35,9 +21,7 @@ public class PlayersList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // ✅ Injection DataSource WildFly
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
     private List<EPlayerPassword> liste = null;
@@ -49,10 +33,6 @@ public class PlayersList implements Serializable {
             WHERE PlayerActivation='1'
             ORDER BY idplayer
             """;
-
-    // ========================================
-    // MÉTHODE PRINCIPALE
-    // ========================================
 
     /**
      * Liste tous les joueurs actifs avec leur mot de passe.
@@ -68,45 +48,24 @@ public class PlayersList implements Serializable {
             return liste;
         }
 
-        // ✅ try-with-resources : Connection, PreparedStatement, ResultSet fermés automatiquement
-        try (Connection conn        = dataSource.getConnection();
-             PreparedStatement ps   = conn.prepareStatement(QUERY);
-             ResultSet rs           = ps.executeQuery()) {
+        RowMapper<EPlayerPassword> compositeMapper = rs -> {
+            var player   = new PlayerRowMapper().map(rs);
+            var password = entite.Password.map(rs);
+            return new EPlayerPassword(player, password);
+        };
 
-            LCUtil.logps(ps);
+        liste = dao.queryList(QUERY, compositeMapper);
 
-            RowMapper<Player> playerMapper = new PlayerRowMapper();
-            List<EPlayerPassword> result   = new ArrayList<>();
-
-            while (rs.next()) {
-                var player   = playerMapper.map(rs);
-                var password = entite.Password.map(rs);
-                result.add(new EPlayerPassword(player, password));
-            }
-
-            if (result.isEmpty()) {
-                String msg = "Empty Result Table in " + methodName;
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
-            } else {
-                LOG.debug(methodName + " - ResultSet has " + result.size() + " lines");
-            }
-
-            liste = result;                                         // ✅ mise en cache
-            return liste;
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();                         // ✅ jamais null
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();                         // ✅ jamais null
+        if (liste.isEmpty()) {
+            String msg = "Empty Result Table in " + methodName;
+            LOG.error(msg);
+            LCUtil.showMessageFatal(msg);
+        } else {
+            LOG.debug(methodName + " - ResultSet has " + liste.size() + " lines");
         }
-    } // end method
 
-    // ========================================
-    // CACHE - Getters / Setters statiques
-    // ========================================
+        return liste;
+    } // end method
 
     // ✅ Getters/setters d'instance
     public List<EPlayerPassword> getListe()               { return liste; }
@@ -119,10 +78,6 @@ public class PlayersList implements Serializable {
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
-
-    // ========================================
-    // MAIN DE TEST - conservé commenté
-    // ========================================
 
     /*
     void main() throws SQLException, Exception {

@@ -2,24 +2,16 @@ package lists;
 
 import entite.Lesson;
 import entite.Professional;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 @Named
 @ApplicationScoped
@@ -27,8 +19,7 @@ public class LessonProList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     private List<Lesson> liste = null;
 
@@ -51,36 +42,19 @@ public class LessonProList implements Serializable {
                 AND EventStartDate > ?
                 """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        // dimanche de la 2e semaine qui precede — semaine courante + semaine precedente
+        Timestamp cutoff = Timestamp.valueOf(
+                LocalDate.now().minusWeeks(2).with(DayOfWeek.SUNDAY).atStartOfDay());
 
-            ps.setInt(1, professional.getProId());
-            // dimanche de la 2e semaine qui précède — semaine courante + semaine précédente
-            ps.setTimestamp(2, Timestamp.valueOf(
-                    LocalDate.now().minusWeeks(2).with(DayOfWeek.SUNDAY).atStartOfDay()));
-            utils.LCUtil.logps(ps);
+        liste = dao.queryList(query, rs -> Lesson.map(rs),
+                professional.getProId(), cutoff);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                while (rs.next()) {
-                    Lesson ev = Lesson.map(rs);
-                    liste.add(ev);
-                } // end while
-                if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
-                } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
-                }
-                return liste;
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        if (liste.isEmpty()) {
+            LOG.warn(methodName + " - empty result list");
+        } else {
+            LOG.debug(methodName + " - list size = " + liste.size());
         }
+        return liste;
     } // end method
 
     public List<Lesson> getListe()             { return liste; }

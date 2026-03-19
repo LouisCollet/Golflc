@@ -17,7 +17,7 @@
     <div class="login-container" style="min-height:auto; align-items:flex-start;">
         <p:panel styleClass="login-card">
             <f:facet name="header">
-                <h:outputText escape="false" value="#{msg['message.welcome']}" />
+                <h1>#{msg['message.welcome']}</h1>
             </f:facet>
 
             <!-- Layout 2 colonnes: info + photo -->
@@ -55,7 +55,11 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Home Club</span>
-                            <span class="info-value">#{playerC.player.playerHomeClub}</span>
+                            <span class="info-value">
+                                #{playerC.homeClubName}
+                                <h:outputText value=" (#{playerC.player.playerHomeClub})"
+                                              rendered="#{playerC.isAdmin()}" style="font-size:0.75rem; color:var(--golf-text-light);"/>
+                            </span>
                         </div>
                         <h:panelGroup layout="block" styleClass="info-row"
                                       rendered="#{playerC.blocking.blockingAttempts > 0}">

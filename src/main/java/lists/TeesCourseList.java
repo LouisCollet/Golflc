@@ -1,23 +1,13 @@
 
 package lists;
 
-import entite.Course;
 import entite.Tee;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import javax.sql.DataSource;
-import jakarta.annotation.Resource;
-import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
-import rowmappers.RowMapper;
+import java.sql.SQLException;
+import java.util.List;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import rowmappers.TeeRowMapper;
 
 @ApplicationScoped
@@ -25,25 +15,23 @@ public class TeesCourseList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
+    // Cache d'instance — @ApplicationScoped garantit le singleton
     private List<Tee> liste = null;
 
  //   public List<Tee> list(final Course course) throws SQLException {
-     public List<Tee> list(final int courseId) throws SQLException {    
+     public List<Tee> list(final int courseId) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        
-        // ✅ Early return si cache existe
+
+        // Early return si cache existe
         if (liste != null) {
             LOG.debug("escaped to " + methodName + " repetition thanks to lazy loading");
             return liste;
         }
 
-        // Sinon, charger depuis la base de données
+        // Sinon, charger depuis la base de donnees
         LOG.debug("entering " + methodName);
-      //  LOG.debug("with Course " + course);
          LOG.debug("with Course " + courseId);
 
         final String query = """
@@ -53,44 +41,21 @@ public class TeesCourseList implements Serializable {
               AND course.idcourse = ?
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-            
-            ps.setInt(1, courseId);
-            utils.LCUtil.logps(ps);
-            
-            try (ResultSet rs = ps.executeQuery()) {
-                liste = new ArrayList<>();
-                RowMapper<Tee> teeMapper = new TeeRowMapper();
-                
-                while (rs.next()) {
-                    Tee t = teeMapper.map(rs);
-                    liste.add(t);
-                }
-                
-                if (liste.isEmpty()) {
-                    LOG.warn("Empty Result Table in " + methodName);
-                } else {
-                    LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-                }
-                
-                return liste;
-            }
-            
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return Collections.emptyList();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return Collections.emptyList();
+        liste = dao.queryList(query, new TeeRowMapper(), courseId);
+
+        if (liste.isEmpty()) {
+            LOG.warn("Empty Result Table in " + methodName);
+        } else {
+            LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
         }
+        return liste;
     } // end method
 
-    // ✅ Getters/setters d'instance
+    // Getters/setters d'instance
     public List<Tee> getListe()               { return liste; }
     public void setListe(List<Tee> liste)     { this.liste = liste; }
 
-    // ✅ Invalidation explicite
+    // Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering " + methodName);
@@ -128,10 +93,10 @@ import utils.LCUtil;
 
 public class TeesCourseList {
     private static List<Tee> liste = null;
-    
-    
+
+
 public List<Tee> list(final Course course, final Connection conn) throws Exception{
-     final String methodName = utils.LCUtil.getCurrentMethodName(); 
+     final String methodName = utils.LCUtil.getCurrentMethodName();
 if(liste == null){
        LOG.debug("entering " + methodName);
        LOG.debug("with Course " + course);
@@ -156,7 +121,7 @@ if(liste == null){
          liste.add(t);
      } // end while
      if(liste.isEmpty()){
-         String error = "££ Empty Result Table in " + methodName;
+         String error = "Empty Result Table in " + methodName;
          LOG.error(error);
          LCUtil.showMessageFatal(error);
   //       return liste;
@@ -181,7 +146,7 @@ return liste;
     //then load and assign it to the property, else return it.
 } //end if
 } //end method
-    
+
 
     public static List<Tee> getListe() {
         return liste;
@@ -189,7 +154,7 @@ return liste;
     public static void setListe(List<Tee> liste) {
         TeesCourseList.liste = liste;
     }
-    
+
   void main() throws SQLException, Exception {
     Connection conn = new connection_package.DBConnection().getConnection();
     Course course = new Course();

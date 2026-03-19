@@ -95,12 +95,29 @@ public class FileUploadController implements Serializable {
                 return null;
             }
 
-            // ✅ Copie vers PHOTOS_LIBRARY
-            File file = new File(settings.getProperty("PHOTOS_LIBRARY") + "/" + fileName);
+            // ✅ Security: sanitize filename — prevent path traversal
+            String safeName = new File(fileName).getName();  // strips ../  ..\ etc.
+            if (safeName.isBlank() || safeName.startsWith(".")) {
+                showMessageFatal("Invalid file name");
+                return null;
+            }
+
+            // ✅ Copie vers PHOTOS_LIBRARY avec vérification canonical path
+            java.nio.file.Path basePath = java.nio.file.Path.of(
+                    settings.getProperty("PHOTOS_LIBRARY")).toAbsolutePath().normalize();
+            java.nio.file.Path targetPath = basePath.resolve(safeName).normalize();
+
+            if (!targetPath.startsWith(basePath)) {
+                LOG.error(methodName + " - path traversal attempt: " + fileName);
+                showMessageFatal("Invalid file path");
+                return null;
+            }
+
+            File file = targetPath.toFile();
             LOG.debug(methodName + " - destination file = " + file);
 
             try (InputStream is = uploadedFile.getInputStream()) {
-                Files.copy(is, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(is, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 LOG.debug(methodName + " - file copy successful");
             }
 

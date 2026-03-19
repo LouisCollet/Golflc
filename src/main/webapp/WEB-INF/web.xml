@@ -30,10 +30,30 @@ https://github.com/eclipse-ee4j/mojarra/blob/4.1/README.md
         <welcome-file>/login.xhtml</welcome-file>
 </welcome-file-list>
 
-<!-- sets the default session timeout to 40 minutes. ATTENTION positionné pour test -->
+<!-- session timeout — 20 minutes — security audit 2026-03-18 -->
 <session-config>
-        <session-timeout>40</session-timeout> 
+        <session-timeout>20</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <!-- ⚠️ set to true in production (requires HTTPS on WildFly) -->
+            <secure>false</secure>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
 </session-config>
+
+<!-- security audit 2026-03-18 — enforce HTTPS in production
+     ⚠️ Enable only when WildFly has HTTPS configured (port 8443)
+     In dev mode (app.devMode=true), this is bypassed by WildFly config
+<security-constraint>
+    <web-resource-collection>
+        <web-resource-name>Entire Application</web-resource-name>
+        <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <user-data-constraint>
+        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+</security-constraint>
+-->
 <!-- ajouté 20-07-2022 
     <error-page>
         <exception-type>jakarta.faces.application.ViewExpiredException</exception-type>
@@ -330,12 +350,21 @@ see also https://gist.github.com/IsmailMarmoush/7915310-->
         </listener-class>
     </listener>
 --> 
- <!-- new 18-06-2021 Sharing Context Data https://howtodoinjava.com/resteasy/share-context-data-with-jax-rs-resteasyproviderfactory/b -->
-<listener>
-  <listener-class>
-    org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
-  </listener-class>
-</listener>
+<!-- Rate limiting — security audit 2026-03-18 -->
+<filter>
+    <filter-name>RateLimitFilter</filter-name>
+    <filter-class>filters.RateLimitFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>RateLimitFilter</filter-name>
+    <url-pattern>*.xhtml</url-pattern>
+</filter-mapping>
+<filter-mapping>
+    <filter-name>RateLimitFilter</filter-name>
+    <url-pattern>/rest/*</url-pattern>
+</filter-mapping>
+
+ <!-- ResteasyBootstrap listener removed 2026-03-18 — not needed, WildFly has built-in RESTEasy support -->
 
 
 </web-app>

@@ -31,7 +31,7 @@
                     height="auto"
                     slotDuration="00:30:00"
                     slotLabelInterval="01:00"
-                    tooltip="this is the tooltip, Louis"
+                    tooltip="#{msg['message.lesson']}"
                     minTime="09:00:00"
                     maxTime="19:00:00"
                     styleClass="ui-custompanelgrid"
@@ -88,10 +88,13 @@ function initSchedule() {
 
                 <p:outputLabel for="@next" value="From" />
 
-                <p:calendar id="from"
-                            value="#{schedulerC.scheduleEvent.startDate}"
-                            pattern="dd/MM/yyyy HH:mm"
-                            />
+                <p:datePicker id="from"
+                              value="#{schedulerC.scheduleEvent.startDate}"
+                              pattern="dd/MM/yyyy HH:mm"
+                              showTime="true"
+                              appendTo="@(body)"
+                              timeInput="false"
+                              stepMinute="30" />
 
                 <p:outputLabel for="@next" value="To" />
                 <p:datePicker id="dateEnd"

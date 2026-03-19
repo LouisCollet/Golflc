@@ -1,13 +1,12 @@
 package read;
 
-import connection_package.ConnectionProvider;
-import connection_package.ProdDB;
 import entite.Player;
 import entite.composite.EPlayerPassword;
 import rowmappers.PlayerRowMapper;
 import rowmappers.RowMapper;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import utils.LCUtil;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -16,140 +15,95 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import javax.sql.DataSource;
+import java.sql.SQLException;
 
 /**
  * Classe refactorée pour lire un Player ou EPlayerPassword
- * Similaire au style de CreatePlayer
+ * ✅ Migré CDI GenericDAO — 2026-03-18
  */
 @ApplicationScoped
 public class ReadPlayer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
-    @ProdDB
-    private ConnectionProvider connectionProvider;
+    @Inject private dao.GenericDAO dao;
 
-      /**
-     * DataSource injecté par WildFly
-     */
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
-    
-    
-    /** Constructeur pour MAIN ou tests hors CDI */
-    public ReadPlayer() {}
-
-    public ReadPlayer(ConnectionProvider connectionProvider) {
-        this.connectionProvider = connectionProvider;
-    }
+    public ReadPlayer() {} // end constructor
 
     /**
      * Lecture d'un Player simple par id
      */
-    public Player read(Player player) throws Exception {
+    public Player read(Player player) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
         final String query = """
                 SELECT *
                 FROM Player
                 WHERE idplayer = ?
                 """;
 
-        try (Connection conn = connectionProvider.getConnection();
-       //   try (Connection conn = datasource.getConnection();        
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, player.getIdplayer());
-            LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-
-                RowMapper<Player> mapper = new PlayerRowMapper();
-
-                if (rs.next()) {
-                    Player p = mapper.map(rs);
-                    LOG.debug("ReadPlayer OK in {}: {}", methodName, p);
-                    return p;
-                }
-
-                String msg = "Player not found in " + methodName;
-                LOG.warn(msg);
-                LCUtil.showMessageFatal(msg);
-                return null;
-            }
-        } catch (Exception ex) {
-            String msg = "Exception in " + methodName + ": " + ex.getMessage();
-            LOG.error(msg, ex);
-            LCUtil.showMessageFatal(msg);
-            throw ex;
+        Player p = dao.querySingle(query, new PlayerRowMapper(), player.getIdplayer());
+        if (p != null) {
+            LOG.debug(methodName + " - Player loaded: " + p);
+            return p;
         }
-    }
+        String msg = "Player not found in " + methodName;
+        LOG.warn(msg);
+        LCUtil.showMessageFatal(msg);
+        return null;
+    } // end method
 
     /**
      * Lecture d'un EPlayerPassword
      */
-    public EPlayerPassword read(EPlayerPassword epp) throws Exception {
+    public EPlayerPassword read(EPlayerPassword epp) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+
         final String query = """
                 SELECT *
                 FROM Player
                 WHERE idplayer = ?
                 """;
 
-        try (Connection conn = connectionProvider.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, epp.player().getIdplayer());
             LCUtil.logps(ps);
 
             try (ResultSet rs = ps.executeQuery()) {
-
                 RowMapper<Player> playerMapper = new PlayerRowMapper();
                 EPlayerPassword result = new EPlayerPassword(null, null);
 
                 if (rs.next()) {
                     Player player = playerMapper.map(rs);
-                    var password = entite.Password.map(rs); // mapping password
+                    var password = entite.Password.map(rs);
                     result = new EPlayerPassword(player, password);
-                    LOG.debug("ReadPlayer EPlayerPassword OK in {}: {}", methodName, result);
+                    LOG.debug(methodName + " - EPlayerPassword loaded: " + result);
                 } else {
                     String msg = "Player not found in " + methodName;
                     LOG.warn(msg);
                     LCUtil.showMessageFatal(msg);
                 }
-
                 return result;
             }
-        } catch (Exception ex) {
-            String msg = "Exception in " + methodName + ": " + ex.getMessage();
-            LOG.error(msg, ex);
-            LCUtil.showMessageFatal(msg);
-            throw ex;
-        }
-    }
-
-    /**
-     * Main pour tests hors CDI
-     */
-    public static void main(String[] args) {
-        try {
-            ConnectionProvider provider = new connection_package.JdbcConnectionProvider();
-            ReadPlayer readPlayer = new ReadPlayer(provider);
-
-            Player p = new Player();
-            p.setIdplayer(324715);
-
-            Player loaded = readPlayer.read(p);
-            LOG.debug("Loaded Player = {}", loaded);
-
-            // Test EPlayerPassword
-            EPlayerPassword epp = new EPlayerPassword(p, null);
-            EPlayerPassword loadedEpp = readPlayer.read(epp);
-            LOG.debug("Loaded EPlayerPassword = {}", loadedEpp);
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return new EPlayerPassword(null, null);
         } catch (Exception e) {
-            LOG.error("Error in main", e);
+            handleGenericException(e, methodName);
+            return new EPlayerPassword(null, null);
         }
-    }
-}
+    } // end method
+
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering " + methodName);
+        // tests locaux
+    } // end main
+    */
+
+} // end class
