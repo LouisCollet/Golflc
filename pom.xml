@@ -171,7 +171,7 @@ provided by wildfly  -->
 <dependency>
     <groupId>org.apache.logging.log4j</groupId>
     <artifactId>log4j-core</artifactId>
-    <version>2.25.3</version> <!-- mod 04-01-2026 was 2.25.2 -->
+    <version>2.25.4</version> <!-- mod 04-01-2026 was 2.25.2 -->
 </dependency> 
 
 <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
