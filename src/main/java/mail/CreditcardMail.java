@@ -26,13 +26,14 @@ public class CreditcardMail implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private MailSender mailSender;
+    @Inject private entite.Settings settings;
 
     public CreditcardMail() { }
 
     public Boolean sendMailGreenfee(Player player, Creditcard creditcard, TarifGreenfee tarif, Round round,
             Inscription inscription) throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your creditcard payment for your Round Inscription via GolfLC";
             String mail =
@@ -49,7 +50,7 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathICS = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
             return true;
@@ -62,7 +63,7 @@ public class CreditcardMail implements Serializable {
     public Boolean sendMailSubscription(Player player, Creditcard creditcard, Subscription subscription)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Subscription at GolfLC is paid !";
             String mail =
@@ -79,7 +80,7 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathICS = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
             return true;
@@ -92,7 +93,7 @@ public class CreditcardMail implements Serializable {
     public Boolean sendMailCotisation(Player player, Creditcard creditcard, Cotisation cotisation,
             Club club, TarifMember tarifMember) throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Cotisation via GolfLC is paid !";
             String mail =
@@ -112,7 +113,7 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathICS = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
             return true;
@@ -125,7 +126,7 @@ public class CreditcardMail implements Serializable {
     public Boolean sendMailGreenfee(Player player, Creditcard creditcard, Greenfee greenfee, Club club)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Greenfee via GolfLC is paid !";
             String mail =
@@ -144,7 +145,7 @@ public class CreditcardMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathICS = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathICS, player.getPlayerLanguage());
             LOG.debug("HTML Mail async dispatched");
@@ -158,7 +159,7 @@ public class CreditcardMail implements Serializable {
 /*
 void main() throws Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

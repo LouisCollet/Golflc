@@ -7,14 +7,14 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Player Page </ui:define>
+<ui:define name="title">Souscription Spontanée </ui:define>
 <ui:define name="content">
 
 <h:form id="subscription">
 
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
 <p:panel styleClass="login-card form-card">
-<f:facet name="header"><h1>#{msg['subscription.new']}</h1></f:facet>
+<f:facet name="header"><h1>#{msg[selectionContextBean.purpose.dialogTitleKey]}</h1></f:facet>
 
 <ui:include src="include/include_subscription.xhtml"/>
 

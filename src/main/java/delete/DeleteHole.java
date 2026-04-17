@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -33,9 +35,9 @@ public class DeleteHole implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean delete(final int holeId) throws Exception {
-
+    public boolean delete(final int holeId) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
 
          try (Connection conn = dao.getConnection()) {
@@ -90,41 +92,29 @@ public class DeleteHole implements Serializable, interfaces.GolfInterface {
 
             return true;
 
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
+    } // end method
 
-    /**
-     * Main pour tests
-     */
-    public static void main(String[] args) {
+/*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         try {
             Hole hole = new Hole();
             hole.setIdhole(200);
-         //   hole.setHoleNumber(1);
-
             LOG.debug("Main ready (CDI required for execution)");
-
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
-    }
-}
+    } // end main
+*/
+} // end class
 /*
 import entite.Tee;
 import java.sql.Connection;
@@ -148,7 +138,7 @@ try
     ps.setInt(1, tee.getIdtee());
     LCUtil.logps(ps);
     int row_deleted = ps.executeUpdate();
-        LOG.debug("deleted Holes = " + row_deleted);
+        LOG.debug("deleted Holes = {}", row_deleted);
     String msg = "<br/> <h1> There are " + row_deleted + " Holes deleted for tee = " + tee;
         LOG.debug(msg);
         LCUtil.showMessageInfo(msg);
@@ -175,7 +165,7 @@ try
      Tee tee = new Tee();
      tee.setIdtee(339);
     boolean b = new DeleteHoles().delete(tee, conn);
-        LOG.debug("from main - resultat deleteRound = " + b);
+        LOG.debug("from main - resultat deleteRound = {}", b);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

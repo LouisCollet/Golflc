@@ -24,7 +24,7 @@ public class FindTarifSubscription implements Serializable {
 
     public TarifSubscription findActive(final String code) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with code = " + code);
 
         final String query = """
@@ -66,7 +66,7 @@ public class FindTarifSubscription implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

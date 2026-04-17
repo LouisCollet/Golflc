@@ -24,7 +24,7 @@ import static interfaces.Log.LOG;
 public class GeoDetector {
     
     private static final String DEFAULT_DB_PATH = "C:/opt/geo/GeoLite2-City.mmdb";
-    private static DatabaseReader reader;
+    private DatabaseReader reader; // migrated from static 2026-03-22
     
     @PostConstruct
     void init() {
@@ -40,7 +40,7 @@ public class GeoDetector {
      * Initialise la base de données GeoIP
      * Peut être appelé manuellement si besoin
      */
-    public static void initDatabase(String dbPath) {
+    public void initDatabase(String dbPath) {
         try {
             File database = new File(dbPath);
             
@@ -61,7 +61,7 @@ public class GeoDetector {
     /**
      * Ferme la base de données
      */
-    public static void closeDatabase() {
+    public void closeDatabase() {
         if (reader != null) {
             try {
                 reader.close();
@@ -75,14 +75,14 @@ public class GeoDetector {
     /**
      * Vérifie si la base de données est disponible
      */
-    public static boolean isAvailable() {
+    public boolean isAvailable() {
         return reader != null;
     }
     
     /**
      * Obtient la localisation d'une IP (format simple: "Ville, Pays")
      */
-    public static String getLocation(String ip) {
+    public String getLocation(String ip) {
         LOG.debug("entering getLocation with ip = " + ip);
         if (!isAvailable()) {
             return "GeoIP non disponible";
@@ -115,7 +115,7 @@ public class GeoDetector {
     /**
      * Obtient uniquement le pays
      */
-    public static String getCountry(String ip) {
+    public String getCountry(String ip) {
         if (!isAvailable() || ip == null || IpDetector.isPrivateIp(ip)) {
             return null;
         }
@@ -132,7 +132,7 @@ public class GeoDetector {
     /**
      * Obtient uniquement la ville
      */
-    public static String getCity(String ip) {
+    public String getCity(String ip) {
         if (!isAvailable() || ip == null || IpDetector.isPrivateIp(ip)) {
             return null;
         }
@@ -149,7 +149,7 @@ public class GeoDetector {
     /**
      * Obtient le code pays (ISO)
      */
-    public static String getCountryCode(String ip) {
+    public String getCountryCode(String ip) {
         if (!isAvailable() || ip == null || IpDetector.isPrivateIp(ip)) {
             return null;
         }
@@ -167,7 +167,7 @@ public class GeoDetector {
     /**
      * Obtient les coordonnées GPS
      */
-    public static Coordinates getCoordinates(String ip) {
+    public Coordinates getCoordinates(String ip) {
         if (!isAvailable() || ip == null || IpDetector.isPrivateIp(ip)) {
             return null;
         }
@@ -189,7 +189,7 @@ public class GeoDetector {
     /**
      * Obtient toutes les informations détaillées
      */
-    public static GeoInfo getFullInfo(String ip) {
+    public GeoInfo getFullInfo(String ip) {
         if (!isAvailable()) {
             return new GeoInfo(ip, null, null, null, null, null);
         }
@@ -314,7 +314,7 @@ public class GeoDetector {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         initDatabase(DEFAULT_DB_PATH);
         LOG.debug("DB available = " + isAvailable());
         // Google DNS (Mountain View, CA)

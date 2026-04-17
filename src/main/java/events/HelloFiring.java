@@ -1,33 +1,31 @@
 package events;
 
-//import events.HelloEvent;
 import java.io.Serializable;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.enterprise.event.Event;
 import jakarta.inject.Inject;
+
 @SessionScoped
-public class HelloFiring implements Serializable, interfaces.Log
-{
+public class HelloFiring implements Serializable, interfaces.Log {
+
+    private static final long serialVersionUID = 1L;
+
     @Inject
-    private static Event<HelloEvent> event;
-    
-    public static void doStuff()
-    {
-        LOG.debug("entering dostuff");
-        event.fire(new HelloEvent("from bean LC, curenttimemillis = " + System.currentTimeMillis()));
-        LOG.debug("after dostuff");
-    }  //end method
+    private Event<HelloEvent> event; // migrated from static 2026-03-22
 
-    void main() { //throws CardException {
-              LOG.debug("before");
-             doStuff();
-    //         LOG.debug("after");
+    public void doStuff() { // migrated from static 2026-03-22
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        event.fire(new HelloEvent("from bean LC, currentTimeMillis = " + System.currentTimeMillis()));
+        LOG.debug("after " + methodName);
+    } // end method
 
-     } //end main 
-    
-    
-    
-    
-    
-} // end classe
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        doStuff();
+    } // end main
+    */
 
+} // end class

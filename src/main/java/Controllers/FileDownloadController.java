@@ -26,9 +26,9 @@ try{
 //	file = new DefaultStreamedContent.Builder.(is, "image/jpg", "downloaded_optimus.jpg");
       DefaultStreamedContent.builder().contentType(contentType).name(name).stream(() -> is).build();
 //DefaultStreamedContent.builder().contentType(contentType)..name(name).stream(() -> new FileInputStream(is)).build();
-        LOG.debug("file downloaded = " + file);
+        LOG.debug("file downloaded = {}", file);
 }catch(Exception e){
-            LOG.debug("IOException upload Exception LC = " + e.getMessage() );
+            LOG.debug("IOException upload Exception LC = {}", e.getMessage());
       }
 finally
 {

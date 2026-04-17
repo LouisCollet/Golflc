@@ -28,20 +28,20 @@ public class CreateOrUpdateScoreStableford implements Serializable {
 
     public boolean status(final ScoreStableford score, final Round round, final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with ScoreStableford = " + score);
-        LOG.debug("with Round = " + round);
-        LOG.debug("with Player = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with ScoreStableford = {}", score);
+        LOG.debug("with Round = {}", round);
+        LOG.debug("with Player = {}", player);
 
         try {
             int rows = findCountScore.find(player, round, "rows");
-            LOG.debug(methodName + " - number of rows = " + rows);
+            LOG.debug("number of rows = {}", rows);
 
             if (rows == 0) {
-                LOG.debug(methodName + " - this is an INSERT");
+                LOG.debug("this is an INSERT");
                 return createScoreStableford.create(score, round, player);
             } else {
-                LOG.debug(methodName + " - this is an UPDATE");
+                LOG.debug("this is an UPDATE");
                 return updateScoreStableford.update(score, round, player);
             }
 
@@ -62,7 +62,7 @@ public class CreateOrUpdateScoreStableford implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();

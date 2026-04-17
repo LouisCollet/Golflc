@@ -17,40 +17,40 @@
     <h1>#{msg['message.selectclub']}
         <h:outputText
             id="Rnd"
-            rendered="#{appContext.inputSelectCourse eq 'CreateRound'}"
+            rendered="#{selectionContextBean.purpose.code eq 'CreateRound'}"
             value="#{msg['message.for.round']}" />
         <h:outputText
             id="tarif"
-            rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}"
+            rendered="#{selectionContextBean.purpose.code eq 'CreateTarifGreenfee'}"
             value="#{msg['message.for.tarif.greenfee']}" />
         <h:outputText
             id="tarifMembers"
-            rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}"
+            rendered="#{selectionContextBean.purpose.code eq 'CreateTarifMember'}"
             value="#{msg['message.for.tarif.members']}" />
         <h:outputText
             id="createPro"
-            rendered="#{appContext.inputSelectCourse eq 'CreatePro'}"
+            rendered="#{selectionContextBean.purpose.code eq 'CreatePro'}"
             value="#{msg['create.pro']}" />
         <h:outputText
             id="unavailableS"
-            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}"
+            rendered="#{selectionContextBean.purpose.code eq 'CreateUnavailableStructure'}"
             value="#{msg['message.for.unavailable']}" />
         <h:outputText
             id="unavailableP"
-            rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}"
+            rendered="#{selectionContextBean.purpose.code eq 'CreateUnavailablePeriod'}"
             value="#{msg['message.for.cotisation.spontaneous']}" />
         <h:outputText
             id="Det"
-            rendered="#{appContext.inputSelectCourse eq 'PaymentCotisationSpontaneous'}"
+            rendered="#{selectionContextBean.purpose.code eq 'PaymentCotisationSpontaneous'}"
             value="#{msg['message.for.cotisation.spontaneous']}" />
         <h:outputText
             id="Avg"
-            rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}"
+            rendered="#{selectionContextBean.purpose.code eq 'ChartCourse'}"
             value="#{msg['message.for.average']}" />
     </h1>
 </f:facet>
 
- <c:set var="select" value="#{appContext.inputSelectCourse}"/>
+ <c:set var="select" value="#{selectionContextBean.purpose.code}"/>
 
 <p:dataTable id="courses"
              value="#{clubC.listClubsDialog()}"

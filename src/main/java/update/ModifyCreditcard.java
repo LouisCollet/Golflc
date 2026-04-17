@@ -30,8 +30,8 @@ public class ModifyCreditcard implements Serializable {
 
     public boolean modify(Creditcard creditcard) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with Creditcard = " + creditcard.toString());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with Creditcard = {}", creditcard.toString());
 
         final String query = """
                 UPDATE creditcard
@@ -56,7 +56,7 @@ public class ModifyCreditcard implements Serializable {
             utils.LCUtil.logps(ps);
 
             int row = ps.executeUpdate();
-            LOG.debug("rows = " + row);
+            LOG.debug("rows = {}", row);
             if (row != 0) {
                 String msg = LCUtil.prepareMessageBean("creditcard.registered") + NEW_LINE + creditcard;
                 LOG.debug(msg);
@@ -81,7 +81,7 @@ public class ModifyCreditcard implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

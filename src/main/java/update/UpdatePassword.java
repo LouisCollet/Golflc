@@ -1,6 +1,8 @@
 package update;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.composite.EPlayerPassword;
 import entite.Password;
 import entite.Player;
@@ -27,6 +29,13 @@ public class UpdatePassword implements Serializable, interfaces.GolfInterface {
 
     private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     @Inject
     private dao.GenericDAO dao;
 
@@ -37,18 +46,18 @@ public class UpdatePassword implements Serializable, interfaces.GolfInterface {
 
     public boolean update(final EPlayerPassword epp) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" with epp = " + epp);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" with epp = {}", epp);
 
         Player player = epp.player();
         Password password = epp.password();
 
         if (password == null) {
-            LOG.debug("entite Password = null " + password);
+            LOG.debug("entite Password = null {}", password);
         }
 
-        LOG.debug("entite Password = " + password);
-        LOG.debug("Previous Passwords = " + password.getPreviousPasswords());
+        LOG.debug("entite Password = {}", password);
+        LOG.debug("Previous Passwords = {}", password.getPreviousPasswords());
 
         if (password.getWrkpassword() == null) {
             String err = "wrkpassword is null !!";
@@ -69,9 +78,9 @@ public class UpdatePassword implements Serializable, interfaces.GolfInterface {
             }
         }
 
-        LOG.debug("control : getPreviousPasswords = " + password.getPreviousPasswords().toString());
+        LOG.debug("control : getPreviousPasswords = {}", password.getPreviousPasswords().toString());
         List<String> listPreviousPasswords = password.getPreviousPasswords();
-        LOG.debug("list previousPasswords = " + listPreviousPasswords);
+        LOG.debug("list previousPasswords = {}", listPreviousPasswords);
 
         if (listPreviousPasswords.contains(password.getWrkpassword())) {
             String err = LCUtil.prepareMessageBean("player.password.reuse") + " : "
@@ -85,22 +94,21 @@ public class UpdatePassword implements Serializable, interfaces.GolfInterface {
 
         if (password.getCurrentPassword() != null) {
             listPreviousPasswords.add(password.getCurrentPassword());
-            LOG.debug("added to listPreviousPasswords = " + password.getCurrentPassword());
+            LOG.debug("added to listPreviousPasswords = {}", password.getCurrentPassword());
         } else {
             listPreviousPasswords.add(password.getWrkpassword());
-            LOG.debug("added to listPreviousPasswords = " + password.getWrkpassword());
+            LOG.debug("added to listPreviousPasswords = {}", password.getWrkpassword());
         }
 
-        LOG.debug("list avec old password ajouté = " + listPreviousPasswords);
+        LOG.debug("list avec old password ajouté = {}", listPreviousPasswords);
         password.setPreviousPasswords(listPreviousPasswords);
 
         String[] array = listPreviousPasswords.toArray(String[]::new);
-        LOG.debug("array = " + Arrays.toString(array));
+        LOG.debug("array = {}", Arrays.toString(array));
         password.setArrayPasswords(array);
 
-        ObjectMapper om = new ObjectMapper();
-        String json = om.writeValueAsString(password);
-        LOG.debug("Previouspasswords converted in json format= " + json);
+        String json = OBJECT_MAPPER.writeValueAsString(password);
+        LOG.debug("Previouspasswords converted in json format= {}", json);
 
         final String query = """
                 UPDATE Player
@@ -122,7 +130,7 @@ public class UpdatePassword implements Serializable, interfaces.GolfInterface {
             utils.LCUtil.logps(ps);
 
             int row = ps.executeUpdate();
-            LOG.debug("row = " + row);
+            LOG.debug("row = {}", row);
             if (row == 1) {
                 LOG.debug("PlayerPassword created or modified");
                 String msg = LCUtil.prepareMessageBean("player.password.modified")
@@ -150,19 +158,19 @@ public class UpdatePassword implements Serializable, interfaces.GolfInterface {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324720);
         Password password = null;
         EPlayerPassword epp = new EPlayerPassword(player, password);
         epp = playerManager.readPlayerWithPassword(epp.getPlayer().getIdplayer());
         Password pa = epp.password();
-        LOG.debug("previousPasswords liste 01 = " + pa.getPreviousPasswords());
+        LOG.debug("previousPasswords liste 01 = {}", pa.getPreviousPasswords());
         pa.setWrkpassword("****");
         pa.setWrkconfirmpassword("****");
-        LOG.debug("liste 02 = " + pa.getPreviousPasswords());
+        LOG.debug("liste 02 = {}", pa.getPreviousPasswords());
         boolean b = new UpdatePassword().update(epp);
-        LOG.debug("from main, result = " + b);
+        LOG.debug("from main, result = {}", b);
     } // end main
     */
 

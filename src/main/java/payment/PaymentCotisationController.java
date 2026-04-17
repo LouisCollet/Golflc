@@ -35,7 +35,7 @@ public boolean RegisterPaymentandInscription(final Creditcard creditcard, final 
         final Course course,
         Inscription inscription) throws SQLException, Exception { // Connection conn removed 2026-02-28 — unused
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
 try{
            LOG.debug("with cotisation = " + cotisation);
 
@@ -119,7 +119,7 @@ private boolean payment(Cotisation cotisation) { // Connection conn removed 2026
     /*
     void main() throws Exception, Throwable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

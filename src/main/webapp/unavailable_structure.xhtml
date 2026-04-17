@@ -52,6 +52,7 @@
                       value="#{clubC.unavailable.structure.workItem}"   />
 
 <f:facet name="footer">
+          <div class="btn-group">
             <p:commandButton value="#{msg['unavailable.structure.add']}"
                          id="commandButtonAdd"
                          ajax="false"
@@ -80,7 +81,7 @@
                          immediate="true"
                          icon="pi pi-undo"
                          action="unavailable_menu.xhtml?faces-redirect=true" />
-
+          </div>
 </f:facet>
 </p:panelGrid>
 </h:form>

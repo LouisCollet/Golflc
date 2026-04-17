@@ -1,74 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:p="primefaces"
-    xmlns:ui="jakarta.faces.facelets"
-    xmlns:f="jakarta.faces.core"
-    xmlns:h="jakarta.faces.html"
-    template="templates/masterTemplate.xhtml">
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
 
-    <ui:define name="title">Select Club and Course</ui:define>
+<ui:define name="title">Select Club and Course</ui:define>
+<ui:define name="content">
 
-    <ui:define name="content">
-
-    <h:form id="club_course">
+<h:form id="club_course">
     <div class="login-container" style="min-height:auto; align-items:flex-start;">
     <p:panel styleClass="login-card form-card" style="max-width:100%;">
-    <f:facet name="header">
-        <h1>
-            #{msg['message.selectcourse']}
-            <h:outputText
-                rendered="#{appContext.inputSelectCourse eq 'CreateRound'}"
-                value=" #{msg['message.for.round']}" />
-            <h:outputText
-                rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}"
-                value=" #{msg['message.for.tarif']}" />
-            <h:outputText
-                rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}"
-                value=" #{msg['message.for.tarif.members']}" />
-            <h:outputText
-                rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}"
-                value=" #{msg['message.for.unavailable']}" />
-            <h:outputText
-                rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}"
-                value=" #{msg['message.for.unavailable']}" />
-            <h:outputText
-                rendered="#{appContext.inputSelectCourse eq 'ChartRound'}"
-                value=" #{msg['message.for.detail']}" />
-            <h:outputText
-                rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}"
-                value=" #{msg['message.for.average']}" />
-        </h1>
-    </f:facet>
+        <f:facet name="header">
+            <h1>#{msg[selectionContextBean.purpose.dialogTitleKey]}</h1>
+        </f:facet>
 
-            <p:panelGrid
-                id="panel1"
-                layout="flex"
-                columns="2"
-                columnClasses="col1Flex, col2Flex"
-                style="width:70%">
+        <p:panelGrid
+            id="panel1"
+            layout="flex"
+            columns="2"
+            columnClasses="col1Flex, col2Flex">
 
-                <!-- =================== INCLUDE CLUB SELECTOR =================== -->
-                <ui:include src="/include/include_club_selector.xhtml">
-                    <ui:param name="clubLabel" value="Club 1" />
-                </ui:include>
-                <!-- =================== INCLUDE COURSE SELECTOR =================== -->
-                <ui:include src="/include/include_course_selector.xhtml" />
+            <!-- ── Club dropdown ──────────────────────────────────────────── -->
+            <p:outputLabel for="clubDropdown" value="#{msg['club.name']} :"/>
+            <p:selectOneMenu id="clubDropdown" value="#{clubC.selectedClubId}">
+                <f:selectItem itemLabel="-- #{msg['message.selectclub']} --" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{clubC.listClubsDialog('any')}"
+                               var="cl"
+                               itemLabel="#{cl.clubName}"
+                               itemValue="#{cl.idclub}"/>
+                <f:validateBean disabled="true"/>
+                <p:ajax event="change" update="panel1" process="@this"/>
+            </p:selectOneMenu>
 
-            </p:panelGrid>
+            <!-- ── Course dropdown (hidden for tarif-only purposes) ────────── -->
+            <p:outputLabel
+                rendered="#{selectionContextBean.purpose.code ne 'CreateTarifMember' and selectionContextBean.purpose.code ne 'CreateTarifGreenfee'}"
+                for="courseDropdown"
+                value="#{msg['course.name']} :"/>
+            <p:selectOneMenu id="courseDropdown"
+                rendered="#{selectionContextBean.purpose.code ne 'CreateTarifMember' and selectionContextBean.purpose.code ne 'CreateTarifGreenfee'}"
+                value="#{clubC.selectedCourseId}">
+                <f:selectItem itemLabel="-- #{msg['message.selectcourse']} --" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{clubC.coursesForSelect}"
+                               var="c"
+                               itemLabel="#{c.courseName}"
+                               itemValue="#{c.idcourse}"/>
+                <f:validateBean disabled="true"/>
+            </p:selectOneMenu>
+
+        </p:panelGrid>
+
+        <div class="btn-group" style="margin-top:1rem;">
+            <p:commandButton
+                value="#{selectionContextBean.purpose.code eq 'ChartRound' or selectionContextBean.purpose.code eq 'ChartCourse' ? 'Chart' : msg['button.select']}"
+                id="selectButton"
+                icon="#{selectionContextBean.purpose.code eq 'ChartRound' or selectionContextBean.purpose.code eq 'ChartCourse' ? 'pi pi-chart-bar' : 'pi pi-check'}"
+                ajax="false"
+                action="#{clubC.clubAndCourseAction()}"/>
 
             <p:commandButton
-                value="Choix Club et Parcours"
-                id="selectButtonCreateRound"
-                update="growl-msg"
+                value="#{msg['course.travel']}"
+                id="selectTravel"
+                icon="pi pi-map-marker"
                 ajax="false"
-                icon="pi pi-question"
-                style="width:240px;"
-                action="#{clubC.clubAndCourseAction()}" />
+                rendered="#{selectionContextBean.purpose.code eq 'ChartRound' or selectionContextBean.purpose.code eq 'ChartCourse'}"
+                action="#{clubC.selectTravel(null)}"/>
+        </div>
 
     </p:panel>
     </div>
-    </h:form>
+</h:form>
 
-    </ui:define>
+</ui:define>
 </ui:composition>

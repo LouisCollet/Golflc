@@ -40,15 +40,14 @@ public class psCreateUpdateCourse {
             ps.setInt(++index, course.getIdcourse());                     // WHERE idcourse = ?
             -------------
       */      
-            ps.setString(1, course.getCourseName());
-          //  ps.setShort(2, (short) 18);// mod 12-11-2018 toujour 18 holes  enlevé dans blacklist de columns update
-            Integer intValue = 18;
-            ps.setShort(2, intValue.shortValue());
-            ps.setShort(3, course.getCoursePar()); 
-            ps.setTimestamp(4, Timestamp.valueOf(DATE_BEGIN_COURSE)); // date de début fictive pour tous les parcours
-            ps.setTimestamp(5, Timestamp.valueOf(course.getCourseEndDate())); //DATE_END_COURSE)); // date de fin fictive pour tous les parcours
-             // WHERE clause
-            ps.setInt(6, course.getIdcourse());  // ne pas oublier
+            ps.setString(1, course.getCourseName());                     // CourseName
+            ps.setShort(2, (short) 18);                                   // CourseHoles — always 18
+            ps.setShort(3, course.getCoursePar());                        // CoursePar
+            ps.setInt(4, course.getClub_idclub());                        // club_idclub
+            ps.setTimestamp(5, Timestamp.valueOf(DATE_BEGIN_COURSE));      // CourseBeginDate
+            ps.setTimestamp(6, Timestamp.valueOf(course.getCourseEndDate())); // CourseEndDate
+            // WHERE clause
+            ps.setInt(7, course.getIdcourse());                           // WHERE idcourse = ?
                 LOG.debug("PreparedStatement for course update: {}", ps);
         } catch (Exception e) {
             String msg = "Exception in mapUpdate = " + getCurrentMethodName() + " / " + e.getMessage();

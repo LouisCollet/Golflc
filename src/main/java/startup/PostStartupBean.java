@@ -21,7 +21,7 @@ public class PostStartupBean {
   @PostConstruct
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         
         try {
             // ✅ TimeZone par défaut

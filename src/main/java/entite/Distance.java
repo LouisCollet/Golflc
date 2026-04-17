@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -24,7 +25,14 @@ import utils.LCUtil;
 // @RequestScoped  // migrated 2026-02-24
 
 public class Distance implements Serializable{
-    
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
 //@JsonInclude(Include.NON_NULL)
 @JsonIgnore
     private int idTee;
@@ -62,8 +70,6 @@ public static Distance map(ResultSet rs) throws SQLException{
     final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
         Distance tm = new Distance();
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
    //     tm = om.readValue(rs.getString("TarifMemberJson"),TarifMember.class);
  //             LOG.debug("TarifMember extracted from database = "  + tm.toString());
    //     tm.setStartDate(rs.getTimestamp("TarifMemberStartDate").toLocalDateTime());

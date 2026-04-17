@@ -28,12 +28,10 @@ public class AllFlightsList implements interfaces.GolfInterface, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
-    private ArrayList<Flight> liste = null;
-
     // ========================================
     // MÉTHODE PRINCIPALE
     // ✅ Connection supprimée — non utilisée dans l'original
+    // Pas de cache : les inputs (sunrise/sunset/timezone) varient selon la date et le course
     // ========================================
 
     /**
@@ -44,15 +42,10 @@ public class AllFlightsList implements interfaces.GolfInterface, Serializable {
      * @param tz     timezone du club (ex: "Europe/Brussels")
      * @return liste des flights générés, jamais null
      */
-    public ArrayList<Flight> createTableFlights(Flight flight, String tz) {
-        final String methodName = "AllFlightsList.createTableFlights";
+    public ArrayList<Flight> generateFlights(Flight flight, String tz) {
+        final String methodName = "AllFlightsList.generateFlights";
 
-        if (liste != null) {
-            LOG.debug("{} - returning cached list ({} entries)", methodName, liste.size());
-            return liste;
-        }
-
-        LOG.debug("{} - liste is null, generating flights", methodName);
+        LOG.debug("{} - generating flights for tz={}", methodName, tz);
 
         try {
             LOG.debug("{} - sunrise before tz conversion = {}", methodName, flight.getSunrise());
@@ -92,8 +85,7 @@ public class AllFlightsList implements interfaces.GolfInterface, Serializable {
 
             LOG.debug("{} - generated {} flights", methodName, i);
 
-            liste = result;                                             // ✅ mise en cache
-            return liste;
+            return result;
 
         } catch (Exception e) {
             String msg = "Exception in " + methodName + ": " + e.getMessage();
@@ -101,7 +93,7 @@ public class AllFlightsList implements interfaces.GolfInterface, Serializable {
             LCUtil.showMessageFatal(msg);
             return new ArrayList<>(Collections.emptyList());           // ✅ jamais null
         }
-    }
+    } // end method
 
     // ========================================
     // MÉTHODES PRIVÉES
@@ -119,18 +111,6 @@ public class AllFlightsList implements interfaces.GolfInterface, Serializable {
         } else {
             return "B";
         }
-    }
-
-    // ✅ Getters/setters d'instance
-    public ArrayList<Flight> getListe()                  { return liste; }
-    public void setListe(ArrayList<Flight> liste)        { this.liste = liste; }
-
-    // ✅ Invalidation explicite
-    public void invalidateCache() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
     } // end method
 
     // ========================================

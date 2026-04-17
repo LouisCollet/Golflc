@@ -1,18 +1,15 @@
 package entite;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import static interfaces.GolfInterface.ZDF_TIME_DAY;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,10 +34,9 @@ public class TarifMember implements Serializable{
  
 @JsonInclude(Include.NON_NULL) // new 09/05/2022
 private String comment;
-// private String [][] membersBase; mod 06/05/2022 replaces by next line
+
 private ArrayList<EquipmentsAndBasicAndRange> basicList = new ArrayList<>();
 
-// private String [][] priceEquipments; 06/05/2022 replaces bu next line
 private ArrayList<EquipmentsAndBasic> equipmentsList = new ArrayList<>(); 
 
 @JsonInclude(Include.NON_NULL) // new 09/05/2022
@@ -48,24 +44,18 @@ private String discount;
 
 @JsonIgnore  private Integer tarifMemberIdClub; // pour periods
 
-//@JsonIgnore private Integer [] membersChoice;
-//@JsonIgnore  private Integer [] equipmentsChoice;
-
 @NotNull(message="{tarifMember.workitem.notnull}")
 @JsonIgnore  private String workItem;
 
  @NotNull(message="{tarifMember.workprice.notnull}")
-// @JsonIgnore  private String workPrice;
  @JsonIgnore  private Double workPrice;  // mod 06/05/2022
  
 @JsonIgnore private String workRangeAge; // pas de contrôle ??ex 10-25 ans
 
-  @NotNull(message="{tarifMember.startdate.notnull}")
-//@JsonIgnore    private Date workStartDate;
 @JsonIgnore private LocalDateTime workStartDate;
 
  @NotNull(message="{tarifMember.enddate.notnull}")
- //@JsonIgnore   private Date workEndDate;
+
  @JsonIgnore private LocalDateTime workEndDate;
 
 public TarifMember(){ // constructor
@@ -113,39 +103,6 @@ public TarifMember(){ // constructor
         this.endDate = endDate;
     }
 
-
-// modifié was String[][]
- //   public String[][] getMembersBase() {
-  //    LOG.debug("getMembers = " + Arrays.deepToString(membersBase));
- //   return membersBase;
-  //      return utils.LCUtil.array2DStringToInt(membersBase);
-  //  }
-    
-    /*  à vérifier !!
- @JsonIgnore  // important, sinonn cree MembersBase Format dans Json !!   
-    public String[][] getMembersBaseFormat() {
-        // formattage de présentation du montant et de l'age (null devient 00-00
-        return utils.LCUtil.ModifyMembersBase(membersBase);
-    }
-    */
-/*
-    public void setMembersBase(String[][] members) { 
-        LOG.debug("setMembers before= " + Arrays.deepToString(members));
-    //    this.membersBase = members;
-        this.membersBase = utils.LCUtil.removeNull2D(members);
-        LOG.debug("setMembers after = " + Arrays.deepToString(this.membersBase));
-    }
-*/
-
-/*
-    public Integer[] getMembersChoice() {
-        return membersChoice;
-    }
-
-    public void setMembersChoice(Integer[] membersChoice) {
-        this.membersChoice = membersChoice;
-    }
-*/
     public String getWorkItem() {
         return workItem;
     }
@@ -161,8 +118,6 @@ public TarifMember(){ // constructor
     public void setBasicList(ArrayList<EquipmentsAndBasicAndRange> basicList) {
         this.basicList = basicList;
     }
-
-
 
     public Double getWorkPrice() {
         return workPrice;
@@ -196,37 +151,6 @@ public TarifMember(){ // constructor
         this.workEndDate = workEndDate;
     }
 
-
-
-
-    
-  //public void RemoveNull(){
-//   membersBase = utils.LCUtil.removeNull2D(membersBase);
- //  priceEquipments = utils.LCUtil.removeNull2D(priceEquipments);
- //  LOG.debug("null removed from membersBase");
-//   membersChoice = utils.LCUtil.removeNull1D(membersChoice);
-   
- //  }
-/*
-    public Date getWorkStartDate() {
-        return workStartDate;
-    }
-
-    public void setWorkStartDate(Date workStartDate) {
-        LOG.debug("setWorkStartDate = " + workStartDate);// ici loader l'aute field ?
-        setMemberStartDate(utils.LCUtil.DatetoLocalDateTime(workStartDate));
-        this.workStartDate = workStartDate;
-    }
-
-    public Date getWorkEndDate() {
-        return workEndDate;
-    }
-
-    public void setWorkEndDate(Date workEndDate) {
-        setMemberEndDate(utils.LCUtil.DatetoLocalDateTime(workEndDate));
-        this.workEndDate = workEndDate;
-    }
-*/
     public ArrayList<EquipmentsAndBasic> getEquipmentsList() {
         return equipmentsList;
     }
@@ -234,15 +158,7 @@ public TarifMember(){ // constructor
     public void setEquipmentsList(ArrayList<EquipmentsAndBasic> equipmentsList) {
         this.equipmentsList = equipmentsList;
     }
-/*
-     public Integer[] getEquipmentsChoice() {
-        return equipmentsChoice;
-    }
 
-    public void setEquipmentsChoice(Integer[] equipmentsChoice) {
-        this.equipmentsChoice = equipmentsChoice;
-    }
-*/
     public String getComment() {
  //       LOG.debug("getComment = " + comment);
    // ??      content = content.replaceAll("\\r|\\n", "");  
@@ -250,13 +166,12 @@ public TarifMember(){ // constructor
     }
 
     public void setComment(String comment) {
- //       LOG.debug("getComment = " + comment);
- //    PolicyFactory sanitizer = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS);
-    //    String cleanResults = sanitizer.sanitize("<p>Hello, <b>World!</b>");
-   //    String safeHTML = sanitizer.sanitize(comment);
-   //   LOG.debug("cleanResults are = " + safeHTML);
-        
-        this.comment = comment;
+        if (comment == null) {
+            this.comment = null;
+            return;
+        }
+        PolicyFactory sanitizer = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.STYLES);
+        this.comment = sanitizer.sanitize(comment);
     }
 
     public String getDiscount() {
@@ -267,27 +182,6 @@ public TarifMember(){ // constructor
         this.discount = discount;
     }
 
-
-public static TarifMember map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        TarifMember tm = new TarifMember();
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
-        tm = om.readValue(rs.getString("TarifMemberJson"),TarifMember.class);
- //             LOG.debug("TarifMember extracted from database = "  + tm.toString());
-        tm.setStartDate(rs.getTimestamp("TarifMemberStartDate").toLocalDateTime());
-        tm.setEndDate(rs.getTimestamp("TarifMemberEndDate").toLocalDateTime());
-        tm.setTarifMemberIdClub(rs.getInt("TarifMemberIdClub"));
-      LOG.debug("TarifMember tm returned from map = " + tm);
-   return tm;
-}catch(Exception e){
-   String msg = "£££ Exception in " + methodName + " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
  @Override
 public String toString(){
  try {

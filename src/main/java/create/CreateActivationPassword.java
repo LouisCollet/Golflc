@@ -31,7 +31,7 @@ public class CreateActivationPassword implements Serializable, interfaces.GolfIn
 
     public boolean create(final Player player) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "activation");
@@ -46,7 +46,7 @@ public class CreateActivationPassword implements Serializable, interfaces.GolfIn
                 if (row != 0) {
                     LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(10);
                     Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-                    LOG.debug("date plus 10 = " + date);
+                    LOG.debug("date plus 10 = {}", date);
                     String href = utils.LCUtil.firstPartUrl() + "/password_check.xhtml"
                             + "?uuid=" + uuid
                             + "&firstname=" + player.getPlayerFirstName()
@@ -55,7 +55,7 @@ public class CreateActivationPassword implements Serializable, interfaces.GolfIn
                             + "&time=" + date
                             + "&millis=" + date.getTime();
                     href = href.replaceAll(" ", "%20");
-                    LOG.debug("** href for activation password = " + href);
+                    LOG.debug("** href for activation password = {}", href);
                     // new mail.ResetPasswordMail().send(...)
                     if (resetPasswordMail.send(player, href)) { // migrated 2026-02-26
                         String msg = LCUtil.prepareMessageBean("create.reset.mail");
@@ -90,13 +90,13 @@ public class CreateActivationPassword implements Serializable, interfaces.GolfIn
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         player.setPlayerFirstName("Jon");
         player.setPlayerLastName("Rahm");
         boolean b = new create.CreateActivationPassword().create(player);
-        LOG.debug("from main, CreateActivationPassword = " + b);
+        LOG.debug("from main, CreateActivationPassword = {}", b);
     } // end main
     */
 

@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TAB 3 : Pricing — Basic / Hours / Days (exclusif) avec tables éditables -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces">
+
+    <p:tab id="PricingTab"
+           title="💰 Pricing (#{memC.tarifGreenfee.basicList.size() + memC.tarifGreenfee.teeTimesList.size() + memC.tarifGreenfee.daysList.size()})"
+           titletip="Define greenfee pricing (choose one type)">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.greenfee.tarif']}</h1>
+                <span> — Pricing</span>
+            </f:facet>
+
+            <!-- Pricing type selector -->
+            <h:panelGroup layout="block" styleClass="text-center mb-3">
+                <p:selectOneButton id="pricingType"
+                                   styleClass="pricing-type-selector"
+                                   value="#{memC.tarifGreenfee.greenfeeType}">
+                    <f:selectItem itemLabel="Basic" itemValue="BA"
+                                 itemDisabled="#{memC.tarifGreenfee.teeTimesList.size() gt 0 or memC.tarifGreenfee.daysList.size() gt 0}"/>
+                    <f:selectItem itemLabel="Hours" itemValue="HO"
+                                 itemDisabled="#{memC.tarifGreenfee.basicList.size() gt 0 or memC.tarifGreenfee.daysList.size() gt 0}"/>
+                    <f:selectItem itemLabel="Days"  itemValue="DA"
+                                 itemDisabled="#{memC.tarifGreenfee.basicList.size() gt 0 or memC.tarifGreenfee.teeTimesList.size() gt 0}"/>
+                    <p:ajax update="pricingContent"/>
+                </p:selectOneButton>
+            </h:panelGroup>
+
+   <h:panelGroup id="pricingContent" layout="block">
+
+    <!-- ===== BASIC ===== -->
+                <h:panelGroup rendered="#{memC.tarifGreenfee.greenfeeType eq 'BA'}" layout="block">
+                    <p:panelGrid columns="2" layout="flex" columnClasses="col1Flex, col2Flex">
+                        <h:panelGroup layout="block">
+                            <h:outputText value="#{msg['tarif.season']} "/>
+                            <i class="pi pi-cloud"/>
+                            <i class="pi pi-sun"/>
+                        </h:panelGroup>
+                        <p:selectOneMenu id="seasonBasic"
+                                         value="#{memC.tarifGreenfee.workSeason}">
+                            <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
+                            <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
+                            <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
+                            <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                           var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                            <f:validateBean disabled="true"/>
+                        </p:selectOneMenu>
+
+                        <h:panelGroup layout="block">
+                            <h:outputText value="#{msg['tarif.members.item']} "/>
+                            <i class="pi pi-list"/>
+                            <i class="pi pi-pencil"/>
+                        </h:panelGroup>
+                        <p:inputText id="basicText" size="20"
+                                     title="#{msg['tarif.item']}"
+                                     value="#{memC.tarifGreenfee.workItem}"
+                                     placeholder="Enter basic item">
+                            <f:validateBean disabled="#{memC.tarifGreenfee.basicList.size() gt 0}"/>
+                        </p:inputText>
+
+                        <h:panelGroup layout="block">
+                            <h:outputText value="#{msg['tarif.members.price']} "/>
+                            <i class="pi pi-euro"/>
+                        </h:panelGroup>
+                        <p:inputNumber id="basicPrice"
+                                       value="#{memC.tarifGreenfee.workPrice}"
+                                       title="#{msg['tooltip.tarif.price3']}"
+                                       size="6" lang="#{languageC.locale}"
+                                       decimalSeparator="." decimalPlaces="1"
+                                       placeholder="999.9" maxValue="300">
+                            <f:validateBean disabled="#{memC.tarifGreenfee.basicList.size() gt 0}"/>
+                        </p:inputNumber>
+                    </p:panelGrid>
+                    <p:commandButton value="#{msg['tarif.greenfee.create']}"
+                                     widgetVar="btnAddBasicWV"
+                                     icon="pi pi-plus"
+                                     action="#{memC.inputTarifGreenfeeWizard('BA')}"
+                                     update="tarif_greenfee_wizard"
+                                     resetValues="true"
+                                     onerror="PF('btnAddBasicWV').enable()"
+                                     styleClass="p-button-outlined mt-2"/>
+
+                    <p:dataTable id="basicTable"
+                                 value="#{memC.tarifGreenfee.basicList}" var="b"
+                                 rendered="#{not empty memC.tarifGreenfee.basicList}"
+                                 editable="true" editMode="row"
+                                 styleClass="compact-table mt-2">
+                        <p:ajax event="rowEdit"       update="tarif_greenfee_wizard"/>
+                        <p:ajax event="rowEditCancel" update="basicTable"/>
+                        <p:column headerText="Season" style="width:15%">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{b.season}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu value="#{b.season}">
+                                        <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
+                                        <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
+                                        <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
+                                        <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                                       var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Item">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{b.item}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{b.item}" size="20"><f:validateBean disabled="true"/></p:inputText></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Price" style="width:12%">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{b.price}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{b.price}" size="6" decimalPlaces="1" decimalSeparator="." maxValue="300">
+                                        <f:validateBean disabled="true"/>
+                                    </p:inputNumber>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="width:8%"><p:rowEditor/></p:column>
+                        <p:column style="width:5%">
+                            <p:commandButton icon="pi pi-trash"
+                                             styleClass="p-button-danger p-button-text p-button-sm"
+                                             action="#{memC.removeBasicItem(b)}"
+                                             update="tarif_greenfee_wizard" process="@this"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+                <!-- ===== HOURS ===== -->
+                <h:panelGroup rendered="#{memC.tarifGreenfee.greenfeeType eq 'HO'}" layout="block">
+                    <p:panelGrid columns="2" layout="flex" columnClasses="col1Flex, col2Flex">
+                        <h:panelGroup layout="block">
+                            <h:outputText value="#{msg['tarif.season']} "/>
+                            <i class="pi pi-cloud"/>
+                            <i class="pi pi-sun"/>
+                        </h:panelGroup>
+                        <p:selectOneMenu id="seasonHours"
+                                         value="#{memC.tarifGreenfee.workSeason}">
+                            <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
+                            <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
+                            <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
+                            <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                           var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                            <f:validateBean disabled="true"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="#{msg['tarif.title']}"/>
+                        <p:inputText id="hoursCategory" size="20"
+                                     value="#{memC.tarifGreenfee.workItem}"
+                                     placeholder="ex: Twilight, Morning, Peak">
+                            <f:validateBean disabled="#{memC.tarifGreenfee.teeTimesList.size() gt 0}"/>
+                        </p:inputText>
+
+                        <h:panelGroup layout="block">
+                            <h:outputText value="#{msg['tarif.hours.start']} :"/>
+                            <i class="pi pi-clock"/>
+                        </h:panelGroup>
+                        <p:datePicker id="hoursStart"
+                                      value="#{memC.tarifGreenfee.startHour}"
+                                      timeOnly="true"
+                                      pattern="HH:mm"
+                                      label="Tarif hours : startHour"
+                                      lang="#{languageC.locale}"
+                                      locale="#{languageC.locale}"
+                                      showIcon="true"
+                                      showOnFocus="false"
+                                      size="6"
+                                      stepMinute="1"
+                                      readonlyInput="false"
+                                      mindate="#{utilsC.localTime(07,30)}"
+                                      maxdate="#{utilsC.localTime(20,45)}"
+                                     >
+                            <f:validateBean disabled="#{memC.tarifGreenfee.teeTimesList.size() gt 0}"/>
+                        </p:datePicker>
+<!--   converter="lenientLocalTimeConverter" -->
+                        <h:outputText value="#{msg['tarif.hours.end']} :"/>
+                        <p:datePicker id="hoursEnd"
+                                      value="#{memC.tarifGreenfee.endHour}"
+                                      timeOnly="true"
+                                      pattern="HH:mm"
+                                      label="Tarif hours : endHour"
+                                      lang="#{languageC.locale}" locale="#{languageC.locale}"
+                                      showIcon="true"
+                                      stepMinute="1"
+                                      showOnFocus="false"
+                                      readonlyInput="false"
+                                      size="6"
+                                      mindate="#{utilsC.localTime(07,30)}"
+                                      maxdate="#{utilsC.localTime(20,45)}"
+                                     >
+                            <f:validateBean disabled="#{memC.tarifGreenfee.teeTimesList.size() gt 0}"/>
+                        </p:datePicker>
+
+                        <h:outputText value="#{msg['tarif.members.price']} :"/>
+                        <p:inputNumber id="hoursPrice"
+                                       value="#{memC.tarifGreenfee.workPrice}"
+                                       title="#{msg['tooltip.tarif.price3']}"
+                                       size="6" lang="#{languageC.locale}"
+                                       decimalPlaces="1" decimalSeparator="."
+                                       placeholder="999.9" minValue="0.1" maxValue="300"
+                                       label="#{msg['tarif.members.price']}">
+                            <f:validateBean disabled="true"/>
+                        </p:inputNumber>
+
+                    </p:panelGrid>
+                    <p:commandButton value="#{msg['tarif.hours.create']}"
+                                     widgetVar="btnAddHoursWV"
+                                     icon="pi pi-plus"
+                                     action="#{memC.inputTarifGreenfeeWizard('HO')}"
+                                     update="tarif_greenfee_wizard"
+                                     resetValues="true"
+                                     onerror="PF('btnAddHoursWV').enable()"
+                                     styleClass="p-button-outlined mt-2"/>
+
+                    <p:dataTable id="hoursTable"
+                                 value="#{memC.teeTimesForCurrentSeason}" var="t"
+                                 rendered="#{not empty memC.teeTimesForCurrentSeason}"
+                                 editable="true" editMode="row"
+                                 styleClass="compact-table mt-2">
+                        <p:ajax event="rowEdit"       update="tarif_greenfee_wizard"/>
+                        <p:ajax event="rowEditCancel" update="hoursTable"/>
+                        <p:column headerText="Season" style="width:10%">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{t.season}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu value="#{t.season}">
+                                        <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
+                                        <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
+                                        <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
+                                        <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                                       var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="#{msg['tarif.period']}" style="width:16%">
+                            <h:outputText value="#{memC.seasonPeriodFor(t.season)}"/>
+                        </p:column>
+                        <p:column headerText="Title" style="width:15%">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{t.item}"/></f:facet>
+                                <f:facet name="input"><p:inputText value="#{t.item}" size="14" placeholder="ex: Twilight"><f:validateBean disabled="true"/></p:inputText></f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Start" style="width:12%">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{t.startTime}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:datePicker value="#{t.startTime}" timeOnly="true" pattern="HH:mm"
+                                                  lang="#{languageC.locale}" locale="#{languageC.locale}"
+                                                  mindate="#{utilsC.localTime(07,30)}" maxdate="#{utilsC.localTime(20,45)}"
+                                                  inputStyle="width:4.5rem">
+                                        <f:validateBean disabled="true"/>
+                                    </p:datePicker>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="End" style="width:12%">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{t.endTime}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:datePicker value="#{t.endTime}" timeOnly="true" pattern="HH:mm"
+                                                  lang="#{languageC.locale}" locale="#{languageC.locale}"
+                                                  mindate="#{utilsC.localTime(07,30)}" maxdate="#{utilsC.localTime(20,45)}"
+                                                  inputStyle="width:4.5rem">
+                                        <f:validateBean disabled="true"/>
+                                    </p:datePicker>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Price" style="width:10%">
+                            <p:cellEditor>
+                                <f:facet name="output"><h:outputText value="#{t.price}"/></f:facet>
+                                <f:facet name="input">
+                                    <p:inputNumber value="#{t.price}" size="5" decimalPlaces="1" decimalSeparator="." maxValue="300"
+                                                   style="width:5rem">
+                                        <f:validateBean disabled="true"/>
+                                    </p:inputNumber>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column style="width:8%"><p:rowEditor/></p:column>
+                        <p:column style="width:5%">
+                            <p:commandButton icon="pi pi-trash"
+                                             styleClass="p-button-danger p-button-text p-button-sm"
+                                             action="#{memC.removeTeeTimeItem(t)}"
+                                             update="tarif_greenfee_wizard" process="@this"/>
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+    <!-- ===== DAYS ===== -->
+             <h:panelGroup rendered="#{memC.tarifGreenfee.greenfeeType eq 'DA'}"
+                           layout="block">
+                   <p:panelGrid columns="2" layout="flex" columnClasses="col1Flex, col2Flex">
+                    
+                        <h:panelGroup layout="block">
+                            <h:outputText value="#{msg['tarif.season']} "/>
+                            <i class="pi pi-cloud"/>
+                            <i class="pi pi-sun"/>
+                        </h:panelGroup>
+                        <p:selectOneMenu id="seasonDays"
+                                         value="#{memC.tarifGreenfee.workSeason}">
+                            <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
+                            <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
+                            <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
+                            <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                           var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                            <f:validateBean disabled="true"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="#{msg['tarif.category']}"/>
+                        <p:inputText id="daysCategory" size="20"
+                                     title="#{msg['tooltip.tarif.item']}"
+                                     value="#{memC.tarifGreenfee.workItem}"
+                                     placeholder="Enter category">
+                            <f:validateBean disabled="#{memC.tarifGreenfee.daysList.size() gt 0}"/>
+                        </p:inputText>
+
+                        <h:outputText value="Twilight"/>
+                        <p:selectOneMenu id="daysWorkTwilight"
+                                         value="#{memC.tarifGreenfee.workTwilight}">
+                            <f:selectItem itemLabel="N — Normal" itemValue="N"/>
+                            <f:selectItem itemLabel="Y — Twilight" itemValue="Y"/>
+                            <f:validateBean disabled="true"/>
+                        </p:selectOneMenu>
+
+                        <h:outputText value="#{msg['tarif.days.available']} :"/>
+                        <h:panelGroup layout="block">
+                            <p:selectBooleanCheckbox value="#{memC.tarifGreenfee.workDaysAvailable[0]}"
+                                                     itemLabel="#{msg['tarif.days.monday']}"/>
+                            <p:selectBooleanCheckbox value="#{memC.tarifGreenfee.workDaysAvailable[1]}"
+                                                     itemLabel="#{msg['tarif.days.week']}"/>
+                            <p:selectBooleanCheckbox value="#{memC.tarifGreenfee.workDaysAvailable[2]}"
+                                                     itemLabel="#{msg['tarif.days.friday']}"/>
+                            <p:selectBooleanCheckbox value="#{memC.tarifGreenfee.workDaysAvailable[3]}"
+                                                     itemLabel="#{msg['tarif.days.weekend']}"/>
+                            <p:selectBooleanCheckbox value="#{memC.tarifGreenfee.workDaysAvailable[4]}"
+                                                     itemLabel="#{msg['tarif.days.holidays']}"/>
+                        </h:panelGroup>
+
+                        <p:outputLabel value="#{msg['tarif.days.monday']} :"/>
+                        <p:inputNumber id="monday" value="#{memC.tarifGreenfee.workDaysPrice[0]}"
+                                       title="#{msg['tooltip.tarif.price3']}"
+                                       size="5" label="Monday" lang="#{languageC.locale}"
+                                       emptyValue="0" required="false"
+                                       decimalPlaces="1" decimalSeparator="."
+                                       placeholder="999.9" minValue="0" maxValue="300"/>
+
+                        <h:outputText value="#{msg['tarif.days.week']} :"/>
+                        <p:inputNumber id="week" value="#{memC.tarifGreenfee.workDaysPrice[1]}"
+                                       title="#{msg['tooltip.tarif.price3']}"
+                                       size="5" label="Week" lang="#{languageC.locale}"
+                                       emptyValue="0" required="false"
+                                       decimalPlaces="1" decimalSeparator="."
+                                       placeholder="999.9" minValue="0" maxValue="300"/>
+
+                        <h:outputText value="#{msg['tarif.days.friday']} :"/>
+                        <p:inputNumber id="friday" value="#{memC.tarifGreenfee.workDaysPrice[2]}"
+                                       title="#{msg['tooltip.tarif.price3']}"
+                                       size="5" label="Friday" lang="#{languageC.locale}"
+                                       emptyValue="0" required="false"
+                                       decimalPlaces="1" decimalSeparator="."
+                                       placeholder="999.9" minValue="0" maxValue="300"/>
+
+                        <h:outputText value="#{msg['tarif.days.weekend']} :"/>
+                        <p:inputNumber id="weekend" value="#{memC.tarifGreenfee.workDaysPrice[3]}"
+                                       title="#{msg['tooltip.tarif.price3']}"
+                                       size="5" label="Weekend"
+                                       emptyValue="0" required="false"
+                                       decimalPlaces="1" decimalSeparator="."
+                                       placeholder="999.9" minValue="0" maxValue="300"/>
+
+                        <h:outputText value="#{msg['tarif.days.holidays']} :"/>
+                        <p:inputNumber id="holidays" value="#{memC.tarifGreenfee.workDaysPrice[4]}"
+                                       title="#{msg['tooltip.tarif.price3']}"
+                                       size="5" label="Holidays"
+                                       emptyValue="0" required="false"
+                                       decimalPlaces="1" decimalSeparator="."
+                                       placeholder="999.9" minValue="0" maxValue="300"/>
+
+                    </p:panelGrid>
+                    <p:commandButton value="#{msg['tarif.days.create']}"
+                                     widgetVar="btnAddDaysWV"
+                                     icon="pi pi-plus"
+                                     action="#{memC.inputTarifGreenfeeWizard('DA')}"
+                                     update="tarif_greenfee_wizard"
+                                     resetValues="true"
+                                     onerror="PF('btnAddDaysWV').enable()"
+                                     styleClass="p-button-outlined mt-2"/>
+
+<p:dataTable id="daysTable"
+             value="#{memC.tarifGreenfee.daysList}"
+             var="d"
+             editable="true"
+             editMode="row"
+             tableStyle="table-layout:fixed; width:100%;"
+             styleClass="compact-table">
+
+    <p:ajax event="rowEdit"       update="daysTable"/>
+    <p:ajax event="rowEditCancel" update="daysTable"/>
+
+    <!-- Season -->
+    <p:column headerText="Season" style="width:120px">
+        <p:cellEditor>
+            <f:facet name="output">
+                <h:outputText value="#{d.season}"/>
+            </f:facet>
+            <f:facet name="input">
+                <p:selectOneMenu value="#{d.season}" style="width:100%">
+                    <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
+                    <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
+                    <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
+                    <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                   var="ds"
+                                   itemLabel="#{ds.season}"
+                                   itemValue="#{ds.season}"/>
+                </p:selectOneMenu>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <!-- Category -->
+    <p:column headerText="Category" style="width:160px">
+        <p:cellEditor>
+            <f:facet name="output">
+                <h:outputText value="#{d.category}"/>
+            </f:facet>
+            <f:facet name="input">
+                <p:inputText value="#{d.category}" style="width:100%"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <!-- Prices -->
+    <p:column headerText="Mon" style="width:90px">
+        <p:cellEditor>
+            <f:facet name="output"><h:outputText value="#{d.price[0]}"/></f:facet>
+            <f:facet name="input">
+                <p:inputNumber value="#{d.price[0]}" decimalPlaces="1" style="width:100%"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="Week" style="width:90px">
+        <p:cellEditor>
+            <f:facet name="output"><h:outputText value="#{d.price[1]}"/></f:facet>
+            <f:facet name="input">
+                <p:inputNumber value="#{d.price[1]}" decimalPlaces="1" style="width:100%"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="Fri" style="width:90px">
+        <p:cellEditor>
+            <f:facet name="output"><h:outputText value="#{d.price[2]}"/></f:facet>
+            <f:facet name="input">
+                <p:inputNumber value="#{d.price[2]}" decimalPlaces="1" style="width:100%"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="W-E" style="width:90px">
+        <p:cellEditor>
+            <f:facet name="output"><h:outputText value="#{d.price[3]}"/></f:facet>
+            <f:facet name="input">
+                <p:inputNumber value="#{d.price[3]}" decimalPlaces="1" style="width:100%"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="Hol" style="width:90px">
+        <p:cellEditor>
+            <f:facet name="output">
+                <h:outputText value="#{d.price[4]}"/>
+            </f:facet>
+            <f:facet name="input">
+                <p:inputNumber value="#{d.price[4]}"
+                               decimalPlaces="1"
+                               style="width:100%"/>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <p:column headerText="Twilight" style="width:90px">
+        <p:cellEditor>
+            <f:facet name="output">
+                <p:tag value="#{d.twilight}"
+                       severity="#{d.twilight eq 'Y' ? 'warn' : d.twilight eq 'P' ? 'info' : 'secondary'}"/>
+            </f:facet>
+            <f:facet name="input">
+                <p:selectOneMenu value="#{d.twilight}" style="width:100%">
+                    <f:selectItem itemLabel="N" itemValue="N"/>
+                    <f:selectItem itemLabel="Y" itemValue="Y"/>
+                    <f:selectItem itemLabel="P" itemValue="P"/>
+                </p:selectOneMenu>
+            </f:facet>
+        </p:cellEditor>
+    </p:column>
+
+    <!-- Actions -->
+    <p:column style="width:100px">
+        <p:rowEditor/>
+    </p:column>
+
+    <p:column style="width:70px">
+        <p:commandButton icon="pi pi-trash"
+                         styleClass="p-button-danger p-button-text p-button-sm"
+                         action="#{memC.removeDaysItem(d)}"
+                         update="daysTable"
+                         process="@this"/>
+    </p:column>
+
+</p:dataTable>
+
+     </h:panelGroup>
+
+ </h:panelGroup>
+            <f:facet name="footer">
+                <p:commandButton value="#{msg['tarif.visualisation']}"
+                                 icon="pi pi-eye"
+                                 process="@this"
+                                 action="#{memC.resetTarifGreenfeeDB()}"
+                                 update="vizDialog"
+                                 oncomplete="PF('vizDialog').show();"
+                                 styleClass="p-button-info p-button-outlined"/>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</ui:composition>

@@ -28,10 +28,10 @@ public class UpdateScoreStableford implements Serializable {
 
     public boolean update(final ScoreStableford score, final Round round, final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with ScoreStableford = " + score);
-        LOG.debug("with Round = " + round);
-        LOG.debug("with Player = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with ScoreStableford = {}", score);
+        LOG.debug("with Round = {}", round);
+        LOG.debug("with Player = {}", player);
 
         final String query = """
             UPDATE score
@@ -54,7 +54,7 @@ public class UpdateScoreStableford implements Serializable {
                 utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
                 if (row != 0) {
-                    LOG.debug(methodName + " - successful update hole = " + sco.getHole());
+                    LOG.debug("successful update hole = {}", sco.getHole());
                 } else {
                     String msg = "NOT NOT successful update, hole = " + sco.getHole();
                     LOG.error(msg);
@@ -63,9 +63,9 @@ public class UpdateScoreStableford implements Serializable {
                 }
             } // end for
 
-            LOG.debug(methodName + " - just before SUM totalPoints");
+            LOG.debug("just before SUM totalPoints");
             if (updateInscriptionFinalResult.update(player, round)) {
-                LOG.debug(methodName + " - update InscriptionFinalResult OK");
+                LOG.debug("update InscriptionFinalResult OK");
             }
 
             String msg = "<br/>Successful update scores <br/> for player = "
@@ -94,7 +94,7 @@ public class UpdateScoreStableford implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();

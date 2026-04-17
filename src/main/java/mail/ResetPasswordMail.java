@@ -16,12 +16,13 @@ public class ResetPasswordMail implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private MailSender mailSender;
+    @Inject private entite.Settings settings;
 
     public ResetPasswordMail() { }
 
     public Boolean send(Player player, String href) throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "You Forgot Your Password for the Application GolfLC";
             String msg =
@@ -41,7 +42,7 @@ public class ResetPasswordMail implements Serializable {
                 + " <br/> The GolfLC team";
 
             LOG.debug("mail to be sended = " + msg);
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathQRC = null;
             mailSender.sendHtmlMailAsync(sujet, msg, to, null, pathQRC, player.getPlayerLanguage());
             LOG.debug("HTML Mail async sent (fire-and-forget)");
@@ -54,7 +55,7 @@ public class ResetPasswordMail implements Serializable {
 
     public Boolean sendMailResetOK(Player player) throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Successfull password reset to Golflc !!!";
             String href = utils.LCUtil.firstPartUrl() + "/login.xhtml";
@@ -73,7 +74,7 @@ public class ResetPasswordMail implements Serializable {
                 + " <br/> We hope to see you back soon!"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathQRC = null;
             mailSender.sendHtmlMailAsync(sujet, msg, to, pathQRC, player.getPlayerLanguage());
             LOG.debug("sendMailResetOK async dispatched");

@@ -13,7 +13,7 @@
 
 <h:form id="form_professional">
 
-<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<div class="login-container form-top">
 <p:panel styleClass="login-card form-card">
 <f:facet name="header"><h1>#{msg['message.select.pro']}</h1></f:facet>
 
@@ -33,7 +33,7 @@
 
         <ui:include src="/include/include_club_selector.xhtml" />
 
-    <h:outputText  value="#{msg['unavailable.period.start']} :"/>
+    <p:outputLabel for="@next" value="#{msg['unavailable.period.start']} :"/>
     <p:datePicker value="#{appContext.professional.proStartDate}"
                   id="startDatePro"
                   locale="#{languageC.locale}"
@@ -43,11 +43,12 @@
                   showIcon="true"
                   readonlyInput="true"
                   showButtonBar="true"
+                  lang="#{languageC.locale}"
                   yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(1)}"
                   yearNavigator="true"
                   monthNavigator="true" />
 
-      <h:outputText  value="#{msg['unavailable.period.end']} :"/>
+      <p:outputLabel for="@next" value="#{msg['unavailable.period.end']} :"/>
       <p:datePicker value="#{appContext.professional.proEndDate}"
                   id="endDatePro"
                   locale="#{languageC.locale}"
@@ -62,9 +63,9 @@
                   yearNavigator="true"
                   monthNavigator="true" />
 
-         <h:outputText  value="#{msg['professional.amount']} :"/>
+         <p:outputLabel for="@next" value="#{msg['professional.amount']} :"/>
          <p:inputNumber  label="lesson"
-                       id="monday${i}"
+                       id="proAmount"
                        value="#{appContext.professional.proAmount}"
                        title="#{msg['tooltip.tarif.price3']}"
                        size="4"
@@ -72,21 +73,32 @@
                        decimalPlaces="1"
                        decimalSeparator="."
                        placeholder="99.9" />
+   <p:outputLabel value="#{msg['professional.workdays']} :"/>
+    <h:panelGroup layout="block" styleClass="p-mt-2">
+         <p:selectManyCheckbox id="days1" 
+                          value="#{appContext.professional.selectedDays}" 
+                          layout="flex"
+                          columns="4"> 
+            <f:selectItems value="#{appContext.professional.days}"
+                       var="day"
+                       itemLabel="#{msg[day.labelKey]}"
+                       itemValue="#{day.name}" />
+        </p:selectManyCheckbox>
+    </h:panelGroup>     
+  
+
+</p:panelGrid>
 
 <f:facet name="footer">
         <p:commandButton
                          value="#{msg['button.professional.create']}"
-                         id="createPlayer"
-                         ajax="false"
-                         update="growl-msg"
+                         id="createProfessional"
+                         update=":growl-msg"
                          icon="pi pi-database"
                          action="#{clubC.createProfessional()}"/>
 </f:facet>
-</p:panelGrid>
-
 </p:panel>
 </div>
-
 </h:form>
 </ui:define>
 </ui:composition>

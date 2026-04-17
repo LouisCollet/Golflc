@@ -29,16 +29,16 @@ public class CreateHolesGlobal implements Serializable {
 
     public boolean create(final HolesGlobal holesGlobal, final Tee tee, final Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("new holes values = " + NEW_LINE + holesGlobal);
-        LOG.debug("course = " + course);
-        LOG.debug("tee = " + tee);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("new holes values = {}", NEW_LINE + holesGlobal);
+        LOG.debug("course = {}", course);
+        LOG.debug("tee = {}", tee);
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "hole");
             for (int i = 0; i < holesGlobal.getDataHoles().length; i++) {
-                LOG.debug("handling index i = " + i);
-                LOG.debug("handling holesGlobal = " + Arrays.toString(holesGlobal.getDataHoles()[i]));
+                LOG.debug("handling index i = {}", i);
+                LOG.debug("handling holesGlobal = {}", Arrays.toString(holesGlobal.getDataHoles()[i]));
                 try (PreparedStatement ps = conn.prepareStatement(query)) {
                     ps.setNull(1, java.sql.Types.INTEGER); // idhole
                     ps.setShort(2, (short) holesGlobal.getDataHoles()[i][0]); // holenumber
@@ -51,10 +51,9 @@ public class CreateHolesGlobal implements Serializable {
                     utils.LCUtil.logps(ps);
                     int row = ps.executeUpdate();
                     if (row != 0) {
-                        LOG.debug("-- Successfull update Hole for hole : " + holesGlobal.getDataHoles()[i][0]
-                                + " for tee = " + tee.getIdtee() + " row inserted = " + row);
+                        LOG.debug("Successfull update Hole for hole={} tee={} row={}", holesGlobal.getDataHoles()[i][0], tee.getIdtee(), row);
                     } else {
-                        LOG.debug("-- ERROR update Hole for hole : " + holesGlobal.getDataHoles()[i][0]);
+                        LOG.debug("-- ERROR update Hole for hole : {}", holesGlobal.getDataHoles()[i][0]);
                         return false;
                     }
                 }
@@ -72,7 +71,7 @@ public class CreateHolesGlobal implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

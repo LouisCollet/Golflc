@@ -24,8 +24,8 @@ public class ReadCreditcard implements Serializable {
 
     public Creditcard read(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - for idplayer = " + player.getIdplayer());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for idplayer = {}", player.getIdplayer());
 
         final String query = """
                 SELECT *
@@ -39,11 +39,11 @@ public class ReadCreditcard implements Serializable {
         }
         if (creditcard.getCreditcardNumber() == null) {
             String msg = prepareMessageBean("creditcard.notfound");
-            LOG.debug(methodName + " - " + msg);
+            LOG.debug("- {}", msg);
             showMessageInfo(msg);
         } else {
             String msg = utils.LCUtil.prepareMessageBean("creditcard.found") + creditcard;
-            LOG.debug(methodName + " - " + msg);
+            LOG.debug("- {}", msg);
         }
         return creditcard;
     } // end method
@@ -51,11 +51,11 @@ public class ReadCreditcard implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Player player = new Player(); player.setIdplayer(324733);
         // Creditcard cc = new ReadCreditcard().read(player);
-        // LOG.debug("creditcard found = " + cc.toString());
+        // LOG.debug("creditcard found = {}", cc.toString());
     } // end main
     */
 

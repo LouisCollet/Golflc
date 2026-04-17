@@ -4,7 +4,7 @@
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:c="jakarta.tags.core"
+      xmlns:f="jakarta.faces.core"
       template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Tarif Round</ui:define>
@@ -17,26 +17,22 @@
 <ui:include src="include/include_summary_round.xhtml"/>
 <ui:include src="include/include_summary_greenfee.xhtml"/>
 
-<c:set var="greenfeeType" value="#{memC.tarifGreenfee.greenfeeType}"/>
-
-<c:set var="tarif" value="#{memC.tarifGreenfee}"/>
-<c:set var="courseId" value="#{clubC.course.idcourse}"/>
-      <c:choose>
-         <c:when test="#{greenfeeType eq 'BA'}">
-          <ui:include src="include/include_greenfee_basic.xhtml"/>
-         </c:when>
-         <c:when test="#{greenfeeType eq 'DA' }">
-             <ui:include src="include/include_greenfee_days.xhtml"/>
-         </c:when>
-         <c:when test="#{greenfeeType eq 'HO' }">
-             <ui:include src="include/include_greenfee_hours.xhtml"/>
-         </c:when>
-         <c:otherwise>
-            No comment sir...There is an error in greenfeeType
-         </c:otherwise>
-      </c:choose>
+<ui:include src="#{memC.greenfeeIncludeSrc}"/>
 
 <ui:include src="include/include_greenfee_equipments.xhtml"/>
+
+<p:panel id="totalPricePanel"
+         styleClass="total-price-panel"
+         style="margin-top:20px; text-align:right;">
+    <h:outputText value="#{msg['tarif.total']} : "
+                  style="font-weight:bold; font-size:1.5rem;"/>
+    <h:outputText value="#{memC.tarifGreenfeeTotal}"
+                  style="font-size:2rem; font-weight:bold; color:var(--primary-color);">
+        <f:convertNumber maxFractionDigits="2" minFractionDigits="2"/>
+    </h:outputText>
+    <h:outputText value=" #{memC.tarifGreenfee.currency}"
+                  style="font-size:1.5rem; margin-left:4px;"/>
+</p:panel>
 
 </h:form>
 </p:panel>

@@ -27,10 +27,10 @@ public class ModifyMatchplayResult implements Serializable {
 
     public void modifyMPResult(final Round round, final Player player, final String result) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - Round ID = " + round.getIdround());
-        LOG.debug(methodName + " - result = " + result);
-        LOG.debug(methodName + " - Player ID = " + player.getIdplayer());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("Round ID = {}", round.getIdround());
+        LOG.debug("result = {}", result);
+        LOG.debug("Player ID = {}", player.getIdplayer());
         try {
             final String query
                     = "  UPDATE player_has_round"
@@ -71,7 +71,7 @@ public class ModifyMatchplayResult implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

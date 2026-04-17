@@ -1,47 +1,56 @@
 package calc;
 
-import entite.PlayingHandicap;
-import static interfaces.Log.LOG;
 import Controllers.UtilsController;
-import utils.LCUtil;
+import entite.PlayingHandicap;
+import static exceptions.LCException.handleGenericException;
+import static interfaces.Log.LOG;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.Serializable;
 
-public class CalcScramblePlayingHandicap {
-    public  int getScramblePlayingHcp(final PlayingHandicap playingHcp, final int players) throws Exception{
-try {
-   // int players = UtilsController.getElem(playingHcp);
-    LOG.debug("Starting getScramblePlaying Hcp"); 
-          LOG.debug("Scramble Hcp with PlayingHcp = " + playingHcp.toString());
-          LOG.debug("Scramble Hcp with number of players = " + players );
-          UtilsController uc = new UtilsController();
-          double sum = uc.getSum(playingHcp);
-          LOG.debug("The sum is :" + sum);
-          PlayingHandicap ph = new PlayingHandicap(); // attention modifié 19/08/2018
-          if(players == 0){
-              ph.setPlayingHandicap(0);
-          }
-          if(players == 2){
-              ph.setPlayingHandicap((int) (sum * .25));
-          }
-          if(players == 3){
-               ph.setPlayingHandicap((int) (sum * .20));
-          }
-          if(players == 4){  
-               ph.setPlayingHandicap((int) (sum * .10));
-          }
-       //     LOG.debug("ending Playing Hcp calculated !! = " + playingHcp.getPlayingHandicap() );
-            LOG.debug("ending Playing Hcp calculated !! = " + ph.getPlayingHandicap() );
-            
-    return playingHcp.getPlayingHandicap();
-} catch(final Exception e){ 
-    //   LOG.error(" -- Exception by LC = " + e.getMessage());
-        String msg = "-- Exception by LC = " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return 99;
-} finally{
+@ApplicationScoped
+public class CalcScramblePlayingHandicap implements Serializable {
 
- // LOG.debug("finally : end of getStoredList ");
-//return 0;
-}
-} //end getPlayingHandicap
+    private static final long serialVersionUID = 1L;
+
+    @Inject private UtilsController utilsController;
+
+    public CalcScramblePlayingHandicap() { }
+
+    public int getScramblePlayingHcp(final PlayingHandicap playingHcp, final int players) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug(methodName + " - with PlayingHcp = " + playingHcp.toString());
+        LOG.debug(methodName + " - with number of players = " + players);
+        try {
+            double sum = utilsController.getSum(playingHcp);
+            LOG.debug(methodName + " - sum = " + sum);
+            PlayingHandicap ph = new PlayingHandicap();
+            if (players == 0) {
+                ph.setPlayingHandicap(0);
+            }
+            if (players == 2) {
+                ph.setPlayingHandicap((int) (sum * .25));
+            }
+            if (players == 3) {
+                ph.setPlayingHandicap((int) (sum * .20));
+            }
+            if (players == 4) {
+                ph.setPlayingHandicap((int) (sum * .10));
+            }
+            LOG.debug(methodName + " - playing handicap calculated = " + ph.getPlayingHandicap());
+            return ph.getPlayingHandicap(); // fix 2026-03-28 — was: playingHcp.getPlayingHandicap() (always returned original, ph was discarded)
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return 0;
+        }
+    } // end method
+
+    /*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+    } // end main
+    */
+
 } // end class

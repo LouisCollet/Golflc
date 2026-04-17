@@ -55,7 +55,7 @@ public class RoundManager implements Serializable {
     public SaveResult createRound(final Round round, final Course course,
                                   final Club club, final UnavailablePeriod unavailable) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with round = " + round);
         LOG.debug("with course = " + course);
         LOG.debug("with club = " + club);
@@ -96,7 +96,7 @@ public class RoundManager implements Serializable {
 
     public Round readRound(final int idround) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with idround = " + idround);
 
         if (idround <= 0) {
@@ -116,7 +116,7 @@ public class RoundManager implements Serializable {
 
     public SaveResult deleteRound(final Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with round = " + round);
 
         if (round == null || round.getIdround() == null || round.getIdround() <= 0) {
@@ -153,7 +153,7 @@ public class RoundManager implements Serializable {
      */
     public SaveResult deleteRoundAndChilds(final Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with round = " + round);
 
         if (round == null || round.getIdround() == null || round.getIdround() <= 0) {
@@ -194,7 +194,7 @@ public class RoundManager implements Serializable {
             final Player invitedBy, final Inscription inscription,
             final Club club, final Course course, final String batch) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with round = " + round);
         LOG.debug("with player = " + player);
         LOG.debug("with inscription = " + inscription);
@@ -230,7 +230,7 @@ public class RoundManager implements Serializable {
     public SaveResult deleteInscription(final Player player, final Round round,
                                         final Club club, final Course course) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with player = " + player);
         LOG.debug("with round = " + round);
 
@@ -269,7 +269,7 @@ public class RoundManager implements Serializable {
     public SaveResult saveScoreStableford(final ScoreStableford score,
                                           final Round round, final Player player) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with score = " + score);
         LOG.debug("with round = " + round);
         LOG.debug("with player = " + player);
@@ -303,7 +303,7 @@ public class RoundManager implements Serializable {
 
     public List<ECourseList> listParticipantsForRound(final Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (round == null) {
             LOG.warn(methodName + " - round is null");
             return Collections.emptyList();
@@ -319,7 +319,7 @@ public class RoundManager implements Serializable {
 
     public List<ECourseList> listInscriptionsForRound(final Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (round == null) {
             LOG.warn(methodName + " - round is null");
             return Collections.emptyList();
@@ -339,7 +339,7 @@ public class RoundManager implements Serializable {
 
     public boolean roundExists(int idround) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         return readRound(idround) != null;
     } // end method
 
@@ -384,7 +384,7 @@ public class RoundManager implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Round round = new Round();
         round.setIdround(630);
         Round loaded = readRound(630);

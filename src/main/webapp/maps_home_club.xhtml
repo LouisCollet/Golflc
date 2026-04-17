@@ -9,7 +9,6 @@
       template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Travel domicile vers Club</ui:define>
-<ui:define name="head"></ui:define>
 <ui:define name="content">
 
 <script async="async"
@@ -22,7 +21,7 @@
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
     <p:panel styleClass="login-card form-card" style="max-width:100%;">
         <f:facet name="header">
-            <h1>Calculate Distance</h1>
+            <h1>#{msg['google.distance']} — Calculate Route</h1>
         </f:facet>
 
         <h:form id="calculate_distance">
@@ -31,47 +30,50 @@
                          columns="2"
                          columnClasses="col1Flex, col2Flex">
 
-                <h:outputText value="D\u00e9part"
-                              style="width: 100px;"/>
-                <h:inputText id="txtSource"
-                             value="#{playerC.player.address.city}" size="40"/>
+                <p:outputLabel for="@next" value="#{msg['player.address']} :"/>
+                <p:inputText id="txtSource"
+                             value="#{playerC.player.address.city}"
+                             size="40"/>
 
-                <h:outputText value="Destination"
-                              style="width: 100px;"/>
-                <h:inputText id="txtDestination"
-                             value="#{clubC.club.address.street},#{clubC.club.address.city},#{clubC.club.address.country.code}" size="60"/>
+                <p:outputLabel value="Destination :"/>
+                <h:panelGroup layout="block" styleClass="selector-row">
+                    <h:outputText value="#{clubC.club.address.street}, #{clubC.club.address.city}, #{clubC.club.address.country.code}"/>
+                    <input type="hidden" id="calculate_distance:txtDestination"
+                           value="#{clubC.club.address.street}, #{clubC.club.address.city}, #{clubC.club.address.country.code}"/>
+                </h:panelGroup>
 
                 <p:outputLabel for="@next" value="#{msg['club.latitude']} :"/>
                 <p:inputText id="ClubLatitude"
-                             value="#{clubC.club.clubLatitude}"/>
+                             value="#{clubC.club.address.latLng.lat}"/>
 
                 <p:outputLabel for="@next" value="#{msg['club.longitude']} :"/>
                 <p:inputText id="ClubLongitude"
-                             value="#{clubC.club.clubLongitude}"/>
+                             value="#{clubC.club.address.latLng.lng}"/>
 
                 <f:facet name="footer">
                     <p:commandButton value="GetRoute"
                                      id="buttonCreate"
-                                     type="submit"
-                                     icon="pi pi-shopping-cart"
+                                     type="button"
+                                     icon="pi pi-map-marker"
                                      onclick="GetRoute()"/>
                 </f:facet>
             </p:panelGrid>
+
+            <p:divider layout="horizontal" type="solid"/>
 
             <p:panelGrid id="panelgrid2"
                          columns="2"
                          layout="flex"
                          columnClasses="col1Flex, col2Flex">
-                <h:outputText value="#{msg['google.distance']} :"
-                              id="distance01"/>
-                <h:inputText id="distance02"/>
-                <h:outputText value="#{msg['google.duration']} :"
-                              id="duration01"/>
-                <h:inputText id="duration02"/>
+                <p:outputLabel value="#{msg['google.distance']} :"/>
+                <p:inputText id="distance02" readonly="true"/>
+
+                <p:outputLabel value="#{msg['google.duration']} :"/>
+                <p:inputText id="duration02" readonly="true"/>
             </p:panelGrid>
 
-            <div id="dvMap" style="width: 1000px; height: 1000px;"/>
-            <div id="dvPanel" style="width: 500px; height: 100%; background-color: lightblue;"/>
+            <div id="dvMap" class="mt-3" style="width:100%; height:500px;"/>
+            <div id="dvPanel" class="mt-2" style="width:100%; max-height:300px; overflow:auto;"/>
         </h:form>
     </p:panel>
 </div>

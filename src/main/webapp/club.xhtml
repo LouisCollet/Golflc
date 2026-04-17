@@ -58,7 +58,6 @@
                     <p:autoComplete id="ClubCountry"
                                     value="#{clubC.club.address.country.code}"
                                     completeMethod="#{countryC.completeCountry}"
-                                    required="true"
                                     var="country"
                                     itemLabel="#{country}"
                                     itemValue="#{country.code}"
@@ -151,6 +150,7 @@
                 </p:panelGrid>
 
                 <f:facet name="footer">
+                  <div class="btn-group">
                     <p:commandButton value="#{msg['club.create']}"
                                      id="ButtonCreateClub"
                                      update="growl-msg ClubLatitude ClubLongitude"
@@ -174,8 +174,9 @@
                                      rendered="#{clubC.course.nextCourse eq true}"
                                      update="growl-msg"
                                      immediate="true"
-                                     style="float: right;"
+                                     icon="pi pi-arrow-right"
                                      action="course.xhtml?faces-redirect=true"/>
+                  </div>
                 </f:facet>
 
             </p:panel>

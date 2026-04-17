@@ -43,7 +43,7 @@ public class PaymentManager implements Serializable {
      */
     public SaveResult createCreditcard(Creditcard creditcard) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             boolean created = createCreditcardService.create(creditcard);
             if (created) {
@@ -67,7 +67,7 @@ public class PaymentManager implements Serializable {
      */
     public Creditcard readCreditcard(Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Creditcard cc = readCreditcardService.read(player);
             LOG.debug(methodName + " - creditcard loaded = " + cc);
@@ -86,7 +86,7 @@ public class PaymentManager implements Serializable {
      */
     public SaveResult modifyCreditcard(Creditcard creditcard) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             boolean modified = modifyCreditcardService.modify(creditcard);
             if (modified) {
@@ -120,7 +120,7 @@ public class PaymentManager implements Serializable {
      */
     public boolean needsUpdate(Creditcard newCard, Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - creditcard input = " + newCard);
         try {
             Creditcard existing = readCreditcardService.read(player);
@@ -205,7 +205,7 @@ public class PaymentManager implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // tests locaux
     } // end main
     */

@@ -40,7 +40,7 @@ public class FindCancellation implements Serializable {
 
     public List<ECourseList> find(final UnavailablePeriod unavailable, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try (Connection conn = dao.getConnection()) {
 
@@ -115,7 +115,7 @@ public class FindCancellation implements Serializable {
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

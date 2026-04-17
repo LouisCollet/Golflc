@@ -2,11 +2,13 @@ package find;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Club;
 import entite.OpenWeather;
 import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -26,6 +28,13 @@ public class FindOpenWeather implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     private static final String[] WIND_DIRECTION = {
         "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
         "S", "SSW", "SW", "WSW", "W", "West-Northwest", "NW", "NNW"
@@ -36,6 +45,8 @@ public class FindOpenWeather implements Serializable {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .connectTimeout(Duration.ofSeconds(10))
             .build();
+
+    @Inject private entite.Settings settings;
 
     public FindOpenWeather() { }
 
@@ -51,7 +62,7 @@ public class FindOpenWeather implements Serializable {
             String string_url = "https://api.openweathermap.org/data/2.5/weather"
                     + "?lat=" + String.valueOf(club.getAddress().getLatLng().getLat())
                     + "&lon=" + String.valueOf(club.getAddress().getLatLng().getLng())
-                    + "&appid=" + System.getenv("OPENWEATHER_API_KEY")
+                    + "&appid=" + settings.getProperty("OPENWEATHER_API_KEY")
                     + "&units=metric"
                     + "&lang=" + language;
 
@@ -66,8 +77,7 @@ public class FindOpenWeather implements Serializable {
             LOG.debug(methodName + " - response statuscode = " + response.statusCode());
             LOG.debug(methodName + " - response body = " + response.body());
 
-            ObjectMapper om = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-            OpenWeather weather = om.readValue(response.body(), OpenWeather.class);
+            OpenWeather weather = OBJECT_MAPPER.readValue(response.body(), OpenWeather.class);
 
             String wd = null;
             if (weather.getWind().getDeg() != null) {
@@ -93,7 +103,7 @@ public class FindOpenWeather implements Serializable {
               .append(" <b>feels like = </b>").append(weather.getMain().getFeelsLike())
               .append(" <b>humidity = </b>").append(weather.getMain().getHumidity());
 
-            String json = om.writeValueAsString(weather);
+            String json = OBJECT_MAPPER.writeValueAsString(weather);
             LOG.debug(methodName + " - json = \n" + json);
 
             return sb.toString();
@@ -106,7 +116,7 @@ public class FindOpenWeather implements Serializable {
 /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Club club = new Club();
             club.setIdclub(113); // anderlecht

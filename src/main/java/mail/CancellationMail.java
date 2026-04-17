@@ -24,12 +24,13 @@ public class CancellationMail implements Serializable {
 
     @Inject private MailSender mailSender;
     @Inject private ical.IcalService icalService;
+    @Inject private entite.Settings settings;
 
     public CancellationMail() { }
 
     public Boolean dispatch(List<ECourseList> ecl) throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             LOG.debug("nombre de cancellations = " + ecl.size());
             for (int i = 0; i < ecl.size(); i++) {
@@ -55,7 +56,7 @@ public class CancellationMail implements Serializable {
     public Boolean sendMail(Player player, Player invitedBy, Round round, Club club, Course course)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Round Cancellation via GolfLC";
             String Smail =
@@ -78,7 +79,7 @@ public class CancellationMail implements Serializable {
                 + " <br/> The GolfLC team"
                 + " <br/>" + LocalDateTime.now().format(ZDF_TIME);
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathICS = icalService.generateIcs(player, invitedBy, round, club, course, true);
             LOG.debug("pathICS = " + pathICS);
             mailSender.sendHtmlMailAsync(sujet, Smail, to, pathICS, player.getPlayerLanguage());

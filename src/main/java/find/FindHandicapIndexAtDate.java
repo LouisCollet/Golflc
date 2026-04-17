@@ -94,6 +94,7 @@ public class FindHandicapIndexAtDate implements Serializable {
         }
     } // end method
 
+    /*
     void main() throws SQLException {
         HandicapIndex handicapIndex = new HandicapIndex();
         handicapIndex.setHandicapPlayerId(324713);
@@ -109,6 +110,7 @@ public class FindHandicapIndexAtDate implements Serializable {
             LOG.debug("HandicapIndex created - needs manual completion");
         }
     } // end main
+    */
 
 } // end Class
 /*

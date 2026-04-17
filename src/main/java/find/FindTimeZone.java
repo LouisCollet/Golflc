@@ -15,7 +15,7 @@ public class FindTimeZone{
  public static TimeZone find(entite.LatLng latlng) throws ApiException{   
    final String methodName = utils.LCUtil.getCurrentMethodName();
 try{
-       LOG.debug("entering " + methodName);
+       LOG.debug("entering {}", methodName);
        java.util.TimeZone timeZone;
        try (GeoApiContext context = new GeoApiContext.Builder().apiKey(System.getenv("GOOGLE_MAPS_API_KEY")).build()) {
         //   LOG.debug("results 0 =" + results[0]);

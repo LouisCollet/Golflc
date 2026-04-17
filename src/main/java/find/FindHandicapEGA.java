@@ -26,7 +26,7 @@ public class FindHandicapEGA implements Serializable {
 
     public double find(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(" for player = " + player);
         LOG.debug("Round Date = " + round.getRoundDate());
         LOG.debug(" for round = " + round);
@@ -70,7 +70,7 @@ public class FindHandicapEGA implements Serializable {
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

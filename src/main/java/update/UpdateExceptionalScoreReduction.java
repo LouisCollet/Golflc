@@ -28,9 +28,9 @@ public class UpdateExceptionalScoreReduction implements Serializable {
 
     public boolean update(final Player player, double esr) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" for player = " + player);
-        LOG.debug(" for ExceptionalScoreReduction = " + esr);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" for player = {}", player);
+        LOG.debug(" for ExceptionalScoreReduction = {}", esr);
 
         final String query = """
                 UPDATE handicap_index AS UPD,
@@ -52,7 +52,7 @@ public class UpdateExceptionalScoreReduction implements Serializable {
             utils.LCUtil.logps(ps);
 
             int row = ps.executeUpdate();
-            LOG.debug(" ESR modified rows = " + row);
+            LOG.debug(" ESR modified rows = {}", row);
             if (row != 0) {
                 String msg = "update records for esr successfull";
                 LOG.debug(msg);
@@ -76,12 +76,12 @@ public class UpdateExceptionalScoreReduction implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         int esr = -1;
         boolean b = new update.UpdateExceptionalScoreReduction().update(player, esr);
-        LOG.debug("from main, result = " + b);
+        LOG.debug("from main, result = {}", b);
     } // end main
     */
 

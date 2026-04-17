@@ -32,10 +32,12 @@
 <!--  stickyHeader="true"  rowHover="true" -->
 <f:facet name="header">
     <h1>#{msg['message.selectflight']} 
-        <h:outputText value="#{roundC.flight.flightStart}">
+        <h:outputText value="#{roundC.flight.flightStart}"
+                      rendered="#{roundC.flight != null}">
                 <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy" />
         </h:outputText>
-        <h:outputText value="#{roundC.flight.firstFlight}">
+        <h:outputText value="#{roundC.flight.firstFlight}"
+                      rendered="#{roundC.flight != null}">
                 <f:convertDateTime type="ZonedDateTime" pattern="HH:mm" />
         </h:outputText>
         
@@ -58,6 +60,7 @@
                   filterBy="#{c.flightPeriod}" >
             <f:facet name="filter">
                 <p:selectOneButton onchange="PF('flightsTable').filter()">
+                    <f:selectItem itemLabel="#{msg['label.all']}"               itemValue="" />
                     <f:selectItem itemLabel="#{msg['flight.period.morning']}"   itemValue="A" />
                     <f:selectItem itemLabel="#{msg['flight.period.midday']}"    itemValue="B" />
                     <f:selectItem itemLabel="#{msg['flight.period.afternoon']}" itemValue="C" />

@@ -67,7 +67,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
      */
     private Subscription findLatestSubscription(int idplayer) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(idplayer);
         List<Subscription> list = findCurrentSubscription.payments(player, "latest"); // migrated 2026-02-25
@@ -139,7 +139,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
      */
     public Subscription complete(Subscription subscription) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try {
             Subscription latest = findLatestSubscription(subscription.getIdplayer()); // migrated 2026-02-25
@@ -175,7 +175,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
      */
     public boolean createPayment(Subscription subscription) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try {
             subscription = complete(subscription); // migrated 2026-02-25
@@ -204,7 +204,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
      */
     public double findTarif(Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         return switch (subscription.getSubCode()) {
             case "MONTHLY", "YEARLY" -> {
@@ -227,7 +227,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
      */
     public Subscription isExists(Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         Subscription subscription = new Subscription();
         subscription.setIdplayer(player.getIdplayer());

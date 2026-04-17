@@ -6,18 +6,12 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-// import jakarta.annotation.PostConstruct;  // migrated 2026-02-26 — POJO, not CDI-managed
-// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
-// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import utils.LCUtil;
 
-// @Named("scheduleEvent")  // migrated 2026-02-24
-// @SessionScoped  // migrated 2026-02-24
-
 public class Lesson implements Serializable{
-    
-//    private Integer proId;
+
+    private Integer eventId;
     private LocalDateTime eventStartDate;
     private LocalDateTime eventEndDate;
     private Integer eventProId;
@@ -27,9 +21,15 @@ public class Lesson implements Serializable{
     private String eventTitle;
     private String eventDescription;
     private Double lessonAmount;
-public Lesson(){ // constructor
+    private Integer eventClubId;        // not yet in DB — reserved for future use
+    private Integer paymentsLessonId;  // FK → payments_lesson.idLesson (null = not paid)
+    private String  eventClubName;     // from JOIN professional → club
+    private String  proName;           // from JOIN player (pro)
+    private String  studentName;       // from LEFT JOIN player (student)
+public Lesson(){ } // end constructor
 
-    } // end constructor
+    public Integer getEventId() { return eventId; }
+    public void setEventId(Integer eventId) { this.eventId = eventId; }
 
     // @PostConstruct  // migrated 2026-02-26 — POJO, not CDI-managed
     public void init(){
@@ -101,6 +101,40 @@ public Lesson(){ // constructor
         this.lessonAmount = lessonAmount;
     }
 
+    public Integer getEventClubId() {
+        return eventClubId;
+    }
+
+    public void setEventClubId(Integer eventClubId) {
+        this.eventClubId = eventClubId;
+    }
+
+    public boolean isLessonPaid() {
+        return paymentsLessonId != null;
+    }
+
+    public Integer getPaymentsLessonId() {
+        return paymentsLessonId;
+    }
+
+    public void setPaymentsLessonId(Integer paymentsLessonId) {
+        this.paymentsLessonId = paymentsLessonId;
+    }
+
+    public String getEventClubName() {
+        return eventClubName;
+    }
+
+    public void setEventClubName(String eventClubName) {
+        this.eventClubName = eventClubName;
+    }
+
+    public String getProName()                { return proName; }
+    public void   setProName(String proName)  { this.proName = proName; }
+
+    public String getStudentName()                    { return studentName; }
+    public void   setStudentName(String studentName)  { this.studentName = studentName; }
+
     public static Lesson map(ResultSet rs) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         try{
@@ -130,8 +164,10 @@ public String toString(){
      //       + "Pro Id : " + this.proId
             + NEW_LINE + "<br>"  + "Start Date : "   + this.eventStartDate //.format(ZDF_TIME)
             + NEW_LINE + "<br>"  + "End Date : "   + this.eventEndDate //.format(ZDF_TIME)
-            + NEW_LINE + "<br>"  + "Id Pro : "   + this.eventProId
-            + NEW_LINE + "<br>"  + "Id player : " + this.eventPlayerId
+            + NEW_LINE
+            + "<br>"  + "Id Pro : "   + this.eventProId
+            + "<br>"  + "Id Player : " + this.eventPlayerId
+            + "<br>"  + "Id Club : " + this.eventClubId
             + NEW_LINE + "<br>"  + "All Day : " + this.eventAllDay
             + NEW_LINE + "<br>"  + "Title : " + this.eventTitle
             + NEW_LINE + "<br>"  + "Description : " + this.eventDescription

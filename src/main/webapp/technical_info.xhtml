@@ -311,7 +311,7 @@
             </tr>
         </thead>
         <tbody>
-            <ui:repeat value="#{jakartaEEVersionDashboard.versions.entrySet().toArray()}" var="entry">
+            <ui:repeat value="#{jakartaEEVersionDashboard.versions.entrySet()}" var="entry">
                 <tr style="background-color:#f9f9f9; border-bottom:1px solid #ddd;">
                     <td style="padding: 8px;">#{entry.key}</td>
                     <td style="padding: 8px;">#{entry.value}</td>

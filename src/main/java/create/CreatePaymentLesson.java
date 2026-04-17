@@ -3,6 +3,7 @@ package create;
 import entite.Creditcard;
 import entite.Lesson;
 import entite.Professional;
+import java.util.List;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
@@ -12,8 +13,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -27,47 +26,82 @@ public class CreatePaymentLesson implements Serializable {
 
     public CreatePaymentLesson() { }
 
+    /**
+     * Enregistre UN paiement groupé pour toutes les leçons.
+     * Une seule ligne dans payments_lesson par transaction de paiement.
+     *
+     * @param lessons             toutes les leçons payées dans cette transaction
+     * @param creditcard          creditcard avec référence de paiement et montant total
+     * @param professional        pro concerné
+     * @param lessonCommunication détail regroupé : dates de toutes les leçons + id étudiant
+     */
     public boolean create(
-            final Lesson lesson,
+            final List<Lesson> lessons,
             final Creditcard creditcard,
-            final Professional professional) throws SQLException {
+            final Professional professional,
+            final String lessonCommunication) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("lesson  = " + lesson);
-        LOG.debug("creditcard  = " + creditcard);
-        LOG.debug("professional  = " + professional);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("lessons count = {}", lessons.size());
+        LOG.debug("creditcard  = {}", creditcard);
+        LOG.debug("professional  = {}", professional);
+        LOG.debug("lessonCommunication = {}", lessonCommunication);
+
+        // startDate = première leçon, endDate = dernière leçon
+  //      Lesson first = lessons.get(0);
+  //      Lesson last  = lessons.get(lessons.size() - 1);
 
         try (Connection conn = dao.getConnection()) {
-            final String query = LCUtil.generateInsertQuery(conn, "payments_lesson");
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setNull(1, java.sql.Types.INTEGER); // AUTO-INCREMENT
-                ps.setInt(2, professional.getProId());
-                ps.setInt(3, professional.getProClubId());
-                ps.setInt(4, creditcard.getCreditCardIdPlayer());
-                ps.setTimestamp(5, Timestamp.valueOf(lesson.getEventStartDate()));
-                ps.setTimestamp(6, Timestamp.valueOf(lesson.getEventEndDate()));
-                ps.setString(7, creditcard.getCreditcardPaymentReference());
-                ps.setString(8, creditcard.getCommunication());
-                ps.setDouble(9, creditcard.getTotalPrice());
-                ps.setTimestamp(10, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
-                int row = ps.executeUpdate();
-                if (row != 0) {
+            conn.setAutoCommit(false);
+            try {
+                // INSERT payments_lesson
+                final String insertQuery = LCUtil.generateInsertQuery(conn, "payments_lesson");
+                try (PreparedStatement ps = conn.prepareStatement(insertQuery)) {
+                    sql.preparedstatement.psCreatePaymentLesson.psMapCreate(ps, lessons, creditcard, professional, lessonCommunication);
+                    utils.LCUtil.logps(ps);
+                    int row = ps.executeUpdate();
+                    if (row == 0) {
+                        String msg = "ERROR insert payments_lesson";
+                        LOG.error(msg);
+                        LCUtil.showMessageFatal(msg);
+                        conn.rollback();
+                        return false;
+                    }
                     generatedKey = LCUtil.generatedKey(conn);
-                    LOG.debug("payment lesson, generated key = " + generatedKey);
-                    String msg = "Payment Lesson created = </h1>" + lesson;
-                    LOG.debug(msg);
-                    return true;
-                } else {
-                    String msg = "<br/><br/>ERROR insert for lesson : ";
-                    LOG.debug(msg);
-                    LCUtil.showMessageFatal(msg);
-                    return false;
+                    LOG.debug("payment lesson, generated key = {}", generatedKey);
                 }
+
+                // UPDATE lesson SET PaymentsLessonId = generatedKey for each lesson in the cart
+                final String updateQuery = """
+                    UPDATE lesson SET PaymentsLessonId = ?
+                    WHERE EventProId = ? AND EventPlayerId = ? AND EventStartDate = ?
+                    """;
+                try (PreparedStatement psUpdate = conn.prepareStatement(updateQuery)) {
+                    for (Lesson lesson : lessons) {
+                        psUpdate.setInt(1, generatedKey);
+                        psUpdate.setInt(2, lesson.getEventProId());
+                        psUpdate.setInt(3, creditcard.getCreditCardIdPlayer());
+                        psUpdate.setTimestamp(4, java.sql.Timestamp.valueOf(lesson.getEventStartDate()));
+                        int updated = psUpdate.executeUpdate();
+                        LOG.debug("PaymentsLessonId={} for proId={} playerId={} start={} rows={}",
+                            generatedKey, lesson.getEventProId(),
+                            creditcard.getCreditCardIdPlayer(), lesson.getEventStartDate(), updated);
+                    }
+                }
+
+                conn.commit();
+                LOG.debug("payment + lesson paid committed, generatedKey={}", generatedKey);
+                return true;
+
+            } catch (Exception ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
             }
         } catch (SQLException sqle) {
             if (sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062) {
-                String msg = LCUtil.prepareMessageBean("create.lesson.duplicate") + lesson;
+                String msg = LCUtil.prepareMessageBean("create.lesson.duplicate");
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
                 return false;
@@ -87,7 +121,7 @@ public class CreatePaymentLesson implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

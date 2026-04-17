@@ -26,7 +26,7 @@ public class ClubsListLocalAdmin implements Serializable {
 
     public List<Club> list(final Player localAdmin) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
                 SELECT *
@@ -54,7 +54,7 @@ public class ClubsListLocalAdmin implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player localAdmin = new Player();
         localAdmin.setIdplayer(324715);
         List<Club> lp = list(localAdmin);

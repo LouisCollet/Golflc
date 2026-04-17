@@ -26,17 +26,26 @@ public class CreateUnavailablePeriod implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        OBJECT_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+        OBJECT_MAPPER.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    }
+
     @Inject private dao.GenericDAO dao;
 
     public CreateUnavailablePeriod() { }
 
     public boolean create(final UnavailablePeriod unavailable) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with unavailable = " + unavailable);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with unavailable = {}", unavailable);
 
         ValidationsLC vlc = this.validate(unavailable);
-        LOG.debug("validation result = " + vlc);
+        LOG.debug("validation result = {}", vlc);
         if (vlc == null || vlc.getStatus0().equals(ValidationStatus.REJECTED.toString())) {
             String err = (vlc != null) ? vlc.getStatus1() : "Validation returned null";
             LOG.error(err);
@@ -44,21 +53,16 @@ public class CreateUnavailablePeriod implements Serializable {
             return false;
         }
 
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
-        om.configure(SerializationFeature.INDENT_OUTPUT, true);
-        om.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-
         try (Connection conn = dao.getConnection()) {
             unavailable.setItemPeriod(utils.LCUtil.removeNull1DBoolean(unavailable.getItemPeriod()));
             String json;
             try {
-                json = om.writeValueAsString(unavailable);
+                json = OBJECT_MAPPER.writeValueAsString(unavailable);
             } catch (Exception ex) {
                 handleGenericException(ex, methodName);
                 return false;
             }
-            LOG.debug("Unavailable Period converted in json format = " + NEW_LINE + json);
+            LOG.debug("Unavailable Period converted in json format = {}", NEW_LINE + json);
 
             final String query = LCUtil.generateInsertQuery(conn, "unavailable_periods");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -70,7 +74,7 @@ public class CreateUnavailablePeriod implements Serializable {
                 ps.setTimestamp(6, Timestamp.from(Instant.now()));
                 utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
-                LOG.debug("row created = " + row);
+                LOG.debug("row created = {}", row);
                 if (row != 0) {
                     String msg = "Unavailable Created for <br/>Course = " + unavailable.getIdclub();
                     LOG.debug(msg);
@@ -93,7 +97,7 @@ public class CreateUnavailablePeriod implements Serializable {
 
     public ValidationsLC validate(final UnavailablePeriod unavailable) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             ValidationsLC vlc = new ValidationsLC();
             vlc.setStatus0(ValidationStatus.APPROVED.toString());
@@ -112,13 +116,13 @@ public class CreateUnavailablePeriod implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         UnavailablePeriod unavailable = new UnavailablePeriod();
         unavailable.setIdclub(1006);
         unavailable.setStartDate(LocalDateTime.parse("2020-11-03T12:45:30"));
         unavailable.setEndDate(LocalDateTime.parse("2020-10-04T12:45:30"));
         boolean lp = new CreateUnavailablePeriod().create(unavailable);
-        LOG.debug("from main, after lp = " + lp);
+        LOG.debug("from main, after lp = {}", lp);
     } // end main
     */
 

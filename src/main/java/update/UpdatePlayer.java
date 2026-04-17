@@ -37,7 +37,7 @@ public class UpdatePlayer implements Serializable {
          //   final String query = new SqlFactory().generateQueryUpdate(conn, "player");  // le where est inclus !!
             final String co = new SqlFactory().listMetaColumnsUpdate(conn,"player"); // 
             //   String co = utils.DBMeta.listMetaColumnsUpdate(conn, "course");
-            LOG.debug("String from listMetaColumns = " + co);
+            LOG.debug("String from listMetaColumns = {}", co);
           final String query = """
           UPDATE player
           SET %s

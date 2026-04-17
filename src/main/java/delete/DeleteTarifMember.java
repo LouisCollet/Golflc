@@ -22,7 +22,7 @@ public class DeleteTarifMember implements Serializable {
 
     public boolean delete(final TarifMember tarif) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
                 DELETE
@@ -50,11 +50,11 @@ public class DeleteTarifMember implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         TarifMember tarif = new TarifMember();
         tarif.setTarifMemberIdClub(1104);
         boolean b = new DeleteTarifMember().delete(tarif);
-        LOG.debug("from main - resultat deleted TarifMember = " + b);
+        LOG.debug("from main - resultat deleted TarifMember = {}", b);
     } // end main
     */
 

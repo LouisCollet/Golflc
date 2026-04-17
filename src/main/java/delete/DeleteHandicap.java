@@ -24,9 +24,9 @@ public class DeleteHandicap implements Serializable {
 
     public String delete(final int idplayer, final Date date) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("Delete Handicap for idplayer = " + idplayer);
-        LOG.debug("Delete Handicap for date     = " + new SimpleDateFormat("dd/MM/yyyy").format(date));
+        LOG.debug("entering {}", methodName);
+        LOG.debug("Delete Handicap for idplayer = {}", idplayer);
+        LOG.debug("Delete Handicap for date = {}", new SimpleDateFormat("dd/MM/yyyy").format(date));
 
         final String deleteQuery = """
                 DELETE from handicap
@@ -51,7 +51,7 @@ public class DeleteHandicap implements Serializable {
                 ps.setDate(2, LCUtil.getSqlDate(date));
                 LCUtil.logps(ps);
                 rowDelete = ps.executeUpdate();
-                LOG.debug(methodName + " - deleted Handicap = " + rowDelete);
+                LOG.debug("deleted Handicap = {}", rowDelete);
             }
 
             if (rowDelete > 0) {
@@ -60,7 +60,7 @@ public class DeleteHandicap implements Serializable {
                     ps.setDate(2, LCUtil.getSqlDate(date));
                     LCUtil.logps(ps);
                     rowUpdate = ps.executeUpdate();
-                    LOG.debug(methodName + " - Updated HandicapEnd = " + rowUpdate);
+                    LOG.debug("Updated HandicapEnd = {}", rowUpdate);
                 }
             }
 
@@ -86,11 +86,11 @@ public class DeleteHandicap implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         int idplayer = 2014102;
         Date date = SDF.parse("01/01/2000");
         String b = new DeleteHandicap().delete(idplayer, date);
-        LOG.debug("from main - resultat deleteHandicap = " + b);
+        LOG.debug("from main - resultat deleteHandicap = {}", b);
     } // end main
     */
 

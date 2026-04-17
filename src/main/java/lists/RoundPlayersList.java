@@ -27,7 +27,7 @@ public class RoundPlayersList implements Serializable {
 
     public List<Player> list(final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for round = " + round);
 
         if (round.getIdround() == null) {
@@ -63,7 +63,7 @@ public class RoundPlayersList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -76,7 +76,7 @@ public class RoundPlayersList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Round round = new Round();
         round.setIdround(628);
         List<Player> p1 = list(round);

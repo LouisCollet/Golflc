@@ -53,6 +53,7 @@
                 </p:panelGrid>
 
                 <f:facet name="footer">
+                  <div class="btn-group">
                     <p:commandButton value="#{msg['button.course.create']}"
                                      id="ButtonCreateCourse"
                                      ajax="false"
@@ -76,8 +77,8 @@
                                      ajax="false"
                                      rendered="#{clubC.tee.nextTee}"
                                      icon="pi pi-arrow-right"
-                                     style="float:right;"
                                      action="tee.xhtml?faces-redirect=true"/>
+                  </div>
                 </f:facet>
 
             </p:panel>

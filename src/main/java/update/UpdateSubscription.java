@@ -31,8 +31,8 @@ public class UpdateSubscription implements Serializable {
 
     public boolean modify(final Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" with Subscription = " + subscription);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" with Subscription = {}", subscription);
 
         final String query = """
                 UPDATE payments_subscription
@@ -48,10 +48,10 @@ public class UpdateSubscription implements Serializable {
         if (subscription.getSubCode().equals("TRIAL")) {
             Short s = subscription.getTrialCount();
             subscription.setTrialCount(++s);
-            LOG.debug("This is a TRIAL, new count = " + subscription.getTrialCount());
+            LOG.debug("This is a TRIAL, new count = {}", subscription.getTrialCount());
         } else {
             subscription.setTrialCount((short) 0);
-            LOG.debug("This is a MONTH/YEAR, donc TRIAL = " + subscription.getTrialCount());
+            LOG.debug("This is a MONTH/YEAR, donc TRIAL = {}", subscription.getTrialCount());
         }
 
         if (subscription.getTrialCount() > 5 && LocalDateTime.now().isAfter(subscription.getEndDate())) {
@@ -103,7 +103,7 @@ public class UpdateSubscription implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

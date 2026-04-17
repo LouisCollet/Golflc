@@ -37,7 +37,7 @@ public class CompetitionStartList implements Serializable {
 
     public List<ECompetition> list(final List<ECompetition> listeInscriptions) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             CompetitionDescription cde = listeInscriptions.get(0).competitionDescription();
             LOG.debug(methodName + " - for competition Description = " + cde);
@@ -83,7 +83,7 @@ public class CompetitionStartList implements Serializable {
 
     public List<ECompetition> listSortAndComplete(final List<ECompetition> li) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             CompetitionDescription cd = li.get(0).competitionDescription();
             LOG.debug(methodName + " - for competition Description = " + cd);
@@ -147,7 +147,7 @@ public class CompetitionStartList implements Serializable {
 
     public boolean modifyCompetition(final List<ECompetition> ec) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             for (int i = 0; i < ec.size(); i++) {
                 CompetitionData cda = ec.get(i).competitionData();
@@ -177,7 +177,7 @@ public class CompetitionStartList implements Serializable {
 
     public PlayingHandicap playingHandicap(final ECompetition competition, final List<Tee> tees) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             LOG.debug(methodName + " - with tees = " + tees);
             LOG.debug(methodName + " - with seriesHandicap = "
@@ -250,14 +250,14 @@ public class CompetitionStartList implements Serializable {
     // CompetitionStartList does not cache — list() always recomputes
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - no-op: CompetitionStartList does not maintain a cache");
     } // end method
 
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // var lp = list(listeInscriptions);
         // LOG.debug("from main, list = " + lp);
         LOG.debug("from main, CompetitionStartList = ");

@@ -7,62 +7,39 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="title">Select Round Page</ui:define>
-
+<ui:define name="title">Select Round</ui:define>
 <ui:define name="content">
 
-    <h:form id="select_round">
+<h:form id="select_round">
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card">
+        <f:facet name="header">
+            <h1>#{msg[selectionContextBean.purpose.dialogTitleKey]}</h1>
+        </f:facet>
 
-        <div class="login-container" style="min-height:auto; align-items:flex-start;">
-            <p:panel styleClass="login-card form-card">
-                <f:facet name="header">
-                    <h1>#{msg['message.selectcourse']}
-                        <h:outputText id="Rnd"
-                                      rendered="#{appContext.inputSelectRound eq 'INSCRIPTION'}"
-                                      value="#{msg['message.for.round']}"/>
-                        <h:outputText id="tarif"
-                                      rendered="#{appContext.inputSelectCourse eq 'CreateTarifGreenfee'}"
-                                      value="#{msg['message.for.tarif']}"/>
-                        <h:outputText id="tarifMembers"
-                                      rendered="#{appContext.inputSelectCourse eq 'CreateTarifMember'}"
-                                      value="#{msg['message.for.tarif.members']}"/>
-                        <h:outputText id="unavailableS"
-                                      rendered="#{appContext.inputSelectCourse eq 'CreateUnavailableStructure'}"
-                                      value="#{msg['message.for.unavailable']}"/>
-                        <h:outputText id="unavailableP"
-                                      rendered="#{appContext.inputSelectCourse eq 'CreateUnavailablePeriod'}"
-                                      value="#{msg['message.for.unavailable']}"/>
-                        <h:outputText id="Det"
-                                      rendered="#{appContext.inputSelectCourse eq 'ChartRound'}"
-                                      value="#{msg['message.for.detail']}"/>
-                        <h:outputText id="Avg"
-                                      rendered="#{appContext.inputSelectCourse eq 'ChartCourse'}"
-                                      value="#{msg['message.for.average']}"/>
-                    </h1>
-                </f:facet>
+        <p:panelGrid id="panelGrid1"
+                     layout="flex"
+                     columns="2"
+                     columnClasses="col1Flex, col2Flex">
 
-                <p:panelGrid id="panelGrid1"
-                             layout="flex"
-                             columns="2"
-                             columnClasses="col1Flex, col2Flex">
+            <ui:include src="/include/include_round_selector.xhtml">
+                <ui:param name="autoSubmitButton" value="select_round:selectButton"/>
+            </ui:include>
 
-                    <ui:include src="include/include_round_selector.xhtml"/>
+        </p:panelGrid>
 
-                </p:panelGrid>
-
-                <f:facet name="footer">
-                    <p:commandButton value="Choix Round"
-                                     id="selectButtonRound"
-                                     update="growl-msg"
-                                     ajax="false"
-                                     icon="pi pi-question"
-                                     action="#{roundC.selectRound()}"/>
-                </f:facet>
-
-            </p:panel>
+        <div class="btn-group" style="margin-top:1rem;">
+            <p:commandButton
+                value="#{msg['button.select']}"
+                id="selectButton"
+                icon="pi pi-check"
+                ajax="false"
+                action="#{roundC.roundSelectorAction()}"/>
         </div>
 
-    </h:form>
+    </p:panel>
+    </div>
+</h:form>
 
 </ui:define>
 </ui:composition>

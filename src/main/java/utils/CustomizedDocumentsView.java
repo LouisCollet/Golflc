@@ -45,14 +45,14 @@ public class CustomizedDocumentsView implements Serializable {
     @PostConstruct
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         customizationOptions();
     } // end method
 
     // ✅ Privée — appelée uniquement par @PostConstruct
     private void customizationOptions() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         excelOpt = new ExcelOptions();
         excelOpt.setFacetBgColor("#F88017");
@@ -80,7 +80,7 @@ public class CustomizedDocumentsView implements Serializable {
 
     public void postProcessXLS(Object document) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             SXSSFWorkbook wb     = (SXSSFWorkbook) document;
             SXSSFSheet    sheet  = wb.getSheetAt(0);
@@ -109,7 +109,7 @@ public class CustomizedDocumentsView implements Serializable {
     /*
     public void preProcessPDF(Object document) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Document pdf = (Document) document;
             pdf.open();

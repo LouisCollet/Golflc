@@ -133,7 +133,7 @@ public class EmailService {
                 + "</br> now italic : " 
                 + " </br> now <i> italiques </i>";
             String title = "Ceci est le sujet du mail, louis";
-            String recipient = System.getenv("SMTP_USERNAME") + "," + System.getenv("SMTP_USERNAME_ONDUTY");
+            String recipient = settings.getProperty("SMTP_USERNAME") + "," + settings.getProperty("SMTP_USERNAME_ONDUTY");
             
             String qrContent = "</br>this is the start of the content" + content 
                               + "</br>this is the end of the content";

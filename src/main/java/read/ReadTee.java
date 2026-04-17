@@ -43,7 +43,7 @@ public class ReadTee implements Serializable, interfaces.GolfInterface {
         try (Connection conn = dao.getConnection()) {
 
             LOG.debug("entering ReadTee.read");
-            LOG.debug(" for tee = " + tee);
+            LOG.debug(" for tee = {}", tee);
 
             final String query = """
                 SELECT *
@@ -112,7 +112,7 @@ public class ReadTee implements Serializable, interfaces.GolfInterface {
             LOG.debug("Test tee ID: {}", tee.getIdtee());
 
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
     }
 }
@@ -138,13 +138,13 @@ public Tee read(final Tee tee,Connection conn) throws SQLException, Exception{
     ResultSet rs = null;
 try{
         LOG.debug("entering ReadTee.read");
-        LOG.debug(" for tee = " + tee);
+        LOG.debug(" for tee = {}", tee);
      final String query = """
         SELECT *
         FROM Tee
         WHERE idtee = ?
       """;
-   //     LOG.debug("Tee loaded = " + tee.getIdtee());
+   //     LOG.debug("Tee loaded = {}", tee.getIdtee());
      ps = conn.prepareStatement(query);
      ps.setInt(1, tee.getIdtee()); // where
      utils.LCUtil.logps(ps);
@@ -191,9 +191,9 @@ void main() throws SQLException, Exception{ // testing purposes
    tee.setIdtee(3000); // existe pas !!
    Tee t = new ReadTee().read(tee,conn);
    if(t.isNotFound()){
-       LOG.debug(" Tee not found ! = " + t.toString());
+       LOG.debug(" Tee not found ! = {}", t.toString());
    }else{
-       LOG.debug(" loaded tee = " + t.toString());
+       LOG.debug(" loaded tee = {}", t.toString());
    }
 
    DBConnection.closeQuietly(conn, null, null, null);

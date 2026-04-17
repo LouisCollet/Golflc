@@ -31,8 +31,8 @@ public class UpdateBlocking implements Serializable, interfaces.GolfInterface {
 
     public boolean update(Blocking blocking) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" with blocking = " + blocking);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" with blocking = {}", blocking);
 
         final String query = """
                 UPDATE blocking
@@ -46,13 +46,13 @@ public class UpdateBlocking implements Serializable, interfaces.GolfInterface {
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setTimestamp(1, Timestamp.from(Instant.now()));
-            LOG.debug("there where attempts = " + blocking.getBlockingAttempts());
+            LOG.debug("there where attempts = {}", blocking.getBlockingAttempts());
             ps.setShort(2, blocking.getBlockingAttempts());
             if (blocking.getBlockingAttempts() > 2) {
                 ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().plusMinutes(15)));
             } else {
                 ps.setTimestamp(3, Timestamp.from(Instant.now()));
-                LOG.debug("There are attempts now = " + blocking.getBlockingAttempts());
+                LOG.debug("There are attempts now = {}", blocking.getBlockingAttempts());
             }
             ps.setInt(4, blocking.getBlockingPlayerId());
             utils.LCUtil.logps(ps);
@@ -82,12 +82,12 @@ public class UpdateBlocking implements Serializable, interfaces.GolfInterface {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Blocking blocking = new Blocking();
         blocking.setBlockingPlayerId(324713);
         blocking.setBlockingAttempts((short) 3);
         boolean b = new update.UpdateBlocking().update(blocking);
-        LOG.debug("from main, result = " + b);
+        LOG.debug("from main, result = {}", b);
     } // end main
     */
 

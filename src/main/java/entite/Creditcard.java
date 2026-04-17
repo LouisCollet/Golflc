@@ -57,6 +57,7 @@ public class Creditcard implements Serializable{
 @JsonIgnore private String creditcardPaymentReference;
 @JsonIgnore private String typePayment;
 @JsonIgnore private YearMonth expirationDateYearMonth;  // new 22-08-2025
+@JsonIgnore private String paymentNonce;  // security audit 2026-03-19 — unique token per transaction
 
    public enum etypePayment{
        SUBSCRIPTION, GREENFEE, COTISATION, LESSON;
@@ -232,6 +233,9 @@ public YearMonth expirationDate(final int year, final int month) {
 //       LOG.debug("setPaymentOK = " + paymentOK);
         this.paymentOK = paymentOK;
     }
+
+    public String getPaymentNonce() { return paymentNonce; }
+    public void setPaymentNonce(String paymentNonce) { this.paymentNonce = paymentNonce; }
 
     public String getSelected() {
         return selected;

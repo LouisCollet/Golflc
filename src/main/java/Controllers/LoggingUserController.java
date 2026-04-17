@@ -79,6 +79,11 @@ public class LoggingUserController implements Serializable {
         textBuffer.get().append(text);
     } // end method
 
+    /** Instance wrapper — CDI-compliant call from injected beans */
+    public void resetText(String text) {
+        setText(text);
+    } // end method
+
     /**
      * Call at the end of each request to prevent ThreadLocal memory leak
      */

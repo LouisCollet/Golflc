@@ -46,10 +46,10 @@ public class CacheInvalidator implements Serializable {
     // ========================================
     // Lists — Scores & Flights
     // ========================================
-    @Inject private lists.ScoreCardList1EGA                    scoreCardList1EGA;
+    // ScoreCardList1EGA removed — EGA no longer supported, moved to parking 2026-03-19
     @Inject private lists.ScoreCardList3                       scoreCardList3;
     @Inject private lists.AllFlightsList                       allFlightsList;
-    @Inject private lists.FlightAvailableList                  flightAvailableList;
+    // FlightAvailableList removed — table flight supprimée 2026-03-26
 
     // ========================================
     // Lists — Competitions
@@ -80,9 +80,9 @@ public class CacheInvalidator implements Serializable {
     // Lists — Subscriptions & Payments
     // ========================================
     @Inject private lists.SubscriptionRenewalList              subscriptionRenewalList;
-    @Inject private lists.LocalAdminCotisationList             localAdminCotisationList;
-    @Inject private lists.LocalAdminGreenfeeList               localAdminGreenfeeList;
-    @Inject private lists.SystemAdminSubscriptionList          systemAdminSubscriptionList;
+    @Inject private lists.LocalAdminCotisationList             localAdminCotisationList;   // migrated to @ApplicationScoped 2026-03-22
+    @Inject private lists.LocalAdminGreenfeeList               localAdminGreenfeeList;     // migrated to @ApplicationScoped 2026-03-22
+    @Inject private lists.SystemAdminSubscriptionList          systemAdminSubscriptionList; // migrated to @ApplicationScoped 2026-03-22
 
     // ========================================
     // Lists — Professionals
@@ -118,7 +118,7 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateAll() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         invalidatePlayerCaches();
         invalidateRoundCaches();
@@ -144,7 +144,7 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidatePlayerCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         playersList.invalidateCache();
         handicapList.invalidateCache();
@@ -156,7 +156,7 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateRoundCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         inscriptionList.invalidateCache();
         inscriptionListForOneRound.invalidateCache();
@@ -172,12 +172,11 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateScoreCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
-        scoreCardList1EGA.invalidateCache();
+        // scoreCardList1EGA removed — EGA no longer supported 2026-03-19
         scoreCardList3.invalidateCache();
-        allFlightsList.invalidateCache();
-        flightAvailableList.invalidateCache();
+        // allFlightsList + FlightAvailableList — supprimées, table flight droppée 2026-03-26
     } // end method
 
     /**
@@ -185,7 +184,7 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateCompetitionCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         competitionDescriptionList.invalidateCache();
         competitionInscriptionsList.invalidateCache();
@@ -202,7 +201,7 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateClubCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         clubList.invalidateCache();
         clubDetailList.invalidateCache();
@@ -220,12 +219,12 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateSubscriptionCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         subscriptionRenewalList.invalidateCache();
-        localAdminCotisationList.invalidateCache();
-        localAdminGreenfeeList.invalidateCache();
-        systemAdminSubscriptionList.invalidateCache();
+        localAdminCotisationList.invalidateCache();   // migrated to @ApplicationScoped 2026-03-22
+        localAdminGreenfeeList.invalidateCache();     // migrated to @ApplicationScoped 2026-03-22
+        systemAdminSubscriptionList.invalidateCache(); // migrated to @ApplicationScoped 2026-03-22
     } // end method
 
     /**
@@ -233,7 +232,7 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateProfessionalCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         professionalClubList.invalidateCache();
         lessonProList.invalidateCache();
@@ -247,7 +246,7 @@ public class CacheInvalidator implements Serializable {
      */
     public void invalidateFindCaches() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         findSlopeRating.invalidateCache();
         findInfoStableford.invalidateCache();

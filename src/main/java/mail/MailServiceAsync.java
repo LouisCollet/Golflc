@@ -33,7 +33,7 @@ public class MailServiceAsync implements Serializable {
                                   final String targetLanguage,
                                   final MailCallback callback) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         mailSender.sendHtmlMailAsync(title, content, recipient, pathICS, pathQRC, targetLanguage)
             .thenRun(() -> {

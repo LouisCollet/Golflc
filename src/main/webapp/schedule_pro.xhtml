@@ -9,150 +9,233 @@
       xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
 
+<ui:param name="hideMenu" value="true"/>
 <ui:define name="title">Schedule Pro Page</ui:define>
 <ui:define name="content">
 
-<h:form id="schedule_form" >
-<ui:include src="include/include_summary_pro.xhtml"/>
+<f:event type="preRenderView" listener="#{schedulerC.onLoad}"/>
 
-<div class="login-container" style="min-height:auto; align-items:flex-start;">
-<p:panel id="panelId" styleClass="login-card form-card" style="max-width:100%;">
-    <f:facet name="header">
-        <h1>#{msg['message.lesson']} </h1>
-    </f:facet>
-    <c:set var="idplayer" value="#{playerC.player.idplayer}"/>
-    <p:outputPanel id="schedulePanel"
-                   style="font-size:0.8rem;">
-        <p:schedule id="schedule"
-                    value="#{schedulerC.scheduleModel}"
-                    widgetVar="myschedule"
-                    locale="#{languageC.locale}"
-                    timeFormat="HH:mm"
-                    height="auto"
-                    slotDuration="00:30:00"
-                    slotLabelInterval="01:00"
-                    tooltip="#{msg['message.lesson']}"
-                    minTime="09:00:00"
-                    maxTime="19:00:00"
-                    styleClass="ui-custompanelgrid"
-                    view="timeGridWeek"
-                    extender="initSchedule"
-                    clientTimeZone="Europe/Brussels"
-                    timeZone="Europe/Brussels" >
-            <p:ajax event="dateSelect"
-                    listener="#{schedulerC.dateSelect}"
-                    update=":schedule_form:panelId,growl-msg,messages, panelId"
-                    oncomplete="PF('eventDialog').show();"/>
-            <p:ajax event="eventSelect"
-                    listener="#{schedulerC.eventSelect}"
-                    update=":schedule_form:panelId,growl-msg,messages,panelId"
-                    oncomplete="PF('eventDialog').show();"/>
-            <p:ajax event="eventMove"
-                    listener="#{schedulerC.moveLesson}"
-                    update=":schedule_form:panelId,growl-msg,messages,panelId"/>
-        </p:schedule>
-    </p:outputPanel>
+<h:form id="schedule_form">
+    <ui:include src="include/include_summary_pro.xhtml"/>
 
- <script type="text/javascript">
-function initSchedule() {
-        this.cfg.options.buttonText = { today : 'Current Date'};
- }
-</script>
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel id="panelId" styleClass="login-card form-card" style="max-width:100%;">
+        <f:facet name="header">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                <h1 style="margin:0;">#{msg['message.lesson']}</h1>
+                <h:outputText value="🛒 #{payC.listLessons.size()} #{msg['lesson.in.cart']}"
+                              rendered="#{not empty payC.listLessons}"
+                              styleClass="lesson-cart-badge"/>
+            </div>
+        </f:facet>
 
-  <p:staticMessage severity="info" summary="Summary INFO" detail="staticMessage detail Content" style="width: 100%"/>
+        <c:set var="idplayer" value="#{playerC.player.idplayer}"/>
 
+        <!-- Schedule calendar -->
+        <p:outputPanel id="schedulePanel" styleClass="schedule-panel">
+            <p:schedule id="schedule"
+                        value="#{schedulerC.scheduleModel}"
+                        widgetVar="myschedule"
+                        locale="#{languageC.locale}"
+                        timeFormat="HH:mm"
+                        height="auto"
+                        slotDuration="00:30:00"
+                        slotLabelInterval="01:00"
+                        tooltip="#{msg['message.lesson']}"
+                        minTime="09:00:00"
+                        maxTime="19:00:00"
+                        styleClass="ui-custompanelgrid"
+                        view="timeGridWeek"
+                        extender="initSchedule"
+                        clientTimeZone="Europe/Brussels"
+                        timeZone="Europe/Brussels">
+                <p:ajax event="dateSelect"
+                        listener="#{schedulerC.dateSelect}"
+                        update=":schedule_form:dialog1,growl-msg"/>
+                <p:ajax event="eventSelect"
+                        listener="#{schedulerC.onEventSelect}"
+                        update=":schedule_form:dialog1,growl-msg"/>
+                <p:ajax event="eventMove"
+                        listener="#{schedulerC.moveLesson}"
+                        onstart="_pfScheduleLockedDate=new Date(PF('myschedule').calendar.view.currentStart.getTime());"
+                        update=":schedule_form:panelId,growl-msg"/>
+            </p:schedule>
+        </p:outputPanel>
+
+        <!-- Bouton Payment caché — déclenché par le custom button FullCalendar -->
+        <p:commandButton id="btnPayment"
+                         style="display:none"
+                         ajax="false"
+                         action="#{payC.manageLesson()}"
+                         process="@this"/>
+
+        <script type="text/javascript">
+        var _pfScheduleLockedDate = null;  // verrouillée avant AJAX par onclick/onstart
+        function initSchedule() {
+            // Si une date est verrouillée, l'injecter AVANT que FullCalendar se construise
+            if (_pfScheduleLockedDate) {
+                this.cfg.options.initialDate = _pfScheduleLockedDate;
+                _pfScheduleLockedDate = null;
+            }
+            this.cfg.options.eventDidMount = function(info) {
+                if (info.event.extendedProps['lesson-paid']) {
+                    info.el.style.cursor = 'not-allowed';
+                    info.el.style.opacity = '0.75';
+                    info.el.title = '#{msg['lesson.paid']}';
+                }
+            };
+            this.cfg.options.buttonText = {
+                today : 'Current Date',
+                payLesson: '💳 #{msg['payment.selected']}'
+            };
+            this.cfg.options.customButtons = {
+                payLesson: {
+                    text: '#{msg['payment.selected']}',
+                    click: function() {
+                        document.getElementById('schedule_form:btnPayment').click();
+                    }
+                }
+            };
+            this.cfg.options.headerToolbar = {
+                left:   'prev,next today',
+                center: 'title',
+                right:  'payLesson dayGridMonth,timeGridWeek,timeGridDay'
+            };
+            this.cfg.options.hiddenDays = #{schedulerC.hiddenDaysJson};
+        }
+        </script>
+
+        <!-- Lesson dialog -->
         <p:dialog id="dialog1"
                   widgetVar="eventDialog"
-                  header="Lesson Details"
-                  width="30%"
+                  header="#{msg['lesson.details']}"
+                  styleClass="schedule-dialog"
+                  width="540"
                   modal="true"
                   minimizable="true"
                   maximizable="true"
                   showEffect="fade"
                   responsive="true"
-                  hideEffect="fade"  >
-        <p:panelGrid id="eventDetails"
-                     layout="flex"
-                     columns="2"
-                     columnClasses="col1Flex,col2Flex"
-                     style="font-size:0.8rem; width:90%" >
-                <p:outputLabel for="@next" value="Title" />
+                  hideEffect="fade">
+
+            <p:defaultCommand target="createButton"/>
+
+            <p:panelGrid id="eventDetails"
+                         layout="flex"
+                         columns="2"
+                         columnClasses="col1Flex,col2Flex">
+
+                <p:outputLabel for="@next" value="#{msg['lesson.title']}"/>
                 <p:inputText id="titleEvent"
-                             value="#{schedulerC.scheduleEvent.title}"
+                             value="#{schedulerC.selectedEvent.title}"
                              required="true"
-                             style="margin-right:1px;"
-                             placeholder="Please complete the lessons's title" />
-                <p:outputLabel for="@next" value="Description" />
+                             placeholder="#{msg['lesson.title']}"/>
+
+                <p:outputLabel for="@next" value="#{msg['lesson.description']}"/>
                 <h:outputText id="descriptionEvent"
-                              value="#{schedulerC.scheduleEvent.description}"/>
+                              value="#{schedulerC.selectedEvent.description}"/>
 
-                <p:outputLabel for="@next" value="From" />
+                <p:outputLabel for="@next" value="#{msg['lesson.club']}"/>
+                <h:outputText id="clubNameEvent"
+                              value="#{schedulerC.selectedClubName}"/>
 
+                <p:outputLabel for="@next" value="#{msg['lesson.proname']}"/>
+                <h:outputText id="proNameEvent"
+                              value="#{schedulerC.selectedProName}"/>
+
+                <p:outputLabel for="@next" value="#{msg['lesson.studentname']}"/>
+                <h:outputText id="studentNameEvent"
+                              value="#{schedulerC.selectedStudentName}"/>
+
+                <p:outputLabel for="@next" value="#{msg['lesson.status']}"/>
+                <h:outputText id="paidEvent"
+                              value="#{schedulerC.selectedEvent.dynamicProperties['lesson-paid'] ? msg['lesson.paid'] : msg['lesson.booked']}"/>
+                
+                <p:outputLabel for="@next" value="#{msg['lesson.startdate']}"/>
                 <p:datePicker id="from"
-                              value="#{schedulerC.scheduleEvent.startDate}"
+                              value="#{schedulerC.selectedEvent.startDate}"
                               pattern="dd/MM/yyyy HH:mm"
                               showTime="true"
                               appendTo="@(body)"
                               timeInput="false"
-                              stepMinute="30" />
+                              stepMinute="30"/>
 
-                <p:outputLabel for="@next" value="To" />
+                <p:outputLabel for="@next" value="#{msg['lesson.enddate']}"/>
                 <p:datePicker id="dateEnd"
-                              value="#{schedulerC.scheduleEvent.endDate}"
-                              pattern="dd/MM/yyyy"
+                              value="#{schedulerC.selectedEvent.endDate}"
+                              pattern="dd/MM/yyyy HH:mm"
                               showTime="true"
                               appendTo="@(body)"
                               mindate="#{utilsC.localTime(9,30)}"
                               maxdate="#{utilsC.localTime(19,00)}"
                               timeInput="false"
-                              stepMinute="30" />
+                              stepMinute="30"/>
 
-                <p:outputLabel for="@next" value="All Day" />
+                <p:outputLabel for="@next" value="#{msg['lesson.allday']}"/>
                 <h:selectBooleanCheckbox id="allDay"
-                                         value="#{schedulerC.scheduleEvent.allDay}"
+                                         value="#{schedulerC.selectedEvent.allDay}"
                                          disabled="#{schedulerC.isNotProfessional()}"/>
 
-             <f:facet name="footer">
-                <p:commandButton id="createButton"
-                                 icon="pi pi-check"
-                                 value="Reservation Lecon"
-                                 process="@form"
-                                 action="#{schedulerC.createLesson()}"
-                                 update="panelId,growl-msg,messages"
-                                 ajax="false"
-                                 oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
-                <p:commandButton id="deleteButton"
-                                 icon="pi pi-times"
-                                 value="Annulation lecon"
-                                 action="#{schedulerC.deleteLesson(idplayer)}"
-                                 update="panelId,growl-msg,messages"
-                                 ajax="false"
-                                 oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
-              </f:facet>
+                <f:facet name="footer">
+                    <div class="btn-group">
+                        <p:commandButton id="createButton"
+                                         icon="pi pi-check"
+                                         value="#{msg['lesson.reserve']}"
+                                         process="@form"
+                                         action="#{schedulerC.createLesson()}"
+                                         update="panelId,growl-msg"
+                                         onclick="_pfScheduleLockedDate=new Date(PF('myschedule').calendar.view.currentStart.getTime());"
+                                         disabled="#{schedulerC.selectedEvent.dynamicProperties['lesson-booked']}"
+                                         styleClass="p-button-success"/>
+                        <p:commandButton id="deleteButton"
+                                         icon="pi pi-times"
+                                         value="#{msg['lesson.cancel']}"
+                                         process="@this"
+                                         oncomplete="PF('deleteDialogSchedule').show()"
+                                         disabled="#{schedulerC.selectedEvent.dynamicProperties['lesson-paid']}"
+                                         styleClass="p-button-danger"/>
+                    </div>
+                </f:facet>
+            </p:panelGrid>
 
-           </p:panelGrid>
-
-             <p:contextMenu for="schedule">
-               <p:menuitem value="Annuler cette lecon"
-                           update="messages, growl-msg"
-                           action="#{schedulerC.deleteLesson(idplayer)}"
-                           oncomplete="PF('myschedule').update();PF('eventDialog').hide();"/>
-            </p:contextMenu>
         </p:dialog>
 
-      <f:facet name="footer">
-           <p:commandButton value="#{msg['payment.selected']}"
-                         id="commandButtonPayment"
-                         ajax="false"
-                         update="growl-msg"
-                         icon="pi pi-credit-card"
-                         action="#{payC.manageLesson()}" >
-           </p:commandButton>
-    </f:facet>
+        <!-- confirmDialog hors de dialog1 — évite les conflits de modaux imbriqués -->
+        <p:confirmDialog widgetVar="deleteDialogSchedule"
+                         message="#{msg['lesson.cancel']} ?"
+                         header="#{msg['button.confirm']}"
+                         severity="warn"
+                         appendTo="@(body)">
+            <p:commandButton value="#{msg['button.no']}"
+                             type="button"
+                             styleClass="ui-button-secondary"
+                             icon="pi pi-times"
+                             onclick="PF('deleteDialogSchedule').hide()"/>
+            <p:commandButton value="#{msg['button.yes']}"
+                             icon="pi pi-check"
+                             action="#{schedulerC.deleteLesson(idplayer)}"
+                             process="@this"
+                             update="panelId,growl-msg"
+                             onclick="_pfScheduleLockedDate=new Date(PF('myschedule').calendar.view.currentStart.getTime());"
+                             oncomplete="PF('deleteDialogSchedule').hide();"/>
+        </p:confirmDialog>
 
-</p:panel>
-</div>
+        <p:contextMenu for="schedule">
+            <p:menuitem value="#{msg['lesson.open.details']}"
+                        icon="pi pi-calendar"
+                        update="panelId,growl-msg"
+                        action="#{dialogC.showLessonDialog()}"/>
+            <p:separator/>
+            <p:menuitem value="#{msg['lesson.cancel']}"
+                        icon="pi pi-times"
+                        styleClass="p-menuitem-danger"
+                        update="panelId,growl-msg"
+                        action="#{schedulerC.deleteLesson(idplayer)}"/>
+        </p:contextMenu>
 
+    </p:panel>
+    </div>
 </h:form>
+
 </ui:define>
 </ui:composition>

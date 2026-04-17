@@ -43,7 +43,7 @@ public class ReadCourse implements Serializable, interfaces.GolfInterface {
             throw new IllegalArgumentException(msg);
         }
 
-        LOG.debug("entering new version {}", methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with Course {}", course);
 
         final String query = """
@@ -67,7 +67,7 @@ public class ReadCourse implements Serializable, interfaces.GolfInterface {
             LOG.debug("Test course ID: {}", course.getIdcourse());
 
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
     }
 }
@@ -93,8 +93,8 @@ public Course read(Course course,Connection conn) throws SQLException, Exception
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
-        LOG.debug("entering new version " + methodName);//
-        LOG.debug("with Course " + course);//
+        LOG.debug("entering {}", methodName);//
+        LOG.debug("with Course {}", course);//
     final String query = """
         SELECT *
         FROM Course
@@ -128,7 +128,7 @@ void main() throws SQLException, Exception{
    Course course = new Course();
    course.setIdcourse(90); // english la tournette
    course = new ReadCourse().read(course,conn);
-      LOG.debug(" from main : course = " + course.toString());
+      LOG.debug(" from main : course = {}", course.toString());
    DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } // end class

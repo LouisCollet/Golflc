@@ -14,7 +14,7 @@ public class SubscriptionRowMapper extends AbstractRowMapper<Subscription> {
        final String methodName = utils.LCUtil.getCurrentMethodName();  
    try{  
            //LOG.debug("entering map for method = " + methodName);
-          Subscription subscription = new Subscription();
+        Subscription subscription = new Subscription();
         subscription.setIdplayer(getInteger(rs,"SubscriptionIdPlayer") );
         subscription.setStartDate(getTimestamp(rs,"SubscriptionStartDate").toLocalDateTime());
         subscription.setEndDate(getTimestamp(rs,"SubscriptionEndDate").toLocalDateTime());

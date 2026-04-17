@@ -15,19 +15,23 @@ import utils.LCUtil;
 
 
 public class psCreateUpdateClub implements Serializable, interfaces.Log, interfaces.GolfInterface{
-    
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
  public static PreparedStatement psMapUpdate(PreparedStatement ps, Club club) throws Exception{
     final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
       // voir aussi http://www.javased.com/index.php?source_dir=archaius/archaius-core/src/main/java/com/netflix/config/sources/JDBCConfigurationSource.java
       int index = 0;
       // mod 16-12-2025
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
-    //    om.configure(SerializationFeature.INDENT_OUTPUT,true);//Set pretty printing of json
        // String json = om.writeValueAsString(club.getUnavailableStructure()); //. prend 3 fields ??
         String json = club.getUnavailableStructure() != null
-              ? om.writeValueAsString(club.getUnavailableStructure())
+              ? OBJECT_MAPPER.writeValueAsString(club.getUnavailableStructure())
               : "{}";                   // ✅ JSON vide par défaut
            LOG.debug("UnavailableStructure data converted in json format = " + NEW_LINE + json);
             ps.setString(++index, club.getClubName());   // 1
@@ -54,10 +58,8 @@ return ps;
     final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
       
-    ObjectMapper om = new ObjectMapper();
-    om.registerModule(new JavaTimeModule());
     String json = club.getUnavailableStructure() != null
-              ? om.writeValueAsString(club.getUnavailableStructure())
+              ? OBJECT_MAPPER.writeValueAsString(club.getUnavailableStructure())
               : "{}";                   // ✅ JSON vide par défaut
       int index = 0;
             ps.setNull(++index, java.sql.Types.INTEGER);

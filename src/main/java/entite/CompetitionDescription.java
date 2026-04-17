@@ -3,6 +3,8 @@ package entite;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
@@ -38,6 +40,14 @@ import validator.FirstUpperConstraint;
 public class CompetitionDescription implements Serializable{
     
     private static final long serialVersionUID = 1L;
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     private StatusExecution status = StatusExecution.PROVISIONAL; // Default priority
 @JsonIgnore private Integer competitionId;
 
@@ -77,6 +87,9 @@ public class CompetitionDescription implements Serializable{
 @JsonIgnore private String competitionQualifying;
 
 @JsonIgnore private String competitionGender;
+@NotNull(message="{competition.starthole.notnull}")
+@Min(value=1, message="{competition.starthole.min}")
+@Max(value=10, message="{competition.starthole.max}")
 @JsonIgnore private Short competitionStartHole;
 
 @NotNull(message="Bean validation : the Number of players must be completed")
@@ -380,8 +393,7 @@ public enum StatusExecution {
     ps.setShort(9, cd.getCompetitionStartHole());
     ps.setShort(10, cd.getFlightNumberPlayers());
     ps.setString(11, cd.getTimeSlots()); // c'est quoi ??
-    ObjectMapper om = new ObjectMapper();
-    String json = om.writeValueAsString(cd); // sur class et pas sur field attention ici erreur cherché longtemps !!
+    String json = OBJECT_MAPPER.writeValueAsString(cd); // sur class et pas sur field attention ici erreur cherché longtemps !!
             LOG.debug("seriesHandicap converted in json format = " + NEW_LINE + json);
     ps.setString(12, json);
     ps.setString(13, cd.getCompetitionQualifying());
@@ -480,8 +492,7 @@ public static CompetitionDescription map(ResultSet rs) throws Exception, SQLExce
         c.setCompetitionStartHole(rs.getShort("CompetitionStartHole"));
         c.setFlightNumberPlayers(rs.getShort("CompetitionFlightNumberPlayers"));
         c.setTimeSlots(rs.getString("CompetitionTimeSlots"));
-        ObjectMapper om = new ObjectMapper();
-        CompetitionDescription cd = om.readValue(rs.getString("CompetitionHandicapLimitsJson"),CompetitionDescription.class);
+        CompetitionDescription cd = OBJECT_MAPPER.readValue(rs.getString("CompetitionHandicapLimitsJson"),CompetitionDescription.class);
 //           LOG.debug("cd handicap series from om = " + Arrays.deepToString(cd.getSeriesHandicap()));
         c.setSeriesHandicap(cd.getSeriesHandicap());
 //           LOG.debug("cd handicap setted to c = " + Arrays.deepToString(c.getSeriesHandicap()));

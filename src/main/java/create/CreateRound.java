@@ -59,14 +59,14 @@ public class CreateRound implements Serializable {
     public boolean create(final Round round, final Course course,
                           final Club club, final UnavailablePeriod unavailable) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("round to be created = " + round);
-        LOG.debug("course = " + course);
-        LOG.debug("club   = " + club);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("round to be created = {}", round);
+        LOG.debug("course = {}", course);
+        LOG.debug("club   = {}", club);
 
         // Validation avant insertion
         if (!validate(round, course, unavailable)) {
-            LOG.debug(methodName + " - validation error, aborting");
+            LOG.debug("validation error, aborting");
             return false;
         }
 
@@ -74,7 +74,7 @@ public class CreateRound implements Serializable {
         try (Connection conn        = dao.getConnection();
              PreparedStatement ps   = conn.prepareStatement(utils.LCUtil.generateInsertQuery(conn, "round"))) {
 
-            LOG.debug(methodName + " - ZoneId = " + club.getAddress().getZoneId());
+            LOG.debug("ZoneId = {}", club.getAddress().getZoneId());
 
             // Conversion date locale → UTC pour stockage en base
             ZonedDateTime zdt = round.getRoundDate()
@@ -82,8 +82,8 @@ public class CreateRound implements Serializable {
                     .withZoneSameInstant(ZoneId.of("UTC"));
             LocalDateTime ldt = zdt.toLocalDateTime();
 
-            LOG.debug(methodName + " - ZonedDateTime UTC for DB = " + zdt + " , offset = " + zdt.getOffset());
-            LOG.debug(methodName + " - LocalDateTime UTC for DB = " + ldt);
+            LOG.debug("ZonedDateTime UTC for DB = {} offset = {}", zdt, zdt.getOffset());
+            LOG.debug("LocalDateTime UTC for DB = {}", ldt);
 
             ps.setNull(1, java.sql.Types.INTEGER);              // auto-increment
             ps.setObject(2, ldt, JDBCType.TIMESTAMP);
@@ -152,28 +152,28 @@ public class CreateRound implements Serializable {
     public boolean validate(final Round round, final Course course,
                             final UnavailablePeriod unavailable) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try {
             if (round.getRoundDate() == null) {
                 String msg = utils.LCUtil.prepareMessageBean("round.date.required");
-                LOG.error(methodName + " - roundDate is null");
+                LOG.error("roundDate is null");
                 showMessageFatal(msg);
                 return false;
             } // end guard clause
 
-            LOG.debug("course begin date = " + course.getCourseBeginDate()); // format localdatetime
+            LOG.debug("course begin date = {}", course.getCourseBeginDate()); // format localdatetime
             LocalDateTime cb = course.getCourseBeginDate();
-            LOG.debug(methodName + " - courseBegin = " + cb);
+            LOG.debug("courseBegin = {}", cb);
             if (round.getRoundDate().isBefore(cb)) {
                 String msg = utils.LCUtil.prepareMessageBean("round.notopened");
                 LOG.error(msg);
                 showMessageFatal(msg);
                 return false;
             }
-            LOG.debug("course end date = " + course.getCourseEndDate()); // format localdatetime
+            LOG.debug("course end date = {}", course.getCourseEndDate()); // format localdatetime
             LocalDateTime ce = course.getCourseEndDate();
-            LOG.debug(methodName + " - courseEnd = " + ce);
+            LOG.debug("courseEnd = {}", ce);
             if (round.getRoundDate().isAfter(ce)) {
                 String msg = utils.LCUtil.prepareMessageBean("round.closed");
                 LOG.error(msg);
@@ -207,7 +207,7 @@ public class CreateRound implements Serializable {
             UnavailablePeriod unavailable = new UnavailablePeriod();
             Club club = null; // fake — à corriger
             boolean lp = new CreateRound().create(round, course, club, unavailable, conn);
-            LOG.debug("from main, after lp = " + lp);
+            LOG.debug("from main, after lp = {}", lp);
         } catch (Exception e) {
             String msg = "££ Exception in main = " + e.getMessage();
             LOG.error(msg);
@@ -247,11 +247,11 @@ public class CreateRound {
         PreparedStatement ps = null;
         try {
             // lors d'une prochaine modfication, séparer create de validate comme dans createGreenfee
-            LOG.debug(" ... starting " + methodName);
-       //     LOG.debug("round competition = " + round.getRoundName());
-            LOG.debug("round to be created = " + round);
-            LOG.debug("entite course = " + course);
-            LOG.debug("entite club = " + club);
+            LOG.debug("starting");
+       //     LOG.debug("round competition = {}", round.getRoundName());
+            LOG.debug("round to be created = {}", round);
+            LOG.debug("entite course = {}", course);
+            LOG.debug("entite club = {}", club);
             
       //      boolean b = new CreateRound().validate(round, course, unavailable);
        if( ! new CreateRound().validate(round, course, unavailable)){
@@ -268,15 +268,15 @@ public class CreateRound {
  //  old solution      //   ps.setTimestamp(2,Timestamp.valueOf(round.getRoundDate())); // roundDate format LocalDateTime
    //https://stackoverflow.com/questions/29773390/getting-the-date-from-a-resultset-for-use-with-java-time-classes
 
-       LOG.debug("ZoneId = " + club.getAddress().getZoneId());
+       LOG.debug("ZoneId = {}", club.getAddress().getZoneId());
    //   ZoneOffset zoneOffSet = ZoneId.of(club.getAddress().getZoneId()).getRules().getOffset(ldt);
-   //        LOG.debug("zoneOffset = " + zoneOffSet);   
+   //        LOG.debug("zoneOffset = {}", zoneOffSet);   
 // here is the magic ! contrepartie = Round.map // new 08-05-2024      
     ZonedDateTime zdt = round.getRoundDate().atZone(ZoneId.of(club.getAddress().getZoneId())) // origine
                         .withZoneSameInstant(ZoneId.of("UTC")); // destination
-       LOG.debug("ZonedDateTime zdt in UTC format for DB insert = " + zdt + " ,offset = " + zdt.getOffset());
+       LOG.debug("ZonedDateTime zdt in UTC format for DB insert = {} ,offset = {}", zdt, zdt.getOffset());
     LocalDateTime ldt = zdt.toLocalDateTime();
-          LOG.debug("LocalDateTime ldt in UTC format for DB insert = " + ldt);
+          LOG.debug("LocalDateTime ldt in UTC format for DB insert = {}", ldt);
     ps.setObject(2, ldt, JDBCType.TIMESTAMP);
  //  // old  ps.setObject(2, round.getRoundDate(), JDBCType.TIMESTAMP); // new 18-02-2020
     ps.setString(3, round.getRoundGame());
@@ -302,7 +302,7 @@ public class CreateRound {
             int x = ps.executeUpdate(); // write into database
             if (x != 0) {
                 round.setIdround(LCUtil.generatedKey(conn));
-           //     LOG.debug("Round created = " + round.getIdround());
+           //     LOG.debug("Round created = {}", round.getIdround());
 //                setNextInscription(true); // affiche le bouton next(Inscription) bas ecran Ã  droite
                 String msg =  LCUtil.prepareMessageBean("round.created")
              //   msg = msg
@@ -334,7 +334,7 @@ public class CreateRound {
             String msg = "Â£Â£Â£ exception in " + methodName + sqle.getMessage() + " ,SQLState = "
                     + sqle.getSQLState() + " ,ErrorCode = " + sqle.getErrorCode();
             LOG.error(msg);
-            LOG.error("--  " + sqle.toString());
+            LOG.error("--  {}", sqle.toString());
             LCUtil.showMessageFatal(msg);
             return false;
 } catch (Exception e) {
@@ -353,7 +353,7 @@ public class CreateRound {
            LOG.debug("entering validation before create round");
       //  LocalDateTime cb = DatetoLocalDateTime(course.getCourseBeginDate()); mod 03-12-2025
         LocalDateTime cb = course.getCourseBeginDate();
-           LOG.debug("LocalDateTime courseBegin = " + cb);
+           LOG.debug("LocalDateTime courseBegin = {}", cb);
         if(round.getRoundDate().isBefore(cb) ){ 
                 String msgerr =  LCUtil.prepareMessageBean("round.notopened");
                 LOG.error(msgerr); 
@@ -363,7 +363,7 @@ public class CreateRound {
    //      LOG.debug("line 02");
         // LocalDateTime ce = DatetoLocalDateTime(course.getCourseEndDate()); // mod 03-12-2025
         LocalDateTime ce = course.getCourseEndDate(); 
-           LOG.debug("LocalDateTime courseEnd = " + ce);
+           LOG.debug("LocalDateTime courseEnd = {}", ce);
         if(round.getRoundDate().isAfter(ce) ){ 
                 String msgerr =  LCUtil.prepareMessageBean("round.closed");
                 LOG.error(msgerr); 
@@ -396,7 +396,7 @@ public class CreateRound {
    UnavailablePeriod unavailable = new UnavailablePeriod();
    Club club = null; // fake à modifier !!
     boolean lp = new CreateRound().create(round, course, club, unavailable, conn);
-        LOG.debug("from main, after lp = " + lp);
+        LOG.debug("from main, after lp = {}", lp);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

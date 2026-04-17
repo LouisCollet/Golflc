@@ -21,7 +21,7 @@ public class DeleteSubscription implements Serializable {
 
     public boolean delete(final Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
                 DELETE from payments_subscription
@@ -29,7 +29,7 @@ public class DeleteSubscription implements Serializable {
                 """;
 
         int rowDeleted = dao.execute(query, subscription.getIdplayer());
-        LOG.debug(methodName + " - deleted Subscription = " + rowDeleted);
+        LOG.debug("deleted Subscription = {}", rowDeleted);
         String msg = "There are " + rowDeleted + " Subscription deleted = " + subscription;
         LOG.debug(msg);
         return true;
@@ -39,11 +39,11 @@ public class DeleteSubscription implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Subscription subscription = new Subscription();
         subscription.setIdplayer(125896);
         boolean b = new DeleteSubscription().delete(subscription);
-        LOG.debug("from main - resultat deleteSubscription = " + b);
+        LOG.debug("from main - resultat deleteSubscription = {}", b);
     } // end main
     */
 

@@ -6,11 +6,9 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Scramble Playing Handicap Page </ui:define>
 
-<ui:define name="content">
+<ui:define name="title">Scramble Playing Handicap</ui:define>
 
 <ui:define name="metadata">
     <f:metadata>
@@ -18,75 +16,94 @@
     </f:metadata>
 </ui:define>
 
+<ui:define name="content">
 <h:form id="scramble_playing_hcp">
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card">
+        <f:facet name="header">
+            <h1>#{msg['playinghcp.scramble.title']}</h1>
+        </f:facet>
 
-<div class="login-container" style="min-height:auto; align-items:flex-start;">
-<p:panel styleClass="login-card form-card">
-<f:facet name="header">
-    <h1>#{msg['playinghcp.scramble.title']}</h1>
-</f:facet>
+        <p:panelGrid
+            id="panelG1"
+            layout="flex"
+            columns="2"
+            columnClasses="col1Flex, col2Flex">
 
-<p:panelGrid
-    id="panelG1"
-    layout="flex"
-    columns="2"
-    columnClasses="col1Flex, col2Flex"
-    style="text-align:center;">
+            <p:outputLabel for="@next" value="Hcp #{msg['player.message']} 1 :"/>
+            <p:inputNumber id="hcpScr1"
+                           label="Hcp 1"
+                           value="#{roundC.playingHcp.hcpScr[0]}"
+                           size="4"
+                           required="true"
+                           decimalPlaces="0"
+                           minValue="0"
+                           maxValue="36"
+                           validatorMessage="#{msg['handicap.player.minMAX']} : 1"
+                           requiredMessage="#{msg['handicap.player.notnull']} : 1">
+                <f:validateLongRange minimum="0" maximum="36"/>
+            </p:inputNumber>
 
-    <c:forEach var="i" begin="1" end="2" step="1">
-      <h:outputText value="Hcp #{msg['player.message']} #{i}" />
-   </c:forEach>
+            <p:outputLabel for="@next" value="Hcp #{msg['player.message']} 2 :"/>
+            <p:inputNumber id="hcpScr2"
+                           label="Hcp 2"
+                           value="#{roundC.playingHcp.hcpScr[1]}"
+                           size="4"
+                           required="true"
+                           decimalPlaces="0"
+                           minValue="0"
+                           maxValue="36"
+                           validatorMessage="#{msg['handicap.player.minMAX']} : 2"
+                           requiredMessage="#{msg['handicap.player.notnull']} : 2">
+                <f:validateLongRange minimum="0" maximum="36"/>
+            </p:inputNumber>
 
-    <c:forEach var="i" begin="1" end="2" step="1">
-      <p:inputNumber  id="LCcpScr1${i}"
-                    label="Hcp"
-                    value="#{roundC.playingHcp.hcpScr[i-1]}"
-                    size="4"
-                    required="true"
-                    validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
-                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}"
-                    decimalPlaces="0"
-                    minValue="0"
-                    maxValue="36">
-            <f:validateLongRange minimum="0" maximum="36" />
-      </p:inputNumber>
-    </c:forEach>
+            <p:outputLabel for="@next" value="Hcp #{msg['player.message']} 3 :"/>
+            <p:inputNumber id="hcpScr3"
+                           label="Hcp 3"
+                           value="#{roundC.playingHcp.hcpScr[2]}"
+                           size="4"
+                           decimalPlaces="0"
+                           minValue="0"
+                           maxValue="36"
+                           validatorMessage="#{msg['handicap.player.minMAX']} : 3"
+                           requiredMessage="#{msg['handicap.player.notnull']} : 3">
+                <f:validateLongRange minimum="0" maximum="36"/>
+            </p:inputNumber>
 
-    <c:forEach var="i" begin="3" end="4" step="1">
-      <h:outputText value="Hcp #{msg['player.message']} #{i}" />
-   </c:forEach>
+            <p:outputLabel for="@next" value="Hcp #{msg['player.message']} 4 :"/>
+            <p:inputNumber id="hcpScr4"
+                           label="Hcp 4"
+                           value="#{roundC.playingHcp.hcpScr[3]}"
+                           size="4"
+                           decimalPlaces="0"
+                           minValue="0"
+                           maxValue="36"
+                           validatorMessage="#{msg['handicap.player.minMAX']} : 4"
+                           requiredMessage="#{msg['handicap.player.notnull']} : 4">
+                <f:validateLongRange minimum="0" maximum="36"/>
+            </p:inputNumber>
 
-    <c:forEach var="i" begin="3" end="4" step="1">
-      <p:inputNumber  id="LCcpScr2${i}"
-                    label="Hcp"
-                    value="#{roundC.playingHcp.hcpScr[i-1]}"
-                    size="4"
-                    decimalPlaces="0"
-                    minValue="0"
-                    maxValue="36"
-                    validatorMessage="#{msg['handicap.player.minMAX']} : #{i}"
-                    requiredMessage="#{msg['handicap.player.notnull']} : #{i}">
-            <f:validateLongRange minimum="0" maximum="36" />
-      </p:inputNumber>
-    </c:forEach>
+            <p:divider layout="horizontal" type="solid"/>
+            <p:divider layout="horizontal" type="solid"/>
 
-    <h:outputText value="#{msg['handicap.playing']}" />
-    <h:outputText value="#{roundC.playingHcp.playingHandicap}"
-                  style="font-size: 3em;" />
+            <h:outputText value="#{msg['handicap.playing']} :" styleClass="info-label"/>
+            <h:outputText value="#{roundC.playingHcp.playingHandicap}"
+                          styleClass="playing-hcp-result"/>
 
-</p:panelGrid>
+        </p:panelGrid>
 
-<f:facet name="footer">
-         <p:commandButton
-                         id="button01"
-                         value="#{msg['button.hcp.calculate']}"
-                         update="growl-msg"
-                         ajax="false"
-                         icon="pi pi-database"
-                         action="#{roundC.calculateHcpScramble()}"/>
-</f:facet>
-</p:panel>
-</div>
+        <f:facet name="footer">
+            <p:commandButton
+                id="button01"
+                value="#{msg['button.hcp.calculate']}"
+                update="growl-msg"
+                ajax="false"
+                icon="pi pi-calculator"
+                action="#{roundC.calculateHcpScramble()}"/>
+        </f:facet>
+    </p:panel>
+    </div>
 </h:form>
 </ui:define>
 </ui:composition>

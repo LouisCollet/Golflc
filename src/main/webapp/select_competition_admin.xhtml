@@ -26,6 +26,7 @@
                              var="c"
                              emptyMessage="#{msg['message.table.empty']}"
                              rowKey="#{c.competitionId}"
+                             scrollable="true"
                              styleClass="compact-table">
 
                     <p:ajax event="rowToggle"
@@ -57,7 +58,7 @@
                     </p:column>
 
                     <p:column headerText="#{msg['competition.name']}"
-                              width="20%"
+                              width="15%"
                               id="competitionName">
                         #{c.competitionName}
                     </p:column>
@@ -69,7 +70,7 @@
                     </p:column>
 
                     <p:column headerText="#{msg['competition.admin.menu']}"
-                              width="20%"
+                              width="15%"
                               rendered="#{playerC.isAdmin()}">
                         <p:commandButton id="selectButtonInscription"
                                          action="#{roundC.beforeCompetitionMenu(c)}"

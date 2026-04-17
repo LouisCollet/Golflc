@@ -4,6 +4,8 @@ import entite.Player;
 import entite.Round;
 import entite.ScoreStableford;
 import entite.Tee;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,9 +34,9 @@ public class ReadScoreList implements Serializable {
     public ArrayList<ScoreStableford.Score> read(final Player player, final Round round, final Tee tee) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
 
-        LOG.debug("starting " + methodName);
-        LOG.debug("for player = " + player.getIdplayer());
-        LOG.debug("for round = " + round.getIdround());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for player = {}", player.getIdplayer());
+        LOG.debug("for round = {}", round.getIdround());
 
         final String query = """
             SELECT *
@@ -59,7 +61,7 @@ public class ReadScoreList implements Serializable {
                     i++;
                 }
 
-                LOG.debug("ending ReadScoreList: " + i + " / " + scoreList.toString());
+                LOG.debug("ending ReadScoreList: {} / {}", i, scoreList.toString());
 
                 // ✅ Ajouter les distances (20-08-2023)
                 if (!scoreList.isEmpty()) {
@@ -78,19 +80,15 @@ public class ReadScoreList implements Serializable {
             }
 
         } catch (SQLException e) {
-            String msg = "SQLException in " + methodName + ": " + e.getMessage()
-                    + ", SQLState = " + e.getSQLState()
-                    + ", ErrorCode = " + e.getErrorCode();
-            LOG.error(msg, e);
-            throw e;
-
+            handleSQLException(e, methodName);
+            return new ArrayList<>();
         } catch (Exception e) {
-            String msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg, e);
-            throw new SQLException(msg, e);
+            handleGenericException(e, methodName);
+            return new ArrayList<>();
         }
     } // end method
 
+    /*
     void main() throws SQLException {
         Player player = new Player();
         player.setIdplayer(324713);
@@ -100,8 +98,9 @@ public class ReadScoreList implements Serializable {
         // tee à compléter
 
         var v = new read.ReadScoreList().read(player, round, tee);
-        LOG.debug("ScoreList = " + v.toString());
+        LOG.debug("ScoreList = {}", v.toString());
     } // end main
+    */
 
 } // end class
 /*
@@ -126,9 +125,9 @@ public  ArrayList<ScoreStableford.Score> read(final Player player, final Round r
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
-     LOG.debug("starting " + methodName) ;
-     LOG.debug(" for player = " + player.getIdplayer());
-     LOG.debug(" for round = " + round.getIdround());
+     LOG.debug("starting");
+     LOG.debug(" for player = {}", player.getIdplayer());
+     LOG.debug(" for round = {}", round.getIdround());
 
    final String query = """
               SELECT *
@@ -147,7 +146,7 @@ try{
          scoreList.add(entite.ScoreStableford.Score.map(rs));
          i++;
      }
-      LOG.debug(" -- ending ReadScoreList : = " + i + " / " + scoreList.toString() );
+      LOG.debug(" -- ending ReadScoreList : = {} / {}", i, scoreList.toString());
  // ici ajouter les distances 20-08-2023
      if(!scoreList.isEmpty()){
         var distance = new find.FindDistances().find(tee);
@@ -188,7 +187,7 @@ void main() throws SQLException, Exception{
     Tee tee = new Tee();
     // tee à compléter
     var v = new read.ReadScoreList().read(player, round,tee, conn);//
-     LOG.debug("ScoreList = " + v.toString());
+     LOG.debug("ScoreList = {}", v.toString());
   }catch (Exception e){
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

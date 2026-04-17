@@ -6,25 +6,20 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces">
 
-    <ui:include src="/include/include_summary_player.xhtml"/>
-
     <p:panelGrid id="panel1"
                  layout="flex"
                  columns="2"
                  columnClasses="col1Flex, col2Flex">
 
         <f:facet name="header">
-            <h1>#{msg['subscription.old']}</h1>
+            <h1>#{msg['title.payment.lesson']}</h1>
         </f:facet>
 
-        <h:outputText value="#{msg['address.city']}"/>
-        <h:outputText value="#{playerC.player.idplayer}"/>
+        <p:outputLabel value="#{msg['professional.name']}"/>
+        <h:outputText value="#{payC.playerPro.playerFirstName} #{payC.playerPro.playerLastName}"/>
 
-        <h:outputText value="#{msg['professional.name']}"/>
-        <h:outputText value="#{payC.professional.proId}"/>
-
-        <h:outputText value="#{msg['subscription.trial']}"/>
-        <h:outputText value="#{payC.professional.proClubId}"/>
+        <p:outputLabel value="#{msg['lesson.in.cart']}"/>
+        <h:outputText value="#{payC.listLessons.size()}"/>
 
     </p:panelGrid>
 

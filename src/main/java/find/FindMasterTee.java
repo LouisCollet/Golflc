@@ -24,7 +24,7 @@ public class FindMasterTee implements Serializable {
 
     public int find(Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(" with course = " + course.toString());
 
         final String query = """
@@ -75,7 +75,7 @@ public class FindMasterTee implements Serializable {
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

@@ -2,6 +2,8 @@ package read;
 
 import entite.Course;
 import entite.ScoreStableford;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,9 +28,9 @@ public class ReadParAndStrokeIndex implements Serializable {
     public ScoreStableford read(final Course course, ScoreStableford scoreStableford) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
 
-        LOG.debug("entering " + methodName);
-        LOG.debug("with course = " + course);
-        LOG.debug("with scoreStableford = " + scoreStableford);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with course = {}", course);
+        LOG.debug("with scoreStableford = {}", scoreStableford);
 
         final String query = """
             WITH
@@ -66,8 +68,8 @@ public class ReadParAndStrokeIndex implements Serializable {
                     i++;
                 }
 
-                LOG.debug("finishing " + methodName + " with par          = " + Arrays.toString(PAR));
-                LOG.debug("finishing " + methodName + " with Stroke Index = " + Arrays.toString(INDEX));
+                LOG.debug("finishing with par          = {}", Arrays.toString(PAR));
+                LOG.debug("finishing with Stroke Index = {}", Arrays.toString(INDEX));
 
                 scoreStableford.setParArray(PAR);
                 scoreStableford.setIndexArray(INDEX);
@@ -76,27 +78,24 @@ public class ReadParAndStrokeIndex implements Serializable {
             }
 
         } catch (SQLException e) {
-            String msg = "SQLException in " + methodName + ": " + e.getMessage()
-                    + ", SQLState = " + e.getSQLState()
-                    + ", ErrorCode = " + e.getErrorCode();
-            LOG.error(msg, e);
-            throw e;
-
+            handleSQLException(e, methodName);
+            return scoreStableford;
         } catch (Exception e) {
-            String msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg, e);
-            throw new SQLException(msg, e);
+            handleGenericException(e, methodName);
+            return scoreStableford;
         }
     } // end method
 
+    /*
     void main() throws SQLException {
         Course course = new Course();
         course.setIdcourse(681);
         ScoreStableford scoreStableford = new ScoreStableford();
 
         scoreStableford = new read.ReadParAndStrokeIndex().read(course, scoreStableford);
-        LOG.info("scoreStableford with arrays par and stroke index = " + scoreStableford);
+        LOG.info("scoreStableford with arrays par and stroke index = {}", scoreStableford);
     } // end main
+    */
 
 } // end class
 /*
@@ -116,9 +115,9 @@ public class ReadParAndStrokeIndex {
 
 public ScoreStableford read(Connection conn, final Course course, ScoreStableford scoreStableford) throws SQLException{
 final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
-    LOG.debug("with course  = " + course);
-    LOG.debug("with scoreStableford = " + scoreStableford); // output
+    LOG.debug("entering {}", methodName);
+    LOG.debug("with course  = {}", course);
+    LOG.debug("with scoreStableford = {}", scoreStableford); // output
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
@@ -159,8 +158,8 @@ SELECT * FROM selection1
    //         LOG.debug("i = " + i + " par = " +PAR[i] + " Stroke Index = " + INDEX[i]);
            i++;
         } // end while
-     LOG.debug("finishing " + methodName + " with par          = " + Arrays.toString(PAR) );
-     LOG.debug("finishing " + methodName + " with Stroke Index = " + Arrays.toString(INDEX) );
+     LOG.debug("finishing with par          = {}", Arrays.toString(PAR));
+     LOG.debug("finishing with Stroke Index = {}", Arrays.toString(INDEX));
      scoreStableford.setParArray(PAR);
      scoreStableford.setIndexArray(INDEX);
 return scoreStableford;
@@ -191,7 +190,7 @@ void main() throws SQLException, Exception{
   //  scoreStableford.setgsetGlobalArray([0][0]);
 
     scoreStableford = new read.ReadParAndStrokeIndex().read(conn, course, scoreStableford);
-       LOG.info("scoreStableford with arrays par and stroke index = " +  scoreStableford);
+       LOG.info("scoreStableford with arrays par and stroke index = {}",  scoreStableford);
     DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } // end class

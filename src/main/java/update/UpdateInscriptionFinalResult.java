@@ -26,9 +26,9 @@ public class UpdateInscriptionFinalResult implements Serializable {
 
     public boolean update(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for player = " + player);
-        LOG.debug("for round = " + round);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for player = {}", player);
+        LOG.debug("for round = {}", round);
 
         try (Connection conn = dao.getConnection()) {
 
@@ -49,7 +49,7 @@ public class UpdateInscriptionFinalResult implements Serializable {
                     }
                 }
             }
-            LOG.debug(methodName + " - totalPoints to update = " + totalPoints);
+            LOG.debug("totalPoints to update = {}", totalPoints);
 
             // 2. UPDATE player_has_round with totalPoints
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -92,13 +92,13 @@ public class UpdateInscriptionFinalResult implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();
         round.setIdround(487);
         boolean b = update(player, round);
-        LOG.debug("update result = " + b);
+        LOG.debug("update result = {}", b);
     } // end main
     */
 

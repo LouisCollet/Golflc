@@ -31,7 +31,7 @@ public class FindPassword implements Serializable {
      */
     public boolean passwordMatch(final EPlayerPassword epp) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - for EPlayerPassword = " + epp);
 
         final String query = """
@@ -78,7 +78,7 @@ public class FindPassword implements Serializable {
 /*
 void main() throws Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

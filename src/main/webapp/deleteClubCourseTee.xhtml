@@ -7,9 +7,9 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Delete Club,Course,Tee,Holes Page </ui:define>
+
+<ui:define name="title">Delete Club,Course,Tee,Holes Page</ui:define>
 <ui:define name="content">
-<script>document.addEventListener('DOMContentLoaded', hideMenuFullWidth);</script>
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
 <p:panel styleClass="login-card form-card" style="max-width:100%;">
 <f:facet name="header"><h1>#{msg['message.selectclub.delete']}</h1></f:facet>
@@ -23,90 +23,90 @@
              filteredValue="#{clubC.filteredCourses}"
              rowHover="true"
              styleClass="compact-table"
-             size="small" >
+             size="small">
 
-<p:column
-     headerText="#"
-     style="width:2%"
-     id="rrow">
-             #{row+1}
-</p:column>
+    <p:column headerText="#"
+              style="width:2%"
+              id="rrow">
+        #{row+1}
+    </p:column>
 
-	<p:column   id="colclubname"
-                    headerText="#{msg['club.name']}"
-                    width="20%"
-                    filterMatchMode="contains"
-                    filterBy="#{c.club.clubName}"
-                    groupRow="true"  >
-            #{c.club.clubName}  (#{c.club.idclub})
-	</p:column>
+    <p:column id="colclubname"
+              headerText="#{msg['club.name']}"
+              width="20%"
+              filterMatchMode="contains"
+              filterBy="#{c.club.clubName}"
+              groupRow="true">
+        #{c.club.clubName} (#{c.club.idclub})
+    </p:column>
 
-	<p:column headerText="#{msg['club.delete']}"
-                  style="width:10%"
-                  groupRow="true">
-            <p:commandButton
-                id="deleteClub"
-                update="messages"
-                action="#{clubC.deleteClub(c)}"
-                value="#{c.club.idclub}"
-                styleClass="ui-button-danger"
-                icon="pi pi-trash">
-                <p:confirm type="popup"
-                           header="#{msg['message.confirm.delete']}"
-                           message="#{msg['message.confirm.delete.club']} CLUB = #{c.club.idclub}"
-                           icon="pi pi-exclamation-triangle" />
-             </p:commandButton>
-            </p:column>
+    <p:column headerText="#{msg['club.delete']}"
+              style="width:10%"
+              groupRow="true">
+        <p:commandButton id="deleteClub"
+                         update="ClubCourseTee growl-msg"
+                         action="#{clubC.deleteClub(c)}"
+                         value="#{c.club.idclub}"
+                         styleClass="ui-button-danger"
+                         icon="pi pi-trash">
+            <p:confirm type="popup"
+                       header="#{msg['message.confirm.delete']}"
+                       message="#{msg['message.confirm.delete.club']} CLUB = #{c.club.idclub}"
+                       icon="pi pi-exclamation-triangle"/>
+        </p:commandButton>
+    </p:column>
 
-<p:column id="colcoursename"
-                  headerText="#{msg['course.name']}"
-                  style="width:20%"
-                  filterMatchMode="contains"
-                  filterBy="#{c.course.courseName}"
-                  groupRow="true">
-		#{c.course.courseName} (#{c.course.idcourse})
-	</p:column>
+    <p:column id="colcoursename"
+              headerText="#{msg['course.name']}"
+              style="width:20%"
+              filterMatchMode="contains"
+              filterBy="#{c.course.courseName}"
+              groupRow="true">
+        #{c.course.courseName} (#{c.course.idcourse})
+    </p:column>
 
-	<p:column headerText="#{msg['course.delete']}"
-                  style="width:10%"
-                  groupRow="true">
-            <p:commandButton
-                id="deleteCourse"
-                action="#{clubC.deleteCourse(c)}"
-                value="#{c.course.idcourse}"
-                styleClass="ui-button-danger"
-                icon="pi pi-trash">
-                <p:confirm type="popup"
-                           header="#{msg['message.confirm.delete']}"
-                           message="#{msg['message.confirm.delete.course']} COURSE = #{c.course.idcourse}"
-                           icon="pi pi-exclamation-triangle" />
-             </p:commandButton>
-	</p:column>
+    <p:column headerText="#{msg['course.delete']}"
+              style="width:10%"
+              groupRow="true">
+        <p:commandButton id="deleteCourse"
+                         update="ClubCourseTee growl-msg"
+                         action="#{clubC.deleteCourse(c)}"
+                         value="#{c.course.idcourse}"
+                         styleClass="ui-button-danger"
+                         icon="pi pi-trash">
+            <p:confirm type="popup"
+                       header="#{msg['message.confirm.delete']}"
+                       message="#{msg['message.confirm.delete.course']} COURSE = #{c.course.idcourse}"
+                       icon="pi pi-exclamation-triangle"/>
+        </p:commandButton>
+    </p:column>
 
-	<p:column headerText="#{msg['tee.delete']}"
-                  style="width:15%" >
-            <p:commandButton
-                id="deleteTee"
-                action="#{clubC.deleteTee(c)}"
-                value="#{c.tee.idtee} - #{c.tee.teeStart} - #{c.tee.teeGender} - #{c.tee.teeHolesPlayed}"
-                styleClass="ui-button-danger"
-                icon="pi pi-trash">
-                <p:confirm type="popup"
-                           header="#{msg['message.confirm.delete']}"
-                           message="#{msg['message.confirm.delete.tee']} TEE = #{c.tee.idtee}"
-                           icon="pi pi-exclamation-triangle" />
-             </p:commandButton>
-	</p:column>
+    <p:column headerText="#{msg['tee.delete']}"
+              style="width:15%">
+        <p:commandButton id="deleteTee"
+                         update="ClubCourseTee growl-msg"
+                         action="#{clubC.deleteTee(c)}"
+                         value="#{c.tee.idtee} - #{c.tee.teeStart} - #{c.tee.teeGender} - #{c.tee.teeHolesPlayed}"
+                         styleClass="ui-button-danger"
+                         icon="pi pi-trash"
+                         rendered="#{c.tee.idtee != null and c.tee.idtee gt 0}">
+            <p:confirm type="popup"
+                       header="#{msg['message.confirm.delete']}"
+                       message="#{msg['message.confirm.delete.tee']} TEE = #{c.tee.idtee}"
+                       icon="pi pi-exclamation-triangle"/>
+        </p:commandButton>
+    </p:column>
 
-<f:facet name="footer">
-    <p:commandButton value="#{msg['welcome.back']}"
+    <f:facet name="footer">
+        <p:commandButton value="#{msg['welcome.back']}"
                          id="buttonBack"
                          immediate="true"
                          ajax="false"
-                         action="welcome.xhtml?faces-redirect=true" />
-</f:facet>
+                         action="welcome.xhtml?faces-redirect=true"/>
+    </f:facet>
 </p:dataTable>
-   <ui:include src="include/include_confirmDialog.xhtml"/>
+
+<ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
 </p:panel>
 </div>

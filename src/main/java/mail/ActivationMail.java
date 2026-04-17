@@ -14,6 +14,7 @@ public class ActivationMail implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private mail.MailSender mailSender; // migrated 2026-02-26
+    @Inject private entite.Settings settings;
 
     public ActivationMail() { }
 
@@ -40,7 +41,7 @@ public class ActivationMail implements Serializable {
                 + " <br/> The GolfLC team"
                     ;
             String sujet = "Activate Your Account for GolfLC";
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathICS = null;
             // ✅ async — ne bloque plus le thread HTTP (fire-and-forget)
             mailSender.sendHtmlMailAsync(sujet, msg, to, pathICS, null, player.getPlayerLanguage());
@@ -49,7 +50,7 @@ public class ActivationMail implements Serializable {
     } // end method
     public Boolean sendMailActivationOK(Player player) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
             String href = utils.LCUtil.firstPartUrl() + "/login.xhtml";
             String sujet = "Succesfull activation to golflc !!!";
@@ -66,7 +67,7 @@ public class ActivationMail implements Serializable {
                 + "Click for connection</a>"
                 + " <br/> The GolfLC team"
                 ;
-                     String to = System.getenv("SMTP_USERNAME");
+                     String to = settings.getProperty("SMTP_USERNAME");
                      byte[] pathICS = null;
                      // ✅ async — ne bloque plus le thread HTTP (fire-and-forget)
                      mailSender.sendHtmlMailAsync(sujet, msg, to, pathICS, null, player.getPlayerLanguage());
@@ -77,7 +78,7 @@ public class ActivationMail implements Serializable {
     /*
     void main() throws IOException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(456783);
         player.setPlayerLastName("Muntingh");

@@ -25,9 +25,9 @@ public class ReadScoreArray implements Serializable {
 
     public int[] load(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - player = " + player.toString());
-        LOG.debug(methodName + " - round = " + round.toString());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("player = {}", player.toString());
+        LOG.debug("round = {}", round.toString());
 
         final String query = """
                 SELECT *
@@ -55,7 +55,7 @@ public class ReadScoreArray implements Serializable {
                         strokes[rowNum + 9] = rs.getInt("ScoreStroke");
                     }
                 }
-                LOG.debug(methodName + " - exiting with strokes[] = " + Arrays.toString(strokes));
+                LOG.debug("exiting with strokes[] = {}", Arrays.toString(strokes));
                 return strokes;
             }
 
@@ -71,12 +71,12 @@ public class ReadScoreArray implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Player player = new Player(); player.setIdplayer(324713);
         // Round round = new Round(); round.setIdround(676);
         // int[] i = new ReadScoreArray().load(player, round);
-        // LOG.debug("result main = " + Arrays.toString(i));
+        // LOG.debug("result main = {}", Arrays.toString(i));
     } // end main
     */
 

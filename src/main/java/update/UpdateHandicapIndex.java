@@ -28,8 +28,8 @@ public class UpdateHandicapIndex implements Serializable {
 
     public boolean update(final HandicapIndex handicapIndex) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" for handicapIndex = " + handicapIndex);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" for handicapIndex = {}", handicapIndex);
 
         final String query = """
                 UPDATE handicap_index
@@ -77,7 +77,7 @@ public class UpdateHandicapIndex implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         HandicapIndex index = new HandicapIndex();
         index.setHandicapId(26);
         index.setHandicapWHS(java.math.BigDecimal.valueOf(2.3));
@@ -85,7 +85,7 @@ public class UpdateHandicapIndex implements Serializable {
         index.setHandicapExceptionalScoreReduction((short) -3);
         index.setHandicapSoftHardCap("capM");
         boolean b = new update.UpdateHandicapIndex().update(index);
-        LOG.debug("from main, result = " + b);
+        LOG.debug("from main, result = {}", b);
     } // end main
     */
 

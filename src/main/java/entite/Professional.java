@@ -1,21 +1,18 @@
 package entite;
 
+import enumeration.WorkingDay;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
-// import jakarta.inject.Named;  // migrated 2026-02-24
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import utils.LCUtil;
-
-// @Named("pro")  // migrated 2026-02-24
-// @RequestScoped  // migrated 2026-02-24
+import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Professional implements Serializable{
-    
 
 @NotNull(message="{unavailable.startdate.notnull}")
     private LocalDateTime proStartDate;
@@ -25,13 +22,14 @@ public class Professional implements Serializable{
 @NotNull(message="{player.id.notnull}")
     private Integer proPlayerId;
 
-//@NotNull(message="Bean validation : the Club ID must be completed")
-//  private Integer idclub;
-
 @NotNull(message="{professional.amount.notnull}")
     private Double proAmount;
 private Integer proId;
 private Integer proClubId;
+/** Bitmask: Mon=1 Tue=2 Wed=4 Thu=8 Fri=16 Sat=32 Sun=64 — default 127 = all days */
+// private int proWorkDays = 127; // defautl = tous les jours travaillés
+@Min(value = 1, message = "{professional.workdays.min}")
+private int proWorkDays = 0; // defaut = aucun jour travaillé
 public Professional(){ // constructor
  //  LOG.debug("constructor Professional executed !");
     } // end constructor
@@ -88,28 +86,46 @@ public Professional(){ // constructor
     public void setProAmount(Double proAmount) {
         this.proAmount = proAmount;
     }
-/* migré 25-01-2026
-    public static Professional map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        try{
-            Professional pro = new Professional();
-            // besoin proid ?
-            pro.setProId(rs.getInt("ProId"));
-            pro.setProClubId(rs.getInt("ProClubId"));
-            pro.setProStartDate(rs.getTimestamp("ProClubStartDate").toLocalDateTime());
-            pro.setProEndDate(rs.getTimestamp("ProClubEndDate").toLocalDateTime());
-            pro.setProPlayerId(rs.getInt("ProPlayerId"));
-            pro.setProAmount(rs.getDouble("ProAmount")); // new 06-06-2021
-    //           LOG.debug("Professional event returned from map = " + pro);
-            return pro;
-        }catch(Exception e){
-            String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;
-        } } //end method
-    
-    */
+
+    public int getProWorkDays() {
+        return proWorkDays;
+    }
+
+    public void setProWorkDays(int proWorkDays) {
+        this.proWorkDays = proWorkDays;
+    }
+
+@Size(min = 1, message = "{professional.workdays.min}")
+public List<String> getSelectedDays() {
+    EnumSet<WorkingDay> days = WorkingDay.fromMask(proWorkDays);
+    return days.stream()
+               .map(WorkingDay::name)
+               .collect(Collectors.toList());
+}
+
+public void setSelectedDays(List<String> days) {
+    if (days == null || days.isEmpty()) {
+        this.proWorkDays = 0;
+        return;
+    }
+    EnumSet<WorkingDay> enumDays = days.stream()
+            .map(WorkingDay::valueOf)
+            .collect(Collectors.toCollection(() -> EnumSet.noneOf(WorkingDay.class)));
+
+    this.proWorkDays = WorkingDay.toMask(enumDays);
+}
+    public WorkingDay[] getDays() {
+        return WorkingDay.values();
+}
+
+
+    /** Returns true if the pro works on the given DayOfWeek
+     * @param dow
+     * @return  */
+    public boolean isWorkingOn(java.time.DayOfWeek dow) {
+        return (proWorkDays & WorkingDay.from(dow).mask()) != 0;
+    }
+
  @Override
 public String toString(){
  try {
@@ -118,10 +134,14 @@ public String toString(){
             (NEW_LINE  + "FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase()
             + NEW_LINE + "<br>"  + "Pro Start Date : "   + this.proStartDate //.format(ZDF_TIME)
             + NEW_LINE + "<br>"  + "Pro End Date : "   + this.proEndDate //.format(ZDF_TIME)
-            + NEW_LINE + "<br>"  + "Pro Id: "   + this.proId
-            + NEW_LINE + "<br>"  + "Pro Id player : " + this.proPlayerId
-            + NEW_LINE + "<br>"  + "Pro Id club : " + this.proClubId
+            +"<br>"  + "Pro Id: "   + this.proId
+            +"<br>"  + "Pro Id player : " + this.proPlayerId
+            +"<br>"  + "Pro Id club : " + this.proClubId
             + NEW_LINE + "<br>"  + "Pro prix lesson : " + this.proAmount
+            + NEW_LINE + "<br>"  + "Pro work days (bitmask) : " + this.proWorkDays
+            + NEW_LINE + "<br>" + WorkingDay.printWorkingDays(this.proWorkDays) // added 08-04-2026 by LC
+            + NEW_LINE + "<br>" + WorkingDay.printWorkingDaysLine(this.proWorkDays) // added 08-04-2026 by LC
+          //  + getWorkingDaysLine
             );
         } catch (Exception ex) {
            LOG.error("Exception in Professional to String" + ex);

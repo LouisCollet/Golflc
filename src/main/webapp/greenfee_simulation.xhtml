@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">#{msg['menu.simulation.greenfee']}</ui:define>
+
+<ui:define name="content">
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card" style="width:100%; max-width:900px;">
+
+    <f:facet name="header">
+        <h2 style="margin:0;">
+            <i class="pi pi-calculator" style="margin-right:0.5rem;"/>
+            #{msg['menu.simulation.greenfee']}
+        </h2>
+    </f:facet>
+
+    <h:form id="form_sim">
+
+        <!-- ── FORMULAIRE ──────────────────────────────────────────────── -->
+        <p:panelGrid columns="2" layout="flex" columnClasses="col1Flex, col2Flex"
+                     style="margin-bottom:1rem;">
+
+            <h:outputText value="#{msg['club.name']} :"/>
+            <p:selectOneMenu id="simClub" value="#{simC.simClubId}" required="true">
+                <f:selectItem itemLabel="-- #{msg['message.selectclub']} --" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{simC.clubsForSim}"
+                               var="cl"
+                               itemLabel="#{cl.clubName} (#{cl.idclub})"
+                               itemValue="#{cl.idclub}"/>
+                <f:validateBean disabled="true"/>
+                <p:ajax event="change" update="simCourse" process="@this"/>
+            </p:selectOneMenu>
+
+            <h:outputText value="#{msg['course.name']} :"/>
+            <p:selectOneMenu id="simCourse" value="#{simC.simCourseId}" required="true">
+                <f:selectItem itemLabel="-- #{msg['message.selectcourse']} --" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{simC.coursesForSim}"
+                               var="c"
+                               itemLabel="#{c.courseName} (#{c.idcourse})"
+                               itemValue="#{c.idcourse}"/>
+                <f:validateBean disabled="true"/>
+                <p:ajax event="change" update="simResult" process="@form" listener="#{simC.simulate()}"/>
+            </p:selectOneMenu>
+
+            <h:outputText value="#{msg['tarif.holes']} :"/>
+            <p:selectOneButton value="#{simC.simHoles}">
+                <f:selectItems value="#{simC.holesItems}"/>
+                <f:validateBean disabled="true"/>
+                <p:ajax event="change" update="simResult" process="@form" listener="#{simC.simulate()}"/>
+            </p:selectOneButton>
+
+            <h:panelGroup layout="block">
+                <h:outputText value="#{msg['round.date']} "/>
+                <i class="pi pi-calendar"/>
+            </h:panelGroup>
+            <p:datePicker id="simDate"
+                          value="#{simC.simDateTime}"
+                          pattern="dd/MM/yyyy HH:mm"
+                          showTime="true"
+                          hourFormat="24"
+                          showIcon="true"
+                          lang="#{languageC.locale}"
+                          locale="#{languageC.locale}"
+                          required="true">
+                <f:validateBean disabled="true"/>
+                <p:ajax event="dateSelect" update="simResult" process="@form" listener="#{simC.simulate()}"/>
+            </p:datePicker>
+
+            <h:panelGroup layout="block">
+                <h:outputText value="#{msg['player.birth']} "/>
+                <i class="pi pi-user" style="margin-left:0.25rem;"/>
+                <span style="font-size:0.8rem; color:var(--text-color-secondary);"> (#{msg['tarif.simulation.dob.hint']})</span>
+            </h:panelGroup>
+            <p:datePicker id="simBirthDate"
+                          value="#{simC.simBirthDate}"
+                          pattern="dd/MM/yyyy"
+                          showTime="false"
+                          showIcon="true"
+                          lang="#{languageC.locale}"
+                          locale="#{languageC.locale}">
+                <f:convertDateTime pattern="dd/MM/yyyy" type="localDate"/>
+                <f:validateBean disabled="true"/>
+                <p:ajax event="dateSelect" update="simResult" process="@form" listener="#{simC.simulate()}"/>
+            </p:datePicker>
+
+        </p:panelGrid>
+
+        <div class="btn-group" style="margin-bottom:1rem;">
+            <p:commandButton value="#{msg['tarif.simulation.run']}"
+                             icon="pi pi-play"
+                             action="#{simC.simulate()}"
+                             update="simResult"
+                             process="@form"
+                             styleClass="p-button-success"/>
+            <p:commandButton value="#{msg['button.back']}"
+                             icon="pi pi-arrow-left"
+                             immediate="true"
+                             ajax="false"
+                             action="menu.xhtml?faces-redirect=true"
+                             styleClass="p-button-secondary"/>
+        </div>
+
+        <!-- ── RÉSULTAT ────────────────────────────────────────────────── -->
+        <h:panelGroup id="simResult" layout="block">
+
+            <!-- Erreur -->
+            <p:message for="simCourse"/>
+            <p:message for="simDate"/>
+
+            <h:panelGroup rendered="#{not empty simC.simError}" layout="block">
+                <p:messages severity="error">
+                    <p:message for="form_sim" rendered="false"/>
+                </p:messages>
+                <p:tag value="#{simC.simError}"
+                       severity="danger"
+                       icon="pi pi-exclamation-triangle"
+                       style="margin-top:1rem; font-size:1rem;"/>
+            </h:panelGroup>
+
+            <!-- Résultat OK -->
+            <h:panelGroup rendered="#{simC.simTarifGreenfee != null}" layout="block">
+
+                <p:divider layout="horizontal" type="solid"/>
+
+                <!-- Contexte -->
+                <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1rem;">
+                    <p:tag value="#{appContext.club.clubName}"          icon="pi pi-building" severity="primary"/>
+                    <p:tag value="#{simC.simTarifGreenfee.currency}"    icon="pi pi-euro"     severity="info"/>
+                    <p:tag value="#{simC.simHoles}T"                    icon="pi pi-circle"   severity="info"/>
+                    <p:tag value="Season : #{simC.simTarifGreenfee.season}" icon="pi pi-sun"  severity="warning"
+                           rendered="#{not empty simC.simTarifGreenfee.season}"/>
+                    <p:tag value="Type : #{simC.simTarifGreenfee.greenfeeType}" icon="pi pi-tag" severity="success"/>
+                </div>
+
+                <!-- TYPE BA — Basic -->
+                <h:panelGroup rendered="#{simC.simTarifGreenfee.greenfeeType eq 'BA'}" layout="block">
+                    <p:dataTable value="#{simC.simTarifGreenfee.basicList}" var="item"
+                                 styleClass="compact-table">
+                        <f:facet name="header">#{msg['title.greenfee.choice']}</f:facet>
+                        <p:column headerText="#{msg['tarif.members.item']}"><h:outputText value="#{item.item}"/></p:column>
+                        <p:column headerText="#{msg['tarif.season']}"><h:outputText value="#{item.season}"/></p:column>
+                        <p:column headerText="#{msg['tarif.members.price']}" style="font-weight:bold;">
+                            <h:outputText value="#{item.price}"/> #{simC.simTarifGreenfee.currency}
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+                <!-- TYPE HO — Hours -->
+                <h:panelGroup rendered="#{simC.simTarifGreenfee.greenfeeType eq 'HO'}" layout="block">
+                    <p:dataTable value="#{simC.simTarifGreenfee.teeTimeChoosen}" var="item"
+                                 styleClass="compact-table">
+                        <f:facet name="header">#{msg['title.greenfee.choice']}</f:facet>
+                        <p:column headerText="#{msg['tarif.hours.start']}"><h:outputText value="#{item.startTime}"/></p:column>
+                        <p:column headerText="#{msg['tarif.hours.end']}"><h:outputText value="#{item.endTime}"/></p:column>
+                        <p:column headerText="#{msg['tarif.season']}"><h:outputText value="#{item.season}"/></p:column>
+                        <p:column headerText="#{msg['tarif.item']}"><h:outputText value="#{item.item}"/></p:column>
+                        <p:column headerText="#{msg['tarif.members.price']}" style="font-weight:bold;">
+                            <h:outputText value="#{item.price}"/> #{simC.simTarifGreenfee.currency}
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+                <!-- TYPE DA — Days -->
+                <h:panelGroup rendered="#{simC.simTarifGreenfee.greenfeeType eq 'DA'}" layout="block">
+                    <p:dataTable value="#{simC.simTarifGreenfee.dayChoosen}" var="item"
+                                 styleClass="compact-table">
+                        <f:facet name="header">#{msg['title.greenfee.choice']}</f:facet>
+                        <p:column headerText="#{msg['tarif.category']}"><h:outputText value="#{item.category}"/></p:column>
+                        <p:column headerText="#{msg['tarif.day']}"><h:outputText value="#{item.dayType}"/></p:column>
+                        <p:column headerText="#{msg['tarif.season']}"><h:outputText value="#{item.season}"/></p:column>
+                        <p:column headerText="#{msg['tarif.members.price']}" style="font-weight:bold;">
+                            <h:outputText value="#{item.price}"/> #{simC.simTarifGreenfee.currency}
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+                <!-- TYPE EQ — Equipments -->
+                <h:panelGroup rendered="#{simC.simTarifGreenfee.greenfeeType eq 'EQ'}" layout="block">
+                    <p:dataTable value="#{simC.simTarifGreenfee.equipmentChoosen}" var="item"
+                                 styleClass="compact-table">
+                        <f:facet name="header">#{msg['title.greenfee.choice']}</f:facet>
+                        <p:column headerText="#{msg['tarif.members.item']}"><h:outputText value="#{item.item}"/></p:column>
+                        <p:column headerText="#{msg['tarif.season']}"><h:outputText value="#{item.season}"/></p:column>
+                        <p:column headerText="#{msg['tarif.members.price']}" style="font-weight:bold;">
+                            <h:outputText value="#{item.price}"/> #{simC.simTarifGreenfee.currency}
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+                <!-- Équipements optionnels — filtrés par slot HO, généraux pour BA/DA, masqués pour EQ -->
+                <h:panelGroup rendered="#{simC.simTarifGreenfee.greenfeeType ne 'EQ'
+                                         and not empty simC.simTarifGreenfee.equipmentChoosen}" layout="block"
+                              style="margin-top:1rem;">
+                    <p:divider layout="horizontal" type="dashed"/>
+                    <p:dataTable value="#{simC.simTarifGreenfee.equipmentChoosen}" var="equip"
+                                 styleClass="compact-table">
+                        <f:facet name="header">
+                            <i class="pi pi-briefcase" style="margin-right:0.4rem;"/>
+                            #{msg['tarif.equipments']}
+                        </f:facet>
+                        <p:column headerText="#{msg['tarif.members.item']}">
+                            <h:outputText value="#{equip.item}"/>
+                        </p:column>
+                        <p:column headerText="#{msg['tarif.season']}">
+                            <h:outputText value="#{equip.season}"/>
+                        </p:column>
+                        <p:column headerText="#{msg['tarif.members.price']}" style="font-weight:bold;">
+                            <h:outputText value="#{equip.price}"/> #{simC.simTarifGreenfee.currency}
+                        </p:column>
+                    </p:dataTable>
+                </h:panelGroup>
+
+                <!-- Bouton visualisation tarif brut -->
+                <div style="margin-top:1rem;">
+                    <p:commandButton value="#{msg['tarif.visualisation']}"
+                                     icon="pi pi-eye"
+                                     process="@none"
+                                     update="simVizDialog"
+                                     oncomplete="PF('simVizDialog').show();"
+                                     styleClass="p-button-info p-button-outlined"/>
+                </div>
+
+            </h:panelGroup>
+
+        </h:panelGroup>
+
+        <!-- Dialog visualisation tarif brut -->
+        <p:dialog id="simVizDialog" widgetVar="simVizDialog"
+                  header="#{simC.simTarifGreenfee.greenfeeType} — #{simC.simHoles}T"
+                  modal="false" resizable="true" draggable="true"
+                  style="width:60vw; max-width:800px;">
+            <div style="overflow-y:auto; max-height:75vh;">
+            <ui:include src="include/include_tarif_greenfee_detail.xhtml">
+                <ui:param name="tarif" value="#{simC.simTarifGreenfee}"/>
+            </ui:include>
+            </div>
+            <f:facet name="footer">
+                <p:commandButton value="#{msg['button.close']}"
+                                 icon="pi pi-times"
+                                 onclick="PF('simVizDialog').hide(); return false;"
+                                 styleClass="p-button-secondary"/>
+            </f:facet>
+        </p:dialog>
+
+    </h:form>
+
+</p:panel>
+</div>
+
+</ui:define>
+</ui:composition>

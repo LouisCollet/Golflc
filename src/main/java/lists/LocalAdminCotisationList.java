@@ -5,7 +5,7 @@ import entite.Cotisation;
 import entite.Player;
 import entite.composite.ECourseList;
 import static interfaces.Log.LOG;
-import jakarta.faces.view.ViewScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -19,7 +19,7 @@ import rowmappers.PlayerRowMapper;
 import rowmappers.RowMapper;
 
 @Named("LACotisation")
-@ViewScoped // nécessaire !! pour faire le total dans local_administrator_cotisations.xhtml
+@ApplicationScoped // migrated from @ViewScoped 2026-03-22
 public class LocalAdminCotisationList implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,7 +29,7 @@ public class LocalAdminCotisationList implements Serializable {
     @Inject
     private PlayerManager playerManager;
 
-    // ✅ Cache d'instance — @ViewScoped resets per view automatically
+    // ✅ Cache d'instance — @ApplicationScoped singleton, invalidated via CacheInvalidator
     private List<ECourseList> liste = null;
 
     public LocalAdminCotisationList() { }
@@ -49,7 +49,7 @@ public class LocalAdminCotisationList implements Serializable {
             FROM payments_cotisation, club, player
             WHERE club.ClubLocalAdmin = ?
               AND payments_cotisation.CotisationIdClub = club.idclub
-              AND player.idplayer = cotisationIdPlayer
+              AND player.idplayer = payments_cotisation.CotisationIdPlayer
             ORDER BY cotisationIdclub, playerlastname
             """;
 
@@ -72,6 +72,16 @@ public class LocalAdminCotisationList implements Serializable {
         return liste;
     } // end method
 
+    public double getTotalForClub(int clubId) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (liste == null) return 0.0;
+        return liste.stream()
+                .filter(o -> o.getClub().getIdclub() == clubId)
+                .mapToDouble(o -> o.getCotisation().map(Cotisation::getPrice).orElse(0.0))
+                .sum();
+    } // end method
+
     // ✅ Getters/setters d'instance
     public List<ECourseList> getListe()              { return liste; }
     public void setListe(List<ECourseList> liste)    { this.liste = liste; }
@@ -79,7 +89,7 @@ public class LocalAdminCotisationList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -87,7 +97,7 @@ public class LocalAdminCotisationList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324715);
         player = playerManager.readPlayer(player.getIdplayer());

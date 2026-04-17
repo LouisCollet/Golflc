@@ -9,7 +9,6 @@ import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
-import java.sql.Connection;
 import static utils.LCUtil.myDoubleRound;
 
 /**
@@ -35,7 +34,7 @@ public class CalcStablefordScoreDifferential implements Serializable {
     public double calc(final ScoreStableford score, final Player player, final Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
  try{
-       LOG.debug(" ...entering " + methodName);
+       LOG.debug("entering " + methodName);
        LOG.debug(" with score = " + score);
   //     LOG.debug(" with round = " + round.toString());
       LoggingUserController.write(CLASSNAME + "." + methodName,"i");   
@@ -246,7 +245,7 @@ public class CalcStablefordScoreDifferential implements Serializable {
   
  } catch (Exception e) {
       handleGenericException(e, methodName);
-      return 999;
+      return 0.0;
   }
  } // end method
 
@@ -255,7 +254,7 @@ public class CalcStablefordScoreDifferential implements Serializable {
 /*
 void main() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

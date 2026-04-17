@@ -11,7 +11,9 @@
 
 <ui:define name="title">Tarif Subscription Wizard Page</ui:define>
 <ui:define name="content">
-<div class="card">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+    <f:facet name="header"><h1>Tarif Subscription</h1></f:facet>
 <h:form id="tarif_subscription_wizard" enctype="application/x-www-form-urlencoded">
 
 <p:wizard id="wizardTarifSubscription"
@@ -23,7 +25,7 @@
 
     <!-- =================== TAB 1: MONTHLY =================== -->
     <p:tab id="MonthlyTab"
-           title="Monthly"
+           title="📅 Monthly"
            titletip="Define monthly subscription tarif">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
@@ -102,7 +104,7 @@
 
     <!-- =================== TAB 2: YEARLY =================== -->
     <p:tab id="YearlyTab"
-           title="Yearly"
+           title="🗓️ Yearly"
            titletip="Define yearly subscription tarif">
         <p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
@@ -181,9 +183,9 @@
 
     <!-- =================== TAB 3: CONFIRMATION =================== -->
     <p:tab id="ConfirmationTab"
-           title="Confirm"
+           title="✅ Confirm"
            titletip="Review and manage tarif subscriptions">
-        <p:panel styleClass="tarif-step-panel">
+        <p:panel styleClass="tarif-step-panel tarif-step-panel-wide">
             <f:facet name="header">
                 <h:outputText value="Confirmation"/>
             </f:facet>
@@ -219,12 +221,12 @@
             </p:dataTable>
 
             <f:facet name="footer">
+              <div class="btn-group">
                 <p:commandButton value="Create"
                                  id="btnCreate"
                                  icon="pi pi-check"
                                  action="#{memC.confirmTarifSubscription()}"
-                                 styleClass="p-button-success ui-button-flat"
-                                 style="margin-right: 10px;"/>
+                                 styleClass="p-button-success ui-button-flat"/>
                 <p:commandButton value="#{msg['button.delete']} all"
                                  id="btnDeleteAll"
                                  icon="pi pi-trash"
@@ -233,6 +235,7 @@
                                  styleClass="p-button-danger">
                     <p:confirm icon="pi pi-exclamation-triangle"/>
                 </p:commandButton>
+              </div>
             </f:facet>
         </p:panel>
     </p:tab>
@@ -241,6 +244,7 @@
 
 <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
+</p:panel>
 </div>
 </ui:define>
 </ui:composition>

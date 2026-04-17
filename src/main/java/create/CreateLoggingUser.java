@@ -26,8 +26,8 @@ public class CreateLoggingUser implements Serializable {
 
     public boolean create(final LoggingUser logging) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with LoggingUser  = " + logging);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with LoggingUser  = {}", logging);
 
         try (Connection conn = dao.getConnection()) {
             final String query = utils.LCUtil.generateInsertQuery(conn, "logging_user");
@@ -63,14 +63,14 @@ public class CreateLoggingUser implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LoggingUser logging = new LoggingUser();
         logging.setLoggingIdPlayer(324713);
         logging.setLoggingIdRound(688);
         logging.setLoggingType("H");
         logging.setLoggingCalculations("these are the calculations for 324713, 388, Handicap");
         var v = new CreateLoggingUser().create(logging);
-        LOG.debug(" from main : LoggingUser = " + v);
+        LOG.debug(" from main : LoggingUser = {}", v);
     } // end main
     */
 

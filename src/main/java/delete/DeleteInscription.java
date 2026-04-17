@@ -28,17 +28,17 @@ public class DeleteInscription implements Serializable {
 
     public boolean delete(final Player player, final Round round, final Club club, final Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for player = " + player);
-        LOG.debug("for round = " + round);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for player = {}", player);
+        LOG.debug("for round = {}", round);
 
         int rows = findCountScore.find(player, round, "rows");
         if (rows == 99) {
-            LOG.error(methodName + " - fatal error in findCountScore");
+            LOG.error("fatal error in findCountScore");
             return false;
         }
         if (rows == 0) {
-            LOG.debug(methodName + " - OK, score not yet registered");
+            LOG.debug("OK, score not yet registered");
         } else {
             String msg = " -- score already registered: delete refused rows = " + rows;
             LOG.debug(msg);
@@ -59,7 +59,7 @@ public class DeleteInscription implements Serializable {
                 ps.setInt(2, round.getIdround());
                 LCUtil.logps(ps);
                 rowPhr = ps.executeUpdate();
-                LOG.debug(methodName + " - deleted inscription = " + rowPhr);
+                LOG.debug("deleted inscription = {}", rowPhr);
             }
 
             if (rowPhr == 0) {
@@ -88,7 +88,7 @@ public class DeleteInscription implements Serializable {
                 ps.setInt(1, player.getIdplayer());
                 ps.setInt(2, round.getIdround());
                 LCUtil.logps(ps);
-                LOG.debug(methodName + " - deleted PaymentGreenfee = " + ps.executeUpdate());
+                LOG.debug("deleted PaymentGreenfee = {}", ps.executeUpdate());
             }
 
             return true;
@@ -110,7 +110,7 @@ public class DeleteInscription implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324715);
         Round round = new Round();
@@ -118,7 +118,7 @@ public class DeleteInscription implements Serializable {
         Club club = new Club();
         Course course = new Course();
         boolean b = delete(player, round, club, course);
-        LOG.debug("delete result = " + b);
+        LOG.debug("delete result = {}", b);
     } // end main
     */
 

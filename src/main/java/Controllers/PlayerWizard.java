@@ -35,8 +35,8 @@ public class PlayerWizard implements Serializable {
     }
 
     public String onFlowProcess(FlowEvent event) {
-        LOG.debug("entering onFlowProcess with oldstep = " + event.getOldStep());
-        LOG.debug("entering onFlowProcess with newstep = " + event.getNewStep());
+        LOG.debug("entering onFlowProcess with oldstep = {}", event.getOldStep());
+        LOG.debug("entering onFlowProcess with newstep = {}", event.getNewStep());
         step = event.getNewStep();
         if (skip) {
             skip = false; //reset in case user goes back
@@ -48,14 +48,14 @@ public class PlayerWizard implements Serializable {
     }
     // ne fonctionne pas !!
   public void validateStep1(FacesContext context, UIComponent component, Object value) throws ValidatorException  {
-         LOG.debug("entering validateStep1  with FacesContext = " + context.toString());
-         LOG.debug("entering validateStep1  with YIComponent = " + component.toString());
-         LOG.debug("entering validateStep1  with Object = " + value.toString());
+         LOG.debug("entering validateStep1  with FacesContext = {}", context.toString());
+         LOG.debug("entering validateStep1  with YIComponent = {}", component.toString());
+         LOG.debug("entering validateStep1  with Object = {}", value.toString());
          boolean condition = false;
         if (condition) {
             throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_WARN, "Validation LC message", "Validation LC summary"));
         }else{
-            LOG.debug("entering validateStep1  in else = " + value.toString());
+            LOG.debug("entering validateStep1  in else = {}", value.toString());
          //   return true;
      }
     }

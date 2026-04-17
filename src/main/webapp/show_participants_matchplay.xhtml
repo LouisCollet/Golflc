@@ -93,7 +93,7 @@
                     </p:column>
                     <p:column>
                         <f:facet name="footer">
-                            <h:outputText value="#{calcMatchplayResult.getFinalResult().stream().map(o->o.getPlayer1().getResult()).sum()}"/>
+                            <h:outputText value="#{calcMatchplayResult.totalPlayer1Score}"/>
                         </f:facet>
                     </p:column>
                      <p:column colspan="1" style="text-align:right">
@@ -101,7 +101,7 @@
                     </p:column>
                     <p:column>
                         <f:facet name="footer">
-                            <h:outputText value="#{calcMatchplayResult.getFinalResult().stream().map(o->o.getPlayer2().getResult()).sum()}"/>
+                            <h:outputText value="#{calcMatchplayResult.totalPlayer2Score}"/>
                         </f:facet>
                     </p:column>
                 </p:row>

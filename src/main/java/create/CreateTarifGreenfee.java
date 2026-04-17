@@ -1,8 +1,5 @@
 package create;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Club;
 import entite.TarifGreenfee;
 import static exceptions.LCException.handleGenericException;
@@ -14,10 +11,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -25,17 +18,18 @@ public class CreateTarifGreenfee implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject private dao.GenericDAO dao;
+    @Inject private dao.GenericDAO                    dao;
+    @Inject private find.FindTarifGreenfeeData        findTarifGreenfeeData;
+    @Inject private update.UpdateTarifGreenfee    updateJson;
+    @Inject private lists.CourseListForClub           courseListForClub;
 
     public CreateTarifGreenfee() { }
 
     public boolean create(final TarifGreenfee tarif, final Club club) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with tarif = " + tarif);
-        LOG.debug("for club = " + club);
-
-        LOG.debug("currency code = " + club.getAddress().getCountry().getCurrency());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with tarif = {}", tarif);
+        LOG.debug("for club = {}", club);
 
         if (tarif.getDatesSeasonsList().isEmpty()) {
             String msgerr = LCUtil.prepareMessageBean("create.greenfee.season.empty");
@@ -43,12 +37,13 @@ public class CreateTarifGreenfee implements Serializable {
             LCUtil.showMessageFatal(msgerr);
             return false;
         }
-        if (tarif.getEquipmentsList().isEmpty()) {
-            String msgerr = LCUtil.prepareMessageBean("create.greenfee.equipments.empty");
-            LOG.error(msgerr);
-            LCUtil.showMessageFatal(msgerr);
-            return false;
-        }
+        // removed 2026-04-13 — equipments list can legitimately be empty (BA/DA/HO tarif without equipment options)
+        // if (tarif.getEquipmentsList().isEmpty()) {
+        //     String msgerr = LCUtil.prepareMessageBean("create.greenfee.equipments.empty");
+        //     LOG.error(msgerr);
+        //     LCUtil.showMessageFatal(msgerr);
+        //     return false;
+        // }
         if (tarif.getTwilightList().isEmpty() && tarif.isTwilightReady()) {
             String msgerr = LCUtil.prepareMessageBean("create.greenfee.twilight.empty");
             LOG.error(msgerr);
@@ -66,67 +61,59 @@ public class CreateTarifGreenfee implements Serializable {
             throw new Exception(msgerr);
         }
 
-        LocalDateTime lddeb = tarif.getDatesSeasonsList().get(0).getStartDate().truncatedTo(ChronoUnit.DAYS);
-        int j = tarif.getDatesSeasonsList().size() - 1;
-        LocalDateTime ldfin = tarif.getDatesSeasonsList().get(j).getStartDate().truncatedTo(ChronoUnit.DAYS);
-        LOG.debug("ldfin format LocalDateTime = " + ldfin);
+        java.util.List<entite.Course> courses = java.util.Collections.emptyList();
+        try { courses = courseListForClub.list(club); } catch (Exception ignored) { }
 
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
-        om.configure(SerializationFeature.INDENT_OUTPUT, true);
-        String json = om.writeValueAsString(tarif);
-        LOG.debug("tarif converted in json format = " + json);
-
-        try (Connection conn = dao.getConnection()) {
-            final String query = LCUtil.generateInsertQuery(conn, "tarif_greenfee");
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.getWarnings();
-                ps.setNull(1, java.sql.Types.INTEGER);  // autoincrement
-                ps.setInt(2, lddeb.getYear());
-                ps.setTimestamp(3, Timestamp.valueOf(lddeb));
-                ps.setTimestamp(4, Timestamp.valueOf(ldfin));
-                ps.setInt(5, tarif.getTarifCourseId());
-                ps.setString(6, json);
-                ps.setString(7, club.getAddress().getCountry().getCurrency());
-                LOG.debug("currency code = " + club.getAddress().getCountry().getCurrency());
-                ps.setTimestamp(8, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
-                int row = ps.executeUpdate();
-                LOG.debug("row  = " + row);
-                if (row != 0) {
-                    String msg = "Tarif Created for Course = " + tarif.getTarifCourseId()
-                            + "<br/>tarif = " + tarif;
-                    LOG.debug(msg);
-                    LCUtil.showMessageInfo(msg);
-                    return true;
-                } else {
-                    String msg = "<br/>NOT NOT Successful TarifGreenfee inserted for " + tarif.getTarifCourseId();
-                    LOG.error(msg);
-                    LCUtil.showMessageFatal(msg);
-                    return false;
+        boolean allOk = true;
+        for (Integer courseId : tarif.getTarifCourseId()) {
+            for (Integer holes : tarif.getTarifHolesList()) {
+                try (Connection conn = dao.getConnection()) {
+                    final String query = LCUtil.generateInsertQuery(conn, "tarif_greenfee");
+                    try (PreparedStatement ps = conn.prepareStatement(query)) {
+                        sql.preparedstatement.psCreateTarifGreenfee.mapCreate(ps, tarif, club, courseId, holes);
+                        int row = ps.executeUpdate();
+                        LOG.debug("row = {} for courseId={}, holes={}", row, courseId, holes);
+                        if (row != 0) {
+                            String courseName = courses.stream()
+                                    .filter(c -> courseId.equals(c.getIdcourse()))
+                                    .map(entite.Course::getCourseName)
+                                    .findFirst().orElse("");
+                            String label = courseName.isEmpty() ? String.valueOf(courseId)
+                                    : courseName + " (" + courseId + ")";
+                            String msg = "Tarif Created for Course = " + label + " — " + holes + "T";
+                            LOG.debug(msg);
+                            LCUtil.showMessageInfo(msg);
+                        } else {
+                            String msg = "NOT Successful TarifGreenfee inserted for courseId=" + courseId + ", holes=" + holes;
+                            LOG.error(msg);
+                            LCUtil.showMessageFatal(msg);
+                            allOk = false;
+                        }
+                    }
+                } catch (SQLException e) {
+                    // Duplicate key (courseId + year + holes) → fall back to UPDATE
+                    if (e.getErrorCode() == 1062) {
+                        LOG.warn("duplicate key for courseId={}, holes={} — falling back to UPDATE", courseId, holes);
+                        entite.TarifGreenfee existing = findTarifGreenfeeData.findSilent(courseId, holes);
+                        if (existing != null) {
+                            tarif.setTarifId(existing.getTarifId());
+                            if (!updateJson.update(tarif)) {
+                                allOk = false;
+                            }
+                        } else {
+                            LOG.error("duplicate key but existing tarif not found — courseId={}, holes={}", courseId, holes);
+                            allOk = false;
+                        }
+                    } else {
+                        handleSQLException(e, methodName);
+                        allOk = false;
+                    }
+                } catch (Exception e) {
+                    handleGenericException(e, methodName);
+                    allOk = false;
                 }
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, methodName);
-            return false;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return false;
-        }
+            }   // end for holes
+        }   // end for courseId
+        return allOk;
     } // end method
-
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        TarifGreenfee tarif = new TarifGreenfee();
-        Club club = new Club();
-        club.setIdclub(151);
-        club = new read.ReadClub().read(club);
-        LOG.debug("club = " + club);
-        boolean b = new CreateTarifGreenfee().create(tarif, club);
-        LOG.debug("result = " + b);
-    } // end main
-    */
-
 } // end class

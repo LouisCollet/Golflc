@@ -19,7 +19,7 @@ public class DeleteActivation implements Serializable {
 
     public Boolean delete(String uuid) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
                 DELETE
@@ -29,10 +29,10 @@ public class DeleteActivation implements Serializable {
 
         int rows = dao.execute(query, uuid);
         if (rows == 1) {
-            LOG.debug(methodName + " - Successful Delete 1 row of table Activation");
+            LOG.debug("Successful Delete 1 row of table Activation");
             return true;
         } else {
-            LOG.debug(methodName + " - NOT successful Delete rows = " + rows);
+            LOG.debug("NOT successful Delete rows = {}", rows);
             return false;
         }
     } // end method
@@ -41,10 +41,10 @@ public class DeleteActivation implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         String uuid = "rrrrrrrrrrr";
         boolean b = new DeleteActivation().delete(uuid);
-        LOG.debug("from main - resultat deleteActivation = " + b);
+        LOG.debug("from main - resultat deleteActivation = {}", b);
     } // end main
     */
 

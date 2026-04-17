@@ -27,32 +27,38 @@ public class LessonProList implements Serializable {
 
     public List<Lesson> list(final Professional professional) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with Professional " + professional);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("proPlayerId = {}", professional.getProPlayerId());
 
         if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            LOG.debug("returning cached list size = {}", liste.size());
             return liste;
         }
 
+        // Join through professional → all clubs for this pro player + club name + paid status via FK
+        // Double join on player for pro name and student name
         final String query = """
-                SELECT *
+                SELECT lesson.*, club.ClubName,
+                       CONCAT(pro_p.PlayerFirstName, ' ', pro_p.PlayerLastName)     AS ProName,
+                       CONCAT(stu_p.PlayerFirstName, ' ', stu_p.PlayerLastName)     AS StudentName
                 FROM lesson
-                WHERE lesson.EventProId = ?
-                AND EventStartDate > ?
+                JOIN professional ON lesson.EventProId       = professional.ProId
+                JOIN club         ON professional.ProClubId  = club.idclub
+                JOIN player AS pro_p ON professional.ProPlayerId = pro_p.idplayer
+                LEFT JOIN player AS stu_p ON lesson.EventPlayerId = stu_p.idplayer
+                WHERE professional.ProPlayerId = ?
+                  AND lesson.EventStartDate > ?
                 """;
 
         // dimanche de la 2e semaine qui precede — semaine courante + semaine precedente
-        Timestamp cutoff = Timestamp.valueOf(
-                LocalDate.now().minusWeeks(2).with(DayOfWeek.SUNDAY).atStartOfDay());
+        Timestamp cutoff = Timestamp.valueOf(LocalDate.now().minusWeeks(2).with(DayOfWeek.SUNDAY).atStartOfDay());
 
-        liste = dao.queryList(query, rs -> Lesson.map(rs),
-                professional.getProId(), cutoff);
+        liste = dao.queryList(query, new rowmappers.LessonRowMapper(), professional.getProPlayerId(), cutoff);
 
         if (liste.isEmpty()) {
-            LOG.warn(methodName + " - empty result list");
+            LOG.warn("empty result list for proPlayerId={}", professional.getProPlayerId());
         } else {
-            LOG.debug(methodName + " - list size = " + liste.size());
+            LOG.debug("list size = {}", liste.size());
         }
         return liste;
     } // end method
@@ -62,7 +68,7 @@ public class LessonProList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -70,7 +76,7 @@ public class LessonProList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Professional pro = new Professional();
         pro.setProId(1);
         List<Lesson> schedules = list(pro);

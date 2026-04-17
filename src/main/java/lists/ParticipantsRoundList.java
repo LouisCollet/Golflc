@@ -45,7 +45,7 @@ public class ParticipantsRoundList implements Serializable {
 
     public List<ECourseList> list(final Round round) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with Round = " + round);
         LOG.debug("with holes = " + round.getRoundHoles());
 
@@ -127,7 +127,7 @@ public class ParticipantsRoundList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -135,7 +135,7 @@ public class ParticipantsRoundList implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Round round = new Round();
         round.setIdround(767); // doit avoir 18 trous
         round.setRoundHoles(18);

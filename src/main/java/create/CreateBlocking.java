@@ -25,8 +25,8 @@ public class CreateBlocking implements Serializable, interfaces.Log {
 
     public boolean create(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for player = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for player = {}", player);
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "blocking");
@@ -60,11 +60,11 @@ public class CreateBlocking implements Serializable, interfaces.Log {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         boolean b = new create.CreateBlocking().create(player);
-        LOG.debug("from main, CreateBlocking = " + b);
+        LOG.debug("from main, CreateBlocking = {}", b);
     } // end main
     */
 

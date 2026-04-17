@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TAB 1 : Periods — club, course, holes, saison, dates début/fin -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces">
+
+    <p:tab id="PeriodsTab"
+           title="📅 Periods (#{memC.tarifGreenfee.datesSeasonsList.size()})"
+           titletip="Define tarif periods (seasons)">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.period.tarif']}</h1>
+                <p:badge value="#{memC.tarifGreenfee.datesSeasonsList.size()}" severity="info"/>
+            </f:facet>
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <p:outputLabel for="@next" value="#{msg['club.name']} :"/>
+                <p:selectOneMenu id="wizardClub" value="#{memC.wizardClubId}"
+                                 filter="true" filterMatchMode="contains">
+                    <f:selectItem itemLabel="-- #{msg['message.selectclub']} --" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{memC.clubsForWizard}"
+                                   var="cl"
+                                   itemLabel="#{cl.clubName} (#{cl.idclub})"
+                                   itemValue="#{cl.idclub}"/>
+                    <f:validateBean disabled="true"/>
+                    <p:ajax event="change"
+                            update="wizardCourse tarif_greenfee_wizard:summaryBar"
+                            process="@this"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel for="@next" value="#{msg['tarif.course']} :"/>
+                <p:selectCheckboxMenu id="wizardCourse"
+                                      value="#{memC.tarifGreenfee.tarifCourseId}"
+                                      required="true"
+                                      requiredMessage="#{msg['tarif.course.required']}"
+                                      disabled="#{memC.tarifGreenfee.tarifId != null}"
+                                      label="-- Select courses --"
+                                      filter="true"
+                                      filterMatchMode="contains">
+                    <f:converter converterId="jakarta.faces.Integer"/>
+                    <f:selectItems value="#{memC.coursesForWizard}"
+                                   var="c"
+                                   itemLabel="#{c.courseName} (#{c.idcourse})"
+                                   itemValue="#{c.idcourse}"/>
+                    <f:validateBean disabled="true"/>
+                    <p:ajax event="change"
+                            update="tarif_greenfee_wizard:summaryBar"
+                            process="@this"/>
+                </p:selectCheckboxMenu>
+
+                <p:outputLabel for="@next" value="#{msg['tarif.holes']} :"/>
+                <p:selectCheckboxMenu id="wizardHoles"
+                                      value="#{memC.tarifGreenfee.tarifHolesList}"
+                                      label="Holes">
+                    <f:selectItems value="#{memC.holesItems}"/>
+                    <f:validateBean disabled="true"/>
+                    <p:ajax event="change"
+                            update="tarif_greenfee_wizard:summaryBar"
+                            process="@this"/>
+                </p:selectCheckboxMenu>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.season']} "/>
+                    <i class="pi pi-cloud"/>
+                    <i class="pi pi-sun"/>
+                    #{memC.tarifGreenfee.datesSeasonsList.size()}
+                </h:panelGroup>
+                <p:inputText id="seasonPeriod"
+                             value="#{memC.tarifGreenfee.season}"
+                             size="20"
+                             placeholder="ex: H, summer, S1"
+                             title="#{msg['tarif.season.hint']}">
+                    <f:validateBean disabled="true"/>
+                </p:inputText>
+
+                <p:outputLabel for="@next" value="#{msg['tarif.period.start']} :"/>
+                <p:datePicker id="periodStart"
+                              value="#{memC.tarifGreenfee.startDate}"
+                              size="10"
+                              lang="#{languageC.locale}"
+                              label="#{msg['tarif.period.start']}"
+                              locale="#{languageC.locale}"
+                              pattern="dd/MM/yyyy HH:mm"
+                              yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(1)}"
+                              readonlyInput="false"
+                              showTime="false"
+                              monthNavigator="true"
+                              yearNavigator="true"
+                              showIcon="true"
+                              showButtonBar="true">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+
+                <p:outputLabel for="@next" value="#{msg['tarif.period.end']} :"/>
+                <p:datePicker id="periodEnd"
+                              value="#{memC.tarifGreenfee.endDate}"
+                              size="10"
+                              label="#{msg['tarif.period.end']}"
+                              locale="#{languageC.locale}"
+                              pattern="dd/MM/yyyy HH:mm"
+                              monthNavigator="true"
+                              yearNavigator="true"
+                              yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(1)}"
+                              readonlyInput="false"
+                              showTime="false"
+                              showIcon="true"
+                              showButtonBar="true">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+            </p:panelGrid>
+            
+            <p:dataTable id="periodsTable"
+                         value="#{memC.tarifGreenfee.datesSeasonsList}"
+                         var="ps"
+                         rendered="#{not empty memC.tarifGreenfee.datesSeasonsList}"
+                         styleClass="compact-table mt-2">
+                <p:column headerText="#{msg['tarif.season']}" style="width:20%">
+                    <h:outputText value="#{ps.season}"/>
+                </p:column>
+                <p:column headerText="#{msg['tarif.period.start']}" style="width:35%">
+                    <h:outputText value="#{ps.startDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd-MM-yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg['tarif.period.end']}" style="width:35%">
+                    <h:outputText value="#{ps.endDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd-MM-yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="width:10%">
+                    <p:commandButton icon="pi pi-pencil"
+                                     styleClass="p-button-warning p-button-text p-button-sm"
+                                     action="#{memC.editPeriodItem(ps)}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     process="@this"
+                                     title="Edit this period"/>
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{memC.removePeriodItem(ps)}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     process="@this"
+                                     rendered="#{memC.editingPeriod == null}"/>
+                </p:column>
+            </p:dataTable>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <!-- Mode ajout -->
+                    <p:commandButton value="#{msg['tarif.period.create']}"
+                                     id="btnAddPeriod"
+                                     icon="pi pi-plus"
+                                     rendered="#{memC.editingPeriod == null}"
+                                     action="#{memC.inputTarifGreenfeeWizard('PE')}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     styleClass="p-button-outlined"/>
+                    <!-- Mode édition -->
+                    <p:commandButton value="#{msg['button.save']}"
+                                     icon="pi pi-check"
+                                     rendered="#{memC.editingPeriod != null}"
+                                     action="#{memC.updatePeriodItem()}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     styleClass="p-button-success p-button-outlined"/>
+                    <p:commandButton value="#{msg['button.cancel']}"
+                                     icon="pi pi-times"
+                                     rendered="#{memC.editingPeriod != null}"
+                                     action="#{memC.cancelEditPeriod()}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     process="@this"
+                                     styleClass="p-button-secondary p-button-outlined"/>
+                    <p:commandButton value="#{msg['tarif.visualisation']}"
+                                     icon="pi pi-eye"
+                                     process="@this"
+                                     action="#{memC.resetTarifGreenfeeDB()}"
+                                     update="vizDialog"
+                                     oncomplete="PF('vizDialog').show();"
+                                     styleClass="p-button-info p-button-outlined"/>
+                </div>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</ui:composition>

@@ -8,67 +8,112 @@
       xmlns:p="primefaces"
       xmlns:my="jakarta.faces.composite/components"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Competition Menu </ui:define>
+
+<ui:define name="title">Competition Admin Menu</ui:define>
 <ui:define name="content">
 
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
 <p:panel styleClass="login-card form-card" style="max-width:100%;">
-<f:facet name="header"><h1>Competition Menu</h1></f:facet>
+    <f:facet name="header"><h1>Competition Admin Menu</h1></f:facet>
 
-<h:form id="competition_menu" >
+<h:form id="competition_menu">
 
- <my:summaryCompetition
-    competition="#{roundC.competition.competitionDescription}"
-    tee="#{clubC.tee}"
-    droppedPlayers="#{playerC.player.droppedPlayers}" />
+    <!-- Summary composite -->
+    <my:summaryCompetition
+        competition="#{roundC.competition.competitionDescription}"
+        tee="#{clubC.tee}"
+        droppedPlayers="#{playerC.player.droppedPlayers}" />
 
-<p:panelMenu id="panel_menu"
-             style="font-size: 1.5rem;">
-    <p:submenu
-            id="submenu"
-            expanded="true"
-            label="Choisissez l'action à exécuter"
-            icon="pi pi-check"
-            style="font-size: 1.5rem;"
-       >
-         <p:menuitem value ="Competition Status = #{roundC.competition.competitionDescription.competitionStatus}"
-                     icon="pi pi-calendar"
-                     disabled="true"/>
-         <p:menuitem value ="#{msg['competition.inscriptionslist']}"
-                     action="#{roundC.beforeListInscriptionsCompetition(roundC.competition.competitionDescription)}"
-                     style="font-size: 1.0rem;"
-                     title="#{msg['tooltip.inscriptions.on']}"
-                     icon="pi pi-calendar" />
-         <p:menuitem value="#{msg['competition.startinglist.provisional']}"
-                     action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription,'PROVISIONAL')}"
-                     style="font-size: 1.0rem;"
-                     title="#{msg['tooltip.inscriptions.provisional']}"
-                     icon="pi pi-sun"/>
-         <p:menuitem value="#{msg['competition.startinglist.final']}"
-                     rendered="#{roundC.competition.competitionDescription.competitionStatus eq '1'}"
-                     action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription, 'FINAL')}"
-                     title="#{msg['tooltip.inscriptions.final']}"
-                     icon="pi pi-sun"/>
-         <p:menuitem value ="#{msg['competition.rounds']}"
-                     rendered="#{roundC.competition.competitionDescription.competitionStatus eq '1'}"
-                     action="#{roundC.createRoundsCompetition(roundC.competition.competitionDescription)}"
-                     style="font-size: 1.0rem;"
-                     title="tooltip.competition.score"
-                     icon="pi pi-clock" />
-         <p:menuitem value ="#{msg['competition.score']}"
-                     action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription,'PROVISIONAL')}"
-                     rendered="#{roundC.competition.competitionDescription.competitionStatus eq '3'}"
-                     title="tooltip.competition.score"
-                     style="font-size: 1.0rem;"
-                     icon="pi pi-clock" />
-         <p:menuitem value ="#{msg['competition.classment.calculate']}"
-                     action="#{roundC.listParticipantsStablefordCompetition(roundC.competition.competitionDescription)}"
-                     rendered="#{roundC.competition.competitionDescription.competitionStatus eq '4'}"
-                     title="tooltip.competition.score"
-                     style="font-size: 1.0rem;"
-                     icon="pi pi-clock" />
-        </p:submenu>
-</p:panelMenu>
+    <p:divider layout="horizontal" type="solid"/>
+
+    <!-- Status badge -->
+    <div style="margin-bottom:1rem;">
+        <span class="info-label">Status :</span>
+        <p:badge value="#{roundC.competition.competitionDescription.competitionStatus}"
+                 severity="#{roundC.competition.competitionDescription.competitionStatus eq '0' ? 'info' :
+                            roundC.competition.competitionDescription.competitionStatus eq '1' ? 'success' :
+                            roundC.competition.competitionDescription.competitionStatus eq '3' ? 'warning' : 'danger'}" />
+    </div>
+
+    <!-- Cards menu -->
+    <div class="account-menu">
+
+        <!-- Section : Inscriptions -->
+        <div class="account-menu-section-label">
+            <i class="pi pi-users"/> #{msg['competition.inscription']}
+        </div>
+        <div class="account-menu-grid">
+            <p:commandLink id="btnInscriptionsList"
+                           styleClass="account-card"
+                           action="#{roundC.beforeListInscriptionsCompetition(roundC.competition.competitionDescription)}">
+                <i class="account-card-icon pi pi-list"/>
+                <span class="account-card-label">#{msg['competition.inscriptionslist']}</span>
+                <span class="account-card-desc">#{msg['tooltip.inscriptions.on']}</span>
+            </p:commandLink>
+        </div>
+
+        <!-- Section : Starting Lists -->
+        <div class="account-menu-section-label">
+            <i class="pi pi-flag"/> #{msg['competition.startinglist']}
+        </div>
+        <div class="account-menu-grid">
+            <p:commandLink id="btnProvisional"
+                           styleClass="account-card"
+                           action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription, 'PROVISIONAL')}">
+                <i class="account-card-icon pi pi-sun"/>
+                <span class="account-card-label">#{msg['competition.startinglist.provisional']}</span>
+                <span class="account-card-desc">#{msg['tooltip.inscriptions.provisional']}</span>
+            </p:commandLink>
+
+            <p:commandLink id="btnFinal"
+                           styleClass="account-card"
+                           rendered="#{roundC.competition.competitionDescription.competitionStatus eq '1'}"
+                           action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription, 'FINAL')}">
+                <i class="account-card-icon pi pi-check-circle"/>
+                <span class="account-card-label">#{msg['competition.startinglist.final']}</span>
+                <span class="account-card-desc">#{msg['tooltip.inscriptions.final']}</span>
+            </p:commandLink>
+        </div>
+
+        <!-- Section : Rounds & Scoring (conditional) -->
+        <h:panelGroup layout="block"
+                      rendered="#{roundC.competition.competitionDescription.competitionStatus eq '1'
+                              or roundC.competition.competitionDescription.competitionStatus eq '3'
+                              or roundC.competition.competitionDescription.competitionStatus eq '4'}">
+            <div class="account-menu-section-label">
+                <i class="pi pi-chart-bar"/> #{msg['competition.score']}
+            </div>
+            <div class="account-menu-grid">
+                <p:commandLink id="btnCreateRounds"
+                               styleClass="account-card"
+                               rendered="#{roundC.competition.competitionDescription.competitionStatus eq '1'}"
+                               action="#{roundC.createRoundsCompetition(roundC.competition.competitionDescription)}">
+                    <i class="account-card-icon pi pi-clock"/>
+                    <span class="account-card-label">#{msg['competition.rounds']}</span>
+                    <span class="account-card-desc">Create competition rounds</span>
+                </p:commandLink>
+
+                <p:commandLink id="btnScore"
+                               styleClass="account-card"
+                               rendered="#{roundC.competition.competitionDescription.competitionStatus eq '3'}"
+                               action="#{roundC.beforeListStartCompetition(roundC.competition.competitionDescription, 'PROVISIONAL')}">
+                    <i class="account-card-icon pi pi-pencil"/>
+                    <span class="account-card-label">#{msg['competition.score']}</span>
+                    <span class="account-card-desc">Enter competition scores</span>
+                </p:commandLink>
+
+                <p:commandLink id="btnClassment"
+                               styleClass="account-card"
+                               rendered="#{roundC.competition.competitionDescription.competitionStatus eq '4'}"
+                               action="#{roundC.listParticipantsStablefordCompetition(roundC.competition.competitionDescription)}">
+                    <i class="account-card-icon pi pi-trophy"/>
+                    <span class="account-card-label">#{msg['competition.classment.calculate']}</span>
+                    <span class="account-card-desc">Calculate final ranking</span>
+                </p:commandLink>
+            </div>
+        </h:panelGroup>
+
+    </div>
 
 </h:form>
 

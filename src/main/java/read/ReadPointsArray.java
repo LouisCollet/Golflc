@@ -27,10 +27,10 @@ public class ReadPointsArray implements Serializable {
 
     public int[][] load(int[][] points, final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - for round = " + round);
-        LOG.debug(methodName + " - player = " + player.getIdplayer());
-        LOG.debug(methodName + " - points = " + Arrays.deepToString(points));
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for round = {}", round);
+        LOG.debug("player = {}", player.getIdplayer());
+        LOG.debug("points = {}", Arrays.deepToString(points));
 
         final String query =
                 "SELECT * "
@@ -71,9 +71,8 @@ public class ReadPointsArray implements Serializable {
                     points[rowNum][4] = 0;
                     points[rowNum][5] = 0;
                 }
-                LOG.debug(methodName + " - Hole" + TAB + "Par" + TAB + "Index" + TAB +
-                        "Stroke" + TAB + "Extra" + TAB + "Points");
-                LOG.debug(methodName + NEW_LINE + "Array completed = " + Arrays.deepToString(points));
+                LOG.debug("Hole{}Par{}Index{}Stroke{}Extra{}Points", TAB, TAB, TAB, TAB, TAB);
+                LOG.debug("Array completed = {}", Arrays.deepToString(points));
                 return points;
             }
 
@@ -89,14 +88,14 @@ public class ReadPointsArray implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // @Inject private manager.PlayerManager playerManager;
         // Player player = new Player(); player.setIdplayer(324713);
         // player = playerManager.readPlayer(player.getIdplayer());
         // Round round = new Round(); round.setIdround(484);
         // int[][] a = load(points, player, round);
-        // LOG.debug("array points filled = " + Arrays.deepToString(a));
+        // LOG.debug("array points filled = {}", Arrays.deepToString(a));
     } // end main
     */
 

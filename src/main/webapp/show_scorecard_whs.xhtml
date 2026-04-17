@@ -189,7 +189,7 @@
           width="3%" >
     <h:outputText value="#{c.par}"
                   style="text-align:center;font-size: 1.5em;font-weight: bold"/>
-    <f:facet name="footer">#{msg['score.par']} = #{roundC.ScoreCardList4().stream().map(o->o.getPar()).sum()}</f:facet>
+    <f:facet name="footer">#{msg['score.par']} = #{roundC.totalPar}</f:facet>
 </p:column>
 
 <p:column headerText="#{msg['hole.index']}"
@@ -205,23 +205,21 @@
       <h:outputText value="**"   rendered="#{c.extra eq 2}"/>
       <h:outputText value="***"  rendered="#{c.extra eq 3}"/>
       <h:outputText value="****" rendered="#{c.extra eq 4}"/>
-      <f:facet name="footer">#{msg['score.extra']} = #{roundC.ScoreCardList4().stream().map(o->o.getExtra()).sum()}</f:facet>
+      <f:facet name="footer">#{msg['score.extra']} = #{roundC.totalExtra}</f:facet>
 </p:column>
 
-<c:set var="TotalDistanceOut" value="#{roundC.ScoreCardList4().stream().limit(9).map(o->o.getDistances()).sum()}"/>
-<c:set var="TotalDistance" value="#{roundC.ScoreCardList4().stream().map(o->o.getDistances()).sum()}"/>
 <c:set var="break" value='&lt;BR/&gt;'/>
 <p:column headerText="#{msg['hole.distance']}"
           width="4%" >
       <f:facet name="footer">
            <h:outputText value="#{msg['hole.distance']} = "/>
-          <h:outputText value="#{TotalDistance}">
+          <h:outputText value="#{roundC.totalDistance}">
               <f:convertNumber pattern="#.###" />
           </h:outputText>
       </f:facet>
           <h:outputText value="#{c.distances}" />
           <h:outputText
-                value="#{break} OUT = #{TotalDistanceOut}"
+                value="#{break} OUT = #{roundC.totalDistanceOut}"
                 escape="false"
                 rendered="#{row+1 == 9}"
                 style="font-size: 1.5em;" >
@@ -229,7 +227,7 @@
            </h:outputText>
 
          <h:outputText
-            value="#{break} IN = #{TotalDistance - TotalDistanceOut}"
+            value="#{break} IN = #{roundC.inDistance}"
             escape="false"
             rendered="#{row+1 == 18}"
             style="font-size: 1.5em;" >
@@ -277,18 +275,18 @@
             title="Eagle Title"
             style="width:60%"
             rendered="#{c.strokes == c.par - 2}" />
-        <f:facet name="footer">#{msg['score.gross']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes()).sum()}</f:facet>
+        <f:facet name="footer">#{msg['score.gross']} = #{roundC.totalStrokes}</f:facet>
 </p:column>
 
  <p:column headerText="#{msg['score.net']}"
           width="3%">
-     <h:outputText value="#{c.strokes - c.extra}"
+     <h:outputText value="#{c.netStrokes}"
                    rendered="#{c.strokes != 0 and c.strokes != 10}"
                    style="white-space: nowrap;" />
      <h:outputText value=" "
                    rendered="#{c.strokes == 10}"
                    style="white-space: nowrap;" />
-     <f:facet name="footer">#{msg['score.net']} = #{roundC.ScoreCardList4().stream().map(o->o.getStrokes() - o.getExtra()).sum()}</f:facet>
+     <f:facet name="footer">#{msg['score.net']} = #{roundC.totalNetStrokes}</f:facet>
 </p:column>
 
  <p:column headerText="#{msg['score.points']}"
@@ -299,21 +297,19 @@
             rendered="#{c.points != 0}"
             style="font-size: 2em; font-weight:bold"/>
 
-   <c:set var="TotalPointsOut" value="#{roundC.ScoreCardList4().stream().limit(9).map(o->o.getPoints()).sum()}"/>
         <h:outputText
             escape="false"
-            value="#{break} Points OUT = #{TotalPointsOut}"
+            value="#{break} Points OUT = #{roundC.totalPointsOut}"
             rendered="#{row+1 == 9}"
             style="font-size: 1.5rem" />
 
-    <c:set var="TotalPoints" value="#{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()}"/>
         <h:outputText
-            value="#{break} Points IN = #{TotalPoints - TotalPointsOut}"
+            value="#{break} Points IN = #{roundC.inPoints}"
             escape="false"
             rendered="#{row+1 == 18}"
             style="font-size: 1.5em;" />
 
-        <f:facet name="footer">#{msg['score.points']} = #{roundC.ScoreCardList4().stream().map(o->o.getPoints()).sum()}</f:facet>
+        <f:facet name="footer">#{msg['score.points']} = #{roundC.totalPoints}</f:facet>
 </p:column>
 
 </p:dataTable>
@@ -325,8 +321,10 @@
 <h:form id="form_scorecard_noprint">
  <p:panel id="panelExportPF"
          header="Primefaces Solutions">
+ <div class="btn-group">
    <p:commandButton id="btnExportPdf"
-                    value="Export as PDF">
+                    value="Export PDF"
+                    icon="pi pi-file-pdf">
         <p:dataExporter id="exporterPF"
                         type="pdf"
                         target="form_show_scorecard:scorecard1,form_show_scorecard:scorecard2a,
@@ -334,11 +332,12 @@
                         fileName="ScoreCardDetails"
                         pageOnly="false"
                         encoding="windows-1252" />
- </p:commandButton>
+   </p:commandButton>
 
-       <p:commandButton icon="pi pi-file-excel"
-                    value="Export as Pdf (PDF) with preprocess"
-                    >
+   <p:commandButton id="btnExportPdfPre"
+                    icon="pi pi-file-pdf"
+                    value="Export PDF (preprocess)"
+                    styleClass="ui-button-secondary">
        <p:dataExporter id="dataexporterPDF"
                        type="pdf"
                        target="form_show_scorecard:scorecard1,form_show_scorecard:scorecard2a,
@@ -346,39 +345,42 @@
                        encoding="windows-1252"
                        options="#{utilsC.pdfOpt}"
                        preProcessor="#{utilsC.preProcessPDF}"
-                       fileName="ScoreCard"
-                       />
+                       fileName="ScoreCard"/>
    </p:commandButton>
 
-    <p:commandButton id="btnExportExcel"
-                     value="Export as Excel">
+   <p:commandButton id="btnExportExcel"
+                    value="Export Excel"
+                    icon="pi pi-file-excel"
+                    styleClass="ui-button-success">
         <p:dataExporter id="exporterXLS"
                         type="xls"
                         target="form_show_scorecard:scorecard1,form_show_scorecard:scorecard2a,
                                 form_show_scorecard:scorecard2b,form_show_scorecard:table4"
                         fileName="ScoreCardMessagesAndDetails"
                         pageOnly="false"
-                        encoding="UTF8"
-                />
- </p:commandButton>
+                        encoding="UTF8"/>
+   </p:commandButton>
 
- <p:commandButton id="btnPrint1"
-                  value="#{msg['button.print']}"
-                  type="button"
-                  icon="pi pi-print">
+   <p:commandButton id="btnPrint1"
+                    value="#{msg['button.print']}"
+                    type="button"
+                    icon="pi pi-print"
+                    styleClass="ui-button-info">
         <p:printer id="printerForm"
                    configuration="title: 'Print Score Card', timeout: 1000"
-                   target="form_show_scorecard" />
- </p:commandButton>
+                   target="form_show_scorecard"/>
+   </p:commandButton>
 
-  <p:commandButton id="btnPrint2"
-                   value="#{msg['button.print']} Detail only"
-                   type="button"
-                   icon="pi pi-print" >
+   <p:commandButton id="btnPrint2"
+                    value="#{msg['button.print']} Detail"
+                    type="button"
+                    icon="pi pi-print"
+                    styleClass="ui-button-warning">
         <p:printer id="printerDetailOnly"
                    configuration="title: 'Print Detail Score Card', timeout: 1000"
-                   target="form_show_scorecard:table4" />
- </p:commandButton>
+                   target="form_show_scorecard:table4"/>
+   </p:commandButton>
+ </div>
 
  </p:panel>
 

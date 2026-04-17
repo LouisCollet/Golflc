@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Club;
 import entite.OpenWeatherOnecall;
 import static interfaces.Log.LOG;
@@ -20,12 +21,22 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import net.fortuna.ical4j.util.MapTimeZoneCache;
 // import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
+import jakarta.inject.Inject;
 import static utils.LCUtil.showMessageFatal;
 
 //genrated by https://www.jsonschema2pojo.org/
 // faire une classe principale et mettre les inner class en static !!!
 @Named
-public class FindOpenWeatherOnecall{ // not used !!
+public class FindOpenWeatherOnecall { // not used !!
+
+    @Inject private entite.Settings settings;
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
   /*/  https://openweathermap.org/api/one-call-api
     &exclude={part}  exclude	optional	
     By using this parameter you can exclude some parts of the weather data from the API response.
@@ -56,7 +67,7 @@ private final HttpClient httpClient = HttpClient.newBuilder()
         String string_url = "https://api.openweathermap.org/data/2.5/onecall"
    ///    to be modified       + "?lat="  + club.getClubLatitude().toString()
    ///           + "&lon="  + club.getClubLongitude().toString()
-              + "&appid=" + System.getenv("OPENWEATHER_API_KEY")
+              + "&appid=" + settings.getProperty("OPENWEATHER_API_KEY")
               + "&units=metric"
               + "&lang=" + language
       ;
@@ -77,8 +88,7 @@ private final HttpClient httpClient = HttpClient.newBuilder()
         LOG.debug("Response Code : " + httpConnection.getResponseCode());
      inputStream = httpConnection.getInputStream();
     */       
-     ObjectMapper om = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT); //pretty print
-     OpenWeatherOnecall weather = om.readValue(response.body(), OpenWeatherOnecall.class);
+     OpenWeatherOnecall weather = OBJECT_MAPPER.readValue(response.body(), OpenWeatherOnecall.class);
   
      StringBuilder sb = new StringBuilder ();
       LOG.debug("size daily : " + weather.getDaily().size()); // 8 jours
@@ -139,7 +149,7 @@ sb.append("Infos météos")
 */
   //  pour vérifier le contenu
   //  String json = om.writeValueAsString(openWeather);
-     String json = om.writeValueAsString(weather);
+     String json = OBJECT_MAPPER.writeValueAsString(weather);
 	LOG.debug("json = \n" + json);
  return sb.toString();
   }catch(JsonGenerationException e) {
@@ -181,7 +191,7 @@ sb.append("Infos météos")
 /*
  void main() throws IOException {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // requires CDI container — cannot run standalone
  } // end main
 */

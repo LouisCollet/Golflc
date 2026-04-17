@@ -294,6 +294,10 @@ public class Score{
         this.strokes = strokes;
     }
 
+    public int getNetStrokes() {
+        return strokes - extra;
+    } // end method
+
         public int getDistances() {
             return distances;
         }
@@ -341,6 +345,10 @@ public class Score{
  }
 } //end method
     } // end inner class Score
+    public boolean isHasPoints() {
+        return scoreList.stream().mapToInt(Score::getPoints).sum() > 0;
+    } // end method
+
     public ArrayList<Score> getScoreList() {
         return scoreList;
     }

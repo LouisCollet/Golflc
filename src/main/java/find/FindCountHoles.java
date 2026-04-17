@@ -23,7 +23,7 @@ public class FindCountHoles implements Serializable {
 
     public int find(final Tee tee) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("tee = " + tee);
 
         final String query = """
@@ -55,7 +55,7 @@ public class FindCountHoles implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Tee tee = new Tee();
         tee.setIdtee(118);
         int i = new FindCountHoles().find(tee);

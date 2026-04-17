@@ -19,6 +19,7 @@ public class ProfessionalRowMapper extends AbstractRowMapper<Professional> {
             pro.setProEndDate(getTimestamp(rs,"ProClubEndDate").toLocalDateTime());
             pro.setProPlayerId(getInteger(rs,"ProPlayerId"));
             pro.setProAmount(getDouble(rs,"ProAmount"));
+            pro.setProWorkDays(rs.getInt("ProWorkDays"));
     //           LOG.debug("Professional event returned from map = " + pro);
             return pro;
 

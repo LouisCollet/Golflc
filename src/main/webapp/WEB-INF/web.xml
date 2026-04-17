@@ -30,13 +30,18 @@ https://github.com/eclipse-ee4j/mojarra/blob/4.1/README.md
         <welcome-file>/login.xhtml</welcome-file>
 </welcome-file-list>
 
-<!-- session timeout — 20 minutes — security audit 2026-03-18 -->
+<!-- session timeout — 40 minutes — doubled 2026-03-30 -->
 <session-config>
-        <session-timeout>20</session-timeout>
+        <session-timeout>40</session-timeout>
         <cookie-config>
             <http-only>true</http-only>
             <!-- ⚠️ set to true in production (requires HTTPS on WildFly) -->
             <secure>false</secure>
+            <!-- security audit 2026-03-19 — prevent CSRF via cross-site cookie sending -->
+            <attribute>
+                <attribute-name>SameSite</attribute-name>
+                <attribute-value>Lax</attribute-value>
+            </attribute>
         </cookie-config>
         <tracking-mode>COOKIE</tracking-mode>
 </session-config>

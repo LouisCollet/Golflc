@@ -28,8 +28,16 @@ import static utils.LCUtil.showMessageFatal;
 @Path("smartcard") // was tutorial
 @DenyAll // security audit 2026-03-09 — test/demo endpoints disabled in production
 public class SmartcardBelgium{
-    
-    
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        OBJECT_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
+        OBJECT_MAPPER.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+    }
+
   public SmartcardBelgium(){ // constructor
     //   LOG.debug("this is the constructor of smartcardBelgium");
 }  
@@ -95,11 +103,6 @@ try{
   */  
 public Player initClient() {
 try{
-    ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());  // new 18/01/2019 traiter LocalDateTime format 
-    	om.configure(SerializationFeature.INDENT_OUTPUT,true);//Set pretty printing of json
-        om.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);  // fonctionne ??
-   
     Creditcard creditcard = new Creditcard();
     creditcard.setCreditCardHolder("LOUIS COLLET");
     creditcard.setCommunication("creditcard communication");
@@ -107,7 +110,7 @@ try{
     creditcard.setCreditcardNumber("1111222233334444");
     creditcard.setTotalPrice(35.0);
     creditcard.setTypePayment("LESSON");
-    String json = om.writeValueAsString(creditcard); //. prend 3 fields ??
+    String json = OBJECT_MAPPER.writeValueAsString(creditcard); //. prend 3 fields ??
        LOG.debug("creditcard data converted in json format = " + NEW_LINE + json);
     
         
@@ -181,10 +184,7 @@ try{
    // response entity = [{"description":"computer","price":2500},{"description":"chair","price":100},{"description":"table","price":200}]
          // c'est déjà un json !!
 //   ObjectMapper om = new ObjectMapper();
-   om.configure(SerializationFeature.INDENT_OUTPUT,true);//Set pretty printing of json
-   om.registerModule(new JavaTimeModule());  // new 18/01/2019 traiter LocalDateTime format 
-   
-   Player player = om.readValue(json, entite.Player.class);
+   Player player = OBJECT_MAPPER.readValue(json, entite.Player.class);
    LOG.debug("player.getPlayerBirthDate() = " + player.getPlayerBirthDate());
    //Convereted to Type as array
  //  Player[] player = om.readValue(json, Player[].class );

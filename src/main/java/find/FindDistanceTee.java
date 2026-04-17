@@ -25,7 +25,7 @@ public class FindDistanceTee implements Serializable {
 
     public int find(Course course, Tee tee) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("tee = " + tee);
 
         final String query = """
@@ -78,7 +78,7 @@ public class FindDistanceTee implements Serializable {
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

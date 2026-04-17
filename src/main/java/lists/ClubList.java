@@ -26,7 +26,7 @@ public class ClubList implements Serializable {
      */
     public List<Club> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         // ✅ EARLY RETURN - Guard clause
         if (liste != null) {
@@ -35,7 +35,7 @@ public class ClubList implements Serializable {
         }
 
         // Chargement depuis la base de données
-        LOG.debug("... entering " + methodName);
+        LOG.debug("entering " + methodName);
 
         final String query = """
             SELECT *
@@ -61,7 +61,7 @@ public class ClubList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method

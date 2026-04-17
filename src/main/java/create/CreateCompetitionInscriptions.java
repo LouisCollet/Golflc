@@ -36,28 +36,28 @@ public class CreateCompetitionInscriptions implements Serializable {
 
     public boolean create(final CompetitionDescription cd) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - with description = " + cd);
-        LOG.debug(methodName + " - competition Status = " + cd.getCompetitionStatus());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with description = {}", cd);
+        LOG.debug("competition Status = {}", cd.getCompetitionStatus());
         try {
             if (!cd.getCompetitionStatus().equals("2")) {
-                LOG.debug(methodName + " - wrong Status, must be = 2 but is = " + cd.getCompetitionStatus());
+                LOG.debug("wrong Status, must be = 2 but is = {}", cd.getCompetitionStatus());
                 return false;
             }
 
             List<ECompetition> li = competitionRoundsList.list(cd);
             for (int i = 0; i < li.size(); i++) {
-                LOG.debug("flightnumber = " + li.get(i).competitionData().getCmpDataFlightNumber());
-                LOG.debug(" - StartTime = " + li.get(i).competitionData().getCmpDataFlightStart());
-                LOG.debug(" - roundId = " + li.get(i).competitionData().getCmpDataRoundId());
-                LOG.debug(" - TeeStart = " + li.get(i).competitionData().getCmpDataTeeStart());
+                LOG.debug("flightnumber = {}", li.get(i).competitionData().getCmpDataFlightNumber());
+                LOG.debug(" - StartTime = {}", li.get(i).competitionData().getCmpDataFlightStart());
+                LOG.debug(" - roundId = {}", li.get(i).competitionData().getCmpDataRoundId());
+                LOG.debug(" - TeeStart = {}", li.get(i).competitionData().getCmpDataTeeStart());
             }
 
             for (int i = 0; i < li.size(); i++) {
                 var competition = li.get(i);
                 var data = li.get(i).competitionData();
-                LOG.debug("round ID = " + data.getCmpDataRoundId());
-                LOG.debug("start time = " + data.getCmpDataFlightStart());
+                LOG.debug("round ID = {}", data.getCmpDataRoundId());
+                LOG.debug("start time = {}", data.getCmpDataFlightStart());
                 if (!this.createOneInscription(competition)) {
                     String msg = methodName + " - createOneInscription NOT created!";
                     LOG.error(msg);
@@ -84,7 +84,7 @@ public class CreateCompetitionInscriptions implements Serializable {
 
     public boolean createOneInscription(final ECompetition ec) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         CompetitionDescription cde = null;
         CompetitionData cda = null;
         try {
@@ -96,7 +96,7 @@ public class CreateCompetitionInscriptions implements Serializable {
                 final String query = LCUtil.generateInsertQuery(conn, "player_has_round");
 
                 try (PreparedStatement ps = conn.prepareStatement(query)) {
-                    LOG.debug(methodName + " - starting createOneInscription");
+                    LOG.debug("starting createOneInscription");
                     ps.setNull(1, java.sql.Types.INTEGER);
                     ps.setInt(2, cda.getCmpDataRoundId());
                     ps.setInt(3, cda.getCmpDataPlayerId());
@@ -107,7 +107,7 @@ public class CreateCompetitionInscriptions implements Serializable {
                     String TeeStart = cda.getCmpDataTeeStart();
                     int tee = Integer.valueOf(TeeStart
                             .substring(TeeStart.lastIndexOf("/") + 2, TeeStart.length()));
-                    LOG.debug(methodName + " - tee extracted from inscriptionTeeStart = " + tee);
+                    LOG.debug("tee extracted from inscriptionTeeStart = {}", tee);
                     ps.setInt(8, tee);
                     ps.setInt(9, cda.getCmpDataPlayerId());
                     ps.setTimestamp(10, Timestamp.from(Instant.now()));
@@ -151,10 +151,10 @@ public class CreateCompetitionInscriptions implements Serializable {
 
     public boolean validate(final Round round, final Course course, final UnavailablePeriod unavailable) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             LocalDateTime cb = course.getCourseBeginDate();
-            LOG.debug(methodName + " - LocalDateTime courseBegin = " + cb);
+            LOG.debug("LocalDateTime courseBegin = {}", cb);
             if (round.getRoundDate().isBefore(cb)) {
                 String msgerr = LCUtil.prepareMessageBean("round.notopened");
                 LOG.error(msgerr);
@@ -162,7 +162,7 @@ public class CreateCompetitionInscriptions implements Serializable {
                 return false;
             }
             LocalDateTime ce = course.getCourseEndDate();
-            LOG.debug(methodName + " - LocalDateTime courseEnd = " + ce);
+            LOG.debug("LocalDateTime courseEnd = {}", ce);
             if (round.getRoundDate().isAfter(ce)) {
                 String msgerr = LCUtil.prepareMessageBean("round.closed");
                 LOG.error(msgerr);
@@ -180,11 +180,11 @@ public class CreateCompetitionInscriptions implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // CompetitionDescription cd = new CompetitionDescription();
         // cd.setCompetitionId(27);
         // boolean b = create(cd);
-        // LOG.debug("from main, b = " + b);
+        // LOG.debug("from main, b = {}", b);
         LOG.debug("from main, CreateCompetitionInscriptions = ");
     } // end main
     */

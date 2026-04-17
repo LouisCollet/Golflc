@@ -5,6 +5,7 @@ import entite.HandicapIndex;
 import entite.LoggingUser;
 import entite.Player;
 import entite.Round;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.math.BigDecimal;
@@ -41,11 +42,12 @@ public class CalculateHandicapIndex implements Serializable, interfaces.GolfInte
 
     public CalculateHandicapIndex() { }
 
-    private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
-public HandicapIndex calc (HandicapIndex handicapIndex){
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-     LOG.debug(" -- Start of " + methodName);
-     LOG.debug(" with HandicapIndex = " + handicapIndex);
+    private static final String CLASSNAME = utils.LCUtil.getCurrentClassName();
+
+    public HandicapIndex calc(HandicapIndex handicapIndex) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug(methodName + " - with HandicapIndex = " + handicapIndex);
 try {
 /*
     1. calculer le nombre de lignes find.FindCountScoreDifferentialWHS    returns int
@@ -136,19 +138,16 @@ try {
       logging.setLoggingType("H");
       loggingUserController.createUpdateLoggingUser(logging); // migrated 2026-02-26
     return handicapIndex;
- } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
- } finally { }
-} // end method
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return handicapIndex;
+        }
+    } // end method
 
-
-public HandicapIndex SDLess20 (final Player player, final HandicapIndex handicapIndex){
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-try{ 
-        LOG.debug(" -- Start of " + methodName);
+    public HandicapIndex SDLess20(final Player player, final HandicapIndex handicapIndex) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
 // Tableau Rules of Handicapping page 39
     List<HandicapIndex> listeSD = scoreDifferentialList.list(player,"<20");
  // on a une liste avec les Score Differentials 
@@ -189,23 +188,20 @@ try{
      handicapIndex.setHandicapComment(handicapIndex.getHandicapComment() 
              + " : sd=" + sd +",avg=" + avg + ",lowest=" + lowest + ",adjustment=" + adjustment);
 
-     return handicapIndex;
- } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
-}
-} // end method
+            return handicapIndex;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return handicapIndex;
+        }
+    } // end method
 
-public HandicapIndex SDMore20 (final Player player, HandicapIndex handicapIndex){
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-try{ 
-       LOG.debug("entering " + methodName);
-       LOG.debug(" with HandicapIndex = " + handicapIndex);
-        LoggingUserController.write(CLASSNAME + "." + methodName,"i");  
-        
-    List<HandicapIndex> listeSD = scoreDifferentialList.list(player,">20");
+    public HandicapIndex SDMore20(final Player player, HandicapIndex handicapIndex) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug(methodName + " - with HandicapIndex = " + handicapIndex);
+        try {
+            LoggingUserController.write(CLASSNAME + "." + methodName,"i");
+            List<HandicapIndex> listeSD = scoreDifferentialList.list(player,">20");
     String msg = "Calculated Handicap Index = selection of lowest 8 SD's = ";
     LOG.debug(msg);
     LoggingUserController.write(msg); 
@@ -245,21 +241,19 @@ try{
        LOG.debug("after caps reduction, index = " + handicapIndex.getHandicapWHS());
      return handicapIndex;
 
- } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
-}
-} // end method
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return handicapIndex;
+        }
+    } // end method
 
- public static double calcESR (double currentIndex, double currentScoreDifferential){
-// Exceptional Score Reduction page 48
-final String methodName = utils.LCUtil.getCurrentMethodName();
-try{
-     LOG.debug(" -- Start of " + methodName);
-     LOG.debug(" -- currentIndex = " + currentIndex);
-     LOG.debug(" -- currentScoreDifferential = " + currentScoreDifferential);
+    public double calcESR(double currentIndex, double currentScoreDifferential) {
+        // Exceptional Score Reduction page 48
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug(methodName + " - currentIndex = " + currentIndex);
+        LOG.debug(methodName + " - currentScoreDifferential = " + currentScoreDifferential);
+        try {
      LoggingUserController.write(CLASSNAME + "." + methodName,"i");
      LoggingUserController.write("Exceptional score reduction","t"); 
  
@@ -280,29 +274,28 @@ try{
      } 
       LOG.debug(" ESR difference at end " + esr);
   //    Controllers.LoggingUserController.write("??? esr is not handled at this moment ! " + esr); 
- return esr;
-  } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return 99;
-}
-} // end method
+            return esr;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return 0.0;
+        }
+    } // end method
 
-  public HandicapIndex calcSoftcapHardcap (HandicapIndex handicapIndex){
-  final String methodName = utils.LCUtil.getCurrentMethodName();
-      try{
-// Limit on upward movement of a Handicap Index -  page 47
-     LOG.debug(" -- Start of "  + methodName);
-     LOG.debug(" -- handicapIndex = " + handicapIndex);
+    public HandicapIndex calcSoftcapHardcap(HandicapIndex handicapIndex) {
+        // Limit on upward movement of a Handicap Index - page 47
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug(methodName + " - handicapIndex = " + handicapIndex);
+        try {
      LoggingUserController.write(CLASSNAME + "." + methodName,"i"); 
      LoggingUserController.write("previous low handicap index" , "t"); 
   // à adapter !!
   // déplacé vers method
-     double lowHandicapIndex = findLowHandicapIndex.find(handicapIndex);
-     if(lowHandicapIndex == 0.0){
-         return null; // cata !!
-     }
+            double lowHandicapIndex = findLowHandicapIndex.find(handicapIndex);
+            if (lowHandicapIndex == 0.0) {
+                LOG.error(methodName + " - lowHandicapIndex == 0.0, skipping caps reduction");
+                return handicapIndex; // fix 2026-03-28 — was: return null → NPE at caller
+            }
      handicapIndex.setLowHandicapIndex(lowHandicapIndex);
      String s = "Previous Low Handicap Index = " + handicapIndex.getLowHandicapIndex();  
      LOG.debug(s);  
@@ -354,7 +347,7 @@ try{
         handicapWHS = handicapIndex.getLowHandicapIndex() + 5;
         handicapIndex.setHandicapWHS(BigDecimal.valueOf(handicapWHS));
         handicapIndex.setHandicapSoftHardCap(String.valueOf(reduction + 5));
-        LoggingUserController.write("reduction hard cap =" + reduction + 5);
+        LoggingUserController.write("reduction hard cap =" + (reduction + 5)); // fix 2026-03-28 — was: string concat, not arithmetic
         handicapIndex.setHandicapComment(handicapIndex.getHandicapComment() + " ,Hard Cap (" + 5 + ")");
     }else{
         LOG.debug("No application of Hard Cap : diff <= 5");
@@ -364,39 +357,33 @@ try{
     LOG.info(msg);
     LoggingUserController.write(msg);
     LCUtil.showMessageInfo(msg);
- return handicapIndex;
-  } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
-}
-} // end method
-  
- public double lowHandicapIndexForFutureUse (HandicapIndex handicapIndex){
-// point 5.7 page 79
-final String methodName = utils.LCUtil.getCurrentMethodName();
-try{
-     LOG.debug(" -- Start of " + methodName);
-     LOG.debug(" -- handicapIndex = " + handicapIndex);
- //   LOG.debug(" -- currentScoreDifferential = " + currentScoreDifferential);
-     LoggingUserController.write(CLASSNAME + "." + methodName,"i"); 
-     LoggingUserController.write("Low HandicapIndex For Future Use","t"); 
-     LoggingUserController.write("Scores between " + handicapIndex.getHandicapDate().minusYears(1).format(ZDF_YEAR) 
-             + " and " + handicapIndex.getHandicapDate().format(ZDF_YEAR)); 
- //    double lowHandicapIndex = 0.0;
-     double lowHandicapIndex = findLowHandicapIndex.find(handicapIndex);
-     String msg = " Low handicap index is " + lowHandicapIndex;
-      LOG.debug(msg);
-      LoggingUserController.write(msg); 
- return lowHandicapIndex;
-  } catch (Exception e) {
-      String msg = " -- Error in " + methodName + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return 99;
-}
-} // end method
+            return handicapIndex;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return handicapIndex;
+        }
+    } // end method
+
+    public double lowHandicapIndexForFutureUse(HandicapIndex handicapIndex) {
+        // point 5.7 page 79
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug(methodName + " - handicapIndex = " + handicapIndex);
+        try {
+            LoggingUserController.write(CLASSNAME + "." + methodName, "i");
+            LoggingUserController.write("Low HandicapIndex For Future Use", "t");
+            LoggingUserController.write("Scores between " + handicapIndex.getHandicapDate().minusYears(1).format(ZDF_YEAR)
+                    + " and " + handicapIndex.getHandicapDate().format(ZDF_YEAR));
+            double lowHandicapIndex = findLowHandicapIndex.find(handicapIndex);
+            String msg = " Low handicap index is " + lowHandicapIndex;
+            LOG.debug(msg);
+            LoggingUserController.write(msg);
+            return lowHandicapIndex;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return 0.0;
+        }
+    } // end method
 /*
 void main() throws Exception, SQLException{
     Connection conn = null; // new DBConnection().getConnection();

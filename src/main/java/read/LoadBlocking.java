@@ -21,8 +21,8 @@ public class LoadBlocking implements Serializable {
 
     public Blocking load(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - for player = " + player.getIdplayer());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for player = {}", player.getIdplayer());
 
         final String query = """
                 SELECT *
@@ -36,11 +36,11 @@ public class LoadBlocking implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Player player = new Player(); player.setIdplayer(206658);
         // Blocking blocking = new LoadBlocking().load(player);
-        // LOG.debug("Blocking found = " + blocking);
+        // LOG.debug("Blocking found = {}", blocking);
     } // end main
     */
 

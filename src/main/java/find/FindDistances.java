@@ -63,7 +63,7 @@ public class FindDistances implements Serializable, interfaces.GolfInterface {
      */
     public Distance find(final Tee tee) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - for tee = " + tee);
 
         // Validation
@@ -142,7 +142,7 @@ public class FindDistances implements Serializable, interfaces.GolfInterface {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // tests locaux
     } // end main
     */

@@ -24,8 +24,8 @@ public class CreateOrModifyHandicapIndex implements Serializable {
 
     public Integer status(final HandicapIndex handicapIndex) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with HandicapIndex  = " + handicapIndex);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with HandicapIndex  = {}", handicapIndex);
 
         final String query = """
             SELECT HandicapId
@@ -42,7 +42,7 @@ public class CreateOrModifyHandicapIndex implements Serializable {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int handicapId = rs.getInt(1);
-                    LOG.debug("HandicapId already exists - This is a modification = " + handicapId);
+                    LOG.debug("HandicapId already exists - This is a modification = {}", handicapId);
                     return handicapId;
                 } else {
                     LOG.debug("HandicapId doesn't exists - This is a creation");
@@ -61,12 +61,12 @@ public class CreateOrModifyHandicapIndex implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         HandicapIndex handicapindex = new HandicapIndex();
         handicapindex.setHandicapRoundId(589);
         handicapindex.setHandicapPlayerId(324715);
         int i = new CreateOrModifyHandicapIndex().status(handicapindex);
-        LOG.debug("Creation or modification ? (0 = creation) " + i);
+        LOG.debug("Creation or modification ? (0 = creation) {}", i);
     } // end main
     */
 

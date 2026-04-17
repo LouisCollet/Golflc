@@ -33,7 +33,7 @@ public class FindCotisationAtRoundDate implements Serializable {
 
     public Cotisation find(final Player player, final Club club, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for player = " + player);
         LOG.debug("for round = " + round);
         LOG.debug("for club = " + club);
@@ -92,7 +92,7 @@ public class FindCotisationAtRoundDate implements Serializable {
 
     public List<Cotisation> findAll(final Player player, final Club club, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for player = " + player);
         LOG.debug("for round = " + round);
         LOG.debug("for club = " + club);
@@ -148,7 +148,7 @@ public class FindCotisationAtRoundDate implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324715);
         Round round = new Round();

@@ -68,7 +68,7 @@ public class ErrorController {
     }
 
     public String getStackTrace() {
-        LOG.debug("entering getStack trace ith devMode = " + devMode);
+        LOG.debug("entering getStack trace ith devMode = {}", devMode);
         if (devMode) {
             Throwable ex = (Throwable) request.getAttribute("jakarta.servlet.error.exception");
             if (ex != null) {

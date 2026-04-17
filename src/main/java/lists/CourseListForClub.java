@@ -25,7 +25,7 @@ public class CourseListForClub implements Serializable {
 
     public List<Course> list(final Club club) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with club = " + club);
 
         // ✅ Early return — guard clause FIRST
@@ -58,7 +58,7 @@ public class CourseListForClub implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -66,7 +66,7 @@ public class CourseListForClub implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Club club = new Club();
         club.setIdclub(102);
         var lp = new CourseListForClub().list(club);

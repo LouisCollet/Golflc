@@ -1,5 +1,7 @@
 package entite;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,7 +91,9 @@ public String getComment(){
 }
 
     public void setComment(String comment) {
-        this.comment = comment;
+        if (comment == null) { this.comment = null; return; }
+        PolicyFactory sanitizer = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.STYLES);
+        this.comment = sanitizer.sanitize(comment);
     }
 
 

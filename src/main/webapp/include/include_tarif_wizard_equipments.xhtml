@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TAB 3 : Equipments — saison, item, prix (+ slot HO optionnel) -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces">
+
+    <p:tab id="EquipmentsTab"
+           title="🎒 Equipments (#{memC.tarifGreenfee.equipmentsList.size()})"
+           titletip="Define equipment items and prices">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.equipments.tarif']}</h1>
+                <p:badge value="#{memC.tarifGreenfee.equipmentsList.size()}" severity="info"/>
+            </f:facet>
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.season']} "/>
+                    <i class="pi pi-cloud"/>
+                    <i class="pi pi-sun"/>
+                </h:panelGroup>
+                <p:selectOneMenu id="seasonEquip"
+                                 value="#{memC.tarifGreenfee.workSeason}"
+                                 disabled="#{memC.tarifGreenfee.greenfeeType eq 'HO' and memC.tarifGreenfee.workLinkedSlotKey != null}">
+                    <f:selectItem itemLabel="#{msg['tarif.season.choose']}" itemValue="A" noSelectionOption="true"/>
+                    <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                   var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                    <f:validateBean disabled="true"/>
+                    <p:ajax listener="#{memC.resetSlotKeyOnSeasonChange()}" update="equipmentsTable equipSlot"/>
+                </p:selectOneMenu>
+
+                <!-- Slot link — visible only when pricing type is HO and at least one slot exists -->
+                <h:panelGroup layout="block"
+                              rendered="#{memC.tarifGreenfee.greenfeeType eq 'HO' and not empty memC.tarifGreenfee.teeTimesList}">
+                    <h:outputText value="#{msg['tarif.slot']} "/>
+                    <i class="pi pi-link"/>
+                </h:panelGroup>
+                <p:selectOneMenu id="equipSlot"
+                                 value="#{memC.tarifGreenfee.workLinkedSlotKey}"
+                                 rendered="#{memC.tarifGreenfee.greenfeeType eq 'HO' and not empty memC.tarifGreenfee.teeTimesList}">
+                    <f:selectItem itemLabel="-- #{msg['tarif.slot.all']} --" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{memC.teeTimesForCurrentSeason}"
+                                   var="tt"
+                                   itemLabel="#{tt.startTime}–#{tt.endTime} (#{tt.item})"
+                                   itemValue="#{tt.slotKey}"/>
+                    <f:validateBean disabled="true"/>
+                    <p:ajax listener="#{memC.syncSeasonFromSlot()}" update="equipmentsTable seasonEquip"/>
+                </p:selectOneMenu>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.members.equipments']} "/>
+                    <i class="pi pi-list"/>
+                    <i class="pi pi-pencil"/>
+                </h:panelGroup>
+                <p:inputText id="equipText"
+                             size="20"
+                             title="#{msg['tooltip.tarif.item']}"
+                             value="#{memC.tarifGreenfee.workItem}"
+                             placeholder="Enter equipment">
+                    <f:validateBean disabled="true"/>
+                </p:inputText>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.members.price']} "/>
+                    <i class="pi pi-euro"/>
+                </h:panelGroup>
+                <p:inputNumber id="equipAmount"
+                               widgetVar="equipAmountWV"
+                               value="#{memC.tarifGreenfee.workPrice}"
+                               title="#{msg['tooltip.tarif.price2']}"
+                               size="6"
+                               lang="#{languageC.locale}"
+                               decimalSeparator="."
+                               decimalPlaces="1"
+                               placeholder="99.9">
+                    <f:validateBean disabled="true"/>
+                </p:inputNumber>
+
+            </p:panelGrid>
+
+            <!-- Equipments table — filtered by current season + slot (HO) -->
+            <p:dataTable id="equipmentsTable"
+                         value="#{memC.equipmentsForDisplay}"
+                         var="equip"
+                         rendered="#{not empty memC.equipmentsForDisplay}"
+                         styleClass="compact-table"
+                         style="margin-top:0.75rem;">
+                <f:facet name="header">Equipments — #{memC.tarifGreenfee.workSeason} (#{memC.equipmentsForDisplay.size()} / #{memC.tarifGreenfee.equipmentsList.size()})</f:facet>
+                <p:column headerText="Season"><h:outputText value="#{equip.season}"/></p:column>
+                <p:column headerText="Item"><h:outputText value="#{equip.item}"/></p:column>
+                <p:column headerText="Price" style="font-weight:bold;"><h:outputText value="#{equip.price}"/></p:column>
+                <p:column headerText="Tranche horaire"
+                          rendered="#{memC.tarifGreenfee.greenfeeType eq 'HO'}">
+                    <h:outputText value="#{memC.slotTimeFor(equip.linkedSlotKey)}"/>
+                </p:column>
+                <p:column style="width:6rem; text-align:center;">
+                    <p:commandButton icon="pi pi-pencil"
+                                     styleClass="p-button-warning p-button-text p-button-sm"
+                                     action="#{memC.editEquipmentItem(equip)}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     process="@this"
+                                     title="Edit this equipment"/>
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{memC.removeEquipmentItem(equip)}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     process="@this"
+                                     rendered="#{memC.editingEquipment == null}"/>
+                </p:column>
+            </p:dataTable>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <!-- Mode ajout -->
+                    <p:commandButton value="#{msg['tarif.equipments.create']}"
+                                     widgetVar="btnAddEquipmentWV"
+                                     icon="pi pi-plus"
+                                     rendered="#{memC.editingEquipment == null}"
+                                     action="#{memC.inputTarifGreenfeeWizard('EQ')}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     resetValues="true"
+                                     onerror="PF('btnAddEquipmentWV').enable()"
+                                     styleClass="p-button-outlined"/>
+                    <!-- Mode édition -->
+                    <p:commandButton value="#{msg['button.save']}"
+                                     icon="pi pi-check"
+                                     rendered="#{memC.editingEquipment != null}"
+                                     action="#{memC.updateEquipmentItem()}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     styleClass="p-button-success p-button-outlined"/>
+                    <p:commandButton value="#{msg['button.cancel']}"
+                                     icon="pi pi-times"
+                                     rendered="#{memC.editingEquipment != null}"
+                                     action="#{memC.cancelEditEquipment()}"
+                                     update="tarif_greenfee_wizard:wizardTarifGreenfee"
+                                     process="@this"
+                                     styleClass="p-button-secondary p-button-outlined"/>
+                    <p:commandButton value="#{msg['tarif.visualisation']}"
+                                     icon="pi pi-eye"
+                                     process="@this"
+                                     action="#{memC.resetTarifGreenfeeDB()}"
+                                     update="vizDialog"
+                                     oncomplete="PF('vizDialog').show();"
+                                     styleClass="p-button-info p-button-outlined"/>
+                </div>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</ui:composition>

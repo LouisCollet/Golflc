@@ -66,7 +66,7 @@ public class FindLastAudit implements Serializable {
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

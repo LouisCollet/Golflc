@@ -7,70 +7,68 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
-<ui:define name="title">Score Stableford Enter Score </ui:define>
+
+<ui:define name="title">Score Stableford</ui:define>
 <ui:define name="content">
 
 <h:form id="score_stableford">
-<ui:include src="include/include_summary_round.xhtml"/>
+    <ui:include src="include/include_summary_round.xhtml"/>
 
-<div class="login-container" style="min-height:auto; align-items:flex-start;">
-<p:panel styleClass="login-card form-card" style="max-width:100%;">
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card" style="max-width:100%;">
+        <f:facet name="header">
+            <h1>#{msg['title.score.results']}</h1>
+        </f:facet>
 
- <p:dataTable id="scoreStablefordTable"
-               var="var"
-               rowIndexVar="row"
-               rowStyleClass="#{(row mod 3) eq 0 ? 'highlight' : null}"
-               value="#{roundC.scoreStableford.scoreList}"
-               editable="true"
-               editMode="cell"
-               lazy="false"
-               editInitEvent="dblclick"
-               widgetVar="cellProducts"
-               style="margin: 0 auto;width:90%;text-align:center;"
-               styleClass="compact-table">
+        <p:dataTable id="scoreStablefordTable"
+                     var="var"
+                     rowIndexVar="row"
+                     rowStyleClass="#{(row mod 3) eq 0 ? 'highlight' : null}"
+                     value="#{roundC.scoreStableford.scoreList}"
+                     editable="true"
+                     editMode="cell"
+                     lazy="false"
+                     editInitEvent="dblclick"
+                     widgetVar="cellProducts"
+                     styleClass="compact-table">
+
             <p:ajax event="cellEdit"
                     listener="#{roundC.scoreStableford.onCellEdit}"
                     update="growl-msg"/>
-     <f:facet name="header">
-         <h1>#{msg['title.score.results']}</h1>
-         <h2 style="margin-right:2.5em;">  (Black Cell Editing with Click) -------V </h2>
-     </f:facet>
 
-        <p:column
-                  headerText="#{msg['hole.hole']} "
-                  width="12%"
-                  style="color:yellow;font-size:1.5em;font-weight:bold;">
-            <h:outputText value="#{var.hole}" />
-        </p:column>
+            <p:column headerText="#{msg['hole.hole']}"
+                      width="12%"
+                      styleClass="score-col-hole">
+                <h:outputText value="#{var.hole}"/>
+            </p:column>
 
-        <p:column
-                  headerText="#{msg['hole.par']} "
-                  width="12%"
-                  style="color: green;font-weight:bold;">
-            <h:outputText value="#{var.par}" />
-        </p:column>
+            <p:column headerText="#{msg['hole.par']}"
+                      width="12%"
+                      styleClass="score-col-par">
+                <h:outputText value="#{var.par}"/>
+            </p:column>
 
-        <p:column
-                  headerText="#{msg['hole.distance']} "
-                  width="12%"
-                  style="color:white;">
-            <h:outputText value="#{var.distances}" />
-        </p:column>
+            <p:column headerText="#{msg['hole.distance']}"
+                      width="12%"
+                      styleClass="score-col-distance">
+                <h:outputText value="#{var.distances}"/>
+            </p:column>
 
-        <p:column headerText="#{msg['hole.index']} "
-                  width="12%"
-                  style="color:whitesmoke;">
-            <h:outputText value="#{var.index}" />
-        </p:column>
+            <p:column headerText="#{msg['hole.index']}"
+                      width="12%"
+                      styleClass="score-col-index">
+                <h:outputText value="#{var.index}"/>
+            </p:column>
 
-        <p:column headerText="#{msg['hole.extra']} "
-                  width="12%"
-                  style="color:white;font-size:1.5em;font-weight:bold">
-            <h:outputText value="*"    rendered="#{var.extra eq 1}" style="font-size:2.0em"/>
-            <h:outputText value="**"   rendered="#{var.extra eq 2}" />
-            <h:outputText value="***"  rendered="#{var.extra eq 3}" />
-            <h:outputText value="****" rendered="#{var.extra eq 4}" />
-        </p:column>
+            <p:column headerText="#{msg['hole.extra']}"
+                      width="12%"
+                      styleClass="score-col-extra">
+                <h:outputText value="*"    rendered="#{var.extra eq 1}"/>
+                <h:outputText value="**"   rendered="#{var.extra eq 2}"/>
+                <h:outputText value="***"  rendered="#{var.extra eq 3}"/>
+                <h:outputText value="****" rendered="#{var.extra eq 4}"/>
+            </p:column>
+
             <p:column headerText="#{msg['score.gross']}"
                       width="12%">
                 <p:cellEditor>
@@ -79,130 +77,114 @@
                     </f:facet>
                     <f:facet name="input">
                         <p:inputNumber id="score"
-                            label="ScoreStableford"
-                            value="#{var.strokes}"
-                            size="2"
-                            decimalPlaces="0"
-                            minValue="0"
-                            maxValue="12">
-                        </p:inputNumber>
+                                       label="ScoreStableford"
+                                       value="#{var.strokes}"
+                                       size="2"
+                                       decimalPlaces="0"
+                                       minValue="0"
+                                       maxValue="12"/>
                     </f:facet>
                 </p:cellEditor>
             </p:column>
 
-       <p:column headerText="#{msg['score.points']} "
-                 width="12%"
-                 style="color:red;font-size:1.5em;font-weight:bold"
-                 rendered="#{roundC.scoreStableford.getScoreList().stream().map(o->o.getPoints()).sum() gt 0}">
-           <h:outputText value="#{var.points}" />
-        </p:column>
+            <p:column headerText="#{msg['score.points']}"
+                      width="12%"
+                      styleClass="score-col-points"
+                      rendered="#{roundC.scoreStableford.hasPoints}">
+                <h:outputText value="#{var.points}"/>
+            </p:column>
 
-    <f:facet name="footer">
-     <p:panelGrid columns="1"
-                  layout="flex">
-      <p:commandButton
-              id="buttonReturnListStart"
-              value="#{msg['competition.startinglist.final']}"
-              update="growl-msg"
-              ajax="false"
-              rendered="#{session.getAttribute('scoreType')eq 'COMPETITION'}"
-              icon="pi pi-list"
-              action="competition_list_start.xhtml"/>
-      <p:commandButton
-              id="buttonCalculateScore"
-              value="#{msg['button.score.calculate']}"
-              update="growl-msg"
-              ajax="false"
-              icon="pi pi-question"
-              action="#{roundC.calculateScoreStableford()}"/>
-      <p:commandButton
-              id="buttonCreateStableford"
-              value="#{msg['button.score.create']}"
-              update="growl-msg"
-              ajax="false"
-              immediate="true"
-              icon="pi pi-database"
-              rendered="#{roundC.scoreStableford.showCreate eq true}"
-              action="#{roundC.createScoreStableford()}"/>
+            <f:facet name="footer">
+                <div class="btn-group" style="flex-wrap:wrap;">
+                    <p:commandButton id="buttonReturnListStart"
+                                     value="#{msg['competition.startinglist.final']}"
+                                     ajax="false"
+                                     rendered="#{session.getAttribute('scoreType') eq 'COMPETITION'}"
+                                     icon="pi pi-list"
+                                     action="competition_list_start.xhtml"/>
+                    <p:commandButton id="buttonCalculateScore"
+                                     value="#{msg['button.score.calculate']}"
+                                     ajax="false"
+                                     icon="pi pi-calculator"
+                                     action="#{roundC.calculateScoreStableford()}"/>
+                    <p:commandButton id="buttonCreateStableford"
+                                     value="#{msg['button.score.create']}"
+                                     ajax="false"
+                                     immediate="true"
+                                     icon="pi pi-database"
+                                     rendered="#{roundC.scoreStableford.showCreate eq true}"
+                                     styleClass="p-button-success"
+                                     action="#{roundC.createScoreStableford()}"/>
+                    <p:commandButton id="buttonStatistics"
+                                     value="#{msg['button.score.statistics.intro']}"
+                                     immediate="true"
+                                     ajax="false"
+                                     rendered="#{roundC.scoreStableford.showButtonStatistics}"
+                                     icon="pi pi-chart-bar"
+                                     action="#{roundC.loadStatisticsTable()}"/>
+                </div>
+            </f:facet>
+        </p:dataTable>
 
-    <h:panelGroup id="panelGroupQualifying"
-                  rendered="#{roundC.scoreStableford.showCreateHandicapIndex eq true}"
-                  layout="block">
-        <p:commandButton
-              id="buttonCreateHandicapIndex"
-              value="#{msg['button.handicapIndex.create']}"
-              update="growl-msg, comment"
-              ajax="false"
-              immediate="true"
-              icon="pi pi-database"
-              styleClass="ui-button-success"
-              action="#{roundC.createHandicapIndex()}"/>
-     <p:panelGrid id="panelComment"
-             columns="2"
-             layout="flex"
-             columnClasses="col1Flex, col2Flex">
-        <p:outputLabel for="@next" value="#{msg['handicap.comment']} *"/>
-            <p:inputText
-            id="comment"
-            value="#{appContext.handicapIndex.handicapComment}"
-            size="45"
-            title="#{msg['tooltip.handicap.comment']}"
-            placeholder="Comment for handicap change" />
-     </p:panelGrid>
-    </h:panelGroup>
+        <!-- Handicap Index creation — conditional -->
+        <h:panelGroup id="panelGroupQualifying"
+                      rendered="#{roundC.scoreStableford.showCreateHandicapIndex eq true}"
+                      layout="block"
+                      styleClass="mt-3">
+            <p:panelGrid id="panelComment"
+                         columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+                <p:outputLabel for="@next" value="#{msg['handicap.comment']} :"/>
+                <p:inputText id="comment"
+                             value="#{appContext.handicapIndex.handicapComment}"
+                             size="45"
+                             title="#{msg['tooltip.handicap.comment']}"
+                             placeholder="Comment for handicap change"/>
+            </p:panelGrid>
+            <div class="btn-group" style="margin-top:0.5rem;">
+                <p:commandButton id="buttonCreateHandicapIndex"
+                                 value="#{msg['button.handicapIndex.create']}"
+                                 update="growl-msg,comment"
+                                 ajax="false"
+                                 immediate="true"
+                                 icon="pi pi-database"
+                                 styleClass="p-button-success"
+                                 action="#{roundC.createHandicapIndex()}"/>
+            </div>
+        </h:panelGroup>
 
-        <p:commandButton
-              id="buttonStatistics"
-              value="#{msg['button.score.statistics.intro']}"
-              update="growl-msg"
-              immediate="true"
-              ajax="false"
-              rendered="#{roundC.scoreStableford.showButtonStatistics}"
-              icon="pi pi-pencil"
-              action="#{roundC.loadStatisticsTable()}"/>
-    </p:panelGrid>
-    </f:facet>
-</p:dataTable>
+        <!-- Score Differential — conditional -->
+        <h:panelGroup id="panelDifferential"
+                      rendered="#{roundC.scoreStableford.showLineDifferential}"
+                      layout="block"
+                      styleClass="mt-3">
+            <p:divider layout="horizontal" type="solid"/>
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+                <h:outputText value="#{msg['score.scoredifferential']} :"/>
+                <h:outputText value="#{roundC.scoreStableford.scoreDifferential}"
+                              styleClass="playing-hcp-result"/>
+                <h:outputText value="#{msg['score.adjusted']} :"/>
+                <h:outputText value="#{roundC.scoreStableford.adjustedGrossScore}"
+                              styleClass="playing-hcp-result"/>
+                <h:outputText value="#{msg['score.strokes']} :"/>
+                <h:outputText value="#{roundC.scoreStableford.totalStrokes}"
+                              styleClass="playing-hcp-result"/>
+            </p:panelGrid>
+        </h:panelGroup>
 
-<p:panelGrid id="panelgrid6"
-             rendered="#{roundC.scoreStableford.showLineDifferential}"
-             layout="flex"
-             columns="6"
-             style="font-size:2.0em;color:blue;">
-    <h:outputText value="#{msg['score.scoredifferential']}"/>
-    <h:outputText value="#{roundC.scoreStableford.scoreDifferential}"
-                style="font-size:2.0em;color:blue; width:50%" />
-    <h:outputText value="#{msg['score.adjusted']}"/>
-    <h:outputText value="#{roundC.scoreStableford.adjustedGrossScore}"
-                style="font-size:2.0em;color:blue; width:50%"  />
-    <h:outputText value="#{msg['score.strokes']}"/>
-    <h:outputText value="#{roundC.scoreStableford.totalStrokes}"
-                style="font-size:2.0em;color:blue; width:50%" />
-</p:panelGrid>
+        <p:contextMenu for="scoreStablefordTable" widgetVar="cMenu">
+            <p:menuitem value="Edit Cell" icon="pi pi-search"
+                        onclick="PF('cellProducts').showCellEditor();return false;"/>
+            <p:menuitem value="Hide Menu" icon="pi pi-times"
+                        onclick="PF('cMenu').hide()"/>
+        </p:contextMenu>
 
-    <p:dialog header="Score Differential"
-              footer="Footer WHS"
-              widgetVar="dlg2"
-              minHeight="40"
-              rendered="#{roundC.round.roundHoles eq 18}"
-              styleClass="ui-page-theme-a ui-bar-inherit">
-        <h:outputText value="#{roundC.scoreStableford.scoreDifferential}"
-                      style="font-size:2.0em;color:blue;width:250%"/>
-        <h:outputText value="#{roundC.scoreStableford.adjustedGrossScore}"
-                style="font-size:2.0em;color:blue; width:250%"/>
-        <h:outputText value="#{roundC.scoreStableford.totalStrokes}"
-                style="font-size:2.0em;color:blue; width:250%" />
-    </p:dialog>
-
-<p:contextMenu for="scoreStablefordTable" widgetVar="cMenu">
-        <p:menuitem value="Edit Cell" icon="pi pi-search"
-                    onclick="PF('cellProducts').showCellEditor();return false;"/>
-        <p:menuitem value="Hide Menu" icon="pi pi-times" onclick="PF('cMenu').hide()"/>
-    </p:contextMenu>
-
-</p:panel>
-</div>
-
+    </p:panel>
+    </div>
 </h:form>
+
 </ui:define>
 </ui:composition>

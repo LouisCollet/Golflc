@@ -33,10 +33,10 @@ public class UpdatePlayerPhotoLocation implements Serializable {
      */
     public boolean updateRecordFromPlayer(Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
-            LOG.debug(methodName + " - idplayer       = " + player.getIdplayer());
-            LOG.debug(methodName + " - photoLocation  = " + player.getPlayerPhotoLocation());
+            LOG.debug("idplayer       = {}", player.getIdplayer());
+            LOG.debug("photoLocation  = {}", player.getPlayerPhotoLocation());
 
             final String query = "UPDATE player "
                     + "SET PlayerPhotoLocation = ? "
@@ -56,13 +56,13 @@ public class UpdatePlayerPhotoLocation implements Serializable {
                     String msg = "Successful UPDATE PhotoLocation = "
                             + player.getPlayerPhotoLocation()
                             + " for idplayer = " + player.getIdplayer();
-                    LOG.debug(methodName + " - " + msg);
+                    LOG.debug("- {}", msg);
                     LCUtil.showMessageInfo(msg);
                     return true;
                 } else {
                     String msg = "Unsuccessful UPDATE PhotoLocation for idplayer = "
                             + player.getIdplayer();
-                    LOG.error(methodName + " - " + msg);
+                    LOG.error("- {}", msg);
                     LCUtil.showMessageFatal(msg);
                     return false;
                 }
@@ -93,8 +93,7 @@ public class UpdatePlayerPhotoLocation {
   public boolean updateRecordFromPlayer(Player player, Connection conn) throws SQLException{
     PreparedStatement ps = null;
 try{
-        LOG.debug("starting update photolocation for. = " + player.getIdplayer() + " photolocation = " 
-                                            + player.getPlayerPhotoLocation() );
+        LOG.debug("starting update photolocation for player={} photolocation={}", player.getIdplayer(), player.getPlayerPhotoLocation());
     final String query = "UPDATE player "
             + " SET PlayerPhotoLocation = ? "
             + " WHERE idplayer = ?";
@@ -104,7 +103,7 @@ try{
          utils.LCUtil.logps(ps);
    int row = ps.executeUpdate();
       if (row!=0){ 
-//LOG.debug("-- successful UPDATE player " + upload.getIdplayer());
+//LOG.debug("-- successful UPDATE player {}", upload.getIdplayer());
         String msg = "<br/>Successful UPDATE file = " + player.getPlayerPhotoLocation()
                 + "<br/> for player = " + player.getIdplayer();
             LOG.debug(msg);

@@ -95,8 +95,13 @@ https://primefaces.github.io/primefaces/10_0_0/#/core/dialogframework -->
 https://primefaces.github.io/primefaces/11_0_0/#/core/errorhandling -->
 <factory>
     <exception-handler-factory>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerFactory</exception-handler-factory>
- <!--   enlevé 31-08-2025<exception-handler-factory>org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory</exception-handler-factory>  
+ <!--   enlevé 31-08-2025<exception-handler-factory>org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
     <exception-handler-factory>org.omnifaces.exceptionhandler.FacesMessageExceptionHandlerFactory</exception-handler-factory>-->
 </factory>
+
+<!-- FullAjaxExceptionHandlerFactory supprimé 2026-04-09 : en tant que couche externe,
+     il interceptait les exceptions avant PrimeFaces et empêchait pfExceptionHandler
+     d'être alimenté → error_throw.xhtml affichait des champs vides.
+     PrimeExceptionHandlerFactory gère déjà les exceptions AJAX et non-AJAX. -->
 
 </faces-config>

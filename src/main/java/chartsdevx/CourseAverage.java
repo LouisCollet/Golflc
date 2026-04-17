@@ -30,7 +30,7 @@ public class CourseAverage implements Serializable {
 
     public List<Average> stat(final Player player, final Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("  with player = " + player);
         LOG.debug("  with course = " + course);
 
@@ -94,7 +94,7 @@ public class CourseAverage implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Course course = new Course();

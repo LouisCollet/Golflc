@@ -141,6 +141,7 @@
                 </p:panelGrid>
 
                 <f:facet name="footer">
+                  <div class="btn-group">
                     <p:commandButton value="#{msg['button.round.create']}"
                                      id="cb1"
                                      update="growl-msg"
@@ -155,8 +156,8 @@
                                      ajax="false"
                                      rendered="#{roundC.nextInscription}"
                                      icon="pi pi-arrow-right"
-                                     style="float:right;"
                                      action="inscription.xhtml?faces-redirect=true"/>
+                  </div>
                 </f:facet>
 
             </p:panel>

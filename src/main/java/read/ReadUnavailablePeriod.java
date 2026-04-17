@@ -24,9 +24,9 @@ public class ReadUnavailablePeriod implements Serializable {
 
     public UnavailablePeriod read(final Club club, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - for round = " + round.toString());
-        LOG.debug(methodName + " - for club = " + club.toString());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for round = {}", round.toString());
+        LOG.debug("for club = {}", club.toString());
 
         final String query = """
                 SELECT *
@@ -39,23 +39,23 @@ public class ReadUnavailablePeriod implements Serializable {
         UnavailablePeriod period = dao.querySingle(query, new UnavailablePeriodRowMapper(),
                 club.getIdclub(), Timestamp.valueOf(round.getRoundDate()), Timestamp.valueOf(round.getRoundDate()));
         if (period == null || period.getIdclub() == null) {
-            LOG.debug(methodName + " - no unavailable period found for club = " + club.getIdclub());
+            LOG.debug("no unavailable period found for club = {}", club.getIdclub());
             return null;
         }
-        LOG.debug(methodName + " - found period = " + period);
+        LOG.debug("found period = {}", period);
         return period;
     } // end method
 
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Club club = new Club(); club.setIdclub(1122);
         // Round round = new Round(); round.setIdround(102);
         // round.setRoundDate(LocalDateTime.of(2020, Month.FEBRUARY, 17, 12, 15));
         // UnavailablePeriod period = new ReadUnavailablePeriod().read(club, round);
-        // LOG.debug("unavailable found = " + period);
+        // LOG.debug("unavailable found = {}", period);
     } // end main
     */
 

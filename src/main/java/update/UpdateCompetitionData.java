@@ -27,8 +27,8 @@ public class UpdateCompetitionData implements Serializable {
 
     public boolean update(final CompetitionData cda) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with CompetitionData = " + cda);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with CompetitionData = {}", cda);
 
         try (Connection conn = dao.getConnection()) {
 
@@ -54,7 +54,7 @@ public class UpdateCompetitionData implements Serializable {
                 utils.LCUtil.logps(ps);
 
                 int row = ps.executeUpdate();
-                LOG.debug(methodName + " - rows modified = " + row);
+                LOG.debug("rows modified = {}", row);
                 if (row != 0) {
                     String msg = " <br/>ID = " + cda.getCmpDataId()
                             + " <br/>Start Time = " + cda.getCmpDataAskedStartTime();
@@ -80,7 +80,7 @@ public class UpdateCompetitionData implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         CompetitionData cda = new CompetitionData();
         cda.setCmpDataId(25);
         // boolean b = update(cda);

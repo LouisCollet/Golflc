@@ -28,8 +28,8 @@ public class UpdatePlayerActivation implements Serializable {
 
     public boolean update(Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" with player = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" with player = {}", player);
 
         final String query = """
                 UPDATE player
@@ -66,11 +66,11 @@ public class UpdatePlayerActivation implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         boolean b = new update.UpdatePlayerActivation().update(player);
-        LOG.debug("from main, result = " + b);
+        LOG.debug("from main, result = {}", b);
     } // end main
     */
 

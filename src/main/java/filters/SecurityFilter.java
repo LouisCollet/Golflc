@@ -37,6 +37,14 @@ public class SecurityFilter implements Filter
       resp.setHeader("X-XSS-Protection", "1; mode=block");
       resp.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
       resp.setHeader("Permissions-Policy", "geolocation=(self), camera=(), microphone=()");
+      // security audit 2026-03-19 — Content-Security-Policy
+      resp.setHeader("Content-Security-Policy",
+              "default-src 'self'; "
+            + "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+            + "style-src 'self' 'unsafe-inline'; "
+            + "img-src 'self' data:; "
+            + "font-src 'self'; "
+            + "frame-ancestors 'self'");
 
       String pageRequested = req.getRequestURI().toString();
       if(session.getAttribute("user") == null && !pageRequested.contains("login.xhtml"))

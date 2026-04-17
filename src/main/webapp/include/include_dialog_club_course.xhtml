@@ -12,9 +12,8 @@
                      columns="2"
                      columnClasses="col1Flex, col2Flex">
 
-            <h:outputText value="#{msg['club.club']}"/>
-            <h:panelGroup layout="block" id="containerClub"
-                          style="display:flex; align-items:center; gap:0.5rem;">
+            <p:outputLabel for="@next" value="#{msg['club.club']} :"/>
+            <h:panelGroup layout="block" styleClass="selector-row" id="containerClub">
                 <p:inputNumber id="inputClub"
                                label="HomeClub"
                                value="#{clubC.club.idclub}"
@@ -31,15 +30,14 @@
                 </p:commandButton>
                 <h:outputText id="clubName"
                               value="#{clubC.club.clubName}"
-                              style="font-style:italic"/>
+                              styleClass="selector-name"/>
                 <h:outputText id="ClubId"
-                              value=" #{clubC.club.idclub}"
-                              style="font-weight:bold;font-size:2rem;font-style:italic;color:red"/>
+                              value="#{clubC.club.idclub}"
+                              styleClass="selector-id"/>
             </h:panelGroup>
 
-            <h:outputText value="#{msg['course.course']}"/>
-            <h:panelGroup layout="block" id="containerCourse"
-                          style="display:flex; align-items:center; gap:0.5rem;">
+            <p:outputLabel for="@next" value="#{msg['course.course']} :"/>
+            <h:panelGroup layout="block" styleClass="selector-row" id="containerCourse">
                 <p:inputNumber id="inputCourse"
                                value="#{clubC.course.idcourse}"
                                size="5"
@@ -54,11 +52,11 @@
                             update=":form_club_course:inputCourse,courseName,courseId"/>
                 </p:commandButton>
                 <h:outputText id="courseName"
-                              value=" #{clubC.course.courseName}"
-                              style="font-style:italic"/>
+                              value="#{clubC.course.courseName}"
+                              styleClass="selector-name"/>
                 <h:outputText id="courseId"
-                              value=" #{clubC.course.idcourse}"
-                              style="font-weight:bold;font-size:2rem;font-style:italic;color:red"/>
+                              value="#{clubC.course.idcourse}"
+                              styleClass="selector-id"/>
             </h:panelGroup>
 
             <f:facet name="footer">

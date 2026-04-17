@@ -14,7 +14,13 @@
 
 <ui:define name="content">
 
-<h:form id="form_dialogClub" >
+<h:form id="form_dialogClub">
+    <h:outputScript>
+        window.addEventListener('load', function() {
+            var f = document.getElementById('form_dialogClub:clubs:colclubname:filter');
+            if (f) { f.focus(); }
+        });
+    </h:outputScript>
     
     <ui:define name="description">
         PanelMenu is a hybrid of accordion-tree components.
@@ -22,9 +28,6 @@
     </ui:define>
     
 <c:set var="type" value="#{param.type_club}"/>
-type = #{type}
-param.type_club = #{param.type_club}
-<!-- remplacé type par 'type'  -->
 <p:dataTable id="clubs"
              value="#{clubC.listClubsDialog(type)}"
              var="c"

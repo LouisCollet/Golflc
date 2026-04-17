@@ -63,24 +63,33 @@ public class FileUploadController implements Serializable {
 
     public String upload(UploadedFile uploadedFile) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
-            LOG.debug(methodName + " - fileName    = " + uploadedFile.getFileName());
-            LOG.debug(methodName + " - contentType = " + uploadedFile.getContentType());
+            LOG.debug("fileName    = {}", uploadedFile.getFileName());
+            LOG.debug("contentType = {}", uploadedFile.getContentType());
+
+            // ✅ security audit 2026-03-19 — file size limit (5 MB max)
+            final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+            if (uploadedFile.getSize() > MAX_FILE_SIZE) {
+                String msg = "File too large: " + uploadedFile.getSize() + " bytes (max " + MAX_FILE_SIZE + ")";
+                LOG.error("- {}", msg);
+                showMessageFatal(msg);
+                return null;
+            }
 
             // ✅ Conversion UTF-8
             String fileName = new String(
                     uploadedFile.getFileName().getBytes(), StandardCharsets.UTF_8);
-            LOG.debug(methodName + " - fileName UTF-8 = " + fileName);
+            LOG.debug("fileName UTF-8 = {}", fileName);
 
             // ✅ Contrôle Tika — détection réelle du type MIME
             String tikaMediaType = tikaDetectDocType(uploadedFile.getInputStream());
-            LOG.debug(methodName + " - tikaMediaType = " + tikaMediaType);
+            LOG.debug("tikaMediaType = {}", tikaMediaType);
 
             if (!tikaMediaType.equals(uploadedFile.getContentType())) {
                 String msg = "Forgery detected by Tika — tikaMediaType = "
                         + tikaMediaType + " , contentType = " + uploadedFile.getContentType();
-                LOG.error(methodName + " - " + msg);
+                LOG.error("- {}", msg);
                 showMessageFatal(msg);
                 return null;
             }
@@ -90,7 +99,7 @@ public class FileUploadController implements Serializable {
                     && !tikaMediaType.equals("image/png")
                     && !tikaMediaType.equals("image/gif")) {
                 String msg = "Media type not jpeg/png/gif = " + tikaMediaType;
-                LOG.error(methodName + " - " + msg);
+                LOG.error("- {}", msg);
                 showMessageFatal(msg);
                 return null;
             }
@@ -108,30 +117,30 @@ public class FileUploadController implements Serializable {
             java.nio.file.Path targetPath = basePath.resolve(safeName).normalize();
 
             if (!targetPath.startsWith(basePath)) {
-                LOG.error(methodName + " - path traversal attempt: " + fileName);
+                LOG.error("path traversal attempt: {}", fileName);
                 showMessageFatal("Invalid file path");
                 return null;
             }
 
             File file = targetPath.toFile();
-            LOG.debug(methodName + " - destination file = " + file);
+            LOG.debug("destination file = {}", file);
 
             try (InputStream is = uploadedFile.getInputStream()) {
                 Files.copy(is, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                LOG.debug(methodName + " - file copy successful");
+                LOG.debug("file copy successful");
             }
 
             // ✅ Génération thumbnail photo 200x200
             if (thumbnailsController.thumbsPhoto("from upload", file)) {
                 String msg = "Successful upload Photo for file = " + file.getName();
-                LOG.debug(methodName + " - " + msg);
+                LOG.debug("- {}", msg);
                 showMessageInfo(msg);
                 BufferedImage image = ImageIO.read(file);
-                LOG.debug(methodName + " - width  = " + image.getWidth());
-                LOG.debug(methodName + " - height = " + image.getHeight());
+                LOG.debug("width  = {}", image.getWidth());
+                LOG.debug("height = {}", image.getHeight());
             } else {
                 String msg = "FAILURE upload Photo for file = " + file.getName();
-                LOG.error(methodName + " - " + msg);
+                LOG.error("- {}", msg);
                 showMessageFatal(msg);
             }
 
@@ -140,24 +149,24 @@ public class FileUploadController implements Serializable {
             playerController.loadPlayer(playerId);
             Player p = appContext.getPlayer();
             p.setPlayerPhotoLocation(file.getName());
-            LOG.debug(methodName + " - photo location updated for player = " + p);
+            LOG.debug("photo location updated for player = {}", p);
 
             // ✅ Mise à jour BDD — via injection CDI, sans Connection
             updatePlayerPhotoLocation.updateRecordFromPlayer(p);
-            LOG.debug(methodName + " - PhotoLocation updated in DB");
+            LOG.debug("PhotoLocation updated in DB");
 
             // ✅ Génération thumbnail 100x100
             if (thumbnailsController.thumbs("from upload", file)) {
                 String msg = "Successful upload Thumbnail for file = " + file.getName();
-                LOG.debug(methodName + " - " + msg);
+                LOG.debug("- {}", msg);
                 showMessageInfo(msg);
                 BufferedImage image2 = ImageIO.read(file);
-                LOG.debug(methodName + " - width  = " + image2.getWidth());
-                LOG.debug(methodName + " - height = " + image2.getHeight());
+                LOG.debug("width  = {}", image2.getWidth());
+                LOG.debug("height = {}", image2.getHeight());
                 return "welcome.xhtml?faces-redirect=true";
             } else {
                 String msg = "FAILURE upload Thumbnail for file = " + file.getName();
-                LOG.error(methodName + " - " + msg);
+                LOG.error("- {}", msg);
                 showMessageFatal(msg);
                 return null;
             }
@@ -177,7 +186,7 @@ public class FileUploadController implements Serializable {
 
     public void handleFileUpload(FileUploadEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             upload(event.getFile());
         } catch (Exception e) {
@@ -191,7 +200,7 @@ public class FileUploadController implements Serializable {
 
     public void handleFileUploadTextarea(FileUploadEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String jsVal    = "PF('textarea').jq.val";
             String fileName = EscapeUtils.forJavaScript(event.getFile().getFileName());
@@ -206,7 +215,7 @@ public class FileUploadController implements Serializable {
     // TIKA — détection réelle du type MIME
     // ========================================
 
-    public static String tikaDetectDocType(InputStream stream) throws IOException {
+    public String tikaDetectDocType(InputStream stream) throws IOException { // migrated from static 2026-03-22
         Detector  detector  = new DefaultDetector();
         Metadata  metadata  = new Metadata();
         MediaType mediaType = detector.detect(stream, metadata);
@@ -285,22 +294,22 @@ public String upload(UploadedFile uploadedFile) throws SQLException {
      Connection conn = null;
 try{  
   //  String fileName = file.getFileName();
-  //     LOG.debug("fileName = " + fileName);
+  //     LOG.debug("fileName = {}", fileName);
   //  String contentType = file.getContentType();
-        LOG.debug("fileName = " + uploadedFile.getFileName());
-        LOG.debug("contentType = " + uploadedFile.getContentType());
+        LOG.debug("fileName = {}", uploadedFile.getFileName());
+        LOG.debug("contentType = {}", uploadedFile.getContentType());
       
  ///   int playerid = Integer.parseInt(sessionMap.get("playerid").toString());
     String fileName = uploadedFile.getFileName();
          //   LOG.debug(" uploaded file name= " + file) ;
-  //          LOG.debug(" uploaded file content extension = " + file.getContentType() ); // basé sur extension !
-   //         LOG.debug(" uploaded file size = " + file.getSize() ); 
-   //     LOG.debug("fName = " + fileName);
+  //          LOG.debug(" uploaded file content extension = {}", file.getContentType()); // basé sur extension !
+   //         LOG.debug(" uploaded file size = {}", file.getSize()); 
+   //     LOG.debug("fName = {}", fileName);
      fileName = new String(fileName.getBytes(),StandardCharsets.UTF_8);
-        LOG.debug("string name converted to UTF8 = " + fileName);
+        LOG.debug("string name converted to UTF8 = {}", fileName);
         //  controle Tika
         String tikaMediaType= tikaDetectDocType(uploadedFile.getInputStream());
-           LOG.debug("tikaMediaType =  " + tikaMediaType);
+           LOG.debug("tikaMediaType =  {}", tikaMediaType);
         if(! tikaMediaType.equals(uploadedFile.getContentType())){
             String msg = "Forgery detected by tika in Media Type = " + tikaMediaType + " ,Content Type = " + uploadedFile.getContentType();
             LOG.debug(msg);
@@ -325,10 +334,10 @@ image/x-icon    favicon
             return null;
         }
     File file = new File(settings.getProperty("PHOTOS_LIBRARY") + "/" + fileName);
-        LOG.debug("Destination photo file = " + file );
+        LOG.debug("Destination photo file = {}", file);
   // copy from input to /resources/images/   
         InputStream is = uploadedFile.getInputStream();
-            LOG.debug("file to path = " + file.getPath());
+            LOG.debug("file to path = {}", file.getPath());
         Files.copy(is, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             LOG.debug("file copy successfull" );
     
@@ -338,8 +347,8 @@ image/x-icon    favicon
             LOG.debug(msg);
             showMessageInfo(msg);
             BufferedImage image = ImageIO.read(file);
-                LOG.debug("New width = " + image.getWidth());
-                LOG.debug("New wheight = " + image.getHeight());
+                LOG.debug("New width = {}", image.getWidth());
+                LOG.debug("New wheight = {}", image.getHeight());
         }else{
             String msg = "<h1>FAILURE NO upload Photo </h1> for file = " + file.getName();
             LOG.debug(msg);
@@ -366,10 +375,10 @@ image/x-icon    favicon
        p.setPlayerPhotoLocation(file.getName());
 
         
-   //      LOG.debug("photo location updated for player = ! " + p);
+   //      LOG.debug("photo location updated for player = ! {}", p);
  // mise à jour table player     
         if(new update.UpdatePlayerPhotoLocation().updateRecordFromPlayer(p, conn)){
-            LOG.debug(" PhotoLocation updated for player = " + p);
+            LOG.debug(" PhotoLocation updated for player = {}", p);
         }else{
             // à compléter
         }
@@ -380,8 +389,8 @@ image/x-icon    favicon
             LOG.debug(msg);
             showMessageInfo(msg);
             BufferedImage image2 = ImageIO.read(file);
-                LOG.debug("Width = " + image2.getWidth());
-                LOG.debug("Height = " + image2.getHeight());
+                LOG.debug("Width = {}", image2.getWidth());
+                LOG.debug("Height = {}", image2.getHeight());
             return "welcome.xhtml?faces-redirect=true";
         }else{
             String msg = "<h1>NO NO upload Thumbnail </h1> for file = " + file.getName();
@@ -417,15 +426,15 @@ finally{
 public void handleFileUpload(FileUploadEvent event) throws SQLException, IOException{
 // upload image choisie par player
  ///   UploadedFile uploadedFile = event.getFile();
- ///       LOG.debug("uploaded File Name (event) = " + uploadedFile.getFileName());
+ ///       LOG.debug("uploaded File Name (event) = {}", uploadedFile.getFileName());
  //   final InputStream inputStream = uploadedFile.getInputStream();  // event from the fileuploader-component
-       // LOG.debug("InputStream = " + is.toString());
+       // LOG.debug("InputStream = {}", is.toString());
  //   DefaultStreamedContent fileUploaded = DefaultStreamedContent.builder()
  //                       .contentType("image/png")
  //                       .name("inspec_met_picture_north")
  //                       .stream(() -> inputStream)
   //                      .build();
-    //  LOG.debug("pictureNorthtoString = " + fileUploaded.toString());
+    //  LOG.debug("pictureNorthtoString = {}", fileUploaded.toString());
     upload(event.getFile());
 }
 
@@ -460,7 +469,7 @@ void main() throws SQLException, Exception{
     round.setIdround(560);
 //   LoadClassment ftes = new LoadClassment();
    Classment cl = new LoadClassment().load(player, round, conn);
-       LOG.debug("Classment = " + cl.toString());
+       LOG.debug("Classment = {}", cl.toString());
 
 //utils.DBConnection.closeQuietly(conn, null, null, null);
 

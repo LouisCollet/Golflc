@@ -26,7 +26,7 @@ public class MatchplayClassmentList implements Serializable {
     // ne fonctionne pas !!
     public List<Round> list(final Round round, final Club club) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - with round = " + round);
         LOG.debug(methodName + " - with club = " + club);
 
@@ -58,7 +58,7 @@ public class MatchplayClassmentList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -66,7 +66,7 @@ public class MatchplayClassmentList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // Club club = new Club();
         // club.setIdclub(1159);
         // Round round = new Round();

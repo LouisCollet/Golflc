@@ -47,7 +47,7 @@ html[data-theme="dark"] {
 }
 
 html {
-    font-size: 100%;
+    font-size: 1.1rem;
 }
 
 body {
@@ -81,10 +81,18 @@ h4 {
     color: var(--golf-warning);
     font-weight: bold;
 }
-
+/*
 th, td {
     padding: 15px;
 }
+*/
+.compact-table td,
+.compact-table th {
+    padding: 0.5rem 0.75rem;
+}
+
+
+
 table {
     margin-left: auto;
     margin-right: auto;
@@ -94,12 +102,23 @@ table {
 }
 
 /* ============================================================
+   BUTTON GROUP — standard flex layout for action buttons (2026-03-19)
+   Usage: <div class="btn-group"> <p:commandButton/> ... </div>
+   ============================================================ */
+.btn-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* ============================================================
    HIGHLIGHT
    ============================================================ */
-.highlight {
-    background-color: #3b82f6 !important;
-    background-image: none !important;
-    color: #ffffff !important;
+tr.highlight td {
+    background-color: var(--golf-primary-bg);
+    background-image: none;
+    color: var(--golf-text);
 }
 
 /* ============================================================
@@ -185,24 +204,94 @@ td.ui-panelgrid-cell.col2Flex {
     padding: 0.5rem 0.75rem;
 }
 
-ui.fieldset.legend {
+/* ============================================================
+   SELECTOR INCLUDES — club/course/round/player selector rows
+   ============================================================ */
+.selector-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.selector-name {
+    font-style: italic;
+    color: var(--text-color, #333);
+}
+.selector-id {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--golf-primary, #2e7d32);
+}
+
+.ui-fieldset .ui-fieldset-legend {
     font-style: normal;
     font-weight: bold;
-    color: var(--golf-accent) !important;
-    background-color: var(--golf-accent-light) !important;
+    color: var(--golf-accent);
+    background-color: var(--golf-accent-light);
 }
 
 /* ============================================================
-   MENU — let Saga theme handle most styling
+   MENU — golf-menu themed panel menu
    ============================================================ */
-.ui-menuitem-link {
-    font-size: 0.9rem;
-    font-style: italic;
+#form_menu .golf-menu {
+    font-size: 0.85rem;
 }
-.ui-menuitem-text {
+#form_menu .golf-menu .ui-panelmenu-header > a {
+    background: var(--golf-primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    margin-bottom: 2px;
+    padding: 0.6rem 0.75rem;
+}
+#form_menu .golf-menu .ui-panelmenu-header > a:hover {
+    background: var(--golf-primary-light);
+}
+#form_menu .golf-menu .ui-panelmenu-header.ui-state-active > a {
+    background: var(--golf-primary);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+#form_menu .golf-menu .ui-panelmenu-content {
+    border: 1px solid var(--surface-border, #dee2e6);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    margin-bottom: 2px;
+    padding: 0.25rem 0;
+}
+#form_menu .golf-menu .ui-menuitem-link {
     font-size: 0.8rem;
-    font-style: italic;
+    font-style: normal;
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    margin: 1px 4px;
+    transition: background 0.15s;
+}
+#form_menu .golf-menu .ui-menuitem-link:hover {
+    background: var(--golf-accent-light);
+}
+#form_menu .golf-menu .ui-menuitem-text {
+    font-size: 0.8rem;
+    font-style: normal;
     color: var(--golf-text);
+}
+#form_menu .golf-menu .ui-menuitem-icon {
+    color: var(--golf-accent);
+    margin-right: 0.4rem;
+}
+/* Role-based section colors */
+#form_menu .golf-menu .ui-panelmenu-header.menu-admin > a {
+    background: var(--golf-danger, #b91c1c);
+}
+#form_menu .golf-menu .ui-panelmenu-header.menu-admin > a:hover {
+    background: #dc2626;
+}
+#form_menu .golf-menu .ui-panelmenu-header.menu-local-admin > a {
+    background: var(--golf-warning, #92400e);
+}
+#form_menu .golf-menu .ui-panelmenu-header.menu-local-admin > a:hover {
+    background: #b45309;
 }
 
 /* ============================================================
@@ -212,6 +301,114 @@ ui.fieldset.legend {
     font-weight: bold;
     background-color: var(--surface-hover, whitesmoke);
     font-size: 1.25em;
+}
+
+/* Schedule wrapper — controls font-size and spacing */
+.schedule-panel {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+.schedule-panel .fc {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Lesson payment — vertical card per lesson (price_pro.xhtml) */
+.lesson-item-card {
+    background: var(--surface-card, #fff);
+    border: 1px solid var(--surface-border, #dee2e6);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
+}
+.lesson-item-card .ui-panelgrid {
+    width: 100%;
+    background: transparent;
+}
+.lesson-item-card td.ui-panelgrid-cell.col1Flex {
+    background-color: var(--golf-accent-light);
+    color: var(--golf-accent);
+    font-weight: 600;
+    padding: 0.4rem 0.75rem;
+    flex: 0 0 35%;
+    max-width: 35%;
+}
+.lesson-item-card td.ui-panelgrid-cell.col2Flex {
+    background-color: var(--surface-hover, var(--golf-surface));
+    padding: 0.4rem 0.75rem;
+}
+
+/* Schedule dialog — lesson details */
+/* Lesson event block — smaller text for yellow events */
+.schedule-panel .fc-event-title {
+    font-size: 0.7rem;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.schedule-panel .fc-event-time {
+    font-size: 0.65rem;
+}
+
+/* Schedule — cart badge */
+.lesson-cart-badge {
+    background: var(--golf-primary);
+    color: #ffffff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Schedule dialog — lesson details */
+.schedule-dialog .ui-dialog-content {
+    padding: 1rem 1.25rem;
+}
+.schedule-dialog .ui-panelgrid {
+    width: 100%;
+    background: transparent;
+}
+.schedule-dialog td.ui-panelgrid-cell.col1Flex {
+    font-weight: 500;
+    min-width: 80px;
+}
+
+/* Playing handicap result — used in scramble/stableford/othergames_playing_hcp */
+.playing-hcp-result {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--golf-primary, #2e7d32);
+}
+
+/* ============================================================
+   SCORE STABLEFORD — column styles
+   ============================================================ */
+.score-col-hole {
+    color: var(--golf-primary, #2e7d32);
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.score-col-par {
+    color: var(--golf-accent, #1b5e20);
+    font-weight: bold;
+}
+.score-col-distance {
+    color: var(--text-color-secondary, #6c757d);
+}
+.score-col-index {
+    color: var(--text-color-secondary, #6c757d);
+}
+.score-col-extra {
+    color: var(--golf-primary, #2e7d32);
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.score-col-points {
+    color: var(--golf-danger, #d32f2f);
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 .fc-timegrid-slot {
@@ -239,17 +436,22 @@ ui.fieldset.legend {
 /* ============================================================
    DATATABLE
    ============================================================ */
+/* ── p:headerRow — groupe de lignes (tri par club) ────────────────── */
 .compact-table {
     font-size: 0.80rem;
 }
-.compact-table .ui-button {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.5rem;
+
+/* toggler rowgroup */
+.compact-table .p-rowgroup-toggler {
+    color: #ffffff;
+    margin-right: 0.5rem;
 }
-.compact-table .ui-datatable-footer .ui-button {
-    font-size: 1.0rem;
-    padding: 0.5rem 1.0rem;
+
+.compact-table .p-rowgroup-toggler:hover {
+    color: var(--golf-primary-light);
 }
+
+
 .ui-datatable-empty-message {
     font-size: 1.5rem;
     font-weight: bold;
@@ -273,8 +475,8 @@ ui.fieldset.legend {
     border: 1px;
     color: var(--text-color, black);
 }
-.ui-panelgrid-cell th {
-    background-color: var(--golf-accent-light) !important;
+.ui-panelgrid .ui-panelgrid-cell th {
+    background-color: var(--golf-accent-light);
     font-weight: bold;
     border: none;
 }
@@ -286,8 +488,7 @@ ui.fieldset.legend {
    BACKGROUNDS UTILITAIRES
    ============================================================ */
 .bg-yellow       { background-color: #FFEB3B; }
-.bg-yellow-light { background-color: #FFF9C4; }
-.bg-yellow-box   { background-color: #FFEB3B; padding: 1rem; border-radius: 4px; }
+/* bg-yellow-light, bg-yellow-box removed 2026-03-23 — unused */
 .bg-warning      { background-color: #FFF3CD; border: 1px solid #FFE69C; color: #856404; }
 
 .danger-confirm .ui-dialog-content {
@@ -297,67 +498,289 @@ ui.fieldset.legend {
 }
 
 /* Bouton danger — texte blanc lisible sur fond rouge PrimeFaces */
-.ui-button-danger.ui-button,
-.ui-button-danger.ui-button:hover {
-    color: white !important;
+.ui-button.ui-button-danger,
+.ui-button.ui-button-danger:hover {
+    color: white;
+}
+
+/* ============================================================
+   DIALOG FRAMEWORK — visual distinction by type (2026-03-19)
+   Usage: add styleClass on the DialogFrameworkOptions or
+   apply via dialogTemplate body class.
+   PrimeFaces dialog titlebar = .ui-dialog-titlebar
+   ============================================================ */
+
+/* Base dialog styling */
+.ui-dialog {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+.ui-dialog .ui-dialog-titlebar {
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid transparent;
+}
+.ui-dialog .ui-dialog-content {
+    padding: 1rem 1.25rem;
+}
+
+/* Selection dialogs (Player, Club, Course, Round) — accent blue */
+.ui-dialog.dlg-select .ui-dialog-titlebar {
+    background: linear-gradient(135deg, var(--golf-accent), #1d4ed8);
+    color: #fff;
+    border-bottom-color: var(--golf-accent);
+}
+.ui-dialog.dlg-select .ui-dialog-titlebar .ui-dialog-title {
+    color: #fff;
+}
+
+/* Detail/Info dialogs (ClubDetail, Handicap, Calculations) — primary green */
+.ui-dialog.dlg-info .ui-dialog-titlebar {
+    background: linear-gradient(135deg, var(--golf-primary), var(--golf-primary-light));
+    color: #fff;
+    border-bottom-color: var(--golf-primary);
+}
+.ui-dialog.dlg-info .ui-dialog-titlebar .ui-dialog-title {
+    color: #fff;
+}
+
+/* Action dialogs (Flight, Weather, Unavailable) — warm amber */
+.ui-dialog.dlg-action .ui-dialog-titlebar {
+    background: linear-gradient(135deg, var(--golf-warning, #b45309), #d97706);
+    color: #fff;
+    border-bottom-color: #d97706;
+}
+.ui-dialog.dlg-action .ui-dialog-titlebar .ui-dialog-title {
+    color: #fff;
 }
 
 /* ============================================================
    TARIF GREENFEE / MEMBER WIZARD
    ============================================================ */
 .tarif-wizard {
-    width: 70%;
+    width: 100%;
     margin: auto;
+    overflow: visible;
 }
 .tarif-wizard .ui-wizard-content {
     display: flex;
     justify-content: center;
+    padding: 0.5rem 1rem;
+    overflow: visible;
+    border: none;
+}
+.tarif-wizard .ui-wizard-step-titles {
+    display: flex;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: var(--surface-ground, #f8f9fa);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: none;
 }
 .tarif-wizard .ui-wizard-step-titles li {
-    font-size: 1.0rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+    background: var(--surface-card, #fff);
+    color: var(--text-color, #495057);
+    border: none;
+    cursor: pointer;
 }
-.tarif-steps {
-    max-width: 700px;
-    margin: 1.5rem auto;
+/* Override PrimeFaces theme borders on step-title li (specificity 4 classes > PF 3 classes) */
+.tarif-wizard.ui-wizard .ui-wizard-step-titles li.ui-wizard-step-title {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+.tarif-wizard .ui-wizard-step-titles li:hover {
+    background: var(--golf-accent-light, #e8f5e9);
+}
+.tarif-wizard .ui-wizard-step-titles li.ui-state-highlight {
+    background: var(--golf-primary, #2e7d32);
+    color: #fff;
+    font-weight: 600;
+    border-color: var(--golf-primary, #2e7d32);
 }
 
-.tarif-step-panel {
-    max-width: 560px;
-    margin: 1rem auto;
-    border-radius: 6px;
-    overflow: hidden;
+/* ── Couleurs distinctes par tab (bordure basse inactive, fond actif) ── */
+
+/* Tab 1 : 💳 Cotisation — vert golf */
+.tarif-wizard .ui-wizard-step-titles li:nth-child(1) {
+    border-bottom: 3px solid var(--golf-primary, #2e7d32);
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(1):hover {
+    background: var(--golf-accent-light, #e8f5e9);
+}
+/* (actif déjà couvert par la règle .ui-state-highlight ci-dessus) */
+
+/* Tab 2 : 🎒 Equipments — bleu */
+.tarif-wizard .ui-wizard-step-titles li:nth-child(2) {
+    border-bottom: 3px solid #3B82F6;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(2):hover {
+    background: #EFF6FF;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(2).ui-state-highlight {
+    background: #3B82F6;
+    border-color: #3B82F6;
+}
+
+/* Tab 3 : 📉 Discount — orange */
+.tarif-wizard .ui-wizard-step-titles li:nth-child(3) {
+    border-bottom: 3px solid #F97316;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(3):hover {
+    background: #FFF7ED;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(3).ui-state-highlight {
+    background: #F97316;
+    border-color: #F97316;
+}
+
+/* Tab 4 : 💬 Comment — violet */
+.tarif-wizard .ui-wizard-step-titles li:nth-child(4) {
+    border-bottom: 3px solid #8B5CF6;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(4):hover {
+    background: #F5F3FF;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(4).ui-state-highlight {
+    background: #8B5CF6;
+    border-color: #8B5CF6;
+}
+
+/* Tab 5 : ✅ Confirm / 📆 Days — teal */
+.tarif-wizard .ui-wizard-step-titles li:nth-child(5) {
+    border-bottom: 3px solid #14B8A6;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(5):hover {
+    background: #F0FDFA;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(5).ui-state-highlight {
+    background: #14B8A6;
+    border-color: #14B8A6;
+}
+
+/* Tab 6 : 🌅 Twilight — rose */
+.tarif-wizard .ui-wizard-step-titles li:nth-child(6) {
+    border-bottom: 3px solid #EC4899;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(6):hover {
+    background: #FDF2F8;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(6).ui-state-highlight {
+    background: #EC4899;
+    border-color: #EC4899;
+}
+
+/* Tab 7 : ✅ Confirm — indigo */
+.tarif-wizard .ui-wizard-step-titles li:nth-child(7) {
+    border-bottom: 3px solid #6366F1;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(7):hover {
+    background: #EEF2FF;
+}
+.tarif-wizard .ui-wizard-step-titles li:nth-child(7).ui-state-highlight {
+    background: #6366F1;
+    border-color: #6366F1;
+}
+
+.tarif-wizard.ui-wizard {
+    overflow: visible;
+}
+.tarif-wizard .ui-wizard-nav-bar {
     text-align: center;
+    padding: 1rem 0 0.5rem;
 }
-.tarif-step-panel .ui-panelgrid {
-    width: 100%;
+.tarif-wizard .ui-wizard-nav-bar .ui-button {
+    margin: 0 0.3rem;
+}
+
+.tarif-step-border {
+    max-width: 700px;
     margin: 0 auto;
-    background-color: transparent;
 }
-.tarif-step-panel .ui-button {
-    display: inline-block;
+.tarif-step-panel {
+    width: 100%;
+    text-align: left;
+    background: var(--surface-card, #fff);
+}
+/* Confirmation tab — wider for dataTables */
+.tarif-step-panel-wide {
+    max-width: 100%;
+}
+.tarif-step-border:has(.tarif-step-panel-wide) {
+    max-width: 100%;
+}
+.tarif-step-panel .ui-panel-titlebar {
+    background: var(--golf-primary, #2e7d32);
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border: none;
+}
+/* Remove theme borders on wizard step panels and their children */
+.tarif-wizard .ui-wizard-content .ui-panel {
+    border: none;
+    box-shadow: none;
+}
+.tarif-step-panel .ui-panel-content.ui-widget-content,
+.tarif-step-panel .ui-panel-footer.ui-widget-content {
+    border: none;
 }
 .tarif-step-panel .ui-panel-titlebar h1,
 .tarif-step-panel .ui-panel-titlebar h2,
 .tarif-step-panel .ui-panel-titlebar h3 {
     display: inline;
     font-size: 1.1rem;
-    color: inherit;
-    font-weight: bold;
+    color: #fff;
+    font-weight: 600;
     margin: 0;
     padding: 0;
-    text-align: left;
+}
+.tarif-step-panel .ui-panel-content {
+    padding: 1.25rem;
+    background: var(--surface-card, #fff);
+}
+.tarif-step-panel .ui-panelgrid {
+    width: 100%;
+    margin: 0;
+    background-color: transparent;
+}
+.tarif-step-panel .ui-button {
+    display: inline-block;
 }
 .tarif-step-panel .ui-panel-footer {
     text-align: center;
-    padding: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--surface-ground, #f8f9fa);
+    border-top: 1px solid var(--surface-border, #dee2e6);
 }
 .tarif-step-panel .ui-panel-footer .ui-button {
     margin: 0 0.3rem;
 }
 .tarif-step-panel td.ui-panelgrid-cell.col1Flex {
     background-color: var(--golf-accent-light);
+    color: var(--golf-accent);
     text-align: left;
     border-radius: 3px 0 0 3px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+    flex: 0 0 40%;
+    max-width: 40%;
+}
+/* All children in col1 inherit the label style */
+.tarif-step-panel td.ui-panelgrid-cell.col1Flex span,
+.tarif-step-panel td.ui-panelgrid-cell.col1Flex label,
+.tarif-step-panel td.ui-panelgrid-cell.col1Flex .ui-outputlabel {
+    color: inherit;
+    font-weight: inherit;
+    font-size: inherit;
 }
 .tarif-step-panel td.ui-panelgrid-cell.col2Flex {
     background-color: var(--surface-hover, var(--golf-surface));
@@ -381,22 +804,18 @@ ui.fieldset.legend {
     font-weight: normal;
 }
 
-.pricing-type-selector .ui-button {
-    background-color: #2196F3 !important;
-    border-color: #1976D2 !important;
-    color: #ffffff !important;
+.pricing-type-selector .ui-button.ui-button {
+    background-color: var(--golf-accent);
+    border-color: var(--golf-accent);
+    color: #fff;
 }
 .pricing-type-selector .ui-button.ui-state-active {
-    background-color: #0D47A1 !important;
-    border-color: #0D47A1 !important;
-    color: #ffffff !important;
+    background-color: var(--golf-primary);
+    border-color: var(--golf-primary);
+    color: #fff;
 }
 
-.tarif-delete-panel .ui-panel-titlebar {
-    background-color: #FFF3CD;
-    border-color: #FFE69C;
-    color: #856404;
-}
+/* tarif-delete-panel removed 2026-03-23 — unused */
 
 .ui-badge {
     margin-left: 0.4rem;
@@ -456,12 +875,7 @@ a.account-card:hover {
 .account-card .p-button-label {
     width: 100%;
 }
-.account-card-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    padding: 0.85rem 1rem;
-}
+/* account-card-inner removed 2026-03-23 — unused */
 .account-card-icon {
     font-size: 1.8rem;
     color: var(--primary-color, #4a7c4a);
@@ -524,21 +938,21 @@ a.account-card:hover {
 }
 
 .pay-grid.ui-panelgrid { width: 100%; }
-.pay-grid .ui-panelgrid-cell {
-    padding: 0.65rem 1.5rem !important;
-    border: none !important;
-    background: transparent !important;
+.pay-grid.ui-panelgrid .ui-panelgrid-cell {
+    padding: 0.65rem 1.5rem;
+    border: none;
+    background: transparent;
 }
-.pay-grid .ui-panelgrid-row:not(:last-child) .ui-panelgrid-cell {
-    border-bottom: 1px solid #f1f5f9 !important;
+.pay-grid.ui-panelgrid .ui-panelgrid-row:not(:last-child) .ui-panelgrid-cell {
+    border-bottom: 1px solid var(--surface-border, #f1f5f9);
 }
 .pay-grid-key { font-size: 0.85rem; color: var(--golf-text-light); }
 .pay-grid-val { font-size: 0.85rem; font-weight: 500; color: var(--golf-text-dark); text-align: right; }
 .pay-mono { font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
 
 .pay-card.ui-card .ui-card-footer {
-    padding: 0 !important;
-    border-top: 1px solid #f1f5f9;
+    padding: 0;
+    border-top: 1px solid var(--surface-border, #f1f5f9);
     background: transparent;
 }
 
@@ -551,15 +965,15 @@ a.account-card:hover {
     text-align: center;
     line-height: 20px;
 }
-.pay-progressbar.ui-progressbar {
-    height: 20px !important;
-    border-radius: 99px !important;
-    border: none !important;
-    background: #e2e8f0 !important;
+.pay-card .pay-progressbar.ui-progressbar {
+    height: 20px;
+    border-radius: 99px;
+    border: none;
+    background: var(--surface-border, #e2e8f0);
 }
-.pay-progressbar .ui-progressbar-value {
-    border-radius: 99px !important;
-    background: #3b82f6 !important;
+.pay-card .pay-progressbar .ui-progressbar-value {
+    border-radius: 99px;
+    background: var(--golf-accent, #3b82f6);
 }
 
 .pay-actions {
@@ -567,21 +981,21 @@ a.account-card:hover {
     gap: 0.75rem;
     padding: 0 1.5rem 1.5rem;
 }
-.pay-btn-pay.ui-button {
+.pay-actions .pay-btn-pay.ui-button {
     flex: 1;
-    border-radius: 10px !important;
-    font-weight: 600 !important;
-    padding: 0.75rem !important;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 0.75rem;
 }
-.pay-btn-pay.ui-button.ui-state-disabled {
+.pay-actions .pay-btn-pay.ui-button.ui-state-disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
-.pay-btn-cancel.ui-button {
-    border-radius: 10px !important;
-    padding: 0.75rem 1.2rem !important;
-    color: #64748b !important;
-    border-color: #cbd5e1 !important;
+.pay-actions .pay-btn-cancel.ui-button {
+    border-radius: 10px;
+    padding: 0.75rem 1.2rem;
+    color: var(--golf-text-light, #64748b);
+    border-color: var(--surface-border, #cbd5e1);
 }
 
 /* ============================================================
@@ -590,32 +1004,39 @@ a.account-card:hover {
 .login-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+ /*   align-items: center; */
+    align-items: flex-start;   /* 🔥 FIX */
     min-height: 60vh;
     padding: 2rem;
+    width: 100%;
+}
+.login-container.form-top {
+    min-height: auto;
+    align-items: flex-start;
 }
 .login-card {
     width: 100%;
     max-width: 80%;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 .login-card.ui-panel {
-    border: none;
+    border: 1px solid var(--surface-border, #dee2e6);
 }
+/* login-card titlebar — border-radius replaces overflow:hidden for rounded corners */
 .login-card.ui-panel .ui-panel-titlebar {
-    background: linear-gradient(135deg, var(--golf-primary), var(--golf-primary-light));
-    border: none;
     padding: 1.5rem 2rem;
-    text-align: center;
+    border-radius: 12px 12px 0 0;
+}
+.login-card.ui-panel .ui-panel-content:last-child {
+    border-radius: 0 0 12px 12px;
+}
+.login-card.ui-panel .ui-panel-footer:last-child {
+    border-radius: 0 0 12px 12px;
 }
 .login-card.ui-panel .ui-panel-titlebar h1 {
-    display: block;
     font-size: 1.4rem;
-    color: white;
-    font-weight: 700;
-    margin: 0;
 }
 .login-card.ui-panel .ui-panel-content {
     padding: 1.5rem 2rem;
@@ -731,7 +1152,7 @@ a.account-card:hover {
    FORM CARD — tous les formulaires CRUD
    ============================================================ */
 .form-card { max-width: 80%; }
-.form-card.ui-panel { border: none; }
+.form-card.ui-panel { border: 1px solid var(--surface-border, #dee2e6); }
 .form-card.ui-panel .ui-panel-titlebar {
     background: linear-gradient(135deg, var(--golf-primary), var(--golf-primary-light));
     border: none;
@@ -832,39 +1253,203 @@ html[data-theme="dark"] .login-option:hover {
 html[data-theme="dark"] .login-option-icon.returning { background: #1e3a5f; color: #60a5fa; }
 html[data-theme="dark"] .login-option-icon.newuser   { background: #14351d; color: #4ade80; }
 
-html[data-theme="dark"] .pay-grid .ui-panelgrid-row:not(:last-child) .ui-panelgrid-cell {
-    border-bottom-color: var(--surface-border) !important;
+html[data-theme="dark"] .pay-grid.ui-panelgrid .ui-panelgrid-row:not(:last-child) .ui-panelgrid-cell {
+    border-bottom-color: var(--surface-border);
 }
 html[data-theme="dark"] .pay-card.ui-card .ui-card-footer {
     border-top-color: var(--surface-border);
 }
 
 html[data-theme="dark"] .bg-yellow       { background-color: #78640a; }
-html[data-theme="dark"] .bg-yellow-light { background-color: #3d3205; }
-html[data-theme="dark"] .bg-yellow-box   { background-color: #78640a; }
+/* bg-yellow-light, bg-yellow-box dark mode removed 2026-03-23 — unused */
 html[data-theme="dark"] .bg-warning      { background-color: #422006; border-color: #78350f; color: #fbbf24; }
 
-html[data-theme="dark"] .pricing-type-selector .ui-button {
-    background-color: #1e40af !important;
-    border-color: #1e3a8a !important;
+html[data-theme="dark"] .pricing-type-selector .ui-button.ui-button {
+    background-color: #1e40af;
+    border-color: #1e3a8a;
 }
 html[data-theme="dark"] .pricing-type-selector .ui-button.ui-state-active {
-    background-color: #1e3a8a !important;
-    border-color: #172554 !important;
+    background-color: #1e3a8a;
+    border-color: #172554;
 }
 
-html[data-theme="dark"] .tarif-delete-panel .ui-panel-titlebar {
-    background-color: #422006;
-    border-color: #78350f;
-    color: #fbbf24;
-}
+/* tarif-delete-panel dark mode removed 2026-03-23 — unused */
 
-html[data-theme="dark"] .highlight {
-    background-color: #1d4ed8 !important;
+html[data-theme="dark"] tr.highlight td {
+    background-color: #1e3a5f;
 }
 
 /* Dark mode transition for theme toggle smoothness */
 html[data-theme="dark"] .login-card.ui-panel .ui-panel-titlebar,
 html[data-theme="dark"] .form-card.ui-panel .ui-panel-titlebar {
     background: linear-gradient(135deg, #166534, #15803d);
+}
+
+.week-container {
+    margin-top: 1rem;
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.day-active {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    border-radius: 8px !important;
+}
+
+.day-inactive {
+    background-color: #f5f5f5 !important;
+    color: #666 !important;
+    border-radius: 8px !important;
+}
+
+.week-summary {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.week-legend {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.legend-item.active {
+    color: #4CAF50;
+}
+
+.legend-item.inactive {
+    color: #999;
+}
+.custom-days-checkbox td {
+    padding-right: 1.5rem; /* remplace le gap de la flexbox */
+}
+/* Force l'alignement vertical entre la checkbox et le texte */
+.ui-selectmanycheckbox.ui-widget label {
+    vertical-align: middle;
+    margin-left: 0.5rem;
+    margin-right: 1rem;
+}
+
+.ui-selectmanycheckbox td {
+    padding: 0.5rem 0; /* Ajoute de l'espace pour éviter le chevauchement */
+}
+
+.ui-selectmanycheckbox-flex {
+    gap: 1.5rem;
+}
+/* Définit la grille Flexbox */
+.days-flex-grid.ui-selectmanycheckbox-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem; /* L'espacement que tu souhaitais au début */
+}
+
+/* Force chaque élément à prendre environ 30% pour faire 3 colonnes */
+.days-flex-grid.ui-selectmanycheckbox-flex .ui-chkbox {
+    flex: 0 0 30%; 
+    display: flex;
+    align-items: center; /* Aligne parfaitement la case et le texte */
+}
+
+/* Espace entre la case et le label */
+.days-flex-grid.ui-selectmanycheckbox-flex label {
+    margin-left: 0.5rem;
+}
+/* =========================
+   CELLULES TABLE (NORMAL + EDIT)
+   ========================= */
+
+/* cellule en édition rowEdit */
+.compact-table .p-cell-editing {
+    vertical-align: middle;
+}
+
+/* =========================
+   INPUTS FULL WIDTH
+   ========================= */
+.compact-table .p-inputtext,
+.compact-table .p-inputnumber,
+.compact-table .p-selectonemenu {
+    width: 100%;
+}
+
+.compact-table .p-inputnumber-input {
+    width: 100%;
+}
+
+/* =========================
+   BOUTONS
+   ========================= */
+.compact-table .p-button {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.5rem;
+}
+
+.compact-table .p-datatable-footer .p-button {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+/* =========================
+   ROWGROUP HEADER
+   ========================= */
+.compact-table .p-rowgroup-header {
+    background-color: var(--golf-primary);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.compact-table .p-rowgroup-header td {
+    padding: 0.5rem 0.75rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid var(--golf-primary-light);
+}
+
+/* =========================
+   ROW EDITING — forcer le layout table-row (override PF15 Nova flex éventuel)
+   ========================= */
+.compact-table.p-datatable .p-datatable-tbody > tr.p-row-editing {
+    display: table-row;
+}
+.compact-table.p-datatable .p-datatable-tbody > tr.p-row-editing > td {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/* =========================
+   CELL EDITOR — compact-table
+   Ne pas surcharger display — laisser PrimeFaces 15 contrôler
+   la visibilité output/input via son propre CSS de thème.
+   ========================= */
+.compact-table .p-cell-editor {
+    width: 100%;
+}
+
+.compact-table .p-cell-editor-input {
+    width: 100%;
+    /* PAS de display: block — PF15 gère show/hide via .p-row-editing */
+}
+
+.compact-table .p-inputnumber input {
+    text-align: right;
+    width: 100%;
+}
+
+.compact-table.p-datatable-scrollable td {
+    white-space: nowrap;
 }

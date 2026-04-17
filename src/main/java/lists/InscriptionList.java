@@ -47,7 +47,7 @@ public class InscriptionList implements Serializable {
 
     public List<ECourseList> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         // ✅ Early return — guard clause FIRST
         if (liste != null) {
@@ -103,7 +103,7 @@ public class InscriptionList implements Serializable {
      */
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -115,7 +115,7 @@ public class InscriptionList implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             List<ECourseList2> p1 = list();
             LOG.debug(methodName + " - number extracted = " + p1.size());

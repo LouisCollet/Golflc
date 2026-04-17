@@ -27,41 +27,98 @@
                     <h2 style="margin:0.5rem 0; color:var(--red-500);">Technical Error</h2>
                 </div>
 
-                <div class="info-grid">
+                <div id="errorInfoGrid" class="info-grid">
                     <div class="info-row">
                         <span class="info-label">View</span>
-                        <span class="info-value" style="font-family:monospace;">
+                        <span id="errView" class="info-value" style="font-family:monospace;">
                             #{view.viewId}
                         </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Exception</span>
-                        <span class="info-value" style="color:var(--red-500);">
+                        <span id="errException" class="info-value" style="color:var(--red-500);">
                             #{pfExceptionHandler.exception}
                         </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Message</span>
-                        <span class="info-value">#{pfExceptionHandler.message}</span>
+                        <span id="errMessage" class="info-value">#{pfExceptionHandler.message}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Type</span>
-                        <span class="info-value">#{pfExceptionHandler.type}</span>
+                        <span id="errType" class="info-value">#{pfExceptionHandler.type}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Timestamp</span>
-                        <span class="info-value">#{pfExceptionHandler.formattedTimestamp}</span>
+                        <span id="errTimestamp" class="info-value">#{pfExceptionHandler.formattedTimestamp}</span>
                     </div>
                 </div>
 
                 <p:divider layout="horizontal" type="solid"/>
 
-                <div style="max-height:300px; overflow:auto; padding:0.5rem;
+                <div id="stackTraceDiv" style="max-height:300px; overflow:auto; padding:0.5rem;
                             background:var(--surface-ground); border-radius:6px;">
                     <h:outputText value="#{pfExceptionHandler.formattedStackTrace}"
                                   escape="false"
                                   style="font-family:monospace; font-size:0.8rem;"/>
                 </div>
+
+                <div style="margin-top:0.75rem; text-align:right;">
+                    <p:button id="btnCopyError"
+                              value="Copy for Claude"
+                              icon="pi pi-copy"
+                              styleClass="p-button-outlined p-button-sm"
+                              onclick="copyErrorForClaude(); return false;"/>
+                    <span id="copyConfirm"
+                          style="display:none; margin-left:0.5rem; color:var(--green-500); font-size:0.85rem;">
+                        ✓ Copied!
+                    </span>
+                </div>
+
+                <script type="text/javascript">
+                function copyErrorForClaude() {
+                    var get = function(id) {
+                        var el = document.getElementById(id);
+                        return el ? el.innerText.trim() : '';
+                    };
+                    var stackRaw = document.getElementById('stackTraceDiv').innerText || '';
+                    var stackLines = stackRaw.split('\n')
+                        .map(function(l){ return l.trim(); })
+                        .filter(function(l){ return l.length > 0; })
+                        .slice(0, 5)
+                        .join('\n');
+                    var text = [
+                        'View      : ' + get('errView'),
+                        'Exception : ' + get('errException'),
+                        'Message   : ' + get('errMessage'),
+                        'Type      : ' + get('errType'),
+                        'Timestamp : ' + get('errTimestamp'),
+                        '--- Stack trace (first 5 lines) ---',
+                        stackLines
+                    ].join('\n');
+                    if (navigator.clipboard &amp;&amp; navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(showCopied, fallbackCopy.bind(null, text));
+                    } else {
+                        fallbackCopy(text);
+                    }
+                }
+                function fallbackCopy(text) {
+                    var ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    showCopied();
+                }
+                function showCopied() {
+                    var c = document.getElementById('copyConfirm');
+                    c.style.display = 'inline';
+                    setTimeout(function(){ c.style.display = 'none'; }, 2500);
+                }
+                </script>
 
                 <f:facet name="footer">
                     <h:link outcome="login.xhtml" styleClass="login-option">

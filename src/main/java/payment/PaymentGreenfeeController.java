@@ -145,7 +145,7 @@ try{
     /*
     void main() throws Exception, Throwable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

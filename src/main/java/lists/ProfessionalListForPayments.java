@@ -6,7 +6,7 @@ import entite.Player;
 import entite.Professional;
 import entite.composite.ECourseList;
 import static interfaces.Log.LOG;
-import jakarta.faces.view.ViewScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -24,7 +24,7 @@ import static exceptions.LCException.handleSQLException;
 // verifier si un player est aussi un pro : retourner les liste des clubs ou il est pro
 
 @Named("ProPayment")
-@ViewScoped // necessaire !! pour faire le total dans local_administrator_cotisations.xhtml
+@ApplicationScoped // migrated from @ViewScoped 2026-03-22
 public class ProfessionalListForPayments implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,14 +37,14 @@ public class ProfessionalListForPayments implements Serializable {
     @Inject
     private read.ReadClub readClubService;
 
-    // Cache d'instance — @ViewScoped resets per view automatically
+    // Cache d'instance — @ApplicationScoped singleton, invalidated via CacheInvalidator
     private List<ECourseList> liste = null;
 
     public ProfessionalListForPayments() { }
 
     public List<ECourseList> list(final Player pro) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with Professional = " + pro);
 
         // Early return — guard clause FIRST
@@ -115,6 +115,16 @@ public class ProfessionalListForPayments implements Serializable {
         }
     } // end method
 
+    public double getTotalForClub(int clubId) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (liste == null) return 0.0;
+        return liste.stream()
+                .filter(o -> o.getClub().getIdclub() == clubId)
+                .mapToDouble(o -> o.getLessonPayment().getPaymentAmount() == null ? 0.0 : o.getLessonPayment().getPaymentAmount())
+                .sum();
+    } // end method
+
     // Getters/setters d'instance
     public List<ECourseList> getListe()              { return liste; }
     public void setListe(List<ECourseList> liste)    { this.liste = liste; }
@@ -122,7 +132,7 @@ public class ProfessionalListForPayments implements Serializable {
     // Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -130,7 +140,7 @@ public class ProfessionalListForPayments implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324715);
         var prof = new ProfessionalListForPayments().list(player);

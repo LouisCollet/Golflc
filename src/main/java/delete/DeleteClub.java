@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -38,9 +40,9 @@ public class DeleteClub implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean delete(final Club club) throws Exception {
-
+    public boolean delete(final Club club) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
 
         try (Connection conn = dao.getConnection()) {
@@ -98,24 +100,14 @@ public class DeleteClub implements Serializable, interfaces.GolfInterface {
 
             return true;
 
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
+    } // end method
 
     // ========================================
     // Suppression Cascade (Club + enfants)
@@ -138,9 +130,9 @@ public class DeleteClub implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean deleteCascading(final Club club) throws Exception {
-
+    public boolean deleteCascading(final Club club) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
 
         try (Connection conn = dao.getConnection()) {
@@ -315,44 +307,29 @@ public class DeleteClub implements Serializable, interfaces.GolfInterface {
 
             return true;
 
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
+    } // end method
 
-    /**
-     * Main pour tests hors JSF
-     * Note: Non fonctionnel sans container CDI
-     */
-    public static void main(String[] args) {
+/*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         try {
             Club club = new Club();
             club.setIdclub(1122);
-            club.setClubName("Test Club");
-
             LOG.debug("Main ready (CDI required for execution)");
-            LOG.debug("Test club: {}", club);
-
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
-            LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
-    }
-}
+    } // end main
+*/
+} // end class
 /*
 import entite.Club;
 import static interfaces.Log.LOG;
@@ -369,7 +346,7 @@ public class DeleteClub implements interfaces.GolfInterface{
     final String methodName = utils.LCUtil.getCurrentMethodName();
       PreparedStatement ps = null;
 try{
-    LOG.debug("starting " + methodName);
+    LOG.debug("starting");
         LOG.debug(" CASCADING DELETE ATTENTION ! for club "  + club); // new 15-02-2021
         // voir autre methode !!
     final String query = """
@@ -380,7 +357,7 @@ try{
     ps.setInt(1, club.getIdclub());
     LCUtil.logps(ps);
     int row_delete = ps.executeUpdate();
-        LOG.debug("deleted Club = " + row_delete);
+        LOG.debug("deleted Club = {}", row_delete);
     String msg = "There are " + row_delete + " Club deleted = " + club;
         LOG.debug(msg);
   //      LCUtil.showMessageInfo(msg);
@@ -415,8 +392,8 @@ try{
 //    REFERENCES `player` (`idplayer`)), SQLState = 23000, ErrorCode = 1451
 //    solution insert value null dans ClubLocalAdmin
 //
-     LOG.debug("starting " + methodName);
-     LOG.debug("for club = " + club);
+     LOG.debug("starting");
+     LOG.debug("for club = {}", club);
      // on commende par le niveau le plus bas !
 
      final String query = """
@@ -427,7 +404,7 @@ try{
   //  ps.setInt(1, club.getIdplayer());
     LCUtil.logps(ps);
     int row_hcp = ps.executeUpdate();
-        LOG.debug("deleted handicap EGA = " + row_hcp);
+        LOG.debug("deleted handicap EGA = {}", row_hcp);
 
   /*
 
@@ -441,7 +418,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_score = ps.executeUpdate();
-        LOG.debug("deleted score = " + row_score);
+        LOG.debug("deleted score = {}", row_score);
 
     query = """
              DELETE from player_has_round
@@ -451,7 +428,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_inscription = ps.executeUpdate();
-        LOG.debug("deleted inscription = " + row_inscription);
+        LOG.debug("deleted inscription = {}", row_inscription);
 
 
 
@@ -463,7 +440,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_hcp_index = ps.executeUpdate();
-        LOG.debug("deleted Handicap Index WHS = " + row_hcp_index);
+        LOG.debug("deleted Handicap Index WHS = {}", row_hcp_index);
 
     query = """
             DELETE from blocking
@@ -473,7 +450,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_blocking = ps.executeUpdate();
-        LOG.debug("deleted blocking = " + row_blocking);
+        LOG.debug("deleted blocking = {}", row_blocking);
 
     query = """
             DELETE from audit
@@ -483,7 +460,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_audit = ps.executeUpdate();
-        LOG.debug("deleted audit = " + row_audit);
+        LOG.debug("deleted audit = {}", row_audit);
 
     query = """
             DELETE from payments_subscription
@@ -493,7 +470,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_subscription = ps.executeUpdate();
-        LOG.debug("deleted subscription = " + row_subscription);
+        LOG.debug("deleted subscription = {}", row_subscription);
 
     query = """
            DELETE from lesson
@@ -503,7 +480,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_schedule = ps.executeUpdate();
-        LOG.debug("deleted schedule = " + row_schedule);
+        LOG.debug("deleted schedule = {}", row_schedule);
 
 
     query = """
@@ -514,7 +491,7 @@ try{
     ps.setInt(1, player.getIdplayer());
     LCUtil.logps(ps);
     int row_player = ps.executeUpdate();
-        LOG.debug("deleted player = " + row_player);
+        LOG.debug("deleted player = {}", row_player);
 
 
 
@@ -552,12 +529,12 @@ try{
  void main() throws SQLException, Exception{
      Connection conn = new DBConnection().getConnection();
  try{
-     LOG.debug("entering main with conn = " + conn);
+     LOG.debug("entering main with conn = {}", conn);
      Club club = new Club();
      club.setIdclub(1122);
      boolean b = new DeleteClub().delete(club, conn);
    // boolean b = new DeleteClub().deleteClubAndChilds(club, conn);
-    LOG.debug("from main - resultat deleteclub = " + b);
+    LOG.debug("from main - resultat deleteclub = {}", b);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

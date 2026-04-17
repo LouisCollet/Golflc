@@ -17,27 +17,11 @@
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
 <p:panel styleClass="login-card form-card">
 
-   <c:set var="type" value="#{appContext.creditcardType}"/>
-
 <f:facet name="header">
-    <c:if test="#{type eq 'SUBSCRIPTION'}"><h1>#{msg['title.payment.subscription']}</h1></c:if>
-    <c:if test="#{type eq 'GREENFEE'}"><h1>#{msg['title.payment.round']}</h1></c:if>
-    <c:if test="#{type eq 'COTISATION'}"><h1>#{msg['title.payment.cotisation']}</h1></c:if>
-    <c:if test="#{type eq 'LESSON'}"><h1>#{msg['title.payment.lesson']}</h1></c:if>
+    <h1>#{payC.paymentTitle}</h1>
 </f:facet>
 
-     <c:if test="#{type eq 'GREENFEE'}">
-         <ui:include src="include/include_summary_round.xhtml"/>
-    </c:if>
-    <c:if test="#{type eq 'COTISATION'}">
-         <ui:include src="include/include_summary_cotisation.xhtml"/>
-    </c:if>
-    <c:if test="#{type eq 'SUBSCRIPTION'}">
-         <ui:include src="include/include_subscription.xhtml"/>
-    </c:if>
-    <c:if test="#{type eq 'LESSON'}">
-         <ui:include src="include/include_lesson.xhtml"/>
-    </c:if>
+<ui:include src="#{payC.paymentIncludeSrc}"/>
 
 <p:panelGrid
     id="panelGrid1"
@@ -69,7 +53,6 @@
    </h:panelGroup>
    <p:selectOneMenu id="TypeCreditcard"
                     value="#{payC.creditcard.creditcardType}"
-                    required="true"
                     valueChangeListener="#{payC.creditCardTypeListener}"
                     title="#{msg['tooltip.creditcard.type']}" >
                 <f:selectItems value="#{payC.creditcard.cards}"/>
@@ -99,21 +82,17 @@
         <p:inputText id="number"
                      value="#{payC.creditcard.creditcardNumber}"
                      placeholder="Card number"
-                     inputmode="numeric"
-                     required="true"/>
+                     inputmode="numeric"/>
 
         <h:outputText value="#{msg['creditcard.holder']} :"/>
         <p:inputText id="name"
                      value="#{payC.creditcard.creditcardHolder}"
-                     placeholder="Full name"
-                     required="true"/>
+                     placeholder="Full name"/>
 
         <h:outputText value="#{msg['creditcard.expirationdate']} :"/>
         <p:outputPanel id="expiration">
             <p:datePicker id="CreditcardExpirationDate"
                           showIcon="true"
-                          required="true"
-                          requiredMessage="Expiration Date must be completed"
                           placeholder="MM/YY"
                           size="6"
                           showButtonBar="true"
@@ -136,8 +115,7 @@
                      value="#{payC.creditcard.creditcardVerificationCode}"
                      placeholder="CVC"
                      size="5"
-                     inputmode="numeric"
-                     required="true"/>
+                     inputmode="numeric"/>
 
 </p:panelGrid>
 

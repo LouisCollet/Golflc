@@ -72,18 +72,6 @@ function togglePlayerSelectButton(input) {
     }
 }
 
-/* ============================================================
-   MENU — hide sidebar and go full width (used in hole.xhtml)
-   ============================================================ */
-function hideMenuFullWidth() {
-    var menuCol = document.querySelector('.md\\:col-2');
-    var contentCol = document.querySelector('.md\\:col-10');
-    if (menuCol) menuCol.style.display = 'none';
-    if (contentCol) {
-        contentCol.classList.remove('md:col-10');
-        contentCol.classList.add('md:col-12');
-    }
-}
 
 /* ============================================================
    HOLE FORM — total distance from 3 inputs

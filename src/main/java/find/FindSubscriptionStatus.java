@@ -26,7 +26,7 @@ public class FindSubscriptionStatus implements Serializable {
 
     public Boolean find(Subscription subscription, Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - with subscription idplayer = " + subscription.getIdplayer());
 
         try {
@@ -81,7 +81,7 @@ public class FindSubscriptionStatus implements Serializable {
     /*
     void main() throws SQLException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(456989);
         Subscription subscription = new Subscription();

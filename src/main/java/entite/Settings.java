@@ -45,7 +45,7 @@ public class Settings implements Serializable {
     @PostConstruct
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Properties properties = new Properties();
 
@@ -79,9 +79,10 @@ public class Settings implements Serializable {
             settings.clear();
             settings.put("EXECUTION",          properties.getProperty("settings.execution", ""));
             settings.put("USER_HOME",           userHome);
-            settings.put("SMTP_PASSWORD",       System.getenv("SMTP_PASSWORD"));
-            settings.put("SMTP_SERVER",         System.getenv("SMTP_SERVER"));
-            settings.put("SMTP_USERNAME",       System.getenv("SMTP_USERNAME"));
+            settings.put("SMTP_PASSWORD",        System.getenv("SMTP_PASSWORD"));
+            settings.put("SMTP_SERVER",          System.getenv("SMTP_SERVER"));
+            settings.put("SMTP_USERNAME",        System.getenv("SMTP_USERNAME"));
+            settings.put("SMTP_USERNAME_ONDUTY", System.getenv("SMTP_USERNAME_ONDUTY"));
             settings.put("BATCH",               userDir   + "/InputBatchFiles/");
             settings.put("WEBAPP",              webapp);
             settings.put("RESOURCES",           resources);
@@ -94,9 +95,23 @@ public class Settings implements Serializable {
             settings.put("PAYMENT_SERVICE_URL",    System.getenv("PAYMENT_SERVICE_URL"));
             settings.put("CREDITCARD_SERVICE_URL", System.getenv("CREDITCARD_SERVICE_URL"));
             settings.put("APP_BASE_URL",           System.getenv("APP_BASE_URL"));
+            settings.put("PAYMENT_HMAC_SECRET",    System.getenv("PAYMENT_HMAC_SECRET"));
+            settings.put("OPENWEATHER_API_KEY",    System.getenv("OPENWEATHER_API_KEY"));
 
             LOG.debug(methodName + " - Settings initialized:");
             settings.forEach((k, v) -> LOG.debug(TAB + k + " = " + v));
+
+            // ✅ Validation des variables d'environnement critiques
+            java.util.List<String> missingVars = new java.util.ArrayList<>();
+            if (settings.get("APP_BASE_URL")           == null || settings.get("APP_BASE_URL").isBlank())           missingVars.add("APP_BASE_URL");
+            if (settings.get("CREDITCARD_SERVICE_URL") == null || settings.get("CREDITCARD_SERVICE_URL").isBlank()) missingVars.add("CREDITCARD_SERVICE_URL");
+            if (settings.get("PAYMENT_SERVICE_URL")    == null || settings.get("PAYMENT_SERVICE_URL").isBlank())    missingVars.add("PAYMENT_SERVICE_URL");
+            if (settings.get("PAYMENT_HMAC_SECRET")    == null || settings.get("PAYMENT_HMAC_SECRET").isBlank())    missingVars.add("PAYMENT_HMAC_SECRET");
+            if (!missingVars.isEmpty()) {
+                String msg = "FATAL — missing environment variable(s): " + missingVars + " — payment and redirect features will not work";
+                LOG.error(msg);
+                LCUtil.showMessageFatal(msg);
+            }
 
         } catch (Exception e) {
             String msg = "Fatal Exception in " + methodName + " : " + e.getMessage();

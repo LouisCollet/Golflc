@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import sql.SqlFactory;
 import utils.LCUtil;
@@ -26,11 +28,11 @@ public class UpdateCourse implements Serializable {
     @Inject
     private dao.GenericDAO dao;
 
-    public boolean update(final Course course) throws Exception {
-        
+    public boolean update(final Course course) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
-        
+
         try (Connection conn = dao.getConnection()) {
             
             conn.setAutoCommit(false);
@@ -74,18 +76,16 @@ public class UpdateCourse implements Serializable {
             
             return true;
             
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = "SQLException in " + methodName + ": " + sqle.getMessage();
-            LOG.error(msg);
-            throw sqle;
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
-}
+    } // end method
+
+} // end class
 
 /*
 
@@ -106,10 +106,10 @@ public boolean update(final Course course, final Connection conn) throws Excepti
    final String methodName = utils.LCUtil.getCurrentMethodName();
         PreparedStatement ps = null;
  try {
-            LOG.debug("... entering = " + methodName);
-            LOG.debug(" with course = " + course);
+            LOG.debug("entering {}", methodName);
+            LOG.debug(" with course = {}", course);
         String co = utils.DBMeta.listMetaColumnsUpdate(conn, "course");
-            LOG.debug("String from listMetaColumns = " + co); //  coursename=?, courseholes=?, coursepar=?, coursebegindate=?, courseenddate=?
+            LOG.debug("String from listMetaColumns = {}", co); //  coursename=?, courseholes=?, coursepar=?, coursebegindate=?, courseenddate=?
      final String query = """
           UPDATE course
           SET %s
@@ -139,7 +139,7 @@ public boolean update(final Course course, final Connection conn) throws Excepti
 
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
-                LOG.debug("row = " + row);
+                LOG.debug("row = {}", row);
             if (row != 0) {
                 String msg =  LCUtil.prepareMessageBean("course.modify");
                 msg = msg // + "<h1> successful modify Player : "
@@ -180,8 +180,8 @@ catch (SQLException sqle) {
   try{
       // définition dans pom.xml <artifactId>exec-maven-plugin</artifactId>
        System.out.println("=== System Properties ===");
-      LOG.debug("System.getProperty property env = " + System.getProperty("env"));
-      LOG.debug("System.getProperty String   mode = " + System.getProperty("mode"));
+      LOG.debug("System.getProperty property env = {}", System.getProperty("env"));
+      LOG.debug("System.getProperty String   mode = {}", System.getProperty("mode"));
        System.out.println("\n=== Environment Variables ===");
       LOG.debug("System.getenv      String API_URL = " + System.getenv("API_URL"));  // null ??
       LOG.debug("MY_VAR = " + System.getenv("MY_VAR"));  // also null 
@@ -198,7 +198,7 @@ catch (SQLException sqle) {
      course.setCourseName("drop table club_test");  // SQL injection  ?? non
      course.setCourseEndDate(LocalDateTime.parse("2014-12-31T23:59:59"));
      boolean b = new UpdateCourse().update(course,conn);
-         LOG.debug("from main, resultat = " + b);
+         LOG.debug("from main, resultat = {}", b);
          
  }catch (Exception e){
             String msg = "££ Exception in main = " + e.getMessage();

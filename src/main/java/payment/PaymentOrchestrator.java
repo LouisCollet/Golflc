@@ -13,12 +13,16 @@ public final class PaymentOrchestrator {
     private final Course course;
     private final Inscription inscription;
     private final PaymentSubscriptionController paymentSubscriptionController;
-    private final PaymentGreenfeeController paymentGreenfeeController; // replaces conn — migrated 2026-02-25
+    private final PaymentGreenfeeController paymentGreenfeeController;
+    private final PaymentCotisationController paymentCotisationController;
+    private final PaymentLessonController paymentLessonController;
 
     public PaymentOrchestrator(Creditcard creditcard, Player player, Round round,
                                Club club, Course course, Inscription inscription,
                                PaymentSubscriptionController paymentSubscriptionController,
-                               PaymentGreenfeeController paymentGreenfeeController) { // conn replaced 2026-02-25
+                               PaymentGreenfeeController paymentGreenfeeController,
+                               PaymentCotisationController paymentCotisationController,
+                               PaymentLessonController paymentLessonController) {
         this.creditcard = creditcard;
         this.player = player;
         this.round = round;
@@ -27,6 +31,8 @@ public final class PaymentOrchestrator {
         this.inscription = inscription;
         this.paymentSubscriptionController = paymentSubscriptionController;
         this.paymentGreenfeeController = paymentGreenfeeController;
+        this.paymentCotisationController = paymentCotisationController;
+        this.paymentLessonController = paymentLessonController;
     }
 
     public void handle(PaymentTarget target) throws Exception {
@@ -35,12 +41,14 @@ public final class PaymentOrchestrator {
 
         boolean success = switch (target) {
             case CotisationPayment cp ->
-                new CotisationRegistrar(creditcard, player, club).register(cp); // conn removed 2026-02-25
+                new CotisationRegistrar(creditcard, player, round, club, course, inscription, paymentCotisationController).register(cp);
             case SubscriptionPayment sp ->
              //   new SubscriptionRegistrar(creditcard, player, club, conn).register(sp);
                 new SubscriptionRegistrar(creditcard, player, club, paymentSubscriptionController).register(sp); // migrated 2026-02-25
             case GreenfeePayment gf ->
                 new GreenfeeRegistrar(creditcard, player, round, club, course, inscription, paymentGreenfeeController).register(gf); // migrated 2026-02-25
+            case LessonPayment lp ->
+                new LessonRegistrar(creditcard, player, club, paymentLessonController).register(lp);
             default -> throw new IllegalArgumentException("Type de paiement inconnu: " + target.getClass());
         };
 

@@ -31,8 +31,8 @@ public class UpdateAudit implements Serializable, interfaces.GolfInterface {
 
     public boolean stop(Audit audit) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" with audit = " + audit);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" with audit = {}", audit);
 
         final String query = """
                 UPDATE audit
@@ -72,12 +72,12 @@ public class UpdateAudit implements Serializable, interfaces.GolfInterface {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Audit audit = new Audit();
         audit.setAuditPlayerId(324713);
         audit.setIdaudit(8538);
         boolean b = new update.UpdateAudit().stop(audit);
-        LOG.debug("from main, result = " + b);
+        LOG.debug("from main, result = {}", b);
     } // end main
     */
 

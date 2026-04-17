@@ -47,19 +47,19 @@ public class ThumbnailsController implements Serializable {
      */
     public String thumbs(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " with param = " + s);
+        LOG.debug("entering with param = {}", s);
         try {
             File sourceDir      = new File(settings.getProperty("PHOTOS_LIBRARY"));      // ✅ new ajouté
             File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));  // ✅ injecté
-            LOG.debug(methodName + " - sourceDir      = " + sourceDir);
-            LOG.debug(methodName + " - destinationDir = " + destinationDir);
+            LOG.debug("sourceDir      = {}", sourceDir);
+            LOG.debug("destinationDir = {}", destinationDir);
 
             Thumbnails.of(sourceDir.listFiles())
                     .scale(0.30)
                     .outputFormat("jpg")
                     .toFiles(destinationDir, Rename.PREFIX_DOT_THUMBNAIL);
 
-            LOG.debug(methodName + " - finished");
+            LOG.debug("finished");
             return "menu.xhtml";
 
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class ThumbnailsController implements Serializable {
      */
     public boolean thumbs(String s, File f) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " with param = " + s + " , file = " + f.getName());
+        LOG.debug("entering with param = {}, file = {}", s, f.getName());
         try {
             File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));  // ✅ injecté
 
@@ -86,7 +86,7 @@ public class ThumbnailsController implements Serializable {
                     .size(100, 100)
                     .toFiles(destinationDir, Rename.PREFIX_DOT_THUMBNAIL);
 
-            LOG.debug(methodName + " - finished");
+            LOG.debug("finished");
             return true;
 
         } catch (Exception e) {
@@ -105,19 +105,18 @@ public class ThumbnailsController implements Serializable {
      */
     public boolean thumbsPhoto(String s, File f) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " with param = " + s
-                + " , file = " + f.getAbsoluteFile());
+        LOG.debug("entering with param = {}, file = {}", s, f.getAbsoluteFile());
         try {
             File sourceDir      = new File(settings.getProperty("PHOTOS_LIBRARY"));      // ✅ injecté
             File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));  // ✅ injecté
-            LOG.debug(methodName + " - sourceDir      = " + sourceDir);
-            LOG.debug(methodName + " - destinationDir = " + destinationDir);
+            LOG.debug("sourceDir      = {}", sourceDir);
+            LOG.debug("destinationDir = {}", destinationDir);
 
             Thumbnails.of(settings.getProperty("PHOTOS_LIBRARY") + f.getName())
                     .size(200, 200)
                     .toFiles(sourceDir, Rename.NO_CHANGE);
 
-            LOG.debug(methodName + " - finished");
+            LOG.debug("finished");
             return true;
 
         } catch (Exception e) {
@@ -166,12 +165,12 @@ public String thumbs(String s) throws ExceptionGolfLC, IOException{
     // all files from a directory
     //https://github.com/coobird/thumbnailator/wiki/Examples
 try{
-        LOG.debug("... entering thumbs all files !! with param = " + s);
+        LOG.debug("... entering thumbs all files !! with param = {}", s);
   //   File SOURCEDIR = new File(Settings.getProperty("PHOTOS_LIBRARY"));
      File SOURCEDIR = File(settings.getProperty("PHOTOS_LIBRARY"));
-        LOG.debug("source dir = " + SOURCEDIR);
+        LOG.debug("source dir = {}", SOURCEDIR);
      File DESTINATIONDIR = new File(Settings.getProperty("THUMBNAILS_LIBRARY"));
-        LOG.debug("destination dir = " + DESTINATIONDIR);
+        LOG.debug("destination dir = {}", DESTINATIONDIR);
     Thumbnails.of(SOURCEDIR.listFiles())
         .scale(0.30)
         .outputFormat("jpg")
@@ -180,7 +179,7 @@ try{
     return "menu.xhtml";
 }catch(Exception ex){
     String msg = "IOException in thumbs() " + ex;
-    LOG.error(" error = " + msg);
+    LOG.error(" error = {}", msg);
     LCUtil.showMessageFatal(msg);
     return "error";
    //         throw new ExceptionGolfLC(ioex);
@@ -191,7 +190,7 @@ try{
 public static boolean thumbs(String s, File f) throws ExceptionGolfLC, IOException{
     //just for one file - 2e constructor
 try{
-        LOG.debug("... entering thumbs One Thumbnail in One file !! with param = " + s +" for file = " + f.getName());
+        LOG.debug("entering thumbs one file with param = {}, file = {}", s, f.getName());
      File DESTINATIONDIR = new File(Settings.getProperty("THUMBNAILS_LIBRARY"));
       Thumbnails.of(Settings.getProperty("PHOTOS_LIBRARY") + f.getName())        
         .size(100,100)
@@ -200,12 +199,12 @@ try{
     return true;
 }catch(IOException ioex){
     String msg = "IOException in thumbs() : " + ioex;
-    LOG.error(" error = " + msg);
+    LOG.error(" error = {}", msg);
     LCUtil.showMessageFatal(msg);
     return false;
 }catch(Exception ex){
     String msg = "Exception in thumbs() : " + ex;
-    LOG.error(" error = " + msg);
+    LOG.error(" error = {}", msg);
     LCUtil.showMessageFatal(msg);
     return false;
 } finally {    }
@@ -215,15 +214,15 @@ public static boolean thumbsPhoto(String s, File f) throws IOException{
     //just for one file - 2e constructor
 try{
 
-     LOG.debug("... entering thumbs for one file !! with param = " + s +" for file = " + f.getAbsoluteFile());
+     LOG.debug("entering thumbs photo with param = {}, file = {}", s, f.getAbsoluteFile());
    //       File SOURCEDIR = new File(Settings.getPHOTOS_LIBRARY());
      //    new 27-11-2021 
            File SOURCEDIR = new File(Settings.getProperty("PHOTOS_LIBRARY"));
     //      File DESTINATIONDIR = new File(Settings.getTHUMBNAILS_LIBRARY());
    //       new 27-11-2021
       File DESTINATIONDIR = new File(Settings.getProperty("THUMBNAILS_LIBRARY"));
-     LOG.debug("source dir = " + SOURCEDIR);
-     LOG.debug("destination dir = " + DESTINATIONDIR);
+     LOG.debug("source dir = {}", SOURCEDIR);
+     LOG.debug("destination dir = {}", DESTINATIONDIR);
  //    Thumbnails.of(Settings.getPHOTOS_LIBRARY() + f.getName())
          // new 27-11-2021    
       Thumbnails.of(Settings.getProperty("PHOTOS_LIBRARY") + f.getName())       
@@ -236,12 +235,12 @@ try{
     return true;
 }catch(IOException ioex){
     String msg = "IOException in thumbs() : " + ioex;
-    LOG.error(" error = " + msg);
+    LOG.error(" error = {}", msg);
     LCUtil.showMessageFatal(msg);
     return false;
 }catch(Exception ex){
     String msg = "Exception in thumbs() : " + ex;
-    LOG.error(" error = " + msg);
+    LOG.error(" error = {}", msg);
     LCUtil.showMessageFatal(msg);
     return false;
 } finally {    }

@@ -26,7 +26,7 @@ public class ProfessionalClubList implements Serializable {
 
     public List<Professional> list(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with Player " + player);
 
         // ✅ Early return — guard clause FIRST
@@ -59,7 +59,7 @@ public class ProfessionalClubList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -67,7 +67,7 @@ public class ProfessionalClubList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324715);
         List<Professional> prof = new ProfessionalClubList().list(player);

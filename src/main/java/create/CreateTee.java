@@ -9,10 +9,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
-import static utils.LCUtil.showMessageInfo;
 
 /**
  * Service de création de Tee
@@ -29,11 +30,11 @@ public class CreateTee implements Serializable {
      */
     @Inject private dao.GenericDAO dao;
 
-    public boolean create(final Tee tee) throws Exception {
-        
+    public boolean create(final Tee tee) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
-        
+
         try (Connection conn = dao.getConnection()) {
             
             conn.setAutoCommit(false);
@@ -84,16 +85,16 @@ public class CreateTee implements Serializable {
             
             return true;
             
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            LOG.error("SQLException in {}: {}", methodName, sqle.getMessage());
-            throw sqle;
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            LOG.error("Exception in {}: {}", methodName, e.getMessage());
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
-}
+    } // end method
+
+} // end class
 
 /*
 import entite.Course;
@@ -121,10 +122,10 @@ public boolean create(
    final String methodName = utils.LCUtil.getCurrentMethodName();
         PreparedStatement ps = null;
  try {
-            LOG.debug("... starting " + methodName);
-        //    LOG.debug("with club = " + club);
-            LOG.debug("with course = " + course);
-            LOG.debug("with tee = " + tee);
+            LOG.debug("starting");
+        //    LOG.debug("with club = {}", club);
+            LOG.debug("with course = {}", course);
+            LOG.debug("with tee = {}", tee);
        ValidationsLC vlc = validate(tee, course, conn);
   //         LOG.debug("line 04 v = "+ vlc.toString());
        if(vlc.getStatus0().equals(ValidationStatus.REJECTED.toString())){
@@ -176,7 +177,7 @@ public boolean create(
               showMessageInfo(msg);
               return true;
          }else{
-           LOG.debug("we have ERROR ! = creation continue ... " + t.isNotFound());
+           LOG.debug("we have ERROR ! = creation continue ... {}", t.isNotFound());
               return false;
          }   
     //       LOG.debug("starting completeDistanceTee");
@@ -384,15 +385,15 @@ public static Tee completeMasterTeeAndDistanceTee (Tee tee, Course course, Conne
    course.setIdcourse(167);
    
     boolean cr = new CreateTee().create(course, tee, conn);
-        LOG.debug("from main, after lp = " + cr);
+        LOG.debug("from main, after lp = {}", cr);
    
    
  //  var v = completeMasterTeeAndDistanceTee(tee, course, conn);   // static  
-  //     LOG.debug("from main, after lp = " + v);
+  //     LOG.debug("from main, after lp = {}", v);
  //      if(v.isNotFound()){
-  //         LOG.debug("we have an error ! = creation rejected " + v.isNotFound());
+  //         LOG.debug("we have an error ! = creation rejected {}", v.isNotFound());
   //     }else{
-  //         LOG.debug("we have NO error ! = creation done ! " + v.isNotFound());
+  //         LOG.debug("we have NO error ! = creation done ! {}", v.isNotFound());
   
   /*    
       
@@ -414,7 +415,7 @@ public static Tee completeMasterTeeAndDistanceTee (Tee tee, Course course, Conne
    tee.setTeePar((short)72);
 
     boolean cr = new CreateTee().create(club, course, tee, conn);
-        LOG.debug("from main, after lp = " + cr);
+        LOG.debug("from main, after lp = {}", cr);
         
     *  
  } catch (Exception e) {

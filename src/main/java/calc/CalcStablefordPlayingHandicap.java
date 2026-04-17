@@ -1,12 +1,11 @@
 package calc;
 
+import Controllers.LoggingUserController;
 import entite.Player;
 import entite.Round;
 import entite.ScoreStableford;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
-import java.sql.SQLException;
-import utils.LCUtil;
-import Controllers.LoggingUserController;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
 
@@ -18,12 +17,12 @@ public class CalcStablefordPlayingHandicap implements Serializable {
     public CalcStablefordPlayingHandicap() { }
     
 private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
- public int calc(final ScoreStableford score, final Player player, final Round round) throws SQLException, Exception{
+ public int calc(final ScoreStableford score, final Player player, final Round round) {
     final String methodName = utils.LCUtil.getCurrentMethodName();
 try{
     // voir appendix C page 67/79
    
-    LOG.debug("... entering " + methodName);
+    LOG.debug("entering " + methodName);
 //    LOG.debug("with scoreStableford = " + score);
      LoggingUserController.write(CLASSNAME + "." + methodName,"i"); 
      LoggingUserController.write("playing handicap", "t");
@@ -39,12 +38,11 @@ try{
         LOG.debug("playingHandicap = " + playingHandicap);
         LoggingUserController.write("playingHandicap =" + playingHandicap);
   return playingHandicap;
-}catch (Exception ex) {
-                LOG.error("Exception in " + methodName + ex);
-                LCUtil.showMessageFatal("Exception = " + ex.toString());
-                return 0;
-} finally{}
- } // end method
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return 0;
+        }
+    } // end method
 
  /*
  void main() throws SQLException, Exception{

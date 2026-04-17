@@ -4,8 +4,10 @@
     xmlns:ui="jakarta.faces.facelets"
     xmlns:h="jakarta.faces.html"
     xmlns:f="jakarta.faces.core"
+    xmlns:c="jakarta.tags.core"
     xmlns:p="primefaces"
-    lang="#{languageC.locale}" 
+    xmlns:pe="primefaces.extensions"
+    lang="#{languageC.locale}"
     xml:lang="#{languageC.locale}">
 
 <ui:insert name="metadata"> </ui:insert>
@@ -23,7 +25,6 @@
          content="text/html; charset=UTF-8"/>
    <meta name="viewport" 
          content="width=device-width, initial-scale=1.0"/>
-   <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=#{request.contextPath}/session_expired.xhtml?cmd=Inactive Interval from masterTemplate"/>
    <title>
        <ui:insert name="title"></ui:insert>
    </title>
@@ -119,13 +120,15 @@
             <ui:include src="/header.xhtml"/>
         </div>
 
-<!--   West - Menu (hidden on mobile, visible md+) -->
+<!--   West - Menu (hidden on mobile, visible md+) — ui:param hideMenu="true" to suppress -->
+        <c:if test="#{hideMenu ne 'true'}">
         <div class="hidden md:block col-12 md:col-2">
          <ui:include src="/menu.xhtml"/>
         </div>
+        </c:if>
 
-<!--   Center - Contenu (full width on mobile, 10 cols on md+) -->
-        <div class="col-12 md:col-10">
+<!--   Center - Contenu (full width on mobile, 10 cols on md+; full width when hideMenu=true) -->
+        <div class="col-12 #{hideMenu eq 'true' ? '' : 'md:col-10'}">
             <!-- Breadcrumb — shows current view name -->
             <div style="font-size:0.72rem; color:var(--text-color-secondary, #6c757d); margin-bottom:0.5rem;">
                 <i class="pi pi-home" style="margin-right:0.3rem;"/>
@@ -155,6 +158,64 @@
 <p:ajaxExceptionHandler type="jakarta.faces.application.ViewExpiredException"
                         onexception="window.location.href = '#{request.contextPath}/session_expired.xhtml';" />
 
+<!-- Session expiry management — pe:session warns 60s before, then logs out -->
+<pe:session onexpire="PF('sessionWarningDialog').show()"
+            onexpired="PF('sessionWarningDialog').hide(); PF('sessionExpiredDialog').show()"
+            reactionPeriod="60"/>
+
+<p:dialog widgetVar="sessionWarningDialog"
+          header="#{msg['session.warning.title']}"
+          styleClass="login-card"
+          modal="true"
+          width="420"
+          appendTo="@(body)"
+          showEffect="fade"
+          hideEffect="fade">
+    <p style="margin:0 0 1rem 0;">#{msg['session.warning.message']}</p>
+    <h:form>
+        <p:commandButton value="#{msg['session.keep.alive']}"
+                         icon="pi pi-refresh"
+                         styleClass="p-button-success"
+                         onsuccess="PF('sessionWarningDialog').hide()"/>
+    </h:form>
+</p:dialog>
+
+<p:dialog widgetVar="sessionExpiredDialog"
+          header="#{msg['session.expired.title']}"
+          styleClass="login-card"
+          modal="true"
+          width="420"
+          appendTo="@(body)"
+          closable="false"
+          showEffect="fade">
+    <p style="margin:0 0 1rem 0;">#{msg['session.expired.inactivity']}</p>
+    <p:commandButton value="#{msg['session.reconnect.button']}"
+                     icon="pi pi-sign-in"
+                     styleClass="p-button-primary"
+                     ajax="false"
+                     onclick="window.location.href='#{request.contextPath}/login.xhtml'"/>
+</p:dialog>
+
+<!-- AJAX Error dialog — shows server stacktrace on any AJAX failure -->
+<p:dialog id="ajaxErrDlg"
+          header="AJAX Error"
+          widgetVar="ajaxErrDlgWV"
+          modal="true"
+          resizable="true"
+          width="900"
+          appendTo="@(body)"
+          showEffect="fade">
+    <pre id="ajaxErrContent"
+         style="font-size:11px; white-space:pre-wrap; max-height:500px; overflow:auto; margin:0;"/>
+</p:dialog>
+
+<h:outputScript target="body">
+$(document).on('pfAjaxError', function(event, xhr, settings) {
+    var txt = xhr.responseText || ('HTTP ' + xhr.status + ' \u2014 ' + xhr.statusText);
+    document.getElementById('ajaxErrContent').textContent = txt.substring(0, 8000);
+    PF('ajaxErrDlgWV').show();
+});
+</h:outputScript>
 
 </f:view>
 </h:body>

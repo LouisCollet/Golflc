@@ -22,7 +22,7 @@ public class DeletePaymentGreenfee implements Serializable, interfaces.GolfInter
 
     public boolean delete(final Player player, final Round round) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
                 DELETE
@@ -49,13 +49,13 @@ public class DeletePaymentGreenfee implements Serializable, interfaces.GolfInter
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324715);
         Round round = new Round();
         round.setIdround(758);
         boolean b = new DeletePaymentGreenfee().delete(player, round);
-        LOG.debug("from main - resultat deleted PaymentGreenfee = " + b);
+        LOG.debug("from main - resultat deleted PaymentGreenfee = {}", b);
     } // end main
     */
 

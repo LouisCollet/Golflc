@@ -25,13 +25,13 @@ public class UpdateCompetitionDescription implements Serializable {
 
     public boolean update(final CompetitionDescription cd) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with CompetitionDescription = " + cd);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with CompetitionDescription = {}", cd);
 
         try (Connection conn = dao.getConnection()) {
 
             String co = utils.DBMeta.listMetaColumnsUpdate(conn, "competition_description");
-            LOG.debug(methodName + " - columns = " + co);
+            LOG.debug("columns = {}", co);
 
             final String query = """
                 UPDATE competition_description
@@ -44,7 +44,7 @@ public class UpdateCompetitionDescription implements Serializable {
                 utils.LCUtil.logps(ps);
 
                 int row = ps.executeUpdate();
-                LOG.debug(methodName + " - rows modified = " + row);
+                LOG.debug("rows modified = {}", row);
                 if (row != 0) {
                     String msg = LCUtil.prepareMessageBean("competition.description.modify")
                             + " <br/>ID = " + cd.getCompetitionId()
@@ -72,7 +72,7 @@ public class UpdateCompetitionDescription implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         CompetitionDescription cd = new CompetitionDescription();
         cd.setCompetitionId(25);
         // boolean b = update(cd);

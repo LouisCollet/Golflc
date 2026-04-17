@@ -8,7 +8,9 @@ import com.google.maps.model.GeocodingResult;
 import entite.Club;
 import entite.Player;
 import entite.LatLng;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.IOException;
@@ -28,16 +30,21 @@ import static interfaces.Log.LOG;
 @Named
 public class CoordinatesService {
 
-    private final String apiKey;
+    private String apiKey;
 
-    public CoordinatesService() {
+    @Inject private entite.Settings settings;
+
+    public CoordinatesService() { }
+
+    @PostConstruct
+    public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.apiKey = System.getenv("GOOGLE_MAPS_API_KEY");
+        LOG.debug("entering {}", methodName);
+        this.apiKey = settings.getProperty("GOOGLE_MAPS_API_KEY");
         if (this.apiKey == null || this.apiKey.isEmpty()) {
             throw new IllegalStateException("Google Maps API key not set in environment variables");
         }
-    }
+    } // end method
 
     // ========================================
     // UPDATE COORDINATES — Club
@@ -48,7 +55,7 @@ public class CoordinatesService {
      */
     public Club updateCoordinates(Club club) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             if (club == null || club.getAddress() == null) {
                 throw new IllegalArgumentException("Club or address is null");
@@ -98,7 +105,7 @@ public class CoordinatesService {
      */
     public Player updateCoordinates(Player player) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             if (player == null || player.getAddress() == null) {
                 throw new IllegalArgumentException("Player or address is null");
@@ -133,7 +140,7 @@ public class CoordinatesService {
      */
     private String buildFullAddress(String street, String zip, String city, String countryCode) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         return String.format("%s, %s %s, %s", street, zip, city, countryCode);
     } // end method
 
@@ -143,7 +150,7 @@ public class CoordinatesService {
     private GeocodingResult geocodeFirst(String address)
             throws InterruptedException, ApiException, IOException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try (GeoApiContext context = new GeoApiContext.Builder()
                 .apiKey(apiKey)
@@ -168,7 +175,7 @@ public class CoordinatesService {
     private void applyCoordinatesAndTimeZone(GeocodingResult result,
                                              entite.Address address) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         LatLng latlng = new LatLng();
         latlng.setLat(result.geometry.location.lat);

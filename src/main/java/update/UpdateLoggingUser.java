@@ -30,8 +30,8 @@ public class UpdateLoggingUser implements Serializable {
 
     public boolean update(final LoggingUser logging) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" for logging = " + logging);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" for logging = {}", logging);
 
         final String query = """
                 UPDATE logging_user
@@ -73,7 +73,7 @@ public class UpdateLoggingUser implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

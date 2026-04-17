@@ -24,17 +24,17 @@
         <span class="summary-sep">|</span>
         <span class="summary-item">
             <span class="summary-label">#{msg['club.name']}</span>
-            <span class="summary-value">#{schedulerC.club.clubName} (#{schedulerC.club.idclub})</span>
+            <span class="summary-value">#{appContext.club.clubName} (#{appContext.club.idclub})</span>
         </span>
         <span class="summary-sep">|</span>
         <span class="summary-item">
             <span class="summary-label">ProId</span>
-            <span class="summary-value">#{schedulerC.getProfessional().proId}</span>
+            <span class="summary-value">#{appContext.professional.proId}</span>
         </span>
         <span class="summary-sep">|</span>
         <span class="summary-item">
             <span class="summary-label">Pro Name</span>
-            <span class="summary-value">#{schedulerC.playerPro.playerFirstName}, #{schedulerC.playerPro.playerLastName}</span>
+            <span class="summary-value">#{appContext.playerPro.playerFirstName}, #{appContext.playerPro.playerLastName}</span>
         </span>
     </h:panelGroup>
 

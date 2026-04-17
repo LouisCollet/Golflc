@@ -10,6 +10,10 @@
 
 <ui:define name="title">Credit Card Payment Canceled</ui:define>
 <ui:define name="content">
+<f:metadata>
+    <f:viewParam name="nonce" value="#{payC.completionNonce}" />
+    <f:event type="preRenderView" listener="#{payC.onPaymentCompleted()}" />
+</f:metadata>
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
 <p:panel styleClass="login-card form-card">
 <f:facet name="header"><h1>#{msg['title.payment.canceled']}</h1></f:facet>

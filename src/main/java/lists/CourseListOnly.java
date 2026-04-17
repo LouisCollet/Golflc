@@ -26,7 +26,7 @@ public class CourseListOnly implements Serializable {
 
     public List<ECourseList> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         if (liste != null) {
             LOG.debug(methodName + " - returning cached list size = " + liste.size());
@@ -56,7 +56,7 @@ public class CourseListOnly implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -64,7 +64,7 @@ public class CourseListOnly implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         List<ECourseList> lp = new CourseListOnly().list();
         LOG.debug("nombre de courses = " + lp.size());
         lp.forEach(item -> LOG.debug("Course list " + item.course().getCourseName()));

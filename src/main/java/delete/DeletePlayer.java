@@ -61,7 +61,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
             REFERENCES `player` (`idplayer`)), SQLState = 23000, ErrorCode = 1451
             solution insert value null dans ClubLocalAdmin
             */
-            LOG.debug("starting " + methodName);
+            LOG.debug("starting");
             // on commende par le niveau le plus bas !
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -71,7 +71,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_score = ps.executeUpdate();
-                LOG.debug("deleted score = " + row_score);
+                LOG.debug("deleted score = {}", row_score);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -81,7 +81,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_inscription = ps.executeUpdate();
-                LOG.debug("deleted inscription = " + row_inscription);
+                LOG.debug("deleted inscription = {}", row_inscription);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -91,7 +91,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_hcp = ps.executeUpdate();
-                LOG.debug("deleted handicap EGA = " + row_hcp);
+                LOG.debug("deleted handicap EGA = {}", row_hcp);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -101,7 +101,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_hcp_index = ps.executeUpdate();
-                LOG.debug("deleted Handicap Index WHS = " + row_hcp_index);
+                LOG.debug("deleted Handicap Index WHS = {}", row_hcp_index);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -111,7 +111,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_blocking = ps.executeUpdate();
-                LOG.debug("deleted blocking = " + row_blocking);
+                LOG.debug("deleted blocking = {}", row_blocking);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -121,7 +121,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_audit = ps.executeUpdate();
-                LOG.debug("deleted audit = " + row_audit);
+                LOG.debug("deleted audit = {}", row_audit);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -131,7 +131,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_subscription = ps.executeUpdate();
-                LOG.debug("deleted subscription = " + row_subscription);
+                LOG.debug("deleted subscription = {}", row_subscription);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -141,7 +141,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_schedule = ps.executeUpdate();
-                LOG.debug("deleted schedule = " + row_schedule);
+                LOG.debug("deleted schedule = {}", row_schedule);
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
@@ -151,7 +151,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
                 int row_player = ps.executeUpdate();
-                LOG.debug("deleted player = " + row_player);
+                LOG.debug("deleted player = {}", row_player);
             }
 
         /*   String msg = "<br/> <h1>Records deleted = "

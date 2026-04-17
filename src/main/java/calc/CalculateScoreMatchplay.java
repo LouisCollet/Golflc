@@ -20,7 +20,7 @@ public class CalculateScoreMatchplay implements Serializable {
 
     public ScoreMatchplay calc(final Player player, ScoreMatchplay score, final Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - with Round = " + round);
         LOG.debug(methodName + " - with Player = " + player);
         LOG.debug(methodName + " - with ScoreMatchplay = " + score);
@@ -30,13 +30,13 @@ public class CalculateScoreMatchplay implements Serializable {
             return score;
         } catch (Exception e) {
             handleGenericException(e, methodName);
-            return null;
+            return score;
         }
     } // end method
 
     public String[] result(int[] teamA, int[] teamB) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             LOG.debug(methodName + " - entering calc A " + Arrays.toString(teamA));
             LOG.debug(methodName + " - entering calc B " + Arrays.toString(teamB));
@@ -122,14 +122,14 @@ public class CalculateScoreMatchplay implements Serializable {
             return result;
         } catch (Exception e) {
             handleGenericException(e, methodName);
-            return null;
+            return new String[]{"", ""};
         }
     } // end method
 
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

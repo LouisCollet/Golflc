@@ -8,9 +8,9 @@
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
+<ui:param name="hideMenu" value="true"/>
 <ui:define name="title">Modify Global Holes Distance </ui:define>
 <ui:define name="content">
-<script>document.addEventListener('DOMContentLoaded', hideMenuFullWidth);</script>
 <style>
     /* Polices reduites pour tenir les 19 colonnes sans scroll horizontal */
     #form_modify_holes_distance .ui-panelgrid { width: 100%; font-size: 0.70rem; }
@@ -29,7 +29,7 @@
 </f:facet>
 
 <p:panelGrid id="panelgrid2"
-             layout="flex"
+             layout="tabular"
              columns="19"
              style="text-align:center;"
              >

@@ -22,8 +22,8 @@ public class ReadUnavailableStructure implements Serializable {
 
     public UnavailableStructure read(final Club club) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - for club = " + club);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for club = {}", club);
 
         final String query = """
                 SELECT *
@@ -34,21 +34,21 @@ public class ReadUnavailableStructure implements Serializable {
         UnavailableStructure structure = dao.querySingle(query, new UnavailableStructureRowMapper(), club.getIdclub());
         if (structure == null) {
             String msg = "No Structure found for club = " + club.getIdclub();
-            LOG.error(methodName + " - " + msg);
+            LOG.error("- {}", msg);
             utils.LCUtil.showMessageFatal(msg);
             return null;
         }
-        LOG.debug(methodName + " - found structure, items = " + structure.getStructureList().size());
+        LOG.debug("found structure, items = {}", structure.getStructureList().size());
         return structure;
     } // end method
 
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Club club = new Club(); club.setIdclub(101);
-        // LOG.debug("UnavailableStructure = " + new ReadUnavailableStructure().read(club));
+        // LOG.debug("UnavailableStructure = {}", new ReadUnavailableStructure().read(club));
     } // end main
     */
 

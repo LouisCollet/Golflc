@@ -36,7 +36,7 @@ public class FindTarifSubscriptionOverlapping implements Serializable {
      */
     public boolean find(final TarifSubscription tarifNew) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for tarifSubscription = " + tarifNew);
 
         final String query = """
@@ -96,7 +96,7 @@ public class FindTarifSubscriptionOverlapping implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

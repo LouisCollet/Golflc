@@ -26,8 +26,8 @@ public class CreatePaymentSubscription implements Serializable {
 
     public boolean create(final Subscription subscription) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for subscription  = " + subscription);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for subscription  = {}", subscription);
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "payments_subscription");
@@ -66,7 +66,7 @@ public class CreatePaymentSubscription implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

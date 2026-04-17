@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
-
+// est utilisé dans les test d'intégration
 @ProdDB
 @ApplicationScoped
 public class JdbcConnectionProvider implements ConnectionProvider {

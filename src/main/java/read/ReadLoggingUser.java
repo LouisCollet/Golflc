@@ -20,8 +20,8 @@ public class ReadLoggingUser implements Serializable {
 
     public LoggingUser read(final LoggingUser logging) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - with logging = " + logging);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with logging = {}", logging);
 
         final String query = """
                 SELECT *
@@ -34,9 +34,9 @@ public class ReadLoggingUser implements Serializable {
         LoggingUser result = dao.querySingle(query, rs -> LoggingUser.map(rs),
                 logging.getLoggingIdPlayer(), logging.getLoggingIdRound(), logging.getLoggingType().toUpperCase());
         if (result == null) {
-            LOG.debug(methodName + " - " + utils.LCUtil.prepareMessageBean("logging.notfound"));
+            LOG.debug("- {}", utils.LCUtil.prepareMessageBean("logging.notfound"));
         } else {
-            LOG.debug(methodName + " - " + utils.LCUtil.prepareMessageBean("logging.found") + result);
+            LOG.debug("- {}", utils.LCUtil.prepareMessageBean("logging.found") + result);
         }
         return result;
     } // end method
@@ -44,14 +44,14 @@ public class ReadLoggingUser implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // LoggingUser logging = new LoggingUser();
         // logging.setLoggingIdPlayer(324713);
         // logging.setLoggingIdRound(688);
         // logging.setLoggingType("H");
         // var v = new ReadLoggingUser().read(logging);
-        // LOG.debug(" from main : LoggingUser = " + v);
+        // LOG.debug(" from main : LoggingUser = {}", v);
     } // end main
     */
 

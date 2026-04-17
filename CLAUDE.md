@@ -78,7 +78,7 @@ public class CreateXxx implements Serializable {
 
     public void create(Entity entity) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
             // JDBC logic
@@ -98,7 +98,29 @@ public class CreateXxx implements Serializable {
 ### ✅ Standard — Premières lignes de chaque méthode (OBLIGATOIRE)
 ```java
 final String methodName = utils.LCUtil.getCurrentMethodName();
+LOG.debug("entering {}", methodName);
+```
+
+### ✅ Standard — Logging paramétré (OBLIGATOIRE)
+
+Toujours utiliser le style **SLF4J paramétré** avec `{}` — jamais la concaténation de strings.
+Log4j2 n'évalue pas la string si le niveau de log est désactivé → meilleure performance.
+Le pattern Log4j2 (`%class{5} . %method %line`) fournit déjà classe+méthode+ligne — ne pas répéter `methodName` dans les messages.
+
+```java
+// ✅ CORRECT — entering avec methodName, autres messages sans
+LOG.debug("entering {}", methodName);
+LOG.debug("list size = {}", liste.size());
+LOG.debug("player = {}, club = {}", player, club);
+LOG.warn("player {} already connected", playerId);
+
+// ❌ INTERDIT — concaténation
 LOG.debug("entering " + methodName);
+LOG.debug(methodName + " - list size = " + liste.size());
+
+// ❌ INTERDIT — methodName dans le message (redondant avec le pattern Log4j2)
+LOG.debug("entering {}", methodName);
+LOG.debug("list size = {}", liste.size());
 ```
 
 ### ✅ Standard — Fin de chaque méthode et classe
@@ -178,7 +200,7 @@ public class ServiceName implements Serializable {
 
     public ReturnType method(params) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
             SELECT ...
@@ -232,11 +254,11 @@ public class XxxList implements Serializable {
 
     public List<Xxx> list(params) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         // ✅ Early return — guard clause FIRST
         if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
+            LOG.debug("returning cached list size = {}", liste.size());
             return liste;
         }
 
@@ -259,9 +281,9 @@ public class XxxList implements Serializable {
                     liste.add(mapper.map(rs));
                 }
                 if (liste.isEmpty()) {
-                    LOG.warn(methodName + " - empty result list");
+                    LOG.warn("empty result list");
                 } else {
-                    LOG.debug(methodName + " - list size = " + liste.size());
+                    LOG.debug("list size = {}", liste.size());
                 }
                 return liste;
             }
@@ -282,9 +304,9 @@ public class XxxList implements Serializable {
     // ✅ Invalidation explicite — plus clair que setListe(null)
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        LOG.debug("cache invalidated");
     } // end method
 
 } // end class
@@ -309,7 +331,7 @@ public class XxxController implements Serializable {
 
     public String createXxx() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             createXxxService.create(xxx);
             xxxListService.invalidateCache();   // ✅ invalidation instance
@@ -457,7 +479,7 @@ CompletableFuture.runAsync(() -> { ... }, mailExecutor);
 // ❌ FORBIDDEN — tue le serveur entier
 System.exit(1);
 // ✅ CORRECT
-LOG.error(methodName + " - module not found for lang = " + lang);
+LOG.error("module not found for lang = {}", lang);
 return null;
 ```
 
@@ -495,10 +517,12 @@ public class ServiceName implements Serializable {
 private DataSource dataSource;
 ```
 
+> **`dao.getConnection()` is the project standard** for obtaining JDBC connections in services.
+
 ### 3. Premières lignes de méthode (TOUTES les méthodes)
 ```java
 final String methodName = utils.LCUtil.getCurrentMethodName();
-LOG.debug("entering " + methodName);
+LOG.debug("entering {}", methodName);
 ```
 
 ### 4. Try-with-resources (3 niveaux)
@@ -527,6 +551,23 @@ xxxListService.list(params);   // ✅
 xxxList.invalidateCache();      // ✅ pas setListe(null) statique
 ```
 
+### 7. Fin de méthode et classe
+```java
+} // end method
+} // end class
+```
+
+### 8. main() conservé commenté
+```java
+/*
+void main() {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering {}", methodName);
+    // tests locaux
+} // end main
+*/
+```
+
 ### 9. Mise à jour des appelants lors de la migration d'une liste (OBLIGATOIRE)
 
 > Quand une liste est migrée, il faut **simultanément** mettre à jour tous les fichiers qui l'appellent.
@@ -551,22 +592,21 @@ xxxListService.invalidateCache(); // migrated YYYY-MM-DD
 clubsListLocalAdminService.invalidateCache(); // migrated 2026-02-23
 ```
 
-### 7. Fin de méthode et classe
+### 10. Cache invalidation dans les controllers — toujours via CacheInvalidator
+
+> **Règle :** Dans les controllers et managers, toutes les invalidations de cache passent par `cache.CacheInvalidator` — jamais d'appel direct à `xxxList.invalidateCache()` depuis un controller.
+
 ```java
-} // end method
-} // end class
+// ✅ CORRECT — via CacheInvalidator injecté
+@Inject private cache.CacheInvalidator cacheInvalidator;
+cacheInvalidator.invalidateProfessionalCaches();
+
+// ❌ INTERDIT dans un controller
+@Inject private lists.LessonProList lessonProList;
+lessonProList.invalidateCache();  // ❌ appel direct depuis controller
 ```
 
-### 8. main() conservé commenté
-```java
-/*
-void main() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
-    // tests locaux
-} // end main
-*/
-```
+`CacheInvalidator` (`cache/CacheInvalidator.java`) est le point unique d'invalidation groupée — il appelle `invalidateCache()` sur les listes concernées.
 
 ---
 
@@ -578,6 +618,24 @@ void main() {
 | `PlayerController` | Délègue à `PlayerManager` |
 | `CourseController` | Délègue à `CourseManager` |
 | `ApplicationContext` | Source de vérité partagée — `Settings`, `Player`, `Club`, `Course`, `HandicapIndex` |
+
+### SelectionPurpose — Navigation club/course/round
+
+Toute navigation vers une page de sélection passe par `enumeration.SelectionPurpose` :
+
+```java
+// Menu → clubC.to_selectPurpose_xhtml('CODE') → SelectionPurpose.fromCode()
+//       → purpose.navigationToFirst()  (ex: selectClubCourse.xhtml)
+// Action bouton → switch(purpose) { case CREATE_TARIF_MEMBER → ... }
+```
+
+Pages unifiées :
+- `selectClubCourse.xhtml` — sélection club/course (remplace selectCourse, selectClubLocalAdmin, selectCourseLocalAdmin)
+- `selectRound.xhtml` — sélection round (remplace selectStablefordRounds, select_participants_round, selectRegisteredRounds)
+
+### Répertoire parking/
+
+`src/main/webapp/parking/` contient des fichiers XHTML archivés (versions remplacées). **Ne pas lire ni modifier.** Voir `.claudeignore`.
 
 ```java
 // ✅ ClubController — toujours via ClubManager
@@ -639,6 +697,67 @@ action="#{clubC.createClub()}"
 <p:divider layout="horizontal" type="solid"/>
 ```
 
+### ✅ process="@this" — commandButton dans un formulaire avec dialog cachée
+
+Quand un `<h:form>` contient un `<p:dialog>` avec des champs `required="true"`, tout bouton **hors du dialog** doit utiliser `process="@this"` pour éviter que Bean Validation valide les champs cachés du dialog.
+
+```xml
+<!-- ❌ Déclenche BV sur les champs cachés du dialog -->
+<p:commandButton value="Select" action="#{xxxC.select(item)}" process="@form"/>
+
+<!-- ✅ Valide uniquement le bouton lui-même -->
+<p:commandButton value="Select" action="#{xxxC.select(item)}" process="@this"/>
+```
+
+### ✅ Initialisation des champs @NotNull sur les entités POJO
+
+Les champs annotés `@NotNull` doivent être initialisés à une valeur par défaut pour éviter les erreurs BV sur une instance fraîche (ex: entité liée à un dialog non encore affiché).
+
+```java
+// ❌ Champ null sur new Professional() → BV error si le form est soumis
+@NotNull(message="{professional.amount.notnull}")
+private Double proAmount;
+
+// ✅ Valeur par défaut — BV passe, l'utilisateur peut corriger ensuite
+@NotNull(message="{professional.amount.notnull}")
+private Double proAmount = 0.0;
+```
+
+### ✅ FullCalendar — customButtons via extender JS
+
+Pour ajouter des boutons personnalisés à la barre d'outils FullCalendar (`p:schedule`), utiliser un `extender` JS + un `p:commandButton` caché déclenché par JS.
+
+```xml
+<p:schedule extender="initSchedule" ...>
+    ...
+</p:schedule>
+
+<!-- Bouton caché — déclenché par le customButton FullCalendar -->
+<p:commandButton id="btnMyAction"
+                 style="display:none"
+                 ajax="false"
+                 action="#{myC.myAction()}"
+                 process="@form"/>
+
+<script type="text/javascript">
+function initSchedule() {
+    this.cfg.options.customButtons = {
+        myButton: {
+            text: 'Mon Action',
+            click: function() {
+                document.getElementById('myFormId:btnMyAction').click();
+            }
+        }
+    };
+    this.cfg.options.headerToolbar = {
+        left:   'prev,next today',
+        center: 'title',
+        right:  'myButton dayGridMonth,timeGridWeek,timeGridDay'
+    };
+}
+</script>
+```
+
 ---
 
 ## 📦 Package Conventions
@@ -658,7 +777,7 @@ action="#{clubC.createClub()}"
 | `calc/` | Pure calculation logic (no DB) | ✅ No migration needed |
 | `entite/` | Domain objects — POJOs sans annotations CDI | ✅ No migration needed |
 | `entite/composite/` | View-layer composite objects | ✅ No migration needed |
-| `payment/` | Payment processing | ⏳ Pending |
+| `payment/` | Payment processing (`PaymentStateStore`, `PaymentTransaction`) | ✅ Done |
 | `mail/` | Email services | ✅ Already CDI |
 | `ical/` | iCal calendar generation | ✅ No migration needed |
 | `security/` | Jakarta Security | ✅ Already CDI |
@@ -818,6 +937,7 @@ import java.sql.SQLException;
 - [ ] `catch(Exception)` → `handleGenericException(e, methodName)`
 - [ ] `return null` → `Collections.emptyList()` ou valeur par défaut
 - [ ] `final String methodName` + `LOG.debug("entering")` dans TOUTES les méthodes
+- [ ] Logs : style paramétré `LOG.debug("msg = {}", value)` — pas de concaténation
 - [ ] `// end method` + `// end class` ajoutés
 - [ ] `main()` conservé commenté avec standards
 - [ ] Pour les listes: cache d'instance (pas static) + `invalidateCache()`
@@ -890,6 +1010,17 @@ Settings.getProperty("WEBAPP");
 settings.getProperty("WEBAPP");
 ```
 
+### Error 7: Cache invalidated directly from controller (bypass CacheInvalidator)
+```java
+// ❌ WRONG — appel direct depuis un controller
+@Inject private lists.LessonProList lessonProList;
+lessonProList.invalidateCache();
+
+// ✅ CORRECT — toujours via CacheInvalidator
+@Inject private cache.CacheInvalidator cacheInvalidator;
+cacheInvalidator.invalidateProfessionalCaches();
+```
+
 ---
 
 ## 🧪 CDI / JSF Patterns
@@ -904,17 +1035,117 @@ settings.getProperty("WEBAPP");
 
 ---
 
+## 💳 Payment Architecture
+
+JAX-RS + JSF sont strictement séparés :
+
+| Class | Scope | Role |
+|---|---|---|
+| `PaymentController` | `@SessionScoped` | JSF backing bean — panier, navigation, persistance |
+| `PaymentRestResource` | `@RequestScoped` | REST callbacks Python (phase1/phase2/phase3) |
+| `PaymentStateStore` | `@ApplicationScoped` | Bridge `ConcurrentHashMap<nonce, PaymentTransaction>` |
+| `PaymentTransaction` | POJO | Snapshot de la transaction (listLessons, creditcard, type) |
+
+**Règle :** `PaymentController` ne doit **jamais** avoir d'annotation `@Path`. La persistance (INSERT en DB) est déclenchée par `onPaymentCompleted()` appelé via `preRenderView` sur `creditcard_payment_executed.xhtml` — garantit le contexte JSF et les messages d'erreur.
+
+```java
+// ✅ onPaymentCompleted() — point unique de persistance côté JSF
+// Appelé par <f:event type="preRenderView" listener="#{payC.onPaymentCompleted}"/>
+public void onPaymentCompleted() {
+    // récupère PaymentTransaction depuis PaymentStateStore via nonce
+    // INSERT lesson / payments_lesson / etc.
+}
+```
+
+---
+
 ## 🌐 REST
 
-JAX-RS est activé via `rest/RestActivator.java`. Certains Controllers mixent logique JSF et annotations JAX-RS dans la même classe.
+JAX-RS est activé via `rest/RestActivator.java`. `PaymentRestResource` est la seule classe REST — les controllers JSF ne doivent pas avoir d'annotations `@Path`.
 
 ---
 
 ## 🧪 Testing
 
 - **Unit tests** (`*Test.java`): JUnit Jupiter 5, Mockito 5, Weld JUnit 5 — run with `-Pfast-ut`
-- **Integration tests** (`*IT.java`): Arquillian avec WildFly Remote (localhost:9990) — credentials dans `src/test/resources/arquillian.xml`
+- **Integration tests** (`*IT.java`): JDBC direct via `JdbcConnectionProvider` — run with `-Pfast-it`
 - **Selenium/E2E**: Selenium 4 + selenium-jupiter, PrimeFaces Selenium — dans `src/test/java/selenium/`
+
+```bash
+# Run a specific IT test
+mvn failsafe:integration-test -Pfast-it -Dit.test=MyListIT
+```
+
+### ✅ IT Test Pattern — List services
+
+```java
+@Tag("integration")
+public class XxxListIT {
+
+    // ✅ SQL défini une seule fois dans la classe de production
+    private static final String QUERY         = lists.XxxList.QUERY;
+    private static final String EXPLAIN_QUERY = "EXPLAIN ANALYZE " + QUERY;
+
+    @Test
+    void query_realDB_executesWithoutError() throws Exception {
+        try (Connection conn = new JdbcConnectionProvider().getConnection();
+             PreparedStatement ps = conn.prepareStatement(QUERY);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                assertTrue(rs.getInt("idplayer") > 0);
+            }
+        }
+    }
+
+    @Test
+    void query_explainAnalyze_showsExecutionPlan() throws Exception {
+        try (Connection conn = new JdbcConnectionProvider().getConnection();
+             PreparedStatement ps = conn.prepareStatement(EXPLAIN_QUERY);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) { LOG.info("{}", rs.getString(1)); }
+        }
+    }
+}
+```
+
+**Règles IT tests :**
+- Pas de Mockito — connexion réelle à MySQL via `JdbcConnectionProvider`
+- `QUERY` → tests de données (assertions sur colonnes/valeurs)
+- `EXPLAIN_QUERY` → test diagnostique plan d'exécution (log uniquement, pas d'assertions)
+- La constante SQL dans la liste de production doit être `public static final`
+- Pas de DELETE sans `conn.setAutoCommit(false)` + `conn.rollback()` dans le catch
+
+### ✅ SQL — Bonnes pratiques
+
+#### ❌ YEAR()/MONTH() bloquent les index
+```sql
+-- ❌ Les fonctions sur la colonne empêchent l'utilisation d'un index
+WHERE YEAR(SubscriptionEndDate) = YEAR(DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH))
+  AND MONTH(SubscriptionEndDate) = MONTH(DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH))
+
+-- ✅ Condition de plage — permet l'utilisation d'un index sur la colonne
+WHERE SubscriptionEndDate >= DATE_ADD(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE())-1 DAY), INTERVAL 1 MONTH)
+  AND SubscriptionEndDate <  DATE_ADD(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE())-1 DAY), INTERVAL 2 MONTH)
+```
+
+#### ❌ Colonnes non qualifiées dans les JOINs
+```sql
+-- ❌ Ambigu — MySQL résout si unique, mais fragile
+AND player.idplayer = cotisationIdPlayer
+
+-- ✅ Toujours qualifier avec le nom de table
+AND player.idplayer = payments_cotisation.CotisationIdPlayer
+```
+
+#### ❌ MONTH() + 1 déborde en décembre
+```sql
+-- ❌ Retourne 13 en décembre → zéro résultat
+AND MONTH(col) = MONTH(CURRENT_DATE()) + 1
+
+-- ✅ DATE_ADD gère le changement d'année
+AND MONTH(col) = MONTH(DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH))
+AND YEAR(col)  = YEAR(DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH))
+```
 
 ---
 
@@ -989,6 +1220,6 @@ mvn test -Pfast-ut
 
 ---
 
-**Version:** 3.0 (Merged — session standards + CDI patterns)
-**Last Updated:** 2026-02-23
+**Version:** 3.1 (Payment architecture, CacheInvalidator, SelectionPurpose, XHTML patterns)
+**Last Updated:** 2026-03-30
 **Maintainer:** GolfLC Team

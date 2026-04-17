@@ -20,6 +20,10 @@
 </script>
 
 <ui:define name="content">
+<f:metadata>
+    <f:viewParam name="nonce" value="#{payC.completionNonce}" />
+    <f:event type="preRenderView" listener="#{payC.onPaymentCompleted()}" />
+</f:metadata>
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
 <p:panel styleClass="login-card form-card">
 <f:facet name="header"><h1>#{msg['title.payment.executed']}</h1></f:facet>
@@ -61,15 +65,27 @@
                   value="#{payC.creditcard.creditcardPaymentReference}"/>
 
     <f:facet name="footer">
+        <div class="btn-group" style="justify-content:center;">
          <p:commandButton value="Back to Welcome screen"
                          id="commandButtonReturn"
                          ajax="false"
                          update="growl-msg"
                          immediate="true"
-                         icon="pi pi-database"
+                         icon="pi pi-home"
+                         rendered="#{not roundC.otherPlayersPaymentFlow}"
                          action="welcome.xhtml?faces-redirect=true" />
-         <p:commandButton value="Back js" icon="pi pi-database"
+         <p:commandButton value="#{msg['button.back.inscriptions']}"
+                         id="commandButtonReturnInscriptions"
+                         ajax="false"
+                         immediate="true"
+                         icon="pi pi-users"
+                         rendered="#{roundC.otherPlayersPaymentFlow}"
+                         action="#{roundC.returnToOtherPlayers()}" />
+         <p:commandButton value="Back"
+                          icon="pi pi-arrow-left"
+                          styleClass="ui-button-secondary"
                           onclick="window.history.back();"/>
+        </div>
     </f:facet>
 </p:panelGrid>
 </h:form>

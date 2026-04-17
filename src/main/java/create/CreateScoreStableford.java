@@ -29,10 +29,10 @@ public class CreateScoreStableford implements Serializable {
 
     public boolean create(final ScoreStableford score, final Round round, final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with ScoreStableford = " + score);
-        LOG.debug("for Round = " + round);
-        LOG.debug("for Player = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with ScoreStableford = {}", score);
+        LOG.debug("for Round = {}", round);
+        LOG.debug("for Player = {}", player);
 
         try (Connection conn = dao.getConnection()) {
 
@@ -65,12 +65,12 @@ public class CreateScoreStableford implements Serializable {
                         LCUtil.showMessageFatal(msg);
                         return false;
                     }
-                    LOG.debug(methodName + " - successful insert for score = " + sco);
+                    LOG.debug("successful insert for score = {}", sco);
                 } // end for
 
-                LOG.debug(methodName + " - just before SUM totalPoints");
+                LOG.debug("just before SUM totalPoints");
                 if (updateInscriptionFinalResult.update(player, round)) {
-                    LOG.debug(methodName + " - update InscriptionFinalResult OK");
+                    LOG.debug("update InscriptionFinalResult OK");
                 }
 
                 String msg = "<br/>Successful insert scores"
@@ -101,7 +101,7 @@ public class CreateScoreStableford implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         // boolean b = create(score, round, player);

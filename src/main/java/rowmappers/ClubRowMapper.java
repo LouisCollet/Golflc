@@ -29,7 +29,7 @@ public class ClubRowMapper extends AbstractRowMapper<Club> {
             // Champs simples
             club.setIdclub(getInteger(rs, "idclub"));
            // club.setClubName(getStringOrDefault(rs, "clubName", "<structure UNKNOWN>"));
-            club.setClubName(getString(rs, "clubName"));
+            club.setClubName(getString(rs, "ClubName"));
             club.setClubWebsite(getStringOrDefault(rs, "ClubWebsite", "<website UNKNOWN>"));
             club.setClubLocalAdmin(getInteger(rs, "ClubLocalAdmin"));
 

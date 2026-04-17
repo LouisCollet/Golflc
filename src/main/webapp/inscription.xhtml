@@ -45,6 +45,11 @@
                              layout="flex"
                              columnClasses="col1Flex, col2Flex">
 
+                    <p:outputLabel value="#{msg['round.date']} :"/>
+                    <h:outputText value="#{roundC.round.roundDate}" style="font-weight:bold; font-size:1.2em;">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+
                     <p:outputLabel for="@next" value="#{msg['inscription.team']} :"/>
                     <p:inputText id="inscriptionTeam"
                                  size="35"
@@ -99,7 +104,17 @@
                                          ajax="false"
                                          immediate="true"
                                          icon="pi pi-sun"
+                                         rendered="#{!roundC.inscription.showWeather}"
                                          action="#{roundC.findWeather()}"/>
+
+                        <p:commandButton id="buttonStopWeather"
+                                         value="Stop #{msg['button.weather']}"
+                                         ajax="false"
+                                         immediate="true"
+                                         icon="pi pi-times"
+                                         styleClass="p-button-secondary"
+                                         rendered="#{roundC.inscription.showWeather}"
+                                         action="#{roundC.stopWeather()}"/>
 
                         <c:set var="idcourse" value="#{clubC.course.idcourse}"/>
                         <p:commandButton id="buttonTarif"
@@ -113,6 +128,7 @@
                                          value="#{msg['button.inscription.otherplayers']} / #{roundC.roundPlayersList().size()}"
                                          update="growl-msg"
                                          ajax="false"
+                                         immediate="true"
                                          disabled="#{(!roundC.inscription.inscriptionOK) or (roundC.roundPlayersList().size() gt max)}"
                                          icon="pi pi-user-plus"
                                          action="select_other_players.xhtml?faces-redirect=true"/>

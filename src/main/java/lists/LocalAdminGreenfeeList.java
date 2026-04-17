@@ -6,7 +6,7 @@ import entite.Player;
 import entite.composite.ECourseList;
 import static interfaces.Log.LOG;
 import jakarta.inject.Inject;
-import jakarta.faces.view.ViewScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -17,21 +17,21 @@ import rowmappers.GreenfeeRowMapper;
 import rowmappers.RowMapper;
 
 @Named("LAGreenfee")
-@ViewScoped // nécessaire !! pour faire le total dans local_administrator_greenfee.xhtml
+@ApplicationScoped // migrated from @ViewScoped 2026-03-22
 public class LocalAdminGreenfeeList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ViewScoped resets per view automatically
+    // ✅ Cache d'instance — @ApplicationScoped singleton, invalidated via CacheInvalidator
     private List<ECourseList> liste = null;
 
     public LocalAdminGreenfeeList() { }
 
     public List<ECourseList> list(final Player localAdmin) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         // ✅ Early return — guard clause FIRST
         if (liste != null) {
@@ -75,7 +75,7 @@ public class LocalAdminGreenfeeList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -83,7 +83,7 @@ public class LocalAdminGreenfeeList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324715);
         var lp = new LocalAdminGreenfeeList().list(player);

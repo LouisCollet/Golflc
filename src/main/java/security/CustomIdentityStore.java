@@ -28,7 +28,7 @@ public class CustomIdentityStore implements IdentityStore {
 
     public CredentialValidationResult validate(UsernamePasswordCredential userCredential) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // ✅ No hardcoded credentials — always reject until DB auth is implemented
         LOG.warn(methodName + " - Jakarta Security auth not yet implemented, rejecting");
         return INVALID_RESULT;

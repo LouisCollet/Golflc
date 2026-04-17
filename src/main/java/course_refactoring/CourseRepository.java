@@ -35,7 +35,7 @@ public class CourseRepository implements Serializable {
 
     public List<ECourseList> findAllValidCourses() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String sql = """
             SELECT *

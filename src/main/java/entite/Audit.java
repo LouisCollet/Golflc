@@ -5,6 +5,7 @@ import static interfaces.Log.LOG;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 // import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
 // import jakarta.inject.Named;  // migrated 2026-02-24
@@ -17,14 +18,11 @@ public class Audit implements Serializable, interfaces.Log, interfaces.GolfInter
     private static final long serialVersionUID = 1L;
     private Integer idaudit;
     private Integer auditPlayerId;
-    private LocalDateTime auditStartDate; 
+    private String playerName; // set via JOIN in AuditConnectionList
+    private LocalDateTime auditStartDate;
     private LocalDateTime auditEndDate;
-  //  private Short auditAttempts;
-  //  private LocalDateTime auditRetryTime;
 
-    public Audit(){
-
-    }
+    public Audit() { }
 
     public Integer getIdaudit() {
         return idaudit;
@@ -40,6 +38,14 @@ public class Audit implements Serializable, interfaces.Log, interfaces.GolfInter
 
     public void setAuditPlayerId(Integer auditPlayerId) {
         this.auditPlayerId = auditPlayerId;
+    }
+
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
     public LocalDateTime getAuditStartDate() {
@@ -74,7 +80,29 @@ public class Audit implements Serializable, interfaces.Log, interfaces.GolfInter
         this.auditRetryTime = auditRetryTime;
     }
 */
-     @Override
+    /**
+     * Connection duration. Returns null if session still open (endDate is null).
+     */
+    public Duration getDuration() {
+        if (auditEndDate == null || auditStartDate == null) return null;
+        return Duration.between(auditStartDate, auditEndDate);
+    } // end method
+
+    /**
+     * Formatted duration as "Xh Ym" or "connected".
+     */
+    public String getDurationFormatted() {
+        Duration d = getDuration();
+        if (d == null) return "connected";
+        long hours = d.toHours();
+        long minutes = d.toMinutesPart();
+        long seconds = d.toSecondsPart();
+        if (hours > 0) return hours + "h " + minutes + "m " + seconds + "s";
+        if (minutes > 0) return minutes + "m " + seconds + "s";
+        return seconds + "s";
+    } // end method
+
+    @Override
 public String toString(){ 
 LOG.debug("starting toString for Audit!");
  try{
@@ -112,10 +140,11 @@ public static Audit mapAudit(ResultSet rs) throws SQLException{
  try{
         LOG.debug("entering mapAudit");
     Audit a = new Audit();
-    a.setIdaudit(rs.getInt("AuditId") );
-    a.setAuditPlayerId(rs.getInt("AuditPlayerId") );
+    a.setIdaudit(rs.getInt("AuditId"));
+    a.setAuditPlayerId(rs.getInt("AuditPlayerId"));
     a.setAuditStartDate(rs.getTimestamp("auditStartDate").toLocalDateTime());
-    a.setAuditEndDate(rs.getTimestamp("auditEndDate").toLocalDateTime());
+    java.sql.Timestamp endTs = rs.getTimestamp("auditEndDate");
+    a.setAuditEndDate(endTs != null ? endTs.toLocalDateTime() : null);
         LOG.debug ("audit returned = " + a);
    return a;
  }catch(Exception e){

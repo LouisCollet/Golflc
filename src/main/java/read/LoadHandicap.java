@@ -23,8 +23,8 @@ public class LoadHandicap implements Serializable {
 
     public Handicap load(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - player = " + player.toString());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("player = {}", player.toString());
 
         final String query = """
                 SELECT *
@@ -42,13 +42,13 @@ public class LoadHandicap implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Player player = new Player(); player.setIdplayer(324713);
         // Round round = new Round();
         // round.setRoundDate(LocalDateTime.of(2017, Month.AUGUST, 26, 0, 0));
         // Handicap h = new LoadHandicap().load(player, round);
-        // LOG.debug(" handicap = " + h.toString());
+        // LOG.debug(" handicap = {}", h.toString());
     } // end main
     */
 

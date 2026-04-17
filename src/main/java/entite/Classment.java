@@ -1,11 +1,8 @@
 package entite;
 
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 // import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
 // import jakarta.inject.Named;  // migrated 2026-02-24
-import utils.LCUtil;
 
 // @Named  // migrated 2026-02-24
 // @RequestScoped  // migrated 2026-02-24

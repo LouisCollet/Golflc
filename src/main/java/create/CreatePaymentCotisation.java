@@ -26,8 +26,8 @@ public class CreatePaymentCotisation implements Serializable, interfaces.GolfInt
 
     public boolean create(final Cotisation cotisation) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with cotisation = " + cotisation);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with cotisation = {}", cotisation);
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "payments_cotisation");
@@ -76,7 +76,7 @@ public class CreatePaymentCotisation implements Serializable, interfaces.GolfInt
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

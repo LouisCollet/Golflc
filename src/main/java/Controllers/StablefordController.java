@@ -45,9 +45,9 @@ public class StablefordController implements Serializable {
      */
     public ScoreStableford completeScoreStableford(final Player player, final Round round, Tee tee) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("... entering " + methodName);
-        LOG.debug("with Round = " + round);
-        LOG.debug("with Player = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with Round = {}", round);
+        LOG.debug("with Player = {}", player);
         LOG.debug("filling only - no score calculations");
 
         try {
@@ -56,20 +56,20 @@ public class StablefordController implements Serializable {
 
             ScoreStableford scoreStableford = new ScoreStableford();
             ArrayList<ScoreStableford.Score> v1 = readScoreListService.read(player, round, tee);
-            LOG.debug("result of readScoreList = " + v1);
+            LOG.debug("result of readScoreList = {}", v1);
 
             if (v1.isEmpty()) {
                 LOG.debug("it's the first time : no scores already registered !");
                 scoreStableford = prepareView(player, round); // ✅ sans new
             } else {
-                LOG.debug("scores were previously registered ! = " + v1.size());
-                LOG.debug("scoreStableford score list completed with distance = " + v1);
+                LOG.debug("scores were previously registered ! = {}", v1.size());
+                LOG.debug("scoreStableford score list completed with distance = {}", v1);
                 scoreStableford.setScoreList(v1);
                 scoreStableford.setStatisticsList(readStatisticsListService.load(player, round));
                 scoreStableford.setShowButtonStatistics(true);
             }
 
-            LOG.debug("returned scoreStableford = " + scoreStableford);
+            LOG.debug("returned scoreStableford = {}", scoreStableford);
             return scoreStableford;
 
         } catch (Exception e) {
@@ -84,9 +84,9 @@ public class StablefordController implements Serializable {
      */
     public ScoreStableford prepareView(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("... entering " + methodName);
-        LOG.debug("with Round = " + round);
-        LOG.debug("with Player = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with Round = {}", round);
+        LOG.debug("with Player = {}", player);
 
         try {
             ECourseList ecl = findInfoStablefordService.find(player, round);
@@ -95,22 +95,22 @@ public class StablefordController implements Serializable {
 
             ScoreStableford scoreStableford = new ScoreStableford();
             scoreStableford = readParAndStrokeIndexService.read(course, scoreStableford);
-            LOG.debug("score with par and index = " + scoreStableford);
+            LOG.debug("score with par and index = {}", scoreStableford);
 
             scoreStableford = calcCourseHandicapService.calc(scoreStableford, player, round, tee);
-            LOG.debug("courseHandicap = " + scoreStableford.getCourseHandicap());
-            LOG.debug("HandicapIndex player WHS = " + scoreStableford.getPlayerHandicapWHS());
+            LOG.debug("courseHandicap = {}", scoreStableford.getCourseHandicap());
+            LOG.debug("HandicapIndex player WHS = {}", scoreStableford.getPlayerHandicapWHS());
 
             // ✅ CORRIGÉ - service injecté
             int playingHandicap = calcPlayingHandicapService.calc(scoreStableford, player, round);
             scoreStableford.setPlayingHandicap(playingHandicap);
-            LOG.debug("playingHandicap = " + scoreStableford.getPlayingHandicap());
+            LOG.debug("playingHandicap = {}", scoreStableford.getPlayingHandicap());
 
             scoreStableford.setExtraArray(completeWithExtraStrokesNew(scoreStableford, round));
-            LOG.debug("ExtraArray completed = " + scoreStableford);
+            LOG.debug("ExtraArray completed = {}", scoreStableford);
 
             scoreStableford.setDistanceArray(completeWithDistances(scoreStableford, tee));
-            LOG.debug("DistanceArray completed = " + scoreStableford);
+            LOG.debug("DistanceArray completed = {}", scoreStableford);
 
             scoreStableford.setTotalStrokes(Arrays.stream(scoreStableford.getStrokeArray()).sum());
 
@@ -119,14 +119,14 @@ public class StablefordController implements Serializable {
                 LOG.debug("statisticsList is empty");
             } else {
                 scoreStableford.setStatisticsList(v);
-                LOG.debug("statistics setted = " + scoreStableford.getStatisticsList().toString());
+                LOG.debug("statistics setted = {}", scoreStableford.getStatisticsList().toString());
             }
 
             scoreStableford.setStart(round.getRoundStart());
             scoreStableford.setHoles(round.getRoundHoles());
             scoreStableford.setScoreList(completeScoreList(scoreStableford));
             scoreStableford.setShowCreate(false);
-            LOG.debug("scoreList setted for rows not = 0 = " + scoreStableford.getScoreList().toString());
+            LOG.debug("scoreList setted for rows not = 0 = {}", scoreStableford.getScoreList().toString());
 
             return scoreStableford;
 
@@ -142,11 +142,11 @@ public class StablefordController implements Serializable {
      */
     public int[] completeWithDistances(ScoreStableford scoreStableford, Tee tee) throws SQLException {
         LOG.debug("entering completeWithDistances !");
-        LOG.debug("with tee = " + tee);
+        LOG.debug("with tee = {}", tee);
 
         try {
             Distance d = findDistancesService.find(tee);
-            LOG.debug("array distances = " + Arrays.toString(d.getDistanceArray()));
+            LOG.debug("array distances = {}", Arrays.toString(d.getDistanceArray()));
             return d.getDistanceArray();
 
         } catch (Exception ex) {
@@ -159,41 +159,39 @@ public class StablefordController implements Serializable {
     /**
      * Calcule les extra strokes (coups reçus) pour chaque trou
      */
-    public static int[] completeWithExtraStrokesNew(ScoreStableford score, Round round) {
+    public int[] completeWithExtraStrokesNew(ScoreStableford score, Round round) { // migrated from static 2026-03-22
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("... entering " + methodName + " for score = " + score);
+        LOG.debug("entering for score = {}", score);
 
         LoggingUserController.write(CLASSNAME + "." + methodName, "i");
         LoggingUserController.write("extra strokes", "t");
 
         try {
             int holes = round.getRoundHoles();
-            LOG.debug("holes via round = " + holes);
+            LOG.debug("holes via round = {}", holes);
             int start = round.getRoundStart();
-            LOG.debug("start via round = " + start);
-            LOG.debug("playingHandicap = " + score.getPlayingHandicap());
+            LOG.debug("start via round = {}", start);
+            LOG.debug("playingHandicap = {}", score.getPlayingHandicap());
 
             int complete = score.getPlayingHandicap() / holes;
-            LOG.debug("-- loop Complete = " + complete);
+            LOG.debug("-- loop Complete = {}", complete);
             LoggingUserController.write(" - loop Complete = " + complete);
 
             int uncomplete = score.getPlayingHandicap() % holes;
-            LOG.debug("-- loop Uncomplete = " + uncomplete);
+            LOG.debug("-- loop Uncomplete = {}", uncomplete);
             LoggingUserController.write(" - loop Uncomplete = " + uncomplete);
 
-            LOG.debug("-- ArrayIndex input = " + Arrays.toString(score.getIndexArray())
-                    + " control : sum must be 171 ! second calcul = " + IntStream.of(score.getIndexArray()).sum()
-                    + " must be also " + IntStream.rangeClosed(1, 18).sum());
+            LOG.debug("-- ArrayIndex input = {} control sum={} must be {}", Arrays.toString(score.getIndexArray()), IntStream.of(score.getIndexArray()).sum(), IntStream.rangeClosed(1, 18).sum());
 
             // 0. Slicing the arrays
             int[] sliced = null;
             if (holes == 9 && start == 1) {
                 sliced = utils.LCUtil.findSlice(score.getIndexArray(), start - 1, holes);
-                LOG.debug("-- sliced v1 1,9 = " + Arrays.toString(sliced));
+                LOG.debug("-- sliced v1 1,9 = {}", Arrays.toString(sliced));
             }
             if (holes == 9 && start == 10) {
                 sliced = utils.LCUtil.findSlice(score.getIndexArray(), start - 1, start - 1 + holes);
-                LOG.debug("-- sliced v1 10,9 = " + Arrays.toString(sliced));
+                LOG.debug("-- sliced v1 10,9 = {}", Arrays.toString(sliced));
             }
             if (holes == 18) {
                 sliced = score.getIndexArray();
@@ -201,47 +199,47 @@ public class StablefordController implements Serializable {
 
             // 1. Load list from array
             Integer[] arrayIndex = Arrays.stream(sliced).boxed().toArray(Integer[]::new);
-            LOG.debug("arrayIndex is now = " + Arrays.toString(arrayIndex));
+            LOG.debug("arrayIndex is now = {}", Arrays.toString(arrayIndex));
 
             List<ScoreStableford.ExtraClass> listExtra = new ArrayList<>();
             for (int i = 0; i < arrayIndex.length; i++) {
                 ScoreStableford.ExtraClass extra = new ScoreStableford.ExtraClass(i + start, arrayIndex[i]);
                 listExtra.add(extra);
             }
-            LOG.debug("-- listExtra loaded from arrayIndex with hole and index = " + listExtra);
+            LOG.debug("-- listExtra loaded from arrayIndex with hole and index = {}", listExtra);
 
             // 2. Complete list with complete extra
             for (int i = 0; i < holes; i++) {
                 listExtra.get(i).setExtra(complete);
             }
-            LOG.debug("-- liste extra completed with complete strokes = " + listExtra);
+            LOG.debug("-- liste extra completed with complete strokes = {}", listExtra);
 
             // 3. Sort list on index
             List<ScoreStableford.ExtraClass> sortedlistExtra = listExtra.stream()
                     .sorted(Comparator.comparingInt(ScoreStableford.ExtraClass::getIndex))
                     .collect(Collectors.toList());
-            LOG.debug("-- liste extra sorted on index= " + sortedlistExtra);
+            LOG.debug("-- liste extra sorted on index= {}", sortedlistExtra);
 
             // 4. Complete list with uncomplete
             for (int i = 0; i < uncomplete; i++) {
                 int e = sortedlistExtra.get(i).getExtra();
                 sortedlistExtra.get(i).setExtra(e + 1);
             }
-            LOG.debug("-- liste extra completed with strokes = " + sortedlistExtra);
+            LOG.debug("-- liste extra completed with strokes = {}", sortedlistExtra);
 
             // 5. Sort list back on hole
             listExtra = listExtra.stream()
                     .sorted(Comparator.comparingInt(ScoreStableford.ExtraClass::getHole))
                     .collect(Collectors.toList());
-            LOG.debug("-- liste extra sorted back on hole = " + listExtra);
+            LOG.debug("-- liste extra sorted back on hole = {}", listExtra);
 
             // 6. Convert back list to extraArray
             int[] extraArray = listExtra.stream()
                     .mapToInt(x -> x.getExtra())
                     .toArray();
 
-            LOG.debug("-- array extraArray = " + Arrays.toString(extraArray));
-            LOG.debug("-- total strokes = " + IntStream.of(extraArray).sum());
+            LOG.debug("-- array extraArray = {}", Arrays.toString(extraArray));
+            LOG.debug("-- total strokes = {}", IntStream.of(extraArray).sum());
 
             // 7. Special handling 9 holes
             if (holes == 9) {
@@ -256,7 +254,7 @@ public class StablefordController implements Serializable {
                             .concat(IntStream.of(extraArray), IntStream.of(zero))
                             .toArray();
                 }
-                LOG.debug("-- extraArray concatenated to 18 holes = " + Arrays.toString(extraArray));
+                LOG.debug("-- extraArray concatenated to 18 holes = {}", Arrays.toString(extraArray));
             }
 
             return extraArray;
@@ -305,17 +303,17 @@ public class StablefordController implements Serializable {
      * Transformation arrays → liste pour affichage dans dataTable
      */
     public ArrayList<ScoreStableford.Score> completeScoreList(ScoreStableford scoreStableford) {
-        LOG.debug("entering completeScoreList with scoreStableford = " + scoreStableford);
+        LOG.debug("entering completeScoreList with scoreStableford = {}", scoreStableford);
 
         try {
             ArrayList<ScoreStableford.Score> scoreList = new ArrayList<>();
             int start = scoreStableford.getStart() - 1;
-            LOG.debug("start = " + start);
+            LOG.debug("start = {}", start);
             int holes = scoreStableford.getHoles();
-            LOG.debug("holes = " + holes);
+            LOG.debug("holes = {}", holes);
             int stop = start + holes;
-            LOG.debug("stop = " + stop);
-            LOG.debug("before loading scoreList, distance array = " + Arrays.toString(scoreStableford.getDistanceArray()));
+            LOG.debug("stop = {}", stop);
+            LOG.debug("before loading scoreList, distance array = {}", Arrays.toString(scoreStableford.getDistanceArray()));
 
             for (int i = start; i < stop; i++) {
                 ScoreStableford.Score score = scoreStableford.new Score();
@@ -329,7 +327,7 @@ public class StablefordController implements Serializable {
                 scoreList.add(score);
             }
 
-            LOG.debug("completed scoreList = " + scoreList.toString());
+            LOG.debug("completed scoreList = {}", scoreList.toString());
 
             if (scoreList.isEmpty()) {
                 String msg = "generated scoreList is empty!";
@@ -365,7 +363,7 @@ public class StablefordController implements Serializable {
                 }
             }
 
-            LOG.debug("scoreList with strokes = " + scoreList.toString());
+            LOG.debug("scoreList with strokes = {}", scoreList.toString());
             return scoreList;
 
         } catch (Exception ex) {
@@ -395,7 +393,7 @@ public class StablefordController implements Serializable {
                 }
             }
 
-            LOG.debug("scoreList points modified = " + scoreList.toString());
+            LOG.debug("scoreList points modified = {}", scoreList.toString());
             return scoreList;
 
         } catch (Exception ex) {
@@ -412,16 +410,16 @@ public class StablefordController implements Serializable {
     public ArrayList<ScoreStableford.Statistics> completeStatisticsListWithStrokes(
             ArrayList<ScoreStableford.Statistics> statisticsList, int[] strokeArray) {
 
-        LOG.debug("entering completeStatisticsListWithStrokes with statisticsList = " + statisticsList);
-        LOG.debug("with strokeArray = " + Arrays.toString(strokeArray));
+        LOG.debug("entering completeStatisticsListWithStrokes with statisticsList = {}", statisticsList);
+        LOG.debug("with strokeArray = {}", Arrays.toString(strokeArray));
 
         try {
             for (int i = 0; i < statisticsList.size(); i++) {
-                LOG.debug("i iteration = " + i);
+                LOG.debug("i iteration = {}", i);
                 statisticsList.get(i).setStroke(strokeArray[i]);
             }
 
-            LOG.debug("scoreList points added = " + statisticsList.toString());
+            LOG.debug("scoreList points added = {}", statisticsList.toString());
             return statisticsList;
 
         } catch (Exception ex) {
@@ -435,7 +433,7 @@ public class StablefordController implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

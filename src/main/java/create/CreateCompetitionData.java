@@ -26,8 +26,8 @@ public class CreateCompetitionData implements Serializable {
 
     public boolean create(final CompetitionData data) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - with competitionData = " + data);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with competitionData = {}", data);
 
         try (Connection conn = dao.getConnection()) {
 
@@ -56,7 +56,7 @@ public class CreateCompetitionData implements Serializable {
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     data.setCmpDataId(LCUtil.generatedKey(conn));
-                    LOG.debug(methodName + " - Successful update CompetitionData");
+                    LOG.debug("Successful update CompetitionData");
                     String msg = LCUtil.prepareMessageBean("competition.data.create") + data + "<br>" + data;
                     LOG.debug(msg);
                     LCUtil.showMessageInfo(msg);
@@ -91,9 +91,9 @@ public class CreateCompetitionData implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // var b = create(data);
-        // LOG.debug("from main, b = " + b);
+        // LOG.debug("from main, b = {}", b);
         LOG.debug("from main, CreateCompetitionData = ");
     } // end main
     */

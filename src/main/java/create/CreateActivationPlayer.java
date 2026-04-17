@@ -29,14 +29,14 @@ public class CreateActivationPlayer implements Serializable {
 
     public boolean create(final Player player) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("-- Inserting initial Activation for new player = " + player.getIdplayer());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("-- Inserting initial Activation for new player = {}", player.getIdplayer());
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "activation");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 String uuid = UUID.randomUUID().toString();
-                LOG.debug("Universally Unique Identifier uuid = " + uuid);
+                LOG.debug("Universally Unique Identifier uuid = {}", uuid);
                 ps.setString(1, uuid); // ActivationKey
                 ps.setInt(2, player.getIdplayer());
                 ps.setString(3, player.getPlayerLanguage());
@@ -50,7 +50,7 @@ public class CreateActivationPlayer implements Serializable {
                             + "&firstname=" + player.getPlayerFirstName().replaceAll(" ", "%20")
                             + "&lastname=" + player.getPlayerLastName().replaceAll(" ", "%20")
                             + "&language=" + player.getPlayerLanguage();
-                    LOG.debug("** href for activation new player = " + href);
+                    LOG.debug("** href for activation new player = {}", href);
                     // LanguageController.setLanguage removed — fix multi-user 2026-03-07
                     // Language is already available via player.getPlayerLanguage()
                     if (activationMail.sendMailAccountCreated(player, href)) { // migrated 2026-02-26
@@ -87,13 +87,13 @@ public class CreateActivationPlayer implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(111111);
         player.setPlayerFirstName("first test activation");
         player.setPlayerLastName("last test activation");
         boolean b = new create.CreateActivationPlayer().create(player);
-        LOG.debug("from main, CreateActivationPlayer = " + b);
+        LOG.debug("from main, CreateActivationPlayer = {}", b);
     } // end main
     */
 

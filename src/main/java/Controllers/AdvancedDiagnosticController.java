@@ -2,8 +2,9 @@ package Controllers;
 
 import static interfaces.Log.LOG;
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
+import java.io.Serializable;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import java.io.InputStream;
@@ -21,10 +22,13 @@ import org.primefaces.PrimeFaces;
 import static org.omnifaces.util.Faces.getResourceAsStream;
 /**
  * Bean admin avancé : diagnostic, monitoring JVM, test ajax, vérif ressource, sessions, export.
+ * Note: uses FacesContext — must only be called from JSF request context (XHTML pages).
  */
 @Named("advancedAdmin")
-@ApplicationScoped
-public class AdvancedDiagnosticController {
+@SessionScoped // migrated from @ApplicationScoped 2026-03-22 — uses FacesContext
+public class AdvancedDiagnosticController implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     // Simple cache for resource checks to avoid repeated IO
     private final Map<String, Boolean> resourceExistsCache = new ConcurrentHashMap<>();
@@ -192,6 +196,20 @@ public class AdvancedDiagnosticController {
      */
     public int getActiveSessionCount() {
         return utils.SessionTracker.getActiveSessions();
+    }
+
+    @jakarta.inject.Inject private lists.AuditConnectionList auditConnectionList;
+
+    /**
+     * Count of users currently online (audit with endDate IS NULL).
+     */
+    public int getOnlineCount() {
+        try {
+            return auditConnectionList.countOnline();
+        } catch (Exception e) {
+            LOG.error("Error counting online users: {}", e.getMessage());
+            return 0;
+        }
     }
 
     /**

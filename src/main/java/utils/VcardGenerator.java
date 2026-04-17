@@ -125,7 +125,7 @@ return null; // fake
  /*
  void main() {
      final String methodName = utils.LCUtil.getCurrentMethodName();
-     LOG.debug("entering " + methodName);
+     LOG.debug("entering {}", methodName);
      // requires CDI container — cannot run standalone
  } // end main
  */

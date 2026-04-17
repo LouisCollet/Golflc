@@ -1,18 +1,15 @@
 package create;
 
-import entite.Address;
 import entite.Club;
-import entite.Country;
-import entite.LatLng;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
-
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -36,12 +33,10 @@ public class CreateClub implements Serializable {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean create(final Club club) throws Exception {
-        
+    public boolean create(final Club club) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
-        
-        LOG.debug("dao = {}", dao);
 
         try (Connection conn = dao.getConnection()) {
             
@@ -126,20 +121,15 @@ public class CreateClub implements Serializable {
             
             return true;
             
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = "SQLException in " + methodName + ": " + sqle.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-            
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    } 
+    } // end method
+
 
     /**
      * Main pour tests hors JSF
@@ -171,7 +161,7 @@ public class CreateClub implements Serializable {
             LOG.debug("Test club: {}", club);
             
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
             LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
         }
     }
@@ -206,7 +196,7 @@ private String[] status = new String [2];
      PreparedStatement ps = null;
   //   status[0] = "false";
      try{
-               LOG.debug("entering Createclub.create with club  = " + club.toString());
+               LOG.debug("entering Createclub.create with club  = {}", club.toString());
             final String query = LCUtil.generateInsertQuery(conn, "club");
        // try{ PreparedStatement ps = conn.prepareStatement(query)) {   
             ps = conn.prepareStatement(query);
@@ -226,7 +216,7 @@ private String[] status = new String [2];
                 LCUtil.showMessageInfo(msg);
             //    status[0] = "true";
              //   status[1] = Integer.toString(club.getIdclub());
-             //   LOG.debug("status = " + Arrays.toString(status));
+             //   LOG.debug("status = {}", Arrays.toString(status));
                // return true;
                 return true;
             }else{
@@ -270,7 +260,7 @@ private String[] status = new String [2];
         club.setClubWebsite("https://golf-empereur.com/");
  
        var v = new CreateClub().create(club,conn);
-            LOG.debug("from main, CreateAudit = " + v);
+            LOG.debug("from main, CreateAudit = {}", v);
         } catch (Exception e) {
             String msg = "££ Exception in main CreateAudit = " + e.getMessage();
             LOG.error(msg);

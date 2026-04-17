@@ -7,47 +7,45 @@
     xmlns:h="jakarta.faces.html">
 
         <!-- ui:param defaults : playerLabel = msg['player.id'], playerPurpose = 'login' -->
-        <p:outputLabel for="@next" value="#{empty playerLabel ? msg['player.id'] : playerLabel}" />
-        <h:panelGroup layout="block"
-                      style="display:flex; align-items:center; gap:0.5rem;"
-                      id="containerPlayer"  >
-                <p:inputNumber
-                       id="inputPlayerId"
-                       label="inputPlayer"
-                       value="#{playerC.playerTemp.idplayer}"
-                       size="7"
-                       decimalPlaces="0"
-                       thousandSeparator=""
-                       emptyValue="0"
-                       onkeyup="togglePlayerSelectButton(this)"
-                       style="margin-left:1.5em; margin-right:1.5em;" >
+        <p:outputLabel for="@next" value="#{empty playerLabel ? msg['player.id'] : playerLabel} :" />
+        <h:panelGroup layout="block" styleClass="selector-row" id="containerPlayer">
+                <p:defaultCommand target="ButtonSelect" scope="containerPlayer"/>
+                <p:inputNumber id="inputPlayerId"
+                               label="inputPlayer"
+                               value="#{playerC.playerTemp.idplayer}"
+                               size="7"
+                               decimalPlaces="0"
+                               thousandSeparator=""
+                               emptyValue="0"
+                               onkeyup="togglePlayerSelectButton(this)">
                     <f:validateBean disabled="true"/>
                 </p:inputNumber>
-                <p:commandButton
-                        id="ButtonPro"
-                        immediate="true"
-                        value="#{msg['button.player.list']}"
-                        actionListener="#{dialogC.showSelectPlayer(empty playerPurpose ? 'login' : playerPurpose)}"
-                        icon="pi pi-search" >
+                <p:commandButton id="ButtonPro"
+                                 immediate="true"
+                                 value="#{msg['button.player.list']}"
+                                 actionListener="#{dialogC.showSelectPlayer(empty playerPurpose ? 'login' : playerPurpose)}"
+                                 icon="pi pi-search">
                     <p:ajax event="dialogReturn"
-                            listener="#{playerC.onPlayerDialogReturn}"
-                            update="inputPlayerId,playerName,playerId,wrapperButtonSelect,growl-msg" />
+                            listener="#{loginC.onPlayerDialogReturn}"
+                            update="inputPlayerId,playerName,playerId,wrapperButtonSelect,growl-msg"/>
                 </p:commandButton>
                 <h:panelGroup id="wrapperButtonSelect"
                               style="display:#{(empty playerPurpose or playerPurpose eq 'login') and playerC.playerTemp.idplayer gt 0 ? '' : 'none'};">
-                    <p:commandButton
-                            id="ButtonSelect"
-                            value="#{msg['button.select']}"
-                            action="#{playerC.selectPlayerById()}"
-                            icon="pi pi-sign-in"
-                            rendered="#{empty playerPurpose or playerPurpose eq 'login'}" />
+                    <!-- disableOnAjax="true" — empêche les double-clics de déclencher plusieurs appels
+                         AJAX vers selectPlayerById() → selectPlayer() → createAudit.create(),
+                         ce qui créait des doublons dans la table audit (fix 2026-04-03) -->
+                    <p:commandButton id="ButtonSelect"
+                                     value="#{msg['button.select']}"
+                                     action="#{loginC.selectPlayerById()}"
+                                     icon="pi pi-sign-in"
+                                     disableOnAjax="true"
+                                     rendered="#{empty playerPurpose or playerPurpose eq 'login'}"/>
                 </h:panelGroup>
-
                 <h:outputText id="playerName"
                               value="#{playerC.playerTemp.playerLastName}"
-                              style="font-style:italic;margin-right: 10px;" />
+                              styleClass="selector-name"/>
                 <h:outputText id="playerId"
                               value="#{playerC.playerTemp.idplayer}"
-                              style="font-weight:bold;font-size: 2rem;font-style:italic;color: red;"/>
+                              styleClass="selector-id"/>
           </h:panelGroup>
 </ui:composition>

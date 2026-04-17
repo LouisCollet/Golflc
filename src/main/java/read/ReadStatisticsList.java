@@ -3,6 +3,8 @@ package read;
 import entite.Player;
 import entite.Round;
 import entite.ScoreStableford;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,7 +27,8 @@ public class ReadStatisticsList implements Serializable {
      * Utilisé dans include_statistics.xhtml pour compléter la dataTable
      */
     public ArrayList<ScoreStableford.Statistics> load(final Player player, final Round round) throws SQLException {
-        LOG.debug("starting ReadStatisticsList.load");
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
 
         final String query = """
             SELECT *
@@ -59,24 +62,20 @@ public class ReadStatisticsList implements Serializable {
                     statisticsList.add(sta);
                 }
 
-                LOG.debug("ReadStatisticsList returned " + statisticsList.size() + " statistics");
+                LOG.debug("ReadStatisticsList returned {} statistics", statisticsList.size());
                 return statisticsList;
             }
 
         } catch (SQLException e) {
-            String msg = "SQLException in readStatisticsList: " + e.getMessage()
-                    + ", SQLState = " + e.getSQLState()
-                    + ", ErrorCode = " + e.getErrorCode();
-            LOG.error(msg, e);
-            throw e;
-
+            handleSQLException(e, methodName);
+            return new ArrayList<>();
         } catch (Exception e) {
-            String msg = "Exception in readStatisticsList: " + e.getMessage();
-            LOG.error(msg, e);
-            throw new SQLException(msg, e);
+            handleGenericException(e, methodName);
+            return new ArrayList<>();
         }
     } // end method
 
+    /*
     void main() throws SQLException {
         Player player = new Player();
         Round round = new Round();
@@ -84,9 +83,10 @@ public class ReadStatisticsList implements Serializable {
         round.setIdround(676);
 
         var v = new read.ReadStatisticsList().load(player, round);
-        LOG.debug("result main size = " + v.size());
-        LOG.debug("result main = " + v.toString());
+        LOG.debug("result main size = {}", v.size());
+        LOG.debug("result main = {}", v.toString());
     } // end main
+    */
 
 } // end class
 /*
@@ -136,7 +136,7 @@ try{
           sta.setPenalty(rs.getInt("ScorePenalty"));
           statisticsList.add(sta);
         } // end while
-   //   LOG.debug(" -- returned statisticsList = " + statisticsList.toString());
+   //   LOG.debug(" -- returned statisticsList = {}", statisticsList.toString());
 return statisticsList;
 }catch (SQLException e){
     String msg = "SQLException in readStatisticsList = " + e.toString() + ", SQLState = " + e.getSQLState()
@@ -145,7 +145,7 @@ return statisticsList;
         LCUtil.showMessageFatal(msg);
         return null;
 }catch (Exception ex){
-    LOG.error("Exception ! " + ex);
+    LOG.error("Exception ! {}", ex);
     LCUtil.showMessageFatal("Exception in readStatisticsList = " + ex.toString() );
      return null;
 }finally{
@@ -160,9 +160,9 @@ void main() throws SQLException, Exception {
     player.setIdplayer(324713);
     round.setIdround(676);
     var v = new read.ReadStatisticsList().load(conn, player, round);
-    //   LOG.debug("result main = " + Arrays.deepToString(v));
-       LOG.debug("result main size = " + v.size());
-       LOG.debug("result main = " + v.toString());
+    //   LOG.debug("result main = {}", Arrays.deepToString(v));
+       LOG.debug("result main size = {}", v.size());
+       LOG.debug("result main = {}", v.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 }// end main
 } // end class

@@ -29,7 +29,7 @@ public class SchedulerQuartzController implements Serializable{
     
  public void stop() throws Exception {
         LOG.debug("entering stop scheduler");
-        LOG.debug("with scheduler = " + scheduler.getSchedulerName());
+        LOG.debug("with scheduler = {}", scheduler.getSchedulerName());
     for (JobExecutionContext currentlyExecutingJob : scheduler.getCurrentlyExecutingJobs()) {
        if (InterruptableJob.class.isAssignableFrom(currentlyExecutingJob.getJobDetail().getJobClass())) // Otherwise it will throw an exception
         scheduler.interrupt(currentlyExecutingJob.getFireInstanceId());
@@ -40,15 +40,15 @@ public class SchedulerQuartzController implements Serializable{
     
   public void list() throws Exception {
         LOG.debug("entering list scheduler");
-          LOG.debug("with scheduler = " + scheduler.getSchedulerName());
+          LOG.debug("with scheduler = {}", scheduler.getSchedulerName());
        for(String group: scheduler.getJobGroupNames()) {
          for(JobKey jobKey : scheduler.getJobKeys(groupEquals(group))) {
-           LOG.debug("list Jobkeys = " + jobKey);
+           LOG.debug("list Jobkeys = {}", jobKey);
          }
       }
       for(String group: scheduler.getTriggerGroupNames()) {
          for(TriggerKey triggerKey : scheduler.getTriggerKeys(groupEquals(group))) {
-           LOG.debug("list Triggerkeys = " + triggerKey);
+           LOG.debug("list Triggerkeys = {}", triggerKey);
          }
       }
          LOG.debug("exiting list scheduler");
@@ -115,25 +115,25 @@ ClassLoader clo = Thread.currentThread().getContextClassLoader();
   //    LOG.debug(" line 04");
       LOG.debug("line 05 ");  // boucle !!
  //       char letter = (char) System.in.read();
-//        LOG.debug("You typed the letter " + letter);
+//        LOG.debug("You typed the letter {}", letter);
    //   if (scheduler != null) {
 ////        scheduler.shutdown();
    //   }
     } catch (final SchedulerException e) {
-      LOG.debug("Scheduler Exception " + e);
+      LOG.debug("Scheduler Exception {}", e);
     } catch (final Exception e) {
-      LOG.debug("Exception " + e);
+      LOG.debug("Exception {}", e);
     }
   
 // catch (final IOException e) {
-//      LOG.debug("IOException Exception " + e);;
+//      LOG.debug("IOException Exception {}", e);;
  //   }
 } //end run
 
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

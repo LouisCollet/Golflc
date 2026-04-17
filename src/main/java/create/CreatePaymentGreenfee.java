@@ -26,9 +26,9 @@ public class CreatePaymentGreenfee implements Serializable, interfaces.GolfInter
 
     public boolean create(final Player player, final Greenfee greenfee) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with Greenfee  = " + greenfee);
-        LOG.debug("for Player  = " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with Greenfee  = {}", greenfee);
+        LOG.debug("for Player  = {}", player);
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "payments_greenfee");
@@ -79,7 +79,7 @@ public class CreatePaymentGreenfee implements Serializable, interfaces.GolfInter
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

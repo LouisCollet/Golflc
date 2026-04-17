@@ -35,7 +35,7 @@ public class RegisterResultList implements Serializable {
 
     public List<ECourseList> list(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - with player = " + player);
 
         if (liste != null) {
@@ -45,10 +45,12 @@ public class RegisterResultList implements Serializable {
 
         final String query = """
             WITH selection AS (
-                SELECT * FROM player, player_has_round, round
-                WHERE player.idplayer = ?
-                  AND player_has_round.InscriptionIdPlayer = player.idplayer
-                  AND player_has_round.InscriptionIdRound = round.idround
+                SELECT * FROM player
+                    INNER JOIN player_has_round
+                        ON player_has_round.InscriptionIdPlayer = player.idplayer
+                    INNER JOIN round
+                        ON round.idround = player_has_round.InscriptionIdRound
+                    WHERE player.idplayer = ?
             )
             SELECT * FROM selection
                 JOIN tee
@@ -92,7 +94,7 @@ public class RegisterResultList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -100,7 +102,7 @@ public class RegisterResultList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // Player player = new Player();
         // player.setIdplayer(324715);
         // var ecl = list(player);

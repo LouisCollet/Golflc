@@ -26,26 +26,22 @@ public class UnavailableListForDate implements Serializable {
 
     @Inject private dao.GenericDAO dao;
 
-    // Cache d'instance — @ApplicationScoped garantit le singleton
-    private List<EUnavailable> liste = null;
-
     public UnavailableListForDate() { }
 
     public EUnavailable list(final LocalDateTime ldt, final Club club) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
-        // Early return — guard clause FIRST
-        if (liste != null) {
-            LOG.debug("escaped to " + methodName + " repetition thanks to lazy loading");
-            return liste.getFirst();
+        if (club == null) {
+            LOG.warn(methodName + " - club is null, returning null");
+            return null;
         }
 
         final String query = """
             SELECT *
             FROM club, unavailable_periods
             WHERE club.idclub = ?
-            AND UnavailableIdClub = club.idclub
+            AND unavailable_periods.UnavailableIdClub = club.idclub
             AND ? BETWEEN UnavailableStartDate AND UnavailableEndDate
             ORDER BY unavailable_periods.UnavailableModificationDate desc
             LIMIT 1
@@ -55,23 +51,23 @@ public class UnavailableListForDate implements Serializable {
         RowMapper<UnavailablePeriod> periodMapper = new UnavailablePeriodRowMapper();
 
         try {
-            liste = dao.queryList(query, rs -> {
+            List<EUnavailable> result = dao.queryList(query, rs -> {
                 var structure = structureMapper.map(rs);
                 var period = periodMapper.map(rs);
                 return new EUnavailable(structure, period);
             }, club.getIdclub(), java.sql.Timestamp.valueOf(ldt));
 
-            if (liste.isEmpty()) {
+            if (result.isEmpty()) {
                 String msg = "Il n'y a pas aujourd'hui un etat du terrain pour ce club : " + club.getIdclub();
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
                 return null;
             } else {
-                LOG.debug("ResultSet " + methodName + " has " + liste.size() + " lines.");
-                String msg = "Etat du terrain pour ce club : " + liste;
+                LOG.debug("ResultSet " + methodName + " has " + result.size() + " lines.");
+                String msg = "Etat du terrain pour ce club : " + result;
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
-                return liste.getFirst();
+                return result.getFirst();
             }
 
         } catch (SQLException e) {
@@ -83,22 +79,17 @@ public class UnavailableListForDate implements Serializable {
         }
     } // end method
 
-    // Getters/setters d'instance
-    public List<EUnavailable> getListe()              { return liste; }
-    public void setListe(List<EUnavailable> liste)    { this.liste = liste; }
-
-    // Invalidation explicite
+    // invalidateCache() conservé pour compatibilité CacheInvalidator
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        LOG.debug("entering {}", methodName);
+        LOG.debug(methodName + " - no-op (cache removed — result depends on (ldt, club) params)");
     } // end method
 
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Club club = new Club();
         club.setIdclub(1075);
         EUnavailable eu = new UnavailableListForDate().list(LocalDateTime.now(), club);

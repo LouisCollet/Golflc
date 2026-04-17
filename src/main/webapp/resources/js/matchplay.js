@@ -229,7 +229,7 @@ if(endC !== "GO")  // end of Course
     document.getElementById("score_matchplay:hiddenString").value = MP4.join(';'); // affiche résultat view
 ////    remoteChangeCommand(); 
     document.getElementById("score_matchplay:hiddenResult").value = endC; // affiche résultat view
-    document.getElementById("score_matchplay:roundResult").innerHTML = endC; 
+    document.getElementById("score_matchplay:roundResult").textContent = endC; // security audit 2026-03-19 — prevent DOM XSS
 alert("end of Course MP4 = \n" + MP4.join(';\n'));
     // new 12/01/2015
 //    document.getElementById("score_matchplay:result").enabled = true; // affiche résultat view
@@ -256,8 +256,8 @@ catch(ex)
 // Update a particular HTML element with a new value
 function updateHTML(elmId, value) {
     console.info("from updateHTML : elmId = " + elmId + " value = " + value );
- document.getElementById(elmId).innerHTML = value;
-  var y = document.getElementById(elmId).innerHTML = value;
+ document.getElementById(elmId).textContent = value; // security audit 2026-03-19 — prevent DOM XSS
+  var y = document.getElementById(elmId).textContent = value;
     console.info("from updateHTML : output = " + y.value);
 }
 } //end function mp_main
@@ -579,13 +579,13 @@ function keyupFunction(keyup) {
 }
 function referrer() {
     var x = document.referrer;
-    document.getElementById("demo").innerHTML = x;
+    document.getElementById("demo").textContent = x; // security audit 2026-03-19
 }
 function lastmodified() {
     var x = document.lastModified;
-    document.getElementById("demo").innerHTML = x;
+    document.getElementById("demo").textContent = x; // security audit 2026-03-19
 }
 function myFunction(el) {
     var x = document.documentURI;
-    document.getElementById("demo").innerHTML = x;
+    document.getElementById("demo").textContent = x; // security audit 2026-03-19
 }

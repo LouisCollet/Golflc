@@ -29,18 +29,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.primefaces.event.ItemSelectEvent;
-import software.xdev.chartjs.model.charts.BarChart;
 import software.xdev.chartjs.model.charts.Chart;
 import software.xdev.chartjs.model.charts.LineChart;
 import software.xdev.chartjs.model.charts.MixedChart;
 import software.xdev.chartjs.model.color.RGBAColor;
-import software.xdev.chartjs.model.data.BarData;
 import software.xdev.chartjs.model.data.LineData;
 import software.xdev.chartjs.model.data.MixedData;
 import software.xdev.chartjs.model.dataset.BarDataset;
 import software.xdev.chartjs.model.dataset.LineDataset;
 import software.xdev.chartjs.model.enums.FontStyle;
-import software.xdev.chartjs.model.options.BarOptions;
 import software.xdev.chartjs.model.options.LineOptions;
 import software.xdev.chartjs.model.options.Options;
 import software.xdev.chartjs.model.options.Plugins;
@@ -55,7 +52,6 @@ import static utils.LCUtil.showMessageFatal;
 public class ChartController implements Serializable{
 
     private static final long serialVersionUID = 1L;
-
     @Inject private chartsdevx.CourseAverage courseAverage; // migrated 2026-02-26
 
     private String lineModel;
@@ -75,8 +71,8 @@ public class ChartController implements Serializable{
     // http://www.primefaces.org/showcase/ui/chart/line.xhtml?jfwid=584f3
  public String lineModelCourse(Player player, Course course) throws SQLException {  // used in statChartCourse.xhtml
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
-    LOG.debug("for course = " + course);
+    LOG.debug("entering {}", methodName);
+    LOG.debug("for course = {}", course);
  try{
     List<Average> listAverage = courseAverage.stat(player, course); // migrated 2026-02-26
         if(listAverage.isEmpty()){
@@ -85,24 +81,24 @@ public class ChartController implements Serializable{
             showMessageFatal(msg);
             return null;
         }else{
-            LOG.debug("number of holes = " + listAverage.size());
-            LOG.debug("list average = " + listAverage.size());
+            LOG.debug("number of holes = {}", listAverage.size());
+            LOG.debug("list average = {}", listAverage.size());
         }
     List<Integer> holesInt =  IntStream.rangeClosed(1, 18).boxed().collect(Collectors.toList());
     List<String>  holes = holesInt.stream().map(i -> i.toString()).collect(Collectors.toList());
-    // holes.forEach(item -> LOG.debug("list of holes 1 to 18 = " + item));
+    // holes.forEach(item -> LOG.debug("list of holes 1 to 18 = {}", item));
     List<Double> valuesStrokes = new ArrayList<>();
     List<Short>  valuesPar = new ArrayList<>();
     List<Double> valuesPoints = new ArrayList<>();
     for(Average average : listAverage) {
- //              LOG.debug("i.getAvgStroke = " + i);
+ //              LOG.debug("i.getAvgStroke = {}", i);
         valuesStrokes.add(average.getAvgStroke()); // Double
         valuesPar.add(average.getAvgPar()); // Short
         valuesPoints.add(average.getAvgPoints());  // Double
     } //end for
-    LOG.debug("value of strokes = " + valuesStrokes.toString());
-    LOG.debug("value of par     = " + valuesPar.toString());
-    LOG.debug("value of points  = " + valuesPoints.toString());
+    LOG.debug("value of strokes = {}", valuesStrokes.toString());
+    LOG.debug("value of par     = {}", valuesPar.toString());
+    LOG.debug("value of points  = {}", valuesPoints.toString());
 //value of strokes = [5.5, 5.5, 4.5, 6.5, 7.0, 6.5, 5.5, 5.0, 7.5, 3.5, 5.0, 5.0, 5.0, 3.0, 7.0, 6.0, 6.5, 6.5] 
 // value of par     = [5, 4, 3, 4, 3, 4, 4, 4, 5, 4, 3, 4, 4, 3, 5, 4, 4, 5] 
 // value of points  = [2.5, 2.5, 2.5, 1.5, 1.0, 0.5, 2.5, 2.0, 0.5, 3.5, 1.0, 3.0, 2.0, 3.0, 2.0, 2.0, 1.5, 1.5] 
@@ -179,7 +175,7 @@ public class ChartController implements Serializable{
     final LineChart chart = new LineChart()
            .setData(data)
            .setOptions(options);
-        LOG.debug("end of linemodelCourse with chart = " + chart.toJson()) ; 
+        LOG.debug("end of linemodelCourse with chart = {}", chart.toJson());
    return chart.toJson();
 
   } catch (Exception e) {
@@ -205,11 +201,11 @@ public class ChartController implements Serializable{
         monthsList.addAll(Arrays.asList(new DateFormatSymbols(Locale.FRANCE).getMonths())); // chercher la locale current
         List<Integer> numbers = Stream.iterate(1, n -> n + 1).limit(18).collect(Collectors.toList());
       //  List<String> numbersStr = Stream.iterate(1, n -> n + 1).limit(18).collect(Collectors.toList());
-        numbers.forEach(item -> LOG.debug("list of holes 1 to 18 = " + item));
+        numbers.forEach(item -> LOG.debug("list of holes 1 to 18 = {}", item));
         
    //https://github.com/orgs/primefaces/discussions/2133 mixed model     
-    //    LOG.debug("frenchMonth list = " + monthsList.toString());
-     //   monthsList.forEach(item -> LOG.debug("list of months = " + item));  // java 8 lambda
+    //    LOG.debug("frenchMonth list = {}", monthsList.toString());
+     //   monthsList.forEach(item -> LOG.debug("list of months = {}", item));  // java 8 lambda
 //     List<Integer> dataList = Arrays. asList(30, 40, 35, 60, 45, 40, 55, 65, 45, 40, 55, 65);
  //   var v = dataList.stream().mapToInt(Integer::intValue);
         lineModel = new LineChart()
@@ -253,7 +249,7 @@ public class ChartController implements Serializable{
                                .setText("Average per Course")) // end Title
                         ) //end Plugins
                 ).toJson();
-        LOG.debug("output = " + lineModel);
+        LOG.debug("output = {}", lineModel);
         return lineModel; // sert à rien !!
     } // end method
 
@@ -308,9 +304,9 @@ public String createMixedModel() {  // not used
                                 )
                         )
                 ).toJson();
-             LOG.debug("string mixed model = " + mixedModel);
+             LOG.debug("string mixed model = {}", mixedModel);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-             LOG.debug("Results gson format : " + gson.toJson(mixedModel));
+             LOG.debug("Results gson format : {}", gson.toJson(mixedModel));
         
         return mixedModel;
 }
@@ -386,7 +382,7 @@ try{
                 \t</body>
                 </html>""", chart.toJson())
 			);
-		LOG.debug("is Destop supported ? " + Desktop.isDesktopSupported());
+		LOG.debug("is Destop supported ? {}", Desktop.isDesktopSupported());
 			Desktop.getDesktop().browse(tmp.toUri());
 }catch(final IOException e){
         LOG.debug("exception in ??");
@@ -398,7 +394,7 @@ try{
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 
@@ -460,7 +456,7 @@ try{
                                .setText("Average per Course")) // end Title
                         ) //end Plugins
                 ).toJson();
-        LOG.debug("output = " + lineModelCourse);
+        LOG.debug("output = {}", lineModelCourse);
         return lineModelCourse;
   //  return lineModel;
                 */

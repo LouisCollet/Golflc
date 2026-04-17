@@ -22,6 +22,7 @@
     columnClasses="col1Flex,col2Flex">
 
 <f:facet name="footer">
+  <div class="btn-group">
          <p:commandButton value="#{msg['greenfee.pay']}"
                          id="commandButtonGreenfee"
                          ajax="false"
@@ -39,8 +40,9 @@
                          id="commandButton1"
                          ajax="false"
                          update="growl-msg"
-                         icon="pi pi-database"
+                         icon="pi pi-home"
                          action="welcome.xhtml?faces-redirect=true" />
+  </div>
 </f:facet>
 </p:panelGrid>
 </h:form>

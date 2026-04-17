@@ -70,7 +70,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult createTarifMember(TarifMember tarif) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (tarif == null) {
             return SaveResult.failure("TarifMember cannot be null");
         }
@@ -95,7 +95,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult deleteTarifMember(TarifMember tarif) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (tarif == null) {
             return SaveResult.failure("TarifMember cannot be null");
         }
@@ -120,7 +120,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult createTarifGreenfee(TarifGreenfee tarif, Club club) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (tarif == null) {
             return SaveResult.failure("TarifGreenfee cannot be null");
         }
@@ -142,7 +142,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult deleteTarifGreenfee(TarifGreenfee tarif, String year) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (tarif == null) {
             return SaveResult.failure("TarifGreenfee cannot be null");
         }
@@ -167,7 +167,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult createPaymentCotisation(Cotisation cotisation) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (cotisation == null) {
             return SaveResult.failure("Cotisation cannot be null");
         }
@@ -193,7 +193,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult createPaymentGreenfee(Player player, Greenfee greenfee) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (player == null || greenfee == null) {
             return SaveResult.failure("Player and Greenfee cannot be null");
         }
@@ -219,7 +219,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult createPaymentSubscription(Subscription subscription) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (subscription == null) {
             return SaveResult.failure("Subscription cannot be null");
         }
@@ -250,7 +250,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult deleteSubscription(Subscription subscription) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (subscription == null) {
             return SaveResult.failure("Subscription cannot be null");
         }
@@ -273,7 +273,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult updateSubscription(Subscription subscription) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (subscription == null) {
             return SaveResult.failure("Subscription cannot be null");
         }
@@ -296,7 +296,7 @@ public class MemberManager implements Serializable {
 
     public SaveResult deletePaymentGreenfee(Player player, Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (player == null || round == null) {
             return SaveResult.failure("Player and Round cannot be null");
         }
@@ -322,7 +322,7 @@ public class MemberManager implements Serializable {
 
     public TarifMember findTarifMembersData(Club club, Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return findTarifMembersDataService.find(club, round);
         } catch (SQLException e) {
@@ -336,7 +336,7 @@ public class MemberManager implements Serializable {
 
     public TarifGreenfee findTarifGreenfeeData(Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return findTarifGreenfeeDataService.find(round);
         } catch (SQLException e) {
@@ -350,7 +350,7 @@ public class MemberManager implements Serializable {
 
     public Boolean findSubscriptionStatus(Subscription subscription, Player player) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return findSubscriptionStatusService.find(subscription, player);
         } catch (SQLException e) {
@@ -364,7 +364,7 @@ public class MemberManager implements Serializable {
 
     public boolean findGreenfeePaid(Player player, Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return findGreenfeePaidService.find(player, round);
         } catch (SQLException e) {
@@ -378,7 +378,7 @@ public class MemberManager implements Serializable {
 
     public Cotisation findCotisationAtRoundDate(Player player, Club club, Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return findCotisationAtRoundDateService.find(player, club, round);
         } catch (SQLException e) {
@@ -392,7 +392,7 @@ public class MemberManager implements Serializable {
 
     public boolean findTarifMembersOverlapping(TarifMember tarif) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return findTarifMembersOverlappingService.find(tarif);
         } catch (SQLException e) {
@@ -410,7 +410,7 @@ public class MemberManager implements Serializable {
 
     public TarifMember inputTarifMembersCotisation(TarifMember tarifMember) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return tarifMemberController.inputTarifMembersCotisation(tarifMember);
         } catch (Exception e) {
@@ -421,7 +421,7 @@ public class MemberManager implements Serializable {
 
     public TarifMember inputTarifMembersEquipments(TarifMember tarifMember) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return tarifMemberController.inputTarifMembersEquipments(tarifMember);
         } catch (Exception e) {
@@ -432,7 +432,7 @@ public class MemberManager implements Serializable {
 
     public Cotisation completeCotisation(TarifMember tarif, Player player, Round round) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return tarifMemberController.completeCotisation(tarif, player, round);
         } catch (Exception e) {
@@ -443,7 +443,7 @@ public class MemberManager implements Serializable {
 
     public Greenfee completeGreenfee(TarifGreenfee tarif, Club club, Round round, Player player) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return tarifGreenfeeController.completeGreenfee(tarif, club, round, player);
         } catch (Exception e) {
@@ -458,7 +458,7 @@ public class MemberManager implements Serializable {
 
     public List<ECourseList> listSystemAdminSubscriptions() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             List<ECourseList> result = systemAdminSubscriptionList.list();
             return result != null ? result : Collections.emptyList();
@@ -473,7 +473,7 @@ public class MemberManager implements Serializable {
 
     public List<ECourseList> listLocalAdminCotisations(Player localAdmin) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             List<ECourseList> result = localAdminCotisationList.list(localAdmin);
             return result != null ? result : Collections.emptyList();
@@ -488,7 +488,7 @@ public class MemberManager implements Serializable {
 
     public List<ECourseList> listLocalAdminGreenfees(Player localAdmin) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             List<ECourseList> result = localAdminGreenfeeList.list(localAdmin);
             return result != null ? result : Collections.emptyList();

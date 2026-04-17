@@ -11,7 +11,8 @@ import utils.LCUtil;
 public class Course implements Serializable, interfaces.Log{
     private static final long serialVersionUID = 1L;
 
-@NotNull(message="Bean validation : the Course ID must be completed")
+@NotNull(message="{course.id.notnull}")
+@Min(value=1, message="{course.id.min}")
     private Integer idcourse;
 
 @Pattern(regexp = "[a-zA-Z0-9'âéèàê ç-]*",message="{course.name.characters}")

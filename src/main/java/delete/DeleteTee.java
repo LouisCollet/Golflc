@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -33,9 +35,9 @@ public class DeleteTee implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean delete(final Tee tee) throws Exception {
-
+    public boolean delete(final Tee tee) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
 
         try (Connection conn = dao.getConnection()) {
@@ -90,41 +92,29 @@ public class DeleteTee implements Serializable, interfaces.GolfInterface {
 
             return true;
 
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
+    } // end method
 
-    /**
-     * Main pour tests
-     */
-    public static void main(String[] args) {
+/*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         try {
             Tee tee = new Tee();
             tee.setIdtee(100);
-         //   tee.setTeeName("Test Tee");
-
             LOG.debug("Main ready (CDI required for execution)");
-
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
-    }
-}
+    } // end main
+*/
+} // end class
 /*
 import entite.Tee;
 import static interfaces.Log.LOG;
@@ -153,7 +143,7 @@ try{
     ps.setInt(1, tee.getIdtee());
     LCUtil.logps(ps);
     int row_deleted = ps.executeUpdate();
-        LOG.debug("deleted Tee = " + row_deleted);
+        LOG.debug("deleted Tee = {}", row_deleted);
     String msg = "<br/> <h2>There are " + row_deleted + " Tee deleted = " + tee;
         LOG.debug(msg);
         showMessageInfo(msg);
@@ -170,7 +160,7 @@ try{
             ps.setInt(1, tee.getIdtee());
             LCUtil.logps(ps);
             int row_inscription = ps.executeUpdate();
-            LOG.debug("deleted DistanceTee = " + row_inscription);
+            LOG.debug("deleted DistanceTee = {}", row_inscription);
            return true;
     } else {
            msg = "ERROR tee NOT Deleted !!: " + tee;
@@ -200,7 +190,7 @@ try{
     Tee tee = new Tee();
     tee.setIdtee(339);
     boolean b = new DeleteTee().delete(tee, conn);
-        LOG.debug("from main - resultat deleteTee = " + b);
+        LOG.debug("from main - resultat deleteTee = {}", b);
  } catch (Exception e) {
         String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

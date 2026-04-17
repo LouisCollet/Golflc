@@ -35,7 +35,7 @@ public class ReadPlayer implements Serializable {
      */
     public Player read(Player player) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
                 SELECT *
@@ -45,7 +45,7 @@ public class ReadPlayer implements Serializable {
 
         Player p = dao.querySingle(query, new PlayerRowMapper(), player.getIdplayer());
         if (p != null) {
-            LOG.debug(methodName + " - Player loaded: " + p);
+            LOG.debug("Player loaded: {}", p);
             return p;
         }
         String msg = "Player not found in " + methodName;
@@ -59,7 +59,7 @@ public class ReadPlayer implements Serializable {
      */
     public EPlayerPassword read(EPlayerPassword epp) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
                 SELECT *
@@ -81,7 +81,7 @@ public class ReadPlayer implements Serializable {
                     Player player = playerMapper.map(rs);
                     var password = entite.Password.map(rs);
                     result = new EPlayerPassword(player, password);
-                    LOG.debug(methodName + " - EPlayerPassword loaded: " + result);
+                    LOG.debug("EPlayerPassword loaded: {}", result);
                 } else {
                     String msg = "Player not found in " + methodName;
                     LOG.warn(msg);
@@ -101,7 +101,7 @@ public class ReadPlayer implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // tests locaux
     } // end main
     */

@@ -9,11 +9,7 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewAction action="#{navC.logout(param['cmd'])}"/>
-    </f:metadata>
-</ui:define>
+<ui:param name="hideMenu" value="true"/>
 
 <ui:define name="title">Session Expired</ui:define>
 
@@ -27,11 +23,15 @@
                 </f:facet>
 
                 <div style="text-align:center; margin-bottom:1rem;">
-                    <i class="pi pi-clock" style="font-size:3rem; color:var(--primary-color);"/>
-                    <h2 style="margin:0.5rem 0;">Session Expired</h2>
-                    <h:outputText value="#{param['cmd']}"
-                                  rendered="#{not empty param['cmd']}"
-                                  style="color:var(--text-secondary-color);"/>
+                    <i class="#{deploymentInfo.recentDeploy ? 'pi pi-refresh' : 'pi pi-clock'}"
+                       style="font-size:3rem; color:var(--primary-color);"/>
+                    <h2 style="margin:0.5rem 0;">#{msg['session.expired.title']}</h2>
+                    <p style="color:var(--text-secondary-color); margin:0;">
+                        <h:outputText rendered="#{deploymentInfo.recentDeploy}"
+                                      value="#{msg['session.expired.redeployment']}"/>
+                        <h:outputText rendered="#{!deploymentInfo.recentDeploy}"
+                                      value="#{msg['session.expired.inactivity']}"/>
+                    </p>
                 </div>
 
                 <div class="info-grid">

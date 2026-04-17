@@ -41,7 +41,7 @@ public class PlayersList implements Serializable {
      */
     public List<EPlayerPassword> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         if (liste != null) {
             LOG.debug(methodName + " - returning cached list (" + liste.size() + " entries)");
@@ -74,7 +74,7 @@ public class PlayersList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method

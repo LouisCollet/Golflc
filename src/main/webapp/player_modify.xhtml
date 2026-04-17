@@ -68,7 +68,6 @@
                     id="birth"
                     locale="#{languageC.locale}"
                     label="LC label birth marche pas"
-                    required="true"
                     yearRange="c-50:c-10"
                     showTime="false"
                     pattern="dd/MM/yyyy"
@@ -138,7 +137,6 @@
                 <p:selectOneMenu id="lang"
                                  value="#{playerC.player.playerLanguage}"
                                  immediate="true"
-                                 required="true"
                                  valueChangeListener="#{playerC.playerLanguageListener}">
                     <f:selectItem
                                   itemLabel="?? Select"

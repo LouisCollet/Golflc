@@ -25,7 +25,7 @@ public class FindGreenfeePaid implements Serializable {
 
     public boolean find(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for player = " + player);
         LOG.debug("for round = " + round);
 
@@ -88,7 +88,7 @@ public class FindGreenfeePaid implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(456781);
         Round round = new Round();

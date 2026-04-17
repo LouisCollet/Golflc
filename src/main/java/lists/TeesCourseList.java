@@ -23,16 +23,15 @@ public class TeesCourseList implements Serializable {
  //   public List<Tee> list(final Course course) throws SQLException {
      public List<Tee> list(final int courseId) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
 
         // Early return si cache existe
         if (liste != null) {
-            LOG.debug("escaped to " + methodName + " repetition thanks to lazy loading");
+            LOG.debug(methodName + " - returning cached list size = " + liste.size());
             return liste;
         }
 
-        // Sinon, charger depuis la base de donnees
-        LOG.debug("entering " + methodName);
-         LOG.debug("with Course " + courseId);
+        LOG.debug("with Course " + courseId);
 
         final String query = """
             SELECT *
@@ -58,7 +57,7 @@ public class TeesCourseList implements Serializable {
     // Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -98,7 +97,7 @@ public class TeesCourseList {
 public List<Tee> list(final Course course, final Connection conn) throws Exception{
      final String methodName = utils.LCUtil.getCurrentMethodName();
 if(liste == null){
-       LOG.debug("entering " + methodName);
+       LOG.debug("entering {}", methodName);
        LOG.debug("with Course " + course);
         PreparedStatement ps = null;
         ResultSet rs = null;

@@ -25,7 +25,7 @@ public class CompetitionDataList implements Serializable {
 
     public List<CompetitionData> list(final CompetitionDescription cd) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - for competition = " + cd);
 
         if (liste != null) {
@@ -57,7 +57,7 @@ public class CompetitionDataList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -65,7 +65,7 @@ public class CompetitionDataList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // CompetitionDescription cde = new CompetitionDescription();
         // cde.setCompetitionId(24);
         // var lp = list(cde);

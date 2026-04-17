@@ -29,7 +29,7 @@ public class FindCurrentSubscription implements Serializable {
 
     public List<Subscription> payments(final Player player, final String type) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - for player = " + player.getIdplayer() + " type = " + type);
 
         final String query;
@@ -84,14 +84,14 @@ public class FindCurrentSubscription implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - no cache to invalidate");
     } // end method
 
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         List<Subscription> p1 = payments(player, "now");

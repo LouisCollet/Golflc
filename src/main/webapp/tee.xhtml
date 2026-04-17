@@ -87,6 +87,7 @@
                 </p:panelGrid>
 
                 <f:facet name="footer">
+                  <div class="btn-group">
                     <p:commandButton id="ButtonCreateTee"
                                      value="#{msg['button.tee.create']}"
                                      update="growl-msg"
@@ -110,8 +111,8 @@
                                      ajax="false"
                                      rendered="#{clubC.hole.nextHole}"
                                      icon="pi pi-arrow-right"
-                                     style="float: right;"
                                      action="hole.xhtml?faces-redirect=true" />
+                  </div>
                 </f:facet>
 
             </p:panel>

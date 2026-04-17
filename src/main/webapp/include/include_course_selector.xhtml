@@ -7,32 +7,26 @@
     
     <!-- COURSE SELECTOR UNIQUEMENT -->
     <p:outputLabel for="@next" value="#{msg['course.id']} :" />
-    <h:panelGroup layout="block"
-                  style="display:flex; align-items:center; gap:0.5rem;"
-                  id="containerCourse">
-        <p:inputNumber
-            id="inputCourseId"
-            label="inputCourse"
-            value="#{clubC.course.idcourse}"
-            size="5"
-            decimalPlaces="0"
-            emptyValue="0"
-            style="margin-left:1.5em;margin-right:1.5em;" />
-        <p:commandButton
-            id="ButtonCourse"
-            immediate="true"
-            value="#{msg['button.course.list']}"
-            actionListener="#{dialogC.showSelectCourse('general',clubC.club.idclub)}"
-            icon="pi pi-search">
+    <h:panelGroup layout="block" styleClass="selector-row" id="containerCourse">
+        <p:inputNumber id="inputCourseId"
+                       label="inputCourse"
+                       value="#{clubC.course.idcourse}"
+                       size="5"
+                       decimalPlaces="0"
+                       emptyValue="0"/>
+        <p:commandButton id="ButtonCourse"
+                         immediate="true"
+                         value="#{msg['button.course.list']}"
+                         actionListener="#{dialogC.showSelectCourse('general',clubC.club.idclub)}"
+                         icon="pi pi-search">
             <p:ajax event="dialogReturn"
-                    update="inputCourseId, courseName,courseId, growl-msg" />
+                    update="inputCourseId,courseName,courseId,growl-msg"/>
         </p:commandButton>
-        
         <h:outputText id="courseName"
-                      value=" #{clubC.course.courseName}"
-                      style="font-style:italic;color:black"/>
+                      value="#{clubC.course.courseName}"
+                      styleClass="selector-name"/>
         <h:outputText id="courseId"
-                      value=" #{clubC.course.idcourse}"
-                      style="font-weight:bold;font-size: 2em;font-style:italic;color: red"/>
+                      value="#{clubC.course.idcourse}"
+                      styleClass="selector-id"/>
     </h:panelGroup>
 </ui:composition>

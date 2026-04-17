@@ -28,7 +28,7 @@ public class CalcMatchplayResult implements Serializable {
 
     public List<EMatchplayResult> calc(final Player player1, final Player player2, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - with Round   = " + round.getIdround());
         LOG.debug(methodName + " - with Player1 = " + player1.getIdplayer());
         LOG.debug(methodName + " - with Player2 = " + player2.getIdplayer());
@@ -66,12 +66,30 @@ public class CalcMatchplayResult implements Serializable {
         }
     } // end method
 
+    public int getTotalPlayer1Score() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (finalResult == null) return 0;
+        return finalResult.stream()
+                .mapToInt(o -> o.getPlayer1().getResult() == null ? 0 : o.getPlayer1().getResult())
+                .sum();
+    } // end method
+
+    public int getTotalPlayer2Score() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (finalResult == null) return 0;
+        return finalResult.stream()
+                .mapToInt(o -> o.getPlayer2().getResult() == null ? 0 : o.getPlayer2().getResult())
+                .sum();
+    } // end method
+
     public List<EMatchplayResult> getFinalResult()                              { return finalResult; }
     public void                   setFinalResult(List<EMatchplayResult> result) { this.finalResult = result; }
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.finalResult = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -79,7 +97,7 @@ public class CalcMatchplayResult implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // Player player1 = new Player();
         // player1.setIdplayer(324713);
         // Player player2 = new Player();

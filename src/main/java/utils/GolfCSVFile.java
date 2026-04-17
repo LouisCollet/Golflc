@@ -21,16 +21,15 @@ import jakarta.inject.Inject;
 /**
  * CSV in action: extract fields from a CSV File using Ostermiller CSVParser */
 
-      private static String  [][] values2D;
-      private static String [] array_return;
-      private static BufferedReader br = null;
- //     private static int nb = 0;
-      private static int errorsCSV = 0;
-      private static Player player = new Player();
-      private static Handicap handicap ;
+      private String[][] values2D; // migrated from static 2026-03-22
+      private String[] array_return;
+      private BufferedReader br = null;
+      private int errorsCSV = 0;
+      private Player player = new Player();
+      private Handicap handicap;
       private static final Charset cs = Charset.forName("UTF-8");
 @Inject private create.CreatePlayer createPlayerService; // migrated 2026-02-26
-static final int NORMAL_INPUT_FIELDS = 13;
+private static final int NORMAL_INPUT_FIELDS = 13;
 public GolfCSVFile()	
 {
 // constructor

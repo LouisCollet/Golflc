@@ -452,7 +452,7 @@ try{
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux — DBConnection removed 2026-02-28
 } // end main
 */

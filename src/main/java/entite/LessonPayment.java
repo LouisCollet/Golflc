@@ -96,37 +96,7 @@ public class LessonPayment implements Serializable{
     public void setPaymentIdClub(Integer paymentIdClub) {
         this.paymentIdClub = paymentIdClub;
     }
-/*
-    public static LessonPayment map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        try{
-            LessonPayment lp = new LessonPayment();
-                LOG.debug("starting LessonPayment");
-            lp.setPaymentStartDate(rs.getTimestamp("LessonStartDate").toLocalDateTime());
-            lp.setPaymentEndDate(rs.getTimestamp("LessonEndDate").toLocalDateTime());
-            lp.setPaymentDate(rs.getTimestamp("LessonModificationDate").toLocalDateTime());
-            lp.setPaymentCommunication(rs.getString("LessonCommunication"));
-            lp.setPaymentAmount(rs.getDouble("LessonAmount"));
-            lp.setPaymentIdStudent(rs.getInt("LessonIdStudent")); // mod 02-02-2023
-            lp.setPaymentIdClub(rs.getInt("LessonIdClub"));
-                LOG.debug("PaymentIdStudent = " +  lp.getPaymentIdStudent());
-            
-       //     lp.setEventEndDate(rs.getTimestamp("EventEndDate").toLocalDateTime());
-            
-       //     lp.setEventProId(rs.getInt("EventProId"));
-       //     lp.setEventPlayerId(rs.getInt("EventPlayerId"));
-      //      event.setEventAllDay(rs.getBoolean("EventAllDay"));
-       //     event.setEventTitle(rs.getString("EventTitle"));
-       //     event.setEventDescription(rs.getString("EventDescription"));
- //              LOG.debug("ScheduleEvent event returned from map = " + event);
-            return lp;
-        }catch(Exception e){
-            String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;
-        } } //end method
-    */
+
  @Override
 public String toString(){
  try {

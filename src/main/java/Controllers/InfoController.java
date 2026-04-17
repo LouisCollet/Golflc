@@ -12,8 +12,7 @@ import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import jakarta.annotation.Resource;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
@@ -50,10 +49,11 @@ import static org.omnifaces.util.Faces.getResourceAsStream;
 import org.primefaces.config.PrimeEnvironment; // new 04-12-2025
 
 @Named("infoC")
-@ApplicationScoped // mod 11/01
+@SessionScoped // migrated from @ApplicationScoped 2026-03-22 — uses FacesContext
 
 public class InfoController implements Serializable, interfaces.GolfInterface{
    @Inject private entite.Settings settings;        // ✅ injection CDI
+   @Inject private info_test.GeoDetector geoDetector; // migrated from static 2026-03-22
     private Attributes manifestAttributes = null; // fix multi-user 2026-03-07 — was static
 
 public InfoController() throws IOException { //  constructor ! le faire private ??
@@ -70,7 +70,7 @@ try{
     }
    } // end try2
 }catch (Exception e){
-	LOG.debug("exception in InfoController constructor " + e);
+	LOG.debug("exception in InfoController constructor {}", e);
 }
 } // end constructor
 
@@ -81,13 +81,18 @@ public void login(){ // throws IOException, SQLException { // executed via actio
 
 // externalContext injection removed — fix multi-user 2026-03-07 (request-scoped, must not be cached in @ApplicationScoped)
 public String deployVersion() throws IOException{
-    // version deployment (affichée dans login.xhtml)
+    // version deployment (affichée dans login.xhtml + footer.xhtml)
   String acp = FacesContext.getCurrentInstance().getExternalContext().getApplicationContextPath();
-//     LOG.debug("ApplicationContextPath = " + acp); //    /GolfWfly-1.0-SNAPSHOT
-  Path path = Paths.get(settings.getProperty("TARGET") + acp + ".war");// converts string to path  
-  FileTime fileTime = Files.getLastModifiedTime(path);
-  LocalDateTime ldt = LocalDateTime.ofInstant(fileTime.toInstant(), ZoneOffset.systemDefault());
-    return ZDF_TIME.format(ldt);
+  Path path = Paths.get(settings.getProperty("TARGET") + acp + ".war");
+  try {
+      FileTime fileTime = Files.getLastModifiedTime(path);
+      LocalDateTime ldt = LocalDateTime.ofInstant(fileTime.toInstant(), ZoneOffset.systemDefault());
+      return ZDF_TIME.format(ldt);
+  } catch (java.nio.file.NoSuchFileException e) {
+      // WAR supprimé pendant mvn clean — pas d'erreur fatale
+      LOG.debug("deployVersion - WAR not found (build in progress): {}", path);
+      return "build...";
+  }
 }
 
 public String getClientIpAddress() throws UnknownHostException, ServletException{
@@ -124,9 +129,9 @@ try{
     */
 return "fake mac";
 }catch (Exception e){
-	LOG.debug("UnknowHostException = " + e);
+	LOG.debug("UnknowHostException = {}", e);
 ////}catch (Exception e){
-//	LOG.debug("SocketException = " + e);
+//	LOG.debug("SocketException = {}", e);
 //}
 return "yes, Louis : Mac adress";
 } //end method
@@ -152,7 +157,7 @@ private DataSource dataSource;
 
 public String getMySql() throws SQLException {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
 
     try (Connection conn = dataSource.getConnection()) {            // ✅ try-with-resources
         return conn.getMetaData().getDatabaseProductName()
@@ -187,7 +192,7 @@ public void putMyStrings(){
  //  Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
    JQueryVersion = FacesContext.getCurrentInstance().getExternalContext()
            .getRequestParameterMap().get("JQueryVersion");
-   LOG.debug("JQueryVersion is now = " + JQueryVersion);
+   LOG.debug("JQueryVersion is now = {}", JQueryVersion);
 }
 */
     public String getJQueryVersion() {
@@ -278,17 +283,17 @@ public static void ListAllSystemProperties() {
     //https://docs.oracle.com/javase/tutorial/essential/environment/env.html
 try{
    System.getenv().forEach((k, v) -> {
-       LOG.debug("Environment Variable = " + k + TAB + v);
+       LOG.debug("Environment Variable = {}", k + TAB + v);
     });
  
    System.getProperties().entrySet().stream()
             .map(e -> e.getKey() + ": " + e.getValue())
-            .forEach(e -> LOG.debug("System Property " + TAB + e));
-// liste.forEach(item -> LOG.debug("Flight list " + item));  // java 8 lambda
+            .forEach(e -> LOG.debug("System Property {}", TAB + e));
+// liste.forEach(item -> LOG.debug("Flight list {}", item));  // java 8 lambda
 
 }catch (Exception e){
     String msg = "error listallasystemproperties = " + e ;
-        LOG.error("error = " + msg );
+        LOG.error("error = {}", msg);
         }
 } // end listallsytemproperti
 
@@ -304,10 +309,10 @@ try{
     while(it.hasNext()) {
        String key = it.next().toString();
        String value = attributes.getValue(key);
-        LOG.debug("manifest attribute = " + key + " / " + value);
+        LOG.debug("manifest attribute = {} / {}", key, value);
     }
    } catch (Exception ex) {
-       LOG.debug("error printattributes" + ex);
+       LOG.debug("error printattributes{}", ex);
    }
  } //end method
 */
@@ -318,7 +323,7 @@ try{
 
 public String getMySQLInfo() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     ExecutorService executor = Executors.newSingleThreadExecutor();
     try {
         Future<String> future = executor.submit(() -> {
@@ -329,10 +334,10 @@ public String getMySQLInfo() {
         });
         return future.get(2, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
-        LOG.error(methodName + " - MySQL retrieval timed out");
+        LOG.error("MySQL retrieval timed out");
         return "MySQL version unavailable (timeout)";
     } catch (Exception e) {
-        LOG.error(methodName + " - Error getting MySQL version", e);
+        LOG.error("Error getting MySQL version", e);
         return "MySQL version error";
     } finally {
         executor.shutdownNow();
@@ -341,7 +346,7 @@ public String getMySQLInfo() {
 
 public String getMongoInfo() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     ExecutorService executor = Executors.newSingleThreadExecutor();
     try {
         Future<String> future = executor.submit(() -> {
@@ -352,13 +357,13 @@ public String getMongoInfo() {
         });
         return future.get(2, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
-        LOG.error(methodName + " - MongoDB retrieval timed out");
+        LOG.error("MongoDB retrieval timed out");
         return "MongoDB version unavailable (timeout)";
     } catch (MongoException e) {
-        LOG.error(methodName + " - MongoDB error", e);
+        LOG.error("MongoDB error", e);
         return "MongoDB info non disponible: " + e.getMessage();
     } catch (Exception e) {
-        LOG.error(methodName + " - Error getting MongoDB version", e);
+        LOG.error("Error getting MongoDB version", e);
         return "MongoDB version error";
     } finally {
         executor.shutdownNow();
@@ -367,21 +372,21 @@ public String getMongoInfo() {
 
 public String getIpDescription() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
             .getExternalContext().getRequest();
     String ip = IpDetector.getClientIp(request);
-    LOG.info(methodName + " - IP detected: {}", ip);
+    LOG.info("IP detected: {}", ip);
     return IpDetector.getIpDescription(ip);
 } // end method
 
 public String getGeoDescription() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance()
             .getExternalContext().getRequest();
     String ip = IpDetector.getClientIp(request);
-    return GeoDetector.getLocation(ip);
+    return geoDetector.getLocation(ip); // migrated from static 2026-03-22
 } // end method
 
 public String getClientAddress() {

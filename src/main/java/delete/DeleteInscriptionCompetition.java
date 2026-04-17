@@ -21,8 +21,8 @@ public class DeleteInscriptionCompetition implements Serializable {
 
     public boolean delete(final ECompetition competition) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for competition = " + competition);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for competition = {}", competition);
 
         final String query = """
             DELETE FROM competition_data
@@ -47,10 +47,10 @@ public class DeleteInscriptionCompetition implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // ECompetition ec = ...;
         // boolean b = delete(ec);
-        // LOG.debug("deleted = " + b);
+        // LOG.debug("deleted = {}", b);
     } // end main
     */
 

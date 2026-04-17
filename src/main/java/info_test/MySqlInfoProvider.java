@@ -27,7 +27,7 @@ public class MySqlInfoProvider implements InfoProvider, Serializable {
     @Override
     public String get() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try (Connection c = dataSource.getConnection()) {
             return c.getMetaData().getDatabaseProductName() + " "
                  + c.getMetaData().getDatabaseProductVersion();

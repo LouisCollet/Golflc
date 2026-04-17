@@ -46,17 +46,19 @@ public class PlayedList implements Serializable {
 
     public List<ECourseList> list(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try {
             LOG.debug(methodName + " - idplayer = " + player.getIdplayer());
 
             final String query = """
                     WITH selection AS (
-                        SELECT * FROM player_has_round, round, player
+                        SELECT * FROM player
+                            INNER JOIN player_has_round
+                                ON player_has_round.InscriptionIdPlayer = player.idplayer
+                            INNER JOIN round
+                                ON round.idround = player_has_round.InscriptionIdRound
                         WHERE player.idplayer = ?
-                          AND player_has_round.InscriptionIdPlayer = player.idplayer
-                          AND player_has_round.InscriptionIdRound = round.idround
                     )
                     SELECT * FROM selection
                         JOIN tee
@@ -113,7 +115,7 @@ public class PlayedList implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Player player = new Player();
             player.setIdplayer(324720);

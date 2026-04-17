@@ -20,8 +20,8 @@ public class LoadCompetitionData implements Serializable {
 
     public CompetitionData load(final CompetitionData competition) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - with competition = " + competition);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with competition = {}", competition);
 
         final String query = """
                 SELECT *
@@ -35,12 +35,12 @@ public class LoadCompetitionData implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // CompetitionData competition = new CompetitionData();
         // competition.setCmpDataId(25);
         // competition = new LoadCompetitionData().load(competition);
-        // LOG.debug(" loaded Competition Data = " + competition);
+        // LOG.debug(" loaded Competition Data = {}", competition);
     } // end main
     */
 

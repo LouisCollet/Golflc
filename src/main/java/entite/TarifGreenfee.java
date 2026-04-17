@@ -1,16 +1,12 @@
 package entite;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-//import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,13 +14,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
-// import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
-// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 
 // ATTENTION ! si on change la structure, la situation DB  fields dans DB ne sont plus reconnues par la version actuelle du l'entite  !!
@@ -34,12 +26,8 @@ import static utils.LCUtil.showMessageFatal;
 @JsonInclude(JsonInclude.Include.NON_NULL) // new 27/05/2022
 @JsonPropertyOrder({"datesSeasonsList","greenfeeType","daysList","teeTimesList","equipmentsList","basicList","twilightList"}) // new 22/01/2019 not working ?
 
-// @Named  // migrated 2026-02-24
-//@RequestScoped
-// @SessionScoped  // migrated 2026-02-24
 public class TarifGreenfee implements Serializable{
-
-     
+    
 // fields reprises en json dans table mysql
   private ArrayList<DatesSeasons> datesSeasonsList = new ArrayList<>(); // pas de dimension de départ
   private ArrayList<TeeTimes> teeTimesList = new ArrayList<>(); 
@@ -47,7 +35,7 @@ public class TarifGreenfee implements Serializable{
   private ArrayList<EquipmentsAndBasic> basicList = new ArrayList<>();
   private ArrayList<DaysGreenfee> daysList = new ArrayList<>(); 
   private ArrayList<Twilight> twilightList = new ArrayList<>();
-  private String greenfeeType; //  BA = basic, DA = days, HO = Hours, EQ = equipments
+  private String greenfeeType = ""; //  BA = basic, DA = days, HO = Hours, EQ = equipments
   
 // les fields qui suivent ne sont pas reprises dans le json
   
@@ -56,16 +44,16 @@ public class TarifGreenfee implements Serializable{
 @JsonIgnore private ArrayList<DaysWeek> dayChoosen = new ArrayList<>(); 
 @JsonIgnore private ArrayList<TeeTimes> timeChoosen = new ArrayList<>(); 
 //@JsonIgnore public Double [] workDaysPrice; 
-@JsonIgnore private Double [] workDaysPrice; 
+@JsonIgnore private Double  [] workDaysPrice;
+@JsonIgnore private boolean[] workDaysAvailable; // true=available, false=N/A — parallel to workDaysPrice
 @JsonIgnore private String season;
 @JsonIgnore private List<LocalDate> multiTwilight;
-//@JsonIgnore private List<String> multiTwilight;
 @JsonIgnore final private DayType type = DayType.MONDAY; // Default priority
 
-@NotNull(message="{tarifMember.startdate.notnull}")
-@JsonIgnore  private LocalDateTime startDate;
+@NotNull(message="{tarif.period.startdate.notnull}")
+@JsonIgnore private LocalDateTime startDate;
 
-@NotNull(message="{tarifMember.enddate.notnull}")
+@NotNull(message="{tarif.period.enddate.notnull}")
 @JsonIgnore private LocalDateTime endDate;
 
 //@NotNull(message="{tarifMember.startdate.notnull}")
@@ -90,6 +78,7 @@ public class TarifGreenfee implements Serializable{
 @NotNull(message="{tarifMember.workseason.notnull}")
 @JsonIgnore private String workSeason;
 @JsonIgnore private String workSeasonTwilight;
+@JsonIgnore private String workLinkedSlotKey; // null = not linked to any HO slot
 
 @NotNull(message="{tarifMember.twilight.notnull}")
 @JsonIgnore private String workTwilight;
@@ -99,7 +88,10 @@ public class TarifGreenfee implements Serializable{
 @JsonIgnore  private boolean twilightReady;
 @JsonIgnore  private boolean twilightDone;
 @JsonIgnore  private String dayOfWeek;
-@JsonIgnore  private Integer tarifCourseId;
+@JsonIgnore  private Integer tarifId;           // DB primary key — set by RowMapper
+@JsonIgnore  private Integer tarifYear;         // DB column TarifYear — set by RowMapper
+@JsonIgnore  private List<Integer> tarifCourseId = new ArrayList<>();
+@JsonIgnore  private List<Integer> tarifHoles = new ArrayList<>(List.of(18));  // 9 et/ou 18 — not stored in TarifJson
 @JsonIgnore  private String currency;
 
 
@@ -130,14 +122,19 @@ public enum DayType {MONDAY,FRIDAY,WEEK,WEEKEND,HOLIDAY};
    */ 
     
     
-public class TeeTimes{
+public static class TeeTimes{
   private LocalTime startTime;
   private LocalTime endTime;
-  private String season; 
+  private String season;
   private String item;
   private Double price;
   private Integer quantity;
   public String twilight;
+  private boolean available = true; // true=available, false=N/A
+  private String slotKey;           // UUID substring — identifies this slot for linked equipments
+
+    public String getSlotKey() { return slotKey; }
+    public void setSlotKey(String slotKey) { this.slotKey = slotKey; }
 
     public LocalTime getStartTime() {
         return startTime;
@@ -195,8 +192,9 @@ public class TeeTimes{
         this.twilight = twilight;
     }
 
+    public boolean isAvailable() { return available; }
+    public void setAvailable(boolean available) { this.available = available; }
 
-  
   public String toString(){
  try {
 //      LOG.debug("starting toString TarifGreenfee !");
@@ -209,6 +207,7 @@ public class TeeTimes{
             + ", price=" + price
             + ", quantity=" + quantity
             + ", Twilight=" + twilight
+            + ", available=" + available
             );
  }catch(Exception e){
     String msg = "£££ Exception in TeeTimes.toString = " + e.getMessage(); 
@@ -218,14 +217,19 @@ public class TeeTimes{
         }
 } //end method
 } // end inner class TeeTimes
-public class DaysGreenfee{
-  private String season;  
+public static class DaysGreenfee{
+  private String season;
   private String category;
-  public Double[] price; // monday, week, friday, weekend, holiday
+  public Double[] price;     // monday, week, friday, weekend, holiday
+  public boolean[] available; // parallel — true=available, false=N/A
   public String twilight;
   public DaysGreenfee(){  // empty constructor
-      price = new Double[5];
+      price     = new Double [5];
+      available = new boolean[]{true, true, true, true, true};
   }
+
+    public boolean[] getAvailable() { return available; }
+    public void setAvailable(boolean[] available) { this.available = available; }
 
     public String getSeason() {
         return season;
@@ -276,7 +280,7 @@ public class DaysGreenfee{
  }
 } //end method
 } // end class DaysGreenfee
-public class Twilight{
+public static class Twilight{
   private LocalTime startTime;
   private String season; 
   private List<Integer> months;
@@ -479,7 +483,8 @@ public static class DatesSeasons{
 
 
 public TarifGreenfee(){ // constructor 1
-        workDaysPrice = new Double[5]; // price for monday, week ... holidays
+        workDaysPrice    = new Double[5];   // price for monday, week ... holidays
+        workDaysAvailable = new boolean[]{true, true, true, true, true};
 //        for(String[] subarray : workDays){
  //           Arrays.fill(subarray, "0");
  //       }
@@ -494,13 +499,44 @@ public TarifGreenfee(){ // constructor 1
         currency = "???";
     } // end constructor
 
-    public Integer getTarifCourseId() {
+    public Integer getTarifId() { return tarifId; }
+    public void setTarifId(Integer tarifId) { this.tarifId = tarifId; }
+
+    public Integer getTarifYear() { return tarifYear; }
+    public void setTarifYear(Integer tarifYear) { this.tarifYear = tarifYear; }
+
+    public List<Integer> getTarifCourseId() {
         return tarifCourseId;
     }
 
-    public void setTarifCourseId(Integer tarifCourseId) {
-        this.tarifCourseId = tarifCourseId;
+    public void setTarifCourseId(List<Integer> tarifCourseId) {
+        this.tarifCourseId = tarifCourseId != null ? tarifCourseId : new ArrayList<>();
     }
+
+    /** Retourne le premier holes — backward compat pour RowMapper, display, delete, find. */
+    public Integer getTarifHoles() {
+        return (tarifHoles == null || tarifHoles.isEmpty()) ? 18 : tarifHoles.get(0);
+    } // end method
+
+    /** Appelé par RowMapper (single value depuis DB). */
+    public void setTarifHoles(Integer h) {
+        this.tarifHoles = new ArrayList<>(List.of(h != null ? h : 18));
+    } // end method
+
+    /** Liste complète — utilisée par le wizard et CreateTarifGreenfee. */
+    public List<Integer> getTarifHolesList() {
+        return tarifHoles != null ? tarifHoles : new ArrayList<>(List.of(18));
+    } // end method
+
+    public void setTarifHolesList(List<Integer> tarifHoles) {
+        this.tarifHoles = tarifHoles;
+    } // end method
+
+    /** Affichage formaté ex: "18T" ou "18T + 9T" — pour wizard header et confirm. */
+    public String getTarifHolesDisplay() {
+        if (tarifHoles == null || tarifHoles.isEmpty()) return "18T";
+        return tarifHoles.stream().map(h -> h + "T").collect(java.util.stream.Collectors.joining(" + "));
+    } // end method
 
     public LocalTime getStartHour() {
         return startHour;
@@ -649,6 +685,9 @@ public TarifGreenfee(){ // constructor 1
         this.workSeason = workSeason;
     }
 
+    public String getWorkLinkedSlotKey() { return workLinkedSlotKey; }
+    public void setWorkLinkedSlotKey(String workLinkedSlotKey) { this.workLinkedSlotKey = workLinkedSlotKey; }
+
     public ArrayList<EquipmentsAndBasic> getBasicList() {
         return basicList;
     }
@@ -771,6 +810,9 @@ public TarifGreenfee(){ // constructor 1
         this.workDaysPrice = workDaysPrice;
     }
 
+    public boolean[] getWorkDaysAvailable() { return workDaysAvailable; }
+    public void setWorkDaysAvailable(boolean[] workDaysAvailable) { this.workDaysAvailable = workDaysAvailable; }
+
     public String getCurrency() {
         return currency;
     }
@@ -779,48 +821,124 @@ public TarifGreenfee(){ // constructor 1
         this.currency = currency;
     }
 
-public String showTarifGreenfee(){
-     String show = null;
-     show = "<br/>" + show + datesSeasonsList;
-     show = "<br/>" + show + equipmentsList;
-     show = show + "<br/> GreenfeeType = " + this.greenfeeType;
-     if(this.greenfeeType.equals("BA")){
-         show = show + "<br/>" + basicList;
-     }
-     if(this.greenfeeType.equals("HO")){
-         show = "<br/>" + show + teeTimesList;
-     }
-     if(this.greenfeeType.equals("DA")){
-         show = "<br/>" + show + daysList;
-     }
-     if(this.twilightList != null){
-         show = "<br/>" + show + twilightList;
-     }
-    return show;
-}
+public String showTarifGreenfee() {
+    LOG.debug("entering showTarifGreenfee");
+    try {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<div style='font-family:monospace; font-size:0.82rem; line-height:1.7;")
+          .append(" max-height:300px; overflow-y:auto; padding-right:0.5rem;'>");
 
-  public static TarifGreenfee map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-      // à adapter !!
-        TarifGreenfee tg = new TarifGreenfee();
-        ObjectMapper om = new ObjectMapper();
-        om.registerModule(new JavaTimeModule());
-////        tm = om.readValue(rs.getString("TarifMembersJson"),TarifMember.class);
- //             LOG.debug("TarifMember extracted from database = "  + tm.toString());
- ////       tm.setMemberStartDate(rs.getTimestamp("TarifMembersStartDate").toLocalDateTime());
- ////       tm.setMemberEndDate(rs.getTimestamp("TarifMembersEndDate").toLocalDateTime());
- ////       tm.setTarifMemberIdClub(rs.getInt("TarifMembersIdClub"));
-      LOG.debug("TarifGreenfee tg returned from map = " + tg);
-   return tg;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
-    
+        // header
+        sb.append("<div style='background:var(--surface-100,#f4f4f4); padding:0.3rem 0.6rem;")
+          .append(" border-radius:4px; margin-bottom:0.5rem;'>")
+          .append("<b>Type:</b> ").append(greenfeeType)
+          .append(" &nbsp;|&nbsp; <b>Holes:</b> ").append(getTarifHolesDisplay())
+          .append(" &nbsp;|&nbsp; <b>Course:</b> ").append(tarifCourseId)
+          .append(" &nbsp;|&nbsp; <b>Currency:</b> ").append(currency)
+          .append("</div>");
+
+        // datesSeasonsList
+        sb.append(sectionTitle("&#128197; Periods", datesSeasonsList.size()));
+        if (datesSeasonsList.isEmpty()) {
+            sb.append(emptyLine());
+        } else {
+            for (var ds : datesSeasonsList) {
+                sb.append(row("<b>" + ds.getSeason() + "</b>"
+                    + " : " + (ds.getStartDate() != null ? ds.getStartDate().toLocalDate() : "?")
+                    + " &#8594; " + (ds.getEndDate()   != null ? ds.getEndDate().toLocalDate()   : "?")));
+            }
+        }
+
+        // teeTimesList
+        if (!teeTimesList.isEmpty()) {
+            sb.append(sectionTitle("&#9200; Tee Times", teeTimesList.size()));
+            for (var tt : teeTimesList) {
+                sb.append(row("<b>" + tt.getItem() + "</b>"
+                    + " [" + tt.getSeason() + "]"
+                    + " &nbsp; " + tt.getStartTime() + " &#8594; " + tt.getEndTime()
+                    + " &nbsp; " + tt.getPrice() + " &#8364;"
+                    + " &nbsp; twilight=" + tt.getTwilight()
+                    + " &nbsp; key=<code>" + tt.getSlotKey() + "</code>"));
+            }
+        }
+
+        // basicList
+        if (!basicList.isEmpty()) {
+            sb.append(sectionTitle("&#128181; Basic", basicList.size()));
+            for (var b : basicList) {
+                sb.append(row("<b>" + b.getItem() + "</b>"
+                    + " [" + b.getSeason() + "]"
+                    + " &nbsp; " + b.getPrice() + " &#8364;"));
+            }
+        }
+
+        // daysList
+        if (!daysList.isEmpty()) {
+            sb.append(sectionTitle("&#128198; Days", daysList.size()));
+            for (var d : daysList) {
+                sb.append(row("<b>" + d.getCategory() + "</b>"
+                    + " [" + d.getSeason() + "]"
+                    + " &nbsp; Mon=" + d.getPrice()[0]
+                    + " Wk=" + d.getPrice()[1]
+                    + " Fri=" + d.getPrice()[2]
+                    + " W-E=" + d.getPrice()[3]
+                    + " Hol=" + d.getPrice()[4]));
+            }
+        }
+
+        // equipmentsList
+        if (!equipmentsList.isEmpty()) {
+            sb.append(sectionTitle("&#127922; Equipments", equipmentsList.size()));
+            for (var eq : equipmentsList) {
+                String slotDisplay = "all";
+                if (eq.getLinkedSlotKey() != null) {
+                    slotDisplay = teeTimesList.stream()
+                            .filter(t -> eq.getLinkedSlotKey().equals(t.getSlotKey()))
+                            .findFirst()
+                            .map(t -> t.getStartTime() + "–" + t.getEndTime())
+                            .orElse("<code>" + eq.getLinkedSlotKey() + "</code>");
+                }
+                sb.append(row("<b>" + eq.getItem() + "</b>"
+                    + " [" + eq.getSeason() + "]"
+                    + " &nbsp; " + eq.getPrice() + " &#8364;"
+                    + " &nbsp; slot=" + slotDisplay));
+            }
+        }
+
+        // twilightList
+        if (!twilightList.isEmpty()) {
+            sb.append(sectionTitle("&#127749; Twilight", twilightList.size()));
+            for (var tw : twilightList) {
+                sb.append(row("[" + tw.getSeason() + "]"
+                    + " &nbsp; start=" + tw.getStartTime()
+                    + " &nbsp; months=" + tw.getMonths()));
+            }
+        }
+
+        sb.append("</div>");
+        return sb.toString();
+    } catch (Exception e) {
+        String msg = "Exception in showTarifGreenfee = " + e.getMessage();
+        LOG.error(msg);
+        showMessageFatal(msg);
+        return msg;
+    }
+} // end method
+
+private String sectionTitle(String label, int count) {
+    return "<div style='font-weight:bold; color:var(--primary-color,#4CAF50);"
+         + " margin-top:0.5rem; border-bottom:1px solid var(--surface-300,#ddd);'>"
+         + label + " <span style='font-weight:normal;'>(" + count + ")</span></div>";
+} // end method
+
+private String row(String content) {
+    return "<div style='padding-left:1rem;'>&#8226; " + content + "</div>";
+} // end method
+
+private String emptyLine() {
+    return "<div style='padding-left:1rem; color:#999;'>— empty —</div>";
+} // end method
+
  @Override
 public String toString(){
  try {
@@ -884,30 +1002,4 @@ public String toString(){
         }
 } //end method
 
- void main() throws SQLException, Exception{
-   //  Connection conn = new DBConnection().getConnection();
-  try{
-    TarifGreenfee tarif = new TarifGreenfee();
- /*   TarifGreenfee.Inner_demo inner = tarif.new Inner_demo();
-    inner.print();
-    LOG.debug("get num = " + inner.getNum());
-    LOG.debug("get lc = " + inner.getLc());
-    TarifGreenfee.TeeTimes teeTimes = tarif.new TeeTimes();
-    teeTimes.setStartTime(LocalTime.MIN);
-    */
-  //      LOG.debug("from main, after lp = " + lp);
-  //      LOG.debug("nombre de clubs dans la liste = " + lp.size());
- } catch (Exception e) {
-            String msg = "££ Exception in main = " + e.getMessage();
-            LOG.error(msg);
-   }finally{
- //        DBConnection.closeQuietly(conn, null, null , null); 
-          }
-   } // end main//
-
-
-
-
-
 } // end class TarifGreenfee
-// à vérifier : inclure ici les autres 

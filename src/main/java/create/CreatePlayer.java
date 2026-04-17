@@ -6,19 +6,15 @@ import entite.Player;
 import entite.Subscription;
 import entite.Subscription.etypeSubscription;
 import jakarta.enterprise.context.ApplicationScoped;
-
 import static interfaces.Log.LOG;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-
-import payment.PaymentSubscriptionController;
 import sql.preparedstatement.psCreateUpdatePlayer;
 import utils.LCUtil;
 
@@ -189,7 +185,7 @@ public class CreatePlayer implements Serializable {
             LOG.debug("Main ready (CDI required for execution)");
 
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
             LCUtil.showMessageFatal(
                     "Exception in main: " + e.getMessage());
         }

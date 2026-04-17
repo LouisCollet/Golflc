@@ -66,7 +66,7 @@ if((evt.keyCode < 48 || evt.keyCode > 57) && (evt.keyCode < 97 || evt.keyCode > 
 function tot_item(item){
  try{
    console.info("entering function tot_item with item = " + item);
-y1 = parseInt(document.getElementById('form_payment:'.concat(item).concat("1")).innerHTML); // inputText
+y1 = parseInt(document.getElementById('form_payment:'.concat(item).concat("1")).textContent); // inputText
     console.info("y1, Unit Item Price = " + y1);
 y2 = parseInt(document.getElementById('form_payment:'.concat(item).concat("2")).value);
 
@@ -84,7 +84,7 @@ console.info("ending function tot_item ! ");
 function modification(i, item){
   try{
   console.info("starting function modification with i = " + i + " item = " + item );
-  document.getElementById('form_payment:'.concat(item).concat("3")).innerHTML = 0;
+  document.getElementById('form_payment:'.concat(item).concat("3")).textContent = 0;
   t = t - MP4[i-1]; // substract global price saved in array
     console.info("TotalPrice Modified = " + t);
   SetMyStrings([{ name: "TotalPrice", value: t}]); // is Working
@@ -96,7 +96,7 @@ if(t < 0){
     console.info("t ne peut être négatif= " + t);
     t = 0;
 }
-document.getElementById('form_payment:TotalPrice').innerHTML = t;
+document.getElementById('form_payment:TotalPrice').textContent = t;
 console.info("ending function modification ");
 }catch(exception){
   var message = exception.message;
@@ -115,12 +115,12 @@ function creation(i, item){
 
   MP4[i-1] = y3; // save in array will be used later in case of modification !
 
- document.getElementById('form_payment:'.concat(item).concat("3")).innerHTML = y3;
+ document.getElementById('form_payment:'.concat(item).concat("3")).textContent = y3;
  
  t = t + y3;
  console.info("TotalPrice = " + t);
  SetMyStrings([{ name: "TotalPrice", value: t}]); // transfert data to bean via xhtml
- document.getElementById('form_payment:TotalPrice').innerHTML = t;
+ document.getElementById('form_payment:TotalPrice').textContent = t;
  document.getElementById('form_payment:hiddenTotalPrice').value = t; // new 08*10-2018
  
 console.info("ending function creation " );

@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import sql.SqlFactory;
 import utils.LCUtil;
@@ -34,12 +36,10 @@ public class UpdateTee implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean update(final Tee tee) throws Exception {
-        
+    public boolean update(final Tee tee) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
-        
-        LOG.debug("dao = {}", dao);
         
         try (Connection conn = dao.getConnection()) {
             
@@ -119,44 +119,29 @@ public class UpdateTee implements Serializable, interfaces.GolfInterface {
             
             return true;
             
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-            
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
+    } // end method
 
-    /**
-     * Main pour tests hors JSF
-     * Note: Non fonctionnel sans container CDI
-     */
-    public static void main(String[] args) {
+/*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         try {
             Tee tee = new Tee();
             tee.setIdtee(140);
-         //   tee.setTeeName("Test Tee Updated");
-            
             LOG.debug("Main ready (CDI required for execution)");
-            LOG.debug("Test tee: {}", tee);
-            
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
-            LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
-    }
-}
+    } // end main
+*/
+} // end class
 /*
 import entite.Tee;
 import static interfaces.Log.LOG;
@@ -174,8 +159,8 @@ public class UpdateTee implements Serializable, interfaces.Log, interfaces.GolfI
   final String methodName = utils.LCUtil.getCurrentMethodName();   
         PreparedStatement ps = null;
   try {
-                LOG.debug("entering " + methodName);
-                LOG.debug("with tee  = " + tee);
+                LOG.debug("entering {}", methodName);
+                LOG.debug("with tee  = {}", tee);
             String te = utils.DBMeta.listMetaColumnsUpdate(conn, "tee");
                 // %s indique qu'il s'agit d'un string dans est le même pour toutes les query
                 // ne fonctionne pas
@@ -186,7 +171,7 @@ public class UpdateTee implements Serializable, interfaces.Log, interfaces.GolfI
             WHERE tee.idtee = ?;
            """.formatted(te);
    
-       LOG.debug("query formatted = " + NEW_LINE +query);
+       LOG.debug("query formatted = {}", NEW_LINE +query);
             ps = conn.prepareStatement(query);
             // insérer dans l'ordre de la database : 1 = first db field
             ps.setString(1, tee.getTeeGender());
@@ -205,7 +190,7 @@ public class UpdateTee implements Serializable, interfaces.Log, interfaces.GolfI
             ps.setInt(10, tee.getIdtee());  // ne pas oublier = where
             utils.LCUtil.logps(ps);
             int row = ps.executeUpdate(); // write into database
-      //         LOG.debug("row = " + row);
+      //         LOG.debug("row = {}", row);
             if(row != 0) {
                 String msg = LCUtil.prepareMessageBean("tee.modify")
                         + "</h1> <br/>ID = " + tee
@@ -248,7 +233,7 @@ public class UpdateTee implements Serializable, interfaces.Log, interfaces.GolfI
             tee.setIdtee(140);
             Tee t = new read.ReadTee().read(tee, conn);
             boolean b = new UpdateTee().update(t, conn);
-            LOG.debug("from main, teemodified = " + b);
+            LOG.debug("from main, teemodified = {}", b);
         } catch (Exception e) {
             String msg = "££ Exception in main Modify tee= " + e.getMessage();
             LOG.error(msg);

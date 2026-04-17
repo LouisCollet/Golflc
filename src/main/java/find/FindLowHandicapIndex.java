@@ -23,7 +23,7 @@ public class FindLowHandicapIndex implements Serializable {
 
     public Double find(final HandicapIndex handicapIndex) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for handicapIndex = " + handicapIndex);
 
         final String query = """
@@ -65,7 +65,7 @@ public class FindLowHandicapIndex implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         HandicapIndex handicapIndex = new HandicapIndex();
         handicapIndex.setHandicapPlayerId(324713);
         handicapIndex.setHandicapDate(java.time.LocalDateTime.parse("2022-07-17T17:11:30"));

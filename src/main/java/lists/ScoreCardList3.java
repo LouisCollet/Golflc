@@ -33,25 +33,13 @@ public class ScoreCardList3 implements Serializable {
 
     @Inject private dao.GenericDAO dao;
 
-    // Cache d'instance — @ApplicationScoped garantit le singleton
-    private List<ECourseList> liste = null;
+    // fix multi-user 2026-03-19 — cache supprimé (données per-user dans singleton = fuite de données)
 
     public ScoreCardList3() { }
 
     public List<ECourseList> list(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-
-        if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
-            liste.forEach(item -> LOG.debug("hole = " + item.scoreStableford().getScoreHole()
-                    + " / points = " + item.scoreStableford().getScorePoints()));
-            LOG.debug("total points = " + liste.stream()
-                    .mapToInt(o -> o.scoreStableford().getScorePoints())
-                    .sum());
-            return liste;
-        }
-
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " with Player = " + player);
         LOG.debug(methodName + " with Round = " + round);
 
@@ -89,7 +77,7 @@ public class ScoreCardList3 implements Serializable {
             RowMapper<Club> clubMapper = new ClubRowMapper();
             Club club = new Club(); // default empty club for roundMapper
 
-            liste = dao.queryList(query, rs -> ECourseList.builder()
+            List<ECourseList> result = dao.queryList(query, rs -> ECourseList.builder()
                     .inscription(inscriptionMapper.map(rs))
                     .round(roundMapper.map(rs, club))
                     .hole(holeMapper.map(rs))
@@ -97,12 +85,12 @@ public class ScoreCardList3 implements Serializable {
                     .build(),
                     player.getIdplayer(), round.getIdround());
 
-            if (liste.isEmpty()) {
+            if (result.isEmpty()) {
                 LOG.warn(methodName + " - empty result list");
             } else {
-                LOG.debug(methodName + " - list size = " + liste.size());
+                LOG.debug(methodName + " - list size = " + result.size());
             }
-            return liste;
+            return result;
 
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -110,22 +98,18 @@ public class ScoreCardList3 implements Serializable {
         }
     } // end method
 
-    // Getters/setters d'instance
-    public List<ECourseList> getListe()                 { return liste; }
-    public void setListe(List<ECourseList> liste)       { this.liste = liste; }
-
-    // Invalidation explicite
+    /**
+     * No-op — cache removed (fix multi-user 2026-03-19)
+     */
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        LOG.debug("entering " + methodName + " - no-op (cache removed)");
     } // end method
 
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();

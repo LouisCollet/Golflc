@@ -1,6 +1,8 @@
 package create;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Distance;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
@@ -24,6 +26,13 @@ public class CreateDistances implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     @Inject private dao.GenericDAO dao;
 
     @Inject
@@ -33,8 +42,8 @@ public class CreateDistances implements Serializable {
 
     public boolean create(final Distance distance) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with distance = " + distance);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with distance = {}", distance);
 
         if (distance.getDistanceArray() == null) {
             LOG.debug("distancearray is null - skipped");
@@ -45,8 +54,8 @@ public class CreateDistances implements Serializable {
             final String query = LCUtil.generateInsertQuery(conn, "distances");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 ps.setInt(1, distance.getIdTee());
-                String json = new ObjectMapper().writeValueAsString(distance);
-                LOG.debug("distances converted in json format = " + NEW_LINE + json);
+                String json = OBJECT_MAPPER.writeValueAsString(distance);
+                LOG.debug("distances converted in json format = {}", NEW_LINE + json);
                 ps.setString(2, json);
                 ps.setTimestamp(3, Timestamp.from(Instant.now()));
                 utils.LCUtil.logps(ps);
@@ -54,7 +63,7 @@ public class CreateDistances implements Serializable {
                 if (row != 0) {
                     String msg = LCUtil.prepareMessageBean("distance.create") + distance;
                     var v = distance.getDistanceArray();
-                    Arrays.stream(v).forEach(e -> LOG.debug(e + ","));
+                    Arrays.stream(v).forEach(e -> LOG.debug("{},", e));
                     msg = msg + "<br>Vérification : total = " + Arrays.stream(v).sum();
                     msg = msg + " ,out = " + Arrays.stream(v, 0, 9).sum();
                     msg = msg + " ,in = " + Arrays.stream(v, 9, 18).sum();
@@ -72,7 +81,7 @@ public class CreateDistances implements Serializable {
             if (sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062) {
                 LOG.info("distances already exists - going to update");
                 boolean b = updateDistances.update(distance);
-                LOG.debug("back from update = " + b);
+                LOG.debug("back from update = {}", b);
                 return true;
             }
             utils.LCUtil.printSQLException(sqle);
@@ -87,14 +96,14 @@ public class CreateDistances implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Distance distance = new Distance();
         distance.setIdTee(218);
         int ar[] = {335,511,140,333,273,442,318,171,407,355,307,180,398,365,472,138,337,399};
         distance.setDistanceArray(ar);
-        LOG.debug("array to insert json = " + Arrays.toString(distance.getDistanceArray()));
+        LOG.debug("array to insert json = {}", Arrays.toString(distance.getDistanceArray()));
         boolean lp = new CreateDistances().create(distance);
-        LOG.debug("from main, after lp = " + lp);
+        LOG.debug("from main, after lp = {}", lp);
     } // end main
     */
 

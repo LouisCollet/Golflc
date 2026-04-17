@@ -9,9 +9,6 @@ import entite.TarifGreenfee;
 import entite.TarifGreenfee.DayType;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,35 +31,41 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, java.io.Seri
      LOG.debug(" --  with club = " + club.toString());  // pour avoir country
  try{
           LOG.debug("greenfeeType = " + tarif.getGreenfeeType());
+          tarif.getTeeTimeChoosen().clear();
+          tarif.getEquipmentChoosen().clear();
+          tarif.getDayChoosen().clear();
           tarif.setCurrency(club.getAddress().getCountry().getCurrency()); // new 28-04-2025
        String season = findSeason(tarif, round);
           LOG.debug("Season season = " + season);
        tarif.setSeason(season);
        
-       if(tarif.getGreenfeeType().equals("BA")){  // cas basic 
-          tarif = findBasic(tarif); 
+       if(tarif.getGreenfeeType().equals("BA")){  // cas basic
+          tarif = findBasic(tarif);
+          tarif = findEquipments(tarif, null); // general equipments (linkedSlotKey == null)
           return tarif;
        }
        if(tarif.getGreenfeeType().equals("HO")){ // HOURS
-           tarif = findHours(tarif, round); // 08:00   12:00
+           tarif = findHours(tarif, round);
+           // also collect linked equipments for the chosen slot
+           if (!tarif.getTeeTimeChoosen().isEmpty()) {
+               String chosenSlotKey = tarif.getTeeTimeChoosen().get(0).getSlotKey();
+               tarif = findEquipments(tarif, chosenSlotKey);
+           }
            return tarif;
        }
        if(tarif.getGreenfeeType().equals("EQ")){  //E
             LocalDate lddob = player.getPlayerBirthDate().toLocalDate();
               LOG.debug("LocalDate playerBirthDate = " + lddob);
-            tarif = findEquipments(tarif); // // senior, junior, FRIDAY, WEEKEND, WEEK, HOLIDAY
+            tarif = findEquipments(tarif, null); // null = not linked to any slot
             return tarif;
        }  
        if(tarif.getGreenfeeType().equals("DA")){
             LocalDate birthDate = player.getPlayerBirthDate().toLocalDate();
               LOG.debug("LocalDate playerBirthDate = " + birthDate);
             tarif = findDays(tarif, round, club.getAddress().getCountry().getCode(), birthDate); // senior, junior, FRIDAY, WEEKEND, WEEK, HOLIDAY
+            tarif = findEquipments(tarif, null); // general equipments (linkedSlotKey == null)
             return tarif;
-       }  
-       if(tarif.getGreenfeeType().equals("HO")){
-           tarif = findHours(tarif, round); // 08:00   12:00
-           return tarif;
-     }
+       }
  return null;
  }catch (Exception e) {
       String msg = " -- Error in calcTarifGreenfee " + e.getMessage();
@@ -93,9 +96,17 @@ public class CalcTarifGreenfee implements interfaces.GolfInterface, java.io.Seri
        LOG.debug("Starting with findPriceBasic = " + tarif.getBasicList());
        LOG.debug("Starting for season = " + tarif.getSeason());
  try{
-        for (EquipmentsAndBasic price : tarif.getBasicList()) { 
-              if (price.getSeason().equals(tarif.getSeason())) { 
+        for (EquipmentsAndBasic price : tarif.getBasicList()) {
+              // "A" = All seasons — matches any season
+              if ("A".equals(price.getSeason()) || price.getSeason().equals(tarif.getSeason())) {
+                  if (!price.isAvailable()) {
+                      LOG.debug("basic price {} not available — skipped", price.getItem());
+                      continue;
+                  }
                   LOG.debug("found priceGreenfee= " + price);
+                  if (price.getQuantity() == 0) {
+                      price.setQuantity(1); // default: 1 greenfee per player
+                  }
                   return price.getPrice();
               }
         }
@@ -162,6 +173,10 @@ public TarifGreenfee findHours (TarifGreenfee tarif, Round round){
   for(int i=0; i<tarif.getTeeTimesList().size(); i++){ 
             var v = tarif.getTeeTimesList().get(i);
                 LOG.debug("work row handled  = " + v);
+            if (!v.isAvailable()) {
+                LOG.debug("tee time entry {} is not available — skipped", v.getItem());
+                continue;
+            }
             if(v.getTwilight().equals("P")){
                    LOG.debug("we handle PREVIOUS " + v); // il faut compléter endTime
                 LocalTime twilightStartTime = twilightStart(v.getTwilight(), tarif.getTwilightList(), tarif.getSeason(), round);
@@ -176,7 +191,7 @@ public TarifGreenfee findHours (TarifGreenfee tarif, Round round){
                    LOG.debug("Twilight StartTime  = " + v.getStartTime());
                 v.setEndTime(LocalTime.of(18,0));
                    LOG.debug("Twilight EndTime  = " + v.getEndTime());
-                work.add(v);   
+                work.add(v);
             }
             if(v.getTwilight().equals("N")){
                    LOG.debug("we handle NORMAL " + v);
@@ -197,6 +212,7 @@ public TarifGreenfee findHours (TarifGreenfee tarif, Round round){
                       || localTimeRound.equals(v.getEndTime())
                       || (localTimeRound.isAfter(v.getStartTime()) && (localTimeRound.isBefore(v.getEndTime())))) {
                               LOG.debug("Found in teeTimes !! for " + v); //for = " + ZDF_HOURS.format(tround));
+                           if (v.getQuantity() == 0) { v.setQuantity(1); }
                            tarif.getTeeTimeChoosen().add(v);  // new 04/05/2022
                               LOG.debug("time added= " + v) ;
                            } //end if 2
@@ -227,6 +243,11 @@ public TarifGreenfee findHours (TarifGreenfee tarif, Round round){
         var v = tarif.getDaysList().get(i);
         LOG.debug("handling DaysList v = " + v);
         if(v.getSeason().equals(tarif.getSeason())){
+             boolean[] avail = v.getAvailable();
+             if (avail != null && avail.length > iDay && !avail[iDay]) {
+                 LOG.debug("day index {} is not available for category {} — skipped", iDay, v.getCategory());
+                 continue;
+             }
           //   var daysWeek = new DaysWeek();// new 04/05/2022
              var daysWeek = tarif.new DaysWeek();// new 04/05/2022
              //TarifGreenfee.Twilight twilight = tarifGreenfee.new Twilight(); // mod 23-06-2021 inner class Teetimes within TarifGreenfee !
@@ -332,21 +353,28 @@ return null;
  }finally{ }    
  } // end method
 
- public TarifGreenfee findEquipments (TarifGreenfee tarif){
-     LOG.debug(" -- Start of findEquipments = " + tarif);
+ /**
+  * Finds equipments matching the current season and optionally linked to a specific HO slot.
+  * @param tarif the tarif being calculated
+  * @param slotKey the slotKey of the chosen HO tee time, or null for EQ type (unlinked equipments)
+  */
+ public TarifGreenfee findEquipments (TarifGreenfee tarif, String slotKey){
+     LOG.debug(" -- Start of findEquipments with slotKey = {}", slotKey);
  try {
-     EquipmentsAndBasic equipment = tarif.getEquipmentsList().stream()
-        //     .peek(num ->System.out.println("wil filter" + num))
-             .peek(item -> LOG.debug("peek - element of equipmentsList =" + item))
-        //     .peek(System.out::println)
-             .filter(x -> x.getSeason().equals(tarif.getSeason())
-                     || x.getSeason().equals("A")) // equipments valables pour A(ll) seasons 03/05/2022
-        //     .peek(System.out::println)
-             .findAny()
-             .orElse(null);
-     
-         LOG.debug("found equipment = " + equipment);
-      tarif.getEquipmentChoosen().add(equipment);
+     tarif.getEquipmentsList().stream()
+             .peek(item -> LOG.debug("peek - element of equipmentsList ={}", item))
+             .filter(x -> x.getSeason().equals(tarif.getSeason()) || x.getSeason().equals("A"))
+             .filter(x -> {
+                 // null linkedSlotKey = applies to all slots (or standalone EQ type)
+                 if (x.getLinkedSlotKey() == null) return slotKey == null;
+                 return x.getLinkedSlotKey().equals(slotKey);
+             })
+             .forEach(x -> {
+                 if (x.getQuantity() == 0) { x.setQuantity(1); }
+                 tarif.getEquipmentChoosen().add(x);
+             });
+
+         LOG.debug("equipmentChoosen = {}", tarif.getEquipmentChoosen());
  return tarif;
 
  }catch (Exception e){
@@ -373,7 +401,7 @@ return null;
 /*
 void main() throws Exception, SQLException{
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // requires CDI container — cannot run standalone
 } //end main
 */

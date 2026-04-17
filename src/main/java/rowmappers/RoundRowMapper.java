@@ -2,6 +2,8 @@
 package rowmappers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Club;
 import entite.Round;
 import entite.ScoreMatchplay;
@@ -13,6 +15,14 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public class RoundRowMapper extends AbstractRowMapper<Round> implements RowMapperRound<Round> {
+
+    private static final ObjectMapper OBJECT_MAPPER;
+
+    static {
+        OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
     @Override
     public Round map(ResultSet rs) throws SQLException {
@@ -46,7 +56,7 @@ public class RoundRowMapper extends AbstractRowMapper<Round> implements RowMappe
 
             String mpJson = getString(rs, "RoundMatchplayResult");
             if (!"no MP score".equals(mpJson)) {
-                round.setScoreMatchplay(new ObjectMapper().readValue(mpJson, ScoreMatchplay.class));
+                round.setScoreMatchplay(OBJECT_MAPPER.readValue(mpJson, ScoreMatchplay.class));
             }
 
             round.setRoundTeam(getString(rs, "roundTeam"));

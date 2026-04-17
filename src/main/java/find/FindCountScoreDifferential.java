@@ -21,7 +21,7 @@ public class FindCountScoreDifferential implements Serializable {
 
     public Integer find(final Player player) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for player = " + player);
 
         final String query = """
@@ -54,7 +54,7 @@ public class FindCountScoreDifferential implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Integer b = new FindCountScoreDifferential().find(player);

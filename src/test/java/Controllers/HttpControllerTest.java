@@ -54,35 +54,35 @@ class HttpControllerTest {
 
         @Test
         void normalHeader_returnsValue() {
-            assertEquals("135.0", HttpController.getCookie("Amount=135.0; Path=/"));
+            assertEquals("135.0", controller.getCookie("Amount=135.0; Path=/"));
         } // end test
 
         @Test
         void multipleEquals_returnsFirstSegment() {
             // "Key=val=ue; Path=/" → doit retourner "val=ue" (entre premier = et premier ;)
-            assertEquals("val=ue", HttpController.getCookie("Key=val=ue; Path=/"));
+            assertEquals("val=ue", controller.getCookie("Key=val=ue; Path=/"));
         } // end test
 
         @Test
         void noEquals_returnsNotFound() {
-            assertEquals("not found", HttpController.getCookie("NoEqualsHere;something"));
+            assertEquals("not found", controller.getCookie("NoEqualsHere;something"));
         } // end test
 
         @Test
         void noSemicolon_returnsNotFound() {
-            assertEquals("not found", HttpController.getCookie("Amount=135.0"));
+            assertEquals("not found", controller.getCookie("Amount=135.0"));
         } // end test
 
         @Test
         void emptyValue_returnsEmpty() {
-            assertEquals("", HttpController.getCookie("Amount=; Path=/"));
+            assertEquals("", controller.getCookie("Amount=; Path=/"));
         } // end test
 
         @Test
         void semicolonBeforeEquals_throwsAppException() {
             // "No;val=ue" → indexOf("=")=6, indexOf(";")=2 → substring(7, 2) → StringIndexOutOfBoundsException
             // handleGenericException wraps it in AppException
-            assertThrows(exceptions.AppException.class, () -> HttpController.getCookie("No;val=ue"));
+            assertThrows(exceptions.AppException.class, () -> controller.getCookie("No;val=ue"));
         } // end test
 
     } // end nested class
@@ -96,14 +96,14 @@ class HttpControllerTest {
         void found_returnsValue() {
             HttpCookie cookie = new HttpCookie("PaymentReference", "REF-123");
             List<HttpCookie> cookies = List.of(cookie);
-            assertEquals("REF-123", HttpController.getCookieValue(cookies, "PaymentReference"));
+            assertEquals("REF-123", controller.getCookieValue(cookies, "PaymentReference"));
         } // end test
 
         @Test
         void notFound_returnsMinus1() {
             HttpCookie cookie = new HttpCookie("Amount", "50.0");
             List<HttpCookie> cookies = List.of(cookie);
-            assertEquals("-1", HttpController.getCookieValue(cookies, "NonExistent"));
+            assertEquals("-1", controller.getCookieValue(cookies, "NonExistent"));
         } // end test
 
         @Test
@@ -112,14 +112,14 @@ class HttpControllerTest {
             HttpCookie c2 = new HttpCookie("PaymentReference", "REF-456");
             HttpCookie c3 = new HttpCookie("Currency", "EUR");
             List<HttpCookie> cookies = List.of(c1, c2, c3);
-            assertEquals("REF-456", HttpController.getCookieValue(cookies, "PaymentReference"));
-            assertEquals("EUR", HttpController.getCookieValue(cookies, "Currency"));
-            assertEquals("50.0", HttpController.getCookieValue(cookies, "Amount"));
+            assertEquals("REF-456", controller.getCookieValue(cookies, "PaymentReference"));
+            assertEquals("EUR", controller.getCookieValue(cookies, "Currency"));
+            assertEquals("50.0", controller.getCookieValue(cookies, "Amount"));
         } // end test
 
         @Test
         void emptyList_returnsMinus1() {
-            assertEquals("-1", HttpController.getCookieValue(Collections.emptyList(), "Anything"));
+            assertEquals("-1", controller.getCookieValue(Collections.emptyList(), "Anything"));
         } // end test
 
         @Test
@@ -127,7 +127,7 @@ class HttpControllerTest {
             HttpCookie c1 = new HttpCookie("Key", "first");
             HttpCookie c2 = new HttpCookie("Key", "second");
             List<HttpCookie> cookies = List.of(c1, c2);
-            assertEquals("first", HttpController.getCookieValue(cookies, "Key"));
+            assertEquals("first", controller.getCookieValue(cookies, "Key"));
         } // end test
 
     } // end nested class

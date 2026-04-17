@@ -2,7 +2,7 @@ package lists;
 
 import entite.composite.ECourseList;
 import static interfaces.Log.LOG;
-import jakarta.faces.view.ViewScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -13,21 +13,21 @@ import rowmappers.RowMapper;
 import rowmappers.SubscriptionRowMapper;
 
 @Named("SASubscription")
-@ViewScoped // nécessaire !! pour faire le total dans local_administrator_cotisations.xhtml
+@ApplicationScoped // migrated from @ViewScoped 2026-03-22
 public class SystemAdminSubscriptionList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ViewScoped resets per view automatically
+    // ✅ Cache d'instance — @ApplicationScoped singleton, invalidated via CacheInvalidator
     private List<ECourseList> liste = null;
 
     public SystemAdminSubscriptionList() { }
 
     public List<ECourseList> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         // ✅ Early return — guard clause FIRST
         if (liste != null) {
@@ -58,7 +58,7 @@ public class SystemAdminSubscriptionList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -66,7 +66,7 @@ public class SystemAdminSubscriptionList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         var lp = new SystemAdminSubscriptionList().list();
         LOG.debug("from main, result = " + lp);
     } // end main

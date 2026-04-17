@@ -51,7 +51,7 @@ public class ReadHole implements Serializable, interfaces.GolfInterface {
         try (Connection conn = dao.getConnection()) {
 
             LOG.debug("entering ReadHoles ...");
-            LOG.debug(" with tee = " + tee);
+            LOG.debug(" with tee = {}", tee);
 
             String query = """
                 SELECT *
@@ -75,9 +75,9 @@ public class ReadHole implements Serializable, interfaces.GolfInterface {
                     if(v == null){
                         LOG.debug("array distance = null , filled with 0");
                         Arrays.fill(v, 0);
-                        LOG.debug("array filled with 0 = " + v);
+                        LOG.debug("array filled with 0 = {}", v);
                     }
-                    LOG.debug("array distance = " + Arrays.toString(v));
+                    LOG.debug("array distance = {}", Arrays.toString(v));
                     while(rs.next()){
                         holesGlobal.getDataHoles()[i][0] = (rs.getInt("HoleNumber") );
                         holesGlobal.getDataHoles()[i][1] = (rs.getInt("HolePar") );
@@ -85,7 +85,7 @@ public class ReadHole implements Serializable, interfaces.GolfInterface {
                         holesGlobal.getDataHoles()[i][3] = v[i];
                         i++;
                     } // end while
-                    LOG.debug("there are rows = " + i);
+                    LOG.debug("there are rows = {}", i);
                     // ✅ PARTIE NON MODIFIÉE - FIN
 
                     return holesGlobal;
@@ -100,7 +100,7 @@ public class ReadHole implements Serializable, interfaces.GolfInterface {
             throw e;
 
         } catch (Exception ex) {
-            LOG.error("Exception ! " + ex);
+            LOG.error("Exception ! {}", ex);
             LCUtil.showMessageFatal("Exception in ReadHoles = " + ex.toString());
             throw new SQLException(ex);
         }
@@ -118,7 +118,7 @@ public class ReadHole implements Serializable, interfaces.GolfInterface {
             LOG.debug("Test tee ID: {}", tee.getIdtee());
 
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
     }
 }
@@ -142,7 +142,7 @@ public HolesGlobal read(Tee tee, Connection conn) throws SQLException{
         HolesGlobal holesGlobal = new HolesGlobal();
 try{
     LOG.debug("entering ReadHoles ...");
-    LOG.debug(" with tee = " + tee) ;
+    LOG.debug("with tee = {}", tee);
   String query =  """
         SELECT *
         FROM hole, tee
@@ -165,10 +165,10 @@ try{
          LOG.debug("array distance = null , filled with 0");
         //  for(int[] subarray : v){
             Arrays.fill(v, 0);
-            LOG.debug("array filled with 0 = " + v);
+            LOG.debug("array filled with 0 = {}", v);
        // }
       }
-         LOG.debug("array distance = " + Arrays.toString(v));
+         LOG.debug("array distance = {}", Arrays.toString(v));
       while(rs.next()){
           holesGlobal.getDataHoles()[i][0] = (rs.getInt("HoleNumber") );
           holesGlobal.getDataHoles()[i][1] = (rs.getInt("HolePar") );
@@ -176,8 +176,8 @@ try{
           holesGlobal.getDataHoles()[i][3] = v[i];
           i++;
         } // end while
-      LOG.debug("there are rows = " + i);
-  //  LOG.debug(" -- holesGlobal.dataHoles = " + Arrays.deepToString(holesGlobal.getDataHoles()));
+      LOG.debug("there are rows = {}", i);
+  //  LOG.debug(" -- holesGlobal.dataHoles = {}", Arrays.deepToString(holesGlobal.getDataHoles()));
   return holesGlobal;
 }catch (SQLException e){
     String msg = "SQLException in ReadHoles() = " + e.toString() + ", SQLState = " + e.getSQLState()
@@ -186,7 +186,7 @@ try{
         LCUtil.showMessageFatal(msg);
         return null;
 }catch (Exception ex){
-    LOG.error("Exception ! " + ex);
+    LOG.error("Exception ! {}", ex);
     LCUtil.showMessageFatal("Exception in ReadHoles = " + ex.toString() );
      return null;
 }finally{
@@ -201,33 +201,33 @@ void main() throws SQLException, Exception{
     tee.setIdtee(203);   // 203
     HolesGlobal h = lha.read(tee, conn);
 
-   // LOG.debug(" -- HOLES [][] = " + Arrays.deepToString(h.getDataHoles()) );
-    LOG.debug(" -- HOLES [][] = " + h.toString());   // mod 14/08/2017
-    LOG.debug(" -- HOLES [0][0] = " + h.getDataHoles()[0][0]);
-    LOG.debug(" -- HOLES [0][1] = " + h.getDataHoles()[0][1]);
-    LOG.debug(" -- HOLES [0][2] = " + h.getDataHoles()[0][2] );
-    LOG.debug(" -- HOLES [0][3] = " + h.getDataHoles()[0][3] );
+   // LOG.debug(" -- HOLES [][] = {}", Arrays.deepToString(h.getDataHoles()));
+    LOG.debug(" -- HOLES [][] = {}", h.toString());   // mod 14/08/2017
+    LOG.debug(" -- HOLES [0][0] = {}", h.getDataHoles()[0][0]);
+    LOG.debug(" -- HOLES [0][1] = {}", h.getDataHoles()[0][1]);
+    LOG.debug(" -- HOLES [0][2] = {}", h.getDataHoles()[0][2]);
+    LOG.debug(" -- HOLES [0][3] = {}", h.getDataHoles()[0][3]);
 
-    LOG.debug(" -- HOLES [1][0] = " + h.getDataHoles()[1][0] );
-    LOG.debug(" -- HOLES [1][1] = " + h.getDataHoles()[1][1] );
-    LOG.debug(" -- HOLES [1][2] = " + h.getDataHoles()[1][2] );
-    LOG.debug(" -- HOLES [1][3] = " + h.getDataHoles()[1][3] );
+    LOG.debug(" -- HOLES [1][0] = {}", h.getDataHoles()[1][0]);
+    LOG.debug(" -- HOLES [1][1] = {}", h.getDataHoles()[1][1]);
+    LOG.debug(" -- HOLES [1][2] = {}", h.getDataHoles()[1][2]);
+    LOG.debug(" -- HOLES [1][3] = {}", h.getDataHoles()[1][3]);
 
     int i = 1;
-    LOG.debug(" - HOLES [0][0] = " + h.getDataHoles()[i-1][0] );
-    LOG.debug(" -- HOLES [1][0] = " + h.getDataHoles()[1][0] );
-    LOG.debug(" -- HOLES [2][0] = " + h.getDataHoles()[2][0] );
-    LOG.debug(" -- HOLES [3][0] = " + h.getDataHoles()[3][0] );
-    LOG.debug(" -- HOLES [4][0] = " + h.getDataHoles()[4][0] );
-    LOG.debug(" -- HOLES [5][0] = " + h.getDataHoles()[5][0] );
+    LOG.debug(" - HOLES [0][0] = {}", h.getDataHoles()[i-1][0]);
+    LOG.debug(" -- HOLES [1][0] = {}", h.getDataHoles()[1][0]);
+    LOG.debug(" -- HOLES [2][0] = {}", h.getDataHoles()[2][0]);
+    LOG.debug(" -- HOLES [3][0] = {}", h.getDataHoles()[3][0]);
+    LOG.debug(" -- HOLES [4][0] = {}", h.getDataHoles()[4][0]);
+    LOG.debug(" -- HOLES [5][0] = {}", h.getDataHoles()[5][0]);
   //      i = 1;
-    LOG.debug(" -HOLES [0][0] = " + h.getDataHoles()[0][1] );
-    LOG.debug(" -- HOLES [1][1] = " + h.getDataHoles()[1][1] );
-    LOG.debug(" -- HOLES [2][1] = " + h.getDataHoles()[2][1] );
-    LOG.debug(" -- HOLES [3][1] = " + h.getDataHoles()[3][1] );
-    LOG.debug(" -- HOLES [4][1] = " + h.getDataHoles()[4][1] );
-    LOG.debug(" -- HOLES [5][1] = " + h.getDataHoles()[5][1] );
-    LOG.debug(" -- HOLES [6][1] = " + h.getDataHoles()[6][1] );
+    LOG.debug(" -HOLES [0][0] = {}", h.getDataHoles()[0][1]);
+    LOG.debug(" -- HOLES [1][1] = {}", h.getDataHoles()[1][1]);
+    LOG.debug(" -- HOLES [2][1] = {}", h.getDataHoles()[2][1]);
+    LOG.debug(" -- HOLES [3][1] = {}", h.getDataHoles()[3][1]);
+    LOG.debug(" -- HOLES [4][1] = {}", h.getDataHoles()[4][1]);
+    LOG.debug(" -- HOLES [5][1] = {}", h.getDataHoles()[5][1]);
+    LOG.debug(" -- HOLES [6][1] = {}", h.getDataHoles()[6][1]);
 
 DBConnection.closeQuietly(conn, null, null, null);
 }// end main

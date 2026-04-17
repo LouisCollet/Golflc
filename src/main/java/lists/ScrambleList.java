@@ -26,7 +26,7 @@ public class ScrambleList implements Serializable {
 
     public List<ScoreScramble> getList(final String formula) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - with formula = " + formula);
 
         if (liste != null) {
@@ -74,7 +74,7 @@ public class ScrambleList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -82,7 +82,7 @@ public class ScrambleList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // var li = getList("SCR");
         // LOG.debug("from main, list = " + li);
         LOG.debug("from main, ScrambleList = ");

@@ -15,9 +15,6 @@
 
 <h:form id="form_select_round" >
 <c:set var="type" value="#{param.type_club}"/>
-type = #{type}
-param.type_club = #{param.type_club}
-<!-- remplacé type par 'type'  -->
 <p:dataTable id="select_round"
              value="#{roundC.listInscriptions()}"
              rowIndexVar="row"
@@ -25,7 +22,8 @@ param.type_club = #{param.type_club}
              var="c"
              emptyMessage="#{msg['message.table.empty']}"
              rowKey="#{c.round.idround}"
-             style="border:solid 5px;overflow-x:scroll;"  >
+             scrollable="true"
+             style="border:solid 5px;"  >
 <!-- 
 <p:ajax event="rowToggle" 
         listener="#{roundC.onRowToggleCompetition}" />
@@ -36,7 +34,7 @@ update=":select_inscription_round:growl-msg"  -->
 
     	<p:column headerText="#{msg['round.selected']}"
                   footerText="#{msg['round.selected']}"
-                  width="20%" >
+                  width="15%" >
             <p:commandButton
                 id="selectButton"
                 action="#{roundC.selectRecentInscription(c)}"
@@ -47,7 +45,7 @@ update=":select_inscription_round:growl-msg"  -->
 
 	<p:column headerText="#{msg['round.date']}"
                   footerText="#{msg['round.date']}"
-                  width="20%"
+                  width="15%"
                   id="rdate">
                   <h:outputText value="#{c.round.roundDate}"> 
                       <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm" />
@@ -55,7 +53,7 @@ update=":select_inscription_round:growl-msg"  -->
 	</p:column>
 
         <p:column headerText="#{msg['round.name']}"
-                  width="20%"
+                  width="15%"
                   id="competitionColumn" >
                         #{c.round.roundName}
         </p:column>
@@ -72,7 +70,7 @@ update=":select_inscription_round:growl-msg"  -->
 	<p:column   id="colclubname"
                     headerText="#{msg['club.name']}"
                     footerText="#{msg['club.name']}"
-                    width="25%"
+                    width="15%"
                     filterMatchMode="contains"
                     filterBy="#{c.club.clubName}" >
             #{c.club.clubName} (#{c.club.idclub})
@@ -81,7 +79,7 @@ update=":select_inscription_round:growl-msg"  -->
 	<p:column id="colcoursename"
                   headerText="#{msg['course.name']}"
                   footerText="#{msg['course.name']}"
-                  width="25%"
+                  width="15%"
                   filterMatchMode="contains"
                   filterBy="#{c.course.courseName}" >
 		#{c.course.courseName} (#{c.course.idcourse})

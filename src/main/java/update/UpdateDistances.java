@@ -1,6 +1,8 @@
 package update;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Distance;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
@@ -26,6 +28,13 @@ public class UpdateDistances implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     @Inject
     private dao.GenericDAO dao;
 
@@ -33,8 +42,8 @@ public class UpdateDistances implements Serializable {
 
     public boolean update(Distance distance) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" with distances = " + distance);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" with distances = {}", distance);
 
         try (Connection conn = dao.getConnection()) {
 
@@ -47,8 +56,8 @@ public class UpdateDistances implements Serializable {
 
             try (PreparedStatement ps = conn.prepareStatement(query)) {
 
-                String json = new ObjectMapper().writeValueAsString(distance);
-                LOG.debug("distances converted in json format = " + NEW_LINE + json);
+                String json = OBJECT_MAPPER.writeValueAsString(distance);
+                LOG.debug("distances converted in json format = {}", NEW_LINE + json);
                 ps.setString(1, json);
                 ps.setTimestamp(2, Timestamp.from(Instant.now()));
                 ps.setInt(3, distance.getIdTee());
@@ -56,9 +65,9 @@ public class UpdateDistances implements Serializable {
 
                 int row = ps.executeUpdate();
                 if (row != 0) {
-                    LOG.debug("Successfull updateDistances : " + distance);
+                    LOG.debug("Successfull updateDistances : {}", distance);
                     var v = distance.getDistanceArray();
-                    Arrays.stream(v).forEach(e -> LOG.debug(e + ","));
+                    Arrays.stream(v).forEach(e -> LOG.debug("{},", e));
                     String msg = LCUtil.prepareMessageBean("distance.update") + distance;
                     msg = msg + "<br>Vérification : total = " + Arrays.stream(v).sum();
                     msg = msg + " ,out = " + Arrays.stream(v, 0, 9).sum();
@@ -86,13 +95,13 @@ public class UpdateDistances implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Distance distance = new Distance();
         distance.setIdTee(2);
         int ar[] = {200,210,220,333,273,442,318,171,407,355,307,180,398,365,472,138,337,399};
         distance.setDistanceArray(ar);
         boolean lp = new UpdateDistances().update(distance);
-        LOG.debug("from main, after lp = " + lp);
+        LOG.debug("from main, after lp = {}", lp);
     } // end main
     */
 

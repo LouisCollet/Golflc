@@ -52,7 +52,7 @@ public class Numbertext implements Serializable {
     @PostConstruct
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end method
 
     // ========================================
@@ -136,7 +136,7 @@ public class Numbertext implements Serializable {
 
     public String moneytext(String input, String money, String lang) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             return numbertext(money + " " + input, lang);
         } catch (Exception e) {
@@ -151,7 +151,7 @@ public class Numbertext implements Serializable {
 
     public String kernel(String[] args) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             if (args == null || args.length == 0) {
                 printHelp();
@@ -260,7 +260,7 @@ public class Numbertext implements Serializable {
     /*
     void main(String[] args) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             args    = new String[3];
             args[0] = "-l";

@@ -23,8 +23,8 @@ public class DeleteRound implements Serializable {
 
     public boolean delete(final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for round = " + round);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for round = {}", round);
 
         final String query = """
             DELETE FROM round
@@ -32,7 +32,7 @@ public class DeleteRound implements Serializable {
             """;
 
         int rowDeleted = dao.execute(query, round.getIdround());
-        LOG.debug(methodName + " - deleted round rows = " + rowDeleted);
+        LOG.debug("deleted round rows = {}", rowDeleted);
         LCUtil.showMessageInfo("Round deleted = " + round.getIdround());
         return true;
     } // end method
@@ -41,8 +41,8 @@ public class DeleteRound implements Serializable {
     // Utilisé uniquement pour les rounds de test
     public boolean deleteRoundAndChilds(final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for round = " + round);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for round = {}", round);
 
         try (Connection conn = dao.getConnection()) {
 
@@ -59,7 +59,7 @@ public class DeleteRound implements Serializable {
                     ps.setInt(1, round.getIdround());
                     LCUtil.logps(ps);
                     rowScore = ps.executeUpdate();
-                    LOG.debug(methodName + " - deleted score = " + rowScore);
+                    LOG.debug("deleted score = {}", rowScore);
                 }
 
                 // 2. Inscriptions
@@ -71,7 +71,7 @@ public class DeleteRound implements Serializable {
                     ps.setInt(1, round.getIdround());
                     LCUtil.logps(ps);
                     rowPhr = ps.executeUpdate();
-                    LOG.debug(methodName + " - deleted inscription = " + rowPhr);
+                    LOG.debug("deleted inscription = {}", rowPhr);
                 }
 
                 // 3. Round
@@ -83,7 +83,7 @@ public class DeleteRound implements Serializable {
                     ps.setInt(1, round.getIdround());
                     LCUtil.logps(ps);
                     rowRnd = ps.executeUpdate();
-                    LOG.debug(methodName + " - deleted round = " + rowRnd);
+                    LOG.debug("deleted round = {}", rowRnd);
                 }
 
                 // 4. Payments greenfee
@@ -95,7 +95,7 @@ public class DeleteRound implements Serializable {
                     ps.setInt(1, round.getIdround());
                     LCUtil.logps(ps);
                     rowPay = ps.executeUpdate();
-                    LOG.debug(methodName + " - deleted payment = " + rowPay);
+                    LOG.debug("deleted payment = {}", rowPay);
                 }
 
                 conn.commit();
@@ -112,7 +112,7 @@ public class DeleteRound implements Serializable {
 
             } catch (SQLException e) {
                 conn.rollback();
-                LOG.error(methodName + " - transaction rolled back");
+                LOG.error("transaction rolled back");
                 throw e;
             }
 
@@ -128,11 +128,11 @@ public class DeleteRound implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Round round = new Round();
         round.setIdround(760);
         boolean b = deleteRoundAndChilds(round);
-        LOG.debug("from main - result deleteRoundAndChilds = " + b);
+        LOG.debug("from main - result deleteRoundAndChilds = {}", b);
     } // end main
     */
 

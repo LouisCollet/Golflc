@@ -19,7 +19,7 @@ public class CalcCompetitionTimeStartList implements Serializable, interfaces.Go
 
     public List<String> calc(ECompetition competition) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try {
             LocalDateTime ldt = competition.competitionDescription().getCompetitionDate();
@@ -46,7 +46,7 @@ public class CalcCompetitionTimeStartList implements Serializable, interfaces.Go
 /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // tests locaux
     } // end main
 */

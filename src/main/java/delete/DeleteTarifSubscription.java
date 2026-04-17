@@ -21,8 +21,8 @@ public class DeleteTarifSubscription implements Serializable {
 
     public boolean delete(final TarifSubscription tarif) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with tarif = " + tarif);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with tarif = {}", tarif);
 
         final String query = """
                 DELETE FROM tarif_subscription
@@ -44,7 +44,7 @@ public class DeleteTarifSubscription implements Serializable {
 
     public boolean deleteAll() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         final String query = "DELETE FROM tarif_subscription";
 
@@ -64,7 +64,7 @@ public class DeleteTarifSubscription implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

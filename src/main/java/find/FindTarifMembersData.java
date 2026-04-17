@@ -27,7 +27,7 @@ public class FindTarifMembersData implements Serializable {
 
     public TarifMember find(final Club club, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - for club = " + club);
         LOG.debug(methodName + " - for round = " + round);
 
@@ -48,8 +48,9 @@ public class FindTarifMembersData implements Serializable {
             try (ResultSet rs = ps.executeQuery()) {
                 TarifMember tarif = null;
                 int i = 0;
+                rowmappers.TarifMemberRowMapper mapper = new rowmappers.TarifMemberRowMapper();
                 while (rs.next()) {
-                    tarif = entite.TarifMember.map(rs);
+                    tarif = mapper.map(rs);
                     i++;
                 }
                 if (i == 0) {
@@ -77,7 +78,7 @@ public class FindTarifMembersData implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Club club = new Club();
         club.setIdclub(101);
         Round round = new Round();

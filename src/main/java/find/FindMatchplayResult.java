@@ -28,7 +28,7 @@ public class FindMatchplayResult implements Serializable {
 
     public List<MatchplayPlayerResult> find(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for player = " + player);
         LOG.debug("for round = " + round);
 
@@ -76,7 +76,7 @@ public class FindMatchplayResult implements Serializable {
     /*
     void main(String[] args) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();

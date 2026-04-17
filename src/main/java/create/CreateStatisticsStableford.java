@@ -28,9 +28,9 @@ public class CreateStatisticsStableford implements Serializable {
 
     public boolean create(final Player player, final Round round, final ScoreStableford score) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with round = " + round);
-        LOG.debug("with scoreStableford = " + score);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with round = {}", round);
+        LOG.debug("with scoreStableford = {}", score);
 
         int rows = findCountScore.find(player, round, "rows");
         if (rows == 0) {
@@ -63,7 +63,7 @@ public class CreateStatisticsStableford implements Serializable {
                 utils.LCUtil.logps(ps);
                 int x = ps.executeUpdate();
                 if (x != 0) {
-                    LOG.debug(methodName + " - successful update statistics hole = " + stt.getHole());
+                    LOG.debug("successful update statistics hole = {}", stt.getHole());
                 } else {
                     String msg = "ERROR updateStatisticsStableford hole = " + stt.getHole();
                     LOG.debug(msg);
@@ -90,7 +90,7 @@ public class CreateStatisticsStableford implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         Round round = new Round();

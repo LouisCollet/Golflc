@@ -594,7 +594,7 @@ try{
   }
 }
 // new 24-06-2024
-public static String prepareMessageBean(String message, String subMessage){ 
+public static String prepareMessageBean(String message, String subMessage){
 try{
     return prepareMessageBean(message) + subMessage;
 
@@ -602,8 +602,8 @@ try{
             String msg = "£££ Exception in prepareMessageBean = " + ex.getMessage();
             LOG.error(msg);
       //      utils.LCUtil.showMessageFatal(msg);
-            return null;
-   } 
+            return "clé absente : " + message;
+   }
 }
 
 
@@ -683,8 +683,8 @@ try{
             String msg = "£££ Exception in prepareMessageBean = " + ex.getMessage();
             LOG.error(msg);
       //      utils.LCUtil.showMessageFatal(msg);
-            return null;
-   } 
+            return "clé absente : " + message;
+   }
 
 } // end method
    //     }
@@ -769,6 +769,7 @@ public static void showMessageFatal(String message){
        }
 
      if(context != null){ //JSF session,
+         PrimeFaces.current().executeScript("window.scrollTo(0,0);"); // scroll top remonte la page après la fin de l’envoi. new 11-04-2026
          context.getExternalContext()
                 .getFlash()
                 .setKeepMessages(true);
@@ -787,6 +788,7 @@ public static void showMessageFatal(String summary, String detail){
     try{
        FacesContext fc1 = FacesContext.getCurrentInstance();
        if(fc1 != null){ //JSF session, 
+            PrimeFaces.current().executeScript("window.scrollTo(0,0);"); // scroll top remonte la page après la fin de l’envoi. new 11-04-2026
             fc1.getExternalContext().getFlash().setKeepMessages(true);
             summary = "<h3 style='text-align:left;'>" + summary + "</h3>";
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_FATAL,summary,detail);
@@ -851,6 +853,7 @@ public static void showMessageInfo(String summary, String detail){   // 2 inputs
 try{
        FacesContext fc = FacesContext.getCurrentInstance();
        if(fc != null){
+            PrimeFaces.current().executeScript("window.scrollTo(0,0);"); // scroll top remonte la page après la fin de l’envoi. new 11-04-2026
             summary = "<h2>" + summary + "</h2>";
             FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_INFO,summary,detail);
             fc.getExternalContext().getFlash().setKeepMessages(true);

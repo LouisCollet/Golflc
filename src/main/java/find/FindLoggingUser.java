@@ -23,7 +23,7 @@ public class FindLoggingUser implements Serializable {
 
     public int find(LoggingUser logging) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with Logging " + logging);
 
         final String query = """
@@ -63,7 +63,7 @@ public class FindLoggingUser implements Serializable {
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

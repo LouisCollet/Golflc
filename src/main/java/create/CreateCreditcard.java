@@ -25,9 +25,9 @@ public class CreateCreditcard implements Serializable {
 
     public boolean create(final Creditcard creditcard) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("player  = " + creditcard.getCreditCardIdPlayer());
-        LOG.debug("creditcard  = " + creditcard);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("player  = {}", creditcard.getCreditCardIdPlayer());
+        LOG.debug("creditcard  = {}", creditcard);
 
         try (Connection conn = dao.getConnection()) {
       //      final String query = LCUtil.generateInsertQuery(conn, "creditcard");
@@ -66,7 +66,7 @@ public class CreateCreditcard implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

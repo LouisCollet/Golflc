@@ -11,7 +11,7 @@ import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
@@ -44,10 +44,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 
 @Named("infoC2")
-@ApplicationScoped
+@SessionScoped // migrated from @ApplicationScoped 2026-03-22 — uses FacesContext
 public class InfoController2 implements Serializable {
 
     @Inject private entite.Settings settings;        // ✅ injection CDI
+    @Inject private info_test.GeoDetector geoDetector; // migrated from static 2026-03-22
     @Resource(lookup = "java:jboss/datasources/golflc")
     private DataSource dataSource; // migrated 2026-02-26
 
@@ -85,12 +86,15 @@ public class InfoController2 implements Serializable {
 
     public String getDeployVersion() throws IOException {
         String contextPath = externalContext.getApplicationContextPath();
-     //   Path war = Paths.get(Settings.getProperty("TARGET"), contextPath + ".war");
-// après migration CDI 
         Path war = Paths.get(settings.getProperty("TARGET"), contextPath + ".war");
-        FileTime time = Files.getLastModifiedTime(war);
-        return ZDF_TIME.format(LocalDateTime.ofInstant(time.toInstant(), ZoneOffset.systemDefault())
-        );
+        try {
+            FileTime time = Files.getLastModifiedTime(war);
+            return ZDF_TIME.format(LocalDateTime.ofInstant(time.toInstant(), ZoneOffset.systemDefault()));
+        } catch (java.nio.file.NoSuchFileException e) {
+            // WAR supprimé pendant mvn clean — pas d'erreur fatale
+            LOG.debug("getDeployVersion - WAR not found (build in progress): {}", war);
+            return "build...";
+        }
     }
 
     
@@ -223,8 +227,8 @@ public String getMySQLInfo2() {
     }
 public String getGeoDescription() {
         String ip = IpDetector.getClientIp(request);
-        String location = GeoDetector.getLocation(ip);
-        LOG.debug("Vous êtes à: " + location); // Résultat: "Vous êtes à: Paris, France"
+        String location = geoDetector.getLocation(ip); // migrated from static 2026-03-22
+        LOG.debug("Vous êtes à: {}", location); // Résultat: "Vous êtes à: Paris, France"
         return location;
  }
   //  @Inject
@@ -243,7 +247,7 @@ public String getGeoDescription() {
   public String jvmUptime() {
   // Pour obtenir l'uptime (temps écoulé depuis le démarrage) :
     long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
-        LOG.debug("Serveur démarré depuis : " + uptime + " ms");
+        LOG.debug("Serveur démarré depuis : {} ms", uptime);
     return "JVM démarré depuis : " + uptime / 1000 + " secs";
     }
 

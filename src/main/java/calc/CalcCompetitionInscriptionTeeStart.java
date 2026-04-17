@@ -3,6 +3,7 @@ package calc;
 import entite.Course;
 import entite.Tee;
 import entite.composite.ECompetition;
+import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -21,7 +22,7 @@ public class CalcCompetitionInscriptionTeeStart implements Serializable, interfa
 
     public String calc(final ECompetition competition) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for Competition = " + competition);
 
         try {
@@ -36,8 +37,6 @@ public class CalcCompetitionInscriptionTeeStart implements Serializable, interfa
             List<Tee> tees = teesCourseList.list(course.getIdcourse());
             tees.forEach(item -> LOG.debug(methodName + " - tee = " + item));
 
-            LOG.debug(methodName + " - series handicap = " + Arrays.deepToString(cde.getSeriesHandicap()));
-
             String teeStart;
             if (cda.getCmpDataPlayerGender().equals("M")) {
                 teeStart = "YELLOW / M / 01-18 / 37";
@@ -49,17 +48,15 @@ public class CalcCompetitionInscriptionTeeStart implements Serializable, interfa
             return teeStart;
 
         } catch (Exception e) {
-            String msg = methodName + " - error = " + e.getMessage();
-            LOG.error(msg);
-            utils.LCUtil.showMessageFatal(msg);
-            return null;
+            handleGenericException(e, methodName);
+            return "";
         }
     } // end method
 
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // String teeStart = calc(competition);
         // LOG.debug("from main, TeeStart = " + teeStart);
         LOG.debug("from main, CalcCompetitionInscriptionTeeStart = ");

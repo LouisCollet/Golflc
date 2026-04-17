@@ -25,9 +25,9 @@ public class ReadArrayStrokes implements Serializable {
 
     public int[] read(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - for player = " + player.getIdplayer());
-        LOG.debug(methodName + " - for round = " + round.getIdround());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for player = {}", player.getIdplayer());
+        LOG.debug("for round = {}", round.getIdround());
 
         final String query = """
                 SELECT *
@@ -50,13 +50,13 @@ public class ReadArrayStrokes implements Serializable {
                 while (rs.next()) {
                     if (i == 0) {
                         plus = rs.getInt("ScoreHole") - 1;
-                        LOG.debug(methodName + " - plus = " + plus);
+                        LOG.debug("plus = {}", plus);
                     }
                     int j = i + plus;
                     arrayStrokes[j] = rs.getInt("ScoreStroke");
                     i++;
                 }
-                LOG.debug(methodName + " - ending ReadArrayStrokes = " + Arrays.toString(arrayStrokes));
+                LOG.debug("ending ReadArrayStrokes = {}", Arrays.toString(arrayStrokes));
                 return arrayStrokes;
             }
 
@@ -72,12 +72,12 @@ public class ReadArrayStrokes implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Player player = new Player(); player.setIdplayer(324713);
         // Round round = new Round(); round.setIdround(630);
         // int[] strokes = new ReadArrayStrokes().read(player, round);
-        // LOG.debug("array strokes = " + Arrays.toString(strokes));
+        // LOG.debug("array strokes = {}", Arrays.toString(strokes));
     } // end main
     */
 

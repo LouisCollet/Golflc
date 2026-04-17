@@ -11,7 +11,9 @@
 
 <ui:define name="title">Tarif Member Wizard Page</ui:define>
 <ui:define name="content">
-<div class="card">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+    <f:facet name="header"><h1>#{msg['title.members.tarif']}</h1></f:facet>
 <h:form id="tarif_member_wizard" enctype="application/x-www-form-urlencoded">
 
 <ui:include src="include/include_summary_cotisation.xhtml"/>
@@ -25,9 +27,9 @@
 
     <!-- =================== TAB 1: COTISATION (Periods + Items) =================== -->
     <p:tab id="CotisationTab"
-           title="Cotisation (#{memC.tarifMember.basicList.size()})"
+           title="💳 Cotisation (#{memC.tarifMember.basicList.size()})"
            titletip="Define member cotisation periods and items">
-        <p:panel styleClass="tarif-step-panel">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
                 <h1>#{msg['title.members.tarif']}</h1>
                 <p:badge value="#{memC.tarifMember.basicList.size()}" severity="info"/>
@@ -121,14 +123,14 @@
                                  update="tarif_member_wizard"
                                  styleClass="p-button-outlined"/>
             </f:facet>
-        </p:panel>
+        </p:panel></div>
     </p:tab>
 
     <!-- =================== TAB 2: EQUIPMENTS =================== -->
     <p:tab id="EquipmentsTab"
-           title="Equipments (#{memC.tarifMember.equipmentsList.size()})"
+           title="🎒 Equipments (#{memC.tarifMember.equipmentsList.size()})"
            titletip="Define equipment items and prices">
-        <p:panel styleClass="tarif-step-panel">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
                 <h1>#{msg['title.equipments.tarif']}</h1>
                 <p:badge value="#{memC.tarifMember.equipmentsList.size()}" severity="info"/>
@@ -175,14 +177,14 @@
                                  update="tarif_member_wizard"
                                  styleClass="p-button-outlined"/>
             </f:facet>
-        </p:panel>
+        </p:panel></div>
     </p:tab>
 
     <!-- =================== TAB 3: DISCOUNT =================== -->
     <p:tab id="DiscountTab"
-           title="Discount"
+           title="📉 Discount"
            titletip="Define discount for uncomplete year">
-        <p:panel styleClass="tarif-step-panel">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
                 <h:outputText value="Discount"/>
             </f:facet>
@@ -192,8 +194,7 @@
 
                 <h:outputText value="Discount Uncomplete Year :"/>
                 <p:selectOneMenu id="discountOption"
-                                 value="#{memC.tarifMember.discount}"
-                                 style="font-weight:bold;">
+                                 value="#{memC.tarifMember.discount}">
                     <f:selectItem itemLabel="Select One"                    itemValue=""/>
                     <f:selectItem itemLabel="Option1 - Complete Year"       itemValue="Year"/>
                     <f:selectItem itemLabel="Option2 - Complete Months"     itemValue="Months"/>
@@ -201,14 +202,14 @@
                     <f:validateBean disabled="true"/>
                 </p:selectOneMenu>
             </p:panelGrid>
-        </p:panel>
+        </p:panel></div>
     </p:tab>
 
     <!-- =================== TAB 4: EDITOR (Comment) =================== -->
     <p:tab id="EditorTab"
-           title="Comment"
+           title="💬 Comment"
            titletip="Add a comment to the tarif">
-        <p:panel styleClass="tarif-step-panel">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
                 <h1>#{msg['title.cotisation.comment']}</h1>
             </f:facet>
@@ -217,7 +218,7 @@
                           widgetVar="editorVar"
                           value="#{memC.tarifMember.comment}"
                           height="70px"
-                          style="width:100%;background-color: whitesmoke;font-weight: normal;"
+                          styleClass="w-full"
                           placeholder="Enter here your content"/>
 
             <p:dialog id="dialog1"
@@ -235,6 +236,7 @@
             </p:dialog>
 
             <f:facet name="footer">
+              <div class="btn-group">
                 <p:commandButton id="btnSaveComment"
                                  value="#{msg['tarif.members.add.comment']}"
                                  update="displayComment"
@@ -246,15 +248,16 @@
                                  onclick="PF('editorVar').clear();"
                                  icon="pi pi-times"
                                  styleClass="p-button-outlined"/>
+              </div>
             </f:facet>
-        </p:panel>
+        </p:panel></div>
     </p:tab>
 
     <!-- =================== TAB 5: CONFIRMATION =================== -->
     <p:tab id="ConfirmationTab"
-           title="Confirm"
+           title="✅ Confirm"
            titletip="Review and create tarif">
-        <p:panel styleClass="tarif-step-panel">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel tarif-step-panel-wide">
             <f:facet name="header">
                 <h:outputText value="Confirmation"/>
             </f:facet>
@@ -275,9 +278,10 @@
                 <h:outputText value="#{memC.tarifMember.discount}"/>
 
                 <h:outputText value="Comment :"/>
-                <h:outputText value="#{memC.tarifMember.comment}" escape="false"/>
+                <h:outputText value="#{memC.tarifMember.comment}"/>
             </p:panelGrid>
             <f:facet name="footer">
+              <div class="btn-group">
                 <p:commandButton value="#{msg['tarif.print']}"
                                  id="btnShowTarif"
                                  icon="pi pi-list"
@@ -299,14 +303,16 @@
                                  styleClass="p-button-danger">
                     <p:confirm icon="pi pi-exclamation-triangle"/>
                 </p:commandButton>
+              </div>
             </f:facet>
-        </p:panel>
+        </p:panel></div>
     </p:tab>
 
 </p:wizard>
 
 <ui:include src="include/include_confirmDialog.xhtml"/>
 </h:form>
+</p:panel>
 </div>
 </ui:define>
 </ui:composition>

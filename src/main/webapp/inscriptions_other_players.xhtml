@@ -127,6 +127,13 @@
                     </p:selectOneMenu>
                 </p:column>
 
+                <p:column headerText="#{msg['payment.status']}"
+                          style="width:10%">
+                    <p:tag value="#{msg['payment.paid']}"
+                           severity="success"
+                           rendered="#{roundC.isPaid(c.idplayer)}"/>
+                </p:column>
+
                 <p:column headerText="#{msg['button.selection.delete']}"
                           style="width:10%" >
                     <p:commandButton
@@ -156,7 +163,7 @@
                          ajax="false"
                          rendered="#{not empty playerC.player.droppedPlayers}"
                          icon="pi pi-database"
-                         style="width:140px"
+                         style="white-space:nowrap"
                          action="#{roundC.createInscriptionOtherPlayers()}"/>
      </p:badge>
 

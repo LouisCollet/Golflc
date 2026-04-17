@@ -43,18 +43,20 @@ public class HandicapIndexList implements Serializable {
 
     public List<ECourseList> list(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         try {
             LOG.debug(methodName + " - idplayer = " + player.getIdplayer());
 
             final String query = """
                     WITH selection AS (
-                        SELECT * FROM handicap_index, player_has_round, player
+                        SELECT * FROM player
+                            INNER JOIN handicap_index
+                                ON handicap_index.HandicapPlayerId = player.idplayer
+                            INNER JOIN player_has_round
+                                ON player_has_round.InscriptionIdPlayer = player.idplayer
+                               AND player_has_round.InscriptionIdRound = handicap_index.HandicapRoundId
                         WHERE player.idplayer = ?
-                          AND handicap_index.HandicapPlayerId = player.idplayer
-                          AND player_has_round.InscriptionIdPlayer = player.idplayer
-                          AND player_has_round.InscriptionIdRound = handicap_index.HandicapRoundId
                     )
                     SELECT * FROM selection
                         JOIN round
@@ -108,7 +110,7 @@ public class HandicapIndexList implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Player player = new Player();
             player.setIdplayer(324713);

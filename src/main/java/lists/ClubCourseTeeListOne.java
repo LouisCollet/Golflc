@@ -34,10 +34,10 @@ public class ClubCourseTeeListOne implements Serializable {
 
     private static final String QUERY = """
         SELECT *
-        FROM club, course, tee
+        FROM club
+        INNER JOIN course ON club.idclub = course.club_idclub
+        LEFT JOIN tee ON tee.course_idcourse = course.idcourse
         WHERE club.idclub = ?
-              AND club.idclub = course.club_idclub
-              AND tee.course_idcourse = course.idcourse
         ORDER BY idclub, idcourse, teegender DESC, teestart DESC
         """;
 
@@ -88,7 +88,7 @@ public class ClubCourseTeeListOne implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method

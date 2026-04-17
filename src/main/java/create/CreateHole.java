@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -27,11 +29,11 @@ public class CreateHole implements Serializable {
      */
     @Inject private dao.GenericDAO dao;
 
-    public boolean create(final Hole hole) throws Exception {
-        
+    public boolean create(final Hole hole) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
-        
+
         try (Connection conn = dao.getConnection()) {
             
             conn.setAutoCommit(false);
@@ -88,16 +90,16 @@ public class CreateHole implements Serializable {
             
             return true;
             
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            LOG.error("SQLException in {}: {}", methodName, sqle.getMessage());
-            throw sqle;
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            LOG.error("Exception in {}: {}", methodName, e.getMessage());
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
-}
+    } // end method
+
+} // end class
 /*
 import entite.Club;
 import entite.Course;
@@ -128,15 +130,15 @@ public class CreateHole implements Serializable,interfaces.Log{
             final Connection conn) throws SQLException{
         PreparedStatement ps = null;
    try {
-            LOG.debug("Course ID    = " + course.getIdcourse());
-            LOG.debug("tee ID    = " + tee.getIdtee());
-            LOG.debug("Club Name  = " + club.getClubName());
-            LOG.debug("Course name  = " + course.getCourseName());
-            LOG.debug("hole Number = " + hole.getHoleNumber());
-            LOG.debug("hole Par = " + hole.getHolePar());
-            LOG.debug("hole Distance = " + hole.getHoleDistance());
-            LOG.debug("hole Index = " + hole.getHoleStrokeIndex());
-            LOG.debug("strokeIndex = " + strokeIndex.toString() );
+            LOG.debug("Course ID    = {}", course.getIdcourse());
+            LOG.debug("tee ID    = {}", tee.getIdtee());
+            LOG.debug("Club Name  = {}", club.getClubName());
+            LOG.debug("Course name  = {}", course.getCourseName());
+            LOG.debug("hole Number = {}", hole.getHoleNumber());
+            LOG.debug("hole Par = {}", hole.getHolePar());
+            LOG.debug("hole Distance = {}", hole.getHoleDistance());
+            LOG.debug("hole Index = {}", hole.getHoleStrokeIndex());
+            LOG.debug("strokeIndex = {}", strokeIndex.toString());
 
     // new 28/12/2012 You can temporary disable foreign key checks in MySQL to perform operations
             //that would fail if these checks were enabled:
@@ -169,7 +171,7 @@ public class CreateHole implements Serializable,interfaces.Log{
             int row = ps.executeUpdate(); // write into database
             if (row != 0){
                  hole.setIdhole(generatedKey(conn));
-                        LOG.debug("Hole created = " + hole.getIdhole());
+                        LOG.debug("Hole created = {}", hole.getIdhole());
                 String msg = "<br/><br/>Successful insert for hole = " + hole.getIdhole()
                         + " </h1><br/> name club = " + club.getClubName()
                         + " <br/> name course = " + course.getCourseName()
@@ -181,11 +183,11 @@ public class CreateHole implements Serializable,interfaces.Log{
                 showMessageInfo(msg);
         // remove dans "values" de indexNumbers : pour ne pas réutiliser le stroke index qui vient d'être utilisé
                 int i = hole.getHoleStrokeIndex().intValue();
-  ///                  LOG.debug("to be Removed stroke index value = " + i + " from strokeindex = " + strokeIndex.toString() );
+  ///                  LOG.debug("to be Removed stroke index value = {} from strokeindex = {}", i, strokeIndex.toString());
                 int t = strokeIndex.indexOf(i); // chercher index sur base valeur !
-  ///                  LOG.debug("after indexOf = " + t);
+  ///                  LOG.debug("after indexOf = {}", t);
                 strokeIndex.remove(t);
-  ///                  LOG.debug("Remaining stroke indexes = " + strokeIndex.toString());
+  ///                  LOG.debug("Remaining stroke indexes = {}", strokeIndex.toString());
                 // incrémenter le hole number de 1
                 short s = hole.getHoleNumber();
                 s++;
@@ -195,7 +197,7 @@ public class CreateHole implements Serializable,interfaces.Log{
                     showMessageInfo(msg);
                 }
                 hole.setHoleNumber(s);
-                LOG.debug("Next hole number = " + hole.getHoleNumber());
+                LOG.debug("Next hole number = {}", hole.getHoleNumber());
      // réinitialise some fields
                 hole.setHolePar((short) 4);
                 hole.setHoleDistance((short) 0);

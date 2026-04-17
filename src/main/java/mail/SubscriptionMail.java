@@ -16,12 +16,13 @@ public class SubscriptionMail implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private MailSender mailSender;
+    @Inject private entite.Settings settings;
 
     public SubscriptionMail() { }
 
     public Boolean sendMail(Player player, Subscription subscription) throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String msg =
                   " Please consider your subcription renewal at the famous GolfLC !!"
@@ -39,7 +40,7 @@ public class SubscriptionMail implements Serializable {
 
             LOG.debug("mail to be sended = " + msg);
             String sujet = "Renouvellement de votre souscription a GolfLC";
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathQRC = null;
             mailSender.sendHtmlMailAsync(sujet, msg, to, pathQRC, player.getPlayerLanguage());
             LOG.debug("HTML Mail async dispatched");

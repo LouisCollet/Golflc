@@ -25,7 +25,7 @@ public class MatchplayList implements Serializable {
 
     public List<Matchplay> getList(final String formula) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - with formula = " + formula);
 
         if (liste != null) {
@@ -72,7 +72,7 @@ public class MatchplayList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -80,7 +80,7 @@ public class MatchplayList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // var li = getList("MP_");
         // LOG.debug("from main, list = " + li);
         LOG.debug("from main, MatchplayList = ");

@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -51,9 +53,9 @@ public class DeleteCourse implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean delete(final Course course) throws Exception {
-
+    public boolean delete(final Course course) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
 
     //    LOG.debug("connectionProvider = {}", connectionProvider);
@@ -125,24 +127,14 @@ public class DeleteCourse implements Serializable, interfaces.GolfInterface {
 
             return true;
 
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
+    } // end method
 
     // ========================================
     // Suppression Cascade (Course + enfants)
@@ -163,9 +155,9 @@ public class DeleteCourse implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean deleteCascading(final Course course) throws Exception {
-
+    public boolean deleteCascading(final Course course) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
 
           try (Connection conn = dao.getConnection()) {
@@ -292,49 +284,29 @@ public class DeleteCourse implements Serializable, interfaces.GolfInterface {
 
             return true;
 
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw sqle;
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
+    } // end method
 
-    // ========================================
-    // Main pour tests (hors container CDI)
-    // ========================================
-
-    /**
-     * Main pour tests hors JSF
-     * Note: Non fonctionnel sans container CDI
-     */
-    public static void main(String[] args) {
+/*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         try {
-            // Exemple de test (nécessite CDI)
             Course course = new Course();
             course.setIdcourse(128);
-            course.setCourseName("Test Course");
-
             LOG.debug("Main ready (CDI required for execution)");
-            LOG.debug("Test course: {}", course);
-
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
-            LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
-    }
-}
+    } // end main
+*/
+} // end class
 
 /*
 import entite.Course;
@@ -359,7 +331,7 @@ try
     ps.setInt(1, course.getIdcourse());
     LCUtil.logps(ps);
     int row_delete = ps.executeUpdate();
-        LOG.debug("deleted Course = " + row_delete);
+        LOG.debug("deleted Course = {}", row_delete);
     String msg = "<br/>There are " + row_delete + " Course deleted = " + course;
         LOG.debug(msg);
         LCUtil.showMessageInfo(msg);
@@ -386,7 +358,7 @@ try
      Course course = new Course();
      course.setIdcourse(128);
     boolean b = new DeleteCourse().delete(course, conn);
-       LOG.debug("from main - resultat deleteCourse = " + b);
+       LOG.debug("from main - resultat deleteCourse = {}", b);
  } catch (Exception e) {
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);

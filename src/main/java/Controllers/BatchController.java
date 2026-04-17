@@ -56,21 +56,21 @@ public class BatchController implements Serializable{
 // public static void thumbs(String s){// throws IOException{
     public void thumbs(String s){
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
 try{
     String msg = "starting thumbs ...";
     LOG.info( msg);
     LCUtil.showMessageInfo(msg);
     File source = new File(settings.getProperty("PHOTOS_LIBRARY"));
-        LOG.debug("source directory = " + source);
+        LOG.debug("source directory = {}", source);
     File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));
     Path path = destinationDir.toPath();
-//        LOG.debug("destination directory = " + destinationDir + " length = " + destinationDir.length());  // size in bytes
-        LOG.debug("destination directory = " + destinationDir + " contains files = " + destinationDir.list().length); // number of files
+//        LOG.debug("destination directory = {} length = {}", destinationDir, destinationDir.length());  // size in bytes
+        LOG.debug("destination directory = {} contains files = {}", destinationDir, destinationDir.list().length); // number of files
     Files.walk(path)
                 .map(Path::toFile)
                 .forEach(File::delete);
-      LOG.debug("destination directory after delete = " + destinationDir + " contains files = " + destinationDir.list().length);
+      LOG.debug("destination directory after delete = {} contains files = {}", destinationDir, destinationDir.list().length);
 
     Thumbnails.of(source.listFiles())
         .scale(0.30)
@@ -86,46 +86,46 @@ try{
 
 public void startBatchJobPlayers(){
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
  try{
     
     //JobOperator jo = BatchRuntime.getJobOperator();
    // long id = jo.start("GolfPlayers", null);
-   // LOG.debug("jobsubmitted ..." + id);
+   // LOG.debug("jobsubmitted ...{}", id);
   
   String JOB_NAME = "GolfPlayers"; // The jobname is the job JSL XML file name (minus the .xml extension) 
   // voir dans dir WEB-INF/META-INF/batch-jobs     
   jobOperator = BatchRuntime.getJobOperator();
-    LOG.debug("jobOperator = " + jobOperator);
+    LOG.debug("jobOperator = {}", jobOperator);
   Properties props = new Properties();
   String fileName = settings.getProperty("BATCH") + "importPlayers.csv";
-      LOG.debug("using file  = " + fileName);
+      LOG.debug("using file  = {}", fileName);
   props.setProperty("input_file", fileName);
   // start 
   executionId = jobOperator.start(JOB_NAME, props);
   // start
   
-  LOG.debug("Job started = " + JOB_NAME);
+  LOG.debug("Job started = {}", JOB_NAME);
   /*
   JobExecution jobExecution = jobOperator.getJobExecution(executionId);
-    LOG.debug("JobExecution = " + jobExecution.toString());
-    LOG.debug("JobStatus = " + getJobStatus(jobOperator));
+    LOG.debug("JobExecution = {}", jobExecution.toString());
+    LOG.debug("JobStatus = {}", getJobStatus(jobOperator));
    var v1 = jobOperator.getJobInstance(executionId);
   Batch b= new Batch();
   batch.setExecID(executionId);
-    LOG.debug("execID long setted = " + b.getExecID());
-    LOG.debug("execID String setted = " + b.getStringID());
-    LOG.debug("batch b  is now " + b.toString());
+    LOG.debug("execID long setted = {}", b.getExecID());
+    LOG.debug("execID String setted = {}", b.getStringID());
+    LOG.debug("batch b  is now {}", b.toString());
   listeBatch.add(b);
  // long lon = jobOperator.getJobInstance(executionId),
   
 // https://jakarta.ee/specifications/batch/2.1/jakarta-batch-spec-2.1.html#batch-exception-classes
    var v = jobOperator.getJobExecutions(v1); 
    // public List<JobExecution> getJobExecutions(JobInstance instance)
-   LOG.debug("liste job executions = " + v);
-   LOG.debug("liste executionId = " + Arrays.toString(listeBatch.toArray()));
+   LOG.debug("liste job executions = {}", v);
+   LOG.debug("liste executionId = {}", Arrays.toString(listeBatch.toArray()));
       //   LOG.debug("exiting startBatchJobPlayers with execID = " + execID) + listeBatch.;
-       LOG.debug("liste executionId = " + Arrays.toString(listeBatch.toArray()));
+       LOG.debug("liste executionId = {}", Arrays.toString(listeBatch.toArray()));
  //  return null;  // next page ici = retour a la page de depart
    //  return "jobstarted"; //mod 15-09-2021
  */
@@ -168,7 +168,7 @@ public void startBatchJobPlayers(){
 
 public String startBatchJobRounds(){ // throws Exception{
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
   try{
         String JOB_NAME = "GolfRounds"; // The jobname is nothing but the job JSL XML file name (minus the .xml extension)       
         jobOperator = BatchRuntime.getJobOperator();
@@ -182,8 +182,8 @@ public String startBatchJobRounds(){ // throws Exception{
         Batch batch = new Batch();
         batch.setExecID(executionId);
         listeBatch.add(batch);
-          LOG.debug("exiting startBatchJobRounds with execID = " + executionId);
-          LOG.debug("liste execID = " + Arrays.toString(listeBatch.toArray()));
+          LOG.debug("exiting startBatchJobRounds with execID = {}", executionId);
+          LOG.debug("liste execID = {}", Arrays.toString(listeBatch.toArray()));
         return null;  // next page ici = retour a la page de depart
   } catch (Exception e) {
     handleGenericException(e, methodName);
@@ -192,7 +192,7 @@ public String startBatchJobRounds(){ // throws Exception{
 } //end method
 public String startBatchJobInscriptions(){ // throws Exception{
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
  try{
         String JOB_NAME = "GolfInscriptions"; // The jobname is nothing but the job JSL XML file name (minus the .xml extension)       
         jobOperator = BatchRuntime.getJobOperator();
@@ -205,8 +205,8 @@ public String startBatchJobInscriptions(){ // throws Exception{
         Batch batch = new Batch();
         batch.setExecID(executionId);
         listeBatch.add(batch);
-         LOG.debug("liste executionId = " + Arrays.toString(listeBatch.toArray()));
-         LOG.debug("exiting startBatchJobInscriptions with execID = " + executionId);
+         LOG.debug("liste executionId = {}", Arrays.toString(listeBatch.toArray()));
+         LOG.debug("exiting startBatchJobInscriptions with execID = {}", executionId);
         return null;  // next page ici = retour a la page de depart
    } catch (Exception e) {
     handleGenericException(e, methodName);
@@ -226,7 +226,7 @@ public String getJobStatus(){ // used in jobSubmitter.xhtml
 /* Get the status of the job from the batch runtime */
 public String getJobStatus(JobOperator jobOp){
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName + " with executionId = " + executionId);
+    LOG.debug("entering with executionId = {}", executionId);
   try{
     //if(executionId = 0){
     //    return "execID = 0 - No batch Status available at the moment !!";
@@ -234,13 +234,13 @@ public String getJobStatus(JobOperator jobOp){
         BatchStatus status = jobOperator
                 .getJobExecution(executionId)
                 .getBatchStatus();
-            LOG.debug("Batchstatus = " + status.toString());
+            LOG.debug("Batchstatus = {}", status.toString());
         JobInstance jobInstance = jobOperator.getJobInstance(executionId);
         jobInstance.getJobName();
 
   //  return BatchStatus.valueOf(status);
      //   return jo.getJobExecution(execID).getBatchStatus().toString();
-     LOG.debug("status =  " + status);
+     LOG.debug("status =  {}", status);
      if(status != BatchStatus.STARTED){
         return status.toString() + " " + jobInstance.getJobName() ; //+ " / write = " + getRecordWritten() + " ,read = " + getRecordReaded();
      }else{
@@ -257,26 +257,26 @@ public String getJobStatus(JobOperator jobOp){
 
 public String getJobExecutionDetails(long executionId){
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     long duration = 0;
     try{
         //jobOperator = BatchRuntime.getJobOperator();  25-08-2023
         JobInstance jobInstance = jobOperator.getJobInstance(executionId);
         String jn = jobInstance.getJobName();
         long iid = jobInstance.getInstanceId();
-        LOG.debug("jobInstance job name = " + jn);
-        LOG.debug("jobInstance id = " + iid );
+        LOG.debug("jobInstance job name = {}", jn);
+        LOG.debug("jobInstance id = {}", iid);
         JobExecution je = jobOperator.getJobExecution(executionId);
         String startd = new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS").format(je.getCreateTime());
-            LOG.debug("jobExecution create time = " + startd );
-            LOG.debug("jobExecution name = " + je.getJobName());
-            LOG.debug("jobExecution end time = " + new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS").format(je.getCreateTime()));
-            LOG.debug("jobExecution batch status = " + je.getBatchStatus());
-            LOG.debug("jobExecution batch executionId = " + je.getExecutionId());
-            LOG.debug("jobExecution batch ExitStatus = " + je.getExitStatus());
+            LOG.debug("jobExecution create time = {}", startd);
+            LOG.debug("jobExecution name = {}", je.getJobName());
+            LOG.debug("jobExecution end time = {}", new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS").format(je.getCreateTime()));
+            LOG.debug("jobExecution batch status = {}", je.getBatchStatus());
+            LOG.debug("jobExecution batch executionId = {}", je.getExecutionId());
+            LOG.debug("jobExecution batch ExitStatus = {}", je.getExitStatus());
             
-      //      LOG.debug("jobExecutions = " + jo.getJobExecutions(ji));
-      //      LOG.debug("jobInstance = " + jo.getJobInstance(executionId));
+      //      LOG.debug("jobExecutions = {}", jo.getJobExecutions(ji));
+      //      LOG.debug("jobInstance = {}", jo.getJobInstance(executionId));
             
    //         List<JobExecution> ljo = jo.getJobExecutions(ji);
        //     ljo.stream().forEach(System.out::println);
@@ -288,16 +288,16 @@ public String getJobExecutionDetails(long executionId){
              //   + TimeUnit.MILLISECONDS.toSeconds(je.getEndTime().getTime()
           duration = (je.getEndTime().getTime() - je.getStartTime().getTime()); // + " milliseconds");
             }
-  //      LOG.debug("Step Execution = " + Arrays.deepToString(se.toArray()));
+  //      LOG.debug("Step Execution = {}", Arrays.deepToString(se.toArray()));
         Set<String> jna = jobOperator.getJobNames();
-        LOG.debug("Job Names = " + Arrays.deepToString(jna.toArray()));
+        LOG.debug("Job Names = {}", Arrays.deepToString(jna.toArray()));
         
         List<String> executedSteps = new ArrayList<>();
         List<StepExecution> se = jobOperator.getStepExecutions(executionId);
         for (StepExecution stepExecution : se) {
             executedSteps.add(stepExecution.getStepName());
         }
-            LOG.debug("Executed Steps 2 = " + Arrays.deepToString(executedSteps.toArray()));
+            LOG.debug("Executed Steps 2 = {}", Arrays.deepToString(executedSteps.toArray()));
       //  return je;
         return je.getExecutionId() + "-" + je.getJobName() + " = " + je.getExitStatus() + " " 
                 + new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS").format(je.getCreateTime()) + " / " + duration + " millisec "
@@ -348,7 +348,7 @@ public long getExecID() {
    //https://www.baeldung.com/opencsv
 
     String fileName = Settings.getProperty("BATCH") + "importPlayers.csv";
-       LOG.debug("fileName for import players csv = " + fileName);
+       LOG.debug("fileName for import players csv = {}", fileName);
     final CSVParser parser = new CSVParserBuilder()
            .withSeparator(';')
            .withIgnoreQuotations(true)
@@ -364,7 +364,7 @@ public long getExecID() {
       //lineinarray format = [2021001, Patrick, Cantlay, San Antonio , Texas, US, 17-03-1992, M, EN] 
        Connection conn = new DBConnection().getConnection();
       while((lineInArray = reader.readNext()) != null) {
-   //       LOG.debug("lineinarray  = " + Arrays.toString(lineInArray)); // chaque call concerne une ligne
+   //       LOG.debug("lineinarray  = {}", Arrays.toString(lineInArray)); // chaque call concerne une ligne
           parsePlayers(lineInArray, conn);
           // return vers processsItem
       }
@@ -398,7 +398,7 @@ public long getExecID() {
      HandicapIndex handicapIndex = new HandicapIndex();
      Player player = new Player();
  //    EPlayerHandicap ePlayerHandicap = new EPlayerHandicap();
-         LOG.debug("line = " + Arrays.toString(line));
+         LOG.debug("line = {}", Arrays.toString(line));
       //line format  = [2021001, Patrick, Cantlay, San Antonio , Texas, US, 17-03-1992, M, EN] 
       player.setIdplayer(Integer.valueOf(line[0]));
       player.setPlayerFirstName(line[1]);
@@ -420,10 +420,10 @@ public long getExecID() {
       double latitude = Double.parseDouble("34.086282"); // hollywood !!
       double longitude = Double.parseDouble("-118.318582");
       player.setPlayerLatLng(new com.google.maps.model.LatLng(latitude, longitude));
-          LOG.debug("player to be inserted = " + player);
+          LOG.debug("player to be inserted = {}", player);
       handicapIndex.setHandicapDate(LocalDateTime.of(2021,Month.JANUARY,01,0,0));
       handicapIndex.setHandicapWHS(BigDecimal.valueOf(0.0));
-         LOG.debug("handicapIndex to be inserted = " + handicapIndex);
+         LOG.debug("handicapIndex to be inserted = {}", handicapIndex);
  //        LOG.debug("just before create player");
    //   ePlayerHandicap.setPlayer(player);
    //   ePlayerHandicap.setHandicapIndex(handicapIndex);
@@ -445,9 +445,9 @@ public long getExecID() {
      showMessageFatal(msg); 
   //   
   //  for(int i=0; i<lineInArray.length; i++){
-  //        LOG.debug("lineinarray " + i + "/" + lineInArray[i]);
-  //        LOG.debug("lineinarray 1 = " + lineInArray[1]);
-  //        LOG.debug("lineinarray 2 = " + lineInArray[2]); //  options[i + 1] = new SelectItem(data[i], data[i]);
+  //        LOG.debug("lineinarray {}/{}", i, lineInArray[i]);
+  //        LOG.debug("lineinarray 1 = {}", lineInArray[1]);
+  //        LOG.debug("lineinarray 2 = {}", lineInArray[2]); //  options[i + 1] = new SelectItem(data[i], data[i]);
         }
  }
 */
@@ -460,7 +460,7 @@ public long getExecID() {
      */
     public String to_jobSubmitter_xhtml() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         navigationController.reset("Reset to_jobSubmitter");
         return "jobSubmitter.xhtml?faces-redirect=true";
     } // end method

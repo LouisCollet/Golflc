@@ -8,316 +8,273 @@
 <h:form id="form_menu"
         rendered="#{playerC.player.showMenu}">
 
-    <p:panelMenu id="panel_menu" stateful="true" statefulGlobal="true">
+    <p:panelMenu id="panel_menu" styleClass="golf-menu" stateful="true" statefulGlobal="true">
 
-        <p:submenu label="HOME LC"
-                   icon="pi pi-home">
+        <!-- ═══════════════════════════════════════
+             HOME — visible par tous
+             ═══════════════════════════════════════ -->
+        <p:submenu label="🏠 HOME" icon="pi pi-home">
             <p:menuitem value="Reset"
                         action="#{clubC.to_reset_menu('from menu : Home')}"
-                        icon="pi pi-refresh" />
+                        icon="pi pi-refresh"/>
         </p:submenu>
 
-        <p:submenu label="#{msg['menu.system.admin']}"
-                   icon="pi pi-cog"
-                   expanded="true"
-                   rendered="#{playerC.isAdmin()}">
-
-            <p:submenu label="SUBMENU CLUB (Create, Delete, Update)"
-                       icon="pi pi-building">
-                <p:menuitem value="#{msg['menu.create.club']}"
-                            action="#{clubC.to_selectPurpose_xhtml('clubCreate')}"
-                            icon="pi pi-pencil" />
-                <p:menuitem value="Delete Club, Course, Tee"
-                            action="#{clubC.to_selectPurpose_xhtml('clubDelete')}"
-                            icon="pi pi-trash" />
-                <p:menuitem value="Modify Club, Course, Tee"
-                            action="#{clubC.to_selectPurpose_xhtml('clubUpdate')}"
-                            icon="pi pi-flag" />
-            </p:submenu>
-
-            <p:menuitem value="#{msg['menu.create.round']}"
-                        action="#{clubC.to_selectPurpose_xhtml('CreateRound')}"
-                        icon="pi pi-list" />
-            <p:menuitem value="Désignation Administrateur Local"
-                        action="#{clubC.to_selectPurpose_xhtml('LocalAdministrator')}"
-                        icon="pi pi-pencil" />
-            <p:menuitem value="#{msg['menu.list.subscriptions']}"
-                        action="#{memC.to_selectSystemAdmin_xhtml('ListSubscriptions')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Tarif Subscription"
-                        action="#{clubC.to_selectPurpose_xhtml('CreateTarifSubscription')}"
-                        icon="pi pi-dollar" />
-            <p:menuitem value="GRPC Server"
-                        action="#{clubC.to_selectGrpc_xhtml('GRPC')}"
-                        icon="pi pi-pencil" />
+        <!-- ═══════════════════════════════════════
+             GOLF — visible par tous (joueur)
+             ═══════════════════════════════════════ -->
+        <p:submenu label="⛳ GOLF" icon="pi pi-sun">
+            <p:menuitem value="Inscription STB/SCR/MP"
+                        action="#{navC.to_selectPurpose_xhtml('INSCRIPTION')}"
+                        icon="pi pi-pencil"/>
+            <p:menuitem value="Register Score"
+                        action="#{navC.to_selectPurpose_xhtml('STABLEFORD')}"
+                        icon="pi pi-check-circle"/>
+            <p:menuitem value="Score Card"
+                        action="#{navC.to_selectPurpose_xhtml('SCORECARD')}"
+                        icon="pi pi-table"/>
+            <p:menuitem value="Classement Participants"
+                        action="#{navC.to_selectPurpose_xhtml('PARTICIPANTS')}"
+                        icon="pi pi-list"/>
+            <p:menuitem value="#{msg['menu.simulation.greenfee']}"
+                        action="#{simC.toSimulation()}"
+                        icon="pi pi-calculator"/>
         </p:submenu>
 
-        <p:submenu label="#{msg['menu.local.admin']}"
-                   icon="pi pi-shield"
-                   rendered="#{playerC.isLocalAdmin()}">
-            <p:menuitem value="#{msg['menu.create.round']}"
-                        action="#{clubC.to_selectPurpose_xhtml('CreateRound')}"
-                        icon="pi pi-list" />
-            <p:menuitem value="#{msg['menu.create.tarif.greenfee']}"
-                        action="#{clubC.to_selectPurpose_xhtml('CreateTarifGreenfee')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="#{msg['menu.create.pro']}"
-                        action="#{clubC.to_selectPurpose_xhtml('CreatePro')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="#{msg['menu.create.tarif.member']}"
-                        action="#{clubC.to_selectPurpose_xhtml('CreateTarifMember')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="#{msg['menu.list.greenfees']}"
-                        action="#{memC.to_selectLocalAdmin_xhtml('Greenfees')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="#{msg['menu.list.members']}"
-                        action="#{memC.to_selectLocalAdmin_xhtml('Members')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Etat du terrain : Menu"
-                        action="#{clubC.to_selectPurpose_xhtml('MenuUnavailable')}"
-                        icon="pi pi-sun" />
+        <!-- ═══════════════════════════════════════
+             PLAYER INFO — visible par tous
+             ═══════════════════════════════════════ -->
+        <p:submenu label="👤 PLAYER" icon="pi pi-id-card">
+            <p:menuitem value="Handicap WHS"
+                        action="#{navC.to_selectPurpose_xhtml('ShowHandicap')}"
+                        icon="pi pi-chart-line"/>
+            <p:menuitem value="Played Rounds"
+                        action="#{navC.to_selectPurpose_xhtml('ShowRound')}"
+                        icon="pi pi-list"/>
+            <p:menuitem value="Stableford Playing Hcp"
+                        action="#{navC.to_selectPurpose_xhtml('PlayingHcpStableford')}"
+                        icon="pi pi-calculator"/>
+            <p:menuitem value="Scramble Playing Hcp"
+                        action="#{navC.to_selectPurpose_xhtml('PlayingHcpScramble')}"
+                        icon="pi pi-calculator"/>
+            <p:menuitem value="Other Games Playing Hcp"
+                        action="#{navC.to_selectPurpose_xhtml('PlayingHcpOther')}"
+                        icon="pi pi-calculator"/>
         </p:submenu>
 
-        <p:submenu label="COMPETITION ADMIN"
-                   icon="pi pi-trophy"
-                   rendered="#{playerC.isAdmin()}">
-            <p:menuitem value="#{msg['menu.create.competition']}"
-                        action="#{clubC.to_selectPurpose_xhtml('Competition Description')}"
-                        icon="pi pi-pencil" />
-            <p:menuitem value="Inscription"
-                        action="#{roundC.to_select_inscription_xhtml('PLAYER COMPETITION')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="#{msg['menu.manage.competition']}"
-                        action="#{roundC.to_select_inscription_xhtml('ADMIN COMPETITION')}"
-                        icon="pi pi-check" />
-        </p:submenu>
-
-        <p:submenu label="COMPETITION PLAYER"
+        <!-- ═══════════════════════════════════════
+             COMPETITION PLAYER — visible par joueurs
+             ═══════════════════════════════════════ -->
+        <p:submenu label="🏆 COMPETITION"
                    icon="pi pi-trophy"
                    rendered="#{playerC.isRegularPlayer()}">
             <p:menuitem value="#{msg['competition.inscription']}"
                         action="#{roundC.to_select_inscription_xhtml('PLAYER COMPETITION')}"
-                        icon="pi pi-check" />
+                        icon="pi pi-user-edit"/>
         </p:submenu>
 
-        <p:submenu label="PROFESSIONAL"
-                   icon="pi pi-briefcase">
+        <!-- ═══════════════════════════════════════
+             PROFESSIONAL — visible par tous (items conditionnels)
+             ═══════════════════════════════════════ -->
+        <p:submenu label="🎓 PROFESSIONAL" icon="pi pi-briefcase">
             <p:menuitem value="Inscription Pro lesson"
                         action="#{memC.to_selectPro_xhtml('Inscription')}"
-                        icon="pi pi-search-plus" />
-            <p:menuitem value="#{msg['menu.list.pro']} #{playerC.professionalCount}"
+                        icon="pi pi-search-plus"/>
+            <p:menuitem value="#{msg['menu.list.pro']}"
                         rendered="#{playerC.isProfessional()}"
                         action="#{memC.to_selectPro_xhtml('Lessons')}"
-                        icon="pi pi-check" />
+                        icon="pi pi-euro"/>
         </p:submenu>
 
-        <p:submenu label="PLAYER INFO"
-                   icon="pi pi-id-card">
-            <p:menuitem value="Show Handicap WHS"
-                        action="#{clubC.to_selectPurpose_xhtml('ShowHandicap')}"
-                        icon="pi pi-question" />
-            <p:menuitem value="Played Rounds"
-                        action="#{clubC.to_selectPurpose_xhtml('ShowRound')}"
-                        icon="pi pi-list" />
-        </p:submenu>
-
-        <p:submenu label="INSCRIPTION"
-                   icon="pi pi-pencil">
-            <p:menuitem value="Inscription STB/SCR/MP"
-                        action="#{roundC.to_select_round_xhtml('INSCRIPTION')}"
-                        icon="pi pi-pencil" />
-            <p:menuitem value="Classment Participants Round"
-                        action="#{roundC.to_selectParticipantsRound_xhtml('ini')}"
-                        icon="pi pi-list" />
-        </p:submenu>
-
-        <p:submenu label="REGISTER SCORE"
-                   icon="pi pi-check-circle">
-            <p:menuitem value="Register Score STB/SCR/MP"
-                        action="#{roundC.to_selectStablefordRounds_xhtml('STABLEFORD')}"
-                        icon="pi pi-check" />
-        </p:submenu>
-
-        <p:submenu label="SCORECARD"
-                   icon="pi pi-table">
-            <p:menuitem value="Score Card"
-                        action="#{roundC.to_selectRegisteredRounds_xhtml('ini')}"
-                        icon="pi pi-check" />
-        </p:submenu>
-
-        <p:submenu label="PLAYING Hcp"
-                   icon="pi pi-calculator">
-            <p:menuitem value="Stableford Playing Hcp"
-                        action="#{roundC.to_stableford_playing_hcp_xhtml('ini')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Scramble Playing Hcp"
-                        action="#{roundC.to_scramble_playing_hcp_xhtml('ini')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Other Games Playing Hcp"
-                        action="#{roundC.to_othergames_playing_hcp_xhtml('ini')}"
-                        icon="pi pi-check" />
-        </p:submenu>
-
-        <p:submenu label="PAYMENTS"
-                   icon="pi pi-credit-card">
+        <!-- ═══════════════════════════════════════
+             PAYMENTS — visible par tous
+             ═══════════════════════════════════════ -->
+        <p:submenu label="💳 PAYMENTS" icon="pi pi-credit-card">
             <p:menuitem value="Subscription = #{memC.subscription.endDate}"
-                        action="#{memC.to_subscription_xhtml('ini')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Payment Spontané Cotisation Member"
-                        action="#{clubC.to_selectPurpose_xhtml('PaymentCotisation')}"
-                        icon="pi pi-check" />
+                        action="#{navC.to_selectPurpose_xhtml('PaymentSubscription')}"
+                        icon="pi pi-wallet"/>
+            <p:menuitem value="Cotisation Member"
+                        action="#{navC.to_selectPurpose_xhtml('PaymentCotisation')}"
+                        icon="pi pi-money-bill"/>
         </p:submenu>
 
-        <p:submenu label="GitHub"
-                   icon="pi pi-github">
-            <p:menuitem value="GitHub"
-                        url="https://github.com/LouisCollet/Golflc.git"
-                        icon="pi pi-github" />
-        </p:submenu>
-
-        <p:submenu label="STATS"
-                   icon="pi pi-chart-bar">
+        <!-- ═══════════════════════════════════════
+             STATS — visible par tous
+             ═══════════════════════════════════════ -->
+        <p:submenu label="📊 STATS" icon="pi pi-chart-bar">
             <p:menuitem value="Stats Round"
-                        action="#{clubC.to_selectCourse_xhtml('ChartRound')}"
-                        icon="pi pi-chart-bar" />
+                        action="#{navC.to_selectPurpose_xhtml('CHART')}"
+                        icon="pi pi-chart-bar"/>
             <p:menuitem value="Chart Course"
-                        action="#{clubC.to_selectCourse_xhtml('ChartCourse')}"
-                        icon="pi pi-chart-line" />
+                        action="#{navC.to_selectPurpose_xhtml('ChartCourse')}"
+                        icon="pi pi-chart-line"/>
         </p:submenu>
 
-        <p:submenu label="HELP"
-                   icon="pi pi-question-circle">
+        <!-- ═══════════════════════════════════════
+             LOCAL ADMIN — visible par local admin
+             ═══════════════════════════════════════ -->
+        <p:submenu label="#{msg['menu.local.admin']}"
+                   icon="pi pi-shield"
+                   styleClass="menu-local-admin"
+                   rendered="#{playerC.isLocalAdmin()}">
+            <p:menuitem value="#{msg['menu.create.round']}"
+                        action="#{navC.to_selectPurpose_xhtml('CreateRound')}"
+                        icon="pi pi-plus-circle"/>
+            <p:menuitem value="#{msg['menu.create.tarif.greenfee']}"
+                        action="#{navC.to_selectPurpose_xhtml('CreateTarifGreenfee')}"
+                        icon="pi pi-euro"/>
+            <p:menuitem value="#{msg['menu.admin.tarif.greenfee']}"
+                        outcome="tarif_greenfee_admin.xhtml"
+                        icon="pi pi-pencil"/>
+            <p:menuitem value="#{msg['menu.create.tarif.member']}"
+                        action="#{navC.to_selectPurpose_xhtml('CreateTarifMember')}"
+                        icon="pi pi-euro"/>
+            <p:menuitem value="#{msg['menu.create.pro']}"
+                        action="#{navC.to_selectPurpose_xhtml('CreatePro')}"
+                        icon="pi pi-user-plus"/>
+            <p:menuitem value="#{msg['menu.local.admin.pros']}"
+                        action="#{memC.to_selectLocalAdmin_xhtml('Professionals')}"
+                        icon="pi pi-user-edit"/>
+            <p:menuitem value="#{msg['menu.list.greenfees']}"
+                        action="#{memC.to_selectLocalAdmin_xhtml('Greenfees')}"
+                        icon="pi pi-list"/>
+            <p:menuitem value="#{msg['menu.list.members']}"
+                        action="#{memC.to_selectLocalAdmin_xhtml('Members')}"
+                        icon="pi pi-users"/>
+            <p:menuitem value="Etat du terrain"
+                        action="#{navC.to_selectPurpose_xhtml('MenuUnavailable')}"
+                        icon="pi pi-sun"/>
+        </p:submenu>
+
+        <!-- ═══════════════════════════════════════
+             SYSTEM ADMIN — visible par admin uniquement
+             ═══════════════════════════════════════ -->
+        <p:submenu label="#{msg['menu.system.admin']}"
+                   icon="pi pi-cog"
+                   styleClass="menu-admin"
+                   rendered="#{playerC.isAdmin()}">
+
+            <p:submenu label="Club / Course / Tee" icon="pi pi-building">
+                <p:menuitem value="#{msg['menu.create.club']}"
+                            action="#{navC.to_selectPurpose_xhtml('clubCreate')}"
+                            icon="pi pi-plus"/>
+                <p:menuitem value="Delete Club, Course, Tee"
+                            action="#{navC.to_selectPurpose_xhtml('clubDelete')}"
+                            icon="pi pi-trash"/>
+                <p:menuitem value="Modify Club, Course, Tee"
+                            action="#{navC.to_selectPurpose_xhtml('clubUpdate')}"
+                            icon="pi pi-pencil"/>
+            </p:submenu>
+
+            <p:menuitem value="#{msg['menu.create.round']}"
+                        action="#{navC.to_selectPurpose_xhtml('CreateRound')}"
+                        icon="pi pi-plus-circle"/>
+            <p:menuitem value="Local Administrator"
+                        action="#{navC.to_selectPurpose_xhtml('LocalAdministrator')}"
+                        icon="pi pi-shield"/>
+            <p:menuitem value="#{msg['menu.list.subscriptions']}"
+                        action="#{memC.to_selectSystemAdmin_xhtml('ListSubscriptions')}"
+                        icon="pi pi-list"/>
+            <p:menuitem value="Tarif Subscription"
+                        action="#{navC.to_selectPurpose_xhtml('CreateTarifSubscription')}"
+                        icon="pi pi-dollar"/>
+        </p:submenu>
+
+        <!-- ═══════════════════════════════════════
+             COMPETITION ADMIN — visible par admin
+             ═══════════════════════════════════════ -->
+        <p:submenu label="🏆 COMPETITION ADMIN"
+                   icon="pi pi-trophy"
+                   styleClass="menu-admin"
+                   rendered="#{playerC.isAdmin()}">
+            <p:menuitem value="#{msg['menu.create.competition']}"
+                        action="#{navC.to_selectPurpose_xhtml('Competition Description')}"
+                        icon="pi pi-plus"/>
+            <p:menuitem value="Inscription"
+                        action="#{roundC.to_select_inscription_xhtml('PLAYER COMPETITION')}"
+                        icon="pi pi-user-edit"/>
+            <p:menuitem value="#{msg['menu.manage.competition']}"
+                        action="#{roundC.to_select_inscription_xhtml('ADMIN COMPETITION')}"
+                        icon="pi pi-sliders-h"/>
+        </p:submenu>
+
+        <!-- ═══════════════════════════════════════
+             HELP — visible par tous
+             ═══════════════════════════════════════ -->
+        <p:submenu label="❓ HELP" icon="pi pi-question-circle">
             <p:menuitem value="Technical Info"
                         action="#{techC.to_page_xhtml('technical_info')}"
-                        icon="pi pi-info-circle" />
+                        icon="pi pi-info-circle"/>
             <p:menuitem value="Advanced Diagnostic"
                         action="#{techC.to_page_xhtml('admin_advanced')}"
-                        icon="pi pi-cog" />
+                        icon="pi pi-cog"/>
+            <p:menuitem value="Connection History"
+                        action="#{techC.to_page_xhtml('audit_connections')}"
+                        icon="pi pi-clock"
+                        rendered="#{playerC.isAdmin()}"/>
         </p:submenu>
 
-        <p:submenu label="BATCH"
+        <!-- ═══════════════════════════════════════
+             BATCH — admin only
+             ═══════════════════════════════════════ -->
+        <p:submenu label="🔄 BATCH"
                    icon="pi pi-cog"
+                   styleClass="menu-admin"
                    rendered="#{playerC.isAdmin()}">
             <p:menuitem value="Thumbnails Generation"
                         action="#{batchC.thumbs('all files')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="test openCSV Import players"
+                        icon="pi pi-image"/>
+            <p:menuitem value="Import Players CSV"
                         action="#{batchC.importPlayers()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Batch Imports Players/Rounds/inscriptions JEE8"
+                        icon="pi pi-upload"/>
+            <p:menuitem value="Batch Imports"
                         action="#{batchC.to_jobSubmitter_xhtml()}"
-                        icon="pi pi-check" />
+                        icon="pi pi-database"/>
         </p:submenu>
 
-        <p:submenu label="TOOLS/TESTS"
+        <!-- ═══════════════════════════════════════
+             TOOLS/TESTS — admin only
+             ═══════════════════════════════════════ -->
+        <p:submenu label="🔧 TOOLS/TESTS"
                    icon="pi pi-wrench"
+                   styleClass="menu-admin"
                    rendered="#{playerC.isAdmin()}">
-            <p:menuitem value="Club and Course Selector via include"
-                        action="#{techC.to_page_xhtml('selectClubCourse2')}"
-                        icon="pi pi-book" />
             <p:menuitem value="Math Calculator"
                         action="#{techC.to_page_xhtml('calculator_css')}"
-                        icon="pi pi-book" />
-            <p:menuitem value="Flex Form Layout"
-                        action="#{techC.to_page_xhtml('flex_formlayout')}"
-                        icon="pi pi-book" />
-            <p:menuitem value="PanelGrid responsive test"
-                        action="#{techC.to_page_xhtml('panelGrid_responsive')}"
-                        icon="pi pi-book" />
-            <p:menuitem value="MongoChangeStreamSample Test"
-                        action="#{streamC.main()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="creditcard Test"
+                        icon="pi pi-calculator"/>
+            <p:menuitem value="Creditcard Test"
                         action="#{payC.to_creditcard_test_xhtml('creditcard')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="geoCityDetector Test"
-                        action="#{geoIPExamples.example1_Simple()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="iPdetector Test"
-                        action="#{ipDetectorTest.testIpDetection()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="webservice Test"
-                        action="#{payC.testWebService()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Test Webservice Creditcard Python"
+                        icon="pi pi-credit-card"/>
+            <p:menuitem value="Test Webservice Python"
                         action="#{payC.testWebServiceHttp()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Cell and Row editor"
-                        action="#{techC.to_editingRow_xhtml('ini','restart')}"
-                        icon="pi pi-flag" />
-            <p:menuitem value="Test payment"
+                        icon="pi pi-server"/>
+            <p:menuitem value="Test Payment"
                         action="#{payC.Testpayment()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="test match play"
-                        action="#{lists.MatchplayList.main()}"
-                        icon="pi pi-check" />
-            <p:menuitem value="test MessageFatal new version"
-                        action="#{techC.newMessageFatal('from menu : test new version FatalMessage')}"
-                        icon="pi pi-check" />
+                        icon="pi pi-credit-card"/>
             <p:menuitem value="Check Mail"
                         action="#{techC.checkMail('from menu : checkMail')}"
-                        icon="pi pi-envelope" />
-            <p:menuitem value="Check Subscription Renewal"
+                        icon="pi pi-envelope"/>
+            <p:menuitem value="Subscription Renewal"
                         action="#{memC.listSubscriptionRenewal('next month')}"
-                        icon="pi pi-envelope" />
-            <p:menuitem value="GeoApiController"
-                        action="#{geoapiC.checkGeoApi()}"
-                        icon="pi pi-envelope" />
-            <p:menuitem value="Picklist"
-                        action="#{techC.to_page_xhtml('picklist')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Media Flash"
-                        action="#{techC.to_page_xhtml('media_flash')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Text directions"
-                        action="#{techC.to_page_xhtml('maps_text_directions')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Travel modes"
-                        action="#{techC.to_page_xhtml('maps_travel_modes')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Geocoding"
-                        action="#{techC.to_page_xhtml('maps_geocoding')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Distance"
-                        action="#{techC.to_page_xhtml('maps_distance_matrix')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Autocomplete"
-                        action="#{techC.to_page_xhtml('autocomplete')}"
-                        icon="pi pi-check" />
+                        icon="pi pi-calendar"/>
             <p:menuitem value="Search Golf Courses"
                         action="#{techC.to_page_xhtml('search_golf')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Autocomplete Address"
-                        action="#{techC.to_page_xhtml('autocomplete_address')}"
-                        icon="pi pi-check" />
-            <p:menuitem value="Player Autocomplete"
-                        action="#{techC.to_page_xhtml('player_autocomplete')}"
-                        icon="pi pi-check" />
+                        icon="pi pi-search"/>
             <p:menuitem value="Thumbnails"
                         action="#{thumbnailsC.thumbs('from menu')}"
-                        icon="pi pi-check" />
+                        icon="pi pi-image"/>
         </p:submenu>
 
-        <p:submenu label="Resources"
-                   icon="pi pi-external-link">
+        <!-- ═══════════════════════════════════════
+             RESOURCES — visible par tous
+             ═══════════════════════════════════════ -->
+        <p:submenu label="📚 Resources" icon="pi pi-external-link">
             <p:menuitem value="Download"
                         action="#{techC.to_page_xhtml('download')}"
-                        icon="pi pi-download" />
-            <p:menuitem value="Demo"
-                        url="http://www.primefaces.org/showcase-labs/ui/home.jsf"
-                        icon="pi pi-external-link" />
-            <p:menuitem value="Documentation"
-                        url="http://www.primefaces.org/documentation.html"
-                        icon="pi pi-external-link" />
-            <p:menuitem value="Forum"
-                        url="http://forum.primefaces.org/"
-                        icon="pi pi-external-link" />
-            <p:menuitem value="Themes"
-                        url="http://www.primefaces.org/themes.html"
-                        icon="pi pi-external-link" />
-            <p:menuitem value="ckEditor"
-                        url="http://docs.cksource.com/CKEditor_3.x/Users_Guide"
-                        icon="pi pi-external-link" />
+                        icon="pi pi-download"/>
+            <p:menuitem value="GitHub"
+                        url="https://github.com/LouisCollet/Golflc.git"
+                        icon="pi pi-github"
+                        rendered="#{playerC.isAdmin()}"/>
         </p:submenu>
 
     </p:panelMenu>

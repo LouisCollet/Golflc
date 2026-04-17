@@ -41,6 +41,7 @@
                   style="width:800px;font-weight: normal;background-color: whitesmoke;" />
 
     <f:facet name="footer">
+      <div class="btn-group">
          <p:commandButton value="Save to MongoDB"
                          id="buttonModify"
                          lang=""
@@ -59,6 +60,7 @@
                          update="growl-msg"
                          icon="pi pi-undo"
                          action="#{mongoHelpC.BackCurrentHelpFile()}" />
+      </div>
     </f:facet>
 </p:panelGrid>
 

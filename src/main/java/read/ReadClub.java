@@ -64,7 +64,7 @@ public class ReadClub implements Serializable, interfaces.GolfInterface {
             LOG.debug("Main ready (CDI required for execution)");
 
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
     }
 }
@@ -89,8 +89,8 @@ public Club read(Club club,Connection conn) throws SQLException, Exception{
     PreparedStatement ps = null;
     ResultSet rs = null;
 try{
-        LOG.debug("entering " + methodName);
-        LOG.debug("with Club = " + club);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with Club = {}", club);
 final String query = """
         SELECT *
         FROM Club
@@ -125,13 +125,13 @@ public static void main(String[] args) throws Exception, SQLException{
     // Affiche la classe principale passée par Maven
         String className = System.getProperty("printClassName");
         if (className != null) {
-            LOG.debug("Classe principale passée par Maven : " + className);
+            LOG.debug("Classe principale passée par Maven : {}", className);
         }
 
     Club club = new Club();
     club.setIdclub(154);
     Club c = new ReadClub().read(club, conn);
-       LOG.debug(" club loaded = " + c.toString());
+       LOG.debug(" club loaded = {}", c.toString());
     DBConnection.closeQuietly(conn, null, null, null);
 
 }// end main

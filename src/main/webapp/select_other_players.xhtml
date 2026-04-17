@@ -63,6 +63,9 @@
   <p:ajax event="rowSelectCheckbox"
              listener="#{playerC.rowPlayerSelect}"
              update=":selectPlayers:table_players" />
+  <p:ajax event="toggleSelect"
+             listener="#{playerC.rowPlayerSelectAll()}"
+             update=":selectPlayers:table_players" />
 
     <p:column id="colPlayerSelected"
               toggleable="false"

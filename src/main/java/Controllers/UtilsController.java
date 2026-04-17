@@ -1,7 +1,7 @@
 package Controllers;
 
 //mod 24-08-2025 duite version3.0.0 import com.lowagie.text.BadElementException;
-//import com.lowagie.text.Document;
+import com.lowagie.text.Document;
 //import com.lowagie.text.DocumentException;
 //import com.lowagie.text.Image;
 //import com.lowagie.text.PageSize;
@@ -10,7 +10,7 @@ package Controllers;
 //import org.openpdf.text.Document;
 //import org.openpdf.text.DocumentException;
 //import org.openpdf.text.Image;
-import org.openpdf.text.PageSize;
+import com.lowagie.text.PageSize;
 import entite.PlayingHandicap;
 import entite.Round;
 import static interfaces.GolfInterface.ZDF_TIME;
@@ -101,7 +101,7 @@ public UtilsController() throws IOException {// constructor
   //  }
 
   } catch (Exception ex) {
-       LOG.debug("error printResultSet" + ex);
+       LOG.debug("error printResultSet{}", ex);
    }          
  } // end init
  //       }
@@ -163,30 +163,30 @@ try{
    //     pdf.setPageSize(PageSize.A4.rotate());
 
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-           LOG.debug("path for logo = " + externalContext.getRealPath(""));
+           LOG.debug("path for logo = {}", externalContext.getRealPath(""));
         String logo = externalContext.getRealPath("") + File.separator + "resources"
                 + File.separator + "demo" + File.separator + "images" + File.separator + "prime_logo.png";
 	pdf.add(Image.getInstance(logo));
  } catch (Exception ex) {
-       LOG.debug("preProcessPDF" + ex);
+       LOG.debug("preProcessPDF{}", ex);
  }
 } //end preProcessPDF       
 */
 
 // utilisé dans datePicker, yearRange
- public static int dateYear(int year){
+ public int dateYear(int year){ // migrated from static 2026-03-22
      return LocalDate.now().getYear() + year;
  }
-  public static int dateMonth(int month){
+  public int dateMonth(int month){ // migrated from static 2026-03-22
      return LocalDate.now().getMonthValue() + month;
  }
   // utilisé dans datePicker, minDate ou maxDate
-  public static LocalDate localDateWeek(int week){  // fonctionne avec -1 par exemple
- //         LOG.debug("LocalDate minusweek = " + LocalDate.now().plusWeeks(week));
+  public LocalDate localDateWeek(int week){  // migrated from static 2026-03-22
+ //         LOG.debug("LocalDate minusweek = {}", LocalDate.now().plusWeeks(week));
           return LocalDate.now().plusWeeks(week);
  }
    // utilisé dans datePicker, minDate ou maxDate
-  public static LocalDate localDateYear(int year){
+  public LocalDate localDateYear(int year){ // migrated from static 2026-03-22
       if(year < 0){
           return LocalDate.now().minusYears(year);
       }else{
@@ -195,7 +195,7 @@ try{
  } 
   
      // utilisé dans datePicker, minDate ou maxDate
-  public static LocalTime localTime(int hour, int minute){
+  public LocalTime localTime(int hour, int minute){ // migrated from static 2026-03-22
       return LocalTime.of(hour,minute);
  } 
   
@@ -312,7 +312,7 @@ public void onResize(ColumnResizeEvent event){
 public String getSessionId() {
         FacesContext fCtx = FacesContext.getCurrentInstance();
         HttpSession session = (HttpSession) fCtx.getExternalContext().getSession(false);
-           LOG.debug("Session Id = " + session.getId() + " - creation time = " + session.getCreationTime());
+           LOG.debug("Session Id = {} - creation time = {}", session.getId(), session.getCreationTime());
      //      LOG.debug("session servlet context Path "+ session.getServletContext().getContextPath());
     return session.getId();
 }
@@ -321,7 +321,7 @@ public int getSessionCount() {
         LOG.debug("session count getter invoked "  + SessionCounter.getCount() + NEW_PAGE);
         
         String s = getSessionId();
-   //     LOG.debug("session id = " + sessionId);
+   //     LOG.debug("session id = {}", sessionId);
         
         return SessionCounter.getCount();
     }
@@ -337,7 +337,13 @@ public void preProcessPDF(Object document) {
       pdf.open();
     }
 */
-public static int getElem(PlayingHandicap playingHcp){
+public void preProcessPDF(Object document) {
+    Document pdf = (Document) document;
+    pdf.setPageSize(PageSize.A4.rotate());
+    pdf.open();
+} // end method
+
+public int getElem(PlayingHandicap playingHcp){ // migrated from static 2026-03-22
     // used in ??
     // calcule le nombre de players (de 1/2 à 4 ?)
     int counter_players = 0;
@@ -345,15 +351,15 @@ public static int getElem(PlayingHandicap playingHcp){
     for (Double hcp1 : hcp) {
         if (hcp1 != 0.0) {
             counter_players ++;
-            LOG.debug("Scramble Hcp = " + hcp1);
+            LOG.debug("Scramble Hcp = {}", hcp1);
         }
     }
-            LOG.debug("Scramble Hcp number of players  = " + counter_players );
+            LOG.debug("Scramble Hcp number of players  = {}", counter_players);
             
 return counter_players;
 }
 
-public static void printResultSet(ResultSet rs) throws SQLException{
+public void printResultSet(ResultSet rs) throws SQLException{ // migrated from static 2026-03-22
     try{
     ResultSetMetaData rsmd = rs.getMetaData();
     LOG.debug("querying SELECT * FROM XXX");
@@ -362,13 +368,13 @@ public static void printResultSet(ResultSet rs) throws SQLException{
         for (int i = 1; i <= columnsNumber; i++) {
             if (i > 1) LOG.debug(",  ");
             String columnValue = rs.getString(i);  // à supposer que ce sont tous des string ??
-            LOG.debug(rsmd.getColumnName(i) + " = " + columnValue);
+            LOG.debug("{} = {}", rsmd.getColumnName(i), columnValue);
         } //end for
         LOG.debug("");
     } //end while
             LOG.debug("Scramble Hcp number of players  = "  );
   } catch (Exception ex) {
-       LOG.debug("error printResultSet" + ex);
+       LOG.debug("error printResultSet{}", ex);
    }          
 } // end method
 
@@ -377,9 +383,9 @@ public double getSum(PlayingHandicap playingHcp){   //To find the sum of array e
           Double hcp[] = playingHcp.getHcpScr();
           for(Double i:hcp){
               sum += i;
-              LOG.debug("Scramble Hcp - The sum is : " + sum); 
+              LOG.debug("Scramble Hcp - The sum is : {}", sum); 
           }
-          LOG.debug("Scramble Hcp - The FINAL sum is : " + sum); 
+          LOG.debug("Scramble Hcp - The FINAL sum is : {}", sum); 
 return sum;
 }
 
@@ -432,7 +438,7 @@ return sum;
     }
     /*
 public void onMarkerSelect(OverlaySelectEvent event){  
-        LOG.debug("onMarkerSelect: " + event.getOverlay().getClass().getName());  
+        LOG.debug("onMarkerSelect: {}", event.getOverlay().getClass().getName());  
         infoWindowText = "blabla";  
     } 
     */
@@ -441,7 +447,7 @@ public void onMarkerSelect(OverlaySelectEvent event){
 public String ViewModificationDate() throws IOException{
 try{
     String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-  //      LOG.debug("viewId = " + viewId);
+  //      LOG.debug("viewId = {}", viewId);
    Path path = Paths.get(settings.getProperty("WEBAPP") + viewId);// converts string to path  
    Instant instant = Files.getLastModifiedTime(path).toInstant();
    LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneOffset.systemDefault());
@@ -457,7 +463,7 @@ try{
 
 /* 25-08-2023 moved to Round
   public Round.GameType[] GameType() {
- //     LOG.debug("array as list = " + Arrays.asList(Round.GameType.values()));
+ //     LOG.debug("array as list = {}", Arrays.asList(Round.GameType.values()));
         return Round.GameType.values();
   }
 */
@@ -467,7 +473,7 @@ public List<SelectItem> ListGameType() {  // from enum to List used in show_play
       var items = new SelectItem[le + 1];
       items[0] = new SelectItem("","Select All Games"); // "" = pour réinitialiser la dropdown list
       for (int i=0; i<le; i++){ 
-  //        LOG.debug("items i = " + i + " data = " + data[i]);
+  //        LOG.debug("items i = {} data = {}", i, data[i]);
             items[i+1] = new SelectItem(data[i]);
       }
 return Arrays.asList(items);
@@ -486,12 +492,12 @@ private static SelectItem[] createFilterOptions() throws Exception{  // not used
     
    /* 25-08-2024 moved to Tee
     public Round.StartType[] StartType() {
-      //  LOG.debug("GameType values = " + Round.GameType.values());
+      //  LOG.debug("GameType values = {}", Round.GameType.values());
         return Round.StartType.values();
     }
 moved to Player
     public Player.LanguageType[] LanguageType() {
-      //  LOG.debug("GameType values = " + Round.GameType.values());
+      //  LOG.debug("GameType values = {}", Round.GameType.values());
         return Player.LanguageType.values();
     }
 */
@@ -500,21 +506,21 @@ moved to Player
 public String CleanHelpFile(String str) throws IOException, GeneralSecurityException{
  try{
        int firstIndex = str.indexOf("<br/>"); 
- //          LOG.debug("firstIndex = " + firstIndex);
+ //          LOG.debug("firstIndex = {}", firstIndex);
        if(firstIndex == -1){
            String msg = "firstIndex not found : " + firstIndex;
            LOG.debug(msg);
            throw new Exception();
        }
        int lastIndex = str.indexOf("</h:outputText>");
-//       LOG.debug("lastIndex = " + lastIndex);
+//       LOG.debug("lastIndex = {}", lastIndex);
        if(lastIndex == -1){
            String msg = "lastIndex not found : " + lastIndex;
            LOG.debug(msg);
            throw new Exception();
        }
        str = str.substring(firstIndex+5, lastIndex);
-       LOG.debug("substring  = " + str);
+       LOG.debug("substring  = {}", str);
 return str;
 }catch (Exception ex){
     String msg = " <br/>££ Exception in ViewHelpFileName() " + ex;
@@ -529,7 +535,7 @@ return str;
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

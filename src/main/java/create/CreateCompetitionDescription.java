@@ -1,6 +1,8 @@
 package create;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.CompetitionDescription;
 import entite.ValidationsLC;
 import entite.ValidationsLC.ValidationStatus;
@@ -25,6 +27,13 @@ public class CreateCompetitionDescription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     @Inject private dao.GenericDAO dao;
 
     ValidationsLC vlc = new ValidationsLC();
@@ -33,14 +42,12 @@ public class CreateCompetitionDescription implements Serializable {
 
     public boolean create(final CompetitionDescription competition) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - for competition = " + competition);
-
-        ObjectMapper om = new ObjectMapper();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for competition = {}", competition);
 
         try {
             vlc = this.validate(competition);
-            LOG.debug(methodName + " - vlc = " + vlc);
+            LOG.debug("vlc = {}", vlc);
             if (vlc.getStatus0().equals(ValidationStatus.REJECTED.toString())) {
                 LOG.error(vlc.getStatus1());
                 LCUtil.showMessageFatal(vlc.getStatus1());
@@ -65,8 +72,8 @@ public class CreateCompetitionDescription implements Serializable {
                     ps.setShort(10, competition.getCompetitionStartHole());
                     ps.setShort(11, competition.getFlightNumberPlayers());
                     ps.setString(12, competition.getTimeSlots());
-                    String json = om.writeValueAsString(competition);
-                    LOG.debug(methodName + " - seriesHandicap converted in json = " + NEW_LINE + json);
+                    String json = OBJECT_MAPPER.writeValueAsString(competition);
+                    LOG.debug("seriesHandicap converted in json = {}", NEW_LINE + json);
                     ps.setString(13, json);
                     ps.setString(14, competition.getCompetitionQualifying());
                     ps.setTime(15, Time.valueOf(competition.getPriceGivingTime()));
@@ -107,7 +114,7 @@ public class CreateCompetitionDescription implements Serializable {
 
     public ValidationsLC validate(final CompetitionDescription competition) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             vlc.setStatus0(ValidationsLC.ValidationStatus.APPROVED.toString());
             if (competition.getEndInscriptionDate().isBefore(competition.getStartInscriptionDate())) {
@@ -139,9 +146,9 @@ public class CreateCompetitionDescription implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // var b = create(competition);
-        // LOG.debug("from main, b = " + b);
+        // LOG.debug("from main, b = {}", b);
         LOG.debug("from main, CreateCompetitionDescription = ");
     } // end main
     */

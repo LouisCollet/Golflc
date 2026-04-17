@@ -31,7 +31,7 @@ public class FindTarifMembersOverlapping implements Serializable {
 
     public boolean find(final TarifMember tarif_new) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for tarifMember = " + tarif_new);
 
         final String query = """
@@ -47,8 +47,9 @@ public class FindTarifMembersOverlapping implements Serializable {
             try (ResultSet rs = ps.executeQuery()) {
                 int i = 0;
                 liste = new ArrayList<>();
+                rowmappers.TarifMemberRowMapper mapper = new rowmappers.TarifMemberRowMapper();
                 while (rs.next()) {
-                    liste.add(entite.TarifMember.map(rs));
+                    liste.add(mapper.map(rs));
                     i++;
                 }
                 LOG.debug("ResultSet " + methodName + " has " + i + " lines.");
@@ -86,7 +87,7 @@ public class FindTarifMembersOverlapping implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         TarifMember tm = new TarifMember();
         tm.setStartDate(LocalDateTime.of(2021, Month.JANUARY, 1, 0, 0));
         tm.setEndDate(LocalDateTime.of(2021, Month.DECEMBER, 31, 0, 0));

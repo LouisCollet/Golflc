@@ -63,6 +63,9 @@ public class IcalService {
     @Inject
     private ApplicationContext appContext;
 
+    @Inject
+    private entite.Settings settings;
+
     public byte[] generateIcs(Player player,
             Player invitedBy,
             Round round,
@@ -162,7 +165,7 @@ public class IcalService {
             }
 
             // ---- Organizer ----
-            String hostEmail = System.getenv("SMTP_USERNAME");
+            String hostEmail = settings.getProperty("SMTP_USERNAME");
             if (hostEmail == null || hostEmail.isBlank()) {
                 throw new IllegalStateException("SMTP_USERNAME non défini");
             }
@@ -202,7 +205,7 @@ public class IcalService {
 /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // tests locaux
     } // end main
 */

@@ -4,6 +4,8 @@ package create;
 import entite.HandicapIndex;
 import entite.Player;
 import entite.Round;
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,8 +38,8 @@ public class CreateHandicapIndex implements Serializable {
     public HandicapIndex create(final HandicapIndex handicapIndex) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
 
-        LOG.debug("entering " + methodName);
-        LOG.debug("with HandicapIndex = " + handicapIndex);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with HandicapIndex = {}", handicapIndex);
 
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "handicap_index");
@@ -72,20 +74,16 @@ public class CreateHandicapIndex implements Serializable {
                 }
             }
 
-        } catch (SQLException sqle) {
-            String msg = "SQLException in " + methodName + ": " + sqle.getMessage()
-                    + ", SQLState = " + sqle.getSQLState()
-                    + ", ErrorCode = " + sqle.getErrorCode();
-            LOG.error(msg, sqle);
-            throw sqle;
-
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return null;
         } catch (Exception e) {
-            String msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg, e);
-            throw new SQLException(msg, e);
+            handleGenericException(e, methodName);
+            return null;
         }
     } // end method
 
+    /*
     void main() throws SQLException {
         try {
             Player player = new Player();
@@ -104,13 +102,14 @@ public class CreateHandicapIndex implements Serializable {
             index.setHandicapWHS(new BigDecimal("36.0").setScale(3, RoundingMode.HALF_UP));
 
             HandicapIndex hi = new create.CreateHandicapIndex().create(index);
-            LOG.debug("from main, CreateHandicapIndex = " + hi);
+            LOG.debug("from main, CreateHandicapIndex = {}", hi);
 
         } catch (Exception e) {
             String msg = "Exception in main CreateHandicapIndex: " + e.getMessage();
             LOG.error(msg, e);
         }
     } // end main
+    */
 
 } // end Class
 
@@ -139,8 +138,8 @@ public class CreateHandicapIndex {
       final String methodName = utils.LCUtil.getCurrentMethodName();
      PreparedStatement ps = null;
  try{
-            LOG.debug("entering " + methodName);
-            LOG.debug("  with HandicapIndex = " + handicapIndex);
+            LOG.debug("entering {}", methodName);
+            LOG.debug("  with HandicapIndex = {}", handicapIndex);
           final String query = LCUtil.generateInsertQuery(conn, "handicap_index");
           ps = conn.prepareStatement(query);
           ps.setNull(1, java.sql.Types.INTEGER);
@@ -212,7 +211,7 @@ void main() throws SQLException, Exception {
      index.setHandicapScoreDifferential(new BigDecimal("36.0").setScale(3,RoundingMode.HALF_UP)); //BigDecimal scaled = value.setScale(0, RoundingMode.HALF_UP);
      index.setHandicapWHS(new BigDecimal("36.0").setScale(3,RoundingMode.HALF_UP));
      HandicapIndex hi = new create.CreateHandicapIndex().create(index, conn);
-      LOG.debug("from main, CreateHandicapIndex = " + hi);
+      LOG.debug("from main, CreateHandicapIndex = {}", hi);
  }catch (Exception e){
             String msg = "££ Exception in main CreateHandicapIndex = " + e.getMessage();
             LOG.error(msg);

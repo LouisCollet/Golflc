@@ -3,6 +3,8 @@ package entite;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 // import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
@@ -21,6 +23,12 @@ import utils.LCUtil;
 public class UnavailableStructure implements Serializable{
 @JsonIgnore private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
 //private String[] itemStructure;
 // rybriques stockées en db
@@ -162,8 +170,7 @@ public static UnavailableStructure map(ResultSet rs) throws SQLException{
             LOG.debug("map - Unavailable Structure is null !! Null returned");
             return null;
          }
-         ObjectMapper om = new ObjectMapper();
-         UnavailableStructure str = om.readValue(structure,UnavailableStructure.class);
+         UnavailableStructure str = OBJECT_MAPPER.readValue(structure,UnavailableStructure.class);
             LOG.debug("UnavailableStructure extracted from database = "  + str);
             LOG.debug("nombre d'items structure = " + str.getStructureList().size());
  //           LOG.debug("array items structure = " + Arrays.deepToString(str.getItemStructure()));

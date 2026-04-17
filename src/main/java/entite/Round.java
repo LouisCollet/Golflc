@@ -35,7 +35,7 @@ public class Round implements Serializable, interfaces.Log, interfaces.GolfInter
     private final static String CLASSNAME = utils.LCUtil.getCurrentClassName();
  //   final DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
-//@NotNull(message="Bean validation : the Round ID must be completed")
+@NotNull(message="{round.id.notnull}")
     private Integer idround;
 
 @NotNull(message="{round.date.notnull}")

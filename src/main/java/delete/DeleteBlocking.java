@@ -21,8 +21,8 @@ public class DeleteBlocking implements Serializable, interfaces.GolfInterface {
 
     public boolean delete(final Player player) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("Delete Blocking for player " + player);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("Delete Blocking for player {}", player);
 
         final String query = """
                 DELETE from blocking
@@ -30,7 +30,7 @@ public class DeleteBlocking implements Serializable, interfaces.GolfInterface {
                 """;
 
         int rowDeleted = dao.execute(query, player.getIdplayer());
-        LOG.debug(methodName + " - deleted Blocking = " + rowDeleted);
+        LOG.debug("deleted Blocking = {}", rowDeleted);
         if (rowDeleted > 0) {
             String msg = "End of Blocking for 15 min for = " + player.getIdplayer();
             LOG.debug(msg);
@@ -48,11 +48,11 @@ public class DeleteBlocking implements Serializable, interfaces.GolfInterface {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324713);
         boolean b = new DeleteBlocking().delete(player);
-        LOG.debug("from main - resultat deleteBlocking = " + b);
+        LOG.debug("from main - resultat deleteBlocking = {}", b);
     } // end main
     */
 

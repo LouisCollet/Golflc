@@ -1,6 +1,8 @@
 
 package entite;
 
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
@@ -39,7 +41,9 @@ public HelpView(){  // constructor
     }
 
     public void setHelpViewText(String HelpViewText) {
-        this.HelpViewText = HelpViewText;
+        if (HelpViewText == null) { this.HelpViewText = null; return; }
+        PolicyFactory sanitizer = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.STYLES);
+        this.HelpViewText = sanitizer.sanitize(HelpViewText);
     }
 
     public String getHelpViewLanguage() {

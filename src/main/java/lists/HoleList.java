@@ -31,7 +31,7 @@ public class HoleList implements Serializable {
      */
     public List<Hole> listForTee(final int teeId) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - for teeId = " + teeId);
 
         if (liste != null) {
@@ -61,7 +61,7 @@ public class HoleList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -69,7 +69,7 @@ public class HoleList implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         int teeId = 98;
         List<Hole> holes = new HoleList().listForTee(teeId);

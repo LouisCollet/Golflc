@@ -10,7 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
@@ -30,9 +29,9 @@ public class UpdateLesson implements Serializable {
 
     public boolean update(final Lesson before, final Lesson after) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(" for ScheduleEvent before = " + before);
-        LOG.debug(" for ScheduleEvent after = " + after);
+        LOG.debug("entering {}", methodName);
+        LOG.debug(" for ScheduleEvent before = {}", before);
+        LOG.debug(" for ScheduleEvent after = {}", after);
 
         final String query = """
                 UPDATE lesson
@@ -44,11 +43,7 @@ public class UpdateLesson implements Serializable {
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setTimestamp(1, Timestamp.valueOf(after.getEventStartDate()));
-            ps.setTimestamp(2, Timestamp.valueOf(after.getEventEndDate()));
-            ps.setInt(3, before.getEventProId());
-            ps.setTimestamp(4, Timestamp.valueOf(before.getEventStartDate()));
-            utils.LCUtil.logps(ps);
+            sql.preparedstatement.psUpdateLesson.psMapUpdate(ps, before, after);
 
             int row = ps.executeUpdate();
             if (row != 0) {
@@ -75,7 +70,7 @@ public class UpdateLesson implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Lesson before = new Lesson();
         before.setEventStartDate(java.time.LocalDateTime.parse("2021-05-12T08:00:00"));
         before.setEventProId(1);
@@ -83,7 +78,7 @@ public class UpdateLesson implements Serializable {
         after.setEventStartDate(java.time.LocalDateTime.parse("2021-05-13T15:45:00"));
         after.setEventEndDate(java.time.LocalDateTime.parse("2021-05-13T16:15:00"));
         boolean b = new UpdateLesson().update(before, after);
-        LOG.debug("from main, result = " + b);
+        LOG.debug("from main, result = {}", b);
     } // end main
     */
 

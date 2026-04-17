@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -39,9 +41,9 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean update(final HolesGlobal holesGlobal, final Tee tee) throws Exception {
-        
+    public boolean update(final HolesGlobal holesGlobal, final Tee tee) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
         
         try (Connection conn = dao.getConnection()) {
@@ -70,7 +72,6 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
             }
             
             int totalHoles = holesGlobal.getDataHoles().length;
-            LOG.debug("entering {}", methodName);
             LOG.debug("holesGlobal - new holes values = {}", holesGlobal);
             LOG.debug("tee = {}", tee.toString());
             LOG.debug("longueur = {}", totalHoles);
@@ -194,67 +195,30 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
             
             return true;
             
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = String.format("£££ SQLException in %s: %s (SQLState: %s, ErrorCode: %d)",
-                               methodName,
-                               sqle.getMessage(),
-                               sqle.getSQLState(),
-                               sqle.getErrorCode());
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
             return false;
-            
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
+            handleGenericException(e, methodName);
             return false;
         }
-    }
+    } // end method
 
-    /**
-     * Main pour tests
-     */
-    public static void main(String[] args) {
+/*
+    void main() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         try {
-            // Exemple de données pour 18 holes
-            int[][] testData = {
-                {1, 4, 10, 380},   // Hole 1: Par 4, Index 10, Distance 380m
-                {2, 3, 18, 150},   // Hole 2: Par 3, Index 18, Distance 150m
-                {3, 5, 2, 520},    // Hole 3: Par 5, Index 2, Distance 520m
-                {4, 4, 12, 350},   // Hole 4: Par 4, Index 12, Distance 350m
-                {5, 4, 6, 400},    // Hole 5: Par 4, Index 6, Distance 400m
-                {6, 3, 16, 160},   // Hole 6: Par 3, Index 16, Distance 160m
-                {7, 5, 4, 510},    // Hole 7: Par 5, Index 4, Distance 510m
-                {8, 4, 8, 390},    // Hole 8: Par 4, Index 8, Distance 390m
-                {9, 4, 14, 370},   // Hole 9: Par 4, Index 14, Distance 370m
-                {10, 4, 11, 360},  // Hole 10: Par 4, Index 11, Distance 360m
-                {11, 3, 17, 140},  // Hole 11: Par 3, Index 17, Distance 140m
-                {12, 5, 1, 540},   // Hole 12: Par 5, Index 1, Distance 540m
-                {13, 4, 7, 410},   // Hole 13: Par 4, Index 7, Distance 410m
-                {14, 4, 13, 340},  // Hole 14: Par 4, Index 13, Distance 340m
-                {15, 3, 15, 170},  // Hole 15: Par 3, Index 15, Distance 170m
-                {16, 5, 3, 500},   // Hole 16: Par 5, Index 3, Distance 500m
-                {17, 4, 9, 380},   // Hole 17: Par 4, Index 9, Distance 380m
-                {18, 4, 5, 420}    // Hole 18: Par 4, Index 5, Distance 420m
-            };
-            
             HolesGlobal holesGlobal = new HolesGlobal();
-            holesGlobal.setDataHoles(testData);
-            
             Tee tee = new Tee();
             tee.setIdtee(100);
-            tee.setCourse_idcourse(50);
-            
             LOG.debug("Main ready (CDI required for execution)");
-            LOG.debug("Test data: {} holes for tee ID {}", testData.length, tee.getIdtee());
-            
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
         }
-    }
-}
+    } // end main
+*/
+} // end class
 
 
 /*
@@ -271,13 +235,13 @@ public class UpdateHole{
     
  public boolean update(HolesGlobal holesGlobal, Tee tee, Connection conn) throws SQLException{
         final String methodName = utils.LCUtil.getCurrentMethodName(); 
-        LOG.debug("entering " + methodName); 
-        LOG.debug("holesGlobal - new holes values = " + holesGlobal);
-        LOG.debug("tee = " + tee.toString());
+        LOG.debug("entering {}", methodName); 
+        LOG.debug("holesGlobal - new holes values = {}", holesGlobal);
+        LOG.debug("tee = {}", tee.toString());
     PreparedStatement ps = null;
 try{
     String ho = utils.DBMeta.listMetaColumnsUpdate(conn, "hole"); // MAJ blacklist !!
-        LOG.debug("String for updateHoles from listMetaColumns = " + ho);
+        LOG.debug("String for updateHoles from listMetaColumns = {}", ho);
      // %s indique qu'il s'agit d'un string dans est le même pour toutes les query
     final String query = """
             UPDATE hole
@@ -285,13 +249,13 @@ try{
             WHERE tee_idtee=?
                AND Hole.holenumber=?
            """.formatted(ho);
-    LOG.debug("query UpdateHolesGlobal = " + query);
-    LOG.debug("longueur = " + holesGlobal.getDataHoles().length);
+    LOG.debug("query UpdateHolesGlobal = {}", query);
+    LOG.debug("longueur = {}", holesGlobal.getDataHoles().length);
  for (int i=0; i<holesGlobal.getDataHoles().length; i++) {
   //      var v = holesGlobal.getDataHoles()[i];
   //      LOG.debug(" v = "+ v);
         ps = conn.prepareStatement(query);
-        LOG.debug(" i = " + i);
+        LOG.debug(" i = {}", i);
    // updated fields
           ps.setShort(1, (short) holesGlobal.getDataHoles()[i][1]); // Par
           // modified 19-08-2023 tansfered to table distances
@@ -305,8 +269,7 @@ try{
              utils.LCUtil.logps(ps);
         int row = ps.executeUpdate(); // write into database
         if(row!=0){
-                LOG.debug("-- Successfull update Hole for hole : " + holesGlobal.getDataHoles()[i][0] + " for tee = " 
-                        + tee.getIdtee() + " row = " + row); 
+                LOG.debug("Successfull update Hole for hole={} tee={} row={}", holesGlobal.getDataHoles()[i][0], tee.getIdtee(), row);
             }else{
                 String msg = "-- ERROR update Hole for hole : " + holesGlobal.getDataHoles()[i][0]; 
                 LOG.debug(msg);
@@ -323,7 +286,7 @@ return true;
        LCUtil.showMessageFatal(msg);
        return false;
 } catch(Exception e) {
-       LOG.error(" -- Exception in  " +methodName + e.getMessage());
+       LOG.error("Exception: {}", e.getMessage());
        return false;
 }finally{
         DBConnection.closeQuietly(null, null, null, ps); // new 14/08/2014

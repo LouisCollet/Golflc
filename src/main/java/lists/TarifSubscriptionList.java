@@ -24,7 +24,7 @@ public class TarifSubscriptionList implements Serializable {
 
     public List<TarifSubscription> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         if (liste != null) {
             LOG.debug(methodName + " - returning cached list size = " + liste.size());
@@ -48,7 +48,7 @@ public class TarifSubscriptionList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -56,7 +56,7 @@ public class TarifSubscriptionList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

@@ -14,6 +14,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import entite.LoggingUser;
 import static interfaces.Log.LOG;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
@@ -44,6 +45,25 @@ public class MongoCalculationsController implements Serializable {
     // ✅ Un seul MongoClient réutilisé partout — @ApplicationScoped garantit le singleton
     private final MongoClient mongoClient = MongoClients.create();
 
+    // ✅ CodecRegistry initialisé une seule fois au lieu d'être recréé à chaque create()
+    private final CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
+            MongoClientSettings.getDefaultCodecRegistry(),
+            CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
+    );
+
+    @PostConstruct
+    public void init() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering — creating index on {}", COLLECTION_NAME);
+        try {
+            String idx = getCollection().createIndex(
+                    Indexes.ascending("loggingIdPlayer", "loggingIdRound", "loggingType"));
+            LOG.debug("index result: {}", idx);
+        } catch (MongoException me) {
+            LOG.error("Unable to create index: {}", me);
+        }
+    } // end method
+
     @PreDestroy
     public void cleanup() {
         LOG.debug("MongoCalculationsController - closing MongoClient");
@@ -62,7 +82,7 @@ public class MongoCalculationsController implements Serializable {
         return getDatabase().getCollection(COLLECTION_NAME);
     } // end method
 
-    public static Bson userFilter(LoggingUser loggingUser) {
+    private Bson userFilter(LoggingUser loggingUser) {
         return Filters.and(
                 Filters.eq("loggingIdPlayer", loggingUser.getLoggingIdPlayer()),
                 Filters.eq("loggingIdRound", loggingUser.getLoggingIdRound()),
@@ -76,94 +96,85 @@ public class MongoCalculationsController implements Serializable {
 
     public long delete(LoggingUser loggingUser) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             DeleteResult result = getCollection().deleteMany(userFilter(loggingUser));
-            LOG.debug(methodName + " - deletedCount = " + result.getDeletedCount());
+            LOG.debug("deletedCount = {}", result.getDeletedCount());
             return result.getDeletedCount();
         } catch (MongoException me) {
-            LOG.error(methodName + " - Unable to delete: " + me);
+            LOG.error("Unable to delete: {}", me);
             return 99;
         }
     } // end method
 
     public long update(LoggingUser loggingUser) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Bson update = Updates.combine(
                     Updates.set("loggingCalculations", loggingUser.getLoggingCalculations()),
                     Updates.set("loggingModificationDate", LocalDateTime.now())
             );
             UpdateResult result = getCollection().updateOne(userFilter(loggingUser), update);
-            LOG.debug(methodName + " - modifiedCount = " + result.getModifiedCount());
+            LOG.debug("modifiedCount = {}", result.getModifiedCount());
             return result.getModifiedCount();
         } catch (MongoException me) {
-            LOG.error(methodName + " - Unable to update: " + me);
+            LOG.error("Unable to update: {}", me);
             return 99;
         }
     } // end method
 
     public boolean create(LoggingUser loggingUser) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " for = " + loggingUser);
+        LOG.debug("entering for = {}", loggingUser);
 
-        if (Controllers.LoggingUserController.getText() == null) {
-            loggingUser.setLoggingCalculations(loggingUser.getLoggingCalculations());
-        } else {
-            loggingUser.setLoggingCalculations(Controllers.LoggingUserController.getText());
-        }
+        // getText() est basé sur ThreadLocal — jamais null (initialisé avec "start text")
+        loggingUser.setLoggingCalculations(Controllers.LoggingUserController.getText());
 
-        LOG.debug(methodName + " - create or Update? with logging = " + loggingUser);
+        LOG.debug("create or Update? with logging = {}", loggingUser);
         if (find(loggingUser)) {
-            LOG.debug(methodName + " - existing situation found ==> update");
+            LOG.debug("existing situation found ==> update");
             update(loggingUser);
             return true;
         }
-        LOG.debug(methodName + " - NO existing situation found ==> create");
+        LOG.debug("NO existing situation found ==> create");
 
         try {
-            CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
-                    MongoClientSettings.getDefaultCodecRegistry(),
-                    CodecRegistries.fromProviders(
-                            PojoCodecProvider.builder().automatic(true).build()
-                    )
-            );
             MongoCollection<LoggingUser> collection = getDatabase()
                     .getCollection(COLLECTION_NAME, LoggingUser.class)
-                    .withCodecRegistry(codecRegistry);
+                    .withCodecRegistry(codecRegistry);  // ✅ champ réutilisé
             collection.insertOne(loggingUser);
             return true;
         } catch (MongoException me) {
-            LOG.error(methodName + " - Unable to create: " + me);
+            LOG.error("Unable to create: {}", me);
             return false;
         }
     } // end method
 
     public String read(LoggingUser loggingUser) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " for " + loggingUser);
+        LOG.debug("entering for {}", loggingUser);
         try {
             Document document = getCollection().find(userFilter(loggingUser)).first();
             if (document == null) {
-                LOG.debug(methodName + " - No calculations details found");
+                LOG.debug("No calculations details found");
                 return "No calculations details found !!";
             }
-            LOG.debug(methodName + " - found document: " + document);
+            LOG.debug("found document: {}", document);
             return document.getString("loggingCalculations");
         } catch (MongoException me) {
-            LOG.error(methodName + " - Unable to read: " + me);
-            return null;
+            LOG.error("Unable to read: {}", me);
+            return "";
         }
     } // end method
 
     public boolean find(LoggingUser loggingUser) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " for " + loggingUser);
+        LOG.debug("entering for {}", loggingUser);
         try {
             return getCollection().countDocuments(userFilter(loggingUser)) > 0;
         } catch (MongoException me) {
-            LOG.error(methodName + " - Unable to find: " + me);
+            LOG.error("Unable to find: {}", me);
             return false;
         }
     } // end method
@@ -174,30 +185,25 @@ public class MongoCalculationsController implements Serializable {
 
     public void utilities() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
-            MongoCollection<Document> coll = getCollection();
-            String resultCreateIndex = coll.createIndex(
-                    Indexes.ascending("loggingIdPlayer", "loggingIdRound", "loggingType"));
-            LOG.debug(methodName + " - Index created: " + resultCreateIndex);
-
             Document commandResult = getDatabase().runCommand(new BsonDocument("dbStats", new BsonInt64(1)));
-            LOG.debug(methodName + " - database Stats: " + commandResult.toJson());
+            LOG.debug("database Stats: {}", commandResult.toJson());
 
             commandResult = getDatabase().runCommand(new BsonDocument("buildinfo", new BsonInt64(1)));
-            LOG.debug(methodName + " - buildinfo: " + commandResult.toJson());
+            LOG.debug("buildinfo: {}", commandResult.toJson());
 
             commandResult = getDatabase().runCommand(new Document("collStats", COLLECTION_NAME));
-            LOG.debug(methodName + " - collection Stats: " + commandResult.toJson());
+            LOG.debug("collection Stats: {}", commandResult.toJson());
         } catch (MongoException me) {
-            LOG.error(methodName + " - An error occurred in utilities: " + me);
+            LOG.error("An error occurred in utilities: {}", me);
         }
     } // end method
 
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

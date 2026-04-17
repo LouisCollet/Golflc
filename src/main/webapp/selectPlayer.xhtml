@@ -13,9 +13,10 @@
 
   <h:outputStylesheet library="styles" name="flags/flags.css" />
   <h:form id="selectPlayer_form">
+    <p:focus for="inputPlayerId"/>
 
     <div class="login-container">
-      <p:panel styleClass="login-card">
+      <p:panel styleClass="login-card;width:50%;margin:0 auto;">
         <f:facet name="header">
             <h1>#{msg['message.playerslist']}</h1>
         </f:facet>
@@ -35,6 +36,26 @@
                          icon="pi pi-list"
                          action="#{playerC.togglePlayerList()}"
                          update="playerListWrapper"
+                         style="width:100%; margin-bottom:0.5em;" />
+
+        <p:commandButton id="btnForceLogout"
+                         value="#{msg['login.force.logout']}"
+                         icon="pi pi-power-off"
+                         ajax="false"
+                         immediate="true"
+                         rendered="#{loginC.showForceLogoutButton}"
+                         action="#{loginC.forceLogout()}"
+                         styleClass="p-button-danger"
+                         style="width:100%; margin-bottom:0.5em;" />
+
+        <p:commandButton id="btnForceReconnect"
+                         value="#{msg['login.force.reconnect']}"
+                         icon="pi pi-sign-in"
+                         ajax="false"
+                         immediate="true"
+                         rendered="#{loginC.showForceReconnectButton}"
+                         action="#{loginC.forceReconnect()}"
+                         styleClass="p-button-warning"
                          style="width:100%; margin-bottom:0.5em;" />
 
       </p:panel>
@@ -99,11 +120,15 @@
                   headerText="#{msg['player.selected']}"
                   footerText="#{msg['player.selected']}"
                   style="width:20%" >
+            <!-- disableOnAjax="true" — empêche les double-clics de déclencher plusieurs appels
+                 AJAX vers selectPlayer() → createAudit.create(), ce qui créait des doublons
+                 dans la table audit (fix 2026-04-03) -->
             <p:commandButton id="selectButton"
-                             action="#{playerC.selectPlayer(c)}"
+                             action="#{loginC.selectPlayer(c)}"
                              value="#{msg['button.select']} - #{c.player.idplayer}"
                              title="Choix du player"
-                             icon="pi pi-sign-in" />
+                             icon="pi pi-sign-in"
+                             disableOnAjax="true"/>
         </p:column>
 
         <p:column id="col001"

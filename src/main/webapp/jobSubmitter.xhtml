@@ -41,6 +41,7 @@
                  action="jobExecution.xhtml?faces-redirect=true" />
 
 <f:facet name="footer">
+  <div class="btn-group">
         <p:commandButton value="Start Batch Players"
                          update="growl-msg"
                          immediate="true"
@@ -59,7 +60,7 @@
                          ajax="false"
                          icon="pi pi-arrow-right"
                          action="#{batchC.startBatchJobInscriptions()}"/>
-
+  </div>
 </f:facet>
 </p:panelGrid>
 

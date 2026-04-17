@@ -3,6 +3,7 @@ package lists;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Club;
 import entite.Flight;
 import entite.Round;
@@ -39,6 +40,14 @@ import static utils.LCUtil.showMessageInfo;
 public class SunriseSunsetList implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    }
 
     private static final String API_URL = "https://api.sunrise-sunset.org/json";
 
@@ -101,12 +110,9 @@ public class SunriseSunsetList implements Serializable {
             LOG.debug("{} - body={}",   methodName, response.body());
             response.headers().map().forEach((k, v) -> LOG.debug("header={}:{}", k, v));
 
-            ObjectMapper om = new ObjectMapper();
-            om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            SunriseSunsetResponse sunriseSunset = om.readValue(response.body(), SunriseSunsetResponse.class);
+            SunriseSunsetResponse sunriseSunset = OBJECT_MAPPER.readValue(response.body(), SunriseSunsetResponse.class);
 
-            om.configure(SerializationFeature.INDENT_OUTPUT, true);
-            LOG.debug("{} - parsed response:\n{}", methodName, om.writeValueAsString(sunriseSunset));
+            LOG.debug("{} - parsed response:\n{}", methodName, OBJECT_MAPPER.writeValueAsString(sunriseSunset));
 
             if ("OK".equals(sunriseSunset.getStatus())) {
                 Flight flight = buildFlight(sunriseSunset, club);
@@ -197,7 +203,7 @@ public class SunriseSunsetList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method

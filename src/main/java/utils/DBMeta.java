@@ -753,7 +753,7 @@ public static void cursorHoldabilitySupport(DatabaseMetaData meta) throws SQLExc
 /*
 void main() throws SQLException, Exception{
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // requires CDI container — cannot run standalone
 } // end main
 */

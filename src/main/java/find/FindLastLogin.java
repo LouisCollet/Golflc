@@ -41,11 +41,11 @@ public class FindLastLogin implements Serializable {
             utils.LCUtil.logps(ps);
 
             try (ResultSet rs = ps.executeQuery()) {
-                Audit audit = new Audit();
-                while (rs.next()) {
-                    audit = entite.Audit.mapAudit(rs);
+                if (rs.next()) {
+                    return entite.Audit.mapAudit(rs);
                 }
-                return audit;
+                LOG.debug(methodName + " - no audit found for player " + player.getIdplayer());
+                return null;
             }
 
         } catch (SQLException e) {
@@ -60,7 +60,7 @@ public class FindLastLogin implements Serializable {
 /*
 void main() throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     // tests locaux
 } // end main
 */

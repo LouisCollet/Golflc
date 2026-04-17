@@ -7,9 +7,11 @@ import static utils.LCUtil.showMessageFatal;
 // utilisé dans TarifGreenfee : à intégrer en inner class ?
 public class EquipmentsAndBasic{
   private String item;
-  private String season; 
+  private String season;
   private Double price;
   private Integer quantity;
+  private boolean available = true;    // true=available, false=N/A
+  private String linkedSlotKey;        // null = applies to all slots; non-null = linked to one HO TeeTimes slot
 
   //Global class constructor
   public EquipmentsAndBasic(String i, String n, Double p, Integer q){
@@ -19,7 +21,6 @@ public class EquipmentsAndBasic{
      quantity = q;
   }
   public EquipmentsAndBasic(){  // empty constructor
- 
   }
 
     public String getItem() {
@@ -54,8 +55,12 @@ public class EquipmentsAndBasic{
         this.quantity = quantity;
     }
 
- 
-  
+    public boolean isAvailable() { return available; }
+    public void setAvailable(boolean available) { this.available = available; }
+
+    public String getLinkedSlotKey() { return linkedSlotKey; }
+    public void setLinkedSlotKey(String linkedSlotKey) { this.linkedSlotKey = linkedSlotKey; }
+
   public String toString(){
  try {
 //      LOG.debug("starting toString TarifGreenfee !");

@@ -26,24 +26,18 @@ public class FindCountListProfessional implements Serializable {
 
     @Inject private dao.GenericDAO dao;
 
-    // Cache d'instance — @ApplicationScoped garantit le singleton
-    private List<Professional> liste = null;
-
+    // Pas de cache — résultat spécifique à chaque joueur (@ApplicationScoped partagé entre tous les utilisateurs)
     private static final String QUERY = """
             SELECT *
             FROM professional
             WHERE professional.ProPlayerId = ?
+            AND NOW() BETWEEN ProClubStartDate AND ProClubEndDate
             LIMIT 500
             """;
 
     public List<Professional> list(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-
-        if (liste != null) {
-            LOG.debug(methodName + " - returning cached list (" + liste.size() + " entries)");
-            return liste;
-        }
+        LOG.debug("entering {}", methodName);
 
         if (player == null || player.getIdplayer() == null || player.getIdplayer() <= 0) {
             LOG.warn(methodName + " - player is null or has no ID");
@@ -53,36 +47,22 @@ public class FindCountListProfessional implements Serializable {
         LOG.debug(methodName + " - querying database for player ID=" + player.getIdplayer());
 
         RowMapper<Professional> professionalMapper = new ProfessionalRowMapper();
-        liste = dao.queryList(QUERY, professionalMapper, player.getIdplayer());
+        List<Professional> result = dao.queryList(QUERY, professionalMapper, player.getIdplayer());
 
-        if (liste.isEmpty()) {
+        if (result.isEmpty()) {
             LOG.debug(methodName + " - no professionals found for player ID=" + player.getIdplayer());
         } else {
-            LOG.debug(methodName + " - found " + liste.size() + " professional(s)");
-            liste.forEach(item ->
+            LOG.debug(methodName + " - found " + result.size() + " professional(s)");
+            result.forEach(item ->
                     LOG.debug("Professional: proId=" + item.getProId()
                             + ", playerId=" + item.getProPlayerId()
                             + ", club=" + item.getProClubId()));
         }
-        return liste;
+        return result;
     } // end method
 
-    // ========================================
-    // CACHE
-    // ========================================
-
-    public boolean isCached() {
-        return liste != null;
-    }
-
-    public List<Professional> getListe()              { return liste; }
-    public void setListe(List<Professional> liste)    { this.liste = liste; }
-
     public void invalidateCache() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        // No-op — pas de cache, résultat player-specific
     } // end method
 
     // ========================================

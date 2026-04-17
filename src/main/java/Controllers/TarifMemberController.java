@@ -34,13 +34,13 @@ public class TarifMemberController implements Serializable {
  
 public TarifMember inputTarifMembersCotisation(TarifMember tarifMember) throws SQLException, Exception{  // used in tarif_members.xhtml
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
 try{
     LOG.debug("with inputTarifMembersCotisation with tarifMember = !"+ tarifMember);
-  LOG.debug("workRangeAge = " + tarifMember.getWorkRangeAge());
+  LOG.debug("workRangeAge = {}", tarifMember.getWorkRangeAge());
      if(tarifMember.getWorkRangeAge() == null){ // pas complété dans écran
          tarifMember.setWorkRangeAge("00-00");
-         LOG.debug("workRangeAge was null, setted to : " + tarifMember.getWorkRangeAge());
+         LOG.debug("workRangeAge was null, setted to : {}", tarifMember.getWorkRangeAge());
     }
      // à modifier : on prend toujours les dates de la dernière période introduite !
     tarifMember.setStartDate(tarifMember.getWorkStartDate());
@@ -72,7 +72,7 @@ try{
 
 public TarifMember inputTarifMembersEquipments(TarifMember tarifMember) throws SQLException, Exception{  // used in tarif_equipments.xhtml
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
 try{
     LOG.debug("with inputTarifMembersEquipments with tarifMember = "+ tarifMember);
     EquipmentsAndBasic equipments = new EquipmentsAndBasic( // mod 09/05/2022
@@ -98,9 +98,9 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
    final String methodName = utils.LCUtil.getCurrentMethodName();
      Cotisation cotisation = new Cotisation();
     try{
-        LOG.debug("entering " + methodName);
-        LOG.debug("with TarifMember = " + tarif);
-        LOG.debug("for Player = " + player.getIdplayer());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with TarifMember = {}", tarif);
+        LOG.debug("for Player = {}", player.getIdplayer());
      // de 00:00 heures à 23:59 introduit le 07-04-2021
      cotisation.setCotisationError(false);
      /* validation sur date début et fin !
@@ -118,7 +118,7 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
  //   LocalDateTime lastDayOfYear = LocalDateTime.now().with(temporalLast).withNano(0);
     cotisation.setCotisationStartDate(LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear()));
  //   LocalDateTime lastDayOfYear = LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear()).withNano(0);
- //       LOG.debug("lastDayOfYear = " + lastDayOfYear);
+ //       LOG.debug("lastDayOfYear = {}", lastDayOfYear);
   // cotisation.setCotisationStartDate(LocalDateTime.now().with(temporalFirst).withNano(0)); TemporalAdjusters.firstDayOfYear()
   //  cotisation.setCotisationEndDate(LocalDateTime.parse("2023-12-31T23:59:59"));
   //  cotisation.setCotisationEndDate(LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59));
@@ -126,13 +126,13 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
     
   //   LocalDateTime firstDayOfYear = LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear());
  //   LocalDateTime first = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0);
-  //  LOG.debug("firstDayOfYear = " + firstDayOfYear);
+  //  LOG.debug("firstDayOfYear = {}", firstDayOfYear);
     
-       LOG.debug("with Cotisation modified start and end date= " + cotisation);    
- //      LOG.debug("cotisation startDate = " + cotisation.getCotisationStartDate());
- //      LOG.debug("cotisation endDate   = " + cotisation.getCotisationEndDate());
+       LOG.debug("with Cotisation modified start and end date= {}", cotisation);    
+ //      LOG.debug("cotisation startDate = {}", cotisation.getCotisationStartDate());
+ //      LOG.debug("cotisation endDate   = {}", cotisation.getCotisationEndDate());
     cotisation = this.calcCotisationPrice(tarif, player, cotisation);
-          LOG.debug("cotisation with price calculated = " + cotisation.getPrice());
+          LOG.debug("cotisation with price calculated = {}", cotisation.getPrice());
     if(cotisation.getPrice() == 0.0){
             String msgerr = "Le total est zéro - il faut choisir au moins un item !!!";
             LOG.error(msgerr);
@@ -164,7 +164,7 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
                   .append("),");
          } //end for
           sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
- //         LOG.debug("final selectedItems = " + sb);
+ //         LOG.debug("final selectedItems = {}", sb);
       cotisation.setItems(sb.toString());
   return cotisation;
 } catch (Exception e) {
@@ -174,9 +174,9 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
 } //end method
 public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisation cotisation){
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
-    LOG.debug(" -- Start of CalcTarifMember.findTarif with tarifMember= " + tarif);
-    LOG.debug(" -- Start of CalcTarifMember.findTarif with cotisation= " + cotisation);
+    LOG.debug("entering {}", methodName);
+    LOG.debug(" -- Start of CalcTarifMember.findTarif with tarifMember= {}", tarif);
+    LOG.debug(" -- Start of CalcTarifMember.findTarif with cotisation= {}", cotisation);
  try {
  //       à faire : proportion pour abonnement en cours d'année (année incomplète)
           LOG.debug("validating cotisation age range- --------");
@@ -187,37 +187,37 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
   //                                    tarifMember.getMemberEndDate());
     //  int days = (int)dur.toDays();
   //    double days = dur.toDays();
-  //       LOG.debug("duration in days = " + days);
+  //       LOG.debug("duration in days = {}", days);
   //    if(days < 0){
- //         LOG.debug("negative days = " + days);
+ //         LOG.debug("negative days = {}", days);
  //     }
       
       // à faire : paiement pour des mois, y compris mois incomplets !
     
-    LOG.debug("player age = " + yourAge);
+    LOG.debug("player age = {}", yourAge);
 
   	for(int i = 0 ; i < tarif.getBasicList().size() ; i++) {
-                LOG.debug("i = " + i);
-   //             LOG.debug("base for calculation = " + Arrays.toString(tarif.getMembersBase()[i]));
-//                LOG.debug("choice for calculation = " + tarif.getMembersChoice()[i]);
+                LOG.debug("i = {}", i);
+   //             LOG.debug("base for calculation = {}", Arrays.toString(tarif.getMembersBase()[i]));
+//                LOG.debug("choice for calculation = {}", tarif.getMembersChoice()[i]);
  //            if(tarif.getMembersChoice()[i] == 0){
  //                LOG.debug("skipped : you are not paying this cotisation");
  //                continue;} // passe item suivant
         //     String range = tarif.getMembersBase()[i][2];
              String range = tarif.getBasicList().get(i).getRange();
-                LOG.debug("age range for this item = " + range);
+                LOG.debug("age range for this item = {}", range);
              if(range.equals("00-00")){
                  LOG.debug("accepted : not considering age range");
                  continue;}
              int startRange = Integer.parseInt(range.substring(0,2));
-                LOG.debug("start for this item = " + startRange);
+                LOG.debug("start for this item = {}", startRange);
              if(startRange < 18){
                  String msg = "Accepted : you are older, but we consider you are paying for your kids";
                  LOG.debug(msg);
                  LCUtil.showMessageInfo(msg);
                  continue;}
              int endRange = Integer.parseInt(range.substring(range.length()-2));
-                LOG.debug("end for this item = " + endRange);
+                LOG.debug("end for this item = {}", endRange);
  // to do : ne pas aller vers creditcard !!               
              if(yourAge < startRange || yourAge > endRange){
                 String msg = "Rejected !!wrong cotisation range : " + range + " for your age = " + yourAge;
@@ -237,34 +237,34 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
      for(EquipmentsAndBasicAndRange basic : tarif.getBasicList()) {
          total = total + (basic.getPrice() * basic.getQuantity());
      }
-        LOG.debug("total after cotisation member= " + total);
+        LOG.debug("total after cotisation member= {}", total);
 
        LOG.debug("calculating equipments- 07/05/2022----------------");
        for (EquipmentsAndBasic equipment : tarif.getEquipmentsList()) {
            total = total + (equipment.getPrice() * equipment.getQuantity());
        }
-         LOG.debug("total after equipments = " + total);
+         LOG.debug("total after equipments = {}", total);
      cotisation.setCommunication(cotisation.getCommunication() + total);       
          
 
      double discount = 0.0;
-        LOG.debug("tarif.getDiscount = " + tarif.getDiscount());
+        LOG.debug("tarif.getDiscount = {}", tarif.getDiscount());
         
   //   if(tarif.getDiscount() == null){  // new 05-06-2021 pour continuer, à revoir !!
  //       tarif.setDiscount("Days");
   //   }
      cotisation.setCommunication(LCUtil.prepareMessageBean("cotisation.communication"));
      if(tarif.getDiscount().equals("Year") || tarif.getDiscount() == null){
-//          LOG.debug("number of days = " + Year.of(year).length());
+//          LOG.debug("number of days = {}", Year.of(year).length());
              LOG.debug("discount = Year - no discount !");
      }
      if(tarif.getDiscount().equals("Months")){
              LOG.debug("entering discount = Months !");
              BigDecimal months = BigDecimal.valueOf(
                   ChronoUnit.MONTHS.between(cotisation.getCotisationStartDate(), cotisation.getCotisationEndDate()));
-                LOG.debug("duration in months = " + months);
+                LOG.debug("duration in months = {}", months);
 ///             discount = total.multiply(BigDecimal.valueOf(12).subtract(months)).divide(BigDecimal.valueOf(12),RoundingMode.HALF_UP);
-                LOG.debug("discount for months = " + discount);
+                LOG.debug("discount for months = {}", discount);
 ///             total = total.subtract(discount);
              cotisation.setCommunication(cotisation.getCommunication() + " - Discount " + months + " Months = " + discount);
          }
@@ -272,25 +272,25 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
          if(tarif.getDiscount().equals("Days")){
                 LOG.debug("entering discount = Days  !");
              int year = cotisation.getCotisationEndDate().getYear();
-                LOG.debug("year = " + year);
+                LOG.debug("year = {}", year);
            //  int days = Year.of(year).length();
              int days = Year.of(cotisation.getCotisationEndDate().getYear()).length();
-                LOG.debug("duration Year in days = " + days);
+                LOG.debug("duration Year in days = {}", days);
     //         double daysYear = Double.valueOf(days);
              double daysPeriod = Double.valueOf(
                         ChronoUnit.DAYS.between(cotisation.getCotisationStartDate(), cotisation.getCotisationEndDate()));
-                LOG.debug("duration period in days = " + daysPeriod);
+                LOG.debug("duration period in days = {}", daysPeriod);
              Duration duration = Duration.between(cotisation.getCotisationStartDate(), cotisation.getCotisationEndDate());  
               long result = duration.toDays();     
-                LOG.debug("duration period in days # 2 = " + result);
+                LOG.debug("duration period in days # 2 = {}", result);
       //       discount = total.multiply(BigDecimal.valueOf(365).subtract(daysPeriod)).divide(BigDecimal.valueOf(365),RoundingMode.HALF_UP);
 // mod             discount = (daysYear.subtract(daysPeriod)).multiply(total).divide(BigDecimal.valueOf(365),RoundingMode.HALF_UP);
-             LOG.debug("discount for days = " + discount);
+             LOG.debug("discount for days = {}", discount);
          //    total = total.multiply(days).divide(new BigDecimal("365"));
  /// mod            total = total.subtract(discount);
              cotisation.setCommunication(cotisation.getCommunication() + " - Discount " + days + " Days = " + discount);
          }
-         LOG.debug("total for cotisation and equipments after discount = " + total);
+         LOG.debug("total for cotisation and equipments after discount = {}", total);
          cotisation.setPrice(utils.LCUtil.myDoubleRound(total,2));
       return cotisation;
  } catch (Exception e) {

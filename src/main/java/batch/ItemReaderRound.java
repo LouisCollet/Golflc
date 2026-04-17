@@ -62,7 +62,7 @@ public class ItemReaderRound extends AbstractItemReader implements interfaces.Go
     @Override
     public void open(final Serializable checkpoint) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             // ✅ Settings injecté — plus de Settings.getProperty() statique
             String fileName = settings.getProperty("BATCH") + "ryder cup rounds.txt";
@@ -119,7 +119,7 @@ public class ItemReaderRound extends AbstractItemReader implements interfaces.Go
     @Override
     public Object readItem() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             if (count < rows) {
                 LOG.debug(methodName + " - parsing elem = "
@@ -158,7 +158,7 @@ public class ItemReaderRound extends AbstractItemReader implements interfaces.Go
     @Override
     public void close() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             LOG.debug(methodName + " - records read  = " + (values2D != null ? values2D.length : 0));
             LOG.debug(methodName + " - errors CSV    = " + errorsCSV);

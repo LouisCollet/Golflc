@@ -28,13 +28,14 @@ public class ScheduleMail implements Serializable {
     @Inject private PlayerManager playerManager;
     @Inject private MailSender mailSender;
     @Inject private read.ReadClub readClubService;
+    @Inject private entite.Settings settings;
 
     public ScheduleMail() { }
 
     public void createLesson(Creditcard creditcard, Professional professional, entite.Lesson lesson)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with creditcard = " + creditcard);
         LOG.debug(" with professional = " + professional);
         LOG.debug(" with lesson = " + lesson);
@@ -73,7 +74,7 @@ public class ScheduleMail implements Serializable {
                 + " <br/>Email de votre pro" + "pro email"
                 + "<br/><br/> envoye le : " + LocalDateTime.now().format(ZDF_TIME);
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathQRC = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
             LOG.debug("mail async dispatched for lesson taker");
@@ -107,7 +108,7 @@ public class ScheduleMail implements Serializable {
     public Boolean deleteLesson(Professional professional, entite.Lesson lesson)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Subscription at GolfLC is paid !";
             Player taker = new Player();
@@ -121,7 +122,7 @@ public class ScheduleMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathQRC = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
             return true;
@@ -134,7 +135,7 @@ public class ScheduleMail implements Serializable {
     public Boolean modifyLesson(Professional professional, entite.Lesson lesson)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Cotisation via GolfLC is paid !";
             Player taker = new Player();
@@ -149,7 +150,7 @@ public class ScheduleMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathQRC = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, taker.getPlayerLanguage());
             return true;
@@ -162,7 +163,7 @@ public class ScheduleMail implements Serializable {
     public Boolean sendMailGreenfee(Player player, Creditcard creditcard, Greenfee greenfee, Club club)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Greenfee via GolfLC is paid !";
             String mail =
@@ -181,7 +182,7 @@ public class ScheduleMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathQRC = null;
             mailSender.sendHtmlMailAsync(sujet, mail, to, pathQRC, player.getPlayerLanguage());
             LOG.debug("HTML Mail async dispatched");

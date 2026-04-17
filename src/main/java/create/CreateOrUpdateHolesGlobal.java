@@ -35,8 +35,8 @@ public class CreateOrUpdateHolesGlobal implements Serializable {
 
     public boolean status(final HolesGlobal holesGlobal, final Tee tee, final Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for type = " + holesGlobal.getType());
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for type = {}", holesGlobal.getType());
 
         try {
             if (holesGlobal.getType().equals("distance")) {
@@ -45,12 +45,12 @@ public class CreateOrUpdateHolesGlobal implements Serializable {
             } else {
                 handleDistance(tee, holesGlobal);
                 int rows = findCountHoles.find(tee);
-                LOG.info("numbers of rows = " + rows);
+                LOG.info("numbers of rows = {}", rows);
                 if (rows == 0) {
-                    LOG.info("This is an Insert " + rows);
+                    LOG.info("This is an Insert {}", rows);
                     return createHolesGlobal.create(holesGlobal, tee, course);
                 } else {
-                    LOG.info("This is a Modify " + rows);
+                    LOG.info("This is a Modify {}", rows);
                     return updateHole.update(holesGlobal, tee);
                 }
             }
@@ -65,13 +65,13 @@ public class CreateOrUpdateHolesGlobal implements Serializable {
 
     private boolean handleDistance(final Tee tee, final HolesGlobal holesGlobal) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             Distance distance = new Distance();
             distance.setIdTee(tee.getIdtee());
-            LOG.debug("input dataHoles for distance = " + Arrays.deepToString(holesGlobal.getDataHoles()));
+            LOG.debug("input dataHoles for distance = {}", Arrays.deepToString(holesGlobal.getDataHoles()));
             var v = utils.LCUtil.extractFrom2D(holesGlobal.getDataHoles(), 3);
-            LOG.debug("input extracted from dataholes = " + Arrays.toString(v));
+            LOG.debug("input extracted from dataholes = {}", Arrays.toString(v));
             distance.setDistanceArray(v);
             return createDistances.create(distance);
         } catch (SQLException sqle) {
@@ -86,7 +86,7 @@ public class CreateOrUpdateHolesGlobal implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

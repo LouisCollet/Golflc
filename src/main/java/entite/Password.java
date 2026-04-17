@@ -3,6 +3,8 @@ package entite;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import static interfaces.Log.LOG;
 // import jakarta.enterprise.context.Dependent;  // migrated 2026-02-26
 // import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
@@ -25,7 +27,14 @@ import utils.LCUtil;
 public class Password implements Serializable, interfaces.Log, interfaces.GolfInterface{
     
     private static final long serialVersionUID = 1L;
-    
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
 @JsonIgnore // ne sera pas chargé en database
 private List<String>previousPasswords = new ArrayList<>();
 
@@ -168,11 +177,10 @@ public static Password map(ResultSet rs) throws SQLException{
   try{
   //  LOG.debug("starting mapPassword for player = "); // + player);
         Password password = new Password();
-        ObjectMapper om = new ObjectMapper();
     //   on récupère l'array avec les anciens mots de passe
         String s = rs.getString("PlayerPreviousPasswords");
         if(s != null){
-            password = om.readValue(s,Password.class);
+            password = OBJECT_MAPPER.readValue(s,Password.class);
             List<String> list = new ArrayList<>(Arrays.asList(password.getArrayPasswords()));
             password.setPreviousPasswords(list);
   //       LOG.debug("at the end of mapper Password = " + pa);

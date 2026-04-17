@@ -1,6 +1,8 @@
 package create;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Round;
 import entite.ScoreMatchplay;
 import static exceptions.LCException.handleGenericException;
@@ -19,15 +21,22 @@ public class CreateScoreMatchplay implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
+        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
+
     @Inject private dao.GenericDAO dao;
 
     public CreateScoreMatchplay() { }
 
     public boolean create(final ScoreMatchplay score, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - scorematchplay = " + score);
-        LOG.debug(methodName + " - Round = " + round);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("scorematchplay = {}", score);
+        LOG.debug("Round = {}", round);
         try {
             final String query
                     = "UPDATE round"
@@ -36,8 +45,7 @@ public class CreateScoreMatchplay implements Serializable {
 
             try (Connection conn = dao.getConnection();
                  PreparedStatement ps = conn.prepareStatement(query)) {
-                ObjectMapper om = new ObjectMapper();
-                ps.setString(1, om.writeValueAsString(score));
+                ps.setString(1, OBJECT_MAPPER.writeValueAsString(score));
                 ps.setInt(2, round.getIdround());
                 utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
@@ -69,7 +77,7 @@ public class CreateScoreMatchplay implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
     } // end main
     */
 

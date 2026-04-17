@@ -32,7 +32,7 @@ public class InscriptionListForOneRound implements Serializable {
 
     public List<ECourseList> list(final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         if (liste != null) {
             LOG.debug(methodName + " - returning cached list size = " + liste.size());
@@ -80,7 +80,7 @@ public class InscriptionListForOneRound implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -88,7 +88,7 @@ public class InscriptionListForOneRound implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Round round = new Round();
         round.setIdround(260);
         List<ECourseList> p1 = list(round);

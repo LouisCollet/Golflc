@@ -39,7 +39,9 @@
                            size="1"
                            emptyValue="0"
                            title="#{msg['tooltip.tarif.choice']}"
-                           decimalPlaces="0"/>
+                           decimalPlaces="0">
+                <p:ajax event="change" update="form_price_round_greenfee:totalPricePanel" process="@form"/>
+            </p:inputNumber>
         </p:column>
     </p:dataTable>
 

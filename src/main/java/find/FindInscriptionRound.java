@@ -24,7 +24,7 @@ public class FindInscriptionRound implements Serializable {
 
     public boolean find(final Round round, final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("for round = " + round);
         LOG.debug("for player = " + player);
 
@@ -68,7 +68,7 @@ public class FindInscriptionRound implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Round round = new Round();
         round.setIdround(633);
         Player player = new Player();

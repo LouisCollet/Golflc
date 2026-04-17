@@ -32,7 +32,7 @@ public class FindTeeStart implements Serializable {
 
     public List<String> find(final Course course, final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         if (liste != null) {
             LOG.debug(methodName + " - escaped thanks to lazy loading");
@@ -98,7 +98,7 @@ public class FindTeeStart implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -106,7 +106,7 @@ public class FindTeeStart implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Course course = new Course();
         course.setIdcourse(99);
         Player player = new Player();

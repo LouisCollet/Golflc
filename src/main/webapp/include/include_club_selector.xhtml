@@ -3,53 +3,30 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:p="primefaces"
     xmlns:ui="jakarta.faces.facelets"
-    xmlns:h="jakarta.faces.html"
-    xmlns:f="jakarta.faces.core">
-    
-            <p:outputLabel for="@next" value="#{msg['club.id']}" />
-            <h:panelGroup layout="block" 
-                          style="display:flex; align-items:center; gap:0.5rem;"
-                          id="containerClub">
-         <!--       <p:inputNumber
-                       id="inputClubId"
-                       label="inputClub"
-                       value="#{clubC.club.idclub}"
-                       size="5"
-                       decimalPlaces="0"
-                       emptyValue="0"
-                       style="margin-left:1.5em; margin-right:1.5em;" />
-                -->
-            <p:inputNumber id="inputClubId"
-               label="inputClub"
-               value="#{clubC.club.idclub}"
-               size="5"
-               lang="#{languageC.locale}"
-               decimalPlaces="0"
-               emptyValue="0"
-               required="true"
-               requiredMessage="#{msg['club.id.notnull']} - required"
-               validatorMessage="#{msg['club.id.notnull']}"
-               style="margin-left:1.5em; margin-right:1.5em;">
-                    <f:validateLongRange minimum="1"/> 
-            </p:inputNumber>
-                  <!-- ✅ 0 invalide -->
-                
-                <p:commandButton 
-                         id="ButtonHomeClub"
-                         immediate="true"
-                         value="#{msg['button.player.homeclub']}"
-                         actionListener="#{dialogC.showSelectClub('general')}"
-                         icon="pi pi-search" >
+    xmlns:h="jakarta.faces.html">
+
+            <p:outputLabel for="@next" value="#{msg['club.id']} :" />
+            <h:panelGroup layout="block" styleClass="selector-row" id="containerClub">
+                <p:inputNumber id="inputClubId"
+                               label="inputClub"
+                               value="#{clubC.club.idclub}"
+                               size="5"
+                               lang="#{languageC.locale}"
+                               decimalPlaces="0"
+                               emptyValue="0"/>
+                <p:commandButton id="ButtonHomeClub"
+                                 immediate="true"
+                                 value="#{msg['button.player.homeclub']}"
+                                 actionListener="#{dialogC.showSelectClub('general')}"
+                                 icon="pi pi-search">
                     <p:ajax event="dialogReturn"
-                            update="inputClubId,clubName,clubId">
-                    </p:ajax>
-                 </p:commandButton>
-      <!--  , growl-msg,inputCourseId, courseName,courseId"  -->
+                            update="inputClubId,clubName,clubId"/>
+                </p:commandButton>
                 <h:outputText id="clubName"
                               value="#{clubC.club.clubName}"
-                              style="font-style:italic;color:black"/>
+                              styleClass="selector-name"/>
                 <h:outputText id="clubId"
-                              value=" #{clubC.club.idclub}"
-                              style="font-weight:bold;font-size: 2em;font-style:italic;color: red" />  
+                              value="#{clubC.club.idclub}"
+                              styleClass="selector-id"/>
             </h:panelGroup>
 </ui:composition>

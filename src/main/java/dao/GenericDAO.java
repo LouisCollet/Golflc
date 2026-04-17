@@ -1,5 +1,7 @@
 package dao;
-
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
+import static interfaces.Log.LOG;
 import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
@@ -13,44 +15,25 @@ import java.util.List;
 import javax.sql.DataSource;
 import rowmappers.RowMapper;
 
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
-import static interfaces.Log.LOG;
-
-/**
- * Generic DAO — reduces boilerplate across 47+ list services.
- * ✅ @ApplicationScoped — singleton CDI
- * ✅ DataSource JNDI standard
- * ✅ Standards CDI : methodName + handleGenericException/handleSQLException
- *
- * Usage:
- *   @Inject private GenericDAO dao;
- *   List<Club> clubs = dao.queryList("SELECT * FROM club", new ClubRowMapper());
- *   Club club = dao.querySingle("SELECT * FROM club WHERE id=?", new ClubRowMapper(), 108);
- *   int rows = dao.execute("DELETE FROM club WHERE id=?", 108);
- *
- * @author GolfLC
- * @version 1.0 — 2026-03-18
- */
 @ApplicationScoped
 public class GenericDAO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
+    private static final long SLOW_QUERY_MS = 100;
+    private static final long VERY_SLOW_QUERY_MS = 500;
+
+    @Resource(lookup = "java:jboss/datasources/golflc") // jndi-name de <datasource> de mysql-ds.xml
     private DataSource dataSource;
 
-    public GenericDAO() {} // end constructor
+    public GenericDAO() {}
 
-    /**
-     * Exécute une requête SELECT et retourne une liste mappée.
-     *
-     * @param sql    requête SQL avec placeholders ?
-     * @param mapper RowMapper pour convertir chaque ligne
-     * @param params paramètres positionnels (dans l'ordre des ?)
-     * @return liste (jamais null — Collections.emptyList() en cas d'erreur)
-     */
+    // =========================
+    // QUERY LIST
+    // =========================
     public <T> List<T> queryList(String sql, RowMapper<T> mapper, Object... params) throws SQLException {
+
+        long start = System.nanoTime();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -58,26 +41,35 @@ public class GenericDAO implements Serializable {
             bindParams(ps, params);
 
             try (ResultSet rs = ps.executeQuery()) {
+
                 List<T> result = new ArrayList<>();
+
                 while (rs.next()) {
                     result.add(mapper.map(rs));
                 }
+
                 return result;
             }
 
         } catch (SQLException e) {
             handleSQLException(e, "GenericDAO.queryList");
             return Collections.emptyList();
+
         } catch (Exception e) {
             handleGenericException(e, "GenericDAO.queryList");
             return Collections.emptyList();
-        }
-    } // end method
 
-    /**
-     * Exécute une requête SELECT et retourne un seul résultat (ou null).
-     */
+        } finally {
+            logExecution("queryList", sql, params, start);
+        }
+    }
+
+    // =========================
+    // QUERY SINGLE
+    // =========================
     public <T> T querySingle(String sql, RowMapper<T> mapper, Object... params) throws SQLException {
+
+        long start = System.nanoTime();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -94,50 +86,109 @@ public class GenericDAO implements Serializable {
         } catch (SQLException e) {
             handleSQLException(e, "GenericDAO.querySingle");
             return null;
+
         } catch (Exception e) {
             handleGenericException(e, "GenericDAO.querySingle");
             return null;
-        }
-    } // end method
 
-    /**
-     * Exécute un INSERT, UPDATE ou DELETE.
-     *
-     * @return nombre de lignes affectées (0 en cas d'erreur)
-     */
+        } finally {
+            logExecution("querySingle", sql, params, start);
+        }
+    }
+
+    // =========================
+    // EXECUTE (INSERT/UPDATE/DELETE)
+    // =========================
     public int execute(String sql, Object... params) throws SQLException {
+
+        long start = System.nanoTime();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             bindParams(ps, params);
+
             return ps.executeUpdate();
 
         } catch (SQLException e) {
             handleSQLException(e, "GenericDAO.execute");
             return 0;
+
         } catch (Exception e) {
             handleGenericException(e, "GenericDAO.execute");
             return 0;
-        }
-    } // end method
 
-    /**
-     * Expose a raw JDBC Connection for edge-case queries that cannot use queryList/querySingle
-     * (e.g. DBMeta calls, temporary tables).
-     * Caller is responsible for closing with try-with-resources.
-     */
+        } finally {
+            logExecution("execute", sql, params, start);
+        }
+    }
+
+    // =========================
+    // CONNECTION
+    // =========================
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
-    } // end method
+    }
 
-    /**
-     * Bind les paramètres positionnels sur le PreparedStatement.
-     */
+    // =========================
+    // PARAM BINDING
+    // =========================
     private void bindParams(PreparedStatement ps, Object... params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
             ps.setObject(i + 1, params[i]);
         }
+    }
+
+    // =========================
+    // 🔥 DAO INTERCEPTOR CORE
+    // =========================
+    private void logExecution(String type, String sql, Object[] params, long startNano) {
+
+        long durationMs = (System.nanoTime() - startNano) / 1_000_000;
+
+        if (durationMs > VERY_SLOW_QUERY_MS) {
+
+            LOG.error("\nVERY SLOW SQL [{}] {} ms | SQL={} | params={}",
+            type,
+            durationMs,
+            sql,
+            formatParams(params)
+            );
+
+        } else if (durationMs > SLOW_QUERY_MS) {
+
+          LOG.warn("\nSLOW SQL [{}] {} ms | SQL={} | params={}",
+            type,
+            durationMs,
+            sql,
+            formatParams(params)
+            );
+
+        } else {
+            LOG.debug("SQL [{}] {} ms", type, durationMs);
+        }
     } // end method
 
-} // end class
+    // =========================
+    // FORMAT PARAMS
+    // =========================
+    private String formatParams(Object[] params) {
+
+        if (params == null || params.length == 0) {
+            return "[]";
+        }
+
+        StringBuilder sb = new StringBuilder("[");
+
+        for (int i = 0; i < params.length; i++) {
+            sb.append(params[i]);
+            if (i < params.length - 1) {
+                sb.append(", ");
+            }
+        }
+
+        sb.append("]");
+        return sb.toString();
+    }
+
+}

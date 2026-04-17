@@ -152,7 +152,7 @@ public class UpdateClub implements Serializable, interfaces.GolfInterface {
             LOG.debug("Test club: {}", club);
             
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
             LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
         }
     }
@@ -327,7 +327,7 @@ public class UpdateClub implements Serializable, interfaces.GolfInterface {
             LOG.debug("Test club: {}", club);
             
         } catch (Exception e) {
-            LOG.error("Exception in main: " + e.getMessage(), e);
+            LOG.error("Exception in main: {}", e.getMessage(), e);
             LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
         }
     }

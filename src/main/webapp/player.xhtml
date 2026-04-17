@@ -10,6 +10,12 @@
 
 <ui:define name="title">Player Page</ui:define>
 
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{playerC.resetPlayer()}"/>
+    </f:metadata>
+</ui:define>
+
 <ui:define name="content">
 
     <h:outputStylesheet library="styles" name="flags/flags.css" />
@@ -25,11 +31,12 @@
                 <p:wizard id="wizardPlayer"
                           widgetVar="myWizard"
                           style="width:100%;"
+                          styleClass="tarif-wizard"
                           flowListener="#{playerWizard.onFlowProcess}">
 
                     <!-- =================== TAB 1 : IDENTIFICATION =================== -->
                     <p:tab id="IdentificationTab"
-                           title="Identification"
+                           title="👤 Identification"
                            titletip="These are the Identification Infos">
                         <p:focus for="PlayerId" />
                         <p:panel id="panelIdentification"
@@ -53,7 +60,7 @@
 
                     <!-- =================== TAB 2 : PERSONAL =================== -->
                     <p:tab id="PersonalTab"
-                           title="Personal"
+                           title="🪪 Personal"
                            titletip="These are the Personal Infos">
                         <p:panel id="panelPersonal"
                                  header="#{msg['player.personal']}">
@@ -95,7 +102,6 @@
 
                                 <p:outputLabel for="@next" value="#{msg['player.gender']}"/>
                                 <p:selectOneButton id="PlayerGender"
-                                                   required="true"
                                                    value="#{playerC.player.playerGender}">
                                     <f:selectItem itemLabel="#{msg['player.gent']}" itemValue="M"/>
                                     <f:selectItem itemLabel="#{msg['player.lady']}" itemValue="L"/>
@@ -106,7 +112,6 @@
                                                  title="Select your language"
                                                  value="#{playerC.player.playerLanguage}"
                                                  immediate="true"
-                                                 required="true"
                                                  valueChangeListener="#{playerC.playerLanguageListener}">
                                     <f:selectItem itemLabel="?? Select Language ??" itemValue=""/>
                                     <f:selectItems value="#{playerC.player.LanguageType()}"
@@ -120,7 +125,7 @@
 
                     <!-- =================== TAB 3 : ADDRESS =================== -->
                     <p:tab id="AddressTab"
-                           title="Address"
+                           title="🏠 Address"
                            titletip="These are the Address Infos">
                         <p:panel id="panelAddress"
                                  header="#{msg['player.address']}">
@@ -157,7 +162,6 @@
                                                 forceSelection="false"
                                                 dropdown="true"
                                                 dropdownMode="current"
-                                                required="true"
                                                 title="#{msg['tooltip.club.clubcountry']}"
                                                 scrollHeight="150">
                                     <p:column>
@@ -225,7 +229,7 @@
 
                     <!-- =================== TAB 4 : GOLF INFO =================== -->
                     <p:tab id="GolfinfoTab"
-                           title="Golf Info"
+                           title="⛳ Golf Info"
                            titletip="These are the Global Infos">
                         <p:panel id="panelGolfinfo"
                                  header="#{msg['player.golfinfo']}">
@@ -240,8 +244,7 @@
                                                title="#{msg['tooltip.player.handicap']}"
                                                decimalPlaces="1"
                                                decimalSeparator="."
-                                               placeholder="99.9"
-                                               required="true"/>
+                                               placeholder="99.9"/>
 
                                 <p:outputLabel for="@next" value="#{msg['player.datehandicap']}"/>
                                 <p:datePicker id="PlayerHandicapDate"
@@ -267,7 +270,7 @@
 
                     <!-- =================== TAB 5 : CONFIRMATION =================== -->
                     <p:tab id="ConfirmationTab"
-                           title="Confirmation"
+                           title="✅ Confirmation"
                            titletip="titletipConfirmation">
                         <p:panel id="panelConfirmataion"
                                  header="#{msg['player.recapitulation']}">

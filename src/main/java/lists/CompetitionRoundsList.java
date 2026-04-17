@@ -25,7 +25,7 @@ public class CompetitionRoundsList implements Serializable {
 
     public List<ECompetition> list(final CompetitionDescription cd) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug(methodName + " - for competition = " + cd);
         LOG.debug(methodName + " - for competitionId = " + cd.getCompetitionId());
 
@@ -66,7 +66,7 @@ public class CompetitionRoundsList implements Serializable {
 
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -74,7 +74,7 @@ public class CompetitionRoundsList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // CompetitionDescription cd = new CompetitionDescription();
         // cd.setCompetitionId(35);
         // var lp = list(cd);

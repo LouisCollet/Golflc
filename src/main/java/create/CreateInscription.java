@@ -48,21 +48,21 @@ public class CreateInscription implements Serializable {
             final Course course,
             final String batch) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("for round = " + round);
-        LOG.debug("for player = " + player);
-        LOG.debug("for inscription = " + inscription);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for round = {}", round);
+        LOG.debug("for player = {}", player);
+        LOG.debug("for inscription = {}", inscription);
 
         inscription.setPlayer_idplayer(player.getIdplayer());
         inscription.setRound_idround(round.getIdround());
-        LOG.debug(methodName + " - inscription completed = " + inscription);
+        LOG.debug("inscription completed = {}", inscription);
 
         // Validation
         ValidationsLC vlc = this.validate(round, player, inscription, club, course);
-        LOG.debug(methodName + " - returned from validate = " + vlc);
+        LOG.debug("returned from validate = {}", vlc);
 
         if (vlc.getStatus2().equals("04")) {  // déjà inscrit
-            LOG.debug(methodName + " - error 04 (duplicate)");
+            LOG.debug("error 04 (duplicate)");
             inscription.setInscriptionError(true);
             inscription.setErrorStatus(vlc.getStatus2());
             LCUtil.showMessageInfo(vlc.getStatus1());
@@ -80,7 +80,7 @@ public class CreateInscription implements Serializable {
         }
 
         if (vlc.getStatus0().equals(ValidationStatus.APPROVED.toString())) {
-            LOG.debug(methodName + " - validation APPROVED = " + vlc.getStatus1());
+            LOG.debug("validation APPROVED = {}", vlc.getStatus1());
             LCUtil.showMessageInfo(vlc.getStatus1());
             inscription.setInscriptionError(false);
         }
@@ -99,7 +99,7 @@ public class CreateInscription implements Serializable {
                 ps.setInt(6, 0);  // NotUsed2
                 ps.setString(7, inscription.getInscriptionTeeStart());
                 String s = inscription.getInscriptionTeeStart();
-                LOG.debug(methodName + " - inscriptionTeeStart = " + s);
+                LOG.debug("inscriptionTeeStart = {}", s);
                 int tee = Integer.parseInt(s.substring(s.lastIndexOf("/") + 2));
                 inscription.setInscriptionIdTee(tee);
                 ps.setInt(8, inscription.getInscriptionIdTee());
@@ -109,16 +109,16 @@ public class CreateInscription implements Serializable {
 
                 int row = ps.executeUpdate();
                 if (row == 1) {
-                    LOG.debug(methodName + " - InscriptionId created = " + LCUtil.generatedKey(conn));
+                    LOG.debug("InscriptionId created = {}", LCUtil.generatedKey(conn));
                     String msg = LCUtil.prepareMessageBean("inscription.ok") + " = " + inscription;
                     LOG.debug(msg);
                     showMessageInfo(msg);
                     if (batch.equalsIgnoreCase("A")) {
                         try {
                             inscriptionMail.create(player, invitedBy, round, club, course);
-                            LOG.debug(methodName + " - mail sent");
+                            LOG.debug("mail sent");
                         } catch (Exception mailEx) {
-                            LOG.error(methodName + " - mail failed: " + mailEx.getMessage());
+                            LOG.error("mail failed: {}", mailEx.getMessage());
                         }
                     }
                     inscription.setInscriptionError(false);
@@ -159,7 +159,7 @@ public class CreateInscription implements Serializable {
     public ValidationsLC validate(final Round round, final Player player, final Inscription inscription,
             final Club club, final Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         ValidationsLC v = new ValidationsLC();
         v.setStatus0(ValidationStatus.APPROVED.toString());
@@ -167,16 +167,15 @@ public class CreateInscription implements Serializable {
         v.setStatus2("00");
 
         try {
-            LOG.debug(methodName + " - starting validation before create inscription");
+            LOG.debug("starting validation before create inscription");
 
             List<Player> listPlayers = roundPlayersList.list(round);
             if (listPlayers == null) {
-                LOG.debug(methodName + " - listPlayers is null");
+                LOG.debug("listPlayers is null");
                 listPlayers = Collections.emptyList();
             }
-            LOG.debug(methodName + " - number players already inscribed = " + listPlayers.size());
-            listPlayers.forEach(item -> LOG.debug(methodName + " - player = "
-                    + item.getIdplayer() + " / " + item.getPlayerLastName()));
+            LOG.debug("number players already inscribed = {}", listPlayers.size());
+            listPlayers.forEach(item -> LOG.debug("player = {} / {}", item.getIdplayer(), item.getPlayerLastName()));
 
             if (listPlayers.size() > 3) {
                 v.setStatus0(ValidationStatus.REJECTED.toString());
@@ -186,9 +185,9 @@ public class CreateInscription implements Serializable {
                 return v;
             }
 
-            LOG.debug(methodName + " - idplayer = " + player.getIdplayer());
-            LOG.debug(methodName + " - club = " + club.getIdclub());
-            LOG.debug(methodName + " - round date = " + round.getRoundDate());
+            LOG.debug("idplayer = {}", player.getIdplayer());
+            LOG.debug("club = {}", club.getIdclub());
+            LOG.debug("round date = {}", round.getRoundDate());
 
             // check duplicate BEFORE admin bypass — admin can also be already inscribed
             if (findInscriptionRound.find(round, player)) {  // déjà inscrit
@@ -199,7 +198,7 @@ public class CreateInscription implements Serializable {
                 return v;
             }
 
-            if (player.getPlayerRole().equals("ADMIN")) {
+            if ("ADMIN".equals(player.getPlayerRole())) {
                 v.setStatus0(ValidationStatus.APPROVED.toString());
                 String msg = LCUtil.prepareMessageBean("inscription.administrator");
                 v.setStatus1(msg);
@@ -208,8 +207,8 @@ public class CreateInscription implements Serializable {
             }
 
             Cotisation cotisation = findCotisationAtRoundDate.find(player, club, round);
-            LOG.debug(methodName + " - cotisation at round date = " + cotisation);
-            LOG.debug(methodName + " - cotisation status = " + (cotisation != null ? cotisation.getStatus() : "null"));
+            LOG.debug("cotisation at round date = {}", cotisation);
+            LOG.debug("cotisation status = {}", (cotisation != null ? cotisation.getStatus() : "null"));
 
             if (findGreenfeePaid.find(player, round)) {
                 v.setStatus0(ValidationStatus.APPROVED.toString());
@@ -265,7 +264,7 @@ public class CreateInscription implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(324714);
         player.setPlayerRole("ADMIN");
@@ -280,7 +279,7 @@ public class CreateInscription implements Serializable {
         inscription.setInscriptionIdTee(154);
         String batch = "A";
         Inscription result = create(round, player, invitedBy, inscription, club, course, batch);
-        LOG.debug("from main, result = " + result);
+        LOG.debug("from main, result = {}", result);
     } // end main
     */
 

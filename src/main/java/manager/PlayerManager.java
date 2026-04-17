@@ -129,7 +129,7 @@ public class PlayerManager {
 /*
     public List<EPlayerPassword> listPlayers() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     try {
         return playersList.list();                              // ✅ plus de conn
     } catch (Exception e) {
@@ -140,7 +140,7 @@ public class PlayerManager {
     */
     public List<EPlayerPassword> listPlayers() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     try {
         return playersListService.list();
     } catch (Exception e) {
@@ -166,7 +166,7 @@ public class PlayerManager {
  */
 public List<ECourseList> listHandicapWHS(Player player) {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering " + methodName);
+    LOG.debug("entering {}", methodName);
     try {
         return handicapIndexList.list(player);          // ✅ via service injecté
     } catch (Exception e) {
@@ -177,7 +177,7 @@ public List<ECourseList> listHandicapWHS(Player player) {
 
     public List<ECourseList> listPlayedRounds(final Player player) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         if (player == null) {
             LOG.warn(methodName + " - player is null");
             return Collections.emptyList();

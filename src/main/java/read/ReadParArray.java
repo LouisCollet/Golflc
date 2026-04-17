@@ -25,9 +25,9 @@ public class ReadParArray implements Serializable {
 
     public int[] read(final Player player, final Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug(methodName + " - player = " + player);
-        LOG.debug(methodName + " - course = " + course);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("player = {}", player);
+        LOG.debug("course = {}", course);
 
         final String query = """
                 SELECT *
@@ -58,7 +58,7 @@ public class ReadParArray implements Serializable {
                     int rowNum = rs.getRow() - 1;
                     par[rowNum] = rs.getInt("HolePar");
                 }
-                LOG.debug(methodName + " - finishing with par = " + Arrays.toString(par));
+                LOG.debug("finishing with par = {}", Arrays.toString(par));
                 return par;
             }
 
@@ -74,12 +74,12 @@ public class ReadParArray implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         // nécessite contexte CDI — DataSource injecté par WildFly
         // Player player = new Player(); player.setIdplayer(324713);
         // Course course = new Course(); course.setIdcourse(86);
         // int[] t = new ReadParArray().read(player, course);
-        // LOG.debug("main result = " + Arrays.toString(t));
+        // LOG.debug("main result = {}", Arrays.toString(t));
     } // end main
     */
 

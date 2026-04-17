@@ -102,7 +102,7 @@ public class ApplicationContext implements Serializable {
 
     private String inputSelectCourse;
     private String inputSelectClub;
-    private String inputSelectRound;
+    // inputSelectRound removed 2026-03-23 — replaced by SelectionPurpose
     private String inputSelectPaiement;
     private String inputSelectSubscriptions;
     private String creditcardType;
@@ -157,7 +157,6 @@ public class ApplicationContext implements Serializable {
         // Navigation routing
         inputSelectCourse       = null;
         inputSelectClub         = null;
-        inputSelectRound        = null;
         inputSelectPaiement     = null;
         inputSelectSubscriptions = null;
         creditcardType          = null;
@@ -443,8 +442,7 @@ public class ApplicationContext implements Serializable {
     public String getInputSelectClub()                          { return inputSelectClub; }
     public void   setInputSelectClub(String inputSelectClub)    { this.inputSelectClub = inputSelectClub; }
 
-    public String getInputSelectRound()                         { return inputSelectRound; }
-    public void   setInputSelectRound(String inputSelectRound)  { this.inputSelectRound = inputSelectRound; }
+    // getInputSelectRound/setInputSelectRound removed 2026-03-23 — replaced by SelectionPurpose
 
     public String getInputSelectPaiement()                              { return inputSelectPaiement; }
     public void   setInputSelectPaiement(String inputSelectPaiement)    { this.inputSelectPaiement = inputSelectPaiement; }

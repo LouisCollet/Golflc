@@ -7,7 +7,7 @@
       xmlns:p="primefaces"
       xmlns:c="jakarta.tags.core">
 
-    <h:panelGroup layout="block" styleClass="summary-bar">
+    <h:panelGroup id="summaryBar" layout="block" styleClass="summary-bar">
         <span class="summary-item">
             <span class="summary-label">#{msg['club.name']}</span>
             <span class="summary-value">#{clubC.club.clubName} (#{clubC.club.idclub})</span>
@@ -15,8 +15,16 @@
         <span class="summary-sep">|</span>
         <span class="summary-item">
             <span class="summary-label">#{msg['course.name']}</span>
-            <span class="summary-value">#{clubC.course.courseName} (#{clubC.course.idcourse})</span>
+            <span class="summary-value">#{memC.tarifGreenfeeCourseDisplay}</span>
         </span>
+        <h:panelGroup rendered="#{not empty memC.tarifGreenfee.tarifHolesList}">
+            <span class="summary-sep">|</span>
+        </h:panelGroup>
+        <h:panelGroup styleClass="summary-item"
+                      rendered="#{not empty memC.tarifGreenfee.tarifHolesList}">
+            <span class="summary-label">#{msg['tarif.holes']}</span>
+            <span class="summary-value">#{memC.tarifGreenfee.tarifHolesDisplay}</span>
+        </h:panelGroup>
         <h:panelGroup rendered="#{memC.tarifGreenfee.greenfeeType ne null}">
             <span class="summary-sep">|</span>
         </h:panelGroup>

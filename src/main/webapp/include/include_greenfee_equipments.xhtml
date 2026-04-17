@@ -19,9 +19,20 @@
             <h:outputText value="#{item.item}"/>
         </p:column>
 
-        <p:column headerText="#{msg['tarif.seasons']}"
-                  width="12%">
+        <p:column headerText="#{msg['tarif.season']}"
+                  width="8%">
             <h:outputText value="#{item.season}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['tarif.period']}"
+                  width="14%">
+            <h:outputText value="#{memC.periodDatesFor(item.season)}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['tarif.slot']}"
+                  width="14%"
+                  rendered="#{memC.tarifGreenfee.greenfeeType eq 'HO'}">
+            <h:outputText value="#{memC.slotNameFor(item.linkedSlotKey)}"/>
         </p:column>
 
         <p:column headerText="#{msg['tarif.members.price']}"
@@ -44,16 +55,18 @@
                            size="1"
                            emptyValue="0"
                            title="#{msg['tooltip.tarif.choice']}"
-                           decimalPlaces="0"/>
+                           decimalPlaces="0">
+                <p:ajax event="change" update="form_price_round_greenfee:totalPricePanel" process="@form"/>
+            </p:inputNumber>
         </p:column>
 
         <f:facet name="footer">
+          <div class="btn-group">
             <p:commandButton value="#{msg['tarif.print']}"
                              id="commandButton1"
-                             ajax="false"
                              update="growl-msg"
                              icon="pi pi-database"
-                             action="#{memC.showTarifGreenfee(courseId)}"/>
+                             action="#{memC.showTarifGreenfee(clubC.course.idcourse)}"/>
             <p:commandButton value="#{msg['inscription.back']}"
                              id="commandButtonback"
                              ajax="false"
@@ -66,8 +79,8 @@
                              ajax="false"
                              update="growl-msg"
                              icon="pi pi-credit-card"
-                             style="float:right;"
                              action="#{payC.manageGreenfee()}"/>
+          </div>
         </f:facet>
     </p:dataTable>
 

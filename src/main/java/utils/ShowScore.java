@@ -19,7 +19,7 @@ public class ShowScore implements Serializable {
     public String show(final Player player, final Club club, final Course course,
             final Round round, final Inscription inscription) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("with player = " + player);
         LOG.debug("with club = " + club);
         LOG.debug("with course = " + course);
@@ -42,7 +42,7 @@ public class ShowScore implements Serializable {
     public String show_empty(final Player player, final Club club, final Course course,
             final Round round, final Inscription inscription) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         LOG.debug("idPlayer = " + player.getIdplayer());
         LOG.debug("idClub = " + club.getIdclub());
         LOG.debug("idCourse = " + course.getIdcourse());
@@ -77,7 +77,7 @@ public class ShowScore implements Serializable {
     /*
     void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Player player = new Player();
         Club club = new Club();
         club.setIdclub(104);

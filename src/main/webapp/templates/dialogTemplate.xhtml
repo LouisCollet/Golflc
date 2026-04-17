@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-       xmlns:f="jakarta.faces.core"
+      xmlns:f="jakarta.faces.core"
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
-      xmlns:p="primefaces"
-       >
+      xmlns:p="primefaces" >
 
 <f:view id="view_dialog"
         contentType="text/html"
@@ -16,12 +15,9 @@
 
 <h:head id="head_PrimeFlex_DialogTemplate">
    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-   <meta http-equiv="Content-Language" content="#{languageC.locale}" /> 
-   <meta name="sessionTimeout"
-         http-equiv="refresh" 
-         content="#{session.maxInactiveInterval};url=#{request.contextPath}/session_expired.xhtml?cmd=time-out"/>
-     <!-- de rediriger le visiteur vers une autre page au bout de N secondes grâce 
-au mot clé refresh et à la précision URL=chemin-vers-ma-page.-->
+   <meta http-equiv="Content-Language" content="#{languageC.locale}" />
+   <!-- meta refresh removed from dialogTemplate — session timeout is handled by the parent page (masterTemplate).
+        Having it here caused premature redirect inside the dialog iframe. 2026-03-19 -->
     <title><ui:insert name="title"> Default title </ui:insert></title>
     <h:outputScript library="js" name="forms.js" target="head"/>
     <!-- https://printjs.crabbly.com/  -->
@@ -39,20 +35,12 @@ au mot clé refresh et à la précision URL=chemin-vers-ma-page.-->
 </h:head>
 
 <h:body id="body_master_template"> 
-    
-    <!-- new 13/07/2014-->
-<!-- Just put them in a .css file which you include
-by <h:outputStylesheet> inside the beginning of the <h:body>
-JSF will automatically relocate the stylesheet
-to the end of the generated HTML <head> and this
-will thus ensure that the stylesheet is loaded after the PrimeFaces' default styles.
--->
 
 <ui:insert name="metadata" />
 <h:outputStylesheet library="styles" name="print.min.css" />
 <h:outputStylesheet library="styles" name="Styles2026.css" />
- <!--<h:outputStylesheet library="styles" name="primeflex/331/primeflex.min.css" /> 
- <h:outputStylesheet library="styles" name="primeflex/331/primeone-light.css" /> -->
+<h:outputStylesheet library="styles" name="primeflex/331/primeflex.min.css" />
+<h:outputStylesheet library="styles" name="primeflex/331/primeone-light.css" id="primeone-css"/>
 
 <div class="card">
     <div class="grid">
@@ -61,26 +49,23 @@ will thus ensure that the stylesheet is loaded after the PrimeFaces' default sty
             
         </div>
 -->
-<!--   Center - Contenu -->
-        <div class="col-10">
+<!--   Center - Contenu (full width — no menu in dialogs) -->
+        <div class="col-12">
             <ui:include src="/include/include_messages.xhtml"/>
             <ui:insert name="content"></ui:insert>
         </div>
-        
-<!--    East - Help mod 09-08-2023 plus de help dans dialogs !
-        <div class="col-2">
-            <ui:include src="/help_read.xhtml"/>
-        </div>-->
-<!--    South - Footer -->
-        <div class="col-12 bg-warning">
-            <b>View : </b> #{view.viewId}
-            <h:outputText id="fmd" 
-                          escape="false" 
-                          
-                          value="#{utilsC.ViewModificationDate()}"></h:outputText>
+
+<!--    South - Footer (admin only) -->
+        <div class="col-12" rendered="#{playerC.isAdmin()}" style="font-size:0.75rem; color:var(--text-color-secondary);">
+            <b>View : </b>#{view.viewId}
+            <h:outputText id="fmd" escape="false" value="#{utilsC.ViewModificationDate()}"/>
         </div>
-    </div> <!-- class p-grid -->
+    </div> <!-- class grid -->
 </div>  <!-- class card -->
+
+<p:ajaxExceptionHandler type="jakarta.faces.application.ViewExpiredException"
+                        onexception="window.location.href = '#{request.contextPath}/session_expired.xhtml';" />
+
 </h:body>
 </f:view>
 </ui:composition>

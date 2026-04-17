@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static exceptions.LCException.handleGenericException;
+import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -34,11 +36,11 @@ public class CreateCourse implements Serializable {
      * @return true si succès, false sinon
      * @throws Exception en cas d'erreur
      */
-    public boolean create(final Course course) throws Exception {
-        
+    public boolean create(final Course course) throws SQLException {
         final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String msg;
-        
+
         try (Connection conn = dao.getConnection()) {
             conn.setAutoCommit(false);
             LOG.info("AutoCommit set to false");
@@ -99,19 +101,16 @@ public class CreateCourse implements Serializable {
             
             return true;
             
-        } catch (SQLException sqle) {
-            LCUtil.printSQLException(sqle);
-            msg = "SQLException in " + methodName + ": " + sqle.getMessage();
-            LOG.error(msg);
-            throw sqle;
-            
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
         } catch (Exception e) {
-            msg = "Exception in " + methodName + ": " + e.getMessage();
-            LOG.error(msg);
-            throw e;
+            handleGenericException(e, methodName);
+            return false;
         }
-    }
-}
+    } // end method
+
+} // end class
 
 
 /*package create;
@@ -138,10 +137,10 @@ public class CreateCourse {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         try {
               LOG.debug("...entering createCourse");
-              LOG.debug("club ID  = " + club.getIdclub());
-              LOG.debug("course Name  = " + course.getCourseName());
-              LOG.debug("course Holes  = " + course.getCourseHoles());
-              LOG.debug("course Par  = " + course.getCoursePar());
+              LOG.debug("club ID  = {}", club.getIdclub());
+              LOG.debug("course Name  = {}", course.getCourseName());
+              LOG.debug("course Holes  = {}", course.getCourseHoles());
+              LOG.debug("course Par  = {}", course.getCoursePar());
             final String query = LCUtil.generateInsertQuery(conn, "course");
          //   final String query = sql.sql.generateInsertQuery(conn, "course"); // new 16/12/2025
             ps = conn.prepareStatement(query);

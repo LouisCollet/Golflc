@@ -30,9 +30,9 @@
         <java.version>25</java.version> <!-- mod 29-09-2025 !! used by compiler was 23  -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version> <!-- mod 08-07-2025 was 10.0.0 // mod 30-07-2023 was 8.0.0 !! the great migration
             https://github.com/jakartaee/platform/blob/main/namespace/unaffected-packages.adoc -->
-        <primefaces.version>15.0.13</primefaces.version> <!-- mod 13-02-2026 was 15.0.12 -->
-        <primefaces-extension.version>15.0.13</primefaces-extension.version> <!-- mod 30-09-2025 was 15.0.7-->
-        <omnifaces.version>5.0</omnifaces.version> <!-- mod 10-01-2026 was 5.0-M6 -->
+        <primefaces.version>15.0.14</primefaces.version> <!-- mod 01-04-2026 was 15.0.13 -->
+        <primefaces-extension.version>15.0.14</primefaces-extension.version> <!-- mod 01-04-2026 was 15.0.13-->
+        <omnifaces.version>5.2</omnifaces.version> <!-- mod 06-04-2026 was 5.1 -->
         <chartjs.version>3.0.1</chartjs.version> <!-- mod 16-03-2026 was 2.9.0 -->
         <mockito.version>5.21.0</mockito.version> <!-- mod 29-12-2025 was 5.20.0-->
    <!-- Official Maven Plugins --> 
@@ -53,8 +53,6 @@
         <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version> <!-- mod 25-10-2025 was 3.6.1 -->
         <maven-exec-plugin.version>3.6.3</maven-exec-plugin.version><!-- mod 04-01-2026 was 3.6.2 -->
 
-
-
   <!--   <exec.file>mongo.MongoHelpLoad</exec.file> utils.Java11HttpClientExample-->
         <exec.mainClass.pom>read.ReadClub</exec.mainClass.pom> <!-- dao.TestClubDAOMainical.icalservice_manual_test utils.CdiAuditScannern dao.TestClubDAOImpl utils.IcalServicetest.prepareStatement.ClubService>lists.CourseListupdate.UpdateClubsql.SqlFactoryutils.DBMetajollyday.JollyDayControllers.HttpController selenium.SeleniumTest  ScreenShotCaptureSelenium execute le main de la classe (qu'il ne faut pas mentionner) -->
         <!-- find.FindTarifMembersData Controllers.MongoHelpController to run with icon toolbar -->
@@ -64,7 +62,7 @@
      <!--   <junit-jupiter.version>5.10.5</junit-jupiter.version> mod 17-11-2025 was 6.0.0-->
     <!--    <junit.jupiter.version>5.10.1</junit.jupiter.version>  -->
         <failsafe.version>3.5.5</failsafe.version>  <!-- mod 16-03-2026 was 3.5.4 -->
-        <arquillian.version>1.10.0.Final</arquillian.version>  <!-- mod 04-01-2026 was 1.8.0.Final-->
+        <arquillian.version>1.10.1.Final</arquillian.version>  <!-- mod 23-03-2026 was 1.10.0.Final-->
         <wildfly.version>31.0.0.Beta3</wildfly.version> <!-- new 06-01-2025-->
         <shrinkwrap.version>1.2.6</shrinkwrap.version>
         
@@ -80,15 +78,13 @@
    <!--      <project.build.testOutputDirectory>src/test/java</project.build.testOutputDirectory>  this is the default  -->
         <maven.archiver.plugin.version>3.6.2 </maven.archiver.plugin.version><!--mod 17-07-2024 was 3.6.0 -->
         <maven.build.helper.plugin.version>3.6.1</maven.build.helper.plugin.version> <!--mod 13-06-2025 was 3.6.0 -->
-        
     <!--    <netbeans.compile.on.save>all</netbeans.compile.on.save>  new 27/11/2013 enlevé 08-08-2024-->
         <netbeans.version>28</netbeans.version> <!-- only used via MANIFEST.MF see manifestEntries further-->
         <primeflex.version>4.0.0</primeflex.version> <!-- modify also masterTemplate - mod 16-03-2025 was 3.3.1 used also in technical info MANIFEST.MF see manifestEntries further-->
-        <log4j2.version>2.24.0</log4j2.version> <!-- mod 28/09/2024  was 2.22.1 -->
-        <slf4j.version>2.0.17</slf4j.version><!-- mod 12-03-2025 was 2.0.163 -->
-        <jackson.version>2.21.1</jackson.version> <!--mod 16-03-2026 was 2.21.0 -->
+        <log4j2.version>2.25.4</log4j2.version> <!-- mod 04-03-2026  was 2.25.4 -->
+        <slf4j.version>2.1.0-alpha1</slf4j.version><!-- mod 12-03-2025 was 2.0.163 -->
+        <jackson.version>2.21.2</jackson.version> <!--mod 03-04-2026 was 2.21.1 -->
         <mysql-connector-j.version>9.6.0</mysql-connector-j.version>  <!-- used by RUN FILE mod 06-05-2025 was version 9.2.0-->
-
         <resteasy.version>7.0.1.Final</resteasy.version> <!--  mod 27-12-2025 was 7.0.0.Final -->
         <version.server.bom>26.1.3.Final</version.server.bom>  <!--mod 11-12-2023 was 26.1.2.Final -->
 <!-- new 14/08/2022 -->
@@ -98,62 +94,45 @@
         <protoc.version>1.78.0</protoc.version> <!--  mod 04-01-2026 was 1.77.0 -->
       <!--  <grpc.version>4.33.2</grpc.version>   mod 27-12-2025 was 4.33.1 
                   https://github.com/grpc/grpc-java/issues/11015   -->
-        <exec.inheritIo>true</exec.inheritIo><!--  mod 19-03-2023  https://github.com/apache/netbeans/issues/5552 -->
+        <exec.inheritIo>true</exec.inheritIo><!--  mod 19-03-2023 fix NetBeans IDE pour voir la sortie support ansi color de mvn exec:java dans la console https://github.com/apache/netbeans/issues/5552 -->
         <selenium.version>4.41.0</selenium.version> <!--  mod 16-03-2026 was 4.39.0 -->
-        <jollyday.version>2.2.1</jollyday.version><!--  mod 16-03-2026 was 1.8.1 -->
+        <jollyday.version>2.4.0</jollyday.version><!--  mod 06-04-2026 was 2.3.0 -->
         <weld.version>6.0.4.Final</weld.version> <!--  pour refactoring CDI -->
-        
-        
-        
+ 
     </properties>
 
  <dependencies>
-     
-   <!-- https://www.baeldung.com/maven-force-update  -->
 
-<!-- remis le 30-11-2020 avec classifier qui va avec  <attachClasses>true</attachClasses> dans war-plugin 
-  <dependency>
-      <groupId>org.primefaces.themes</groupId>
-      <artifactId>bluesky</artifactId>
-      <version>1.0.10</version>
-  </dependency>
-  -->
-  <!-- https://mvnrepository.com/artifact/jakarta.platform/jakarta.jakartaee-api
-provided by wildfly  -->
+  <!-- Jakarta EE 11 platform API — CDI, Servlet, JSF, JPA, JAX-RS, etc. — provided by WildFly at runtime -->
 <dependency>
     <groupId>jakarta.platform</groupId>
     <artifactId>jakarta.jakartaee-api</artifactId>
     <version>${jakartaee-api.version}</version>
     <scope>provided</scope>
 </dependency>
-  <!-- added 30/08/2022 pour erreur .course_refactoring InvalidateCache
-<dependency> 
-    <groupId>jakarta.interceptor</groupId>
-    <artifactId>jakarta.interceptor-api</artifactId>
-    <version>2.2.0</version>
-    <scope>provided</scope>
-</dependency>
--->
 
+<!-- OmniFaces 5 — JSF utilities: conditional rendering, converters, validators, combined resource handler -->
 <dependency>
     <groupId>org.omnifaces</groupId>
     <artifactId>omnifaces</artifactId>
     <version>${omnifaces.version}</version>
 </dependency>
+<!-- PrimeFaces Extensions — additional UI components: Timeline, CodeEditor, Sheet, etc. -->
 <dependency>
     <groupId>org.primefaces.extensions</groupId>
     <artifactId>primefaces-extensions</artifactId>
     <version>${primefaces-extension.version}</version>
-    
+
     <classifier>jakarta</classifier>
 </dependency>
-<!-- pour charts à partir de PF 15  -->
+<!-- Chart.js Java model — server-side chart data building for p:chart (PrimeFaces 15+) -->
 <dependency>
    <groupId>software.xdev</groupId>
    <artifactId>chartjs-java-model</artifactId>
    <version>${chartjs.version}</version>
  </dependency>
 
+<!-- PrimeFaces 15 — main JSF UI component library (dataTables, dialogs, calendars, etc.) -->
 <dependency>
     <groupId>org.primefaces</groupId>
     <artifactId>primefaces</artifactId>
@@ -165,101 +144,86 @@ provided by wildfly  -->
 <dependency>
     <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
     <artifactId>owasp-java-html-sanitizer</artifactId>
-    <version>20240325.1</version>
+    <version>20260313.1</version>
 </dependency>
 
+<!-- Log4j 2 API — logging interface used throughout the application (LOG.debug/info/warn/error) -->
 <dependency>
     <groupId>org.apache.logging.log4j</groupId>
     <artifactId>log4j-api</artifactId>
-    <version>2.25.3</version> <!-- mod 04-01-2026 was 2.25.2 -->
-  
+    <version>${log4j2.version}</version> 
 </dependency>
 
+<!-- Log4j 2 core — logging runtime implementation (config: src/main/resources/log4j2.xml) -->
 <dependency>
     <groupId>org.apache.logging.log4j</groupId>
     <artifactId>log4j-core</artifactId>
-    <version>2.25.3</version> <!-- mod 04-01-2026 was 2.25.2 -->
+    <version>${log4j2.version}</version> 
 </dependency> 
 
-<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+<!-- Apache POI — Excel XLS support (base library, required by poi-ooxml) -->
 <dependency>
     <groupId>org.apache.poi</groupId>
     <artifactId>poi</artifactId>
     <version>5.5.1</version> <!-- mod 27-12-2025 was 5.5.0 -->
 </dependency>
 
-<!-- new 28/08/2022 for export XLSX PF 12.0 https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas -->
+<!-- Apache POI OOXML — Excel XLSX export used by PrimeFaces p:dataExporter -->
 <dependency>
     <groupId>org.apache.poi</groupId>
     <artifactId>poi-ooxml</artifactId>
     <version>5.5.1</version> <!-- mod 27-12-2025 was 5.5.0  -->
 </dependency>
 
-<!-- new 14-02-2024 https://stackoverflow.com/questions/71530141/java-lang-classnotfoundexception-org-apache-commons-io-output-unsynchronizedbyt    -->
+<!-- Apache Commons IO — required by Apache POI (UnsynchronizedByteArrayOutputStream) -->
 <dependency>
     <groupId>commons-io</groupId>
     <artifactId>commons-io</artifactId>
     <version>2.21.0</version> <!-- mod 17-11-2025 was 2.20.0  -->
 </dependency>
 
+<!-- Jackson core — JSON streaming API (low-level tokenizer, required by jackson-databind) -->
 <dependency>
   <groupId>com.fasterxml.jackson.core</groupId>
   <artifactId>jackson-core</artifactId>
-  <version>${jackson.version}</version> 
+  <version>${jackson.version}</version>
 </dependency> 
-<!-- 
-<dependency>
-  <groupId>com.fasterxml.jackson.core</groupId>
-  <artifactId>jackson-annotations</artifactId>
-  <version>${jackson.version}</version>  mod 12-09-2025 was jackson.version 
-</dependency>
--->
-<!-- Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/Jackson-annotations -->
+
+<!-- Jackson annotations — @JsonProperty, @JsonIgnore, etc. (used in REST/payment DTOs) -->
 <dependency>
     <groupId>com.fasterxml.jackson.core</groupId>
     <artifactId>jackson-annotations</artifactId>
     <version>2.21</version>
-   <!-- <scope>compile</scope>  -->
 </dependency>
 
-
-
-
-
- <dependency>
+<!-- Jackson JSR-310 module — serialization of LocalDate/LocalDateTime/ZonedDateTime -->
+<dependency>
     <groupId>com.fasterxml.jackson.datatype</groupId>
     <artifactId>jackson-datatype-jsr310</artifactId>
-    <version>${jackson.version}</version> 
+    <version>${jackson.version}</version>
 </dependency>
-<!-- 01/05/2022  https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+<!-- Jackson databind — ObjectMapper: JSON serialization/deserialization (REST payloads, MongoDB) -->
 <dependency>
     <groupId>com.fasterxml.jackson.core</groupId>
     <artifactId>jackson-databind</artifactId>
-    <version>${jackson.version}</version> 
+    <version>${jackson.version}</version>
 </dependency>
 
-
-<!-- https://mvnrepository.com/artifact/com.google.maps/google-maps-services remplacé par entite LatLng  -->
+<!-- Google Maps Services — geocoding API used to find GPS coordinates from club address -->
 <dependency>
     <groupId>com.google.maps</groupId>
     <artifactId>google-maps-services</artifactId>
     <version>2.2.0</version>  <!-- mod 23-06-2023 was 2.0.0 -->
 </dependency>
 
-<dependency>
-    <groupId>br.com.esign</groupId>
-    <artifactId>google-geocode</artifactId>
-    <version>3.0.0</version>
-</dependency>
-
-<!-- https://mvnrepository.com/artifact/com.opencsv/opencsv new 10-09-2021 -->
+<!-- OpenCSV — CSV parsing and generation (player import/export) -->
 <dependency>
     <groupId>com.opencsv</groupId>
     <artifactId>opencsv</artifactId>
     <version>5.12.0</version> <!--   mod 31-07-2025 was 5.11.2 -->
 </dependency>
 
-<!-- mod 26-01-2026  -->
+<!-- MySQL Connector/J — JDBC driver for golflc database at port 3308 -->
 <dependency>
     <groupId>com.mysql</groupId>
     <artifactId>mysql-connector-j</artifactId>
@@ -267,85 +231,55 @@ provided by wildfly  -->
     <scope>compile</scope>
 </dependency>
 
-
-<!-- Primefaces 10 https://mvnrepository.com/artifact/com.github.librepdf/openpdf -->
+<!-- OpenPDF — PDF generation used by PrimeFaces p:dataExporter (fork of iText with com.lowagie.* API) -->
 <dependency>
     <groupId>com.github.librepdf</groupId>
-    <artifactId>openpdf</artifactId> 
-    <version>3.0.0</version><!-- mod 06-03-2026 was 2.2.2 3.0.0 — downgrade: PrimeFaces needs com.lowagie.* package -->
+    <artifactId>openpdf</artifactId>
+    <version>2.0.3</version><!-- PrimeFaces 15 needs com.lowagie.* package — OpenPDF 3.x renamed to com.github.librepdf -->
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j -->
+<!-- iCal4j — iCalendar (.ics) generation for round/lesson scheduling exports -->
 <dependency>
     <groupId>org.mnode.ical4j</groupId>
     <artifactId>ical4j</artifactId>
-    <version>4.2.3</version> <!-- mod 10-01-2026 was 4.2.2-->
+    <version>4.2.4</version> <!-- mod 04-03-2026 was 4.2.3-->
 </dependency>
-<!-- https://mvnrepository.com/artifact/org.mnode.ical4j/ical4j-vcard -->
+<!-- iCal4j vCard — vCard (.vcf) contact generation (player contact export) -->
 <dependency>
     <groupId>org.mnode.ical4j</groupId>
     <artifactId>ical4j-vcard</artifactId>
     <version>2.1.0</version> <!-- mod 04-01-2026 was 2.0.1 -->
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.apache.tika/tika-java7 new 03-01-2020
-ava-7 reliant components, including FileTypeDetector implementations
-     https://stackoverflow.com/questions/54078118/managed-bean-with-a-parameterized-bean-class-must-be-dependent-class-org-apach/55210108
-     Exclude otherwise the following error is thrown:
-  000071: Managed bean with a parameterized bean class 
-     must be @Dependent: class org.apache.cxf.jaxrs.provider.XPathProvider 
--->
-
+<!-- Apache Tika core — MIME type detection for file upload validation (FileUploadController) -->
 <dependency>
     <groupId>org.apache.tika</groupId>
     <artifactId>tika-core</artifactId>
-    <version>3.2.3</version><!-- mod 26-09-2025 was 3.2.2-->
-  </dependency>
+    <version>3.3.0</version><!-- mod 07-04-2026 was 3.2.32-->
+</dependency>
 
+<!-- Thumbnailator — image thumbnail generation for player/club photo uploads -->
 <dependency>
     <groupId>net.coobird</groupId>
     <artifactId>thumbnailator</artifactId>
     <version>0.4.21</version> <!-- mod 24-10-2025 was 0.4.20-->
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.apache.maven/maven-plugin-api 
-<dependency>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven-plugin-api</artifactId>
-    <version>${maven.version}</version>
-</dependency>
--->
-<!-- enlevé 18-12-2025 suggestion chat gpthttps://mvnrepository.com/artifact/org.apache.maven/maven-core 
-<dependency>
-    <groupId>org.apache.maven</groupId>
-    <artifactId>maven-core</artifactId>
-    <version>${maven.version}</version>
-</dependency>
--->
-<!--enlevé 22-01-2026 double emploi https://mvnrepository.com/artifact/org.codehaus.mojo/build-helper-maven-plugin 
-<dependency>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>build-helper-maven-plugin</artifactId>
-    <version>3.6.1</version> 
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+<!-- JUnit 5 API — test annotations (@Test, @BeforeEach, etc.) -->
 <dependency>
     <groupId>org.junit.jupiter</groupId>
     <artifactId>junit-jupiter-api</artifactId>
     <version>${junit-jupiter.version}</version>
     <scope>test</scope>
 </dependency>
-
-<!-- new 20-05-2020 -->
-<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+<!-- JUnit 5 engine — test runner (required by Surefire/Failsafe to execute Jupiter tests) -->
 <dependency>
     <groupId>org.junit.jupiter</groupId>
      <artifactId>junit-jupiter-engine</artifactId>
     <version>${junit-jupiter.version}</version>
     <scope>test</scope>
 </dependency>
-<!-- Parameterized Tests -->
+<!-- JUnit 5 parameterized tests — @ParameterizedTest, @CsvSource, @MethodSource -->
 <dependency>
 	<groupId>org.junit.jupiter</groupId>
 	<artifactId>junit-jupiter-params</artifactId>
@@ -353,86 +287,38 @@ ava-7 reliant components, including FileTypeDetector implementations
 	<scope>test</scope>
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.passay/passay 12-08-2020 -->
-<dependency>
-    <groupId>org.passay</groupId>
-    <artifactId>passay</artifactId>
-    <version>1.6.6</version> <!-- mod 27-10-2024 was 1.6.5 -->
-</dependency>
-
-<!-- enlevé 19-12-2025 suite suggestion chatgpt : Les plugins ne vont jamais dans <dependencies> https://www.mojohaus.org/exec-maven-plugin/ 
-<dependency>
-  <groupId>org.codehaus.mojo</groupId>
-  <artifactId>exec-maven-plugin</artifactId>
-  <version>${maven-exec-plugin.version}</version> 
-  <type>maven-plugin</type>
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/pl.allegro.finance/tradukisto -->
-<dependency>
-    <groupId>pl.allegro.finance</groupId>
-    <artifactId>tradukisto</artifactId>
-    <version>4.3.2</version> <!-- mod 16-03-2026 was 4.1.0 -->
-</dependency>
-
-<!-- enlevé 13-12-2020
-  <dependency>
-         <groupId>eid</groupId>
-         <artifactId>mavenEID</artifactId>
-         <version>1.0-SNAPSHOT</version>
-   </dependency> 
- -->  
-
-<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+<!-- Apache Commons Lang 3 — string utilities, reflection helpers, date utils (StringUtils, etc.) -->
 <dependency>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-lang3</artifactId>
     <version>3.20.0</version>  <!-- mod 25-11-2025 was 3.19.0  -->
-    
 </dependency>
 
-<!-- <scope>provided</scope>30-06-2021 https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2 -->
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-configuration2</artifactId>
-    <version>2.13.0</version> <!-- mod 06-12-2025 was 2.12.0  -->
-</dependency>
-
+<!-- Google Cloud Translation API — auto-translate validation/UI messages to supported locales -->
 <dependency>
     <groupId>com.google.cloud</groupId>
     <artifactId>google-cloud-translate</artifactId>
-    <version>2.86.0</version> <!-- mod 16-03-2026 was 2.82.0 -->
-  </dependency>
-
-<dependency>
-    <groupId>com.google.cloud</groupId>
-    <artifactId>google-cloud-storage</artifactId>
-    <version>2.64.0</version> <!-- mod 16-03-2026 was 2.62.0 -->
-  </dependency>
-<dependency>
-    
-  <groupId>com.github.mawippel</groupId>
-  <artifactId>overlapping-date-ranges</artifactId>
-  <version>1.0.5</version>
+    <version>2.88.0</version> <!-- mod 03-04-2026 was 2.86.0 -->
 </dependency>
 
-<!-- enlevé 23-11-2024 https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
+<!-- overlapping-date-ranges — detect overlapping tarif periods (greenfee/member tarif validation) -->
+<dependency>
+    <groupId>com.github.mawippel</groupId>
+    <artifactId>overlapping-date-ranges</artifactId>
+    <version>1.0.5</version>
+</dependency>
+
+<!-- Quartz Scheduler — cron-like job scheduling (SchedulerProController, subscription renewal) -->
 <dependency>
     <groupId>org.quartz-scheduler</groupId>
-    <artifactId>quartz</artifactId> 
-    <version>2.5.2</version> 
+    <artifactId>quartz</artifactId>
+    <version>2.5.2</version>
 </dependency>
+<!-- Quartz built-in jobs — standard job implementations bundled with Quartz -->
 <dependency>
     <groupId>org.quartz-scheduler</groupId>
     <artifactId>quartz-jobs</artifactId>
     <version>2.5.2</version>
-</dependency>
-
-<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
-<dependency>
-    <groupId>org.jsoup</groupId>
-    <artifactId>jsoup</artifactId>
-    <version>1.22.1</version> <!--   mod 10-01-2026 was 1.21.2 -->
 </dependency>
 
 <!-- QRGen JavaSE (QR code generator) -->
@@ -442,132 +328,44 @@ ava-7 reliant components, including FileTypeDetector implementations
       <version>3.0.1</version>
     </dependency>
 
-    <!-- ZXing core & javase (au besoin selon résolution classes) 
-    <dependency>
-      <groupId>com.google.zxing</groupId>
-      <artifactId>core</artifactId>
-      <version>3.5.4</version>
-    </dependency>
-    -->
-  <!--  
-    <dependency>
-      <groupId>com.google.zxing</groupId>
-      <artifactId>javase</artifactId>
-      <version>3.5.4</version>
-    </dependency>
--->
-<!--
-<dependency>   utilise zxing new 28-12-2025 
-    <groupId>net.glxn</groupId>
-    <artifactId>qrgen</artifactId>
-    <version>1.4</version>
-</dependency>
--->
-
-
-<!-- enlevé 10-08-2025 https://mvnrepository.com/artifact/org.json/json 
-<dependency>
-    <groupId>org.json</groupId>
-    <artifactId>json</artifactId>
-    <version>20250517</version>
-</dependency>-->
-
-<!-- https://mvnrepository.com/artifact/org.mongodb/bson --><!-- https://mvnrepository.com/artifact/com.mchange/c3p0 database mysql résul tsquartz 
-<dependency>
-    <groupId>com.mchange</groupId>
-    <artifactId>c3p0</artifactId>
-    <version>0.9.5.5</version>
-</dependency>
--->
-
-
-
-<dependency>
-            <groupId>org.jsonschema2pojo</groupId>
-            <artifactId>jsonschema2pojo-core</artifactId>
-            <version>1.3.3</version> <!--   mod 16-03-2026 was 1.2.2 -->
-</dependency>
-
-<!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-sync -->
+<!-- MongoDB BSON — BSON types (Document, ObjectId) used in MongoHelpController -->
 <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>bson</artifactId>
     <version>5.6.4</version> <!-- mod 16-03-2026 was 5.6.2  -->
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core utile ??-->
+<!-- MongoDB synchronous driver — MongoClient, MongoCollection queries (MongoHelpController) -->
 <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver-sync</artifactId>
     <version>${mongodb-driver-sync.version}</version>
 </dependency>
 
-   <dependency>
+<!-- mongodb-driver-core désactivé 2026-04-03 — déjà tiré transitivement par mongodb-driver-sync,
+     aucun import direct dans le code. Laisser Maven gérer la version via mongodb-driver-sync.
+<dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver-core</artifactId>
-    <version>${mongodb-driver-sync.version}</version> 
+    <version>${mongodb-driver-sync.version}</version>
 </dependency>
- <!--
-<dependency>
-        <groupId>org.mongodb</groupId>
-        <artifactId>mongodb-crypt</artifactId>
-        <version>${mongodb-crypt.version}</version>
-    </dependency>
-   activé 13-08-2025  enlevé 30-12-2025
-        <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jackson2-provider</artifactId>
-        <version>${resteasy.version}</version>
-        <scope>provided</scope>
-</dependency>
+-->
 
+<!-- PrimeFlex — CSS utility library (flex grid, spacing, responsive) — served as WebJar -->
 <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-client</artifactId>
-        <version>${resteasy.version}</version>
-        <scope>provided</scope>
-    </dependency>
-  -->   
- <!--  for google geocoding  11-04-2022 -->   
- <dependency>
    <groupId>org.webjars.npm</groupId>
    <artifactId>primeflex</artifactId>
    <version>${primeflex.version}</version>
-</dependency><!-- enlevé 12-12-2025 suite conflit avec JollyDay
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-simple</artifactId>
-    <version>${slf4j.version}</version>
 </dependency>
- -->
-   <!-- enlevé 10-a1-2026 dded dependency plugin 30/08/2022 
-  <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-api</artifactId> 
-      <version>1.78.0</version>
-  </dependency>
--->  
-    <!-- https://mvnrepository.com/artifact/io.grpc/grpc-netty-shaded 
-<dependency>
-    <groupId>io.grpc</groupId>
-    <artifactId>grpc-netty-shaded</artifactId>
-    <version>1.48.1</version>
-</dependency>
---><!-- https://mvnrepository.com/artifact/org.xeustechnologies.google-api/google-api-spelling 
-<dependency>
-    <groupId>org.xeustechnologies.google-api</groupId>
-    <artifactId>google-api-spelling</artifactId>
-    <version>1.1</version>
-</dependency>
-   --> 
-   
 
-<!-- https://mvnrepository.com/artifact/io.grpc/grpc-netty -->
+<!-- SLF4J API — logging facade required by JollyDay and MongoDB driver (bridged to Log4j 2) -->
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-api</artifactId>
     <version>${slf4j.version}</version>
+    <scope>compile</scope>
 </dependency>
+
 <!-- nécessaire  
 <dependency>
     <groupId>org.jboss.as</groupId>
@@ -617,13 +415,6 @@ ava-7 reliant components, including FileTypeDetector implementations
 <!-- mod 16-02-2024 https://mvnrepository.com/artifact/jakarta.activation/jakarta.activation-api -->
 <!-- https://mvnrepository.com/artifact/jakarta.mail/jakarta.mail-api -->
 
-<!-- enlevé 
-<dependency>
-    <groupId>jakarta.activation</groupId>
-    <artifactId>jakarta.activation-api</artifactId>
-    <version>2.1.4</version> 
-</dependency>
--->
 <!--
 <dependency>
     <groupId>jakarta.mail</groupId>
@@ -632,44 +423,49 @@ ava-7 reliant components, including FileTypeDetector implementations
 </dependency>
 -->
 
-<!-- new 11-03-2024 https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core -->
+<!-- Eclipse Angus Mail — Jakarta Mail implementation used to send emails (activation, password reset) -->
 <dependency>
     <groupId>org.eclipse.angus</groupId>
     <artifactId>jakarta.mail</artifactId>
     <version>2.0.5</version> <!-- mod 24-10-2025 was 2.0.4  -->
-</dependency><!-- new 16-05-2024 https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+</dependency>
 
-
+<!-- Dropwizard Metrics core — required transitively by MongoDB driver sync -->
 <dependency>
     <groupId>io.dropwizard.metrics</groupId>
     <artifactId>metrics-core</artifactId>
     <version>4.2.38</version><!-- mod 16-03-2026 was 4.2.37  -->
-</dependency><dependency>
+</dependency>
+
+<!-- Selenium WebDriver Java — E2E browser automation base library -->
+<dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-java</artifactId>
-    <version>${selenium.version}</version>  
-     <scope>test</scope>
+    <version>${selenium.version}</version>
+    <scope>test</scope>
 </dependency>
-<!-- new 16-05-2024 https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-chrome-driver -->
+<!-- Selenium Chrome driver — ChromeDriver WebDriver implementation for E2E tests -->
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-chrome-driver</artifactId>
     <version>${selenium.version}</version>
     <scope>test</scope>
 </dependency>
-<!-- new 2026-03-07 multi-user test: Firefox + Edge drivers -->
+<!-- Selenium Firefox driver — GeckoDriver implementation (multi-browser E2E tests) -->
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-firefox-driver</artifactId>
     <version>${selenium.version}</version>
     <scope>test</scope>
 </dependency>
+<!-- Selenium Edge driver — EdgeDriver implementation (multi-browser E2E tests) -->
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-edge-driver</artifactId>
     <version>${selenium.version}</version>
     <scope>test</scope>
 </dependency>
+<!-- Selenium DevTools v133 — Chrome DevTools Protocol support for network/console inspection -->
 <dependency>
     <groupId>org.seleniumhq.selenium</groupId>
     <artifactId>selenium-devtools-v133</artifactId>
@@ -677,73 +473,66 @@ ava-7 reliant components, including FileTypeDetector implementations
     <scope>test</scope>
 </dependency>
 
-
-<!-- new 16-05-2024 https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
+<!-- WebDriverManager — automatic ChromeDriver/GeckoDriver binary management for Selenium tests -->
 <dependency>
     <groupId>io.github.bonigarcia</groupId>
     <artifactId>webdrivermanager</artifactId>
-    <version>6.3.3</version> <!-- mod 17-11-2025 was 6.3.2  <scope>test</scope> -->
-   <!-- <scope>provided</scope>  mod 28-03-2025 by selenium-jupiter ?? -->
+    <version>6.3.3</version>
+    <scope>test</scope>
 </dependency>
 
-<!-- 28-03-2025 https://mvnrepository.com/artifact/org.assertj/assertj-core -->
-
-
+<!-- selenium-jupiter — JUnit 5 extension for Selenium: @SeleniumJupiter, driver injection -->
 <dependency>
     <groupId>io.github.bonigarcia</groupId>
     <artifactId>selenium-jupiter</artifactId>
-    <version>6.3.1</version> <!-- mod 29-09-2025 was 6.2.0  <scope>test</scope> -->
+    <version>6.3.1</version> <!-- mod 29-09-2025 was 6.2.0 -->
     <scope>test</scope>
-</dependency><!--  <scope>test</scope>screenshot full page https://mvnrepository.com/artifact/ru.yandex.qatools.ashot/ashot
-screenshot full page -->
+</dependency>
 
-
+<!-- AssertJ — fluent assertion library used in unit and integration tests -->
 <dependency>
     <groupId>org.assertj</groupId>
     <artifactId>assertj-core</artifactId>
     <version>3.27.7</version> <!-- new 16-03-2026 was 3.27.6 -->
     <scope>test</scope>
-</dependency><!-- new 21-05-2024 https://mvnrepository.com/artifact/org.primefaces/primefaces-selenium-core -->
+</dependency>
 
-
+<!-- AShot — full-page screenshot utility for Selenium E2E tests -->
 <dependency>
     <groupId>ru.yandex.qatools.ashot</groupId>
     <artifactId>ashot</artifactId>
     <version>1.5.4</version>
-</dependency><dependency>
+    <scope>test</scope>
+</dependency>
+
+<!-- PrimeFaces Selenium core — base framework for PrimeFaces component testing -->
+<dependency>
     <groupId>org.primefaces</groupId>
     <artifactId>primefaces-selenium-core</artifactId>
     <version>${primefaces.version}</version>
     <scope>test</scope>
 </dependency>
-<!-- https://mvnrepository.com/artifact/io.mikael/urlbuilder -->
 
-
-  <!-- https://mvnrepository.com/artifact/org.testng/testng 
-<dependency>
-    <groupId>org.testng</groupId>
-    <artifactId>testng</artifactId>
-    <version>7.11.0</version> 
-    <type>jar</type>
-</dependency>
--->
-  
+<!-- PrimeFaces Selenium components — typed wrappers for PrimeFaces UI components in tests -->
 <dependency>
     <groupId>org.primefaces</groupId>
     <artifactId>primefaces-selenium-components</artifactId>
     <version>${primefaces.version}</version>
     <scope>test</scope>
 </dependency>
-  
-<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+
+<!-- urlbuilder — fluent URL builder used in PaymentRestResource payment callbacks -->
 <dependency>
     <groupId>io.mikael</groupId>
     <artifactId>urlbuilder</artifactId>
     <version>2.0.9</version>
-</dependency><dependency>
+</dependency>
+
+<!-- Mockito core — mock framework for unit tests (CDI beans, services) -->
+<dependency>
     <groupId>org.mockito</groupId>
-    <artifactId>mockito-core</artifactId>  
-    <version>5.22.0</version>  <!-- mod 16-03-2026 was 5.21.0 -->
+    <artifactId>mockito-core</artifactId>
+    <version>5.23.0</version>  <!-- mod 23-03-2026 was 5.22.0 -->
     <scope>test</scope>
 </dependency>
 <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter 
@@ -768,24 +557,12 @@ screenshot full page -->
     </exclusions>-->
 </dependency>
 
-<!-- indispensable -->
+<!-- JollyDay Jackson — Jackson-based holiday data loader required by jollyday-core -->
 <dependency>
   <groupId>de.focus-shift</groupId>
   <artifactId>jollyday-jackson</artifactId>
   <version>${jollyday.version}</version>
 </dependency>
-
-
-    <!-- MapStruct utilisé pour DTO voir pour creditcard -->
-<!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct 
-<dependency>
-    <groupId>org.mapstruct</groupId>
-    <artifactId>mapstruct</artifactId>
-    <version>${mapstruct.version}</version>
-</dependency>
--->
-<!-- Arquillian JUnit 5 -->
-
 
         <!-- ========================= -->
         <!-- Arquillian core API -->
@@ -793,7 +570,7 @@ screenshot full page -->
         <dependency>
             <groupId>org.jboss.arquillian.container</groupId>
             <artifactId>arquillian-container-test-api</artifactId>
-            <version>1.10.0.Final</version> <!-- mod 03-01-2025 was 1.8.0.Final -->
+            <version>1.10.1.Final</version> <!-- mod 23-03-2026 was 1.10.0.Final -->
             <scope>test</scope>
         </dependency>
 
@@ -823,15 +600,8 @@ screenshot full page -->
             <version>${shrinkwrap.version}</version>
             <scope>test</scope>
         </dependency>
-<!--
-<dependency>
-    <groupId>org.jboss.shrinkwrap.resolver</groupId>
-    <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-    <version>4.0.0</version> 
-    <scope>test</scope>
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/org.jboss.shrinkwrap.resolver/shrinkwrap-resolver-impl-maven -->
+
+<!-- ShrinkWrap Maven resolver implementation — resolves Maven artifacts for Arquillian deployment archives -->
 <dependency>
     <groupId>org.jboss.shrinkwrap.resolver</groupId>
     <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
@@ -840,6 +610,7 @@ screenshot full page -->
 
 </dependency>
 
+<!-- ShrinkWrap Maven resolver API — Maven resolver contract (required by impl) -->
 <dependency>
     <groupId>org.jboss.shrinkwrap.resolver</groupId>
     <artifactId>shrinkwrap-resolver-api-maven</artifactId>
@@ -847,7 +618,7 @@ screenshot full page -->
     <scope>test</scope>
 </dependency>
 
-<!-- Pour résoudre les archives et les artefacts correctement -->
+<!-- ShrinkWrap Maven archive resolver — resolves Maven artifacts into ShrinkWrap archives -->
 <dependency>
     <groupId>org.jboss.shrinkwrap.resolver</groupId>
     <artifactId>shrinkwrap-resolver-impl-maven-archive</artifactId>
@@ -865,23 +636,16 @@ screenshot full page -->
     <version>6.0.0.Alpha1</version>  <!-- existe autre version  -->
     <scope>test</scope>
 </dependency>
-<!--
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-bom</artifactId>
-      <version>${log4j2.version}</version>
-      <scope>import</scope>
-      <type>pom</type>
-    </dependency>
--->
+
+<!-- Log4j2 SLF4J bridge — routes SLF4J calls to Log4j2 during Arquillian/WildFly tests -->
 <dependency>
   <groupId>org.apache.logging.log4j</groupId>
   <artifactId>log4j-slf4j2-impl</artifactId>
-  <version>2.25.3</version>
+  <version>${log4j2.version}</version>
   <scope>test</scope>
 </dependency>
 
-<!-- https://mvnrepository.com/artifact/org.wildfly/wildfly-client-all -->
+<!-- WildFly client all — WildFly remote management client required by Arquillian remote container -->
 <dependency>
     <groupId>org.wildfly</groupId>
     <artifactId>wildfly-client-all</artifactId>
@@ -889,51 +653,42 @@ screenshot full page -->
     <scope>test</scope>
 </dependency>
 
-        <!-- Weld SE for testing  added 04-01-2026 -->
-        <dependency>
-            <groupId>org.jboss.weld.se</groupId>
-            <artifactId>weld-se-core</artifactId>
-            <version>${weld.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
-  <!--added 26-01-2026 Weld SE for testing    https://weld.cdi-spec.org/ 
-        CDI-api (provided) te permet de compiler les annotations CDI (@Inject, @Named, @ApplicationScoped, etc.).    -->  
+<!-- weld-se-core désactivé 2026-04-03 — aucun import trouvé dans les tests. Les tests utilisent
+     Arquillian (@ExtendWith(ArquillianExtension.class)), pas Weld SE standalone. Résidu d'une
+     tentative de tests CDI unitaires abandonnée.
+<dependency>
+    <groupId>org.jboss.weld.se</groupId>
+    <artifactId>weld-se-core</artifactId>
+    <version>${weld.version}</version>
+    <scope>test</scope>
+</dependency>
+-->
+
+<!-- jakarta.enterprise.cdi-api désactivé 2026-04-03 — doublon : déjà inclus transitivement
+     via jakarta.jakartaee-api (scope provided). Ajouter les deux crée une ambiguïté de version.
 <dependency>
    <groupId>jakarta.enterprise</groupId>
    <artifactId>jakarta.enterprise.cdi-api</artifactId>
    <version>4.1.0</version>
    <scope>provided</scope>
 </dependency>
-<!--
-<dependency>
-    <groupId>jakarta.inject</groupId>
-    <artifactId>jakarta.inject-api</artifactId>
-    <version>2.0.1</version>  Pour utiliser jakarta.inject.Inject 
-</dependency>
 -->
-<!-- https://mvnrepository.com/artifact/org.wildfly.core/wildfly-controller-client -->
+
+<!-- WildFly Controller Client — WildFly management API for deployment/monitoring operations -->
 <dependency>
     <groupId>org.wildfly.core</groupId>
     <artifactId>wildfly-controller-client</artifactId>
-    <scope>provided</scope> <!-- was test ou 'compile' si tu l'utilises hors tests -->
-    <version>32.0.0.Beta4</version>  <!-- mod 16-03-2026 was 31.0.1.Final -->
+    <scope>provided</scope>
+    <version>32.0.0.Beta6</version>  <!-- mod 16-03-2026 was 31.0.1.Final -->
 </dependency>
-<!-- https://mvnrepository.com/artifact/org.jboss/jboss-dmr -->
+<!-- JBoss DMR — Dynamic Model Representation used with wildfly-controller-client management API -->
 <dependency>
     <groupId>org.jboss</groupId>
     <artifactId>jboss-dmr</artifactId>
     <version>1.7.0.Final</version>
 </dependency>
-<!-- 
-<dependency>
-    <groupId>org.wildfly.core</groupId>
-    <artifactId>wildfly-version</artifactId>
-    <version>${wildfly.version}</version>
-    <scope>provided</scope>
-</dependency>
--->
-<!-- https://mvnrepository.com/artifact/com.maxmind.geoip2/geoip2 -->
+
+<!-- MaxMind GeoIP2 — IP geolocation to auto-detect player country/language at login (DB at C:/opt/geo/) -->
 <dependency>
     <groupId>com.maxmind.geoip2</groupId>
     <artifactId>geoip2</artifactId>
@@ -947,15 +702,23 @@ screenshot full page -->
     <version>3.1</version>
     <scope>provided</scope>
 </dependency>
+<!-- Fix warning: Cannot find annotation method 'resolution()' in type 'Requirement' -->
+<dependency>
+    <groupId>org.osgi</groupId>
+    <artifactId>org.osgi.annotation.bundle</artifactId>
+    <version>2.0.0</version>
+    <scope>provided</scope>
+</dependency>
 
-<!-- Source: https://mvnrepository.com/artifact/org.wildfly.core/wildfly-core-galleon-pack -->
+<!-- WildFly Core Galleon pack — WildFly provisioning BOM (resolves wildfly-controller-client transitive deps) -->
 <dependency>
     <groupId>org.wildfly.core</groupId>
     <artifactId>wildfly-core-galleon-pack</artifactId>
-    <version>32.0.0.Beta4</version>  <!-- mod 16-03-2026 was 31.0.1.Final -->
+    <version>32.0.0.Beta6</version>  <!-- mod 16-03-2026 was 31.0.1.Final -->
     <type>pom</type>
     <scope>provided</scope>
 </dependency>
+<!-- OSGi versioning annotation — suppresses Maven "Cannot find annotation method 'version()'" warnings -->
 <dependency>
     <groupId>org.osgi</groupId>
     <artifactId>org.osgi.annotation.versioning</artifactId>
@@ -963,23 +726,16 @@ screenshot full page -->
     <scope>provided</scope>
 </dependency>
 
-    <!-- Weld JUnit 5 pour test unitaire -->
-    <dependency>
-        <groupId>org.jboss.weld</groupId>
-        <artifactId>weld-junit5</artifactId>
-        <version>5.0.3.Final</version> <!-- was 4.0.1.Final  -->
-        <scope>test</scope>
-    </dependency>
-    <!-- H2 in-memory 
-    <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <version>2.4.240</version>
-        <scope>test</scope>
-    </dependency>
+<!-- weld-junit5 désactivé 2026-04-03 — aucun import trouvé dans les tests. Les tests d'intégration
+     passent par Arquillian remote (WildFly), les tests unitaires par Mockito. Aucune classe
+     n'utilise @WeldSetup ou l'extension Weld JUnit 5.
+<dependency>
+    <groupId>org.jboss.weld</groupId>
+    <artifactId>weld-junit5</artifactId>
+    <version>5.0.3.Final</version>
+    <scope>test</scope>
+</dependency>
 -->
-
-
  </dependencies>
  
  
@@ -1018,31 +774,8 @@ screenshot full page -->
      <artifactId>maven-install-plugin</artifactId>
      <version>${maven-install-plugin.version}</version>
 </plugin>
-            
-<!-- essai le 16-02-2024 voir Wildfly GLOW by Lc.docx
- <plugin>
-    <groupId>org.wildfly.plugins</groupId>
-    <artifactId>wildfly-maven-plugin</artifactId>
-    <version>5.0.0.Beta3</version>
-    <configuration>
-       <discover-provisioning-info>
-          <suggest>true</suggest>
-          <failsOnError>false</failsOnError>
-          <verbose>true</verbose>
-       </discover-provisioning-info>
-       <runtime-name>ROOT.war</runtime-name>
-    </configuration>
-    <executions>
-        <execution>
-            <goals>
-                <goal>package</goal>
-            </goals>
-            
-        </execution>
-    </executions>
-</plugin>
--->
-     <plugin>
+
+<plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
                 <version>${maven-wildfly-plugin.version}</version>
@@ -1053,25 +786,9 @@ screenshot full page -->
                     <hostname>localhost</hostname> <!-- added 11-12-2025 default -->
                     <port>9990</port> <!-- added 11-12-2025 default -->
                     <javaOpts>-Dapp.devMode=true</javaOpts> <!-- added 14/01/2026 used in ErrorController -->
-                    <!--<add-user>  new 17-12-2022 
-                        <users>
-                            <user>
-                                <username>LouisCollet</username>
-                                <password>Lc1lc2lc3</password>
-                            </user>
-                        </users>
-                    </add-user>-->
-                </configuration>
+                 </configuration>
                 <executions>
-                    <!-- new 03/11/2024 starts wildfly server 
-                      <execution>
-                     <id>id-start</id>
-                        <phase>run</phase>
-                        <goals>
-                           <goal>start</goal> 
-                        </goals>
-                    </execution>
-                   -->  <execution>
+                    <execution>
                         <id>package-deploy-only-lc</id>
                         <phase>package</phase> <!-- mod 13-01-2026 was install -->
                         <goals>
@@ -1435,20 +1152,6 @@ Les tests d’intégration seront exécutés lors de mvn verify ou mvn integrati
             <skip.integration.tests>true</skip.integration.tests>
         </properties>
     </profile>
-    <!--
-        <profile>
-        <id>default-main</id>
-        <activation>
-            <property>
-                <name>!exec.mainClass</name>
-            </property>
-        </activation>
-        <properties>
-            <exec.mainClass>${exec.mainClass.pom>}</exec.mainClass>
-        </properties>
-    </profile>
-    -->
-    
     
 </profiles>
         <!--
@@ -1519,108 +1222,4 @@ Les tests d’intégration seront exécutés lors de mvn verify ou mvn integrati
     
 </repositories>
 
-     
-     
-  <!--   enlevé 21-11-2020 transféré à projet mavenEID 
-     <url>http://localhost:8080/users/collet/.m2/repository/com/jEidlib/1.1/jEidlib-1.1.jar</url>
-     
-     ajouté 28-08-2021 pour theme bluesky voir aussi web.xml
-         enlevé 13-10-2023 remplacé par theming
- <repository>
-        <id>bluesky</id>
-        <url>http://localhost:8080/users/Louis%20Collet/.m2/repository/org/primefaces/themes/1.0.10/bluesky-1.0.10.jar</url>
-    </repository> 
- -->
-
- <!--ajouté s 15-11-2020 <url>http://localhost:8080/users/collet/.m2/repository/eid/mavenEID/</url>
- -->
- <!-- 
-17-08-2021 erreur maven à partir de 3.8.1 : ajouté dans m2.settings.xml
-<mirrors>
-		<mirror>
-			<id>PrimeFaces-maven-lib</id>
-			<mirrorOf>external:http:*</mirrorOf>
-			<name>Repository for library PrimeFaces-maven-lib</name>
-			<url>http://repository.primefaces.org/</url>
-			<blocked>false</blocked>
-		</mirror>
-	</mirrors>
-           XHTML
-
- -->    
- <!-- enlevé 28-08-2021 voir plus haut
-     <repository>
-        <id>prime-repo</id>
-        <name>PrimeFaces Maven Repository</name>
-        <url>https://repository.primefaces.org/</url>
-        <layout>default</layout>
-     </repository>
-  -->   
- 
-<!--
-<dependencyManagement>
-<dependencies>
- 
-
-
-    <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-bom</artifactId>
-        <version>${resteasy.version}</version>
-        <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-        <groupId>org.wildfly.bom</groupId>
-        <artifactId>wildfly-jakartaee8-with-tools</artifactId>
-        <version>${version.server.bom}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-    <dependency>
-      <groupId>com.google.cloud</groupId>
-      <artifactId>libraries-bom</artifactId>
-      <version>26.31.0</version> 
-      <type>pom</type>
-      <scope>import</scope>
-    </dependency>
-    
-  <dependency>
-            <groupId>com.fasterxml.jackson</groupId>
-            <artifactId>jackson-bom</artifactId>
-            <version>${jackson.version}</version>
-            <scope>import</scope>
-            <type>pom</type>
-    </dependency>  
-</dependencies>
-
-</dependencyManagement>
--->
-<!-- https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html  -->
-	<developers>
-		<developer>
-			<id>Louis</id>
-			<name>Louis Collet</name>
-			<email>yonathan@gmail.com</email>
-			<url>https://github.com/yonran</url>
-			<organization>jnasmartcardio</organization>
-			<organizationUrl>https://github.com/jnasmartcardio</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>Europe/Brussels</timezone>
-		</developer>
-	</developers>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>config/sun_checks.xml</configLocation>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>

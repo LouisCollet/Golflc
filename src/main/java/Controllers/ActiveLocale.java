@@ -30,17 +30,19 @@ public class ActiveLocale implements Serializable {
     @PostConstruct
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         supportedLocales = Faces.getSupportedLocales();
-        LOG.debug(methodName + " - supportedLocales = " + supportedLocales);
-        currentLocale = supportedLocales.get(0);
+        LOG.debug("supportedLocales = {}", supportedLocales);
+        // Use default locale (EN) — not supportedLocales.get(0) which was FR
+        currentLocale = Faces.getDefaultLocale();
+        LOG.debug("initial locale = {}", currentLocale);
     } // end method
 
     public void reload() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         PrimeFaces.current().executeScript("window.location.reload(true);");
-        LOG.debug(methodName + " - page reloaded");
+        LOG.debug("page reloaded");
     } // end method
 
     public Locale getCurrentLocale() {
@@ -61,13 +63,13 @@ public class ActiveLocale implements Serializable {
 
     public void setLanguageTag(String language) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " with = " + language);
+        LOG.debug("entering with = {}", language);
         if (language == null || language.isBlank()) {
-            LOG.debug(methodName + " - empty language, ignoring");
+            LOG.debug("empty language, ignoring");
             return;
         }
         currentLocale = Locale.forLanguageTag(language);
-        LOG.debug(methodName + " - current Locale = " + currentLocale);
+        LOG.debug("current Locale = {}", currentLocale);
         languageController.setLanguage(language); // fix multi-user 2026-03-07 — was static call
     } // end method
 

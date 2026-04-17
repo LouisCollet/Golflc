@@ -25,13 +25,14 @@ public class InscriptionMail implements Serializable {
     @Inject private utils.QRCodeService qrService;
     @Inject private MailSender mailSender;
     @Inject private ical.IcalService icalService;
+    @Inject private entite.Settings settings;
 
     public InscriptionMail() { }
 
     public Boolean create(Player player, Player invitedBy, Round round, Club club, Course course)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Your Round Inscription via GolfLC";
             String mail =
@@ -53,7 +54,7 @@ public class InscriptionMail implements Serializable {
                 + " <br/> Thank you !"
                 + " <br/> The GolfLC team";
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             byte[] pathICS = icalService.generateIcs(player, invitedBy, round, club, course, true);
             String content = mail.replaceAll("<br/>", "\n").replaceAll("<b>", "").replaceAll("</b>", "");
             byte[] pathQRC = qrService.generateQR(content, 200);
@@ -73,7 +74,7 @@ public class InscriptionMail implements Serializable {
     public Boolean delete(Player player, Round round, Club club, Course course)
             throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             String sujet = "Cancellation of your Round Inscription in GolfLC";
             String content =
@@ -98,7 +99,7 @@ public class InscriptionMail implements Serializable {
             byte[] pathQRC = qrService.generateQR(content, 200);
             LOG.debug("reponse de qrService = " + pathQRC.toString());
 
-            String to = System.getenv("SMTP_USERNAME");
+            String to = settings.getProperty("SMTP_USERNAME");
             mailSender.sendHtmlMailAsync(sujet, content, to, pathICS, pathQRC, player.getPlayerLanguage());
             LOG.debug("HTML Mail async dispatched");
             return true;

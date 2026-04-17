@@ -62,8 +62,7 @@ public class ClubManager implements Serializable {
     @Inject private lists.ClubCourseTeeListOne clubCourseTeeListOneService;
     @Inject private lists.SunriseSunsetList   sunriseSunsetList;
     @Inject private lists.AllFlightsList      allFlightsList;
-    @Inject private create.CreateTableFlights createTableFlightsService;
-    @Inject private lists.FlightAvailableList flightAvailableList;
+    @Inject private read.ReadRound            readRoundService;
     @Inject private find.FindSlopeRating      findSlopeRating;
     @Inject private lists.ClubDetailList      clubDetailListService;         // migrated 2026-02-24
     @Inject private lists.CourseListForClub   courseListForClubService;      // migrated 2026-02-24
@@ -601,7 +600,7 @@ public class ClubManager implements Serializable {
      */
     public List<Club> listClubs() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         try {
             List<Club> result = clubListService.list();
             return result != null ? result : Collections.emptyList();
@@ -672,42 +671,47 @@ public List<ECourseList> listCoursesForClub(int clubId) {
             return Collections.emptyList();
         }
     }
-// ========== MÉTHODE À AJOUTER dans ClubManager ==========
 /**
- * Calcule les flights disponibles pour le round, club et course courants
+ * Calcule les flights disponibles pour le round, club et course courants.
+ * Filtrage entièrement en mémoire — aucune écriture en base.
  * 1. Récupère sunrise/sunset via API
- * 2. Génère la table des flights (toutes les 12 min)
- * 3. Insère en base
- * 4. Retourne les flights non encore réservés
+ * 2. Génère tous les créneaux (toutes les 12 min)
+ * 3. Récupère les heures déjà réservées pour ce course+date
+ * 4. Filtre en Java : retire les créneaux déjà pris
  */
 public List<Flight> computeAvailableFlights(Round round, Club club, Course course) throws SQLException {
     final String methodName = "ClubManager.computeAvailableFlights";
 
     // Étape 1 — sunrise / sunset via API
-    Flight flight = sunriseSunsetList.list(round, club);            // ✅ injecté
+    Flight flight = sunriseSunsetList.list(round, club);
     LOG.debug("{} - step 1 flight={}", methodName, flight);
     if (flight == null) {
         LOG.error("{} - flight is null after SunriseSunsetList", methodName);
         return Collections.emptyList();
     }
 
-    // Étape 2 — génération de la table des flights (toutes les 12 min)
-    ArrayList<Flight> flights = allFlightsList.createTableFlights(  // ✅ injecté
+    // Étape 2 — génération de tous les créneaux (toutes les 12 min)
+    ArrayList<Flight> allFlights = allFlightsList.generateFlights(
             flight, club.getAddress().getZoneId());
-    LOG.debug("{} - step 2 flightList size={}", methodName, flights.size());
+    LOG.debug("{} - step 2 allFlights size={}", methodName, allFlights.size());
 
-    // Étape 3 — insertion en base + récupération des flights disponibles
-    if (createTableFlightsService.create(flights, course)) {        // ✅ injecté
-        LOG.debug("{} - step 3 CreateTableFlights OK", methodName);
+    // Étape 3 — heures déjà réservées pour ce course+date (converties en heure locale du club)
+    java.util.List<java.time.LocalDateTime> bookedTimes =
+            readRoundService.readBookedTimesForCourseDate(
+                    course.getIdcourse(),
+                    round.getRoundDate().toLocalDate(),
+                    club.getAddress().getZoneId());
+    LOG.debug("{} - step 3 bookedTimes size={}", methodName, bookedTimes.size());
 
-        // Invalidation du cache avant de relire les flights disponibles
-        // lists.FlightAvailableList.setListe(null);
-    //    flightAvailableList.invalidateCache();
-        return flightAvailableList.listAllFlights();                 // ✅ injecté
-    }
+    // Étape 4 — filtre en mémoire : retire les créneaux déjà réservés
+    java.util.Set<java.time.LocalDateTime> bookedSet = new java.util.HashSet<>(bookedTimes);
+    ArrayList<Flight> available = allFlights.stream()
+            .filter(f -> !bookedSet.contains(
+                    f.getFlightStart().truncatedTo(java.time.temporal.ChronoUnit.MINUTES)))
+            .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+    LOG.debug("{} - step 4 available flights={}", methodName, available.size());
 
-    LOG.error("{} - step 3 CreateTableFlights FAILED", methodName);
-    return Collections.emptyList();
+    return available;
 }
 
     // ========================================

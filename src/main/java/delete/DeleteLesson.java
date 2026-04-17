@@ -24,8 +24,8 @@ public class DeleteLesson implements Serializable {
 
     public boolean delete(final Lesson lesson) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
-        LOG.debug("with lesson = " + lesson);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("with lesson = {}", lesson);
 
         final String query = """
                 DELETE FROM lesson
@@ -37,12 +37,12 @@ public class DeleteLesson implements Serializable {
                 lesson.getEventProId(),
                 Timestamp.valueOf(lesson.getEventStartDate()));
         if (row != 0) {
-            String msg = "ScheduleEvent Deleted = " + lesson;
+            String msg = "lesson Deleted = " + lesson;
             LOG.info(msg);
             showMessageInfo(msg);
             return true;
         } else {
-            String msg = "ERROR ScheduleEvent NOT Deleted !!: " + lesson;
+            String msg = "ERROR lesson NOT Deleted !!: " + lesson;
             LOG.debug(msg);
             showMessageFatal(msg);
             return false;
@@ -53,12 +53,12 @@ public class DeleteLesson implements Serializable {
     /*
     void main() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         Lesson event = new Lesson();
         event.setEventStartDate(LocalDateTime.parse("2021-05-23T12:45:30"));
         event.setEventProId(1);
         boolean lp = new DeleteLesson().delete(event);
-        LOG.debug("from main, after lp = " + lp);
+        LOG.debug("from main, after lp = {}", lp);
     } // end main
     */
 

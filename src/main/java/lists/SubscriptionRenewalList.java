@@ -27,9 +27,30 @@ public class SubscriptionRenewalList implements Serializable {
 
     public SubscriptionRenewalList() { }
 
-    public List<ECourseList> list() throws SQLException {
+    /*/ ✅ Constante partagée avec le test d'intégration — modifier ici suffit
+    public static final String QUERY = """
+            SELECT *
+            FROM payments_subscription
+            JOIN player
+               ON player.idplayer = payments_subscription.SubscriptionIdPlayer
+               AND PlayerActivation = '1'
+            WHERE YEAR(SubscriptionEndDate)  = YEAR(DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH))
+              AND MONTH(SubscriptionEndDate) = MONTH(DATE_ADD(CURRENT_DATE(), INTERVAL 1 MONTH))
+            """;
+*/
+     public static final String QUERY = """
+    SELECT ps.*, p.*
+    FROM payments_subscription ps
+    JOIN player p
+      ON p.idplayer = ps.SubscriptionIdPlayer
+    WHERE p.PlayerActivation = 1
+      AND ps.SubscriptionEndDate >= DATE_ADD(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE())-1 DAY), INTERVAL 1 MONTH)
+      AND ps.SubscriptionEndDate <  DATE_ADD(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE())-1 DAY), INTERVAL 2 MONTH);
+    """;
+    
+     public List<ECourseList> list() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
 
         // ✅ Early return — guard clause FIRST
         if (liste != null) {
@@ -37,22 +58,12 @@ public class SubscriptionRenewalList implements Serializable {
             return liste;
         }
 
-        final String query = """
-            SELECT *
-            FROM payments_subscription
-            JOIN player
-               ON player.idplayer = subscriptionIdPlayer
-               AND PlayerActivation = '1'
-            WHERE YEAR(SubscriptionEndDate) = YEAR(CURRENT_DATE())
-              AND MONTH(SubscriptionEndDate) = MONTH(CURRENT_DATE()) + 1
-            """;
-
         RowMapper<ECourseList> compositeMapper = rs -> ECourseList.builder()
                 .player(new PlayerRowMapper().map(rs))
                 .subscription(new SubscriptionRowMapper().map(rs))
                 .build();
 
-        liste = dao.queryList(query, compositeMapper);
+        liste = dao.queryList(QUERY, compositeMapper);
 
         liste.forEach(item -> LOG.debug("players candidates to renewal = " + item));
 
@@ -77,7 +88,7 @@ public class SubscriptionRenewalList implements Serializable {
     // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         this.liste = null;
         LOG.debug(methodName + " - cache invalidated");
     } // end method
@@ -85,7 +96,7 @@ public class SubscriptionRenewalList implements Serializable {
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName);
+        LOG.debug("entering {}", methodName);
         List<ECourseList> ec = new SubscriptionRenewalList().list();
         LOG.debug("from main, ec = " + ec);
     } // end main
