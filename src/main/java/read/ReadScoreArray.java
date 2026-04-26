@@ -32,10 +32,10 @@ public class ReadScoreArray implements Serializable {
         final String query = """
                 SELECT *
                 FROM score, round
-                WHERE score.player_has_round_player_idplayer = ?
+                WHERE score.inscription_player_idplayer = ?
                 AND round.idround = ?
-                AND score.player_has_round_round_idround = round.idround
-                AND round.idround = score.player_has_round_round_idround
+                AND score.inscription_round_idround = round.idround
+                AND round.idround = score.inscription_round_idround
                 """;
 
         try (Connection conn = dao.getConnection();

@@ -12,6 +12,7 @@ public class EquipmentsAndBasic{
   private Integer quantity;
   private boolean available = true;    // true=available, false=N/A
   private String linkedSlotKey;        // null = applies to all slots; non-null = linked to one HO TeeTimes slot
+  private String twilight = "N";       // N=Normal, Y=Twilight
 
   //Global class constructor
   public EquipmentsAndBasic(String i, String n, Double p, Integer q){
@@ -60,6 +61,9 @@ public class EquipmentsAndBasic{
 
     public String getLinkedSlotKey() { return linkedSlotKey; }
     public void setLinkedSlotKey(String linkedSlotKey) { this.linkedSlotKey = linkedSlotKey; }
+
+    public String getTwilight() { return twilight != null ? twilight : "N"; }
+    public void setTwilight(String twilight) { this.twilight = twilight; }
 
   public String toString(){
  try {

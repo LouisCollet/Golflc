@@ -43,7 +43,7 @@ public class FindTarifGreenfeeData implements Serializable, interfaces.GolfInter
         }
 
         final String query = """
-            SELECT TarifJson, TarifCourseId, TarifHoles
+            SELECT TarifJson, TarifCourseId, TarifHoles, TarifCurrency
             FROM tarif_greenfee
             WHERE tarif_greenfee.TarifCourseId = ?
             AND ? BETWEEN tarif_greenfee.TarifStartDate AND tarif_greenfee.TarifEndDate

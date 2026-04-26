@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -28,8 +29,15 @@ public class FindTarifMembersData implements Serializable {
     public TarifMember find(final Club club, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug(methodName + " - for club = " + club);
-        LOG.debug(methodName + " - for round = " + round);
+        LOG.debug("for round = {}", round);
+        return find(club, round.getRoundDate().toLocalDate());
+    } // end method
+
+    public TarifMember find(final Club club, final LocalDate referenceDate) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for club = {}", club);
+        LOG.debug("for referenceDate = {}", referenceDate);
 
         final String query = """
             SELECT *
@@ -42,7 +50,7 @@ public class FindTarifMembersData implements Serializable {
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, club.getIdclub());
-            ps.setTimestamp(2, Timestamp.valueOf(round.getRoundDate()));
+            ps.setTimestamp(2, Timestamp.valueOf(referenceDate.atStartOfDay()));
             utils.LCUtil.logps(ps);
 
             try (ResultSet rs = ps.executeQuery()) {

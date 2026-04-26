@@ -23,8 +23,9 @@
              emptyMessage="#{msg['message.table.empty']}"
              rowKey="#{c.round.idround}"
              scrollable="true"
-             style="border:solid 5px;"  >
-<!-- 
+             scrollWidth="100%"
+             style="border:solid 5px;width:99%"  >
+<!-- style=""
 <p:ajax event="rowToggle" 
         listener="#{roundC.onRowToggleCompetition}" />
 update=":select_inscription_round:growl-msg"  -->
@@ -82,7 +83,7 @@ update=":select_inscription_round:growl-msg"  -->
                   width="15%"
                   filterMatchMode="contains"
                   filterBy="#{c.course.courseName}" >
-		#{c.course.courseName} (#{c.course.idcourse})
+	    #{c.course.courseName} (#{c.course.idcourse})
 	</p:column>
 <!--
 <p:rowExpansion>

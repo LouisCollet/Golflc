@@ -51,20 +51,20 @@ public class ScoreCardList3 implements Serializable {
              JOIN round
                  ON round.idround = ?
                  AND round.course_idcourse = course.idcourse
-              JOIN player_has_round
+              JOIN inscription
                 ON  InscriptionIdPlayer = player.idplayer
                 AND InscriptionIdRound = round.idround
               JOIN tee
                 ON course.idcourse = tee.course_idcourse
-                AND player_has_round.InscriptionIdTee = tee.idtee
+                AND inscription.InscriptionIdTee = tee.idtee
                 AND tee.TeeGender = player.PlayerGender
               JOIN hole
                 ON hole.tee_idtee = tee.TeeMasterTee
                 AND hole.tee_course_idcourse = course.idcourse
                 AND Hole.HoleNumber between roundstart and roundstart + roundholes - 1
               JOIN score
-                ON score.player_has_round_player_idplayer = player.idplayer
-                AND score.player_has_round_round_idround = round.idround
+                ON score.inscription_player_idplayer = player.idplayer
+                AND score.inscription_round_idround = round.idround
                 AND hole.HoleNumber = score.ScoreHole
               ORDER by hole.HoleNumber
             """;

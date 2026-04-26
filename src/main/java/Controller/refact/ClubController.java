@@ -52,6 +52,7 @@ public class ClubController implements Serializable {
     @Inject private read.ReadUnavailableStructure readUnavailableStructure; // migrated 2026-02-25
     @Inject private Controller.refact.NavigationController navigationController; // renamed from CourseController 2026-02-28
     @Inject private create.CreateUnavailablePeriod createUnavailablePeriodService; // migrated 2026-02-25 — Groupe D
+    @Inject private update.UpdateUnavailablePeriod updateUnavailablePeriodService;
     @Inject private lists.UnavailableListForDate unavailableListForDate; // migrated 2026-02-25 — Groupe D
     @Inject private lists.CourseListOnly courseListOnly; // migrated 2026-02-25 — Groupe B
     @Inject private lists.ClubDetailList clubDetailList; // migrated 2026-02-25 — Groupe B
@@ -63,6 +64,8 @@ public class ClubController implements Serializable {
     @Inject private create.CreateProfessional createProfessionalService; // migrated 2026-02-28 from CourseController
     @Inject private update.UpdateProfessional updateProfessionalService;
     @Inject private lists.ClubsListLocalAdmin clubsListLocalAdmin;
+    @Inject private Controller.refact.MemberController memberController; // added 2026-04-22 — cotisation flow restoration
+    @Inject private find.FindUnavailablePeriodOverlapping findUnavailablePeriodOverlapping; // added 2026-04-25
 
     private entite.Professional selectedProfessional = new entite.Professional();
 private List<Flight> flightList = Collections.emptyList();
@@ -87,6 +90,7 @@ private int cptFlight = 0;
     private List<ECourseList> filteredCourses = null; // PrimeFaces DataTable filtering
     private String lineModelCourse; // migrated 2026-02-25 from CourseController
     private TarifMember tarifMember; // migrated 2026-02-25 from CourseController
+    private EUnavailable unavailableDB = null; // DB snapshot for viz comparison — unavailable wizard
     @PostConstruct
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -1432,7 +1436,7 @@ public void convertYtoM() {
             if (purpose == enumeration.SelectionPurpose.PAYMENT_COTISATION) {
                 LOG.debug("purpose is PAYMENT_COTISATION");
                 LOG.debug("pour le club = {}", appContext.getClub().getIdclub());
-                return "cotisation.xhtml?faces-redirect=true";
+                return memberController.findTarifCotisationForToday();
             } else {
                 return null;
             }
@@ -1512,6 +1516,13 @@ public void convertYtoM() {
 
     public List<Course> getCourseListForClub() { return courseListForClub; }
     public void setCourseListForClub(List<Course> l) { this.courseListForClub = l; }
+
+    public List<String> getUnavailabilityTypeKeys() {
+        return List.of(
+                "unavailable.type.maintenance",
+                "unavailable.type.impraticable",
+                "unavailable.type.competition");
+    } // end method
 
     public List<Tee> getTeeListForCourse() { return teeListForCourse; }
     public void setTeeListForCourse(List<Tee> l) { this.teeListForCourse = l; }
@@ -2282,25 +2293,98 @@ public void convertYtoM() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            LOG.debug("for club = {}", appContext.getClub());
             EUnavailable unavailable = appContext.getUnavailable();
-            unavailable.period().setIdclub(appContext.getClub().getIdclub());
-            String msg = "Indisponibilité to be created = " + unavailable.period();
-            LOG.info(msg);
-
-            if (createUnavailablePeriodService.create(unavailable.period())) {
-                unavailable.period().setStartDate(null);
-                unavailable.period().setEndDate(null);
-                msg = "Unavailable Period created = " + unavailable.period();
-                LOG.info(msg);
-                showMessageInfo(msg);
-                return null;
-            } else {
-                msg = "Unavailable is NOT created !";
-                LOG.debug(msg);
-                showMessageFatal(msg);
+            if (appContext.getClub() == null || appContext.getClub().getIdclub() == null) {
+                showMessageFatal(LCUtil.prepareMessageBean("message.selectclub"));
                 return null;
             }
+            if (unavailable.period().getStartDate() == null || unavailable.period().getEndDate() == null) {
+                showMessageFatal(LCUtil.prepareMessageBean("tarif.member.period.dates.required"));
+                return null;
+            }
+            unavailable.period().setIdclub(appContext.getClub().getIdclub());
+            unavailable.structure().setPeriodSaved(true);
+            unavailable.structure().setMenuLaunched(true);
+            LOG.debug("period saved to bean: start={}, end={}", unavailable.period().getStartDate(), unavailable.period().getEndDate());
+            showMessageInfo(unavailable.period().getStartDate() + " → " + unavailable.period().getEndDate());
+            return null;
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return null;
+        }
+    } // end method
+
+    public String updateUnavailablePeriodAvailability() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            EUnavailable unavailable = appContext.getUnavailable();
+            if (unavailable.period().getUnavailabilityType() == null
+                    || unavailable.period().getUnavailabilityType().isBlank()) {
+                showMessageFatal(LCUtil.prepareMessageBean("unavailable.type.required"));
+                return null;
+            }
+            LOG.debug("availability saved to bean: type={}, label={}",
+                    unavailable.period().getUnavailabilityType(),
+                    unavailable.period().getUnavailabilityLabel());
+            showMessageInfo(unavailable.period().getUnavailabilityType()
+                    + (unavailable.period().getUnavailabilityLabel() != null
+                       ? " — " + unavailable.period().getUnavailabilityLabel() : ""));
+            return null;
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return null;
+        }
+    } // end method
+
+    public String saveFullUnavailability() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            if (appContext.getClub() == null || appContext.getClub().getIdclub() == null) {
+                showMessageFatal(LCUtil.prepareMessageBean("message.selectclub"));
+                return null;
+            }
+            EUnavailable unavailable = appContext.getUnavailable();
+            Club club = appContext.getClub();
+
+            // 1. Period (insert si pas encore persisté en DB)
+            if (unavailable.period().getStartDate() == null || unavailable.period().getEndDate() == null) {
+                showMessageFatal(LCUtil.prepareMessageBean("tarif.member.period.dates.required"));
+                return null;
+            }
+            unavailable.period().setIdclub(club.getIdclub());
+            if (!unavailable.structure().isPeriodPersistedToDB()) {
+                if (findUnavailablePeriodOverlapping.find(unavailable.period())) {
+                    return null; // message already shown by the service
+                }
+                if (createUnavailablePeriodService.create(unavailable.period())) {
+                    unavailable.structure().setPeriodSaved(true);
+                    unavailable.structure().setMenuLaunched(true);
+                    unavailable.structure().setPeriodPersistedToDB(true);
+                    LOG.debug("period inserted to DB");
+                } else {
+                    showMessageFatal(LCUtil.prepareMessageBean("unavailable.availability.notsaved"));
+                    return null;
+                }
+            }
+
+            // 2. Availability type/label (update le record le plus récent du club)
+            if (unavailable.period().getUnavailabilityType() != null
+                    && !unavailable.period().getUnavailabilityType().isBlank()) {
+                if (!updateUnavailablePeriodService.updateAvailability(unavailable.period())) {
+                    LOG.warn("updateAvailability returned false — type/label not persisted");
+                }
+            }
+
+            // 3. Structure → club.ClubUnavailableStructure
+            if (unavailableController.updateClub(unavailable, club)) {
+                unavailable.structure().setStructureExists(true);
+                showMessageInfo(LCUtil.prepareMessageBean("unavailable.availability.saved"));
+            } else {
+                showMessageFatal(LCUtil.prepareMessageBean("unavailable.availability.notsaved"));
+            }
+            return null;
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
             return null;
@@ -2416,6 +2500,184 @@ public void convertYtoM() {
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
             return null;
+        }
+    } // end method
+
+    // ========================================
+    // Wizard unavailable — flow + helpers
+    // ========================================
+
+    public String onUnavailableWizardFlow(org.primefaces.event.FlowEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("oldStep = {}, newStep = {}", event.getOldStep(), event.getNewStep());
+        try {
+            // Period → Availability: dates required then period must be saved
+            if ("PeriodTab".equals(event.getOldStep()) && "AvailabilityTab".equals(event.getNewStep())) {
+                EUnavailable unavailable = appContext.getUnavailable();
+                if (!unavailable.structure().isPeriodSaved()) {
+                    if (unavailable.period().getStartDate() == null || unavailable.period().getEndDate() == null) {
+                        showMessageFatal(LCUtil.prepareMessageBean("tarif.member.period.dates.required"));
+                    } else {
+                        showMessageFatal(LCUtil.prepareMessageBean("unavailable.period.required"));
+                    }
+                    return event.getOldStep();
+                }
+                LOG.debug("PeriodTab validated — periodSaved=true");
+            }
+            // Availability → Structure: validate type is selected
+            if ("AvailabilityTab".equals(event.getOldStep()) && "StructureTab".equals(event.getNewStep())) {
+                EUnavailable unavailable = appContext.getUnavailable();
+                if (unavailable == null || unavailable.period() == null
+                        || unavailable.period().getUnavailabilityType() == null
+                        || unavailable.period().getUnavailabilityType().isBlank()) {
+                    showMessageFatal(LCUtil.prepareMessageBean("unavailable.type.required"));
+                    return event.getOldStep();
+                }
+                LOG.debug("AvailabilityTab validated — type = {}", unavailable.period().getUnavailabilityType());
+            }
+            // Structure → Editor: validate at least one item in structure
+            if ("StructureTab".equals(event.getOldStep()) && "EditorTab".equals(event.getNewStep())) {
+                EUnavailable unavailable = appContext.getUnavailable();
+                if (unavailable == null || unavailable.structure() == null
+                        || unavailable.structure().getStructureList() == null
+                        || unavailable.structure().getStructureList().isEmpty()) {
+                    showMessageFatal(LCUtil.prepareMessageBean("unavailable.structure.notfound"));
+                    return event.getOldStep();
+                }
+                LOG.debug("StructureTab validated — {} items", unavailable.structure().getStructureList().size());
+            }
+            return event.getNewStep();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return event.getOldStep();
+        }
+    } // end method
+
+    public void initUnavailableWizard() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        unavailableDB = null;
+        EUnavailable unavailable = appContext.getUnavailable();
+        if (unavailable == null) {
+            appContext.setUnavailable(new EUnavailable(new entite.UnavailableStructure(), new entite.UnavailablePeriod()));
+            LOG.debug("EUnavailable initialized fresh");
+        } else {
+            unavailable.structure().setPeriodSaved(false);
+            unavailable.structure().setPeriodPersistedToDB(false);
+            unavailable.structure().setMenuLaunched(false);
+            unavailable.period().setStartDate(null);
+            unavailable.period().setEndDate(null);
+            LOG.debug("EUnavailable reset for new wizard session");
+        }
+    } // end method
+
+    public List<Club> getClubsForUnavailableWizard() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            return clubsListLocalAdmin.list(appContext.getPlayer());
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
+
+    public Integer getUnavailableWizardClubId() {
+        Club club = appContext.getClub();
+        return (club != null) ? club.getIdclub() : null;
+    } // end method
+
+    public void setUnavailableWizardClubId(Integer clubId) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (clubId == null) return;
+        try {
+            List<Club> clubs = clubsListLocalAdmin.list(appContext.getPlayer());
+            Club selected = clubs.stream()
+                    .filter(c -> clubId.equals(c.getIdclub()))
+                    .findFirst()
+                    .orElse(null);
+            if (selected != null) {
+                appContext.setClub(selected);
+                LOG.debug("unavailable wizard club set to {}", selected.getClubName());
+            }
+            courseListForClub = Collections.emptyList();
+            findCourseListForClub();
+            // Fresh EUnavailable for this club — load existing structure from DB
+            EUnavailable fresh = new EUnavailable(new entite.UnavailableStructure(), new entite.UnavailablePeriod());
+            entite.UnavailableStructure v = readUnavailableStructure.read(appContext.getClub());
+            if (v != null && !v.getStructureList().isEmpty()) {
+                fresh.structure().setStructureList(v.getStructureList());
+                fresh.structure().setStructureExists(true);
+                fresh.structure().setItemExists(true);
+            }
+            appContext.setUnavailable(fresh);
+            unavailableDB = null;
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+        }
+    } // end method
+
+    public Integer getUnavailableWizardCourseId() {
+        entite.UnavailablePeriod p = appContext.getUnavailable() != null ? appContext.getUnavailable().period() : null;
+        if (p == null) return null;
+        return p.isAllCourses() ? Integer.valueOf(9999) : p.getCourseId();
+    } // end method
+
+    public void setUnavailableWizardCourseId(Integer value) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        entite.UnavailablePeriod p = appContext.getUnavailable() != null ? appContext.getUnavailable().period() : null;
+        if (p == null) return;
+        if (value == null) {
+            p.setAllCourses(false);
+            p.setCourseId(null);
+        } else if (value == 9999) {
+            p.setAllCourses(true);
+            p.setCourseId(null);
+        } else {
+            p.setAllCourses(false);
+            p.setCourseId(value);
+        }
+        LOG.debug("allCourses = {}, courseId = {}", p.isAllCourses(), p.getCourseId());
+    } // end method
+
+    public void resetUnavailableDB() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        unavailableDB = null;
+    } // end method
+
+    public EUnavailable getUnavailableDB() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (unavailableDB != null) return unavailableDB;
+        try {
+            unavailableDB = unavailableListForDate.list(java.time.LocalDateTime.now(), appContext.getClub());
+            if (unavailableDB == null) {
+                unavailableDB = new EUnavailable(new entite.UnavailableStructure(), null);
+            }
+            LOG.debug("unavailableDB loaded from DB");
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+            unavailableDB = new EUnavailable(new entite.UnavailableStructure(), null);
+        }
+        return unavailableDB;
+    } // end method
+
+    public void removeStructureItem(entite.Structure item) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            EUnavailable unavailable = appContext.getUnavailable();
+            unavailable.structure().getStructureList().remove(item);
+            if (unavailable.structure().getStructureList().isEmpty()) {
+                unavailable.structure().setItemExists(false);
+            }
+            LOG.debug("structureList size after remove = {}", unavailable.structure().getStructureList().size());
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
         }
     } // end method
 

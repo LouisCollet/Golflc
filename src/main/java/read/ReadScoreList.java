@@ -41,8 +41,8 @@ public class ReadScoreList implements Serializable {
         final String query = """
             SELECT *
             FROM score
-            WHERE score.player_has_round_round_idround = ?
-               AND score.player_has_round_player_idplayer = ?
+            WHERE score.inscription_round_idround = ?
+               AND score.inscription_player_idplayer = ?
             """;
 
         try (Connection conn = dao.getConnection();
@@ -132,8 +132,8 @@ try{
    final String query = """
               SELECT *
               FROM score
-              WHERE score.player_has_round_round_idround = ?
-                 AND score.player_has_round_player_idplayer = ?;
+              WHERE score.inscription_round_idround = ?
+                 AND score.inscription_player_idplayer = ?;
      """ ;
      ps = conn.prepareStatement(query);
      ps.setInt(1, round.getIdround());

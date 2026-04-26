@@ -3,28 +3,20 @@ package entite;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Named;
 import jakarta.servlet.annotation.WebListener;
-import jakarta.servlet.http.HttpSessionBindingEvent;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
-
 import java.time.LocalDateTime;
 import utils.LCUtil;
 import jakarta.servlet.http.HttpSessionBindingListener;
 import jakarta.servlet.http.HttpSessionListener;
+import java.nio.charset.StandardCharsets;
 
 
 @WebListener // enlevé 25/01/2026 new 26-08-2025 https://www.logicbig.com/tutorials/java-ee-tutorial/java-servlet/http-session-binding-listener.html
-//@Named("cotisation") 14-02-2026
-//@RequestScoped
 
-
-//public class Cotisation implements Serializable, interfaces.GolfInterface{
 public class Cotisation implements Serializable, HttpSessionBindingListener, HttpSessionListener {    
     private static final long serialVersionUID = 1L;
-    
     private Integer idplayer;
     
   @NotNull(message="{cotisation.startdate.notnull}")
@@ -93,8 +85,6 @@ public Cotisation(){    // constructor
     public void setCotisationError(boolean cotisationError) {
         this.cotisationError = cotisationError;
     }
-
-
 
 @Override
     protected Object clone() throws CloneNotSupportedException {
@@ -198,6 +188,9 @@ public Cotisation(){    // constructor
 public String toString(){
     try{
      //   LOG.debug("starting toString Cotisation!");
+    int taille = java.util.Optional.ofNullable(this.getItems())
+        .map(s -> s.getBytes(StandardCharsets.UTF_8).length)
+        .orElse(0);
     return 
         ( NEW_LINE + "<br/>FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase() + NEW_LINE 
                + " idplayer : "   + this.getIdplayer()
@@ -210,6 +203,7 @@ public String toString(){
              + NEW_LINE + TAB
                + " ,date paiement : "  + this.getPaymentDate()
                + " ,items : "  + this.getItems()
+               + " ,longueur items : "  + taille
                + " ,club : "  + this.getIdclub()
                + " ,status : "  + this.getStatus()
                + " ,error : "  + cotisationError

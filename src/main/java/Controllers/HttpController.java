@@ -180,7 +180,7 @@ public class HttpController implements Serializable {
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .version(HttpClient.Version.HTTP_1_1)
-                .timeout(Duration.ofSeconds(5))
+                .timeout(Duration.ofSeconds(15))
                 // .header("ReturnDirectory", utils.LCUtil.firstPartUrl() + "/rest/payment/") // migrated 2026-03-28 — moved to return_url query param
                 .header("MerchantSite", "GolfLC Merchant Site")
                 .header("X-Timestamp", timestamp)
@@ -221,9 +221,12 @@ public class HttpController implements Serializable {
                     java.util.Map<?, ?> map = OBJECT_MAPPER.readValue(body, java.util.Map.class);
                     LOG.error("payment server error response: {}", body);
                     Object message = map.get("message");
+                    if (message == null) message = map.get("name");        // Python flask-limiter style
                     Object details = map.get("details");
-                    msg = (message != null ? message : "Unknown error")
-                        + "\n" + (details != null ? details : "");
+                    if (details == null) details = map.get("description"); // Python flask-limiter style
+                    msg = "HTTP " + response.statusCode() + " — "
+                        + (message != null ? message : "Unknown error")
+                        + (details != null ? " : " + details : "");
                 } else {
                     msg = "Error from payment server (HTTP " + response.statusCode() + "): " + body;
                     LOG.error(msg);
@@ -347,7 +350,9 @@ public class HttpController implements Serializable {
             LOG.debug("CA subject = {}", caCert.getSubjectX500Principal());
             LOG.debug("CA valid until = {}", caCert.getNotAfter());
 
-            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        //    KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType()); 
+            KeyStore trustStore = KeyStore.getInstance("PKCS12");// mod 21/04/2026 suite jdk 26
+            
             trustStore.load(null, null);
             trustStore.setCertificateEntry("GolfLCCreditcardCertificate", caCert);
             LOG.debug("CA certificate loaded into trustStore");

@@ -234,9 +234,21 @@ public class MailSender implements Serializable {
         String title = mail.title();
         String text  = mail.text();
 
-        if (!"fr".equalsIgnoreCase(mail.targetLanguage())) {
-            title = translation.FileTranslation.translateList(List.of(title), mail.targetLanguage());
-            text  = translation.FileTranslation.translateList(List.of(text),  mail.targetLanguage());
+        // Traduction via Google Translate — skip si langue null/vide ou "fr" (source)
+        // Si la traduction échoue (API indisponible, quota, etc.), on conserve l'original
+        // pour éviter qu'un null ne se propage dans le corps du mail.
+        String lang = mail.targetLanguage();
+        if (lang != null && !lang.isBlank() && !"fr".equalsIgnoreCase(lang)) {
+            try {
+                String translatedTitle = translation.FileTranslation.translateList(List.of(title), lang);
+                String translatedText  = translation.FileTranslation.translateList(List.of(text),  lang);
+                if (translatedTitle != null && !translatedTitle.isBlank()) title = translatedTitle;
+                else LOG.warn("title translation returned null/blank — keeping original");
+                if (translatedText != null && !translatedText.isBlank())   text  = translatedText;
+                else LOG.warn("text translation returned null/blank — keeping original");
+            } catch (Exception translationEx) {
+                LOG.error("translation failed — keeping original text: {}", translationEx.getMessage());
+            }
         }
 
         if (title != null && (title.contains("\r") || title.contains("\n"))) {

@@ -717,9 +717,8 @@ public void onCellEdit(CellEditEvent<Object> event) { // used in include_statist
         setShowCalculate(true); // donner la possibilité de recalculer  not used
         if (newValue != null && !newValue.equals(oldValue)) {
             String msg = "Calculate = " + isShowCalculate() +" - Cell Changed Old: " + oldValue + ", New:" + newValue;
-            LCUtil.showMessageInfo(msg);
-    //        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Calculate = true - Cell Changed", "Old: " + oldValue + ", New:" + newValue);
-    //        FacesContext.getCurrentInstance().addMessage(null, msg);
+    //        LCUtil.showMessageInfo(msg);
+
         }
     }
     

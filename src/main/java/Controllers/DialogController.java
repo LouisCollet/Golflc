@@ -168,14 +168,14 @@ public class DialogController implements Serializable {
     public void showSelectRound(String purpose) {
         PrimeFaces.current().dialog()
                 .openDynamic("dialogRound.xhtml",
-                        modal("50%", "70%", false, false, "dlg-select"),
+                        modal("80%", "80%", false, false, "dlg-select"), // mod 21-04-2026
                         singleParam("type_club", purpose));
     }
 
     public void showRound() {
         PrimeFaces.current().dialog()
                 .openDynamic("dialog_played_rounds.xhtml",
-                        modal("840", "640", false, true, "dlg-info"),
+                        modal("70%", "80%", false, true, "dlg-info"),
                         null);
     }
 

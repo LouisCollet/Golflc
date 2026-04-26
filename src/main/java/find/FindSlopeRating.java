@@ -66,12 +66,12 @@ public class FindSlopeRating implements Serializable {
              AND round.idround = ?
             JOIN club
              ON club.idclub = course.club_idclub
-            JOIN player_has_round
+            JOIN inscription
              ON InscriptionIdRound = round.idround
              AND InscriptionIdPlayer = player.idplayer
             JOIN tee
              ON tee.course_idcourse = course.idcourse
-             AND player_has_round.InscriptionIdTee = tee.idtee
+             AND inscription.InscriptionIdTee = tee.idtee
             """;
 
         try (Connection conn = dao.getConnection();

@@ -27,8 +27,16 @@ public class PaymentGreenfeeController implements Serializable, interfaces.Log{
 
     private static final long serialVersionUID = 1L;
 
-    @Inject private create.CreateInscription createInscriptionService; // migrated 2026-02-25
-    @Inject private create.CreatePaymentGreenfee createPaymentGreenfeeService; // migrated 2026-02-25
+    @Inject private create.CreateInscription      createInscriptionService;      // migrated 2026-02-25
+    @Inject private create.CreatePaymentGreenfee  createPaymentGreenfeeService;  // migrated 2026-02-25
+    @Inject private manager.RoundManager          roundManager;                  // added 2026-04-19 flight booking
+    @Inject private find.FindRoundBySlot          findRoundBySlot;               // find-or-create au slot — 2026-04-21
+    @Inject private find.FindGreenfeePaid         findGreenfeePaid;              // skip insert si déjà payé — 2026-04-21
+    @Inject private find.FindInscriptionRound     findInscriptionRound;          // idempotence auto-inscription — 2026-04-21
+    @Inject private find.FindTeeStart             findTeeStart;                  // 1er tee valide — 2026-04-21
+    @Inject private lists.ParticipantsRoundList   participantsRoundList;         // max 4 joueurs — 2026-04-21
+
+    private static final int MAX_PLAYERS_PER_SLOT = 4;
 
 public PaymentGreenfeeController(){ // constructor
     //
@@ -40,37 +48,73 @@ public boolean RegisterPaymentandInscription(final Creditcard creditcard, final 
 try{
            LOG.debug("entering RegisterPaymentandInscriptionGreenfee");
            LOG.debug("with greenfee = " + greenfee);
- ///          LOG.debug("with inscription = " + inscription);
 
-  // 1. Register payment
-       //   if(! new PaymentsGreenfeeController().payment(player, greenfee, conn)){
-               if(! payment(player, greenfee)){ 
+  // 0. Find-or-create du round au slot — robustesse concurrence + reliquats en DB
+           if (round.getIdround() == null) {
+               Round existing = findRoundBySlot.find(course.getIdcourse(), round.getRoundDate(),
+                       java.time.ZoneId.of(club.getAddress().getZoneId()));
+               if (existing != null) {
+                   round.setIdround(existing.getIdround());
+                   LOG.debug("round found by slot — reusing idround={}", existing.getIdround());
+               } else {
+                   LOG.debug("round.idround null and no round at slot — creating");
+                   manager.RoundManager.SaveResult result =
+                       roundManager.createRound(round, course, club, new entite.UnavailablePeriod());
+                   if (!result.isSuccess()) {
+                       String msg = "Round creation failed before greenfee payment: " + result.getMessage();
+                       LOG.error(msg);
+                       showMessageFatal(msg);
+                       throw new Exception(msg);
+                   }
+                   LOG.debug("round created idround={}", round.getIdround());
+               }
+               greenfee.setIdround(round.getIdround());  // sync greenfee avec l'idround (existant ou nouveau)
+           }
+
+  // 1. Register payment (skip si déjà payé pour ce (player, round) — reliquat d'un essai précédent)
+           if (findGreenfeePaid.find(player, round)) {
+               LOG.info("PaymentGreenfee already registered for player={} round={} — skipping insert",
+                       player.getIdplayer(), round.getIdround());
+           } else if(! payment(player, greenfee)){
                   String msg = "Create Payment Greenfee FAILED - no round inscription accepted !!";
                   LOG.error(msg);
                   showMessageFatal(msg);
                   throw new Exception(msg);
-          }
-// true
-             String msg = "PaymentGreenfee registered"; 
-           LOG.debug(msg);
-  // 2. Register Inscription 
-          //    Inscription inscription = new Inscription();
-              
-          // inscription = new create.CreateInscription().create(round, player, player, inscription, club, course, "A", conn);
-             inscription = createInscriptionService.create(round, player, player,
-                      inscription,
-                      club, course, "A"); // migrated 2026-02-25
-              if( ! inscription.isInscriptionError()){  // no errors
-                  msg = "no error :  Inscription done";
-                  LOG.info(msg);
-                  showMessageInfo(msg);
-                  return true;
-              }else{ // error inscription
-                  msg = "FATAL error : we cannot create the Inscription BUT the payment is registered - refund needed !!";
-                  LOG.error(msg);
-                  showMessageFatal(msg);
-                  throw new Exception(msg);
-              }
+           } else {
+               LOG.debug("PaymentGreenfee registered");
+           }
+
+  // 2. Auto-inscription (idempotent) — 1er tee valide via FindTeeStart
+           if (findInscriptionRound.find(round, player)) {
+               LOG.debug("player {} déjà inscrit — skip auto-inscription", player.getIdplayer());
+               return true;
+           }
+           // Filet de sécurité max 4 joueurs — race condition avec un autre payeur concurrent
+           participantsRoundList.invalidateCache();
+           int inscrits = participantsRoundList.list(round).size();
+           if (inscrits >= MAX_PLAYERS_PER_SLOT) {
+               String msg = "Créneau complet (" + inscrits + "/" + MAX_PLAYERS_PER_SLOT
+                       + ") — inscription refusée après paiement. Contacter l'administrateur pour un remboursement.";
+               LOG.error(msg);
+               showMessageFatal(msg);
+               return true;   // paiement enregistré, mais inscription non créée
+           }
+           findTeeStart.invalidateCache();
+           java.util.List<String> teeStarts = findTeeStart.find(course, player, round);
+           if (teeStarts == null || teeStarts.isEmpty() || !teeStarts.get(0).contains("/")) {
+               LOG.warn("no tee found for gender {} — inscription deferred to Register Score", player.getPlayerGender());
+               return true;
+           }
+           Inscription auto = new Inscription();
+           auto.setInscriptionTeeStart(teeStarts.get(0));
+           LOG.debug("auto-inscription with tee = {}", teeStarts.get(0));
+           Inscription result = createInscriptionService.create(round, player, player, auto, club, course, "A");
+           if (result == null || result.isInscriptionError()) {
+               LOG.warn("GREENFEE auto-inscription failed — user can retry via Register Score");
+           } else {
+               LOG.info("GREENFEE auto-inscription created player={} round={}", player.getIdplayer(), round.getIdround());
+           }
+           return true;
 }catch (Exception e) {
             String msg = "££ Exception in RegisterPaymentandInscriptionGreenfee  = " + e.getMessage();
             LOG.error(msg);

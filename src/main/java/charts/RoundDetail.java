@@ -44,8 +44,8 @@ public class RoundDetail implements Serializable {
             FROM score, round, course
             WHERE
                 round.idround = ?
-                and score.player_has_round_player_idplayer = ?
-                and score.player_has_round_round_idround = round.idround
+                and score.inscription_player_idplayer = ?
+                and score.inscription_round_idround = round.idround
             GROUP BY scorehole
             ORDER by scorehole
             """;

@@ -4,7 +4,6 @@ import entite.Cotisation;
 import entite.EquipmentsAndBasic;
 import entite.EquipmentsAndBasicAndRange;
 import entite.Player;
-import entite.Round;
 import entite.TarifMember;
 //import static interfaces.GolfInterface.temporalFirst;
 //import static interfaces.GolfInterface.temporalLast;
@@ -13,11 +12,13 @@ import static interfaces.Log.LOG;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
@@ -28,6 +29,8 @@ public class TarifMemberController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Inject private Controller.refact.PlayerController playerController;
+
     public TarifMemberController() { }
 
  
@@ -37,29 +40,37 @@ public TarifMember inputTarifMembersCotisation(TarifMember tarifMember) throws S
     LOG.debug("entering {}", methodName);
 try{
     LOG.debug("with inputTarifMembersCotisation with tarifMember = !"+ tarifMember);
-  LOG.debug("workRangeAge = {}", tarifMember.getWorkRangeAge());
-     if(tarifMember.getWorkRangeAge() == null){ // pas complété dans écran
-         tarifMember.setWorkRangeAge("00-00");
-         LOG.debug("workRangeAge was null, setted to : {}", tarifMember.getWorkRangeAge());
+    LOG.debug("workRangeAge = {}", tarifMember.getWorkRangeAge());
+    if (tarifMember.getStartDate() == null || tarifMember.getEndDate() == null) {
+        String msg = "period not created — cannot add cotisation item";
+        LOG.error(msg);
+        showMessageFatal(msg);
+        return tarifMember;
     }
-     // à modifier : on prend toujours les dates de la dernière période introduite !
-    tarifMember.setStartDate(tarifMember.getWorkStartDate());
-    tarifMember.setEndDate(tarifMember.getWorkEndDate());
-    EquipmentsAndBasicAndRange basic = new EquipmentsAndBasicAndRange( // mod 09/05/2022
-            tarifMember.getWorkStartDate(),
-            tarifMember.getWorkEndDate(),
+    if (tarifMember.getWorkRangeAge() == null || tarifMember.getWorkRangeAge().isBlank()) { // pas complété dans écran
+        tarifMember.setWorkRangeAge("00-00");
+        LOG.debug("workRangeAge was null, setted to : {}", tarifMember.getWorkRangeAge());
+    }
+    for (EquipmentsAndBasicAndRange existing : tarifMember.getBasicList()) {
+        if (rangesOverlap(existing.getRange(), tarifMember.getWorkRangeAge())) {
+            String msg = LCUtil.prepareMessageBean("tarif.member.range.overlap") + " " + existing.getRange();
+            LOG.warn(msg);
+            showMessageFatal(msg);
+            return tarifMember;
+        }
+    }
+    EquipmentsAndBasicAndRange basic = new EquipmentsAndBasicAndRange(
+            tarifMember.getStartDate(),
+            tarifMember.getEndDate(),
             tarifMember.getWorkItem(),
             tarifMember.getWorkRangeAge(),
             tarifMember.getWorkPrice(),
-            0) // quantity
-            ; 
+            0); // quantity
     tarifMember.getBasicList().add(basic);
   // house keeping
     tarifMember.setWorkItem(null); // pour le prochain affichage
     tarifMember.setWorkPrice(null);
     tarifMember.setWorkRangeAge(null);
-    tarifMember.setWorkStartDate(null);
-    tarifMember.setWorkEndDate(null);
     String msg = "inputTarifMembers updated = " + tarifMember.getBasicList();
         LOG.debug(msg);
         showMessageInfo(msg);
@@ -94,13 +105,14 @@ try{
 }
 } // end method
 
-public Cotisation completeCotisation(TarifMember tarif, Player player, Round round) throws Exception{
+public Cotisation completeCotisation(TarifMember tarif, Player player, LocalDate referenceDate) throws Exception{
    final String methodName = utils.LCUtil.getCurrentMethodName();
      Cotisation cotisation = new Cotisation();
     try{
         LOG.debug("entering {}", methodName);
         LOG.debug("with TarifMember = {}", tarif);
         LOG.debug("for Player = {}", player.getIdplayer());
+        LOG.debug("for referenceDate = {}", referenceDate);
      // de 00:00 heures à 23:59 introduit le 07-04-2021
      cotisation.setCotisationError(false);
      /* validation sur date début et fin !
@@ -110,19 +122,10 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
          showMessageFatal(msg);
          return null;
      }
-   */  
-  //  à faire ?? à vérifier utiliser la date round pour déterminer start et enddate ?? 
-
-           LOG.debug("fake start and end hours !!  needs registration real dates , needs new screen !!");
- //   TemporalAdjuster temporalLast = TemporalAdjusters.lastDayOfYear();
- //   LocalDateTime lastDayOfYear = LocalDateTime.now().with(temporalLast).withNano(0);
-    cotisation.setCotisationStartDate(LocalDateTime.now().with(TemporalAdjusters.firstDayOfYear()));
- //   LocalDateTime lastDayOfYear = LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear()).withNano(0);
- //       LOG.debug("lastDayOfYear = {}", lastDayOfYear);
-  // cotisation.setCotisationStartDate(LocalDateTime.now().with(temporalFirst).withNano(0)); TemporalAdjusters.firstDayOfYear()
-  //  cotisation.setCotisationEndDate(LocalDateTime.parse("2023-12-31T23:59:59"));
-  //  cotisation.setCotisationEndDate(LocalDateTime.of(LocalDateTime.now().getYear(), 12, 31, 23, 59));
-    cotisation.setCotisationEndDate(LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear()));
+   */
+    LocalDateTime reference = referenceDate.atStartOfDay();
+    cotisation.setCotisationStartDate(reference.with(TemporalAdjusters.firstDayOfYear()));
+    cotisation.setCotisationEndDate(reference.with(TemporalAdjusters.lastDayOfYear()));
     
   //   LocalDateTime firstDayOfYear = LocalDateTime.now().with(TemporalAdjusters.lastDayOfYear());
  //   LocalDateTime first = LocalDateTime.of(LocalDateTime.now().getYear(), 1, 1, 0, 0);
@@ -141,30 +144,32 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, Round rou
          }
        StringBuilder sb = new StringBuilder("");
       LOG.debug("starting cotisation");
- //      cotisation.setStatus("N"); // utilisé par savoir facilement si le member est en ordre pour la période
        for(int i = 0 ; i < tarif.getBasicList().size() ; i++) {
                 var v = tarif.getBasicList().get(i);
-                sb.append(v.getItem()) // item
+                if (v.getQuantity() == null || v.getQuantity() <= 0) continue; // skip unselected
+                sb.append(v.getItem())
                   .append(" (")
-                  .append(v.getPrice()) //prix
+                  .append(v.getPrice())
                   .append("*").append(v.getQuantity())
                   .append("),");
-                cotisation.setStatus("Y"); // ?? le player a payé sa cotisation et est abonné pour la période
+                cotisation.setStatus("Y");
          } //end for
 
-  /// constitution items pour equipments
      LOG.debug("starting equipment");
        for(int i = 0 ; i < tarif.getEquipmentsList().size() ; i++) {
                 var v = tarif.getEquipmentsList().get(i);
-                sb.append(v.getItem()) // item
+                if (v.getQuantity() == null || v.getQuantity() <= 0) continue; // skip unselected
+                sb.append(v.getItem())
                   .append(" (")
-                  .append(v.getPrice()) //prix
+                  .append(v.getPrice())
                   .append("*")
                   .append(v.getQuantity())
                   .append("),");
          } //end for
-          sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
- //         LOG.debug("final selectedItems = {}", sb);
+         if (sb.length() > 0) {
+             sb.deleteCharAt(sb.lastIndexOf(","));
+         }
+         LOG.debug("selected items = {}", sb);
       cotisation.setItems(sb.toString());
   return cotisation;
 } catch (Exception e) {
@@ -180,7 +185,7 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
  try {
  //       à faire : proportion pour abonnement en cours d'année (année incomplète)
           LOG.debug("validating cotisation age range- --------");
-     int yourAge = utils.LCUtil.calculateAgeFirstJanuary(player.getPlayerBirthDate());
+     int yourAge = playerController.calculateAgeFirstJanuary(player.getPlayerBirthDate());
 
      // calcul du nombre de jours
   //    Duration dur = Duration.between(tarifMember.getMemberStartDate(),
@@ -198,13 +203,12 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
 
   	for(int i = 0 ; i < tarif.getBasicList().size() ; i++) {
                 LOG.debug("i = {}", i);
-   //             LOG.debug("base for calculation = {}", Arrays.toString(tarif.getMembersBase()[i]));
-//                LOG.debug("choice for calculation = {}", tarif.getMembersChoice()[i]);
- //            if(tarif.getMembersChoice()[i] == 0){
- //                LOG.debug("skipped : you are not paying this cotisation");
- //                continue;} // passe item suivant
-        //     String range = tarif.getMembersBase()[i][2];
-             String range = tarif.getBasicList().get(i).getRange();
+             EquipmentsAndBasicAndRange currentItem = tarif.getBasicList().get(i);
+             if (currentItem.getQuantity() == null || currentItem.getQuantity() <= 0) {
+                 LOG.debug("skipped : quantity = 0, not in cart");
+                 continue;
+             }
+             String range = currentItem.getRange();
                 LOG.debug("age range for this item = {}", range);
              if(range.equals("00-00")){
                  LOG.debug("accepted : not considering age range");
@@ -298,4 +302,29 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
     return null;
  }
 } // end method
+
+    /**
+     * Check if two age ranges overlap.
+     * Format: "XX-YY" where XX = min age, YY = max age.
+     * "00-00" is the wildcard "all ages" — overlaps with anything, including another "00-00".
+     */
+    private boolean rangesOverlap(String rangeA, String rangeB) {
+        if (rangeA == null || rangeB == null) return false;
+        if ("00-00".equals(rangeA) || "00-00".equals(rangeB)) return true;
+        int[] a = parseRange(rangeA);
+        int[] b = parseRange(rangeB);
+        if (a == null || b == null) return false;
+        return a[0] <= b[1] && b[0] <= a[1];
+    } // end method
+
+    private int[] parseRange(String range) {
+        try {
+            String[] parts = range.split("-");
+            if (parts.length != 2) return null;
+            return new int[] { Integer.parseInt(parts[0].trim()), Integer.parseInt(parts[1].trim()) };
+        } catch (NumberFormatException ex) {
+            LOG.warn("invalid range format: {}", range);
+            return null;
+        }
+    } // end method
 } //end Class

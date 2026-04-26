@@ -29,7 +29,6 @@ public class psCreateUpdateClub implements Serializable, interfaces.Log, interfa
       // voir aussi http://www.javased.com/index.php?source_dir=archaius/archaius-core/src/main/java/com/netflix/config/sources/JDBCConfigurationSource.java
       int index = 0;
       // mod 16-12-2025
-       // String json = om.writeValueAsString(club.getUnavailableStructure()); //. prend 3 fields ??
         String json = club.getUnavailableStructure() != null
               ? OBJECT_MAPPER.writeValueAsString(club.getUnavailableStructure())
               : "{}";                   // ✅ JSON vide par défaut
@@ -45,7 +44,8 @@ public class psCreateUpdateClub implements Serializable, interfaces.Log, interfa
             ps.setInt(9, club.getClubLocalAdmin());
             ps.setString(10, json); // new 19-12-2025
             ps.setInt(11, club.getIdclub());  // clé de recherche
-            ps.getWarnings(); // new 27-04-2025
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
    //// ps. 12 modificationDate non nécessaire (faite par DB System)
 return ps;
   }catch(Exception e){
@@ -81,7 +81,8 @@ return ps;
             ps.setString(11, json); // mod par claude 20-02-2026 mod 18-12-2025 sur suggestion chatgpt
             
             ps.setTimestamp(12, Timestamp.from(Instant.now()));
-            ps.getWarnings(); // new 27-04-2025
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
 return ps;
   }catch(Exception e){
    String msg = "£££ Exception in psClubCreate = " + methodName + " / "+ e.getMessage();

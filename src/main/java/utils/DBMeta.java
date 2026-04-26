@@ -488,7 +488,7 @@ try{
   sb.append(" "); // space to separate query element
    while(rs.next()){
         sb.append(rs.getString("TABLE_NAME")).append(".").append(rs.getString("COLUMN_NAME"));
-   //     if(rs.getString("COLUMN_NAME").equals("player_has_round")){
+   //     if(rs.getString("COLUMN_NAME").equals("inscription")){
   //          LOG.debug("sb is now = " +sb.toString());
      //   }
         sb.append(", ");

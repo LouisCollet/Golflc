@@ -78,10 +78,8 @@ public class CreatePaymentLesson implements Serializable {
                     """;
                 try (PreparedStatement psUpdate = conn.prepareStatement(updateQuery)) {
                     for (Lesson lesson : lessons) {
-                        psUpdate.setInt(1, generatedKey);
-                        psUpdate.setInt(2, lesson.getEventProId());
-                        psUpdate.setInt(3, creditcard.getCreditCardIdPlayer());
-                        psUpdate.setTimestamp(4, java.sql.Timestamp.valueOf(lesson.getEventStartDate()));
+                        sql.preparedstatement.psUpdateLessonPaymentsId.psMapUpdate(psUpdate, generatedKey, lesson, creditcard.getCreditCardIdPlayer());
+                        utils.LCUtil.logps(psUpdate);
                         int updated = psUpdate.executeUpdate();
                         LOG.debug("PaymentsLessonId={} for proId={} playerId={} start={} rows={}",
                             generatedKey, lesson.getEventProId(),

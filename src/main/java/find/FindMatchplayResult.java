@@ -40,8 +40,8 @@ public class FindMatchplayResult implements Serializable {
                 ON player.idplayer = ?
                 AND round.idround = ?
             JOIN score
-                ON score.player_has_round_player_idplayer = player.idplayer
-                AND score.player_has_round_round_idround = round.idround
+                ON score.inscription_player_idplayer = player.idplayer
+                AND score.inscription_round_idround = round.idround
             """;
 
         try (Connection conn = dao.getConnection();

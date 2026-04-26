@@ -7,16 +7,13 @@ import static interfaces.Log.NEW_LINE;
 import static interfaces.Log.TAB;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import utils.DBMeta;
@@ -365,72 +362,6 @@ public static List<String> getColumnNames(Connection conn, String table) throws 
            " VALUES (" + placeholderList + ")";
 }
     
-    private static final Map<String, String> DRIVER_MARKERS = Map.of(
-    "ClientPreparedStatement",    "Connector/J",          // MySQL standard
-    "ServerPreparedStatement",    "Connector/J server",   // MySQL server-side
-    "WrappedPreparedStatement",   "IronJacamar pooled",   // WildFly / JBoss pool
-    "HikariProxyPreparedStatement","HikariCP pooled",     // HikariCP pool
-    "ProxyPreparedStatement",     "C3P0 pooled",          // C3P0 pool
-    "LoggingPreparedStatement",   "P6Spy logging"         // P6Spy interceptor
-);
-
-public static void logps(PreparedStatement ps) {
-    if (ps == null) {
-        LOG.warn("logps : PreparedStatement est null");
-        return;
-    }
-    try {
-        String psString   = ps.toString();
-        int    colonIndex = psString.indexOf(": ");
-
-        // Détection du driver
-        String driverName = DRIVER_MARKERS.entrySet().stream()
-            .filter(e -> psString.contains(e.getKey()))
-            .map(Map.Entry::getValue)
-            .findFirst()
-            .orElse("driver inconnu [" + ps.getClass().getSimpleName() + "]");
-
-        if (colonIndex >= 0) {
-            // Driver expose la requête après ": "
-            LOG.debug("PreparedStatement [{}] :{}{}",
-                driverName, NEW_LINE, psString.substring(colonIndex + 2));
-
-        } else {
-            // Driver poolé ou inconnu : toString() n'expose pas la requête
-            // On tente via unwrap() pour récupérer le PS sous-jacent
-            LOG.debug("going to unwrap()");
-            String query = tryUnwrap(ps);
-            if (query != null) {
-                LOG.debug("PreparedStatement [{}] (unwrapped) :{}{}", driverName, NEW_LINE, query);
-            } else {
-                LOG.debug("PreparedStatement [{}] : requête non disponible — toString = {}",
-                    driverName, psString);
-            }
-        }
-
-    } catch (Exception e) {
-        LOG.error("logps : erreur inattendue sur [{}] : {}",
-            ps.getClass().getSimpleName(), e.getMessage(), e);
-    }
-}
-
-/**
- * Tente de récupérer la requête via unwrap() sur les drivers poolés.
- * Retourne null si non disponible.
- */
-private static String tryUnwrap(PreparedStatement ps) {
-    try {
-        // Tente d'unwrapper vers le PS natif MySQL
-        if (ps.isWrapperFor(com.mysql.cj.jdbc.ClientPreparedStatement.class)) {
-            String raw = ps.unwrap(com.mysql.cj.jdbc.ClientPreparedStatement.class).toString();
-            int idx = raw.indexOf(": ");
-            return idx >= 0 ? raw.substring(idx + 2) : raw;
-        }
-    } catch (Exception e) {
-        LOG.trace("tryUnwrap : unwrap non disponible — {}", e.getMessage());
-    }
-    return null;
-}
     
     /*
 public static void logps(PreparedStatement ps){

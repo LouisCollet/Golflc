@@ -19,8 +19,7 @@ public class UpdateScoreStableford implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
-    private dao.GenericDAO dao;
+    @Inject private dao.GenericDAO dao;
 
     @Inject private update.UpdateInscriptionFinalResult updateInscriptionFinalResult;
 
@@ -37,43 +36,32 @@ public class UpdateScoreStableford implements Serializable {
             UPDATE score
             SET ScoreStroke=?, ScorePoints=?, ScoreExtraStroke=?
             WHERE ScoreHole=?
-               AND player_has_round_player_idplayer=?
-               AND player_has_round_round_idround=?
+               AND inscription_player_idplayer=?
+               AND inscription_round_idround=?
             """;
 
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query.strip())) {
 
             for (ScoreStableford.Score sco : score.getScoreList()) {
-                ps.setInt(1, sco.getStrokes());
-                ps.setInt(2, sco.getPoints());
-                ps.setInt(3, sco.getExtra());
-                ps.setInt(4, sco.getHole());
-                ps.setInt(5, player.getIdplayer());
-                ps.setInt(6, round.getIdround());
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdateScoreStableford.psMapUpdate(ps, sco, player, round);
                 int row = ps.executeUpdate();
                 if (row != 0) {
-                    LOG.debug("successful update hole = {}", sco.getHole());
+                    LOG.debug("UPDATE score hole = {}", sco.getHole());
                 } else {
-                    String msg = "NOT NOT successful update, hole = " + sco.getHole();
-                    LOG.error(msg);
-                    LCUtil.showMessageFatal(msg);
+                    LOG.error("update failed for hole = {}", sco.getHole());
+                    LCUtil.showMessageFatal(LCUtil.prepareMessageBean("score.error"));
                     return false;
                 }
-            } // end for
-
-            LOG.debug("just before SUM totalPoints");
-            if (updateInscriptionFinalResult.update(player, round)) {
-                LOG.debug("update InscriptionFinalResult OK");
             }
 
-            String msg = "<br/>Successful update scores <br/> for player = "
-                    + "id = " + player.getIdplayer()
-                    + " name " + player.getPlayerLastName()
-                    + "<br/> , round id = " + round.getIdround()
-                    + " , round name = " + round.getRoundName();
-            LOG.debug(msg);
+            LOG.debug("all scores updated for player={} round={}", player.getIdplayer(), round.getIdround());
+            if (updateInscriptionFinalResult.update(player, round)) {
+                LOG.debug("updateInscriptionFinalResult OK");
+            }
+
+            String msg = LCUtil.prepareMessageBean("score.modify");
+            LOG.debug("scores updated player={} {} round={} {}", player.getIdplayer(), player.getPlayerLastName(), round.getIdround(), round.getRoundName());
             LCUtil.showMessageInfo(msg);
             return true;
 
@@ -86,21 +74,10 @@ public class UpdateScoreStableford implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new UpdateScoreStableford().update(..., conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #update(ScoreStableford, Round, Player)} via injection CDI */
     /*
-    void main() throws SQLException {
+    void main() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        Round round = new Round();
-        round.setIdround(300);
-        // boolean b = update(score, round, player);
-        LOG.debug("from main, UpdateScoreStableford = ");
     } // end main
     */
 

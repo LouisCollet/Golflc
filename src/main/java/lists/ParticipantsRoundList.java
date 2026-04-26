@@ -71,10 +71,10 @@ public class ParticipantsRoundList implements Serializable {
                ON round.course_idcourse = course.idcourse
             JOIN club
                ON course.club_idclub = club.idclub
-            JOIN player_has_round
+            JOIN inscription
                ON  InscriptionIdPlayer = player.idplayer
                AND InscriptionIdRound = round.idround
-            ORDER BY player_has_round.InscriptionFinalResult, InscriptionMatchplayTeam ASC;
+            ORDER BY inscription.InscriptionFinalResult, InscriptionMatchplayTeam ASC;
             """;
 
         try {

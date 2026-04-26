@@ -40,9 +40,9 @@ public class ReadClassment implements Serializable {
                  sum(case WHEN score.ScoreHole >= 16 THEN score.ScorePoints ELSE 0 end) as Last3,
                  sum(case WHEN score.ScoreHole >= 18 THEN score.ScorePoints ELSE 0 end) as Last1
               FROM score
-              WHERE score.player_has_round_player_idplayer = ?
-                AND score.player_has_round_round_idround = ?
-              GROUP BY score.player_has_round_player_idplayer
+              WHERE score.inscription_player_idplayer = ?
+                AND score.inscription_round_idround = ?
+              GROUP BY score.inscription_player_idplayer
             """;
 
         // new 13/04/2022
@@ -55,9 +55,9 @@ public class ReadClassment implements Serializable {
                  sum(case WHEN score.ScoreHole >= 7 THEN score.ScorePoints ELSE 0 end) as Last3,
                  sum(case WHEN score.ScoreHole >= 9 THEN score.ScorePoints ELSE 0 end) as Last1
               FROM score
-              WHERE score.player_has_round_player_idplayer = ?
-                AND score.player_has_round_round_idround = ?
-              GROUP BY score.player_has_round_player_idplayer
+              WHERE score.inscription_player_idplayer = ?
+                AND score.inscription_round_idround = ?
+              GROUP BY score.inscription_player_idplayer
             """;
 
         final boolean is9HolesFromStart = round.getRoundHoles() == 9 && round.getRoundStart() == 1;

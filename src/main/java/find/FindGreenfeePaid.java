@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import utils.LCUtil;
 
 @ApplicationScoped
 public class FindGreenfeePaid implements Serializable {
@@ -26,8 +25,8 @@ public class FindGreenfeePaid implements Serializable {
     public boolean find(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("for player = " + player);
-        LOG.debug("for round = " + round);
+        LOG.debug("for player = {}", player);
+        LOG.debug("for round = {}", round);
 
         final String query = """
             SELECT COUNT(*)
@@ -49,25 +48,14 @@ public class FindGreenfeePaid implements Serializable {
                     i = rs.getInt(1);
                 }
                 if (i == 0) {
-                    String msg = LCUtil.prepareMessageBean("greenfee.notfound")
-                            + " for player = " + player.getPlayerLastName()
-                            + " / " + player.getIdplayer()
-                            + " for round = " + round;
-                    LOG.debug(msg);
-                    LCUtil.showMessageInfo(msg);
+                    LOG.debug("greenfee not found for player={} round={}", player.getIdplayer(), round.getIdround());
                     return false;
                 }
                 if (i > 1) {
-                    String err = "Abnormal technical situation !! More than 1 greenfee paid ?";
-                    LOG.error(err);
-                    LCUtil.showMessageFatal(err);
+                    LOG.error("abnormal: {} greenfee rows for player={} round={}", i, player.getIdplayer(), round.getIdround());
                     return false;
                 }
-                String msg = LCUtil.prepareMessageBean("greenfee.paid")
-                        + player.getPlayerLastName() + " / " + player.getIdplayer()
-                        + " for round : " + round.getRoundName();
-                LOG.info(msg);
-                LCUtil.showMessageInfo(msg);
+                LOG.debug("greenfee found for player={} round={}", player.getIdplayer(), round.getIdround());
                 return true;
             }
 

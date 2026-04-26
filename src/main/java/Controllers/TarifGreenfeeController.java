@@ -1,6 +1,5 @@
 package Controllers;
 
-import com.github.mawippel.validator.OverlappingVerificator;
 import entite.Club;
 import entite.EquipmentsAndBasic;
 import entite.Greenfee;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import utils.LCUtil;
 import static utils.LCUtil.myDoubleRound;
@@ -30,6 +30,8 @@ import utils.TimeOverlap;
 public class TarifGreenfeeController implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    @Inject private find.OverlapChecker overlapChecker;
 
     public TarifGreenfeeController() { }
 
@@ -92,35 +94,16 @@ try{
 }
 } // end method
 
-public boolean overlapCheckPeriods(TarifGreenfee tarif){
+public boolean overlapCheckPeriods(TarifGreenfee tarif) {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
-    try {
-        LOG.debug("new period : startDate={} endDate={}", tarif.getStartDate(), tarif.getEndDate());
-        LOG.debug("existing list size = {}", tarif.getDatesSeasonsList().size());
-        for (int i = 0; i < tarif.getDatesSeasonsList().size(); i++) {
-            var v = tarif.getDatesSeasonsList().get(i);
-            LOG.debug("compare existing[{}] season={} start={} end={}", i, v.getSeason(), v.getStartDate(), v.getEndDate());
-            boolean isOverlap = OverlappingVerificator.isOverlap(
-                    tarif.getStartDate(), tarif.getEndDate(),
-                    v.getStartDate(),     v.getEndDate());
-            LOG.debug("isOverlap = {}", isOverlap);
-            if (isOverlap) {
-                String msg = LCUtil.prepareMessageBean("tarif.overlapping")
-                        + ZDF_DAY.format(tarif.getStartDate()) + " - " + ZDF_DAY.format(tarif.getEndDate())
-                        + " against "
-                        + ZDF_DAY.format(v.getStartDate()) + " - " + ZDF_DAY.format(v.getEndDate());
-                LOG.error("overlap detected: {}", msg);
-                showMessageFatal(msg);
-                return true;
-            }
-        } // end for
-        return false;
-    } catch (Exception e) {
-        handleGenericException(e, methodName);
-        return true;
-    }
-}  // end method
+    LOG.debug("new period : startDate={} endDate={}", tarif.getStartDate(), tarif.getEndDate());
+    return overlapChecker.check(
+            tarif.getStartDate(), tarif.getEndDate(),
+            tarif.getDatesSeasonsList(),
+            TarifGreenfee.DatesSeasons::getStartDate,
+            TarifGreenfee.DatesSeasons::getEndDate);
+} // end method
 
 public TarifGreenfee inputTarifGreenfeeBasic(TarifGreenfee tarifGreenfee){ // used in tarif_equipments.xhtml
     final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -140,6 +123,7 @@ try{
             tarifGreenfee.getWorkSeason(),
             tarifGreenfee.getWorkPrice(),
             0); // quantity
+    basic.setTwilight(tarifGreenfee.getWorkTwilight() != null ? tarifGreenfee.getWorkTwilight() : "N");
     tarifGreenfee.getBasicList().add(basic);
     String msg = "Tarif Greenfees Basic = " + tarifGreenfee.getBasicList();
     LOG.info(msg);
@@ -152,6 +136,9 @@ try{
     tarifGreenfee.setGreenfeeType("BA");
     tarifGreenfee.setUpdateReady(true); // gestion menu
        LOG.debug("tarif BA setUpdateReady to true");
+    if ("Y".equals(tarifGreenfee.getWorkTwilight())) {
+        tarifGreenfee.setTwilightReady(true); // affiche le tab Twilight
+    }
        // new 28/08/2022
     tarifGreenfee.setTwilightDone(true);   
     tarifGreenfee.setWorkItem(null); // init pour le prochain affichage

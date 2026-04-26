@@ -19,7 +19,7 @@
 <ui:include src="include/include_summary_cotisation.xhtml"/>
 
 <p:dataTable var="item"
-             value="#{memC.tarifMember.basicList}"
+             value="#{memC.basicListForCurrentPlayer}"
              rowIndexVar="row"
              emptyMessage="#{msg['message.table.empty']}"
              styleClass="compact-table">
@@ -72,9 +72,15 @@
                  width="12%" >
                 <h:outputText value="#{item.price}" />
        </p:column>
-       <p:column headerText="#{msg['tarif.season']} "
-                 width="12%" >
-           <h:outputText value="#{item.season}" />
+       <p:column headerText="#{msg['tarif.period']} "
+                 width="20%" >
+           <h:outputText value="#{memC.tarifMember.startDate}">
+               <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+           </h:outputText>
+           <h:outputText value=" → "/>
+           <h:outputText value="#{memC.tarifMember.endDate}">
+               <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+           </h:outputText>
        </p:column>
        <p:column headerText="#{msg['tarif.members.choice']}"
                  width="12%"

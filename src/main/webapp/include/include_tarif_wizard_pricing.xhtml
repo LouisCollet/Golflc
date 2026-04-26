@@ -42,9 +42,6 @@
                         </h:panelGroup>
                         <p:selectOneMenu id="seasonBasic"
                                          value="#{memC.tarifGreenfee.workSeason}">
-                            <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
-                            <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
-                            <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
                             <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
                                            var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
                             <f:validateBean disabled="true"/>
@@ -74,6 +71,14 @@
                                        placeholder="999.9" maxValue="300">
                             <f:validateBean disabled="#{memC.tarifGreenfee.basicList.size() gt 0}"/>
                         </p:inputNumber>
+
+                        <h:outputText value="Twilight"/>
+                        <p:selectOneMenu id="basicWorkTwilight"
+                                         value="#{memC.tarifGreenfee.workTwilight}">
+                            <f:selectItem itemLabel="N — Normal"  itemValue="N"/>
+                            <f:selectItem itemLabel="Y — Twilight" itemValue="Y"/>
+                            <f:validateBean disabled="true"/>
+                        </p:selectOneMenu>
                     </p:panelGrid>
                     <p:commandButton value="#{msg['tarif.greenfee.create']}"
                                      widgetVar="btnAddBasicWV"
@@ -96,9 +101,6 @@
                                 <f:facet name="output"><h:outputText value="#{b.season}"/></f:facet>
                                 <f:facet name="input">
                                     <p:selectOneMenu value="#{b.season}">
-                                        <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
-                                        <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
-                                        <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
                                         <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
                                                        var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
                                     </p:selectOneMenu>
@@ -118,6 +120,20 @@
                                     <p:inputNumber value="#{b.price}" size="6" decimalPlaces="1" decimalSeparator="." maxValue="300">
                                         <f:validateBean disabled="true"/>
                                     </p:inputNumber>
+                                </f:facet>
+                            </p:cellEditor>
+                        </p:column>
+                        <p:column headerText="Twilight" style="width:12%">
+                            <p:cellEditor>
+                                <f:facet name="output">
+                                    <p:tag value="TW" severity="warn"
+                                           rendered="#{b.twilight eq 'Y'}"/>
+                                </f:facet>
+                                <f:facet name="input">
+                                    <p:selectOneMenu value="#{b.twilight}" style="width:100%">
+                                        <f:selectItem itemLabel="N" itemValue="N"/>
+                                        <f:selectItem itemLabel="Y" itemValue="Y"/>
+                                    </p:selectOneMenu>
                                 </f:facet>
                             </p:cellEditor>
                         </p:column>
@@ -141,9 +157,6 @@
                         </h:panelGroup>
                         <p:selectOneMenu id="seasonHours"
                                          value="#{memC.tarifGreenfee.workSeason}">
-                            <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
-                            <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
-                            <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
                             <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
                                            var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
                             <f:validateBean disabled="true"/>
@@ -229,9 +242,6 @@
                                 <f:facet name="output"><h:outputText value="#{t.season}"/></f:facet>
                                 <f:facet name="input">
                                     <p:selectOneMenu value="#{t.season}">
-                                        <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
-                                        <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
-                                        <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
                                         <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
                                                        var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
                                     </p:selectOneMenu>
@@ -306,9 +316,6 @@
                         </h:panelGroup>
                         <p:selectOneMenu id="seasonDays"
                                          value="#{memC.tarifGreenfee.workSeason}">
-                            <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
-                            <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
-                            <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
                             <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
                                            var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
                             <f:validateBean disabled="true"/>
@@ -413,9 +420,6 @@
             </f:facet>
             <f:facet name="input">
                 <p:selectOneMenu value="#{d.season}" style="width:100%">
-                    <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
-                    <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
-                    <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
                     <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
                                    var="ds"
                                    itemLabel="#{ds.season}"

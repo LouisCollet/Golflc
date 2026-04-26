@@ -1080,45 +1080,8 @@ for (File file : files){
 } // end for
 } // end method
 
-private static final Map<String, String> DRIVER_MARKERS = Map.of(
-    "ClientPreparedStatement",  "Connector/J",
-    "WrappedPreparedStatement", "IronJacamar pooled"
-);
-
 public static void logps(PreparedStatement ps) {
-    if (ps == null) {
-        LOG.warn("logps : PreparedStatement est null");
-        return;
-    }
-    try {
-        // IronJacamar wraps the real driver PS.
-        // unwrap(PreparedStatement.class) returns the Connector/J ClientPreparedStatement
-        // whose toString() = "com.mysql.cj.jdbc.ClientPreparedStatement: SELECT ... actual values ..."
-        PreparedStatement realPs = ps;
-        try {
-            if (ps.isWrapperFor(PreparedStatement.class)) {
-                PreparedStatement unwrapped = ps.unwrap(PreparedStatement.class);
-                if (unwrapped != ps) {
-                    realPs = unwrapped;
-                }
-            }
-        } catch (Exception ignored) {
-            // unwrap not supported — use original
-        }
-
-        String psString    = realPs.toString();
-        int    colonIndex  = psString.indexOf(": ");
-
-        if (colonIndex >= 0) {
-            // Connector/J format: "com.mysql.cj.jdbc.ClientPreparedStatement: SELECT ..."
-            LOG.debug("SQL :{}{}", NEW_LINE, psString.substring(colonIndex + 2));
-        } else {
-            LOG.debug("SQL : {}", psString);
-        }
-
-    } catch (Exception e) {
-        LOG.error("logps : erreur inattendue sur [{}] : {}", ps.getClass().getSimpleName(), e.getMessage(), e);
-    }
+    sql.LogPs.log(ps);  // délégation pour éviter de modifier 186 appelants
 }
 
 
@@ -1817,25 +1780,6 @@ public static String extractHHmm (String sunris) {
         }
 } // end method
 
- public static int calculateAgeFirstJanuary(LocalDateTime birthDate){
- try{
-//           LOG.debug("entering calculateAgeFirstJanuary" );
- //          LOG.debug("entering calculateAgeFirstJanuary with birthdate = " + birthDate);
-     if(birthDate != null) {
-        LocalDate localDateBirth = birthDate.toLocalDate();
-        LocalDate firstDayYear = Year.of(LocalDate.now().getYear()).atMonth(Month.JANUARY).atDay(1);
-        return localDateBirth.until(firstDayYear).getYears();
-     }else{
-        return 99;
-     }
- }catch(Exception e){
-       String msg = "Error calculateAgeFirstJanuary = " + e ;
-       LOG.error("error = " + msg );
-       return 99;
-    }
-    }//end method
-
- 
     /**
      * Clones the provided array
      * 

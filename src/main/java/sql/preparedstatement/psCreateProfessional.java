@@ -22,7 +22,8 @@ public class psCreateProfessional implements Serializable, interfaces.Log, inter
         ps.setDouble(6, professional.getProAmount()); // new 06-06-2021
         ps.setInt(7, professional.getProWorkDays());
         ps.setTimestamp(8, Timestamp.from(Instant.now()));
-        ps.getWarnings(); // new 27-04-2025
+        sql.PrintWarnings.print(ps.getWarnings(), methodName);
+        utils.LCUtil.logps(ps);
  return ps;
 }catch(Exception e){
      handleGenericException(e, methodName);

@@ -90,7 +90,6 @@ public class FindOpenWeather implements Serializable {
             Instant instant = Instant.ofEpochSecond(weather.getDt());
             ZonedDateTime zdt = ZonedDateTime.ofInstant(instant, ZoneId.of(club.getAddress().getZoneId()));
             LOG.debug(methodName + " - time zoned = " + zdt);
-
             StringBuilder sb = new StringBuilder();
             sb.append("Infos météos").append(" at time = ").append(zdt)
               .append("<img src=http://openweathermap.org/img/wn/")
@@ -105,7 +104,7 @@ public class FindOpenWeather implements Serializable {
 
             String json = OBJECT_MAPPER.writeValueAsString(weather);
             LOG.debug(methodName + " - json = \n" + json);
-
+            
             return sb.toString();
         } catch (Exception e) {
             handleGenericException(e, methodName);

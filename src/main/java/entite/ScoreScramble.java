@@ -38,8 +38,8 @@ public class ScoreScramble implements Serializable, interfaces.Log
     private Short scorePar;
     private Short scoreStrokeIndex;
     
-    private Integer player_has_round_player_idplayer;
-    private Integer player_has_round_round_idround;
+    private Integer inscription_player_idplayer;
+    private Integer inscription_round_idround;
         private String inscriptionTeam;
         
     private Date scoreModificationDate;
@@ -129,20 +129,20 @@ public ScoreScramble(){ // constructor
         this.scoreStrokeIndex = scoreStrokeIndex;
     }
 
-    public Integer getPlayer_has_round_player_idplayer() {
-        return player_has_round_player_idplayer;
+    public Integer getInscription_player_idplayer() {
+        return inscription_player_idplayer;
     }
 
-    public void setPlayer_has_round_player_idplayer(Integer player_has_round_player_idplayer) {
-        this.player_has_round_player_idplayer = player_has_round_player_idplayer;
+    public void setInscription_player_idplayer(Integer inscription_player_idplayer) {
+        this.inscription_player_idplayer = inscription_player_idplayer;
     }
 
-    public Integer getPlayer_has_round_round_idround() {
-        return player_has_round_round_idround;
+    public Integer getInscription_round_idround() {
+        return inscription_round_idround;
     }
 
-    public void setPlayer_has_round_round_idround(Integer player_has_round_round_idround) {
-        this.player_has_round_round_idround = player_has_round_round_idround;
+    public void setInscription_round_idround(Integer inscription_round_idround) {
+        this.inscription_round_idround = inscription_round_idround;
     }
 
     public String getInscriptionTeam() {

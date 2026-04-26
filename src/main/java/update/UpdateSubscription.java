@@ -15,24 +15,19 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import utils.LCUtil;
 
-/**
- * Service de modification d'abonnement (renouvellement, essai)
- * ✅ @ApplicationScoped - Stateless, partagé
- */
 @ApplicationScoped
 public class UpdateSubscription implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject
-    private dao.GenericDAO dao;
+    @Inject private dao.GenericDAO dao;
 
     public UpdateSubscription() { }
 
     public boolean modify(final Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug(" with Subscription = {}", subscription);
+        LOG.debug("with Subscription = {}", subscription);
 
         final String query = """
                 UPDATE payments_subscription
@@ -48,34 +43,29 @@ public class UpdateSubscription implements Serializable {
         if (subscription.getSubCode().equals("TRIAL")) {
             Short s = subscription.getTrialCount();
             subscription.setTrialCount(++s);
-            LOG.debug("This is a TRIAL, new count = {}", subscription.getTrialCount());
+            LOG.debug("TRIAL — new count = {}", subscription.getTrialCount());
         } else {
             subscription.setTrialCount((short) 0);
-            LOG.debug("This is a MONTH/YEAR, donc TRIAL = {}", subscription.getTrialCount());
+            LOG.debug("MONTH/YEAR — trial count reset to {}", subscription.getTrialCount());
         }
 
         if (subscription.getTrialCount() > 5 && LocalDateTime.now().isAfter(subscription.getEndDate())) {
             String msg = LCUtil.prepareMessageBean("subscription.create.toomuchtrials")
                     + " player = " + subscription.getIdplayer()
-                    + " , trial  = <h1>" + subscription.getTrialCount() + "</h1>";
+                    + " trial = " + subscription.getTrialCount();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
             throw new Exception(msg);
         }
 
+        Timestamp endDate = subscription.getSubCode().equals("TRIAL")
+                ? Timestamp.valueOf(subscription.getEndDate().plusDays(1))
+                : Timestamp.valueOf(subscription.getEndDate());
+
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            if (subscription.getSubCode().equals("TRIAL")) {
-                ps.setTimestamp(1, Timestamp.valueOf(subscription.getEndDate().plusDays(1)));
-            } else {
-                ps.setTimestamp(1, Timestamp.valueOf(subscription.getEndDate()));
-            }
-            ps.setInt(2, subscription.getTrialCount());
-            ps.setString(3, subscription.getPaymentReference());
-            ps.setString(4, subscription.getCommunication());
-            ps.setDouble(5, subscription.getSubscriptionAmount());
-            ps.setInt(6, subscription.getIdplayer());
+            sql.preparedstatement.psUpdateSubscription.psMapUpdate(ps, subscription, endDate);
             utils.LCUtil.logps(ps);
 
             int row = ps.executeUpdate();
@@ -85,10 +75,9 @@ public class UpdateSubscription implements Serializable {
                 LCUtil.showMessageInfo(msg);
                 return true;
             } else {
-                String msg = "NOT NOT Successful update, row = 0 player = " + subscription.getIdplayer();
-                LOG.debug(msg);
-                LCUtil.showMessageFatal(msg);
-                throw new Exception(msg);
+                LOG.error("no row updated for player = {}", subscription.getIdplayer());
+                LCUtil.showMessageFatal("Update subscription failed for player = " + subscription.getIdplayer());
+                throw new Exception("no row updated for player = " + subscription.getIdplayer());
             }
 
         } catch (SQLException e) {

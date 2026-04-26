@@ -30,9 +30,9 @@ public class FindInscriptionRound implements Serializable {
 
         final String query = """
             SELECT COUNT(*)
-            FROM  player_has_round
-            WHERE player_has_round.InscriptionIdRound = ?
-               AND player_has_round.InscriptionIdPlayer = ?
+            FROM  inscription
+            WHERE inscription.InscriptionIdRound = ?
+               AND inscription.InscriptionIdPlayer = ?
             """;
 
         try (Connection conn = dao.getConnection();

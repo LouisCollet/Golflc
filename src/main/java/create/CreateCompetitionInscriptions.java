@@ -93,7 +93,7 @@ public class CreateCompetitionInscriptions implements Serializable {
 
             try (Connection conn = dao.getConnection()) {
 
-                final String query = LCUtil.generateInsertQuery(conn, "player_has_round");
+                final String query = LCUtil.generateInsertQuery(conn, "inscription");
 
                 try (PreparedStatement ps = conn.prepareStatement(query)) {
                     LOG.debug("starting createOneInscription");

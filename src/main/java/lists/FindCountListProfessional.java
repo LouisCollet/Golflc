@@ -40,23 +40,22 @@ public class FindCountListProfessional implements Serializable {
         LOG.debug("entering {}", methodName);
 
         if (player == null || player.getIdplayer() == null || player.getIdplayer() <= 0) {
-            LOG.warn(methodName + " - player is null or has no ID");
+            LOG.warn("player is null or has no ID");
             return Collections.emptyList();
         }
 
-        LOG.debug(methodName + " - querying database for player ID=" + player.getIdplayer());
+        LOG.debug("querying database for player ID={}", player.getIdplayer());
 
         RowMapper<Professional> professionalMapper = new ProfessionalRowMapper();
         List<Professional> result = dao.queryList(QUERY, professionalMapper, player.getIdplayer());
 
         if (result.isEmpty()) {
-            LOG.debug(methodName + " - no professionals found for player ID=" + player.getIdplayer());
+            LOG.debug("no professionals found for player ID={}", player.getIdplayer());
         } else {
-            LOG.debug(methodName + " - found " + result.size() + " professional(s)");
+            LOG.debug("found {} professional(s)", result.size());
             result.forEach(item ->
-                    LOG.debug("Professional: proId=" + item.getProId()
-                            + ", playerId=" + item.getProPlayerId()
-                            + ", club=" + item.getProClubId()));
+                    LOG.debug("Professional: proId={}, playerId={}, club={}",
+                            item.getProId(), item.getProPlayerId(), item.getProClubId()));
         }
         return result;
     } // end method

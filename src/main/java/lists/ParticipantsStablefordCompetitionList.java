@@ -64,10 +64,10 @@ public class ParticipantsStablefordCompetitionList implements Serializable, inte
                 ON round.course_idcourse = course.idcourse
             JOIN club
                 ON course.club_idclub = club.idclub
-            JOIN player_has_round
+            JOIN inscription
                 ON  InscriptionIdPlayer = player.idplayer
                 AND InscriptionIdRound = round.idround
-            ORDER BY player_has_round.InscriptionFinalResult DESC
+            ORDER BY inscription.InscriptionFinalResult DESC
             """;
 
         try {

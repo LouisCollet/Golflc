@@ -62,25 +62,6 @@
                                  rendered="#{abb eq 'MP_'}"
                                  value="#{roundC.inscription.inscriptionMatchplayTeam}"/>
 
-                    <p:outputLabel for="@next" value="#{msg['tee.start']} :"/>
-                    <p:selectOneMenu id="teeStartSelect"
-                                     var="teeColor"
-                                     value="#{roundC.inscription.inscriptionTeeStart}">
-                        <f:selectItem itemLabel="#{msg['inscription.tee.select']}"
-                                      itemValue=""
-                                      noSelectionOption="true"/>
-                        <f:selectItems id="teeStartList"
-                                       value="#{roundC.teeStartList(player)}"/>
-                        <p:column>
-                            <h:outputText value="#{teeColor}" style="color:goldenrod; font-weight:bold; background-color:gray;" rendered="#{teeColor.startsWith('YELLOW')}"/>
-                            <h:outputText value="#{teeColor}" style="color:red; font-weight:bold;" rendered="#{teeColor.startsWith('RED')}"/>
-                            <h:outputText value="#{teeColor}" style="color:blue; font-weight:bold;" rendered="#{teeColor.startsWith('BLUE')}"/>
-                            <h:outputText value="#{teeColor}" style="color:orange; font-weight:bold;" rendered="#{teeColor.startsWith('ORANGE')}"/>
-                            <h:outputText value="#{teeColor}" style="color:black; font-weight:bold;" rendered="#{teeColor.startsWith('BLACK')}"/>
-                            <h:outputText value="#{teeColor}" style="color:white; font-weight:bold; background-color:gray;" rendered="#{teeColor.startsWith('WHITE')}"/>
-                        </p:column>
-                    </p:selectOneMenu>
-
                     <p:outputLabel for="@next" value="#{msg['club.web']} :"/>
                     <h:outputLink value="https://#{clubC.club.clubWebsite}/"
                                   title="Club WebPage">

@@ -430,11 +430,11 @@ public class MemberManager implements Serializable {
         }
     } // end method
 
-    public Cotisation completeCotisation(TarifMember tarif, Player player, Round round) {
+    public Cotisation completeCotisation(TarifMember tarif, Player player, java.time.LocalDate referenceDate) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return tarifMemberController.completeCotisation(tarif, player, round);
+            return tarifMemberController.completeCotisation(tarif, player, referenceDate);
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;

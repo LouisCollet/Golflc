@@ -44,8 +44,8 @@ public class CourseAverage implements Serializable {
                 SELECT scorehole, scorepar, scorestroke, scoreextrastroke, scorePoints, scorestrokeindex, course.idcourse, round.RoundHoles, round.idround, round.RoundDate
                 FROM score, round, course
                 WHERE ROUND.course_idcourse = ?
-                AND score.player_has_round_round_idround = round.idround
-                AND score.player_has_round_player_idplayer = ?
+                AND score.inscription_round_idround = round.idround
+                AND score.inscription_player_idplayer = ?
                 GROUP BY idround, scorehole
                 ORDER BY idround DESC
             )

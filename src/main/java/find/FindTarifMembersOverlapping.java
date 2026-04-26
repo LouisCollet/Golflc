@@ -1,80 +1,35 @@
 package find;
 
-import com.github.mawippel.validator.OverlappingVerificator;
 import entite.TarifMember;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
-import static interfaces.GolfInterface.ZDF_DAY;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import utils.LCUtil;
-import static utils.LCUtil.showMessageFatal;
 
 @ApplicationScoped
 public class FindTarifMembersOverlapping implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject private dao.GenericDAO dao;
-
-    private List<TarifMember> liste = null;
+    @Inject private find.OverlapChecker overlapChecker;
 
     public FindTarifMembersOverlapping() { }
 
-    public boolean find(final TarifMember tarif_new) throws SQLException {
+    public boolean find(final TarifMember tarif) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("for tarifMember = " + tarif_new);
-
-        final String query = """
-                SELECT *
-                FROM tarif_members
-                WHERE tarif_members.TarifMemberIdClub = ?
-                """;
-
-        try (Connection conn = dao.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setInt(1, tarif_new.getTarifMemberIdClub());
-            utils.LCUtil.logps(ps);
-            try (ResultSet rs = ps.executeQuery()) {
-                int i = 0;
-                liste = new ArrayList<>();
-                rowmappers.TarifMemberRowMapper mapper = new rowmappers.TarifMemberRowMapper();
-                while (rs.next()) {
-                    liste.add(mapper.map(rs));
-                    i++;
-                }
-                LOG.debug("ResultSet " + methodName + " has " + i + " lines.");
-                if (i == 0) {
-                    LOG.debug("ok because i = 0 : first tarif for this club !");
-                    return false;
-                }
-                liste.forEach(item -> LOG.debug("list of TarifMember =" + item));
-                for (i = 0; i < liste.size(); i++) {
-                    boolean isOverlap = OverlappingVerificator.isOverlap(
-                            tarif_new.getStartDate(), tarif_new.getEndDate(),
-                            liste.get(i).getStartDate(), liste.get(i).getEndDate());
-                    LOG.debug(" isOverlap ? = " + isOverlap);
-                    if (isOverlap) {
-                        String msg = LCUtil.prepareMessageBean("tarif.overlapping")
-                                + ZDF_DAY.format(tarif_new.getStartDate()) + " - " + ZDF_DAY.format(tarif_new.getEndDate())
-                                + " against <br>"
-                                + ZDF_DAY.format(liste.get(i).getStartDate()) + " - " + ZDF_DAY.format(liste.get(i).getEndDate());
-                        LOG.error(msg);
-                        showMessageFatal(msg);
-                        return true;
-                    }
-                } // end for
-                return false;
-            }
+        LOG.debug("for tarifMember = {}", tarif);
+        try {
+            return overlapChecker.check(
+                    tarif.getStartDate(), tarif.getEndDate(),
+                    "SELECT * FROM tarif_members WHERE TarifMemberIdClub = ?",
+                    ps -> ps.setInt(1, tarif.getTarifMemberIdClub()),
+                    new rowmappers.TarifMemberRowMapper(),
+                    TarifMember::getStartDate,
+                    TarifMember::getEndDate);
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return false;
@@ -89,11 +44,11 @@ public class FindTarifMembersOverlapping implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         TarifMember tm = new TarifMember();
-        tm.setStartDate(LocalDateTime.of(2021, Month.JANUARY, 1, 0, 0));
-        tm.setEndDate(LocalDateTime.of(2021, Month.DECEMBER, 31, 0, 0));
+        tm.setStartDate(java.time.LocalDateTime.of(2021, java.time.Month.JANUARY, 1, 0, 0));
+        tm.setEndDate(java.time.LocalDateTime.of(2021, java.time.Month.DECEMBER, 31, 0, 0));
         tm.setTarifMemberIdClub(1122);
-        boolean b = new FindTarifMembersOverlapping().find(tm);
-        LOG.debug("result overlapping = " + b);
+        boolean b = find(tm);
+        LOG.debug("result overlapping = {}", b);
     } // end main
     */
 

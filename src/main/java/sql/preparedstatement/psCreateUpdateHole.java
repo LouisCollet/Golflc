@@ -25,6 +25,7 @@ public class psCreateUpdateHole {
     public static void mapUpdate(PreparedStatement ps, Hole hole) throws Exception {
         int index = 0;
         try {
+            final String methodName = utils.LCUtil.getCurrentMethodName();
             LOG.debug("entering mapUpdate for hole = {}", hole);
             
             // ========================================
@@ -46,7 +47,8 @@ public class psCreateUpdateHole {
             
             // WHERE clause
             ps.setInt(++index, hole.getIdhole());                 // WHERE idhole = ?
-
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
 
        LOG.debug("PreparedStatement for hole update completed with {} parameters", index);
             

@@ -10,8 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -32,25 +30,15 @@ public class CreateCreditcard implements Serializable {
         try (Connection conn = dao.getConnection()) {
       //      final String query = LCUtil.generateInsertQuery(conn, "creditcard");
             try (PreparedStatement ps = conn.prepareStatement(LCUtil.generateInsertQuery(conn, "creditcard"))) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-                ps.setInt(2, creditcard.getCreditCardIdPlayer());
-                ps.setString(3, creditcard.getCreditcardHolder());
-                ps.setString(4, creditcard.getCreditcardNumber());
-                ps.setTimestamp(5, Timestamp.valueOf(creditcard.getCreditCardExpirationDateLdt()));
-                ps.setString(6, creditcard.getCreditcardType());
-                ps.setShort(7, creditcard.getCreditcardVerificationCode());
-                ps.setTimestamp(8, Timestamp.from(Instant.now()));
+                sql.preparedstatement.psCreateCreditcard.psMapCreate(ps, creditcard);
                 utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
                 if (row != 0) {
-                    String msg = "Creditcard created for player = " + creditcard.getCreditCardIdPlayer();
-                    LOG.debug(msg);
-                    LCUtil.showMessageInfo(msg);
+                    LOG.debug("creditcard created for player={}", creditcard.getCreditCardIdPlayer());
                     return true;
                 } else {
-                    String msg = "<br/><br/>ERROR insert for creditcard : " + creditcard.getCreditCardIdPlayer();
-                    LOG.debug(msg);
-                    LCUtil.showMessageFatal(msg);
+                    LOG.error("insert creditcard returned 0 rows for player={}", creditcard.getCreditCardIdPlayer());
+                    LCUtil.showMessageFatal(LCUtil.prepareMessageBean("creditcard.error"));
                     return false;
                 }
             }

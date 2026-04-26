@@ -37,8 +37,8 @@ public class UpdateInscriptionFinalResult implements Serializable {
             try (PreparedStatement ps = conn.prepareStatement("""
                     SELECT SUM(score.ScorePoints) AS totalPoints
                     FROM score
-                    WHERE score.player_has_round_player_idplayer = ?
-                      AND score.player_has_round_round_idround = ?
+                    WHERE score.inscription_player_idplayer = ?
+                      AND score.inscription_round_idround = ?
                     """)) {
                 ps.setInt(1, player.getIdplayer());
                 ps.setInt(2, round.getIdround());
@@ -51,9 +51,9 @@ public class UpdateInscriptionFinalResult implements Serializable {
             }
             LOG.debug("totalPoints to update = {}", totalPoints);
 
-            // 2. UPDATE player_has_round with totalPoints
+            // 2. UPDATE inscription with totalPoints
             try (PreparedStatement ps = conn.prepareStatement("""
-                    UPDATE player_has_round
+                    UPDATE inscription
                     SET InscriptionFinalResult = ?
                     WHERE InscriptionIdPlayer = ?
                       AND InscriptionIdRound = ?

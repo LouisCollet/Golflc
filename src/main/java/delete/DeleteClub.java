@@ -120,7 +120,7 @@ public class DeleteClub implements Serializable, interfaces.GolfInterface {
      * 1. Holes
      * 2. Tees
      * 3. Scores
-     * 4. Inscriptions (player_has_round)
+     * 4. Inscriptions (inscription)
      * 5. Rounds
      * 6. Courses
      * 7. Subscriptions/Payments liés au club
@@ -187,8 +187,9 @@ public class DeleteClub implements Serializable, interfaces.GolfInterface {
             // ========================================
             query = """
                 DELETE score FROM score
-                INNER JOIN player_has_round ON score.player_has_round_idinscription = player_has_round.idinscription
-                INNER JOIN round ON player_has_round.round_idround = round.idround
+                INNER JOIN inscription ON score.inscription_player_idplayer = inscription.InscriptionIdPlayer
+                                      AND score.inscription_round_idround   = inscription.InscriptionIdRound
+                INNER JOIN round ON inscription.round_idround = round.idround
                 INNER JOIN course ON round.course_idcourse = course.idcourse
                 WHERE course.club_idclub = ?
                 """;
@@ -201,11 +202,11 @@ public class DeleteClub implements Serializable, interfaces.GolfInterface {
             }
 
             // ========================================
-            // 4. Delete Inscriptions (player_has_round)
+            // 4. Delete Inscriptions (inscription)
             // ========================================
             query = """
-                DELETE player_has_round FROM player_has_round
-                INNER JOIN round ON player_has_round.round_idround = round.idround
+                DELETE inscription FROM inscription
+                INNER JOIN round ON inscription.round_idround = round.idround
                 INNER JOIN course ON round.course_idcourse = course.idcourse
                 WHERE course.club_idclub = ?
                 """;
@@ -412,7 +413,7 @@ try{
 
   final String query = """
                DELETE from score
-               WHERE score.player_has_round_player_idplayer = ?
+               WHERE score.inscription_player_idplayer = ?
             """;
     ps = conn.prepareStatement(query);
     ps.setInt(1, player.getIdplayer());
@@ -421,7 +422,7 @@ try{
         LOG.debug("deleted score = {}", row_score);
 
     query = """
-             DELETE from player_has_round
+             DELETE from inscription
              WHERE InscriptionIdPlayer = ?
           """;
     ps = conn.prepareStatement(query);

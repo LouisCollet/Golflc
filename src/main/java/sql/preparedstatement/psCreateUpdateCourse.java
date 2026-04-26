@@ -22,6 +22,7 @@ public class psCreateUpdateCourse {
     public static void mapUpdate(PreparedStatement ps, Course course) throws Exception {
         int index = 0;
         try {
+            final String methodName = utils.LCUtil.getCurrentMethodName();
             LOG.debug("entering mapUpdate for course = {}", course);
             
             // ========================================
@@ -48,6 +49,8 @@ public class psCreateUpdateCourse {
             ps.setTimestamp(6, Timestamp.valueOf(course.getCourseEndDate())); // CourseEndDate
             // WHERE clause
             ps.setInt(7, course.getIdcourse());                           // WHERE idcourse = ?
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
                 LOG.debug("PreparedStatement for course update: {}", ps);
         } catch (Exception e) {
             String msg = "Exception in mapUpdate = " + getCurrentMethodName() + " / " + e.getMessage();

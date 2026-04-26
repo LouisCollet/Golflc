@@ -48,14 +48,14 @@ public class FindCancellation implements Serializable {
             String co = utils.DBMeta.listMetaColumnsLoad(conn, "course");
             String ro = utils.DBMeta.listMetaColumnsLoad(conn, "round");
             String pl = utils.DBMeta.listMetaColumnsLoad(conn, "player");
-            String ph = utils.DBMeta.listMetaColumnsLoad(conn, "player_has_round");
+            String ph = utils.DBMeta.listMetaColumnsLoad(conn, "inscription");
 
             final String query =
                 "SELECT " + cl + "," + co + "," + ro + "," + pl + "," + ph +
                 "     FROM player" +
-                "     JOIN player_has_round" +
+                "     JOIN inscription" +
                 "         ON InscriptionIdPlayer = player.idplayer" +
-                "     AND player_has_round.InscriptionFinalResult = 0" +
+                "     AND inscription.InscriptionFinalResult = 0" +
                 "      JOIN round" +
                 "         ON InscriptionIdRound = round.idround" +
                 "           AND DATE(round.RoundDate) >= DATE(?) " +

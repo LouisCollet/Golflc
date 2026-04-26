@@ -9,14 +9,14 @@ public enum SelectionPurpose {
     CREATE_PLAYER("CreatePlayer", "selectPlayer.xhtml", "??player.xhtml"),
     SHOW_PLAYER("ShowHandicap", "show_handicap_whs.xhtml", "??player.xhtml"),
     SHOW_ROUND("ShowRound", "show_played_rounds.xhtml", "??player.xhtml"),
-    PAYMENT_COTISATION("PaymentCotisation", "selectClubDialog.xhtml", "??paymentCotisation.xhtml", "message.selectclub.cotisaton"),
+    PAYMENT_COTISATION("PaymentCotisation", "selectClubDialog.xhtml", "cotisation.xhtml", "message.selectclub.cotisaton"),
     PAYMENT_SUBSCRIPTION("PaymentSubscription", "subscription.xhtml", "not used", "subscription.new"),
    // CREATE_COMPETITION("CreateCompetition", "selectCompetition.xhtml", "??competition.xhtml"),
     LOCAL_ADMIN("LocalAdministrator", "local_administrator.xhtml", "??local_administrator_final.xhtml"),
     CREATE_PRO("CreatePro", "professional.xhtml", "not used"),
     COMPETITION_DESCRIPTION("Competition Description", "competition_create_description.xhtml", "not used"),
     
-    MENU_UNAVAILABLE("MenuUnavailable", "unavailable_menu.xhtml", "??unavailable_final.xhtml"),
+    MENU_UNAVAILABLE("MenuUnavailable", "unavailable_wizard.xhtml", "unavailable_wizard.xhtml", "title.unavailable.structure"),
   //  CREATE_ROUND("CreateRound", "selectClubCourse.xhtml", "round.xhtml");  // OK 04-02-2026
     CREATE_ROUND("CreateRound", "round.xhtml", "??round.xhtml", "message.for.round"),  // OK 13-02-2026
     UPDATE_CLUB("clubUpdate", "selectClubModify.xhtml", "??round.xhtml"),  // OK 14-02-2026
@@ -30,6 +30,9 @@ public enum SelectionPurpose {
     ROUND_SCORECARD("SCORECARD", "selectRound.xhtml", "not used", "message.for.scorecard"),
     ROUND_PARTICIPANTS("PARTICIPANTS", "selectRound.xhtml", "not used", "message.for.participants"),
     ROUND_CHART("CHART", "selectRound.xhtml", "not used", "message.for.stat"),
+
+    // Round calendar — selectClubCourse → schedule_round.xhtml — 2026-04-19
+    SCHEDULE_ROUND("ScheduleRound", "selectClubCourse.xhtml", "schedule_round.xhtml", "message.for.schedule.round"),
 
     // Playing Hcp — direct navigation, no selector page — 2026-03-23
     PLAYING_HCP_STABLEFORD("PlayingHcpStableford", "stableford_playing_hcp.xhtml", "not used"),

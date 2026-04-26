@@ -26,14 +26,18 @@ public class UnavailablePeriod implements Serializable, interfaces.Log, interfac
  
  @JsonIgnore private static final long serialVersionUID = 1L;
  
- //  going to json 
- 
+ //  going to json
+
   private Boolean[] itemPeriod;
-  
+  private Integer courseId; // stored in JSON — null = no specific course restriction; use allCourses instead of 9999
+  private boolean allCourses; // stored in JSON — true = all courses blocked; false = courseId specific
+  private String unavailabilityType; // stored in JSON — MAINTENANCE | IMPRATICABLE | COMPETITION | free text
+  private String unavailabilityLabel; // stored in JSON — free text detail alongside the type
+
   //private ArrayList<String> itemListPeriod = new ArrayList<>();
   //private ArrayList<Boolean> itemListPeriod = new ArrayList<>();
   private String comment;
-  
+
  // not in database json field
  @JsonIgnore    private Integer idclub;
  //   @FutureOrPresent(message="Start date future or present !")
@@ -58,6 +62,38 @@ public UnavailablePeriod(){    // constructor
 
     public void setIdclub(Integer idclub) {
         this.idclub = idclub;
+    }
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
+    }
+
+    public boolean isAllCourses() {
+        return allCourses;
+    }
+
+    public void setAllCourses(boolean allCourses) {
+        this.allCourses = allCourses;
+    }
+
+    public String getUnavailabilityType() {
+        return unavailabilityType;
+    }
+
+    public void setUnavailabilityType(String unavailabilityType) {
+        this.unavailabilityType = unavailabilityType;
+    }
+
+    public String getUnavailabilityLabel() {
+        return unavailabilityLabel;
+    }
+
+    public void setUnavailabilityLabel(String unavailabilityLabel) {
+        this.unavailabilityLabel = unavailabilityLabel;
     }
 
     public Boolean[] getItemPeriod() {
@@ -103,12 +139,14 @@ public String getComment(){
    try { 
        return
                 (NEW_LINE + "FROM ENTITE " + this.getClass().getSimpleName().toUpperCase()
-                + "<br/>idclub : "   + this.getIdclub()
-                + " ,startDate : "  + this.getStartDate()
+                + "<br/>idclub : "         + this.getIdclub()
+                + " ,courseId : "         + this.getCourseId()
+                + " ,allCourses : "       + this.isAllCourses()
+                + " ,unavailabilityType : " + this.getUnavailabilityType()
+                + " ,unavailabilityLabel : " + this.getUnavailabilityLabel()
+                + " ,startDate : "         + this.getStartDate()
                 + " ,endDate : "    + this.getEndDate()
                 + " ,array itemPeriod (boolean): "   + Arrays.deepToString(utils.LCUtil.removeNull1DBoolean(getItemPeriod()))
-//               + " ,array Period: "   +  Arrays.deepToString(getItemPeriod())
- //               + " ,itemListPeriod: "   + itemListPeriod.toString()
                 + " ,comment : "    + this.getComment()
                 );
   }catch(Exception e){

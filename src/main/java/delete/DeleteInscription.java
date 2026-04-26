@@ -51,7 +51,7 @@ public class DeleteInscription implements Serializable {
             // 1. DELETE inscription
             int rowPhr;
             try (PreparedStatement ps = conn.prepareStatement("""
-                    DELETE FROM player_has_round
+                    DELETE FROM inscription
                     WHERE InscriptionIdPlayer = ?
                       AND InscriptionIdRound = ?
                     """)) {

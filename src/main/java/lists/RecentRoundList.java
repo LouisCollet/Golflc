@@ -42,10 +42,10 @@ public class RecentRoundList implements Serializable {
         final String query = """
             WITH selection AS (
                 SELECT * FROM player
-                    INNER JOIN player_has_round
-                        ON player_has_round.InscriptionIdPlayer = player.idplayer
+                    INNER JOIN inscription
+                        ON inscription.InscriptionIdPlayer = player.idplayer
                     INNER JOIN round
-                        ON round.idround = player_has_round.InscriptionIdRound
+                        ON round.idround = inscription.InscriptionIdRound
                     WHERE player.idplayer = ?
             )
             SELECT * FROM selection

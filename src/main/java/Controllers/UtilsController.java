@@ -2,14 +2,6 @@ package Controllers;
 
 //mod 24-08-2025 duite version3.0.0 import com.lowagie.text.BadElementException;
 import com.lowagie.text.Document;
-//import com.lowagie.text.DocumentException;
-//import com.lowagie.text.Image;
-//import com.lowagie.text.PageSize;
-
-//import org.openpdf.text.BadElementException;
-//import org.openpdf.text.Document;
-//import org.openpdf.text.DocumentException;
-//import org.openpdf.text.Image;
 import com.lowagie.text.PageSize;
 import entite.PlayingHandicap;
 import entite.Round;
@@ -30,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.model.SelectItem;
 import jakarta.inject.Inject;
@@ -59,11 +50,8 @@ import org.primefaces.model.map.Overlay;
 public class UtilsController implements Serializable, interfaces.GolfInterface, interfaces.Log{
 @Inject private entite.Settings settings;        // ✅ injection CDI
 private String content;
-//private static String locale;
-private String fmd;
  private ExcelOptions excelOpt;
  private PDFOptions pdfOpt;
-
 private MapModel<Object> mapModel;  
   private String mapCenter;  
   private int mapZoom;  
@@ -72,16 +60,10 @@ private MapModel<Object> mapModel;
 private Overlay<Object> overlay;
 private LocalTime minTime;
 private LocalTime maxTime;
-//private LocalDate monthPlus1;
-//private LocalDate weekMinus1;
  
 public UtilsController() throws IOException {// constructor
     // pourquoi la ligne suivante ??
     super();  
-  //      this.clo = Thread.currentThread().getContextClassLoader();
-  //      this.str = clo.getResourceAsStream("myPOM.properties"); // loaded in pom.xml via properties-maven-plugin
-  //      this.prop1 = new Properties();
-  //      prop1.load(str);
         mapModel = new DefaultMapModel<>();  
         mapZoom = 7;  
         mapCenter = "51.5, 10.49";  
@@ -174,19 +156,19 @@ try{
 */
 
 // utilisé dans datePicker, yearRange
- public int dateYear(int year){ // migrated from static 2026-03-22
+ public int dateYear(int year){ 
      return LocalDate.now().getYear() + year;
  }
-  public int dateMonth(int month){ // migrated from static 2026-03-22
+  public int dateMonth(int month){ 
      return LocalDate.now().getMonthValue() + month;
  }
   // utilisé dans datePicker, minDate ou maxDate
-  public LocalDate localDateWeek(int week){  // migrated from static 2026-03-22
+  public LocalDate localDateWeek(int week){  
  //         LOG.debug("LocalDate minusweek = {}", LocalDate.now().plusWeeks(week));
           return LocalDate.now().plusWeeks(week);
  }
    // utilisé dans datePicker, minDate ou maxDate
-  public LocalDate localDateYear(int year){ // migrated from static 2026-03-22
+  public LocalDate localDateYear(int year){
       if(year < 0){
           return LocalDate.now().minusYears(year);
       }else{
@@ -199,9 +181,9 @@ try{
       return LocalTime.of(hour,minute);
  } 
   
-    public void setFmd(String fmd) {
-        this.fmd = fmd;
-    }
+//   public void setFmd(String fmd) {
+//        this.fmd = fmd;
+//    }
 
     public LocalTime getMinTime() {
         return minTime;
@@ -220,7 +202,6 @@ try{
     }
     
 
-
 public void logFile() throws IOException{
     Runtime runtime = Runtime.getRuntime();
     runtime.exec(new String[] { "C:\\Program Files\\JGsoft\\EditPadLite\\EditPadLite7.exe", "C:\\log\\golflc.log" } );
@@ -238,29 +219,7 @@ public void setCount(int count){
 public void increment(){
 	count--;  // count down
 }
-//public void displayMessage(ActionEvent actionEvent) {
-//		LCUtil.addMessageInfo("You said:'" + text + "'");
-//	}
-/*
-public void save(ActionEvent actionEvent){
-	LCUtil.showMessageInfo("Data saved");
-}
 
-public void update(ActionEvent actionEvent){
-	LCUtil.showMessageInfo("Data updated");
-}
-
-public void delete(ActionEvent actionEvent){
-	LCUtil.showMessageInfo("Data deleted");
-}
-
-public void saveListener() {
-        content = content.replaceAll("\\r|\\n", "");
-        final FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Content",
-                    content.length() > 150 ? content.substring(0, 100) : content);
-        FacesContext.getCurrentInstance().addMessage(null, msg);
-    }
-*/
 public String getContent() {
         return content;
     }
@@ -270,73 +229,7 @@ public void setContent(final String content)
         this.content = content;
     }
 
-//public Date getNow()
-//{
-//      return (new Date()); // used in /header.xhtml @110,52 value="#{utilsC.now}":
-//   }
-/*
-public void onStateChange(StateChangeEvent event){
- LatLngBounds bounds = event.getBounds();
- int zoomLevel = event.getZoomLevel();
 
-addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Zoom Level", String.valueOf(zoomLevel)));
-//  addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Center", bounds.getCenter().toString()));
- addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "NorthEast", bounds.getNorthEast().toString()));
- addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "SouthWest", bounds.getSouthWest().toString()));
- }
-
-public void onPointSelect(PointSelectEvent event){
- LatLng latlng = event.getLatLng();
-
-addMessage(new FacesMessage(FacesMessage.SEVERITY_INFO, "Point Selected",
-        "Lat:" + latlng.getLat() + ", Lng:" + latlng.getLng()));
- }
-
-public void addMessage(FacesMessage message){
- FacesContext.getCurrentInstance().addMessage(null, message);
- }
-
-public void onResize(ColumnResizeEvent event){
-        //FacesMessage msg = new FacesMessage("Column " + event.getColumn().getClientId()
-        //        + " resized", "W:" + event.getWidth() + ", H:" + event.getHeight());
-        addMessage(new FacesMessage("The Column " + event.getColumn().getClientId()
-                + " has been resized : "
-                + " W = " + event.getWidth()
-                + " ,H = " + event.getHeight() ) )
-                //+ event.getComponent().getFamily() ) )
-                ;
-      
-    }
-*/
-/*
-public String getSessionId() {
-        FacesContext fCtx = FacesContext.getCurrentInstance();
-        HttpSession session = (HttpSession) fCtx.getExternalContext().getSession(false);
-           LOG.debug("Session Id = {} - creation time = {}", session.getId(), session.getCreationTime());
-     //      LOG.debug("session servlet context Path "+ session.getServletContext().getContextPath());
-    return session.getId();
-}
-
-public int getSessionCount() {
-        LOG.debug("session count getter invoked "  + SessionCounter.getCount() + NEW_PAGE);
-        
-        String s = getSessionId();
-   //     LOG.debug("session id = {}", sessionId);
-        
-        return SessionCounter.getCount();
-    }
-
-
-public String getClientIpAddress() throws UnknownHostException{
-return InetAddress.getLocalHost().toString();
-}
-
-public void preProcessPDF(Object document) {
-      Document pdf = (Document) document;
-      pdf.setPageSize(PageSize.A4.rotate());
-      pdf.open();
-    }
-*/
 public void preProcessPDF(Object document) {
     Document pdf = (Document) document;
     pdf.setPageSize(PageSize.A4.rotate());
@@ -451,7 +344,7 @@ try{
    Path path = Paths.get(settings.getProperty("WEBAPP") + viewId);// converts string to path  
    Instant instant = Files.getLastModifiedTime(path).toInstant();
    LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneOffset.systemDefault());
-   return "<b>Last modification :</b> " + ZDF_TIME.format(ldt);
+   return " <b>Last modification :</b> " + ZDF_TIME.format(ldt);
 }catch (Exception ex){
     String msg = " <br/>££ Exception in ViewModificationDate() " + ex;
     LOG.error(msg);

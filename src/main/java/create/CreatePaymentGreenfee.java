@@ -11,8 +11,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -33,29 +31,15 @@ public class CreatePaymentGreenfee implements Serializable, interfaces.GolfInter
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "payments_greenfee");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setNull(1, java.sql.Types.INTEGER); // AUTO-INCREMENT
-                ps.setInt(2, greenfee.getIdclub());
-                ps.setInt(3, player.getIdplayer());
-                ps.setInt(4, greenfee.getIdround());
-                ps.setTimestamp(5, Timestamp.valueOf(greenfee.getRoundDate()));
-                ps.setString(6, greenfee.getPaymentReference());
-                ps.setString(7, greenfee.getCommunication());
-                ps.setString(8, greenfee.getItems());
-                ps.setString(9, greenfee.getStatus());
-                ps.setDouble(10, greenfee.getPrice());
-                ps.setString(11, greenfee.getCurrency());
-                ps.setTimestamp(12, Timestamp.from(Instant.now()));
+                sql.preparedstatement.psCreatePaymentGreenfee.psMapCreate(ps, player, greenfee);
                 utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
                 if (row != 0) {
-                    String msg = "Payment Greenfee done for = " + greenfee.getPrice() + " for round = " + greenfee.getIdround();
-                    LOG.debug(msg);
-                    LCUtil.showMessageInfo(msg);
+                    LOG.debug("greenfee payment created price={} round={}", greenfee.getPrice(), greenfee.getIdround());
                     return true;
                 } else {
-                    String msg = "<br/>ERROR insert for Greenfee : ";
-                    LOG.debug(msg);
-                    LCUtil.showMessageFatal(msg);
+                    LOG.error("insert payments_greenfee returned 0 rows player={} round={}", player.getIdplayer(), greenfee.getIdround());
+                    LCUtil.showMessageFatal(LCUtil.prepareMessageBean("greenfee.error"));
                     return false;
                 }
             }

@@ -43,7 +43,7 @@ public class UpdateLesson implements Serializable {
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            sql.preparedstatement.psUpdateLesson.psMapUpdate(ps, before, after);
+            sql.preparedstatement.psCreateUpdateLesson.psMapUpdate(ps, before, after);
 
             int row = ps.executeUpdate();
             if (row != 0) {

@@ -92,7 +92,7 @@ class CreateInscriptionTest {
                 .thenReturn(psCountColumns);
         when(psCountColumns.executeQuery()).thenReturn(rsCountColumns);
         when(rsCountColumns.next()).thenReturn(true);
-        when(rsCountColumns.getInt(1)).thenReturn(10);  // 10 colonnes dans player_has_round
+        when(rsCountColumns.getInt(1)).thenReturn(10);  // 10 colonnes dans inscription
 
         // Mock pour l'INSERT (toute autre requête)
         when(conn.prepareStatement(argThat(q -> q != null && !q.contains("information_schema"))))

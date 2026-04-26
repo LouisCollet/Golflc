@@ -14,7 +14,8 @@
             <f:facet name="header">
                 <h1>#{msg['title.hours.tarif']}</h1>
                 <span> — Twilight</span>
-                <p:badge value="#{memC.tarifGreenfee.twilightList.size()}" severity="info"/>
+                <p:badge value="#{memC.tarifGreenfee.twilightList.size()}"
+                         severity="info"/>
             </f:facet>
             <p:panelGrid columns="2"
                          layout="flex"
@@ -23,10 +24,12 @@
                 <h:outputText value="#{msg['tarif.hours.start']} :"/>
                 <p:datePicker id="twilightStart"
                               value="#{memC.tarifGreenfee.startHour}"
-                              timeOnly="true" pattern="HH:mm"
+                              timeOnly="true"
+                              pattern="HH:mm"
                               label="Tarif twilight : startHour"
-                              lang="#{languageC.locale}" locale="#{languageC.locale}"
-                              showIcon="true" size="6" required="false"
+                              locale="#{languageC.locale}"
+                              showIcon="true" size="6"
+                              required="false"
                               mindate="#{utilsC.localTime(12,30)}"
                               maxdate="#{utilsC.localTime(20,45)}">
                     <f:validateBean disabled="true"/>
@@ -40,11 +43,10 @@
                 </h:panelGroup>
                 <p:selectOneMenu id="seasonTwilight"
                                  value="#{memC.tarifGreenfee.workSeasonTwilight}">
-                    <f:selectItem itemLabel="#{msg['tarif.all']}"  itemValue="A"/>
-                    <f:selectItem itemLabel="#{msg['tarif.high']}" itemValue="H"/>
-                    <f:selectItem itemLabel="#{msg['tarif.low']}"  itemValue="L"/>
                     <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
-                                   var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                                   var="ds"
+                                   itemLabel="#{ds.season}"
+                                   itemValue="#{ds.season}"/>
                     <f:validateBean disabled="true"/>
                 </p:selectOneMenu>
 

@@ -28,6 +28,7 @@ public class psCreateUpdateTee {
     public static void mapUpdate(PreparedStatement ps, Tee tee) throws Exception {
         int index = 0;
         try {
+            final String methodName = utils.LCUtil.getCurrentMethodName();
             LOG.debug("entering mapUpdate for tee = {}", tee);
             
             // ========================================
@@ -62,7 +63,8 @@ public class psCreateUpdateTee {
             // WHERE clause (toujours en dernier)
             // ========================================
             ps.setInt(++index, tee.getIdtee());                   // WHERE idtee = ?
-            
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
             LOG.debug("PreparedStatement for tee update completed with {} parameters", index);
             
         } catch (Exception e) {

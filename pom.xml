@@ -27,12 +27,12 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> <!-- used by surefire -->
-        <java.version>25</java.version> <!-- mod 29-09-2025 !! used by compiler was 23  -->
+        <java.version>26</java.version> <!-- mod 29-09-2025 !! used by compiler was 23  -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version> <!-- mod 08-07-2025 was 10.0.0 // mod 30-07-2023 was 8.0.0 !! the great migration
             https://github.com/jakartaee/platform/blob/main/namespace/unaffected-packages.adoc -->
         <primefaces.version>15.0.14</primefaces.version> <!-- mod 01-04-2026 was 15.0.13 -->
         <primefaces-extension.version>15.0.14</primefaces-extension.version> <!-- mod 01-04-2026 was 15.0.13-->
-        <omnifaces.version>5.2</omnifaces.version> <!-- mod 06-04-2026 was 5.1 -->
+        <omnifaces.version>5.2.2</omnifaces.version> <!-- mod 06-04-2026 was 5.1 -->
         <chartjs.version>3.0.1</chartjs.version> <!-- mod 16-03-2026 was 2.9.0 -->
         <mockito.version>5.21.0</mockito.version> <!-- mod 29-12-2025 was 5.20.0-->
    <!-- Official Maven Plugins --> 
@@ -96,7 +96,7 @@
                   https://github.com/grpc/grpc-java/issues/11015   -->
         <exec.inheritIo>true</exec.inheritIo><!--  mod 19-03-2023 fix NetBeans IDE pour voir la sortie support ansi color de mvn exec:java dans la console https://github.com/apache/netbeans/issues/5552 -->
         <selenium.version>4.41.0</selenium.version> <!--  mod 16-03-2026 was 4.39.0 -->
-        <jollyday.version>2.4.0</jollyday.version><!--  mod 06-04-2026 was 2.3.0 -->
+        <jollyday.version>2.5.0</jollyday.version><!--  mod 17-04-2026 was 2.4.0 -->
         <weld.version>6.0.4.Final</weld.version> <!--  pour refactoring CDI -->
  
     </properties>
@@ -242,7 +242,7 @@
 <dependency>
     <groupId>org.mnode.ical4j</groupId>
     <artifactId>ical4j</artifactId>
-    <version>4.2.4</version> <!-- mod 04-03-2026 was 4.2.3-->
+    <version>4.2.5</version> <!-- mod 17-04-2026 was 4.2.4-->
 </dependency>
 <!-- iCal4j vCard — vCard (.vcf) contact generation (player contact export) -->
 <dependency>
@@ -301,12 +301,6 @@
     <version>2.88.0</version> <!-- mod 03-04-2026 was 2.86.0 -->
 </dependency>
 
-<!-- overlapping-date-ranges — detect overlapping tarif periods (greenfee/member tarif validation) -->
-<dependency>
-    <groupId>com.github.mawippel</groupId>
-    <artifactId>overlapping-date-ranges</artifactId>
-    <version>1.0.5</version>
-</dependency>
 
 <!-- Quartz Scheduler — cron-like job scheduling (SchedulerProController, subscription renewal) -->
 <dependency>
@@ -477,7 +471,7 @@
 <dependency>
     <groupId>io.github.bonigarcia</groupId>
     <artifactId>webdrivermanager</artifactId>
-    <version>6.3.3</version>
+    <version>6.3.4</version> <!-- mod 17-04-2026 was 6.3.3 -->
     <scope>test</scope>
 </dependency>
 
@@ -1051,7 +1045,7 @@ https://github.com/mojohaus/exec-maven-plugin/releases    -->
  <!--    mod 13-01-2026<meminitial>256m</meminitial>
      <maxmem>2048m</maxmem>
      -->
-     <release>${java.version}</release>
+     <release>26</release>
      <encoding>${project.build.sourceEncoding}</encoding>
     <compilerArgs>
         <arg>-Xlint:all,-serial,-path</arg>

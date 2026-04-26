@@ -27,7 +27,9 @@ import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import manager.PlayerManager;
@@ -84,9 +86,10 @@ public class PlayerController implements Serializable {
     private List<ECourseList> filteredPlayedRound = null;
 
     // ✅ Session-level cache — avoid repeated DB queries on JSF re-render
-    private List<ECourseList> cachedHandicapWHS = null;
-    private List<ECourseList> cachedPlayedRounds = null;
-    private List<EPlayerPassword> cachedPlayers = null;
+    private List<ECourseList>    cachedHandicapWHS    = null;
+    private List<ECourseList>    cachedPlayedRounds   = null;
+    private List<EPlayerPassword> cachedPlayers       = null;
+    private List<Professional>   cachedProfessionals  = null;
     @Inject private Controllers.MongoCalculationsController mongoCalculationsController;
 
     // ✅ Injections Activation/Password — migrated 2026-02-26 from CourseController
@@ -111,6 +114,20 @@ public class PlayerController implements Serializable {
      */
     public Player getPlayer()              { return appContext.getPlayer(); }
     public void   setPlayer(Player player) { appContext.setPlayer(player); }
+
+    public Integer getCurrentPlayerAge() {
+        Player p = appContext.getPlayer();
+        if (p == null || p.getPlayerBirthDate() == null) return null;
+        return calculateAgeFirstJanuary(p.getPlayerBirthDate());
+    } // end method
+
+    public int calculateAgeFirstJanuary(LocalDateTime birthDate) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (birthDate == null) return 99;
+        LocalDate firstDayOfYear = LocalDate.now().withDayOfYear(1);
+        return (int) ChronoUnit.YEARS.between(birthDate.toLocalDate(), firstDayOfYear);
+    } // end method
 
     /**
      * Listener for player language change — fix multi-user 2026-03-07
@@ -308,8 +325,13 @@ public class PlayerController implements Serializable {
     public List<Professional> getProfessionals() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
+        if (cachedProfessionals != null) {
+            LOG.debug("returning cached list size = {}", cachedProfessionals.size());
+            return cachedProfessionals;
+        }
         try {
-            return playerManager.findProfessionals(appContext.getPlayer());
+            cachedProfessionals = playerManager.findProfessionals(appContext.getPlayer());
+            return cachedProfessionals;
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return Collections.emptyList();
@@ -377,9 +399,10 @@ public List<ECourseList> listPlayedRounds() {
 public void invalidatePlayerCaches() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
-    this.cachedHandicapWHS = null;
-    this.cachedPlayedRounds = null;
-    this.cachedPlayers = null;
+    this.cachedHandicapWHS   = null;
+    this.cachedPlayedRounds  = null;
+    this.cachedPlayers       = null;
+    this.cachedProfessionals = null;
     LOG.debug("player session caches invalidated");
 } // end method
 

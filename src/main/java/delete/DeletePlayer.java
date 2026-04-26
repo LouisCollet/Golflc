@@ -66,7 +66,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
 
             try (PreparedStatement ps = conn.prepareStatement("""
                     DELETE from score
-                    WHERE score.player_has_round_player_idplayer = ?
+                    WHERE score.inscription_player_idplayer = ?
                     """)) {
                 ps.setInt(1, player.getIdplayer());
                 LCUtil.logps(ps);
@@ -75,7 +75,7 @@ public class DeletePlayer implements Serializable, interfaces.GolfInterface {
             }
 
             try (PreparedStatement ps = conn.prepareStatement("""
-                    DELETE from player_has_round
+                    DELETE from inscription
                     WHERE InscriptionIdPlayer = ?
                     """)) {
                 ps.setInt(1, player.getIdplayer());

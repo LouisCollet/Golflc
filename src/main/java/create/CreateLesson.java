@@ -40,7 +40,7 @@ public class CreateLesson implements Serializable {
         try (Connection conn = dao.getConnection()) {
             final String query = utils.LCUtil.generateInsertQuery(conn, "lesson");
             try (PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-                sql.preparedstatement.psCreateLesson.psMapCreate(ps, lesson, player);
+                sql.preparedstatement.psCreateUpdateLesson.psMapCreate(ps, lesson, player);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     try (ResultSet gk = ps.getGeneratedKeys()) {

@@ -64,6 +64,7 @@ public class MemberController implements Serializable {
     @Inject private lists.TarifGreenfeeList            tarifGreenfeeList;              // added for admin tarif list
     @Inject private update.UpdateTarifGreenfee         updateTarifGreenfeeJsonService; // added for add period to existing tarif
     @Inject private dao.GenericDAO                     dao;                            // added for wizard club lookup
+    @Inject private Controller.refact.PlayerController playerController;               // added 2026-04-22 — age delegation
 
     // ========================================
     // ETAT UI LOCAL
@@ -82,6 +83,8 @@ public class MemberController implements Serializable {
     private entite.TarifSubscription tarifSubscription; // added 2026-03-06
     private entite.TarifGreenfee.DatesSeasons editingPeriod    = null; // non-null = mode édition d'une période existante
     private entite.EquipmentsAndBasic          editingEquipment = null; // non-null = mode édition d'un équipement existant
+    private String                             wizardCourseDisplay = ""; // pre-computed display for courseDisplay ajax
+    private java.util.Map<Integer, String>     courseNameCache = new java.util.HashMap<>(); // id→name, populated when courses are loaded
 
     public MemberController() { }
 
@@ -163,6 +166,33 @@ public class MemberController implements Serializable {
             } else {
                 return "cotisation.xhtml?faces-redirect=true";
             }
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return null;
+        }
+    } // end method
+
+    public String findTarifCotisationForToday() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            entite.Club club = appContext.getClub();
+            if (club == null || club.getIdclub() == null || club.getIdclub() <= 0) {
+                String msgerr = "No club selected";
+                LOG.error(msgerr);
+                showMessageFatal(msgerr);
+                return "selectClubDialog.xhtml?faces-redirect=true";
+            }
+            tarifMember = findTarifMembersData.find(club, java.time.LocalDate.now());
+            LOG.debug("tarifMember found = {}", tarifMember);
+            if (tarifMember == null) {
+                String msgerr = prepareMessageBean("tarif.member.notfound");
+                LOG.error(msgerr);
+                showMessageFatal(msgerr);
+                return "selectClubDialog.xhtml?faces-redirect=true";
+            }
+            appContext.setInputSelectClub("PaymentCotisationSpontaneous");
+            return "cotisation.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;
@@ -744,6 +774,8 @@ public class MemberController implements Serializable {
         }
         try {
             List<entite.Course> courses = courseListForClub.list(appContext.getClub());
+            // populate courseNameCache — used by getTarifGreenfeeCourseDisplay() during ajax render
+            courses.forEach(c -> courseNameCache.put(c.getIdcourse(), c.getCourseName()));
             // auto-select when only one course exists
             if (courses.size() == 1 && tarifGreenfee != null && tarifGreenfee.getTarifCourseId().isEmpty()) {
                 tarifGreenfee.setTarifCourseId(new java.util.ArrayList<>(java.util.List.of(courses.get(0).getIdcourse())));
@@ -761,6 +793,28 @@ public class MemberController implements Serializable {
             new jakarta.faces.model.SelectItem(Integer.valueOf(18), "18T"),
             new jakarta.faces.model.SelectItem(Integer.valueOf(9),  "9T")
         );
+    } // end method
+
+    /** Season selector items A/H/L — labels from i18n bundle, resolved at render time. */
+    public java.util.List<jakarta.faces.model.SelectItem> getSeasonItems() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        jakarta.faces.context.FacesContext fc = jakarta.faces.context.FacesContext.getCurrentInstance();
+        java.util.ResourceBundle bundle = fc.getApplication().getResourceBundle(fc, "msg");
+        return java.util.List.of(
+            new jakarta.faces.model.SelectItem("All",         getMsg(bundle, "tarif.all")),
+            new jakarta.faces.model.SelectItem("High season", getMsg(bundle, "tarif.high")),
+            new jakarta.faces.model.SelectItem("Low season",  getMsg(bundle, "tarif.low"))
+        );
+    } // end method
+
+    private static String getMsg(java.util.ResourceBundle bundle, String key) {
+        try {
+            return bundle.getString(key);
+        } catch (java.util.MissingResourceException e) {
+            LOG.warn("missing i18n key: {}", key);
+            return key;
+        }
     } // end method
 
     public List<entite.Club> getClubsForWizard() {
@@ -798,25 +852,36 @@ public class MemberController implements Serializable {
         }
     } // end method
 
-    /** Returns "CourseName (id), ..." for all courses selected in the wizard, or empty string. */
-    public String getTarifGreenfeeCourseDisplay() {
+    /** Called by p:ajax listener on wizardCourse change — pre-computes course display string. */
+    public void onWizardCourseChange() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (tarifGreenfee == null || tarifGreenfee.getTarifCourseId().isEmpty()) {
-            return "";
+            wizardCourseDisplay = "";
+            return;
         }
-        try {
-            java.util.List<entite.Course> all = courseListForClub.list(appContext.getClub());
-            return tarifGreenfee.getTarifCourseId().stream()
-                    .map(id -> all.stream()
-                            .filter(c -> id.equals(c.getIdcourse()))
-                            .map(c -> c.getCourseName() + " (" + c.getIdcourse() + ")")
-                            .findFirst()
-                            .orElse("Course #" + id))
-                    .collect(java.util.stream.Collectors.joining(", "));
-        } catch (Exception e) {
-            return tarifGreenfee.getTarifCourseId().toString();
-        }
+        java.util.List<entite.Course> all = getCoursesForWizard();
+        wizardCourseDisplay = tarifGreenfee.getTarifCourseId().stream()
+                .map(id -> all.stream()
+                        .filter(c -> id.equals(c.getIdcourse()))
+                        .map(c -> c.getCourseName() + " (" + c.getIdcourse() + ")")
+                        .findFirst()
+                        .orElse("#" + id))
+                .collect(java.util.stream.Collectors.joining(", "));
+        LOG.debug("wizardCourseDisplay = {}", wizardCourseDisplay);
+    } // end method
+
+    public String getWizardCourseDisplay() { return wizardCourseDisplay; }
+
+    /** Returns "CourseName (id), ..." for all courses selected in the wizard, or empty string.
+     *  Reads from courseNameCache (populated by getCoursesForWizard) — no external call during render. */
+    public String getTarifGreenfeeCourseDisplay() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (tarifGreenfee == null || tarifGreenfee.getTarifCourseId().isEmpty()) return "";
+        return tarifGreenfee.getTarifCourseId().stream()
+                .map(id -> courseNameCache.getOrDefault(id, "Course #" + id) + " (" + id + ")")
+                .collect(java.util.stream.Collectors.joining(", "));
     } // end method
 
     /** Returns the course name for a given courseId — used in tarif_greenfee_admin.xhtml table rows.
@@ -1501,6 +1566,12 @@ public class MemberController implements Serializable {
         try {
             LOG.debug("param = {}", param);
             LOG.debug("tarifMember = {}", tarifMember);
+            if (tarifMember.getStartDate() == null || tarifMember.getEndDate() == null) {
+                String msg = prepareMessageBean("tarif.member.period.required");
+                LOG.warn(msg);
+                showMessageFatal(msg);
+                return;
+            }
             switch (param) {
                 case "CO" -> tarifMember = tarifMemberController.inputTarifMembersCotisation(tarifMember);
                 case "EQ" -> tarifMember = tarifMemberController.inputTarifMembersEquipments(tarifMember);
@@ -1516,6 +1587,121 @@ public class MemberController implements Serializable {
     } // end method
 
     // ========================================
+    // WIZARD — TARIF MEMBER : PERIOD (one-and-only)
+    // ========================================
+
+    public void createMemberPeriod() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            java.time.LocalDateTime s = tarifMember.getWorkStartDate();
+            java.time.LocalDateTime e = tarifMember.getWorkEndDate();
+            if (s == null || e == null) {
+                showMessageFatal(prepareMessageBean("tarif.member.period.dates.required"));
+                return;
+            }
+            if (!e.isAfter(s)) {
+                showMessageFatal(prepareMessageBean("tarif.member.period.end.after.start"));
+                return;
+            }
+            tarifMember.setStartDate(s);
+            tarifMember.setEndDate(e);
+            tarifMember.setWorkStartDate(null);
+            tarifMember.setWorkEndDate(null);
+            LOG.debug("period created: {} → {}", s, e);
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+        }
+    } // end method
+
+    public void editMemberPeriod() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            if (!tarifMember.getBasicList().isEmpty() || !tarifMember.getEquipmentsList().isEmpty()) {
+                showMessageFatal(prepareMessageBean("tarif.member.period.locked"));
+                return;
+            }
+            tarifMember.setWorkStartDate(tarifMember.getStartDate());
+            tarifMember.setWorkEndDate(tarifMember.getEndDate());
+            tarifMember.setStartDate(null);
+            tarifMember.setEndDate(null);
+            LOG.debug("period moved back to edit fields");
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+        }
+    } // end method
+
+    public java.util.List<entite.EquipmentsAndBasicAndRange> getBasicListForCurrentPlayer() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (tarifMember == null || tarifMember.getBasicList() == null) return Collections.emptyList();
+        Integer age = playerController.getCurrentPlayerAge();
+        if (age == null) {
+            LOG.debug("no current player age — returning full list");
+            return tarifMember.getBasicList();
+        }
+        LOG.debug("filtering basicList for age = {}", age);
+        return tarifMember.getBasicList().stream()
+                .filter(b -> matchesAge(b.getRange(), age))
+                .toList();
+    } // end method
+
+    private boolean matchesAge(String range, int age) {
+        if (range == null || range.isBlank() || "00-00".equals(range)) return true;
+        try {
+            String[] parts = range.split("-");
+            if (parts.length != 2) return true;
+            int lo = Integer.parseInt(parts[0].trim());
+            int hi = Integer.parseInt(parts[1].trim());
+            return age >= lo && age <= hi;
+        } catch (NumberFormatException ex) {
+            LOG.warn("invalid range format: {}", range);
+            return true;
+        }
+    } // end method
+
+    public void removeMemberBasicItem(entite.EquipmentsAndBasicAndRange item) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            tarifMember.getBasicList().remove(item);
+            LOG.debug("basicList size after remove = {}", tarifMember.getBasicList().size());
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    public void removeMemberEquipmentItem(entite.EquipmentsAndBasic item) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            tarifMember.getEquipmentsList().remove(item);
+            LOG.debug("equipmentsList size after remove = {}", tarifMember.getEquipmentsList().size());
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    public void deleteMemberPeriod() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            if (!tarifMember.getBasicList().isEmpty() || !tarifMember.getEquipmentsList().isEmpty()) {
+                showMessageFatal(prepareMessageBean("tarif.member.period.locked"));
+                return;
+            }
+            tarifMember.setStartDate(null);
+            tarifMember.setEndDate(null);
+            tarifMember.setWorkStartDate(null);
+            tarifMember.setWorkEndDate(null);
+            LOG.debug("period deleted");
+        } catch (Exception ex) {
+            handleGenericException(ex, methodName);
+        }
+    } // end method
+
+    // ========================================
     // WIZARD FLOW LISTENER — MEMBER
     // ========================================
 
@@ -1524,6 +1710,14 @@ public class MemberController implements Serializable {
         LOG.debug("entering {}", methodName);
         LOG.debug("oldStep = {}", event.getOldStep());
         LOG.debug("newStep = {}", event.getNewStep());
+
+        if ("PeriodsTab".equals(event.getOldStep())
+                && !"PeriodsTab".equals(event.getNewStep())
+                && (tarifMember.getStartDate() == null || tarifMember.getEndDate() == null)) {
+            showMessageFatal(prepareMessageBean("tarif.member.period.required"));
+            return event.getOldStep();
+        }
+
         return event.getNewStep();
     } // end method
 
@@ -1755,7 +1949,7 @@ public class MemberController implements Serializable {
                 // Linked equipments — in teeTimesList order
                 for (entite.TarifGreenfee.TeeTimes slot : slots) {
                     java.util.List<entite.EquipmentsAndBasic> slotEquips = seasonEquips.stream()
-                            .filter(e -> slot.getSlotKey().equals(e.getLinkedSlotKey()))
+                            .filter(e -> slot.getSlotKey() != null && slot.getSlotKey().equals(e.getLinkedSlotKey()))
                             .collect(java.util.stream.Collectors.toList());
                     if (slotEquips.isEmpty()) continue;
                     String slotLabel = slot.getStartTime() + "–" + slot.getEndTime()

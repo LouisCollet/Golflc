@@ -17,9 +17,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import utils.LCUtil;
@@ -88,29 +85,26 @@ public class CreateInscription implements Serializable {
         // INSERT
         try (Connection conn = dao.getConnection()) {
 
-            final String query = LCUtil.generateInsertQuery(conn, "player_has_round");
+            final String query = LCUtil.generateInsertQuery(conn, "inscription");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
 
-                ps.setNull(1, java.sql.Types.INTEGER);
-                ps.setInt(2, round.getIdround());
-                ps.setInt(3, player.getIdplayer());
-                ps.setInt(4, 0);  // FinalResult initial value
-                ps.setString(5, inscription.getInscriptionMatchplayTeam());
-                ps.setInt(6, 0);  // NotUsed2
-                ps.setString(7, inscription.getInscriptionTeeStart());
+                // calcul de l'idTee avant le mapping PS — null si tee différé (score_stableford)
                 String s = inscription.getInscriptionTeeStart();
                 LOG.debug("inscriptionTeeStart = {}", s);
-                int tee = Integer.parseInt(s.substring(s.lastIndexOf("/") + 2));
-                inscription.setInscriptionIdTee(tee);
-                ps.setInt(8, inscription.getInscriptionIdTee());
-                ps.setInt(9, invitedBy.getIdplayer());
-                ps.setTimestamp(10, Timestamp.from(Instant.now()));
+                if (s != null && s.contains("/")) {
+                    int tee = Integer.parseInt(s.substring(s.lastIndexOf("/") + 2).trim());
+                    inscription.setInscriptionIdTee(tee);
+                } else {
+                    inscription.setInscriptionIdTee(0); // tee sélectionné ultérieurement dans score_stableford
+                }
+
+                sql.preparedstatement.psCreateInscription.psMapCreate(ps, round, player, invitedBy, inscription);
                 utils.LCUtil.logps(ps);
 
                 int row = ps.executeUpdate();
                 if (row == 1) {
                     LOG.debug("InscriptionId created = {}", LCUtil.generatedKey(conn));
-                    String msg = LCUtil.prepareMessageBean("inscription.ok") + " = " + inscription;
+                    String msg = LCUtil.prepareMessageBean("inscription.ok") + " = " + inscription + " for round = " + round;
                     LOG.debug(msg);
                     showMessageInfo(msg);
                     if (batch.equalsIgnoreCase("A")) {
@@ -228,16 +222,14 @@ public class CreateInscription implements Serializable {
             if (cotisation != null && cotisation.getStatus().equals("NF")
                     && (!findGreenfeePaid.find(player, round))) {
                 v.setStatus0(ValidationStatus.REJECTED.toString());
-                String msg = "Cotisation pas trouvée, greenfee pas trouvé";
-                v.setStatus1(msg);
+                v.setStatus1(LCUtil.prepareMessageBean("inscription.notmember.notgreenfee"));
                 v.setStatus2("02");
                 return v;
             }
 
             if (cotisation != null && cotisation.getStatus().equals("N")) {
                 v.setStatus0(ValidationStatus.REJECTED.toString());
-                String msg = "cotisation.notmember";
-                v.setStatus1(msg);
+                v.setStatus1(LCUtil.prepareMessageBean("inscription.notmember"));
                 v.setStatus2("03");
                 return v;
             }
@@ -254,33 +246,4 @@ public class CreateInscription implements Serializable {
             return v;
         }
     } // end method
-
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new CreateInscription().create(..., conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #create(Round, Player, Player, Inscription, Club, Course, String)} via injection CDI */
-    /** @deprecated Utiliser {@link #validate(Round, Player, Inscription, Club, Course)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324714);
-        player.setPlayerRole("ADMIN");
-        Player invitedBy = player;
-        Round round = new Round();
-        round.setIdround(435);
-        Club club = new Club();
-        club.setIdclub(1135);
-        Course course = new Course();
-        course.setIdcourse(135);
-        Inscription inscription = new Inscription();
-        inscription.setInscriptionIdTee(154);
-        String batch = "A";
-        Inscription result = create(round, player, invitedBy, inscription, club, course, batch);
-        LOG.debug("from main, result = {}", result);
-    } // end main
-    */
-
 } // end class

@@ -42,7 +42,7 @@ public class RoundPlayersList implements Serializable {
 
         final String query = """
             SELECT *
-            FROM player_has_round, round, player
+            FROM inscription, round, player
             WHERE round.idround = ?
               AND InscriptionIdRound = round.idround
               AND player.idplayer = InscriptionIdPlayer

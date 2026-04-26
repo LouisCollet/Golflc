@@ -103,6 +103,11 @@ public class RoundController implements Serializable {
     @Inject private lists.ScoreCardList3               scoreCardList3;
     @Inject private find.FindSlopeRating               findSlopeRating;
     @Inject private find.FindHandicapIndexAtDate       findHandicapIndexAtDate;
+    @Inject private find.FindInscriptionRound          findInscriptionRound;
+    @Inject private find.FindInfoStableford            findInfoStableford;
+    @Inject private read.ReadTee                       readTeeService;
+    @Inject private update.UpdateInscriptionTee        updateInscriptionTeeService;
+    @Inject private update.UpdateRoundGameQualifying   updateRoundGameQualifyingService;
     @Inject private read.ReadScoreList                 readScoreListService;
 
     // ✅ Injections Matchplay/Participants — migrated 2026-02-25
@@ -344,6 +349,11 @@ public class RoundController implements Serializable {
                 inscription.setInscriptionOK(true);
                 invalidateRoundCaches();
                 playerController.invalidatePlayerCaches();
+                // Chaînage : Register Score → inscription.xhtml → score_stableford.xhtml
+                if (clubSelectionContext.getPurpose() == enumeration.SelectionPurpose.ROUND_STABLEFORD) {
+                    LOG.debug("purpose STABLEFORD — enchaînement vers score_stableford");
+                    return selectedScoreToRegister(null, "individual");
+                }
                 return "inscription.xhtml?faces-redirect=true";
             }
 
@@ -572,29 +582,39 @@ public class RoundController implements Serializable {
             dialogController.closeDialog(null);
 
             enumeration.SelectionPurpose purpose = clubSelectionContext.getPurpose(); // Phase 2 — 2026-03-23
-            if (purpose == enumeration.SelectionPurpose.ROUND_INSCRIPTION) {
-                Round partial = appContext.getRound();
-                if (partial.getIdround() == null || partial.getIdround() == 0) {
-                    showMessageFatal("Veuillez sélectionner un round");
-                    return null;
-                }
-                // Charge round + course + club depuis la DB (fonctionne même sans inscription)
-                Round round       = readRoundService.read(partial);
-                entite.Course c   = new entite.Course();
-                c.setIdcourse(round.getCourseIdcourse());
-                entite.Course course = readCourseService.read(c);
-                entite.Club b     = new entite.Club();
-                b.setIdclub(course.getClub_idclub());
-                entite.Club club  = readClubService.read(b);
-                appContext.setRound(round);
-                appContext.setCourse(course);
-                appContext.setClub(club);
-                LOG.debug("Round = {}", round);
-                LOG.debug("Course = {}", course);
-                LOG.debug("Club = {}", club);
-                return "inscription.xhtml?faces-redirect=true";
+            if (purpose != enumeration.SelectionPurpose.ROUND_INSCRIPTION
+             && purpose != enumeration.SelectionPurpose.ROUND_STABLEFORD) {
+                return null;
             }
-            return null;
+
+            Round partial = appContext.getRound();
+            if (partial.getIdround() == null || partial.getIdround() == 0) {
+                showMessageFatal("Veuillez sélectionner un round");
+                return null;
+            }
+            // Charge round + course + club depuis la DB (fonctionne même sans inscription)
+            Round round       = readRoundService.read(partial);
+            entite.Course c   = new entite.Course();
+            c.setIdcourse(round.getCourseIdcourse());
+            entite.Course course = readCourseService.read(c);
+            entite.Club b     = new entite.Club();
+            b.setIdclub(course.getClub_idclub());
+            entite.Club club  = readClubService.read(b);
+            appContext.setRound(round);
+            appContext.setCourse(course);
+            appContext.setClub(club);
+            if (appContext.getInscription() == null) {
+                appContext.setInscription(new Inscription());
+            }
+            LOG.debug("Round = {}, Course = {}, Club = {}", round, course, club);
+
+            // ROUND_STABLEFORD — toujours direct vers score_stableford
+            if (purpose == enumeration.SelectionPurpose.ROUND_STABLEFORD) {
+                LOG.debug("ROUND_STABLEFORD — direct score_stableford");
+                return selectedScoreToRegister(null, "individual");
+            }
+
+            return "inscription.xhtml?faces-redirect=true";
 
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -1251,17 +1271,34 @@ public class RoundController implements Serializable {
      * Cherche la météo pour le club du round courant.
      * Migré depuis CourseController — 2026-02-25
      */
-    public String findWeather() {
+    
+    @Inject cache.WeatherCacheService weatherCache;
+
+    private dto.WeatherDTO weather2;
+    
+    
+    
+ public String findWeather() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
+    try {
             Club club = appContext.getClub();
             Inscription inscription = appContext.getInscription();
             LOG.debug("club = {}", club);
             LOG.debug("player = {}", appContext.getPlayer());
             LOG.debug("round = {}", appContext.getRound());
-
+// cette solution n'est pas en production - son intérêt = le cache
+          weather2 = weatherCache.getWeather(club, languageController.getLanguage());
+            LOG.debug("weather = {}", weather2.toString());
+            LOG.debug("humidity = {}", weather2.humidity().toString());
+            LOG.debug("windspeed = {}", weather2.windSpeed().toString());
+            LOG.debug("windsdirection = {}", weather2.windDirection());
+            LOG.debug("windsdirection = {}", weather2.windDirection());
+            LOG.debug("temperature = {}", weather2.temperature().toString());
+            LOG.debug("feelsLike = {}", weather2.feelsLike().toString());
+   // solution en production  
             String weather = findOpenWeather.find(club, languageController.getLanguage()); // fix multi-user 2026-03-07
+            
             if (weather == null) {
                 LOG.debug("weather is null");
                 inscription.setWeather("Weather returned from findWeather is null");
@@ -1301,19 +1338,25 @@ public class RoundController implements Serializable {
         LOG.debug("ecl = {}", ecl);
         LOG.debug("type = {}", type);
         try {
-            // ecl is null when called from include_round_selector (round already in appContext)
+            // ecl is null when called from selectRound() — round/course/club already in appContext
+            // Charger tee + inscription depuis la DB (inscription créée via schedule_round + paiement)
             if (ecl == null) {
-                // Find matching ECourseList from cached stableford results by round ID
-                int roundId = appContext.getRound().getIdround();
-                List<ECourseList> results = registerStablefordResult();
-                ecl = results.stream()
-                        .filter(e -> e.round().getIdround() == roundId)
-                        .findFirst()
-                        .orElse(null);
-                if (ecl == null) {
-                    String msg = "Round " + roundId + " not found in stableford results";
-                    LOG.error(msg);
-                    showMessageFatal(msg);
+                LOG.debug("ecl null — loading tee+inscription from DB for round = {}", appContext.getRound().getIdround());
+                ECourseList info = findInfoStableford.find(appContext.getPlayer(), appContext.getRound());
+                if (info != null) {
+                    appContext.setInscription(info.inscription());
+                    ecl = ECourseList.builder()
+                            .round(appContext.getRound())
+                            .course(appContext.getCourse())
+                            .club(appContext.getClub())
+                            .player(appContext.getPlayer())
+                            .inscription(info.inscription())
+                            .tee(info.tee())
+                            .build();
+                    LOG.debug("tee loaded = {}, inscription = {}", info.tee(), info.inscription());
+                } else {
+                    LOG.warn("findInfoStableford returned null — player not inscribed for round {}?", appContext.getRound().getIdround());
+                    showMessageFatal(LCUtil.prepareMessageBean("inscription.notfound"));
                     return null;
                 }
             }
@@ -1363,10 +1406,77 @@ public class RoundController implements Serializable {
         }
     } // end method
 
-    /**
+    /*
      * Calcule le score Stableford (WHS uniquement).
      * Migré depuis CourseController — 2026-02-25
      */
+    /**
+     * Appelé par le p:selectOneMenu du tee dans score_stableford.xhtml via p:ajax valueChange.
+     * Parse l'idtee depuis la string "COLOR / GENDER / HH-HH / idtee", recharge le Tee,
+     * persiste en DB et met à jour le champ local. Le recalcul des scores est laissé
+     * au click explicite sur "Calculate".
+     */
+    public void onTeeStartChange() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            String teeStart = appContext.getInscription() != null ? appContext.getInscription().getInscriptionTeeStart() : null;
+            LOG.debug("new teeStart = {}", teeStart);
+            if (teeStart == null || !teeStart.contains("/")) {
+                LOG.warn("invalid teeStart format — ignoring");
+                return;
+            }
+            int idtee = Integer.parseInt(teeStart.substring(teeStart.lastIndexOf("/") + 2).trim());
+            entite.Tee lookup = new entite.Tee();
+            lookup.setIdtee(idtee);
+            entite.Tee fresh = readTeeService.read(lookup);
+            if (fresh == null || fresh.isNotFound()) {
+                showMessageFatal("Tee introuvable (idtee=" + idtee + ")");
+                return;
+            }
+            this.tee = fresh;
+            appContext.getInscription().setInscriptionIdTee(idtee);
+            boolean ok = updateInscriptionTeeService.update(appContext.getRound(), appContext.getPlayer(), teeStart, idtee);
+            if (!ok) {
+                showMessageFatal("Mise à jour du tee en DB échouée");
+                return;
+            }
+            invalidateRoundCaches();
+            showMessageInfo("Tee mis à jour : " + teeStart + ". Clique sur « Calculate » pour recalculer les scores.");
+        } catch (NumberFormatException nfe) {
+            LOG.error("cannot parse idtee from teeStart: {}", nfe.getMessage());
+            showMessageFatal("Format de tee invalide.");
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    /**
+     * Appelé par le p:selectOneMenu "Genre de jeu" dans score_stableford.xhtml via p:ajax valueChange.
+     * Persiste la nouvelle valeur de RoundGame en DB. Champ migré depuis round.xhtml le 2026-04-21.
+     */
+    public void onGameChange() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            Round round = appContext.getRound();
+            if (round == null || round.getIdround() == null) {
+                LOG.warn("round or idround null — game change ignored");
+                return;
+            }
+            LOG.debug("new game = {} for idround={}", round.getRoundGame(), round.getIdround());
+            boolean ok = updateRoundGameQualifyingService.update(round);
+            if (!ok) {
+                showMessageFatal("Mise à jour du genre de jeu en DB échouée");
+                return;
+            }
+            invalidateRoundCaches();
+            showMessageInfo("Genre de jeu mis à jour : " + round.getRoundGame());
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
     public String calculateScoreStableford() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -2384,10 +2494,29 @@ public class RoundController implements Serializable {
         LOG.debug("OldValue = {}", e.getOldValue());
         LOG.debug("NewValue = {}", e.getNewValue());
         Round round = appContext.getRound();
-        if (e.getNewValue().equals("Y")) {
+        String newValue = (String) e.getNewValue();
+        if ("Y".equals(newValue)) {
             round.setShowQualifying(true);
         } else {
             round.setShowQualifying(false);
+        }
+        // Persistance DB — champ migré depuis round.xhtml le 2026-04-21
+        // valueChangeListener est appelé AVANT "Update Model Values" — on fixe la valeur manuellement
+        if (round != null && round.getIdround() != null) {
+            round.setRoundQualifying(newValue);
+            try {
+                boolean ok = updateRoundGameQualifyingService.update(round);
+                if (!ok) {
+                    showMessageFatal("Mise à jour du qualifying en DB échouée");
+                } else {
+                    invalidateRoundCaches();
+                    LOG.debug("round {} qualifying persisted = {}", round.getIdround(), newValue);
+                }
+            } catch (Exception ex) {
+                handleGenericException(ex, methodName);
+            }
+        } else {
+            LOG.warn("round or idround null — qualifying not persisted");
         }
         LOG.debug("showQualifying is {}", round.isShowQualifying());
         PrimeFaces.current().executeScript("window.location.reload(true);");
@@ -2660,7 +2789,7 @@ public class RoundController implements Serializable {
 
         return switch (purpose) {
             case ROUND_INSCRIPTION -> selectRound();
-            case ROUND_STABLEFORD -> selectedScoreToRegister(null, "individual");
+            case ROUND_STABLEFORD -> selectRound();   // inscription.xhtml d'abord, puis score_stableford.xhtml
             case ROUND_SCORECARD -> scorecard(null);
             case ROUND_PARTICIPANTS -> listParticipantsStablefordRound(null);
             case ROUND_CHART -> scorecard(null); // redirects to scorecard — viewChartRounds dialog not yet implemented

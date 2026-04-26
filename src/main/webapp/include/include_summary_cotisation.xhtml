@@ -34,6 +34,11 @@
             <c:set var="com" value="#{memC.tarifMember.comment}" />
             <span class="summary-value">#{of:abbreviate(com, 30)}</span>
         </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['tarif.members.age']}</span>
+            <span class="summary-value">#{playerC.currentPlayerAge}</span>
+        </span>
     </h:panelGroup>
 
 </ui:composition>

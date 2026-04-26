@@ -1453,3 +1453,8 @@ html[data-theme="dark"] .form-card.ui-panel .ui-panel-titlebar {
 .compact-table.p-datatable-scrollable td {
     white-space: nowrap;
 }
+/* new 21-04-2026*/
+.card {
+    width: 100%;
+    max-width: none;
+}

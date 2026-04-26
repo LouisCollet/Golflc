@@ -59,7 +59,7 @@ private String name;
 @JsonProperty("cod")
 private Integer cod;
 @JsonIgnore
-private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+private final Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 @JsonProperty("coord")
 public Coord getCoord() {

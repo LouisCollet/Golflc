@@ -53,9 +53,9 @@ public class HandicapIndexList implements Serializable {
                         SELECT * FROM player
                             INNER JOIN handicap_index
                                 ON handicap_index.HandicapPlayerId = player.idplayer
-                            INNER JOIN player_has_round
-                                ON player_has_round.InscriptionIdPlayer = player.idplayer
-                               AND player_has_round.InscriptionIdRound = handicap_index.HandicapRoundId
+                            INNER JOIN inscription
+                                ON inscription.InscriptionIdPlayer = player.idplayer
+                               AND inscription.InscriptionIdRound = handicap_index.HandicapRoundId
                         WHERE player.idplayer = ?
                     )
                     SELECT * FROM selection

@@ -225,8 +225,7 @@ public static HandicapIndex map(ResultSet rs) throws SQLException{
                + " ,HandicapPlayedStrokes : " + this.getHandicapPlayedStrokes()
                + " ,LowHandicapIndex : " + this.lowHandicapIndex
     //       + NEW_LINE + TAB
-    //           + " ,vers UnavailableStructure : " + this.getUnavailableStructure().toString()
-              );
+                );
     }catch(Exception e){
         String msg = "£££ Exception in toString HandicapIndex " + " / " + e.getMessage();
         LOG.error(msg);

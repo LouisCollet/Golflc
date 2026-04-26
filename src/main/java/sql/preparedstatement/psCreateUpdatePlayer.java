@@ -13,7 +13,7 @@ import static utils.LCUtil.getCurrentMethodName;
 public class psCreateUpdatePlayer implements Serializable, interfaces.Log, interfaces.GolfInterface{
     
  public static PreparedStatement psMapUpdate(PreparedStatement ps, Player player){
- //   final String methodName = utils.LCUtil.getCurrentMethodName(); 
+    final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
       // voir aussi http://www.javased.com/index.php?source_dir=archaius/archaius-core/src/main/java/com/netflix/config/sources/JDBCConfigurationSource.java
         LOG.debug("entering psMapUpdate with player = " + player);
@@ -40,7 +40,8 @@ public class psCreateUpdatePlayer implements Serializable, interfaces.Log, inter
             ps.setString(13, player.getPlayerRole());
         //clé de recherche used for WHERE ?    
             ps.setInt(14, player.getIdplayer()); 
-            ps.getWarnings(); // new 27-04-2025
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
    //// ps. 12 modificationDate non nécessaire (faite par DB System)
 return ps;
   }catch(Exception e){

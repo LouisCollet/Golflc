@@ -82,39 +82,26 @@ try{
             String msg = "££ Exception in RegisterPaymentandInscription = " + e.getMessage();
             LOG.error(msg);
             showMessageFatal(msg);
-           return false; // indicates that the same view should be redisplayed
-     //   } finally {}
-//return null;
-   } 
+            throw e; // rethrow so REST can propagate real cause to the user via PaymentStateStore
+   }
 } //end method
 
 
-private boolean payment(Cotisation cotisation) { // Connection conn removed 2026-02-28 — unused
- try{
-      LOG.debug("entering createPaymentCotisation");
-      LOG.debug("with cotisation = " + cotisation);
- 
-      if(createPaymentCotisationService.create(cotisation)){ // migrated 2026-02-26
-        String msg = prepareMessageBean("subscription.success")
-                  + cotisation //.getCotisationStartDate().format(ZDF_DAY) + " - " 
-          //        + cotisation.getCotisationEndDate().format(ZDF_DAY)
-                  + " for club = " + cotisation.getIdclub();
+private boolean payment(Cotisation cotisation) throws Exception {
+    LOG.debug("entering createPaymentCotisation");
+    LOG.debug("with cotisation = " + cotisation);
+
+    if (createPaymentCotisationService.create(cotisation)) { // migrated 2026-02-26
+        String msg = prepareMessageBean("subscription.success") + cotisation + " for club = " + cotisation.getIdclub();
         LOG.info(msg);
         showMessageInfo(msg);
         return true;
-     }else{
-        String msg = "Error : payment cotisation NOT done !";
-        LOG.error(msg);
-        showMessageFatal(msg);
-        return false;
     }
-  }catch (Exception ex){
-            String msg = "Exception in payment " + ex.getLocalizedMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return false;
-  }
- } //end method createPaymentCotisation
+    String msg = "Error : payment cotisation NOT done !";
+    LOG.error(msg);
+    showMessageFatal(msg);
+    return false;
+} //end method createPaymentCotisation
 
     /*
     void main() throws Exception, Throwable {

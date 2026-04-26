@@ -20,6 +20,72 @@
             <h1>#{msg['title.score.results']}</h1>
         </f:facet>
 
+        <!-- Choix du tee de départ + genre de jeu + qualificatif hcp — migré depuis round.xhtml 2026-04-21 -->
+        <p:panelGrid id="panelTeeStart"
+                     columns="2"
+                     layout="flex"
+                     columnClasses="col1Flex, col2Flex"
+                     style="margin-bottom:0.75rem;">
+
+            <!-- 1 — Tee de départ -->
+            <p:outputLabel for="@next" value="#{msg['tee.start']} :"/>
+            <p:selectOneMenu id="teeStartSelect"
+                             var="teeColor"
+                             value="#{roundC.inscription.inscriptionTeeStart}">
+                <p:ajax event="valueChange"
+                        listener="#{roundC.onTeeStartChange}"
+                        update="growl-msg"/>
+                <f:selectItem itemLabel="#{msg['inscription.tee.select']}"
+                              itemValue=""
+                              noSelectionOption="true"/>
+                <f:selectItems id="teeStartList"
+                               value="#{roundC.teeStartList(playerC.player)}"/>
+                <p:column>
+                    <h:outputText value="#{teeColor}" style="color:goldenrod; font-weight:bold; background-color:gray;" rendered="#{teeColor.startsWith('YELLOW')}"/>
+                    <h:outputText value="#{teeColor}" style="color:red; font-weight:bold;" rendered="#{teeColor.startsWith('RED')}"/>
+                    <h:outputText value="#{teeColor}" style="color:blue; font-weight:bold;" rendered="#{teeColor.startsWith('BLUE')}"/>
+                    <h:outputText value="#{teeColor}" style="color:orange; font-weight:bold;" rendered="#{teeColor.startsWith('ORANGE')}"/>
+                    <h:outputText value="#{teeColor}" style="color:black; font-weight:bold;" rendered="#{teeColor.startsWith('BLACK')}"/>
+                    <h:outputText value="#{teeColor}" style="color:white; font-weight:bold; background-color:gray;" rendered="#{teeColor.startsWith('WHITE')}"/>
+                </p:column>
+            </p:selectOneMenu>
+
+            <!-- 2 — Genre de jeu (migré depuis round.xhtml) -->
+            <p:outputLabel for="@next" value="#{msg['round.game']}"/>
+            <p:selectOneMenu id="gameType"
+                             title="title select one game"
+                             value="#{roundC.round.roundGame}">
+                <p:ajax event="valueChange"
+                        listener="#{roundC.onGameChange}"
+                        update="growl-msg"/>
+                <f:selectItem itemLabel="#{msg['round.game.select']}"
+                              itemValue=""
+                              noSelectionOption="true"/>
+                <f:selectItems value="#{roundC.round.GameType()}"
+                               var="v"
+                               itemLabel="#{v}"
+                               itemValue="#{v}"/>
+            </p:selectOneMenu>
+
+            <!-- 3 — Qualificatif HCP (migré depuis round.xhtml) -->
+            <p:outputLabel for="@next" value="#{msg['round.qualifying']}"/>
+            <h:panelGroup id="panelGroupQualifyingTop"
+                          style="display:flex; align-items:center; gap:0.5rem;">
+                <p:selectOneButton id="qualifying"
+                                   value="#{roundC.round.roundQualifying}"
+                                   valueChangeListener="#{roundC.qualifyingListener}">
+                    <f:selectItems value="#{roundC.availableQualifying}"/>
+                    <p:ajax listener="#{roundC.round.ajaxListener}"/>
+                </p:selectOneButton>
+                <p:inputText id="commentQualifying"
+                             size="25"
+                             rendered="#{roundC.round.showQualifying}"
+                             title="#{msg['tooltip.round.RoundName']}"
+                             value="#{playerC.handicapIndex.handicapComment}"/>
+            </h:panelGroup>
+
+        </p:panelGrid>
+
         <p:dataTable id="scoreStablefordTable"
                      var="var"
                      rowIndexVar="row"

@@ -145,7 +145,7 @@ public class DeleteCourse implements Serializable, interfaces.GolfInterface {
      *
      * Ordre de suppression (du plus bas au plus haut) :
      * 1. Scores
-     * 2. Inscriptions (player_has_round)
+     * 2. Inscriptions (inscription)
      * 3. Rounds
      * 4. Holes
      * 5. Tees
@@ -181,8 +181,9 @@ public class DeleteCourse implements Serializable, interfaces.GolfInterface {
             // ========================================
             String query = """
                 DELETE score FROM score
-                INNER JOIN player_has_round ON score.player_has_round_idinscription = player_has_round.idinscription
-                INNER JOIN round ON player_has_round.round_idround = round.idround
+                INNER JOIN inscription ON score.inscription_player_idplayer = inscription.InscriptionIdPlayer
+                                      AND score.inscription_round_idround   = inscription.InscriptionIdRound
+                INNER JOIN round ON inscription.round_idround = round.idround
                 WHERE round.course_idcourse = ?
                 """;
 
@@ -194,11 +195,11 @@ public class DeleteCourse implements Serializable, interfaces.GolfInterface {
             }
 
             // ========================================
-            // 2. Delete Inscriptions (player_has_round)
+            // 2. Delete Inscriptions (inscription)
             // ========================================
             query = """
-                DELETE player_has_round FROM player_has_round
-                INNER JOIN round ON player_has_round.round_idround = round.idround
+                DELETE inscription FROM inscription
+                INNER JOIN round ON inscription.round_idround = round.idround
                 WHERE round.course_idcourse = ?
                 """;
 

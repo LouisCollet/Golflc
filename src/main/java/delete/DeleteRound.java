@@ -54,7 +54,7 @@ public class DeleteRound implements Serializable {
                 int rowScore = 0;
                 try (PreparedStatement ps = conn.prepareStatement("""
                         DELETE FROM score
-                        WHERE score.player_has_round_round_idround = ?
+                        WHERE score.inscription_round_idround = ?
                         """)) {
                     ps.setInt(1, round.getIdround());
                     LCUtil.logps(ps);
@@ -65,7 +65,7 @@ public class DeleteRound implements Serializable {
                 // 2. Inscriptions
                 int rowPhr = 0;
                 try (PreparedStatement ps = conn.prepareStatement("""
-                        DELETE FROM player_has_round
+                        DELETE FROM inscription
                         WHERE InscriptionIdRound = ?
                         """)) {
                     ps.setInt(1, round.getIdround());

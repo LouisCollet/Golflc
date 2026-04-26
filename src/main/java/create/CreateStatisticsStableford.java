@@ -44,8 +44,8 @@ public class CreateStatisticsStableford implements Serializable {
             UPDATE score
             SET ScoreFairway=?, ScoreGreen=?, ScorePutts=?, ScoreBunker=?, ScorePenalty=?
             WHERE ScoreHole = ?
-              AND player_has_round_player_idplayer=?
-              AND player_has_round_round_idround=?
+              AND inscription_player_idplayer=?
+              AND inscription_round_idround=?
             """;
 
         try (Connection conn = dao.getConnection();

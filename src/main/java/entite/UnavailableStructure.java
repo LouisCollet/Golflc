@@ -7,19 +7,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
-// import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
-// import jakarta.inject.Named;  // migrated 2026-02-24
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import utils.LCUtil;
 
-// @Named  // migrated 2026-02-24
-// @RequestScoped  // migrated 2026-02-24
-@JsonInclude(JsonInclude.Include.NON_NULL) // déplacé 10/06/2022
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UnavailableStructure implements Serializable{
 @JsonIgnore private static final long serialVersionUID = 1L;
 
@@ -30,8 +23,7 @@ public class UnavailableStructure implements Serializable{
         OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
-//private String[] itemStructure;
-// rybriques stockées en db
+// rubriques stockées en db
 private ArrayList<Structure> structureList = new ArrayList<>();
 private String comment;
 
@@ -53,6 +45,8 @@ and the \ is necessary before the dollar sign because dollar sign has a special 
 @JsonIgnore private boolean menuLaunched;
 @JsonIgnore private boolean structureExists;
 @JsonIgnore private boolean itemExists;
+@JsonIgnore private boolean periodSaved;        // period data validated in bean (Tab 1 button)
+@JsonIgnore private boolean periodPersistedToDB; // period record actually INSERTed in DB
 
 public UnavailableStructure(){    // constructor
     workCourseId = " ";
@@ -112,6 +106,22 @@ public UnavailableStructure(){    // constructor
 
     public void setItemExists(boolean itemExists) {
         this.itemExists = itemExists;
+    }
+
+    public boolean isPeriodSaved() {
+        return periodSaved;
+    }
+
+    public void setPeriodSaved(boolean periodSaved) {
+        this.periodSaved = periodSaved;
+    }
+
+    public boolean isPeriodPersistedToDB() {
+        return periodPersistedToDB;
+    }
+
+    public void setPeriodPersistedToDB(boolean periodPersistedToDB) {
+        this.periodPersistedToDB = periodPersistedToDB;
     }
 
     public String getWorkItem() {

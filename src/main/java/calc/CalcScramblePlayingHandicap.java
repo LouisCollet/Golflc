@@ -14,8 +14,7 @@ public class CalcScramblePlayingHandicap implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private UtilsController utilsController;
-
-    public CalcScramblePlayingHandicap() { }
+ public CalcScramblePlayingHandicap() { }
 
     public int getScramblePlayingHcp(final PlayingHandicap playingHcp, final int players) {
         final String methodName = utils.LCUtil.getCurrentMethodName();

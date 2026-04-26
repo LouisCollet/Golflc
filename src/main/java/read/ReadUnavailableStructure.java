@@ -42,6 +42,22 @@ public class ReadUnavailableStructure implements Serializable {
         return structure;
     } // end method
 
+    // Variante silencieuse — pas de showMessageFatal, utilisée dans les checks automatiques
+    public UnavailableStructure readSilent(final Club club) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+
+        final String query = """
+                SELECT *
+                FROM club
+                WHERE idclub = ?
+                """;
+
+        UnavailableStructure structure = dao.querySingle(query, new UnavailableStructureRowMapper(), club.getIdclub());
+        LOG.debug("structure = {}", structure != null ? structure.getStructureList().size() + " items" : "null");
+        return structure;
+    } // end method
+
     /*
     void main() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();

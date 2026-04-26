@@ -52,9 +52,8 @@ public class CreateProfessional implements Serializable, interfaces.Log, interfa
                     showMessageInfo(msg);
                     return true;
                 } else {
-                    String msg = "<br/>ERROR insert Professional : " + professional;
-                    LOG.debug(msg);
-                    showMessageFatal(msg);
+                    LOG.error("insert professional failed for = {}", professional);
+                    showMessageFatal("ERROR: could not save professional");
                     return false;
                 }
             }
@@ -95,7 +94,7 @@ public class CreateProfessional implements Serializable, interfaces.Log, interfa
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int existingMask = rs.getInt("ProWorkDays");
-                    LOG.debug("bits printing = " + enumeration.WorkingDay.printWorkingDays(existingMask)); // added 08-04-2026 by LC
+                    LOG.debug("bits printing = {}", enumeration.WorkingDay.printWorkingDays(existingMask));
                     
                     int overlap = existingMask & p.getProWorkDays();
                     if (overlap != 0) {

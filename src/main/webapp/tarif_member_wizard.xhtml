@@ -25,18 +25,20 @@
           onnext="$('.ui-growl-item').remove(); $('.ui-messages').empty();"
           onback="$('.ui-growl-item').remove(); $('.ui-messages').empty();">
 
-    <!-- =================== TAB 1: COTISATION (Periods + Items) =================== -->
-    <p:tab id="CotisationTab"
-           title="💳 Cotisation (#{memC.tarifMember.basicList.size()})"
-           titletip="Define member cotisation periods and items">
+    <!-- =================== TAB 1: PERIOD (one-and-only) =================== -->
+    <p:tab id="PeriodsTab"
+           title="📅 Period"
+           titletip="Define the single tarif period">
         <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
             <f:facet name="header">
-                <h1>#{msg['title.members.tarif']}</h1>
-                <p:badge value="#{memC.tarifMember.basicList.size()}" severity="info"/>
+                <h1>#{msg['title.period.tarif']}</h1>
             </f:facet>
+
+            <!-- EDIT MODE: no period yet, show inputs -->
             <p:panelGrid columns="2"
                          layout="flex"
-                         columnClasses="col1Flex, col2Flex">
+                         columnClasses="col1Flex, col2Flex"
+                         rendered="#{memC.tarifMember.startDate == null}">
 
                 <h:outputText value="#{msg['tarif.period.start']} :"/>
                 <p:datePicker id="startPeriod"
@@ -71,6 +73,66 @@
                               required="false">
                     <f:validateBean disabled="true"/>
                 </p:datePicker>
+            </p:panelGrid>
+
+            <!-- VIEW MODE: period created, show chip + edit/delete -->
+            <p:dataTable id="periodsTable"
+                         value="#{memC.tarifMember.startDate != null ? [memC.tarifMember] : []}"
+                         var="pd"
+                         rendered="#{memC.tarifMember.startDate != null}"
+                         styleClass="compact-table mt-2">
+                <p:column headerText="#{msg['tarif.period.start']}" style="width:40%">
+                    <h:outputText value="#{pd.startDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd-MM-yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg['tarif.period.end']}" style="width:40%">
+                    <h:outputText value="#{pd.endDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd-MM-yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="width:20%">
+                    <p:commandButton icon="pi pi-pencil"
+                                     styleClass="p-button-warning p-button-text p-button-sm"
+                                     action="#{memC.editMemberPeriod()}"
+                                     update="tarif_member_wizard:wizardTarifMember"
+                                     process="@this"
+                                     disabled="#{not empty memC.tarifMember.basicList or not empty memC.tarifMember.equipmentsList}"
+                                     title="Edit period"/>
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{memC.deleteMemberPeriod()}"
+                                     update="tarif_member_wizard:wizardTarifMember"
+                                     process="@this"
+                                     disabled="#{not empty memC.tarifMember.basicList or not empty memC.tarifMember.equipmentsList}"
+                                     title="Delete period"/>
+                </p:column>
+            </p:dataTable>
+
+            <f:facet name="footer">
+                <p:commandButton value="#{msg['tarif.period.create']}"
+                                 id="btnCreatePeriod"
+                                 icon="pi pi-plus"
+                                 rendered="#{memC.tarifMember.startDate == null}"
+                                 action="#{memC.createMemberPeriod()}"
+                                 update="tarif_member_wizard:wizardTarifMember"
+                                 styleClass="p-button-outlined"/>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+    <!-- =================== TAB 2: COTISATION ITEMS =================== -->
+    <p:tab id="CotisationTab"
+           title="💳 Cotisation (#{memC.tarifMember.basicList.size()})"
+           titletip="Define member cotisation items">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.members.tarif']}</h1>
+                <p:badge value="#{memC.tarifMember.basicList.size()}" severity="info"/>
+            </f:facet>
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
 
                 <h:panelGroup layout="block">
                     <h:outputText value="#{msg['tarif.members.item']} "/>
@@ -115,14 +177,65 @@
                     <f:validateBean disabled="true"/>
                 </p:inputMask>
             </p:panelGrid>
-            <f:facet name="footer">
-                <p:commandButton value="#{msg['tarif.members.add']}"
-                                 id="btnAddCotisation"
-                                 icon="pi pi-plus"
-                                 action="#{memC.inputTarifMemberWizard('CO')}"
-                                 update="tarif_member_wizard"
-                                 styleClass="p-button-outlined"/>
-            </f:facet>
+            <p:commandButton value="#{msg['tarif.members.add']}"
+                             id="btnAddCotisation"
+                             icon="pi pi-plus"
+                             action="#{memC.inputTarifMemberWizard('CO')}"
+                             update="tarif_member_wizard"
+                             styleClass="p-button-outlined mt-2"/>
+
+            <p:dataTable id="basicTable"
+                         value="#{memC.tarifMember.basicList}" var="b"
+                         rendered="#{not empty memC.tarifMember.basicList}"
+                         editable="true" editMode="row"
+                         styleClass="compact-table mt-2">
+                <p:ajax event="rowEdit"       update="tarif_member_wizard"/>
+                <p:ajax event="rowEditCancel" update="basicTable"/>
+
+                <p:column headerText="#{msg['tarif.members.item']}">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{b.item}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{b.item}" size="20">
+                                <f:validateBean disabled="true"/>
+                            </p:inputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="#{msg['tarif.members.price']}" style="width:15%">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{b.price}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputNumber value="#{b.price}" size="6"
+                                           decimalPlaces="1" decimalSeparator="."
+                                           minValue="0" maxValue="2000.0">
+                                <f:validateBean disabled="true"/>
+                            </p:inputNumber>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="#{msg['tarif.members.rangeage']}" style="width:15%">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{b.range}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputMask value="#{b.range}" size="6" mask="99-99">
+                                <f:validateBean disabled="true"/>
+                            </p:inputMask>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column style="width:10%"><p:rowEditor/></p:column>
+                <p:column style="width:5%">
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{memC.removeMemberBasicItem(b)}"
+                                     update="tarif_member_wizard"
+                                     process="@this"/>
+                </p:column>
+            </p:dataTable>
         </p:panel></div>
     </p:tab>
 
@@ -169,14 +282,55 @@
                     <f:validateBean disabled="true"/>
                 </p:inputNumber>
             </p:panelGrid>
-            <f:facet name="footer">
-                <p:commandButton value="#{msg['tarif.equipments.create']}"
-                                 id="btnAddEquipment"
-                                 icon="pi pi-plus"
-                                 action="#{memC.inputTarifMemberWizard('EQ')}"
-                                 update="tarif_member_wizard"
-                                 styleClass="p-button-outlined"/>
-            </f:facet>
+            <p:commandButton value="#{msg['tarif.equipments.create']}"
+                             id="btnAddEquipment"
+                             icon="pi pi-plus"
+                             action="#{memC.inputTarifMemberWizard('EQ')}"
+                             update="tarif_member_wizard"
+                             styleClass="p-button-outlined mt-2"/>
+
+            <p:dataTable id="equipTable"
+                         value="#{memC.tarifMember.equipmentsList}"
+                         var="e"
+                         rendered="#{not empty memC.tarifMember.equipmentsList}"
+                         editable="true" editMode="row"
+                         styleClass="compact-table mt-2">
+                <p:ajax event="rowEdit"       update="tarif_member_wizard"/>
+                <p:ajax event="rowEditCancel" update="equipTable"/>
+
+                <p:column headerText="#{msg['tarif.members.item']}">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{e.item}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{e.item}" size="20">
+                                <f:validateBean disabled="true"/>
+                            </p:inputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column headerText="#{msg['tarif.members.price']}" style="width:15%">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{e.price}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputNumber value="#{e.price}" size="6"
+                                           decimalPlaces="1" decimalSeparator="."
+                                           minValue="0" maxValue="400.0">
+                                <f:validateBean disabled="true"/>
+                            </p:inputNumber>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column style="width:10%"><p:rowEditor/></p:column>
+                <p:column style="width:5%">
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{memC.removeMemberEquipmentItem(e)}"
+                                     update="tarif_member_wizard"
+                                     process="@this"/>
+                </p:column>
+            </p:dataTable>
         </p:panel></div>
     </p:tab>
 

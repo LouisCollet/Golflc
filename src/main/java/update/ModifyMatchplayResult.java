@@ -33,8 +33,8 @@ public class ModifyMatchplayResult implements Serializable {
         LOG.debug("Player ID = {}", player.getIdplayer());
         try {
             final String query
-                    = "  UPDATE player_has_round"
-                    + "  SET player_has_round.Player_has_roundMatchplayResult = ?, Player_has_roundModificationDate = ? "
+                    = "  UPDATE inscription"
+                    + "  SET inscription.Player_has_roundMatchplayResult = ?, Player_has_roundModificationDate = ? "
                     + "  WHERE "
                     + "       InscriptionIdPlayer = ?"
                     + "   AND InscriptionIdRound = ?";

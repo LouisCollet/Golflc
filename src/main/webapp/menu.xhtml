@@ -23,9 +23,9 @@
              GOLF — visible par tous (joueur)
              ═══════════════════════════════════════ -->
         <p:submenu label="⛳ GOLF" icon="pi pi-sun">
-            <p:menuitem value="Inscription STB/SCR/MP"
-                        action="#{navC.to_selectPurpose_xhtml('INSCRIPTION')}"
-                        icon="pi pi-pencil"/>
+            <p:menuitem value="#{msg['menu.schedule.round']}"
+                        action="#{navC.to_selectPurpose_xhtml('ScheduleRound')}"
+                        icon="pi pi-calendar"/>
             <p:menuitem value="Register Score"
                         action="#{navC.to_selectPurpose_xhtml('STABLEFORD')}"
                         icon="pi pi-check-circle"/>

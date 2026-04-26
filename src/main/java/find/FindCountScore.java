@@ -28,15 +28,15 @@ public class FindCountScore implements Serializable {
             query = """
                     SELECT count(*)
                     FROM score
-                    WHERE score.player_has_round_player_idplayer = ?
-                      AND player_has_round_round_idround = ?
+                    WHERE score.inscription_player_idplayer = ?
+                      AND inscription_round_idround = ?
                     """;
         } else {
             query = """
                     SELECT sum(scorestroke)
                     FROM score
-                    WHERE score.player_has_round_player_idplayer = ?
-                      AND player_has_round_round_idround = ?
+                    WHERE score.inscription_player_idplayer = ?
+                      AND inscription_round_idround = ?
                     """;
         }
 
@@ -104,15 +104,15 @@ try{
       query = """
             SELECT count(*)
             FROM score
-            WHERE score.player_has_round_player_idplayer = ?
-              AND player_has_round_round_idround = ?
+            WHERE score.inscription_player_idplayer = ?
+              AND inscription_round_idround = ?
           """ ;
   }else{
        query = """
             SELECT sum(scorestroke)
             FROM score
-            WHERE score.player_has_round_player_idplayer = ?
-              AND player_has_round_round_idround = ?
+            WHERE score.inscription_player_idplayer = ?
+              AND inscription_round_idround = ?
          """  ;
   }
     ps = conn.prepareStatement(query);
