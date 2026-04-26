@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TAB 5 : Confirmation — résumé compteurs + Create / Delete -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces">
+
+    <p:tab id="ConfirmationTab"
+           title="✅ Confirm"
+           titletip="Review and create tarif">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h:outputText value="#{appContext.club.clubName} — #{memC.tarifGreenfeeCourseDisplay} — #{memC.tarifGreenfee.tarifHolesDisplay}"/>
+            </f:facet>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+                <p:tag value="Periods : #{memC.tarifGreenfee.datesSeasonsList.size()}"
+                       icon="pi pi-calendar" severity="success"/>
+                <p:tag value="Equipments : #{memC.tarifGreenfee.equipmentsList.size()}"
+                       icon="pi pi-briefcase" severity="info"
+                       rendered="#{not empty memC.tarifGreenfee.equipmentsList}"/>
+                <p:tag value="Basic : #{memC.tarifGreenfee.basicList.size()}"
+                       icon="pi pi-tag" severity="info"
+                       rendered="#{not empty memC.tarifGreenfee.basicList}"/>
+                <p:tag value="Hours : #{memC.tarifGreenfee.teeTimesList.size()}"
+                       icon="pi pi-clock" severity="info"
+                       rendered="#{not empty memC.tarifGreenfee.teeTimesList}"/>
+                <p:tag value="Days : #{memC.tarifGreenfee.daysList.size()}"
+                       icon="pi pi-calendar-times" severity="info"
+                       rendered="#{not empty memC.tarifGreenfee.daysList}"/>
+            </div>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['tarif.visualisation']}"
+                                     icon="pi pi-eye"
+                                     process="@this"
+                                     action="#{memC.resetTarifGreenfeeDB()}"
+                                     update="vizDialog"
+                                     oncomplete="PF('vizDialog').show();"
+                                     styleClass="p-button-info p-button-outlined"/>
+                    <p:commandButton value="Create all tarifs"
+                                     id="btnCreateAll" icon="pi pi-database"
+                                     action="#{memC.createTarifGreenfee()}"
+                                     styleClass="p-button-success"/>
+                    <p:commandButton id="btnDeleteAll"
+                                     value="#{msg['button.delete']}"
+                                     icon="pi pi-trash"
+                                     action="#{memC.deleteTarifGreenfee('')}"
+                                     styleClass="p-button-danger">
+                        <p:confirm icon="pi pi-exclamation-triangle"/>
+                    </p:commandButton>
+                </div>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</ui:composition>

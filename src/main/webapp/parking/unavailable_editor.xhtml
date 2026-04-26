@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Unavailable textEditor</ui:define>
+<ui:define name="head"></ui:define>
+<ui:define name="content">
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card">
+        <f:facet name="header">
+            <h1>#{msg['title.cotisation.comment']}</h1>
+        </f:facet>
+
+        <h:form id="unavailable_editor">
+            <ui:include src="include/include_summary_club.xhtml"/>
+
+            <p:textEditor id="textEditor"
+                          widgetVar="editorVar"
+                          value="#{clubC.unavailable.period.comment}"
+                          height="70px"
+                          style="width:600px;background-color: whitesmoke;font-weight: normal;"
+                          placeholder="Enter here your content"/>
+
+            <p:dialog id="dialog1"
+                      width="auto"
+                      height="auto"
+                      header="Content of comment"
+                      footer="this is the footer"
+                      widgetVar="dlg"
+                      showEffect="fade"
+                      hideEffect="fade"
+                      styleClass="ui-page-theme-a ui-bar-inherit">
+                <p:outputPanel id="displayComment">
+                    <h3>Comment registered !</h3>
+                    <h:outputText value="#{clubC.unavailable.period.comment}"
+                                  escape="false"/>
+                </p:outputPanel>
+            </p:dialog>
+
+            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                <p:commandButton id="command1"
+                                 value="#{msg['button.comment.add']}"
+                                 update="displayComment"
+                                 oncomplete="PF('dlg').show()"
+                                 icon="pi pi-plus"/>
+                <p:commandButton value="Clear"
+                                 type="buttonClear"
+                                 onclick="PF('editorVar').clear();"
+                                 icon="pi pi-times"/>
+                <p:commandButton value="#{msg['unavailable.back']}"
+                                 id="commandButtonback"
+                                 ajax="false"
+                                 update="growl-msg"
+                                 immediate="true"
+                                 icon="pi pi-undo"
+                                 action="unavailable_period.xhtml?faces-redirect=true"/>
+            </div>
+        </h:form>
+    </p:panel>
+</div>
+
+</ui:define>
+</ui:composition>

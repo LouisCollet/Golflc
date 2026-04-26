@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Payment Cart</ui:define>
+<ui:define name="content">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:960px;">
+    <f:facet name="header">
+        <h1>
+            <h:outputText value="#{msg['title.payment.cotisation']}" rendered="#{payC.cotisation}"/>
+            <h:outputText value="#{msg['title.payment.lesson']}"     rendered="#{payC.lesson}"/>
+        </h1>
+    </f:facet>
+
+    <h:form id="form_cart">
+
+        <!-- ============== COTISATION BLOCK ============== -->
+        <h:panelGroup rendered="#{payC.cotisation}" layout="block">
+            <ui:include src="include/include_summary_cotisation.xhtml"/>
+
+            <p:dataTable id="basicCart"
+                         var="b"
+                         value="#{payC.cotisationBasicCart}"
+                         rendered="#{not empty payC.cotisationBasicCart}"
+                         styleClass="compact-table mt-2">
+                <f:facet name="header">#{msg['title.cotisation.choice']}</f:facet>
+                <p:column headerText="#{msg['tarif.members.item']}">
+                    <h:outputText value="#{b.item}"/>
+                </p:column>
+                <p:column headerText="#{msg['tarif.members.price']}" style="width:15%">
+                    <h:outputText value="#{b.price}"/>
+                </p:column>
+                <p:column headerText="#{msg['tarif.members.rangeage']}" style="width:15%">
+                    <h:outputText value="#{b.range}"/>
+                </p:column>
+                <p:column headerText="#{msg['tarif.members.choice']}" style="width:10%">
+                    <h:outputText value="#{b.quantity}"/>
+                </p:column>
+                <p:column headerText="Total" style="width:12%">
+                    <h:outputText value="#{b.price * b.quantity}"/>
+                </p:column>
+                <p:column style="width:5%">
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{payC.removeCotisationBasicItem(b)}"
+                                     update="form_cart"
+                                     process="@this"/>
+                </p:column>
+            </p:dataTable>
+
+            <p:dataTable id="equipCart"
+                         var="e"
+                         value="#{payC.cotisationEquipCart}"
+                         rendered="#{not empty payC.cotisationEquipCart}"
+                         styleClass="compact-table mt-2">
+                <f:facet name="header">#{msg['title.equipments.choice']}</f:facet>
+                <p:column headerText="#{msg['tarif.members.item']}">
+                    <h:outputText value="#{e.item}"/>
+                </p:column>
+                <p:column headerText="#{msg['tarif.period']}" style="width:20%">
+                    <h:outputText value="#{memC.tarifMember.startDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value=" → "/>
+                    <h:outputText value="#{memC.tarifMember.endDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="#{msg['tarif.members.price']}" style="width:15%">
+                    <h:outputText value="#{e.price}"/>
+                </p:column>
+                <p:column headerText="#{msg['tarif.members.choice']}" style="width:10%">
+                    <h:outputText value="#{e.quantity}"/>
+                </p:column>
+                <p:column headerText="Total" style="width:12%">
+                    <h:outputText value="#{e.price * e.quantity}"/>
+                </p:column>
+                <p:column style="width:5%">
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{payC.removeCotisationEquipmentItem(e)}"
+                                     update="form_cart"
+                                     process="@this"/>
+                </p:column>
+            </p:dataTable>
+
+            <h:panelGroup rendered="#{empty payC.cotisationBasicCart and empty payC.cotisationEquipCart}"
+                          layout="block"
+                          style="text-align:center; padding:1.5rem; color:var(--text-color-secondary);">
+                <i class="pi pi-shopping-cart" style="font-size:2rem; display:block; margin-bottom:0.5rem;"/>
+                #{msg['message.table.empty']}
+            </h:panelGroup>
+
+            <h:panelGroup layout="block" styleClass="mt-3" style="text-align:right;">
+                <strong>Total: #{appContext.cotisation.price} €</strong>
+            </h:panelGroup>
+        </h:panelGroup>
+
+        <!-- ============== LESSON BLOCK ============== -->
+        <h:panelGroup rendered="#{payC.lesson}" layout="block">
+            <ui:include src="include/include_summary_pro.xhtml"/>
+
+            <h:panelGroup rendered="#{payC.proFree}" layout="block"
+                          style="background:var(--golf-primary-light,#e8f5e9); border-left:4px solid var(--golf-primary,#2e7d32); padding:0.75rem 1rem; margin-bottom:1rem; border-radius:4px;">
+                <i class="pi pi-check-circle" style="color:var(--golf-primary,#2e7d32); margin-right:0.5rem;"/>
+                <strong>#{msg['lesson.pro.free']}</strong>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{empty payC.listLessons}" layout="block"
+                          style="text-align:center; padding:1.5rem; color:var(--text-color-secondary);">
+                <i class="pi pi-calendar" style="font-size:2rem; display:block; margin-bottom:0.5rem;"/>
+                #{msg['message.table.empty']}
+            </h:panelGroup>
+
+            <ui:repeat value="#{payC.listLessons}" var="c">
+                <div class="lesson-item-card">
+                    <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
+                        <p:outputLabel value="#{msg['lesson.startdate']}"/>
+                        <h:outputText value="#{c.eventStartDate}">
+                            <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                        <p:outputLabel value="#{msg['lesson.enddate']}"/>
+                        <h:outputText value="#{c.eventEndDate}">
+                            <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                        <p:outputLabel value="#{msg['lesson.title']}"/>
+                        <h:outputText value="#{c.eventTitle}"/>
+                        <p:outputLabel value="#{msg['lesson.proname']}"/>
+                        <h:outputText value="#{c.proName}"/>
+                        <p:outputLabel value="#{msg['lesson.studentname']}"/>
+                        <h:outputText value="#{c.studentName}"/>
+                        <p:outputLabel value="#{msg['lesson.amount']}"/>
+                        <h:outputText value="#{c.lessonAmount}"/>
+                    </p:panelGrid>
+                    <div class="btn-group" style="margin-top:0.5rem;">
+                        <p:commandButton icon="pi pi-trash"
+                                         value="#{msg['lesson.cancel']}"
+                                         styleClass="p-button-danger p-button-sm"
+                                         process="@this"
+                                         oncomplete="PF('deleteProductDialog').show()">
+                            <f:setPropertyActionListener value="#{c}" target="#{payC.selectedLesson}"/>
+                        </p:commandButton>
+                    </div>
+                </div>
+            </ui:repeat>
+        </h:panelGroup>
+
+        <!-- ============== COMMON BUTTONS ============== -->
+        <div class="btn-group" style="margin-top:1rem;">
+            <p:commandButton value="#{msg['button.confirm']}"
+                             id="commandButtonConfirmFree"
+                             rendered="#{payC.lesson and payC.proFree}"
+                             ajax="false"
+                             icon="pi pi-check"
+                             action="#{payC.confirmProFreeLesson()}"
+                             styleClass="p-button-success"/>
+            <p:commandButton value="#{msg['payment.selected']}"
+                             id="commandButtonPayment"
+                             rendered="#{not (payC.lesson and payC.proFree)}"
+                             ajax="false"
+                             icon="pi pi-credit-card"
+                             action="creditcard.xhtml?faces-redirect=true"
+                             styleClass="p-button-warning"/>
+            <p:commandButton value="#{msg['button.cancel']}"
+                             ajax="false"
+                             icon="pi pi-times"
+                             action="#{payC.cancelCart()}"
+                             styleClass="p-button-secondary"
+                             immediate="true"/>
+        </div>
+
+        <p:confirmDialog widgetVar="deleteProductDialog"
+                         showEffect="fade"
+                         width="300"
+                         message="#{msg['lesson.cancel']} ?"
+                         header="#{msg['button.confirm']}"
+                         severity="warn">
+            <p:commandButton value="#{msg['button.no']}"
+                             type="button"
+                             styleClass="ui-button-secondary"
+                             icon="pi pi-times"
+                             onclick="PF('deleteProductDialog').hide()"/>
+            <p:commandButton value="#{msg['button.yes']}"
+                             icon="pi pi-check"
+                             actionListener="#{payC.deleteLesson}"
+                             process="@this"
+                             update="form_cart"
+                             oncomplete="PF('deleteProductDialog').hide()"/>
+        </p:confirmDialog>
+
+        <ui:include src="include/include_confirmDialog.xhtml"/>
+    </h:form>
+</p:panel>
+</div>
+</ui:define>
+</ui:composition>

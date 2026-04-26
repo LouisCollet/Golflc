@@ -1,0 +1,46 @@
+package parking;
+import java.util.Arrays;
+
+// Lien entre le menu et les sélections d'un club
+// PARKED 2026-04-08 — remplacé par enumeration.SelectionPurpose (superset complet, 0 usages actifs)
+public enum ClubSelectionPurpose {
+    CREATE_TARIF_MEMBER("TarifMember", "selectTarifMember.xhtml", "??tarifMember.xhtml"),
+    CREATE_PLAYER("CreatePlayer", "selectPlayer.xhtml", "??player.xhtml"),
+    SHOW_PLAYER("ShowHandicap", "show_handicap_whs.xhtml", "??player.xhtml"),
+    SHOW_ROUND("ShowRound", "show_played_rounds.xhtml", "??player.xhtml"),
+    PAYMENT_COTISATION("PaymentCotisation", "selectClubDialog.xhtml", "??paymentCotisation.xhtml"),
+   // CREATE_COMPETITION("CreateCompetition", "selectCompetition.xhtml", "??competition.xhtml"),
+    LOCAL_ADMIN("LocalAdministrator", "local_administrator.xhtml", "??local_administrator_final.xhtml"),
+    CREATE_PRO("CreatePro", "professional.xhtml", "not used"),
+    COMPETITION_DESCRIPTION("Competition Description", "competition_create_description.xhtml", "not used"),
+
+    MENU_UNAVAILABLE("MenuUnavailable", "unavailable_menu.xhtml", "??unavailable_final.xhtml"),
+  //  CREATE_ROUND("CreateRound", "selectClubCourse.xhtml", "round.xhtml");  // OK 04-02-2026
+    CREATE_ROUND("CreateRound", "round.xhtml", "??round.xhtml"),  // OK 13-02-2026
+    UPDATE_CLUB("clubUpdate", "selectClubModify.xhtml", "??round.xhtml"),  // OK 14-02-2026
+    CREATE_CLUB("clubCreate", "club.xhtml", "??round.xhtml"),  // OK 14-02-2026
+    DELETE_CLUB("clubDelete", "selectClubDelete.xhtml", "??round.xhtml");  // OK 14-02-2026
+
+    private final String code;
+    private final String targetPage;
+    private final String finalPage;
+
+    ClubSelectionPurpose(String code, String targetPage, String finalPage) {
+        this.code = code;
+        this.targetPage = targetPage;
+        this.finalPage = finalPage;
+    }
+
+    public String getCode() { return code; }
+    public String getTargetPage() { return targetPage; }
+    public String getFinalPage() { return finalPage; }
+    public String navigationToFirst() { return targetPage + "?faces-redirect=true"; }
+    public String navigationToFinal() { return finalPage + "?faces-redirect=true"; }
+
+    public static ClubSelectionPurpose fromCode(String code) {
+        return Arrays.stream(values())
+                .filter(p -> p.code.equalsIgnoreCase(code))
+                .findFirst()
+                .orElse(CREATE_PLAYER);
+    }
+}

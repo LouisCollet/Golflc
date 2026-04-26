@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">#{msg['title.greenfee.tarif']} — Admin</ui:define>
+
+<ui:define name="content">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card" style="width:100%; max-width:1100px;">
+
+    <f:facet name="header">
+        <h2 style="margin:0;">
+            <i class="pi pi-list" style="margin-right:0.5rem;"/>
+            #{msg['title.greenfee.tarif']} — #{appContext.club.clubName}
+        </h2>
+    </f:facet>
+
+    <h:form id="formTarifAdmin">
+
+        <!-- ── LISTE DES TARIFS ────────────────────────────────────────── -->
+        <p:dataTable id="tarifTable"
+                     value="#{memC.tarifGreenfeeListForClub}"
+                     var="tg"
+                     styleClass="compact-table"
+                     emptyMessage="No tarif found for this club / year.">
+
+            <f:facet name="header">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>#{memC.tarifGreenfeeListForClub.size()} tarif(s)</span>
+                    <p:commandButton value="#{msg['tarif.wizard.new']}"
+                                     icon="pi pi-plus"
+                                     ajax="false"
+                                     action="tarif_greenfee_wizard.xhtml?faces-redirect=true"
+                                     styleClass="p-button-success p-button-sm"/>
+                </div>
+            </f:facet>
+
+            <p:column headerText="Year"  style="width:4rem; text-align:center;">
+                <h:outputText value="#{tg.tarifYear}"/>
+            </p:column>
+            <p:column headerText="Course">
+                <h:outputText value="#{memC.courseNameFor(tg.tarifCourseId)}"/>
+            </p:column>
+            <p:column headerText="T" style="width:3rem; text-align:center;">
+                <p:tag value="#{tg.tarifHoles}T"
+                       severity="#{tg.tarifHoles == 9 ? 'warning' : 'info'}"/>
+            </p:column>
+            <p:column headerText="Type" style="width:4rem; text-align:center;">
+                <p:tag value="#{tg.greenfeeType}" severity="success"/>
+            </p:column>
+            <p:column headerText="Periods" style="width:5rem; text-align:center;">
+                <p:badge value="#{tg.datesSeasonsList.size()}" severity="info"/>
+            </p:column>
+            <p:column headerText="Equipments" style="width:6rem; text-align:center;">
+                <p:badge value="#{tg.equipmentsList.size()}" severity="secondary"/>
+            </p:column>
+            <p:column headerText="Currency" style="width:5rem;">
+                <h:outputText value="#{tg.currency}"/>
+            </p:column>
+
+            <!-- Actions -->
+            <p:column style="width:9rem; text-align:center;">
+                <!-- Visualiser -->
+                <p:commandButton icon="pi pi-eye"
+                                 styleClass="p-button-info p-button-text p-button-sm"
+                                 title="#{msg['tarif.visualisation']}"
+                                 process="@this"
+                                 update="formTarifAdmin:vizAdminDialog"
+                                 oncomplete="PF('vizAdminDialog').show();"
+                                 action="#{memC.loadTarifForEdit(tg.tarifId)}"/>
+                <!-- + Période → wizard -->
+                <p:commandButton icon="pi pi-calendar-plus"
+                                 styleClass="p-button-success p-button-text p-button-sm"
+                                 title="#{msg['tarif.period.create']}"
+                                 ajax="false"
+                                 action="#{memC.loadTarifForWizard(tg.tarifId)}"/>
+            </p:column>
+        </p:dataTable>
+
+        <!-- ── DIALOG : VISUALISATION ─────────────────────────────────── -->
+        <p:dialog id="vizAdminDialog" widgetVar="vizAdminDialog"
+                  header="#{appContext.club.clubName} — #{memC.tarifGreenfeeCourseDisplay} — #{memC.tarifGreenfee.tarifHoles}T (#{memC.tarifGreenfee.greenfeeType})"
+                  modal="false" resizable="true" draggable="true"
+                  style="width:60vw; max-width:800px;">
+            <div style="overflow-y:auto; max-height:75vh;">
+                <ui:include src="include/include_tarif_greenfee_detail.xhtml">
+                    <ui:param name="tarif" value="#{memC.tarifGreenfee}"/>
+                </ui:include>
+            </div>
+            <f:facet name="footer">
+                <p:commandButton value="#{msg['button.close']}"
+                                 icon="pi pi-times"
+                                 onclick="PF('vizAdminDialog').hide(); return false;"
+                                 styleClass="p-button-secondary"/>
+            </f:facet>
+        </p:dialog>
+
+        <!-- Bouton retour -->
+        <div style="margin-top:1rem;">
+            <p:commandButton value="#{msg['button.back']}"
+                             icon="pi pi-arrow-left"
+                             immediate="true"
+                             ajax="false"
+                             action="tarif_members_menu.xhtml?faces-redirect=true"
+                             styleClass="p-button-secondary"/>
+        </div>
+
+    </h:form>
+</p:panel>
+</div>
+</ui:define>
+</ui:composition>

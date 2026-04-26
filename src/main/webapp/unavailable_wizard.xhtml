@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      xmlns:c="jakarta.tags.core"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{clubC.initUnavailableWizard()}" onPostback="false"/>
+    </f:metadata>
+</ui:define>
+
+<ui:define name="title">Unavailable Wizard</ui:define>
+<ui:define name="content">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+    <f:facet name="header"><h1>#{msg['title.unavailable.structure']}</h1></f:facet>
+<h:form id="unavailable_wizard" enctype="application/x-www-form-urlencoded">
+
+<ui:include src="include/include_summary_club.xhtml"/>
+
+<p:wizard id="wizardUnavailable"
+          widgetVar="unavailableWizard"
+          styleClass="tarif-wizard"
+          flowListener="#{clubC.onUnavailableWizardFlow}"
+          onnext="$('.ui-growl-item').remove(); $('.ui-messages').empty();"
+          onback="$('.ui-growl-item').remove(); $('.ui-messages').empty();">
+
+    <!-- =================== TAB 1: PERIOD (club + dates) =================== -->
+    <p:tab id="PeriodTab"
+           title="📅 Period (#{clubC.unavailable.structure.periodSaved ? 1 : 0})"
+           titletip="#{msg['title.unavailable.period']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.unavailable.period']}</h1>
+                <p:badge value="#{clubC.unavailable.structure.periodSaved ? 1 : 0}"
+                         severity="#{clubC.unavailable.structure.periodSaved ? 'success' : 'danger'}"/>
+            </f:facet>
+
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <p:outputLabel for="@next" value="#{msg['club.name']} :"/>
+                <p:selectOneMenu id="wizardClub"
+                                 value="#{clubC.unavailableWizardClubId}"
+                                 disabled="#{clubC.unavailable.structure.menuLaunched}"
+                                 filter="true"
+                                 filterMatchMode="contains">
+                    <f:selectItem itemLabel="-- #{msg['message.selectclub']} --"
+                                  itemValue="#{null}"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{clubC.clubsForUnavailableWizard}"
+                                   var="cl"
+                                   itemLabel="#{cl.clubName} (#{cl.idclub})"
+                                   itemValue="#{cl.idclub}"/>
+                    <f:validateBean disabled="true"/>
+                    <p:ajax event="change"
+                            update=":unavailable_wizard:wizardUnavailable"
+                            process="@this"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel for="@next" value="#{msg['course.name']} :"/>
+                <p:selectOneMenu id="wizardCourse"
+                                 value="#{clubC.unavailableWizardCourseId}"
+                                 disabled="#{clubC.unavailable.structure.menuLaunched}">
+                    <f:selectItem itemLabel="-- #{msg['message.selectcourse']} --" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItem itemLabel="#{msg['unavailable.structure.allcourses']}" itemValue="9999"/>
+                    <f:selectItems value="#{clubC.courseListForClub}"
+                                   var="c"
+                                   itemLabel="#{c.idcourse} - #{c.courseName}"
+                                   itemValue="#{c.idcourse}"/>
+                    <f:validateBean disabled="true"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel for="@next" value="#{msg['unavailable.period.start']} :"/>
+                <p:datePicker id="startDate"
+                              value="#{clubC.unavailable.period.startDate}"
+                              locale="#{languageC.locale}"
+                              pattern="dd/MM/yyyy HH:mm"
+                              showTime="true"
+                              showIcon="true"
+                              readonlyInput="false"
+                              showButtonBar="true"
+                              mindate="#{utilsC.localDateYear(0)}"
+                              maxdate="#{utilsC.localDateYear(1)}"
+                              yearNavigator="true"
+                              monthNavigator="true">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+
+                <p:outputLabel for="@next" value="#{msg['unavailable.period.end']} :"/>
+                <p:datePicker id="endDate"
+                              value="#{clubC.unavailable.period.endDate}"
+                              locale="#{languageC.locale}"
+                              pattern="dd/MM/yyyy HH:mm"
+                              showTime="true"
+                              showIcon="true"
+                              readonlyInput="false"
+                              showButtonBar="true"
+                              mindate="#{utilsC.localDateYear(0)}"
+                              maxdate="#{utilsC.localDateYear(1)}"
+                              yearNavigator="true"
+                              monthNavigator="true">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+
+            </p:panelGrid>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['unavailable.period.create']}"
+                                     id="btnSavePeriodDirect"
+                                     icon="pi pi-database"
+                                     action="#{clubC.createUnavailablePeriod()}"
+                                     process="@this wizardClub wizardCourse startDate endDate"
+                                     update="unavailable_wizard growl-msg"
+                                     styleClass="p-button-success"/>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+    <!-- =================== TAB 2: AVAILABILITY (type + label) =================== -->
+    <p:tab id="AvailabilityTab"
+           title="⚠️ Availability (#{not empty clubC.unavailable.period.unavailabilityType ? 1 : 0})"
+           titletip="#{msg['unavailable.title']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['unavailable.title']}</h1>
+                <p:badge value="#{not empty clubC.unavailable.period.unavailabilityType ? 1 : 0}"
+                         severity="#{not empty clubC.unavailable.period.unavailabilityType ? 'success' : 'danger'}"/>
+            </f:facet>
+
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <p:outputLabel for="@next" value="#{msg['unavailable.type.label']} :"/>
+                <p:selectOneMenu id="unavailabilityType"
+                                 value="#{clubC.unavailable.period.unavailabilityType}"
+                                 editable="true"
+                                 placeholder="#{msg['unavailable.type.placeholder']}">
+                    <f:selectItem itemLabel="-- #{msg['message.select']} --"
+                                  itemValue="#{null}"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{clubC.unavailabilityTypeKeys}"
+                                   var="typeKey"
+                                   itemLabel="#{msg[typeKey]}"
+                                   itemValue="#{msg[typeKey]}"/>
+                    <f:validateBean disabled="true"/>
+                </p:selectOneMenu>
+
+                <p:outputLabel for="@next" value="#{msg['unavailable.type.detail']} :"/>
+                <p:inputText id="unavailabilityLabel"
+                             value="#{clubC.unavailable.period.unavailabilityLabel}"
+                             placeholder="#{msg['unavailable.type.detail.placeholder']}"
+                             styleClass="w-full">
+                    <f:validateBean disabled="true"/>
+                </p:inputText>
+
+            </p:panelGrid>
+
+            <p:message for="unavailabilityType" styleClass="mt-1"/>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['unavailable.availability.create']}"
+                                     id="btnSaveAvailability"
+                                     icon="pi pi-database"
+                                     action="#{clubC.updateUnavailablePeriodAvailability()}"
+                                     process="@this unavailabilityType unavailabilityLabel"
+                                     update="unavailable_wizard growl-msg"
+                                     styleClass="p-button-success"
+                                     rendered="#{clubC.unavailable.structure.periodSaved}"/>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+    <!-- =================== TAB 3: STRUCTURE =================== -->
+    <p:tab id="StructureTab"
+           title="📋 Structure (#{clubC.unavailable.structure.structureList.size()})"
+           titletip="#{msg['title.unavailable.structure']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.unavailable.structure']}</h1>
+                <p:badge value="#{clubC.unavailable.structure.structureList.size()}" severity="info"/>
+            </f:facet>
+
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <h:panelGroup layout="block">
+                    <p:outputLabel value="#{msg['course.id']}"/>
+                    <i class="pi pi-list"/>
+                </h:panelGroup>
+                <p:selectOneMenu id="workCourseId"
+                                 value="#{clubC.unavailable.structure.workCourseId}">
+                    <f:selectItem itemLabel="-- Select --" itemValue=" "/>
+                    <f:selectItem itemLabel="#{msg['unavailable.structure.allcourses']}" itemValue="9999"/>
+                    <f:selectItems value="#{clubC.courseListForClub}"
+                                   var="c"
+                                   itemLabel="#{c.idcourse} - #{c.courseName}"
+                                   itemValue="#{c.idcourse}"/>
+                    <f:validateBean disabled="true"/>
+                </p:selectOneMenu>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['unavailable.structure.cause']}"/>
+                    <i class="pi pi-pencil"/>
+                </h:panelGroup>
+                <p:inputText id="workItem"
+                             size="25"
+                             title="#{msg['tooltip.tarif.item']}"
+                             value="#{clubC.unavailable.structure.workItem}"
+                             placeholder="Cause...">
+                    <f:validateBean disabled="true"/>
+                </p:inputText>
+            </p:panelGrid>
+
+            <p:commandButton value="#{msg['unavailable.structure.add']}"
+                             id="btnAddStructure"
+                             icon="pi pi-plus"
+                             action="#{clubC.inputUnvailableStructure()}"
+                             update="unavailable_wizard:wizardUnavailable"
+                             styleClass="p-button-outlined mt-2"/>
+
+            <p:dataTable id="structureTable"
+                         value="#{clubC.unavailable.structure.structureList}"
+                         var="s"
+                         rendered="#{not empty clubC.unavailable.structure.structureList}"
+                         editable="true" editMode="row"
+                         styleClass="compact-table mt-2">
+                <p:ajax event="rowEdit"       update="unavailable_wizard:wizardUnavailable"/>
+                <p:ajax event="rowEditCancel" update="structureTable"/>
+                <p:column headerText="#{msg['course.id']}" style="width:30%">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{s.courseId}"/></f:facet>
+                        <f:facet name="input">
+                            <p:selectOneMenu value="#{s.courseId}" style="width:100%">
+                                <f:selectItem itemLabel="#{msg['unavailable.structure.allcourses']}" itemValue="9999"/>
+                                <f:selectItems value="#{clubC.courseListForClub}"
+                                               var="c"
+                                               itemLabel="#{c.idcourse} - #{c.courseName}"
+                                               itemValue="#{c.idcourse}"/>
+                                <f:validateBean disabled="true"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="#{msg['unavailable.structure.cause']}">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{s.item}"/></f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{s.item}" size="25" placeholder="Cause...">
+                                <f:validateBean disabled="true"/>
+                            </p:inputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column style="width:8%"><p:rowEditor/></p:column>
+                <p:column style="width:6%">
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{clubC.removeStructureItem(s)}"
+                                     update="unavailable_wizard:wizardUnavailable"
+                                     process="@this"
+                                     title="#{msg['button.delete']}"/>
+                </p:column>
+            </p:dataTable>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['unavailable.structure.create']}"
+                                     id="btnSaveStructure"
+                                     icon="pi pi-database"
+                                     rendered="#{clubC.unavailable.structure.itemExists}"
+                                     action="#{clubC.modifyClubUnavailableStructure('modify')}"
+                                     update="unavailable_wizard:wizardUnavailable"
+                                     styleClass="p-button-success"/>
+                    <p:commandLink id="btnDeleteStructure"
+                                   styleClass="p-button p-button-danger p-button-outlined"
+                                   rendered="#{clubC.unavailable.structure.structureExists}"
+                                   action="#{clubC.modifyClubUnavailableStructure('delete')}"
+                                   update="unavailable_wizard:wizardUnavailable growl-msg">
+                        <i class="pi pi-trash"/> #{msg['button.delete']}
+                        <p:confirm type="popup"
+                                   header="#{msg['message.confirm.delete']}"
+                                   message="#{msg['title.unavailable.structure']} — #{appContext.club.clubName} ?"
+                                   icon="pi pi-exclamation-triangle"/>
+                    </p:commandLink>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+    <!-- =================== TAB 4: COMMENT (EDITOR) =================== -->
+    <p:tab id="EditorTab"
+           title="💬 Comment"
+           titletip="#{msg['title.cotisation.comment']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.cotisation.comment']}</h1>
+            </f:facet>
+
+            <p:textEditor id="textEditor"
+                          widgetVar="editorVar"
+                          value="#{clubC.unavailable.period.comment}"
+                          height="70px"
+                          styleClass="w-full"
+                          placeholder="Enter here your content"/>
+
+            <p:dialog id="dialogComment"
+                      width="auto"
+                      height="auto"
+                      header="#{msg['title.cotisation.comment']}"
+                      widgetVar="dlgComment"
+                      showEffect="fade"
+                      hideEffect="fade">
+                <p:outputPanel id="displayComment">
+                    <h3>#{msg['tarif.members.add.comment']}</h3>
+                    <h:outputText value="#{clubC.unavailable.period.comment}" escape="false"/>
+                </p:outputPanel>
+            </p:dialog>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton id="btnSaveComment"
+                                     value="#{msg['tarif.members.add.comment']}"
+                                     process="@this textEditor"
+                                     update="displayComment"
+                                     oncomplete="PF('dlgComment').show()"
+                                     icon="pi pi-database"
+                                     styleClass="p-button-outlined"/>
+                    <p:commandButton value="Clear"
+                                     type="button"
+                                     onclick="PF('editorVar').clear();"
+                                     icon="pi pi-times"
+                                     styleClass="p-button-outlined"/>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+    <!-- =================== TAB 5: CONFIRM =================== -->
+    <p:tab id="ConfirmTab"
+           title="✅ Confirm"
+           titletip="#{msg['title.unavailable.show']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel tarif-step-panel-wide">
+            <f:facet name="header">
+                <h:outputText value="#{appContext.club.clubName} — #{msg['title.unavailable.show']}"/>
+            </f:facet>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+                <p:tag value="Structure : #{clubC.unavailable.structure.structureList.size()}"
+                       icon="pi pi-list" severity="info"/>
+                <p:tag value="#{msg['unavailable.period.start']} : #{clubC.unavailable.period.startDate}"
+                       icon="pi pi-calendar" severity="success"
+                       rendered="#{clubC.unavailable.period != null and clubC.unavailable.period.startDate != null}"/>
+                <p:tag value="#{msg['unavailable.period.end']} : #{clubC.unavailable.period.endDate}"
+                       icon="pi pi-calendar-times" severity="warn"
+                       rendered="#{clubC.unavailable.period != null and clubC.unavailable.period.endDate != null}"/>
+            </div>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['unavailable.structure.create']}"
+                                     id="btnSaveStructureConfirm"
+                                     icon="pi pi-database"
+                                     action="#{clubC.saveFullUnavailability()}"
+                                     process="@this"
+                                     update="unavailable_wizard:wizardUnavailable growl-msg"
+                                     styleClass="p-button-success"/>
+                    <p:commandLink id="btnDeleteStructureConfirm"
+                                   styleClass="p-button p-button-danger p-button-outlined"
+                                   rendered="#{clubC.unavailable.structure.structureExists}"
+                                   action="#{clubC.modifyClubUnavailableStructure('delete')}"
+                                   update="unavailable_wizard:wizardUnavailable growl-msg">
+                        <i class="pi pi-trash"/> #{msg['button.delete']}
+                        <p:confirm type="popup"
+                                   header="#{msg['message.confirm.delete']}"
+                                   message="#{msg['title.unavailable.structure']} — #{appContext.club.clubName} ?"
+                                   icon="pi pi-exclamation-triangle"/>
+                    </p:commandLink>
+                    <p:commandButton value="#{msg['tarif.visualisation']}"
+                                     icon="pi pi-eye"
+                                     process="@this"
+                                     action="#{clubC.resetUnavailableDB()}"
+                                     update="vizUnavailableDialog"
+                                     oncomplete="PF('vizUnavailableDialog').show();"
+                                     styleClass="p-button-info p-button-outlined"/>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+</p:wizard>
+
+<!-- =================== DIALOG : VISUALISATION =================== -->
+<p:dialog id="vizUnavailableDialog" widgetVar="vizUnavailableDialog"
+          header="#{appContext.club.clubName} — #{msg['title.unavailable.show']}"
+          modal="false" resizable="true" draggable="true"
+          style="width:90vw; max-width:1400px;">
+
+    <div style="overflow-y:auto; max-height:75vh;">
+    <div style="display:flex; gap:1.5rem; align-items:flex-start;">
+
+        <!-- GAUCHE : EN CONSTRUCTION -->
+        <div style="flex:1; background:var(--surface-ground,#f4f4f4); border:2px solid var(--primary-color,#4CAF50); border-radius:8px; padding:1rem; overflow-y:auto; max-height:65vh;">
+            <h3 style="margin-top:0; color:var(--primary-color,#4CAF50);">In construction</h3>
+            <p:panelGrid columns="2" layout="flex" columnClasses="col1Flex, col2Flex">
+                <h:outputText value="#{msg['unavailable.period.start']} :"/>
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{clubC.unavailable.period.startDate}"
+                                  rendered="#{clubC.unavailable.period != null and clubC.unavailable.period.startDate != null}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="—" rendered="#{clubC.unavailable.period == null or clubC.unavailable.period.startDate == null}"/>
+                </h:panelGroup>
+                <h:outputText value="#{msg['unavailable.period.end']} :"/>
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{clubC.unavailable.period.endDate}"
+                                  rendered="#{clubC.unavailable.period != null and clubC.unavailable.period.endDate != null}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="—" rendered="#{clubC.unavailable.period == null or clubC.unavailable.period.endDate == null}"/>
+                </h:panelGroup>
+                <h:outputText value="#{msg['unavailable.type.label']} :"/>
+                <h:outputText value="#{not empty clubC.unavailable.period.unavailabilityType ? clubC.unavailable.period.unavailabilityType : '—'}"/>
+                <h:outputText value="#{msg['unavailable.type.detail']} :"/>
+                <h:outputText value="#{not empty clubC.unavailable.period.unavailabilityLabel ? clubC.unavailable.period.unavailabilityLabel : '—'}"/>
+                <h:outputText value="Comment :"/>
+                <h:outputText value="#{clubC.unavailable.period != null ? clubC.unavailable.period.comment : '—'}" escape="false"/>
+            </p:panelGrid>
+            <p:dataTable value="#{clubC.unavailable.structure.structureList}"
+                         var="s" rowIndexVar="row"
+                         rendered="#{not empty clubC.unavailable.structure.structureList}"
+                         styleClass="compact-table mt-2">
+                <p:column headerText="#{msg['course.id']}" style="width:20%">
+                    <h:outputText value="#{s.courseId}"/>
+                </p:column>
+                <p:column headerText="#{msg['unavailable.structure.cause']}">
+                    <h:outputText value="#{s.item}"/>
+                </p:column>
+                <p:column headerText="#{msg['unavailable.title']}" style="width:20%">
+                    <h:outputText value="#{clubC.unavailable.period.itemPeriod[row]}" rendered="#{clubC.unavailable.period != null}"/>
+                </p:column>
+            </p:dataTable>
+        </div>
+
+        <!-- DROITE : EN BASE DE DONNÉES -->
+        <div style="flex:1; background:var(--surface-ground,#f4f4f4); border:2px solid var(--blue-500,#2196F3); border-radius:8px; padding:1rem; overflow-y:auto; max-height:65vh;">
+            <h3 style="margin-top:0; color:var(--blue-500,#2196F3);">In database (today)</h3>
+            <p:panelGrid columns="2" layout="flex" columnClasses="col1Flex, col2Flex">
+                <h:outputText value="#{msg['unavailable.period.start']} :"/>
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{clubC.unavailableDB.period.startDate}"
+                                  rendered="#{clubC.unavailableDB.period != null and clubC.unavailableDB.period.startDate != null}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="—" rendered="#{clubC.unavailableDB.period == null or clubC.unavailableDB.period.startDate == null}"/>
+                </h:panelGroup>
+                <h:outputText value="#{msg['unavailable.period.end']} :"/>
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{clubC.unavailableDB.period.endDate}"
+                                  rendered="#{clubC.unavailableDB.period != null and clubC.unavailableDB.period.endDate != null}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="—" rendered="#{clubC.unavailableDB.period == null or clubC.unavailableDB.period.endDate == null}"/>
+                </h:panelGroup>
+                <h:outputText value="#{msg['unavailable.type.label']} :"/>
+                <h:outputText value="#{not empty clubC.unavailableDB.period.unavailabilityType ? clubC.unavailableDB.period.unavailabilityType : '—'}"/>
+                <h:outputText value="#{msg['unavailable.type.detail']} :"/>
+                <h:outputText value="#{not empty clubC.unavailableDB.period.unavailabilityLabel ? clubC.unavailableDB.period.unavailabilityLabel : '—'}"/>
+                <h:outputText value="Comment :"/>
+                <h:outputText value="#{clubC.unavailableDB.period != null ? clubC.unavailableDB.period.comment : '—'}" escape="false"/>
+            </p:panelGrid>
+            <p:dataTable value="#{clubC.unavailableDB.structure.structureList}"
+                         var="sdb" rowIndexVar="rowdb"
+                         rendered="#{not empty clubC.unavailableDB.structure.structureList}"
+                         styleClass="compact-table mt-2">
+                <p:column headerText="#{msg['course.id']}" style="width:20%">
+                    <h:outputText value="#{sdb.courseId}"/>
+                </p:column>
+                <p:column headerText="#{msg['unavailable.structure.cause']}">
+                    <h:outputText value="#{sdb.item}"/>
+                </p:column>
+                <p:column headerText="#{msg['unavailable.title']}" style="width:20%">
+                    <h:outputText value="#{clubC.unavailableDB.period.itemPeriod[rowdb]}" rendered="#{clubC.unavailableDB.period != null}"/>
+                </p:column>
+            </p:dataTable>
+        </div>
+
+    </div>
+    </div>
+
+    <f:facet name="footer">
+        <p:commandButton value="#{msg['button.close']}"
+                         icon="pi pi-times"
+                         onclick="PF('vizUnavailableDialog').hide(); return false;"
+                         styleClass="p-button-secondary"/>
+    </f:facet>
+</p:dialog>
+
+<ui:include src="include/include_confirmDialog.xhtml"/>
+</h:form>
+</p:panel>
+</div>
+</ui:define>
+</ui:composition>

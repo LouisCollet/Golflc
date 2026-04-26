@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TAB 4 : Twilight — heure de début, saison, mois -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces">
+
+    <p:tab id="TwilightTab"
+           title="🌅 Twilight (#{memC.tarifGreenfee.twilightList.size()})"
+           titletip="Define twilight pricing">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.hours.tarif']}</h1>
+                <span> — Twilight</span>
+                <p:badge value="#{memC.tarifGreenfee.twilightList.size()}" severity="info"/>
+            </f:facet>
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex">
+
+                <h:outputText value="#{msg['tarif.hours.start']} :"/>
+                <p:datePicker id="twilightStart"
+                              value="#{memC.tarifGreenfee.startHour}"
+                              timeOnly="true" pattern="HH:mm"
+                              label="Tarif twilight : startHour"
+                              lang="#{languageC.locale}" locale="#{languageC.locale}"
+                              showIcon="true" size="6" required="false"
+                              mindate="#{utilsC.localTime(12,30)}"
+                              maxdate="#{utilsC.localTime(20,45)}">
+                    <f:validateBean disabled="true"/>
+                </p:datePicker>
+
+                <h:panelGroup layout="block">
+                    <h:outputText value="#{msg['tarif.season']} "/>
+                    <i class="pi pi-cloud"/>
+                    <i class="pi pi-sun"/>
+                    #{memC.tarifGreenfee.twilightList.size()}
+                </h:panelGroup>
+                <p:selectOneMenu id="seasonTwilight"
+                                 value="#{memC.tarifGreenfee.workSeasonTwilight}">
+                    <f:selectItem itemLabel="#{msg['tarif.all']}" itemValue="A"/>
+                    <f:selectItems value="#{memC.tarifGreenfee.datesSeasonsList}"
+                                   var="ds" itemLabel="#{ds.season}" itemValue="#{ds.season}"/>
+                    <f:validateBean disabled="true"/>
+                </p:selectOneMenu>
+
+                <h:outputText value="#{msg['tarif.twilight.months']}"/>
+                <p:datePicker id="twilightMonths"
+                              selectionMode="multiple"
+                              value="#{memC.tarifGreenfee.multiTwilight}"
+                              readonlyInput="true"
+                              view="month" pattern="MM/d/yyyy"
+                              showIcon="true" yearNavigator="false"
+                              size="30" required="false"
+                              locale="#{languageC.locale}" lang="#{languageC.locale}"
+                              yearRange="#{utilsC.dateYear(0)}:#{utilsC.dateYear(0)}">
+                    <f:validateBean disabled="true"/>
+                    <f:convertDateTime pattern="MM/d/yyyy" type="localDate"/>
+                </p:datePicker>
+            </p:panelGrid>
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['tarif.twilight.create']}"
+                                     id="btnAddTwilight" icon="pi pi-plus"
+                                     action="#{memC.inputTarifGreenfeeWizard('TW')}"
+                                     update="tarif_greenfee_wizard"
+                                     styleClass="p-button-outlined"/>
+                    <p:commandButton value="#{msg['tarif.visualisation']}"
+                                     icon="pi pi-eye"
+                                     process="@none"
+                                     update="vizDialog"
+                                     oncomplete="PF('vizDialog').show();"
+                                     styleClass="p-button-info p-button-outlined"/>
+                </div>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</ui:composition>

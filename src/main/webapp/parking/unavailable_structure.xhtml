@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+    <ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{clubC.findCourseListForClub()}"/>
+    </f:metadata>
+</ui:define>
+
+<ui:define name="title">Unavailabilities structure registration</ui:define>
+<ui:define name="content">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card">
+<f:facet name="header"><h1>#{msg['title.unavailable.structure']}</h1></f:facet>
+<h:form id="form_unavailable">
+
+<ui:include src="include/include_summary_club.xhtml"/>
+<p:panelGrid
+    id="panel1"
+    layout="flex"
+    columns="2"
+    columnClasses="col1Flex, col2Flex">
+
+     <h:panelGroup id="panelGroupPrice" layout="block" >
+         <p:outputLabel value="#{msg['course.id']}"/>
+         <i class="pi pi-cog"></i>
+         <i class="pi pi-list"></i>
+         #{clubC.unavailable.structure.structureList.size()}
+     </h:panelGroup>
+
+     <p:selectOneMenu id="workCourseId"
+                      value="#{clubC.unavailable.structure.workCourseId}" >
+         <f:selectItem itemLabel="Select One"  itemValue=""/>
+         <f:selectItem itemLabel="#{msg['unavailable.structure.allcourses']}" itemValue="9999"/>
+         <f:selectItems value="#{clubC.courseListForClub}"
+                        var="c"
+                        itemLabel="#{c.idcourse}-#{c.courseName}"
+                        itemValue="#{c.idcourse}"/>
+     </p:selectOneMenu>
+
+     <h:outputText value="#{msg['unavailable.structure.cause']}" />
+     <p:inputText     id="CauseUnavailable"
+                      size="25"
+                      title="#{msg['tooltip.tarif.item']}"
+                      value="#{clubC.unavailable.structure.workItem}"   />
+
+<f:facet name="footer">
+          <div class="btn-group">
+            <p:commandButton value="#{msg['unavailable.structure.add']}"
+                         id="commandButtonAdd"
+                         ajax="false"
+                         update="growl-msg"
+                         icon="pi pi-plus"
+                         action="#{clubC.inputUnvailableStructure()}"/>
+            <p:commandButton value="Visualisation"
+                         id="commandButtonVisual"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-plus"
+                         action="#{clubC.showUnavailableStructure}"/>
+            <p:commandButton value="#{msg['unavailable.structure.create']}"
+                         id="commandButtonCreate"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-database"
+                         rendered="#{clubC.unavailable.structure.itemExists eq true}"
+                         action="#{clubC.modifyClubUnavailableStructure('modify')}"/>
+            <p:commandButton value="#{msg['tarif.back']}"
+                         id="commandButtonback"
+                         ajax="false"
+                         update="growl-msg"
+                         immediate="true"
+                         icon="pi pi-undo"
+                         action="unavailable_menu.xhtml?faces-redirect=true" />
+          </div>
+</f:facet>
+</p:panelGrid>
+</h:form>
+</p:panel>
+</div>
+</ui:define>
+</ui:composition>

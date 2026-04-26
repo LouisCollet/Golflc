@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    include_tarif_greenfee_detail.xhtml
+    Paramètre : tarif (TarifGreenfee) — peut être null
+    Affiche les listes complètes d'un TarifGreenfee : holes, periods, equipments, basic, hours, days, twilight.
+    Utilisé dans : tarif_greenfee_wizard.xhtml (dialog vizDialog), greenfee_simulation.xhtml (dialog simVizDialog)
+-->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces"
+                xmlns:f="jakarta.faces.core">
+
+    <h:panelGroup rendered="#{tarif == null}" layout="block">
+        <p:tag value="No data" severity="warning" icon="pi pi-exclamation-triangle"/>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{tarif != null}" layout="block">
+
+        <p:tag value="#{tarif.tarifHoles}T" icon="pi pi-circle" severity="info" style="margin-bottom:0.75rem;"/>
+
+        <p:dataTable value="#{tarif.datesSeasonsList}" var="per"
+                     rendered="#{not empty tarif.datesSeasonsList}"
+                     styleClass="compact-table" style="margin-bottom:0.5rem;">
+            <f:facet name="header">Periods (#{tarif.datesSeasonsList.size()})</f:facet>
+            <p:column headerText="Season"><h:outputText value="#{per.season}"/></p:column>
+            <p:column headerText="Start">
+                <h:outputText value="#{per.startDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                </h:outputText>
+            </p:column>
+            <p:column headerText="End">
+                <h:outputText value="#{per.endDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                </h:outputText>
+            </p:column>
+        </p:dataTable>
+
+        <p:dataTable value="#{memC.buildEquipmentDisplayRows(tarif)}" var="eqRow"
+                     rendered="#{not empty tarif.equipmentsList}"
+                     styleClass="compact-table" style="margin-bottom:0.5rem;">
+            <f:facet name="header">Equipments (#{tarif.equipmentsList.size()})</f:facet>
+
+            <!-- Level 1 : Period header — shown when season changes -->
+            <p:headerRow field="season">
+                <p:column colspan="2"
+                          style="background:var(--primary-100,#c8e6c9); padding:0.3rem 0.5rem; font-weight:bold;">
+                    <i class="pi pi-calendar" style="margin-right:0.4rem;"/>
+                    <h:outputText value="#{eqRow.season}"/>
+                </p:column>
+            </p:headerRow>
+
+            <!-- Level 2 : Slot header — shown when slotLabel changes (empty string = no header for non-HO) -->
+            <p:headerRow field="slotLabel">
+                <p:column colspan="2"
+                          style="background:var(--surface-100,#f4f4f4); padding:0.25rem 0.5rem 0.25rem 1.5rem;">
+                    <i class="pi pi-clock" style="margin-right:0.4rem; color:var(--primary-color,#4CAF50);"/>
+                    <h:outputText value="#{eqRow.slotLabel}"/>
+                </p:column>
+            </p:headerRow>
+
+            <!-- Level 3 : Equipment data row -->
+            <p:column headerText="Item" style="padding-left:2.5rem;">
+                <h:outputText value="#{eqRow.item}"/>
+            </p:column>
+            <p:column headerText="Price" style="font-weight:bold; width:6rem;">
+                <h:outputText value="#{eqRow.price}"/>
+            </p:column>
+        </p:dataTable>
+
+        <p:dataTable value="#{tarif.basicList}" var="ba"
+                     rendered="#{not empty tarif.basicList}"
+                     styleClass="compact-table" style="margin-bottom:0.5rem;">
+            <f:facet name="header">Basic (#{tarif.basicList.size()})</f:facet>
+            <p:column headerText="Season"><h:outputText value="#{ba.season}"/></p:column>
+            <p:column headerText="Item"><h:outputText value="#{ba.item}"/></p:column>
+            <p:column headerText="Price" style="font-weight:bold;"><h:outputText value="#{ba.price}"/></p:column>
+        </p:dataTable>
+
+        <p:dataTable value="#{tarif.teeTimesList}" var="tt"
+                     rendered="#{not empty tarif.teeTimesList}"
+                     styleClass="compact-table" style="margin-bottom:0.5rem;">
+            <f:facet name="header">Hours (#{tarif.teeTimesList.size()})</f:facet>
+            <p:column headerText="Season"><h:outputText value="#{tt.season}"/></p:column>
+            <p:column headerText="Item"><h:outputText value="#{tt.item}"/></p:column>
+            <p:column headerText="Start"><h:outputText value="#{tt.startTime}"/></p:column>
+            <p:column headerText="End"><h:outputText value="#{tt.endTime}"/></p:column>
+            <p:column headerText="Price" style="font-weight:bold;"><h:outputText value="#{tt.price}"/></p:column>
+            <p:column headerText="Twilight"><h:outputText value="#{tt.twilight}"/></p:column>
+        </p:dataTable>
+
+        <p:dataTable value="#{tarif.daysList}" var="da"
+                     rendered="#{not empty tarif.daysList}"
+                     styleClass="compact-table" style="margin-bottom:0.5rem;">
+            <f:facet name="header">Days (#{tarif.daysList.size()})</f:facet>
+            <p:column headerText="Season"><h:outputText value="#{da.season}"/></p:column>
+            <p:column headerText="Category"><h:outputText value="#{da.category}"/></p:column>
+            <p:column headerText="Mon" style="font-weight:bold;"><h:outputText value="#{da.price[0]}"/></p:column>
+            <p:column headerText="Week" style="font-weight:bold;"><h:outputText value="#{da.price[1]}"/></p:column>
+            <p:column headerText="Fri" style="font-weight:bold;"><h:outputText value="#{da.price[2]}"/></p:column>
+            <p:column headerText="Wknd" style="font-weight:bold;"><h:outputText value="#{da.price[3]}"/></p:column>
+            <p:column headerText="Hol" style="font-weight:bold;"><h:outputText value="#{da.price[4]}"/></p:column>
+            <p:column headerText="Twilight"><h:outputText value="#{da.twilight}"/></p:column>
+        </p:dataTable>
+
+        <p:dataTable value="#{tarif.twilightList}" var="tw"
+                     rendered="#{not empty tarif.twilightList}"
+                     styleClass="compact-table">
+            <f:facet name="header">Twilight (#{tarif.twilightList.size()})</f:facet>
+            <p:column headerText="Season"><h:outputText value="#{tw.season}"/></p:column>
+            <p:column headerText="Start"><h:outputText value="#{tw.startTime}"/></p:column>
+            <p:column headerText="Months"><h:outputText value="#{tw.months}"/></p:column>
+            <p:column rendered="#{showDelete}" style="width:60px">
+                <p:commandButton icon="pi pi-trash"
+                                 styleClass="p-button-danger p-button-text p-button-sm"
+                                 action="#{memC.removeTwilightItem(tw)}"
+                                 update="tarif_greenfee_wizard"
+                                 process="@this"/>
+            </p:column>
+        </p:dataTable>
+
+    </h:panelGroup>
+
+</ui:composition>

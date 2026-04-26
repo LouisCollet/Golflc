@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">Audit Connections</ui:define>
+<ui:define name="content">
+
+<h:form id="form_audit">
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel styleClass="login-card form-card" style="max-width:100%;">
+        <f:facet name="header">
+            <h1>Connection History (last 30 days)</h1>
+        </f:facet>
+
+        <!-- Spinner affiché pendant le chargement AJAX deferred -->
+        <div id="auditLoadingSpinner" style="text-align:center; padding:3rem 0;">
+            <i class="pi pi-spin pi-spinner" style="font-size:3rem; color:var(--primary-color);"/>
+            <p style="margin-top:1rem; color:var(--text-color-secondary);">
+                Loading connection history...
+            </p>
+        </div>
+
+        <!-- Contenu chargé en AJAX après affichage de la page -->
+        <p:outputPanel id="auditPanel" deferred="true" deferredMode="load">
+
+        <p:dataTable id="auditTable"
+                     var="a"
+                     value="#{techC.listAuditConnections()}"
+                     emptyMessage="No connections found"
+                     sortBy="#{a.playerName}"
+                     rows="50"
+                     paginator="true"
+                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords}"
+                     rowsPerPageTemplate="20,50,100"
+                     rowHover="true"
+                     styleClass="compact-table">
+
+            <p:headerRow field="playerName"
+                         expandable="true"
+                         expanded="true">
+                <p:column colspan="3">
+                    <h:outputText value="#{a.playerName}"
+                                  style="font-weight:600;"/>
+                    <h:outputText value=" (#{a.auditPlayerId})"
+                                  styleClass="selector-id"
+                                  style="font-size:0.85rem;"/>
+                </p:column>
+            </p:headerRow>
+
+            <p:column headerText="Login" width="35%">
+                <h:outputText value="#{a.auditStartDate}"
+                              rendered="#{a.auditStartDate != null}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                </h:outputText>
+            </p:column>
+
+            <p:column headerText="Logout" width="35%">
+                <h:outputText value="#{a.auditEndDate}"
+                              rendered="#{a.auditEndDate != null}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                </h:outputText>
+                <p:tag value="online" severity="success"
+                       rendered="#{a.auditEndDate == null}"/>
+            </p:column>
+
+            <p:column headerText="Duration" width="30%">
+                <h:outputText value="#{a.durationFormatted}"
+                              styleClass="#{a.auditEndDate == null ? 'score-col-hole' : ''}"/>
+            </p:column>
+
+            <f:facet name="footer">
+                <p:commandButton icon="pi pi-file-excel"
+                                 value="Export Excel">
+                    <p:dataExporter type="xlsx"
+                                   target="auditTable"
+                                   fileName="Audit_Connections"/>
+                </p:commandButton>
+            </f:facet>
+        </p:dataTable>
+
+        <!-- Script à l'intérieur du panel différé : s'exécute exactement quand PrimeFaces
+             injecte le contenu AJAX dans le DOM, quelle que soit l'ordre des autres appels AJAX
+             (idle monitor, paginator, etc.). Plus fiable que $(document).one('pfAjaxComplete'). -->
+        <script type="text/javascript">
+            document.getElementById('auditLoadingSpinner').style.display = 'none';
+        </script>
+
+        </p:outputPanel>
+
+    </p:panel>
+    </div>
+
+</h:form>
+
+</ui:define>
+</ui:composition>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="title">#{msg['menu.local.admin.pros']}</ui:define>
+<ui:define name="content">
+
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+<f:facet name="header">
+    <h1>#{msg['menu.local.admin.pros']}</h1>
+</f:facet>
+
+<h:form id="form_local_admin_pros">
+    <ui:include src="/include/include_summary_player.xhtml"/>
+
+    <p:dataTable id="tablePros"
+                 var="c"
+                 widgetVar="prosTable"
+                 value="#{clubC.listProfessionalsForLocalAdmin()}"
+                 emptyMessage="#{msg['message.table.empty']}"
+                 sortBy="#{c.club.clubName}"
+                 rowHover="true"
+                 styleClass="compact-table">
+
+        <p:column headerText="#{msg['club.name']}"
+                  sortBy="#{c.club.clubName}"
+                  width="20%">
+            <h:outputText value="#{c.club.clubName}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['professional.name']}"
+                  sortBy="#{c.player.playerLastName}"
+                  width="18%">
+            <h:outputText value="#{c.player.playerLastName}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['professional.firstname']}" width="15%">
+            <h:outputText value="#{c.player.playerFirstName}"/>
+        </p:column>
+
+        <p:column headerText="#{msg['start.date']}" width="12%">
+            <h:outputText value="#{c.professional.proStartDate}">
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="#{msg['end.date']}" width="12%">
+            <h:outputText value="#{c.professional.proEndDate}">
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="#{msg['lesson.amount']}" width="9%" style="text-align:right">
+            <h:outputText value="#{c.professional.proAmount}">
+                <f:convertNumber type="currency" currencySymbol="€" maxFractionDigits="2" locale="fr"/>
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="" width="9%" style="text-align:center">
+            <p:commandButton icon="pi pi-user-edit"
+                             styleClass="p-button-text p-button-sm p-button-rounded"
+                             process="@this"
+                             update=":form_local_admin_pros:editProDialog"
+                             oncomplete="PF('editProDlg').show()">
+                <f:setPropertyActionListener value="#{c.professional}" target="#{clubC.selectedProfessional}"/>
+            </p:commandButton>
+        </p:column>
+
+    </p:dataTable>
+
+    <!-- Edit Dialog -->
+    <p:dialog id="editProDialog"
+              header="#{msg['menu.local.admin.pros']}"
+              widgetVar="editProDlg"
+              modal="true"
+              resizable="false"
+              style="width:420px">
+
+        <p:panelGrid columns="2" layout="flex"
+                     columnClasses="col1Flex,col2Flex"
+                     style="width:100%">
+
+            <p:outputLabel for="editAmount" value="#{msg['lesson.amount']}"/>
+            <p:inputNumber id="editAmount"
+                           value="#{clubC.selectedProfessional.proAmount}"
+                           minValue="0.1"
+                           decimalPlaces="2"
+                           required="true"/>
+
+            <p:outputLabel for="editStartDate" value="#{msg['start.date']}"/>
+            <p:datePicker id="editStartDate"
+                          value="#{clubC.selectedProfessional.proStartDate}"
+                          pattern="dd/MM/yyyy"
+                          showIcon="true"
+                          showButtonBar="true"
+                          monthNavigator="true"
+                          yearNavigator="true"
+                          yearRange="#{utilsC.dateYear(-5)}:#{utilsC.dateYear(10)}">
+                <f:convertDateTime type="localDateTime"/>
+                <f:validateBean disabled="true"/>
+            </p:datePicker>
+
+            <p:outputLabel for="editEndDate" value="#{msg['end.date']}"/>
+            <p:datePicker id="editEndDate"
+                          value="#{clubC.selectedProfessional.proEndDate}"
+                          pattern="dd/MM/yyyy"
+                          showIcon="true"
+                          showButtonBar="true"
+                          monthNavigator="true"
+                          yearNavigator="true"
+                          yearRange="#{utilsC.dateYear(-5)}:#{utilsC.dateYear(10)}">
+                <f:convertDateTime type="localDateTime"/>
+                <f:validateBean disabled="true"/>
+            </p:datePicker>
+
+        </p:panelGrid>
+
+        <f:facet name="footer">
+            <div class="flex justify-content-end gap-2">
+                <p:commandButton value="#{msg['button.cancel']}"
+                                 type="button"
+                                 icon="pi pi-times"
+                                 styleClass="ui-button-outlined"
+                                 onclick="PF('editProDlg').hide()"/>
+                <p:commandButton value="#{msg['button.save']}"
+                                 icon="pi pi-check"
+                                 action="#{clubC.updateProFull()}"
+                                 process="editProDialog"
+                                 update="tablePros growl-msg"
+                                 oncomplete="PF('editProDlg').hide()"/>
+            </div>
+        </f:facet>
+
+    </p:dialog>
+
+</h:form>
+</p:panel>
+</div>
+
+</ui:define>
+</ui:composition>

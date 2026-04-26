@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:param name="hideMenu" value="true"/>
+<ui:define name="title">Rounds Calendar</ui:define>
+<ui:define name="content">
+
+<h:form id="round_schedule_form">
+
+    <!-- Summary bar — club + course sélectionnés -->
+    <h:panelGroup layout="block" styleClass="summary-bar">
+        <span class="summary-item">
+            <span class="summary-label">#{msg['player.first']}</span>
+            <span class="summary-value">#{playerC.player.playerFirstName} #{playerC.player.playerLastName}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['club.name']}</span>
+            <span class="summary-value">#{appContext.club.clubName}</span>
+        </span>
+        <span class="summary-sep">|</span>
+        <span class="summary-item">
+            <span class="summary-label">#{msg['course.name']}</span>
+            <span class="summary-value">#{appContext.course.courseName}</span>
+        </span>
+    </h:panelGroup>
+
+    <div class="login-container" style="min-height:auto; align-items:flex-start;">
+    <p:panel id="roundSchedulePanel" styleClass="login-card form-card" style="max-width:100%;">
+        <f:facet name="header">
+            <h1 style="margin:0;">#{msg['menu.schedule.round']}</h1>
+        </f:facet>
+
+        <!-- Légende périodes -->
+        <div style="display:flex; gap:1rem; margin-bottom:0.75rem; align-items:center;">
+            <span style="display:inline-flex; align-items:center; gap:0.3rem;">
+                <span style="width:14px;height:14px;border-radius:3px;background:#28a745;display:inline-block;"></span>
+                <span style="font-size:0.85rem;">Matin (A)</span>
+            </span>
+            <span style="display:inline-flex; align-items:center; gap:0.3rem;">
+                <span style="width:14px;height:14px;border-radius:3px;background:#fd7e14;display:inline-block;"></span>
+                <span style="font-size:0.85rem;">Midi (B)</span>
+            </span>
+            <span style="display:inline-flex; align-items:center; gap:0.3rem;">
+                <span style="width:14px;height:14px;border-radius:3px;background:#0d6efd;display:inline-block;"></span>
+                <span style="font-size:0.85rem;">Après-midi (C)</span>
+            </span>
+        </div>
+
+        <!-- Calendrier des créneaux -->
+        <p:outputPanel id="schedulePanel" styleClass="schedule-panel">
+            <p:schedule id="schedule"
+                        value="#{schedRoundC.scheduleModel}"
+                        widgetVar="roundschedule"
+                        locale="#{languageC.locale}"
+                        timeFormat="HH:mm"
+                        height="auto"
+                        slotDuration="00:12:00"
+                        slotLabelInterval="01:00"
+                        minTime="06:00:00"
+                        maxTime="20:00:00"
+                        styleClass="ui-custompanelgrid"
+                        view="timeGridWeek"
+                        extender="initRoundSchedule"
+                        clientTimeZone="Europe/Brussels"
+                        timeZone="Europe/Brussels">
+                <p:ajax event="eventSelect"
+                        listener="#{schedRoundC.onEventSelect}"
+                        update=":round_schedule_form:roundDialog,growl-msg"
+                        oncomplete="if(args &amp;&amp; !args.full) PF('roundDialog').show()"/>
+            </p:schedule>
+        </p:outputPanel>
+
+        <!-- Dialog réservation créneau -->
+        <p:dialog id="roundDialog"
+                  widgetVar="roundDialog"
+                  header="Réservation créneau"
+                  width="420"
+                  modal="true"
+                  showEffect="fade"
+                  hideEffect="fade"
+                  responsive="true">
+
+            <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
+
+                <p:outputLabel value="Créneau"/>
+                <h:outputText value="#{schedRoundC.selectedFlightStart}">
+                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="localDateTime"/>
+                </h:outputText>
+
+                <p:outputLabel value="Club"/>
+                <h:outputText value="#{appContext.club.clubName}"/>
+
+                <p:outputLabel value="Parcours"/>
+                <h:outputText value="#{appContext.course.courseName}"/>
+
+                <!-- Joueurs déjà inscrits — visible ADMIN uniquement -->
+                <p:outputLabel value="Inscrits"
+                               rendered="#{schedRoundC.adminStrict}"/>
+                <h:panelGroup layout="block"
+                              rendered="#{schedRoundC.adminStrict}"
+                              style="font-weight:bold;">
+                    <h:outputText value="— aucun inscrit —"
+                                  rendered="#{empty schedRoundC.selectedFlightPlayers}"/>
+                    <ui:repeat value="#{schedRoundC.selectedFlightPlayers}" var="name">
+                        <div>#{name}</div>
+                    </ui:repeat>
+                </h:panelGroup>
+
+                <!-- Holes — éditable si nouveau slot, lecture seule si round existant -->
+                <p:outputLabel for="roundHolesBtn" value="#{msg['round.holes']} *"
+                               rendered="#{not schedRoundC.slotHasExistingRound}"/>
+                <p:selectOneButton id="roundHolesBtn"
+                                   value="#{schedRoundC.roundHoles}"
+                                   rendered="#{not schedRoundC.slotHasExistingRound}">
+                    <f:selectItem itemLabel="Holes 9"  itemValue="9"/>
+                    <f:selectItem itemLabel="Holes 18" itemValue="18"/>
+                </p:selectOneButton>
+                <p:outputLabel value="#{msg['round.holes']}"
+                               rendered="#{schedRoundC.slotHasExistingRound}"/>
+                <h:outputText value="#{schedRoundC.roundHoles}"
+                              rendered="#{schedRoundC.slotHasExistingRound}"
+                              style="font-weight:bold;"/>
+
+                <!-- Start — éditable si nouveau slot, lecture seule si round existant -->
+                <p:outputLabel for="roundStartBtn" value="#{msg['round.start']} *"
+                               rendered="#{not schedRoundC.slotHasExistingRound}"/>
+                <p:selectOneButton id="roundStartBtn"
+                                   value="#{schedRoundC.roundStart}"
+                                   rendered="#{not schedRoundC.slotHasExistingRound}">
+                    <f:selectItem itemLabel="Start 1"  itemValue="1"/>
+                    <f:selectItem itemLabel="Start 10" itemValue="10"/>
+                </p:selectOneButton>
+                <p:outputLabel value="#{msg['round.start']}"
+                               rendered="#{schedRoundC.slotHasExistingRound}"/>
+                <h:outputText value="#{schedRoundC.roundStart}"
+                              rendered="#{schedRoundC.slotHasExistingRound}"
+                              style="font-weight:bold;"/>
+
+                <!-- Indisponibilité du parcours -->
+                <h:outputText value=""
+                              rendered="#{schedRoundC.slotUnavailable}"/>
+                <h:outputText value="🚫 #{schedRoundC.slotUnavailableReason}"
+                              rendered="#{schedRoundC.slotUnavailable}"
+                              style="color:#dc3545; font-weight:bold;"/>
+
+                <!-- Statut paiement/inscription pour le joueur courant -->
+                <h:outputText value=""
+                              rendered="#{schedRoundC.slotAlreadyInscribed}"/>
+                <h:outputText value="✅ Vous êtes déjà inscrit à ce créneau"
+                              rendered="#{schedRoundC.slotAlreadyInscribed}"
+                              style="color:#198754; font-weight:bold;"/>
+
+                <h:outputText value=""
+                              rendered="#{schedRoundC.slotAlreadyPaid and not schedRoundC.slotAlreadyInscribed}"/>
+                <h:outputText value="💳 Paiement déjà effectué — cliquez Confirmer pour finaliser l'inscription"
+                              rendered="#{schedRoundC.slotAlreadyPaid and not schedRoundC.slotAlreadyInscribed}"
+                              style="color:#0d6efd; font-weight:bold;"/>
+
+                <f:facet name="footer">
+                    <div class="btn-group">
+                        <p:commandButton value="Confirmer"
+                                         icon="pi pi-check"
+                                         action="#{schedRoundC.confirmRound()}"
+                                         process="@form"
+                                         update=":round_schedule_form:roundSchedulePanel,growl-msg"
+                                         oncomplete="if(args &amp;&amp; !args.validationFailed) PF('roundDialog').hide()"
+                                         disabled="#{schedRoundC.slotAlreadyInscribed or schedRoundC.slotUnavailable}"
+                                         styleClass="p-button-success"/>
+                        <p:commandButton value="Annuler"
+                                         icon="pi pi-times"
+                                         type="button"
+                                         onclick="PF('roundDialog').hide()"
+                                         styleClass="p-button-secondary"/>
+                    </div>
+                </f:facet>
+            </p:panelGrid>
+
+        </p:dialog>
+
+        <!-- holder pour le nom du course, lu par datesSet — robuste aux apostrophes -->
+        <h:outputText value="#{appContext.course.courseName}"
+                      styleClass="course-name-holder"
+                      style="display:none"/>
+
+        <style type="text/css">
+            /* Masque les jours passés dans la vue Semaine (colonnes + en-têtes) */
+            .fc-day-past { visibility: hidden !important; }
+            .fc-day-past .fc-event,
+            .fc-day-past .fc-timegrid-event-harness,
+            .fc-day-past .fc-col-header-cell-cushion { display: none !important; }
+            /* Curseur "doigt" au survol d'un event */
+            .fc-event,
+            .fc-event * { cursor: pointer !important; }
+        </style>
+        <script type="text/javascript">
+        function initRoundSchedule() {
+            this.cfg.options.selectable = false;
+            this.cfg.options.eventStartEditable = false;
+            this.cfg.options.eventDurationEditable = false;
+            this.cfg.options.displayEventTime = false;
+            this.cfg.options.headerToolbar = {
+                left:   'prev,next today',
+                center: 'title',
+                right:  'timeGridWeek,timeGridDay'
+            };
+            this.cfg.options.buttonText = {
+                today: 'Aujourd\'hui',
+                week:  'Semaine',
+                day:   'Jour'
+            };
+            // Empêche la navigation vers des semaines passées
+            var _today = new Date(); _today.setHours(0,0,0,0);
+            this.cfg.options.validRange = { start: _today };
+            // Ajoute le nom du course à côté de la date dans le titre (center)
+            this.cfg.options.datesSet = function() {
+                var holder = document.querySelector('.course-name-holder');
+                var name = holder ? holder.textContent.trim() : '';
+                if (!name) return;
+                var titleEl = document.querySelector('.fc-toolbar-title');
+                if (!titleEl) return;
+                var span = titleEl.querySelector('.fc-course-suffix');
+                if (!span) {
+                    span = document.createElement('span');
+                    span.className = 'fc-course-suffix';
+                    span.style.marginLeft = '0.6rem';
+                    span.style.fontWeight = 'normal';
+                    span.style.opacity    = '0.75';
+                    titleEl.appendChild(span);
+                }
+                span.textContent = '— ' + name;
+            };
+            // Hover (ADMIN uniquement) — affiche les noms des inscrits via tooltip HTML natif
+            this.cfg.options.eventDidMount = function(info) {
+                var names = info.event.extendedProps ? info.event.extendedProps.names : null;
+                if (names &amp;&amp; names.length > 0) {
+                    info.el.setAttribute('title', names);
+                }
+            };
+            // Ajuste slotMinTime/slotMaxTime à la première/dernière heure réelle des events
+            this.cfg.options.eventsSet = function(events) {
+                var widget = PF('roundschedule');
+                if (!widget || !widget.calendar || !events || events.length === 0) return;
+                var minH = 23, maxH = 0;
+                events.forEach(function(e) {
+                    if (e.start) minH = Math.min(minH, e.start.getHours());
+                    if (e.end)   maxH = Math.max(maxH, e.end.getHours() + (e.end.getMinutes() > 0 ? 1 : 0));
+                });
+                var pad = function(n) { return String(n).padStart(2, '0'); };
+                widget.calendar.setOption('slotMinTime', pad(minH) + ':00:00');
+                widget.calendar.setOption('slotMaxTime', pad(maxH) + ':00:00');
+            };
+        }
+        </script>
+
+    </p:panel>
+    </div>
+
+</h:form>
+
+</ui:define>
+</ui:composition>
