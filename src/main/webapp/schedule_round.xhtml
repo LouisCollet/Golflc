@@ -88,6 +88,21 @@
                   hideEffect="fade"
                   responsive="true">
 
+            <!-- Bandeau indisponibilité — affiché avant tout le reste du dialog -->
+            <h:panelGroup layout="block"
+                          rendered="#{schedRoundC.slotUnavailable}"
+                          style="display:flex; align-items:flex-start; gap:0.8rem;
+                                 background:#fff0f0; border:2px solid #dc3545; border-radius:8px;
+                                 padding:1rem 1.2rem; margin-bottom:1rem;">
+                <i class="pi pi-ban" style="font-size:2rem; color:#dc3545; flex-shrink:0; margin-top:0.05rem;"/>
+                <div>
+                    <div style="font-weight:700; font-size:1.1rem; color:#b02a37; margin-bottom:0.2rem;">#{msg[schedRoundC.slotUnavailableTypeKey]}</div>
+                    <h:panelGroup layout="block"
+                                  rendered="#{not empty schedRoundC.slotUnavailableLabel}"
+                                  style="color:#c0392b; font-size:0.95rem;">#{schedRoundC.slotUnavailableLabel}</h:panelGroup>
+                </div>
+            </h:panelGroup>
+
             <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
 
                 <p:outputLabel value="Créneau"/>
@@ -143,13 +158,6 @@
                 <h:outputText value="#{schedRoundC.roundStart}"
                               rendered="#{schedRoundC.slotHasExistingRound}"
                               style="font-weight:bold;"/>
-
-                <!-- Indisponibilité du parcours -->
-                <h:outputText value=""
-                              rendered="#{schedRoundC.slotUnavailable}"/>
-                <h:outputText value="🚫 #{schedRoundC.slotUnavailableReason}"
-                              rendered="#{schedRoundC.slotUnavailable}"
-                              style="color:#dc3545; font-weight:bold;"/>
 
                 <!-- Statut paiement/inscription pour le joueur courant -->
                 <h:outputText value=""

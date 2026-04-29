@@ -69,7 +69,6 @@ public class ScheduleRoundController implements Serializable {
     @Inject private Controller.refact.MemberController    memberController;
     @Inject private Controller.refact.PaymentController   payC;
     @Inject private read.ReadUnavailablePeriod            readUnavailablePeriod;
-    @Inject private read.ReadUnavailableStructure         readUnavailableStructure;
 
     // ========================================
     // CHAMPS
@@ -88,7 +87,8 @@ public class ScheduleRoundController implements Serializable {
     private boolean           slotAlreadyPaid       = false;   // greenfee déjà payé par le joueur courant
     private boolean           slotAlreadyInscribed  = false;   // déjà inscrit au round
     private boolean           slotUnavailable       = false;   // période d'indisponibilité active
-    private String            slotUnavailableReason = null;    // type + label de l'indisponibilité
+    private String            slotUnavailableTypeKey = null;  // message bundle key du type (ex: unavailable.type.maintenance)
+    private String            slotUnavailableLabel   = null;  // détail libre saisi par l'admin
     private java.util.List<String> selectedFlightPlayers = java.util.Collections.emptyList();   // ADMIN uniquement
 
     public ScheduleRoundController() { }
@@ -129,7 +129,8 @@ public class ScheduleRoundController implements Serializable {
             slotAlreadyPaid = false;
             slotAlreadyInscribed = false;
             slotUnavailable = false;
-            slotUnavailableReason = null;
+            slotUnavailableTypeKey = null;
+            slotUnavailableLabel   = null;
             LOG.debug("selectedFlightStart = {}, full = {}", selectedFlightStart, full);
 
             if (full) {
@@ -155,40 +156,16 @@ public class ScheduleRoundController implements Serializable {
                     UnavailablePeriod unavailPeriod = readUnavailablePeriod.read(club, dummyRound);
                     if (unavailPeriod != null) {
                         Integer upCourseId = unavailPeriod.getCourseId();
-                        boolean wantsAllCourses = unavailPeriod.isAllCourses()
+                        boolean affectsCourse = unavailPeriod.isAllCourses()
                                 || upCourseId == null
-                                || Integer.valueOf(9999).equals(upCourseId);
-                        boolean affectsCourse;
-                        if (wantsAllCourses) {
-                            // Consulter la structure : si elle liste des courses spécifiques,
-                            // seuls ceux-là sont bloqués — sinon le club entier est bloqué
-                            try {
-                                entite.UnavailableStructure str = readUnavailableStructure.readSilent(club);
-                                if (str != null && !str.getStructureList().isEmpty()) {
-                                    affectsCourse = str.getStructureList().stream()
-                                            .anyMatch(s -> Integer.valueOf(9999).equals(s.getCourseId())
-                                                    || (course != null && s.getCourseId() != null
-                                                        && s.getCourseId().equals(course.getIdcourse())));
-                                } else {
-                                    affectsCourse = true; // pas de structure → tout le club est bloqué
-                                }
-                            } catch (Exception strEx) {
-                                LOG.warn("structure read failed during unavailability check: {}", strEx.getMessage());
-                                affectsCourse = true; // conservateur : bloquer si lecture impossible
-                            }
-                        } else {
-                            affectsCourse = course != null && upCourseId != null
-                                    && upCourseId.equals(course.getIdcourse());
-                        }
+                                || Integer.valueOf(9999).equals(upCourseId)
+                                || (course != null && upCourseId != null && upCourseId.equals(course.getIdcourse()));
                         if (affectsCourse) {
                             slotUnavailable = true;
                             String type = unavailPeriod.getUnavailabilityType();
-                            slotUnavailableReason = (type != null && !type.isBlank()) ? type : "Indisponible";
-                            if (unavailPeriod.getUnavailabilityLabel() != null
-                                    && !unavailPeriod.getUnavailabilityLabel().isBlank()) {
-                                slotUnavailableReason += " — " + unavailPeriod.getUnavailabilityLabel();
-                            }
-                            LOG.debug("slot unavailable: reason = {}", slotUnavailableReason);
+                            slotUnavailableTypeKey = (type != null && !type.isBlank()) ? type : "unavailable.type.placeholder";
+                            slotUnavailableLabel   = unavailPeriod.getUnavailabilityLabel();
+                            LOG.debug("slot unavailable: typeKey={}, label={}", slotUnavailableTypeKey, slotUnavailableLabel);
                         }
                     }
                 } catch (Exception ex) {
@@ -272,7 +249,11 @@ public class ScheduleRoundController implements Serializable {
             return null;
         }
         if (slotUnavailable) {
-            showMessageFatal(slotUnavailableReason);
+            String msg = slotUnavailableTypeKey != null ? slotUnavailableTypeKey : "Indisponible";
+            if (slotUnavailableLabel != null && !slotUnavailableLabel.isBlank()) {
+                msg += " — " + slotUnavailableLabel;
+            }
+            showMessageFatal(msg);
             return null;
         }
 
@@ -737,7 +718,8 @@ public class ScheduleRoundController implements Serializable {
     public boolean       isSlotAlreadyPaid()                      { return slotAlreadyPaid; }
     public boolean       isSlotAlreadyInscribed()                 { return slotAlreadyInscribed; }
     public boolean       isSlotUnavailable()                      { return slotUnavailable; }
-    public String        getSlotUnavailableReason()               { return slotUnavailableReason; }
+    public String        getSlotUnavailableTypeKey()              { return slotUnavailableTypeKey; }
+    public String        getSlotUnavailableLabel()                { return slotUnavailableLabel; }
     public java.util.List<String> getSelectedFlightPlayers()      { return selectedFlightPlayers; }
 
 } // end class

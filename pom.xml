@@ -32,7 +32,7 @@
             https://github.com/jakartaee/platform/blob/main/namespace/unaffected-packages.adoc -->
         <primefaces.version>15.0.14</primefaces.version> <!-- mod 01-04-2026 was 15.0.13 -->
         <primefaces-extension.version>15.0.14</primefaces-extension.version> <!-- mod 01-04-2026 was 15.0.13-->
-        <omnifaces.version>5.2.2</omnifaces.version> <!-- mod 06-04-2026 was 5.1 -->
+        <omnifaces.version>5.2.3</omnifaces.version> <!-- mod 29-04-2026 was 5.2.2 -->
         <chartjs.version>3.0.1</chartjs.version> <!-- mod 16-03-2026 was 2.9.0 -->
         <mockito.version>5.21.0</mockito.version> <!-- mod 29-12-2025 was 5.20.0-->
    <!-- Official Maven Plugins --> 
@@ -45,7 +45,7 @@
         <maven-install-plugin.version>3.1.4</maven-install-plugin.version> <!-- mod 12-02-2025 was 3.1.3 -->
         <maven-properties-plugin.version> </maven-properties-plugin.version>
         <maven-surefire-plugin.version>3.5.5</maven-surefire-plugin.version><!-- mod 16-03-2026  was 3.5.4 -->
-        <maven-wildfly-plugin.version>6.0.0.Beta2</maven-wildfly-plugin.version> <!-- mod 16-03-2026 was 5.1.5.Final -->
+        <maven-wildfly-plugin.version>6.0.0.Beta3</maven-wildfly-plugin.version> <!-- mod 29-04-2026 was 6.0.0.Beta2 -->
         <wildfly-hostname>localhost</wildfly-hostname>  <!-- was 127.0.0.1   essai avec default ??-->
         <wildfly-port>8080</wildfly-port>
       <!--  <wildfly.home>c:/ProgramData/wildfly-35.0.0.Final4</wildfly.home>  new 03/11/20224 used in ??? -->
@@ -84,19 +84,19 @@
         <log4j2.version>2.25.4</log4j2.version> <!-- mod 04-03-2026  was 2.25.4 -->
         <slf4j.version>2.1.0-alpha1</slf4j.version><!-- mod 12-03-2025 was 2.0.163 -->
         <jackson.version>2.21.2</jackson.version> <!--mod 03-04-2026 was 2.21.1 -->
-        <mysql-connector-j.version>9.6.0</mysql-connector-j.version>  <!-- used by RUN FILE mod 06-05-2025 was version 9.2.0-->
+        <mysql-connector-j.version>9.7.0</mysql-connector-j.version>  <!-- used by RUN FILE mod 06-05-2025 was version 9.2.0-->
         <resteasy.version>7.0.1.Final</resteasy.version> <!--  mod 27-12-2025 was 7.0.0.Final -->
         <version.server.bom>26.1.3.Final</version.server.bom>  <!--mod 11-12-2023 was 26.1.2.Final -->
 <!-- new 14/08/2022 -->
-        <mongodb-driver-sync.version>5.6.4</mongodb-driver-sync.version> <!-- mod 16-03-2026 was 5.6.2 -->
+        <mongodb-driver-sync.version>5.6.5</mongodb-driver-sync.version> <!-- mod 29-04-2026 was 5.6.4 -->
        <!-- <mongodb-driver-reactivestrings.version>4.11.1</mongodb-driver-reactivestrings.version> mod 11-12-2023 was 4.11.0 -->
         <mongodb-crypt.version>5.6.2</mongodb-crypt.version><!--  mod 27-12-2025 was 5.6.1 -->
         <protoc.version>1.78.0</protoc.version> <!--  mod 04-01-2026 was 1.77.0 -->
       <!--  <grpc.version>4.33.2</grpc.version>   mod 27-12-2025 was 4.33.1 
                   https://github.com/grpc/grpc-java/issues/11015   -->
         <exec.inheritIo>true</exec.inheritIo><!--  mod 19-03-2023 fix NetBeans IDE pour voir la sortie support ansi color de mvn exec:java dans la console https://github.com/apache/netbeans/issues/5552 -->
-        <selenium.version>4.41.0</selenium.version> <!--  mod 16-03-2026 was 4.39.0 -->
-        <jollyday.version>2.5.0</jollyday.version><!--  mod 17-04-2026 was 2.4.0 -->
+        <selenium.version>4.43.0</selenium.version> <!--  mod 29-04-2026 was 4.41.0 -->
+        <jollyday.version>2.6.0</jollyday.version><!--  mod 29-04-2026 was 2.5.0 -->
         <weld.version>6.0.4.Final</weld.version> <!--  pour refactoring CDI -->
  
     </properties>
@@ -298,7 +298,7 @@
 <dependency>
     <groupId>com.google.cloud</groupId>
     <artifactId>google-cloud-translate</artifactId>
-    <version>2.88.0</version> <!-- mod 03-04-2026 was 2.86.0 -->
+    <version>2.91.0</version> <!-- mod 29-04-2026 was 2.88.0 -->
 </dependency>
 
 
@@ -326,7 +326,7 @@
 <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>bson</artifactId>
-    <version>5.6.4</version> <!-- mod 16-03-2026 was 5.6.2  -->
+    <version>5.6.5</version> <!-- mod 29-04-2026 was 5.6.4  -->
 </dependency>
 
 <!-- MongoDB synchronous driver — MongoClient, MongoCollection queries (MongoHelpController) -->
@@ -673,7 +673,7 @@
     <groupId>org.wildfly.core</groupId>
     <artifactId>wildfly-controller-client</artifactId>
     <scope>provided</scope>
-    <version>32.0.0.Beta6</version>  <!-- mod 16-03-2026 was 31.0.1.Final -->
+    <version>32.0.0.Beta7</version>  <!-- mod 29-04-2026 was 32.0.0.Beta6 -->
 </dependency>
 <!-- JBoss DMR — Dynamic Model Representation used with wildfly-controller-client management API -->
 <dependency>
@@ -708,7 +708,7 @@
 <dependency>
     <groupId>org.wildfly.core</groupId>
     <artifactId>wildfly-core-galleon-pack</artifactId>
-    <version>32.0.0.Beta6</version>  <!-- mod 16-03-2026 was 31.0.1.Final -->
+    <version>32.0.0.Beta7</version>  <!-- mod 29-04-2026 was 32.0.0.Beta6 -->
     <type>pom</type>
     <scope>provided</scope>
 </dependency>

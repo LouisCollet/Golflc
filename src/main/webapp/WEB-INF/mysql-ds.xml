@@ -30,7 +30,7 @@ port est devenu 3308 à partir version mysql 8.2 le 31-10-2023
               use-ccm="true">
     <connection-url>jdbc:mysql://localhost:3308/golflc?AllowMultiQueries=true&amp;AllowUserVariables=true&amp;useSSL=false&amp;allowPublicKeyRetrieval=true&amp;nullNamePatternMatchesAll=true&amp;useUnicode=true&amp;characterEncoding=UTF-8</connection-url>
     <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
-    <driver>mysql-connector-j-9.6.0.jar</driver> <!-- name mod 27-07-2025 -->
+    <driver>mysql-connector-j-9.7.0.jar</driver> <!-- name mod 27-07-2025 -->
     <pool>
         <min-pool-size>5</min-pool-size>
         <max-pool-size>50</max-pool-size>
@@ -54,6 +54,7 @@ port est devenu 3308 à partir version mysql 8.2 le 31-10-2023
      <validation>   <!-- ← évite connexions zombie balise ouvrante manquante -->
         <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
         <background-validation>true</background-validation>
+        <background-validation-millis>60000</background-validation-millis>
         <validate-on-match>false</validate-on-match>
         <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
     </validation>
