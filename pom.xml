@@ -1050,7 +1050,7 @@ https://github.com/mojohaus/exec-maven-plugin/releases    -->
     <compilerArgs>
         <arg>-Xlint:all,-serial,-path</arg>
         <arg>-Xmaxerrs</arg>
-        <arg>50</arg>
+        <arg>150</arg>
         <arg>-J-Duser.language=fr</arg>
         <arg>-J-Duser.country=FR</arg>
         <arg>--enable-preview</arg>

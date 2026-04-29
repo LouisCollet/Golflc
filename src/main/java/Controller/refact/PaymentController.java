@@ -1073,7 +1073,9 @@ public class PaymentController implements Serializable {
     public String getPaymentTitle() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        return switch (appContext.getCreditcardType()) {
+        String type = appContext.getCreditcardType();
+        if (type == null) return "";
+        return switch (type) {
             case "SUBSCRIPTION" -> utils.LCUtil.prepareMessageBean("title.payment.subscription");
             case "GREENFEE"     -> utils.LCUtil.prepareMessageBean("title.payment.round");
             case "COTISATION"   -> utils.LCUtil.prepareMessageBean("title.payment.cotisation");
@@ -1085,7 +1087,9 @@ public class PaymentController implements Serializable {
     public String getPaymentIncludeSrc() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        return switch (appContext.getCreditcardType()) {
+        String type = appContext.getCreditcardType();
+        if (type == null) return "include/include_empty.xhtml";
+        return switch (type) {
             case "GREENFEE"     -> "include/include_summary_round.xhtml";
             case "COTISATION"   -> "include/include_summary_cotisation.xhtml";
             case "SUBSCRIPTION" -> "include/include_subscription.xhtml";
