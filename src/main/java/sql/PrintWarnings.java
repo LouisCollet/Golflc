@@ -4,17 +4,15 @@ import static interfaces.Log.LOG;
 import java.sql.SQLWarning;
 
 public final class PrintWarnings {
-    private PrintWarnings() {
-        // empêche l'instanciation
-    }
+    private PrintWarnings() { }
+
     public static void print(SQLWarning warning, String context) {
+        if (warning == null) return;
+        LOG.debug("SQL warnings for context = {}", context);
         while (warning != null) {
-            LOG.debug("warnings for context = " + context);
-            LOG.debug("SQLWarning:");
-            LOG.debug("Message  : " + warning.getMessage());
-            LOG.debug("SQLState : " + warning.getSQLState());
-            LOG.debug("Code     : " + warning.getErrorCode());
+            LOG.debug("SQLWarning: message={}, SQLState={}, code={}",
+                    warning.getMessage(), warning.getSQLState(), warning.getErrorCode());
             warning = warning.getNextWarning();
         }
     }
-}
+} // end class

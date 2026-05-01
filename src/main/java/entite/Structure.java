@@ -1,5 +1,6 @@
 package entite;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import static utils.LCUtil.showMessageFatal;
@@ -7,8 +8,10 @@ import static utils.LCUtil.showMessageFatal;
 // utilisé dans ControllerUnvailable
 public class Structure{
   private Integer courseId;
-  private String item; 
+  private String item;
   private Boolean status;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String comment;
 
     public Integer getCourseId() {
         return courseId;
@@ -33,7 +36,15 @@ public class Structure{
     public void setStatus(Boolean status) {
         this.status = status;
     }
- 
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
   public String toString(){
  try {
 //      LOG.debug("starting toString TarifGreenfee !");

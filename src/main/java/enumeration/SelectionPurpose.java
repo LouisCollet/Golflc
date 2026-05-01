@@ -17,6 +17,8 @@ public enum SelectionPurpose {
     COMPETITION_DESCRIPTION("Competition Description", "competition_create_description.xhtml", "not used"),
     
     MENU_UNAVAILABLE("MenuUnavailable", "unavailable_wizard.xhtml", "unavailable_wizard.xhtml", "title.unavailable.structure"),
+    GROUND_CONDITION_WIZARD("GroundConditionWizard", "ground_condition_wizard.xhtml", "ground_condition_wizard.xhtml", "menu.ground.condition"),
+    GROUND_CONDITION_UPDATE("GroundConditionUpdate", "ground_condition_update.xhtml", "ground_condition_update.xhtml", "menu.ground.condition.update"),
   //  CREATE_ROUND("CreateRound", "selectClubCourse.xhtml", "round.xhtml");  // OK 04-02-2026
     CREATE_ROUND("CreateRound", "round.xhtml", "??round.xhtml", "message.for.round"),  // OK 13-02-2026
     UPDATE_CLUB("clubUpdate", "selectClubModify.xhtml", "??round.xhtml"),  // OK 14-02-2026

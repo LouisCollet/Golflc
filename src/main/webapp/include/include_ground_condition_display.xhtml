@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+
+<h:panelGroup rendered="#{groundC.hasData}" layout="block" styleClass="ground-display-panel">
+
+    <!-- En-tête : titre + horodatage -->
+    <div class="ground-display-header">
+        <span><i class="pi pi-map" style="margin-right:0.4rem;"/>#{msg['menu.ground.condition']}</span>
+        <ui:fragment rendered="#{groundC.lastUpdate != null}">
+            <span class="ground-display-ts">
+                <i class="pi pi-clock" style="margin-right:0.25rem;"/>
+                <h:outputText value="#{groundC.lastUpdate}">
+                    <f:convertDateTime pattern="dd/MM HH:mm" type="localDateTime"/>
+                </h:outputText>
+            </span>
+        </ui:fragment>
+    </div>
+
+    <!-- Items ouverts -->
+    <ui:repeat value="#{groundC.openItems}" var="gitem">
+        <div class="ground-display-row ground-row-open">
+            <i class="pi pi-check-circle ground-icon-open"/>
+            <span>#{gitem}</span>
+        </div>
+    </ui:repeat>
+
+    <!-- Séparateur (uniquement si des items fermés existent) -->
+    <ui:fragment rendered="#{not empty groundC.closedItems}">
+        <div class="ground-display-separator"/>
+    </ui:fragment>
+
+    <!-- Items fermés -->
+    <ui:repeat value="#{groundC.closedItems}" var="gitem">
+        <div class="ground-display-row ground-row-closed">
+            <i class="pi pi-times-circle ground-icon-closed"/>
+            <span>#{gitem}</span>
+        </div>
+    </ui:repeat>
+
+</h:panelGroup>
+
+<style>
+.ground-display-panel {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 370px;
+    margin-top: 0.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+.ground-display-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1a4731;
+    color: #fff;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+.ground-display-ts {
+    font-size: 0.75rem;
+    font-weight: normal;
+    opacity: 0.82;
+}
+.ground-display-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.28rem 0.75rem;
+    font-size: 0.84rem;
+    border-bottom: 1px solid #f2f2f2;
+}
+.ground-row-open {
+    background: #fff;
+    border-left: 3px solid #198754;
+}
+.ground-row-closed {
+    background: #f8f9fa;
+    border-left: 3px solid #dee2e6;
+    opacity: 0.6;
+}
+.ground-icon-open  { color: #198754; font-size: 0.9rem; flex-shrink: 0; }
+.ground-icon-closed { color: #dc3545; font-size: 0.9rem; flex-shrink: 0; }
+.ground-display-separator {
+    height: 1px;
+    background: repeating-linear-gradient(90deg, #dee2e6 0, #dee2e6 6px, transparent 6px, transparent 10px);
+    margin: 0.15rem 0;
+}
+</style>
+
+</ui:composition>

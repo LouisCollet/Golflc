@@ -1,6 +1,7 @@
 package utils;
 
 // import Controllers.LanguageController; // removed — fix multi-user 2026-03-07
+import com.fasterxml.jackson.databind.ObjectMapper;
 import static com.google.api.client.util.Strings.isNullOrEmpty;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -2156,6 +2157,24 @@ public void listAllProperties() {
         }
     });
 }
+
+public final class JsonLogUtil {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private JsonLogUtil() {
+        // utility class
+    }
+    public static String toJson(Object obj) {
+        if (obj == null) {
+            return "NULL";
+        }
+        try {
+            return MAPPER.writeValueAsString(obj);
+        } catch (Exception e) {
+            return "JSON_SERIALIZATION_ERROR: " + e.getClass().getSimpleName();
+        }
+    }
+} // end method
 
 }// end Class LCUtil
 

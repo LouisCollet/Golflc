@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{groundC.initWizard()}" onPostback="false"/>
+    </f:metadata>
+</ui:define>
+
+<ui:define name="title">#{msg['menu.ground.condition']}</ui:define>
+<ui:define name="content">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:100%;">
+    <f:facet name="header"><h1>#{msg['menu.ground.condition']}</h1></f:facet>
+<h:form id="ground_form" >
+
+<ui:include src="include/include_summary_club.xhtml"/>
+
+<p:wizard id="groundWizard"
+          widgetVar="groundWizard"
+          styleClass="tarif-wizard"
+          flowListener="#{groundC.onFlow}"
+          onnext="$('.ui-growl-item').remove(); $('.ui-messages').empty();"
+          onback="$('.ui-growl-item').remove(); $('.ui-messages').empty();">
+
+    <!-- =================== TAB 1 : SÉLECTION + PICKLIST =================== -->
+    <p:tab id="SelectionTab"
+           title="⛳ #{msg['ground.condition.items.tab']}"
+           titletip="#{msg['ground.condition.items.tab']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel tarif-step-panel-wide">
+            <f:facet name="header">
+                <h1>#{msg['ground.condition.items.tab']}</h1>
+            </f:facet>
+
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex, col2Flex"
+                         style="margin-bottom:1.5rem;">
+
+                <p:outputLabel for="groundClub" value="#{msg['club.name']} :"/>
+                <p:selectOneMenu id="groundClub"
+                                 value="#{groundC.workClubId}"
+                                 filter="true"
+                                 filterMatchMode="contains">
+                    <f:selectItem itemLabel="-- #{msg['message.selectclub']} --"
+                                  itemValue="#{null}"
+                                  noSelectionOption="true"/>
+                    <f:selectItems value="#{clubC.clubsForUnavailableWizard}"
+                                   var="cl"
+                                   itemLabel="#{cl.clubName} (#{cl.idclub})"
+                                   itemValue="#{cl.idclub}"/>
+                    <f:validateBean disabled="true"/>
+                    <p:ajax event="change"
+                            listener="#{groundC.onClubChange}"
+                            update=":ground_form, growl-msg"
+                            process="@this"/>
+                </p:selectOneMenu>
+            </p:panelGrid>
+
+            <p:divider layout="horizontal" type="solid"/>
+
+            <p:pickList id="groundPickList"
+                        value="#{groundC.pickList}"
+                        var="pitem"
+                        itemLabel="#{pitem}"
+                        itemValue="#{pitem}"
+                        converter="stringPassThroughConverter"
+                        responsive="true"
+                        showSourceControls="true"
+                        showTargetControls="true"
+                        disabled="#{groundC.workClubId == null}"
+                        styleClass="ground-picklist">
+                <f:facet name="sourceCaption">
+                    <span>
+                        <i class="pi pi-check-circle" style="color:#198754; margin-right:0.3rem;"/>
+                        #{msg['ground.condition.available']}
+                    </span>
+                </f:facet>
+                <f:facet name="targetCaption">
+                    <span>
+                        <i class="pi pi-times-circle" style="color:#dc3545; margin-right:0.3rem;"/>
+                        #{msg['ground.condition.unavailable']}
+                    </span>
+                </f:facet>
+            </p:pickList>
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['ground.condition.save']}"
+                                     id="btnSaveItems"
+                                     icon="pi pi-database"
+                                     action="#{groundC.saveGroundCondition()}"
+                                     process="@this"
+                                     update="growl-msg"
+                                     
+                                     disabled="#{groundC.workClubId == null}"
+                                     styleClass="p-button-success"/>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+    <!-- rendered="#{groundC.workClubId != null}"=================== TAB 2 : COMMENT =================== -->
+    <p:tab id="CommentTab"
+           title="💬 Comment"
+           titletip="#{msg['title.cotisation.comment']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.cotisation.comment']}</h1>
+            </f:facet>
+
+            <p:textEditor id="groundEditor"
+                          widgetVar="groundEditorVar"
+                          value="#{groundC.groundCondition.comment}"
+                          height="70px"
+                          styleClass="w-full"
+                          placeholder="Enter here your content"/>
+
+            <p:dialog id="dialogGroundComment"
+                      width="auto" height="auto"
+                      header="#{msg['title.cotisation.comment']}"
+                      widgetVar="dlgGroundComment"
+                      showEffect="fade" hideEffect="fade">
+                <p:outputPanel id="displayGroundComment">
+                    <h:outputText value="#{groundC.groundCondition.comment}" escape="false"/>
+                </p:outputPanel>
+            </p:dialog>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton id="btnSaveGroundComment"
+                                     value="#{msg['tarif.members.add.comment']}"
+                                     process="@this groundEditor"
+                                     update="displayGroundComment, growl-msg"
+                                     oncomplete="PF('dlgGroundComment').show()"
+                                     icon="pi pi-database"
+                                     styleClass="p-button-outlined"/>
+                    <p:commandButton value="Clear"
+                                     type="button"
+                                     onclick="PF('groundEditorVar').clear();"
+                                     icon="pi pi-times"
+                                     styleClass="p-button-outlined"/>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+    <!-- =================== TAB 3 : CONFIRM =================== -->
+    <p:tab id="ConfirmTab"
+           title="✅ Confirm"
+           titletip="#{msg['title.unavailable.show']}">
+        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['menu.ground.condition']}</h1>
+            </f:facet>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
+                <p:tag value="#{msg['ground.condition.available']} : #{empty groundC.pickList ? 0 : groundC.pickList.source.size()}"
+                       icon="pi pi-check-circle" severity="success"/>
+                <p:tag value="#{msg['ground.condition.unavailable']} : #{empty groundC.pickList ? 0 : groundC.pickList.target.size()}"
+                       icon="pi pi-times-circle" severity="danger"/>
+                <h:panelGroup rendered="#{groundC.groundCondition.lastUpdate != null}">
+                    <p:tag icon="pi pi-clock" severity="warn">
+                        <f:facet name="content">
+                            <span>#{msg['ground.condition.last.update']} :&#160;
+                                <h:outputText value="#{groundC.groundCondition.lastUpdate}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="localDateTime"/>
+                                </h:outputText>
+                            </span>
+                        </f:facet>
+                    </p:tag>
+                </h:panelGroup>
+            </div>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton value="#{msg['tarif.visualisation']}"
+                                     icon="pi pi-eye"
+                                     process="@this"
+                                     update="vizGroundDialog, growl-msg"
+                                     oncomplete="PF('vizGroundDialog').show();"
+                                     rendered="#{groundC.workClubId != null}"
+                                     styleClass="p-button-info p-button-outlined"/>
+                    <p:commandButton value="#{msg['ground.condition.save']}"
+                                     id="btnSaveConfirm"
+                                     icon="pi pi-database"
+                                     action="#{groundC.saveGroundCondition()}"
+                                     process="groundPickList"
+                                     update="ground_form, growl-msg"
+                                     rendered="#{groundC.workClubId != null}"
+                                     styleClass="p-button-success"/>
+                </div>
+            </f:facet>
+        </p:panel></div>
+    </p:tab>
+
+</p:wizard>
+
+<!-- =================== DIALOG : VISUALISATION =================== -->
+<p:dialog id="vizGroundDialog"
+          widgetVar="vizGroundDialog"
+          header="#{msg['menu.ground.condition']}"
+          modal="false" resizable="true" draggable="true"
+          style="width:420px; max-width:98vw;">
+
+    <div style="overflow-y:auto; max-height:75vh;">
+
+        <ui:repeat value="#{groundC.pickList.source}" var="vizItem">
+            <div style="display:flex; justify-content:space-between;
+                         padding:0.25rem 0.8rem;
+                         border-bottom:1px solid #dee2e6;">
+                <span>#{vizItem}</span>
+                <i class="pi pi-check-circle" style="color:#198754; font-size:1rem;"/>
+            </div>
+        </ui:repeat>
+
+        <ui:repeat value="#{groundC.pickList.target}" var="vizItem">
+            <div style="display:flex; justify-content:space-between;
+                         padding:0.25rem 0.8rem;
+                         border-bottom:1px solid #dee2e6;
+                         opacity:0.55;">
+                <span>#{vizItem}</span>
+                <i class="pi pi-times-circle" style="color:#dc3545; font-size:1rem;"/>
+            </div>
+        </ui:repeat>
+
+    </div>
+
+    <f:facet name="footer">
+        <p:commandButton value="#{msg['button.close']}"
+                         icon="pi pi-times"
+                         onclick="PF('vizGroundDialog').hide(); return false;"
+                         styleClass="p-button-secondary"/>
+    </f:facet>
+</p:dialog>
+
+<style>
+.ground-picklist .ui-picklist-list-wrapper { flex: 1; }
+.ground-picklist .ui-picklist-item         { padding: 0.18rem 0.5rem; font-size: 0.8rem; line-height: 1.4; }
+</style>
+
+</h:form>
+</p:panel>
+</div>
+
+</ui:define>
+</ui:composition>

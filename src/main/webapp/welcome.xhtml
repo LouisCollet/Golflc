@@ -144,20 +144,11 @@
                     </h:link>
                 </div>
 
-                <!-- Section : Golf -->
+                <!-- Section : Etat du terrain -->
                 <div class="account-menu-section-label">
                     <i class="pi pi-sun"/> #{msg['menu.section.golf']}
                 </div>
-                <div class="account-menu-grid">
-                    <p:commandLink id="btnUnavailable"
-                                   styleClass="account-card"
-                                   update="growl-msg"
-                                   action="#{dialogC.showUnavailable()}">
-                        <i class="account-card-icon pi pi-sun"/>
-                        <span class="account-card-label">#{msg['menu.card.terrain']}</span>
-                        <span class="account-card-desc">#{msg['menu.card.terrain.desc']}</span>
-                    </p:commandLink>
-                </div>
+                <ui:include src="include/include_ground_condition_display.xhtml"/>
 
             </div>
 

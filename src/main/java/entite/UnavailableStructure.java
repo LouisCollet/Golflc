@@ -10,6 +10,7 @@ import static interfaces.Log.NEW_LINE;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,6 +27,8 @@ public class UnavailableStructure implements Serializable{
 // rubriques stockées en db
 private ArrayList<Structure> structureList = new ArrayList<>();
 private String comment;
+private String choiceType;
+private LocalDateTime lastUpdate;
 
 // autres rubriques non stockées en table
 @JsonIgnore private Integer idclub;
@@ -147,8 +150,24 @@ public UnavailableStructure(){    // constructor
     public void setWorkCourseId(String workCourseId) {
         this.workCourseId = workCourseId;
     }
-    
-    
+
+    public String getChoiceType() {
+        return choiceType;
+    }
+
+    public void setChoiceType(String choiceType) {
+        this.choiceType = choiceType;
+    }
+
+    public LocalDateTime getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(LocalDateTime lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+
 /*
     public void RemoveNull(){
    //     LOG.debug("itemstructure = " + itemStructure.toString());

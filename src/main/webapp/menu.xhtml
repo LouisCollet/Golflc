@@ -143,6 +143,12 @@
             <p:menuitem value="Etat du terrain"
                         action="#{navC.to_selectPurpose_xhtml('MenuUnavailable')}"
                         icon="pi pi-sun"/>
+            <p:menuitem value="#{msg['menu.ground.condition']}"
+                        action="#{navC.to_selectPurpose_xhtml('GroundConditionWizard')}"
+                        icon="pi pi-map"/>
+            <p:menuitem value="#{msg['menu.ground.condition.update']}"
+                        action="#{navC.to_selectPurpose_xhtml('GroundConditionUpdate')}"
+                        icon="pi pi-pencil"/>
         </p:submenu>
 
         <!-- ═══════════════════════════════════════

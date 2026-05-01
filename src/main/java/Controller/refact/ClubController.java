@@ -2444,7 +2444,7 @@ public void convertYtoM() {
                 String msg = "showUnavailablePeriods - first element of list is = " + lun.toString();
                 LOG.debug(msg);
                 showMessageInfo(msg);
-                return "unavailable_show.xhtml?faces-redirect=true";
+                return "ground_condition_show.xhtml?faces-redirect=true";
             }
             return null;
         } catch (Exception ex) {
@@ -2476,11 +2476,11 @@ public void convertYtoM() {
                 LOG.debug("lun is null");
                 LOG.debug("no unavailabilities known");
                 appContext.setUnavailable(null);
-                return "unavailable_show.xhtml?faces-redirect=true";
+                return "ground_condition_show.xhtml?faces-redirect=true";
             } else {
                 appContext.setUnavailable(lun);
                 LOG.debug("showUnavailablePeriods - element is = {}", lun);
-                return "unavailable_show.xhtml?faces-redirect=true";
+                return "ground_condition_show.xhtml?faces-redirect=true";
             }
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
@@ -2496,7 +2496,7 @@ public void convertYtoM() {
             EUnavailable lun = unavailableListForDate.list(LocalDateTime.now(), ecl.club());
             LOG.debug("showUnavailablePeriods - element of list is = {}", lun);
             appContext.setUnavailable(lun);
-            return "unavailable_show.xhtml?faces-redirect=true";
+            return "ground_condition_show.xhtml?faces-redirect=true";
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
             return null;

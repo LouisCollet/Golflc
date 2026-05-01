@@ -38,7 +38,7 @@ public class ReadUnavailableStructure implements Serializable {
             utils.LCUtil.showMessageFatal(msg);
             return null;
         }
-        LOG.debug("found structure, items = {}", structure.getStructureList().size());
+        LOG.debug("found structure, items size = {}", structure.getStructureList().size());
         return structure;
     } // end method
 
@@ -57,15 +57,5 @@ public class ReadUnavailableStructure implements Serializable {
         LOG.debug("structure = {}", structure != null ? structure.getStructureList().size() + " items" : "null");
         return structure;
     } // end method
-
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        // nécessite contexte CDI — DataSource injecté par WildFly
-        // Club club = new Club(); club.setIdclub(101);
-        // LOG.debug("UnavailableStructure = {}", new ReadUnavailableStructure().read(club));
-    } // end main
-    */
 
 } // end class

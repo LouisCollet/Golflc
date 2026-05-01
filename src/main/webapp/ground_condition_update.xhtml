@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:define name="metadata">
+    <f:metadata>
+        <f:viewAction action="#{groundC.initUpdate()}" onPostback="false"/>
+    </f:metadata>
+</ui:define>
+
+<ui:define name="title">#{msg['menu.ground.condition.update']}</ui:define>
+<ui:define name="content">
+<div class="login-container" style="min-height:auto; align-items:flex-start;">
+<p:panel styleClass="login-card form-card" style="max-width:480px;">
+    <f:facet name="header"><h1>#{msg['menu.ground.condition.update']}</h1></f:facet>
+
+<h:form id="ground_update_form">
+
+    <p:panelGrid columns="2"
+                 layout="flex"
+                 columnClasses="col1Flex, col2Flex"
+                 style="margin-bottom:1.2rem;">
+        <p:outputLabel for="updateClub" value="#{msg['club.name']} :"/>
+        <p:selectOneMenu id="updateClub"
+                         value="#{groundC.workClubId}"
+                         filter="true"
+                         filterMatchMode="contains">
+            <f:selectItem itemLabel="-- #{msg['message.selectclub']} --"
+                          itemValue="#{null}"
+                          noSelectionOption="true"/>
+            <f:selectItems value="#{clubC.clubsForUnavailableWizard}"
+                           var="cl"
+                           itemLabel="#{cl.clubName} (#{cl.idclub})"
+                           itemValue="#{cl.idclub}"/>
+            <f:validateBean disabled="true"/>
+            <p:ajax event="change"
+                    listener="#{groundC.onClubChangeUpdate}"
+                    update=":ground_update_form:itemsPanel"
+                    process="@this"/>
+        </p:selectOneMenu>
+    </p:panelGrid>
+
+    <p:outputPanel id="itemsPanel">
+        <h:panelGroup layout="block" rendered="#{groundC.workClubId != null}">
+
+            <p:divider layout="horizontal" type="solid"/>
+
+            <ui:repeat value="#{groundC.masterItems}" var="mitem">
+                <div style="display:flex; align-items:center; gap:0.9rem;
+                             padding:0.3rem 0.4rem; border-bottom:1px solid #f0f0f0;">
+                    <p:toggleSwitch value="#{groundC.itemStatus[mitem]}"/>
+                    <span style="font-size:0.88rem;">#{mitem}</span>
+                </div>
+            </ui:repeat>
+
+            <h:panelGroup rendered="#{groundC.groundCondition.lastUpdate != null}"
+                          style="display:block; margin-top:0.8rem;
+                                 font-size:0.78rem; color:#6c757d;">
+                <i class="pi pi-clock" style="margin-right:0.3rem;"/>
+                #{msg['ground.condition.last.update']} :
+                <h:outputText value="#{groundC.groundCondition.lastUpdate}">
+                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="localDateTime"/>
+                </h:outputText>
+            </h:panelGroup>
+
+            <div style="margin-top:1rem;">
+                <p:commandButton value="#{msg['ground.condition.save']}"
+                                 icon="pi pi-save"
+                                 action="#{groundC.saveGroundConditionUpdate()}"
+                                 process="@form"
+                                 update=":ground_update_form:itemsPanel growl-msg"
+                                 styleClass="p-button-success"/>
+            </div>
+
+        </h:panelGroup>
+    </p:outputPanel>
+
+</h:form>
+</p:panel>
+</div>
+
+</ui:define>
+</ui:composition>
