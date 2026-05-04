@@ -282,13 +282,13 @@
                                      id="btnSaveStructure"
                                      icon="pi pi-database"
                                      rendered="#{clubC.unavailable.structure.itemExists}"
-                                     action="#{clubC.modifyClubUnavailableStructure('modify')}"
+                                     action="#{clubC.modifyGroundCondition('modify')}"
                                      update="unavailable_wizard:wizardUnavailable"
                                      styleClass="p-button-success"/>
                     <p:commandLink id="btnDeleteStructure"
                                    styleClass="p-button p-button-danger p-button-outlined"
                                    rendered="#{clubC.unavailable.structure.structureExists}"
-                                   action="#{clubC.modifyClubUnavailableStructure('delete')}"
+                                   action="#{clubC.modifyGroundCondition('delete')}"
                                    update="unavailable_wizard:wizardUnavailable growl-msg">
                         <i class="pi pi-trash"/> #{msg['button.delete']}
                         <p:confirm type="popup"
@@ -381,7 +381,7 @@
                     <p:commandLink id="btnDeleteStructureConfirm"
                                    styleClass="p-button p-button-danger p-button-outlined"
                                    rendered="#{clubC.unavailable.structure.structureExists}"
-                                   action="#{clubC.modifyClubUnavailableStructure('delete')}"
+                                   action="#{clubC.modifyGroundCondition('delete')}"
                                    update="unavailable_wizard:wizardUnavailable growl-msg">
                         <i class="pi pi-trash"/> #{msg['button.delete']}
                         <p:confirm type="popup"

@@ -8,12 +8,6 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewAction action="#{groundC.initUpdate()}" onPostback="false"/>
-    </f:metadata>
-</ui:define>
-
 <ui:define name="title">#{msg['menu.ground.condition.update']}</ui:define>
 <ui:define name="content">
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
@@ -30,7 +24,8 @@
         <p:selectOneMenu id="updateClub"
                          value="#{groundC.workClubId}"
                          filter="true"
-                         filterMatchMode="contains">
+                         filterMatchMode="contains"
+                         style="width:100%">
             <f:selectItem itemLabel="-- #{msg['message.selectclub']} --"
                           itemValue="#{null}"
                           noSelectionOption="true"/>
@@ -51,10 +46,15 @@
 
             <p:divider layout="horizontal" type="solid"/>
 
-            <ui:repeat value="#{groundC.masterItems}" var="mitem">
-                <div style="display:flex; align-items:center; gap:0.9rem;
-                             padding:0.3rem 0.4rem; border-bottom:1px solid #f0f0f0;">
-                    <p:toggleSwitch value="#{groundC.itemStatus[mitem]}"/>
+            <ui:repeat value="#{groundC.groundConditionItems}" var="mitem">
+                <div class="ground-display-row #{groundC.itemStatus[mitem] ? 'ground-row-open' : 'ground-row-closed'}">
+                    <p:commandButton icon="#{groundC.itemStatus[mitem] ? 'pi pi-check-circle' : 'pi pi-times-circle'}"
+                                     styleClass="p-button-text p-button-sm"
+                                     style="padding:0; min-width:unset; color:inherit; font-size:0.9rem;"
+                                     title="#{groundC.itemStatus[mitem] ? msg['ground.condition.available'] : msg['ground.condition.unavailable']}"
+                                     action="#{groundC.toggleItemStatus(mitem)}"
+                                     process="@this"
+                                     update=":ground_update_form:itemsPanel"/>
                     <span style="font-size:0.88rem;">#{mitem}</span>
                 </div>
             </ui:repeat>
@@ -76,14 +76,41 @@
                                  process="@form"
                                  update=":ground_update_form:itemsPanel growl-msg"
                                  styleClass="p-button-success"/>
+                <p:commandButton value="#{groundC.showPreview ? msg['ground.condition.preview.hide'] : msg['ground.condition.preview.show']}"
+                                 icon="#{groundC.showPreview ? 'pi pi-eye-slash' : 'pi pi-eye'}"
+                                 action="#{groundC.togglePreview()}"
+                                 process="@this"
+                                 update=":ground_update_form:itemsPanel :previewPanel"
+                                 styleClass="p-button-info p-button-outlined"
+                                 style="margin-left:0.5rem;"/>
             </div>
 
         </h:panelGroup>
     </p:outputPanel>
 
 </h:form>
+
+<p:outputPanel id="previewPanel">
+    <h:panelGroup rendered="#{groundC.showPreview}" layout="block" style="margin-top:1rem;">
+        <ui:include src="include/include_ground_condition_display.xhtml"/>
+    </h:panelGroup>
+</p:outputPanel>
+
 </p:panel>
 </div>
+
+<style>
+.ground-display-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.28rem 0.75rem;
+    font-size: 0.84rem;
+    border-bottom: 1px solid #f2f2f2;
+}
+.ground-row-open  { background:#fff;    border-left:3px solid #198754; color:#198754; }
+.ground-row-closed{ background:#f8f9fa; border-left:3px solid #dc3545; color:#dc3545; }
+</style>
 
 </ui:define>
 </ui:composition>

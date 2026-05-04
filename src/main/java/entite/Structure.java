@@ -47,7 +47,6 @@ public class Structure{
 
   public String toString(){
  try {
-//      LOG.debug("starting toString TarifGreenfee !");
     return
             ( NEW_LINE + "<br/>FROM ENTITE : " + this.getClass().getSimpleName().toUpperCase()
               + " courseId='" + courseId
@@ -55,7 +54,7 @@ public class Structure{
               + ", status=" + status
             );
  }catch(Exception e){
-    String msg = "£££ Exception in Structure.toString = " + e.getMessage(); 
+    String msg = "£££ Exception in Structure.toString = " + e.getMessage();
         LOG.error(msg);
         showMessageFatal(msg);
         return msg;

@@ -1458,3 +1458,13 @@ html[data-theme="dark"] .form-card.ui-panel .ui-panel-titlebar {
     width: 100%;
     max-width: none;
 }
+
+.ground-picklist .ui-picklist-list-wrapper {
+    flex: 1;
+}
+
+.ground-picklist {
+      width: 70%;
+      margin: 0 auto;
+  }
+

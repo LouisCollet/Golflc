@@ -8,17 +8,15 @@
       xmlns:p="primefaces"
       template="templates/masterTemplate.xhtml">
 
-<ui:define name="metadata">
-    <f:metadata>
-        <f:viewAction action="#{groundC.initWizard()}" onPostback="false"/>
-    </f:metadata>
-</ui:define>
-
 <ui:define name="title">#{msg['menu.ground.condition']}</ui:define>
 <ui:define name="content">
 <div class="login-container" style="min-height:auto; align-items:flex-start;">
-<p:panel styleClass="login-card form-card" style="max-width:100%;">
-    <f:facet name="header"><h1>#{msg['menu.ground.condition']}</h1></f:facet>
+<p:panel id="panelOne"
+         styleClass="login-card form-card"
+         style="max-width:100%;">
+    <f:facet name="header">
+        <h1>#{msg['menu.ground.condition']}</h1>
+    </f:facet>
 <h:form id="ground_form" >
 
 <ui:include src="include/include_summary_club.xhtml"/>
@@ -32,14 +30,15 @@
 
     <!-- =================== TAB 1 : SÉLECTION + PICKLIST =================== -->
     <p:tab id="SelectionTab"
-           title="⛳ #{msg['ground.condition.items.tab']}"
+           title="⛳ #{msg['ground.condition.items.tab']}#{groundC.unavailableCount > 0 ? ' ('.concat(groundC.unavailableCount).concat(')') : ''}"
            titletip="#{msg['ground.condition.items.tab']}">
         <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel tarif-step-panel-wide">
             <f:facet name="header">
                 <h1>#{msg['ground.condition.items.tab']}</h1>
             </f:facet>
 
-            <p:panelGrid columns="2"
+            <p:panelGrid id="panelGridOne"
+                         columns="2"
                          layout="flex"
                          columnClasses="col1Flex, col2Flex"
                          style="margin-bottom:1.5rem;">
@@ -48,7 +47,8 @@
                 <p:selectOneMenu id="groundClub"
                                  value="#{groundC.workClubId}"
                                  filter="true"
-                                 filterMatchMode="contains">
+                                 filterMatchMode="contains"
+                                 style="width:100%">
                     <f:selectItem itemLabel="-- #{msg['message.selectclub']} --"
                                   itemValue="#{null}"
                                   noSelectionOption="true"/>
@@ -75,30 +75,102 @@
                         responsive="true"
                         showSourceControls="true"
                         showTargetControls="true"
+                        style="width:70%;"
                         disabled="#{groundC.workClubId == null}"
                         styleClass="ground-picklist">
                 <f:facet name="sourceCaption">
-                    <span>
+                  
+                   
+                        #{msg['ground.condition.available']}
+                  
+               <!--     <span>
                         <i class="pi pi-check-circle" style="color:#198754; margin-right:0.3rem;"/>
                         #{msg['ground.condition.available']}
-                    </span>
+                    </span> 
+                -->    
+                    
                 </f:facet>
                 <f:facet name="targetCaption">
                     <span>
-                        <i class="pi pi-times-circle" style="color:#dc3545; margin-right:0.3rem;"/>
+                        <i class="pi pi-check-circle" style="color:#dc3545; margin-right:0.3rem;"/>
                         #{msg['ground.condition.unavailable']}
                     </span>
                 </f:facet>
             </p:pickList>
+
+            <!-- Custom items — add form + table wrapped for reliable AJAX update -->
+            <p:outputPanel id="customItemsSection"
+                           layout="block"
+                           rendered="#{groundC.workClubId != null}">
+
+                <h:panelGroup layout="block"
+                              style="display:flex; align-items:center; gap:0.6rem; margin-top:0.8rem; margin-bottom:0.4rem;">
+                    <p:inputText id="customItemInput"
+                                 value="#{groundC.newCustomItemInput}"
+                                 placeholder="#{msg['ground.condition.custom.placeholder']}"
+                                 maxlength="80"
+                                 style="flex:1;"/>
+                    <p:commandButton id="btnAddCustomItem"
+                                     value="#{msg['ground.condition.custom.add']}"
+                                     icon="pi pi-plus"
+                                     action="#{groundC.addCustomItem()}"
+                                     process="@this customItemInput"
+                                     update="customItemsSection growl-msg"
+                                     styleClass="p-button-outlined p-button-secondary"/>
+                </h:panelGroup>
+
+            <!-- Custom items table — p:cellEditor pattern from include_tarif_wizard_pricing -->
+            <p:dataTable id="customItemsArea"
+                         value="#{groundC.customItemsBuffer}"
+                         var="citem"
+                         rowIndexVar="rowIdx"
+                         editable="true"
+                         editMode="row"
+                         style="width:70%"
+                         emptyMessage=" "
+                         styleClass="compact-table mt-2">
+                <p:ajax event="rowEdit"       update="customItemsArea"/>
+                <p:ajax event="rowEditCancel" update="customItemsArea"/>
+
+                <p:column>
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{citem}" style="font-size:0.85rem;"/>
+                        </f:facet>
+                        <f:facet name="input">
+                            <p:inputText value="#{groundC.customItemsBuffer[rowIdx]}"
+                                         maxlength="80"
+                                         style="width:100%;">
+                                <f:validateBean disabled="true"/>
+                            </p:inputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column style="width:5rem;">
+                    <p:rowEditor/>
+                </p:column>
+
+                <p:column style="width:3.5rem;">
+                    <p:commandButton id="BtnItemCustom"
+                                     icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     process="@this"
+                                     action="#{groundC.removeCustomItem(citem)}"
+                                     update="customItemsArea customItemsSection growl-msg"
+                                     />
+                </p:column>
+            </p:dataTable>
+            </p:outputPanel>
+
             <f:facet name="footer">
                 <div class="btn-group">
                     <p:commandButton value="#{msg['ground.condition.save']}"
                                      id="btnSaveItems"
                                      icon="pi pi-database"
                                      action="#{groundC.saveGroundCondition()}"
-                                     process="@this"
+                                     process="@this groundPickList"
                                      update="growl-msg"
-                                     
                                      disabled="#{groundC.workClubId == null}"
                                      styleClass="p-button-success"/>
                 </div>
@@ -106,7 +178,7 @@
         </p:panel></div>
     </p:tab>
 
-    <!-- rendered="#{groundC.workClubId != null}"=================== TAB 2 : COMMENT =================== -->
+    <!-- =================== TAB 2 : COMMENT =================== -->
     <p:tab id="CommentTab"
            title="💬 Comment"
            titletip="#{msg['title.cotisation.comment']}">
@@ -155,44 +227,82 @@
     <p:tab id="ConfirmTab"
            title="✅ Confirm"
            titletip="#{msg['title.unavailable.show']}">
-        <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel">
+        <div class="tarif-step-border"><p:panel id="confirmPanel" styleClass="tarif-step-panel">
             <f:facet name="header">
                 <h1>#{msg['menu.ground.condition']}</h1>
             </f:facet>
 
-            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem;">
-                <p:tag value="#{msg['ground.condition.available']} : #{empty groundC.pickList ? 0 : groundC.pickList.source.size()}"
-                       icon="pi pi-check-circle" severity="success"/>
-                <p:tag value="#{msg['ground.condition.unavailable']} : #{empty groundC.pickList ? 0 : groundC.pickList.target.size()}"
-                       icon="pi pi-times-circle" severity="danger"/>
-                <h:panelGroup rendered="#{groundC.groundCondition.lastUpdate != null}">
-                    <p:tag icon="pi pi-clock" severity="warn">
-                        <f:facet name="content">
-                            <span>#{msg['ground.condition.last.update']} :&#160;
-                                <h:outputText value="#{groundC.groundCondition.lastUpdate}">
-                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="localDateTime"/>
-                                </h:outputText>
-                            </span>
+            <p:dataTable id="confirmItemsTable"
+                         value="#{groundC.itemsToPersist}"
+                         var="persistItem"
+                         rowIndexVar="rowIdx"
+                         editable="true"
+                         editMode="row"
+                         styleClass="compact-table"
+                         style="width:70%; margin-bottom:1rem;"
+                         emptyMessage="&#10003; #{msg['ground.condition.available']}">
+                <p:ajax event="rowEdit"       listener="#{groundC.onConfirmRowEdit}" update="confirmItemsTable"/>
+                <p:ajax event="rowEditCancel" update="confirmItemsTable"/>
+
+                <f:facet name="header">
+                    <span>
+                        <i class="pi pi-times-circle" style="color:#dc3545; margin-right:0.4rem;"/>
+                        #{msg['ground.condition.unavailable']} (#{groundC.itemsToPersist.size()})
+                    </span>
+                </f:facet>
+
+                <p:column style="width:2rem;">
+                    <i class="pi pi-times-circle" style="color:#dc3545;"/>
+                </p:column>
+
+                <p:column>
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{persistItem}" style="font-size:0.85rem;"/>
                         </f:facet>
-                    </p:tag>
-                </h:panelGroup>
-            </div>
+                        <f:facet name="input">
+                            <p:inputText value="#{groundC.itemsToPersist[rowIdx]}"
+                                         maxlength="80"
+                                         style="width:100%;">
+                                <f:validateBean disabled="true"/>
+                            </p:inputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+
+                <p:column style="width:5rem;">
+                    <p:rowEditor/>
+                </p:column>
+
+                <p:column style="width:3.5rem;">
+                    <p:commandButton icon="pi pi-trash"
+                                     styleClass="p-button-danger p-button-text p-button-sm"
+                                     action="#{groundC.removeFromPersist(persistItem)}"
+                                     update="confirmItemsTable growl-msg"
+                                     process="@this"/>
+                </p:column>
+            </p:dataTable>
+
+            <h:panelGroup rendered="#{groundC.groundCondition.lastUpdate != null}">
+                <p:tag icon="pi pi-clock" severity="warn" style="margin-bottom:1rem;">
+                    <f:facet name="content">
+                        <span>#{msg['ground.condition.last.update']} :&#160;
+                            <h:outputText value="#{groundC.groundCondition.lastUpdate}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="localDateTime"/>
+                            </h:outputText>
+                        </span>
+                    </f:facet>
+                </p:tag>
+            </h:panelGroup>
 
             <f:facet name="footer">
                 <div class="btn-group">
-                    <p:commandButton value="#{msg['tarif.visualisation']}"
-                                     icon="pi pi-eye"
-                                     process="@this"
-                                     update="vizGroundDialog, growl-msg"
-                                     oncomplete="PF('vizGroundDialog').show();"
-                                     rendered="#{groundC.workClubId != null}"
-                                     styleClass="p-button-info p-button-outlined"/>
                     <p:commandButton value="#{msg['ground.condition.save']}"
                                      id="btnSaveConfirm"
                                      icon="pi pi-database"
                                      action="#{groundC.saveGroundCondition()}"
-                                     process="groundPickList"
-                                     update="ground_form, growl-msg"
+                                     process="@this groundPickList"
+                                     update="confirmPanel growl-msg"
                                      rendered="#{groundC.workClubId != null}"
                                      styleClass="p-button-success"/>
                 </div>
@@ -201,49 +311,6 @@
     </p:tab>
 
 </p:wizard>
-
-<!-- =================== DIALOG : VISUALISATION =================== -->
-<p:dialog id="vizGroundDialog"
-          widgetVar="vizGroundDialog"
-          header="#{msg['menu.ground.condition']}"
-          modal="false" resizable="true" draggable="true"
-          style="width:420px; max-width:98vw;">
-
-    <div style="overflow-y:auto; max-height:75vh;">
-
-        <ui:repeat value="#{groundC.pickList.source}" var="vizItem">
-            <div style="display:flex; justify-content:space-between;
-                         padding:0.25rem 0.8rem;
-                         border-bottom:1px solid #dee2e6;">
-                <span>#{vizItem}</span>
-                <i class="pi pi-check-circle" style="color:#198754; font-size:1rem;"/>
-            </div>
-        </ui:repeat>
-
-        <ui:repeat value="#{groundC.pickList.target}" var="vizItem">
-            <div style="display:flex; justify-content:space-between;
-                         padding:0.25rem 0.8rem;
-                         border-bottom:1px solid #dee2e6;
-                         opacity:0.55;">
-                <span>#{vizItem}</span>
-                <i class="pi pi-times-circle" style="color:#dc3545; font-size:1rem;"/>
-            </div>
-        </ui:repeat>
-
-    </div>
-
-    <f:facet name="footer">
-        <p:commandButton value="#{msg['button.close']}"
-                         icon="pi pi-times"
-                         onclick="PF('vizGroundDialog').hide(); return false;"
-                         styleClass="p-button-secondary"/>
-    </f:facet>
-</p:dialog>
-
-<style>
-.ground-picklist .ui-picklist-list-wrapper { flex: 1; }
-.ground-picklist .ui-picklist-item         { padding: 0.18rem 0.5rem; font-size: 0.8rem; line-height: 1.4; }
-</style>
 
 </h:form>
 </p:panel>

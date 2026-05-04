@@ -122,12 +122,12 @@ private String Region;
         this.unavailableStructure = unavailableStructure;
     }
 
-    public String getClubUnavailableStructure() {
+    public String getGroundCondition() {
         return clubUnavailableStructure;
     }
 
-    public void setClubUnavailableStructure(String clubUnavailableStructure) {
-        this.clubUnavailableStructure = clubUnavailableStructure;
+    public void setGroundCondition(String groundCondition) {
+        this.clubUnavailableStructure = groundCondition;
     }
 
     

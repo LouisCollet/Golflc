@@ -16,7 +16,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import utils.LCUtil;
-import utils.LCUtil.JsonLogUtil;
 import static utils.LCUtil.showMessageInfo;
 
 @ApplicationScoped
@@ -42,7 +41,7 @@ public class UpdateClubStructure implements Serializable {
 
         final String query = """
                 UPDATE club
-                SET ClubUnavailableStructure = ?
+                SET GroundCondition = ?
                 WHERE idclub = ?
                 """;
 
@@ -57,7 +56,7 @@ public class UpdateClubStructure implements Serializable {
             String msg = String.format(
                "rows updated = %d, structure json = %s",
                rows,
-               JsonLogUtil.toJson(structure)
+               json
             );
             LOG.debug(msg);
             showMessageInfo(msg);

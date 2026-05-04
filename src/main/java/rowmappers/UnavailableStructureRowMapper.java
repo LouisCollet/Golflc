@@ -24,9 +24,9 @@ public class UnavailableStructureRowMapper extends AbstractRowMapper<Unavailable
         final String methodName = utils.LCUtil.getCurrentMethodName();
 
      try {
-         String struct = getString(rs,"ClubUnavailableStructure");
+         String struct = getString(rs,"GroundCondition");
       //      LOG.debug("String structure from DB = " + struct);
-         if(rs.getString("ClubUnavailableStructure") == null){
+         if(rs.getString("GroundCondition") == null){
       //      LOG.debug("map - Unavailable Structure is null !! Null returned");
             return null;
          }

@@ -30,11 +30,6 @@
         </div>
     </ui:repeat>
 
-    <!-- Séparateur (uniquement si des items fermés existent) -->
-    <ui:fragment rendered="#{not empty groundC.closedItems}">
-        <div class="ground-display-separator"/>
-    </ui:fragment>
-
     <!-- Items fermés -->
     <ui:repeat value="#{groundC.closedItems}" var="gitem">
         <div class="ground-display-row ground-row-closed">
@@ -77,22 +72,10 @@
     font-size: 0.84rem;
     border-bottom: 1px solid #f2f2f2;
 }
-.ground-row-open {
-    background: #fff;
-    border-left: 3px solid #198754;
-}
-.ground-row-closed {
-    background: #f8f9fa;
-    border-left: 3px solid #dee2e6;
-    opacity: 0.6;
-}
-.ground-icon-open  { color: #198754; font-size: 0.9rem; flex-shrink: 0; }
+.ground-row-open  { background: #fff;    border-left: 3px solid #198754; }
+.ground-icon-open { color: #198754; font-size: 0.9rem; flex-shrink: 0; }
+.ground-row-closed { background: #f8f9fa; border-left: 3px solid #dc3545; }
 .ground-icon-closed { color: #dc3545; font-size: 0.9rem; flex-shrink: 0; }
-.ground-display-separator {
-    height: 1px;
-    background: repeating-linear-gradient(90deg, #dee2e6 0, #dee2e6 6px, transparent 6px, transparent 10px);
-    margin: 0.15rem 0;
-}
 </style>
 
 </ui:composition>

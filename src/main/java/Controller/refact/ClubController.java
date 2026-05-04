@@ -1606,7 +1606,7 @@ public void convertYtoM() {
      * Met à jour la structure unavailable d'un club (modify ou delete).
      * Migré depuis CourseController — 2026-02-25
      */
-    public String modifyClubUnavailableStructure(String type) {
+    public String modifyGroundCondition(String type) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {} for type = {}", type);
         try {
@@ -1625,14 +1625,7 @@ public void convertYtoM() {
         }
     } // end method
 
-    // ========================================
-    // Migrated from CourseController — 2026-02-25
-    // ========================================
-
-    // selectCourse(ECourseList) removed 2026-03-23 — dead code, routing via clubAndCourseAction + SelectionPurpose
-
-    /**
-     * Sélection d'un course pour afficher le trajet (maps).
+     /* Sélection d'un course pour afficher le trajet (maps).
      * Migré depuis CourseController — 2026-02-25
      */
     public String selectTravel(ECourseList ecl) {
@@ -2377,7 +2370,7 @@ public void convertYtoM() {
                 }
             }
 
-            // 3. Structure → club.ClubUnavailableStructure
+            // 3. Structure → club.GroundCondition
             if (unavailableController.updateClub(unavailable, club)) {
                 unavailable.structure().setStructureExists(true);
                 showMessageInfo(LCUtil.prepareMessageBean("unavailable.availability.saved"));

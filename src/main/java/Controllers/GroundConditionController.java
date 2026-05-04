@@ -5,6 +5,7 @@ import entite.UnavailableStructure;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -17,7 +18,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import jakarta.enterprise.event.Observes;
 import org.primefaces.event.FlowEvent;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.model.DualListModel;
 import utils.LCUtil;
 
@@ -50,10 +53,14 @@ public class GroundConditionController implements Serializable {
 
     // ── Wizard / Update state ─────────────────────────────────────────────────
 
-    private Integer               workClubId      = null;
-    private UnavailableStructure  groundCondition  = new UnavailableStructure();
-    private DualListModel<String> pickList         = new DualListModel<>(new ArrayList<>(), new ArrayList<>());
-    private Map<String, Boolean>  itemStatus       = new LinkedHashMap<>();
+    private Integer               workClubId        = null;
+    private String                newCustomItemInput = "";
+    private UnavailableStructure  groundCondition   = new UnavailableStructure();
+    private DualListModel<String> pickList          = new DualListModel<>(new ArrayList<>(), new ArrayList<>());
+    private Map<String, Boolean>  itemStatus        = new LinkedHashMap<>();
+    private List<String>          customItemsBuffer = new ArrayList<>();
+    private List<String>          itemsToPersist    = null;
+    private boolean               showPreview       = false;
 
     // ── Display state (widget welcome page) ───────────────────────────────────
 
@@ -66,18 +73,30 @@ public class GroundConditionController implements Serializable {
 
     // ── Lifecycle : wizard ────────────────────────────────────────────────────
 
+    @PostConstruct
     public void initWizard() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        workClubId      = null;
-        groundCondition = new UnavailableStructure();
-        pickList        = new DualListModel<>(new ArrayList<>(), new ArrayList<>());
-        itemStatus      = new LinkedHashMap<>();
+        workClubId        = null;
+        newCustomItemInput = "";
+        groundCondition   = new UnavailableStructure();
+        pickList          = new DualListModel<>(new ArrayList<>(), new ArrayList<>());
+        itemStatus        = new LinkedHashMap<>();
+        customItemsBuffer = new ArrayList<>();
+        itemsToPersist    = null;
+        showPreview       = false;
+    } // end method
+
+    public void onReset(@Observes events.ResetEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        initWizard();
     } // end method
 
     public String onFlow(FlowEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
+        if ("ConfirmTab".equals(event.getNewStep())) itemsToPersist = null;
         return event.getNewStep();
     } // end method
 
@@ -107,9 +126,65 @@ public class GroundConditionController implements Serializable {
         LOG.debug("entering {}", methodName);
         groundCondition = new UnavailableStructure();
         itemStatus      = new LinkedHashMap<>();
+        showPreview     = false;
         if (workClubId == null) return;
         loadItemStatus();
     } // end method
+
+    // ── Custom items — wizard ─────────────────────────────────────────────────
+
+    public void addCustomItem() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        String trimmed = (newCustomItemInput == null) ? "" : newCustomItemInput.trim();
+        if (trimmed.isEmpty()) return;
+
+        boolean duplicate = MASTER_ITEMS.stream().anyMatch(m -> m.equalsIgnoreCase(trimmed))
+                         || pickList.getSource().stream().anyMatch(s -> s.equalsIgnoreCase(trimmed))
+                         || pickList.getTarget().stream().anyMatch(s -> s.equalsIgnoreCase(trimmed))
+                         || customItemsBuffer.stream().anyMatch(c -> c.equalsIgnoreCase(trimmed));
+        if (duplicate) {
+            LCUtil.showMessageWarn("Item déjà existant", trimmed);
+            newCustomItemInput = "";
+            return;
+        }
+        customItemsBuffer.add(trimmed);
+        itemsToPersist = null;
+        newCustomItemInput = "";
+        LOG.debug("custom item added to buffer: {}", trimmed);
+    } // end method
+
+    public void toggleItemStatus(String item) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        Boolean current = itemStatus.get(item);
+        if (current != null) {
+            itemStatus.put(item, !current);
+            LOG.debug("toggled {} → {}", item, !current);
+        }
+    } // end method
+
+    public void removeCustomItem(String item) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        customItemsBuffer.remove(item);
+        itemsToPersist = null;
+        LOG.debug("removed custom item: {}", item);
+    } // end method
+
+    public void removeFromPersist(String item) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        getItemsToPersist().remove(item);
+        LOG.debug("removed from persist list: {}", item);
+    } // end method
+
+    public void onConfirmRowEdit(RowEditEvent<?> event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("confirm row edited, list size = {}", itemsToPersist == null ? 0 : itemsToPersist.size());
+    } // end method
+
 
     // ── Item loading — wizard (DualListModel) ─────────────────────────────────
 
@@ -125,7 +200,7 @@ public class GroundConditionController implements Serializable {
 
         try {
             UnavailableStructure existing = readUnavailableStructure.readSilent(clubById(workClubId));
-            if (existing != null && !existing.getStructureList().isEmpty()) {
+            if (existing != null) {
                 Set<String> unavailableItems = buildUnavailableSet(existing);
                 if (!unavailableItems.isEmpty()) {
                     source.clear();
@@ -137,6 +212,10 @@ public class GroundConditionController implements Serializable {
                     copyMeta(existing);
                     LOG.debug("loaded {} unavailable items from DB", unavailableItems.size());
                 }
+                customItemsBuffer.clear();
+                Set<String> masterSet = new LinkedHashSet<>(MASTER_ITEMS);
+                for (Structure s : existing.getStructureList())
+                    if (!masterSet.contains(s.getItem())) customItemsBuffer.add(s.getItem());
             }
         } catch (SQLException e) {
             handleSQLException(e, methodName);
@@ -148,18 +227,15 @@ public class GroundConditionController implements Serializable {
     private void loadItemStatus() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        for (String item : MASTER_ITEMS) itemStatus.put(item, Boolean.TRUE);
+        itemStatus = new LinkedHashMap<>();
 
         try {
             UnavailableStructure existing = readUnavailableStructure.readSilent(clubById(workClubId));
-            if (existing != null && !existing.getStructureList().isEmpty()) {
-                Set<String> unavailableItems = buildUnavailableSet(existing);
-                if (!unavailableItems.isEmpty()) {
-                    for (String item : MASTER_ITEMS)
-                        itemStatus.put(item, !unavailableItems.contains(item));
-                    copyMeta(existing);
-                    LOG.debug("loaded status for {} items", itemStatus.size());
-                }
+            if (existing != null) {
+                for (Structure s : existing.getStructureList())
+                    itemStatus.put(s.getItem(), !Boolean.FALSE.equals(s.getStatus()));
+                copyMeta(existing);
+                LOG.debug("loaded {} items from GroundCondition", itemStatus.size());
             }
         } catch (SQLException e) {
             handleSQLException(e, methodName);
@@ -174,7 +250,7 @@ public class GroundConditionController implements Serializable {
         LOG.debug("source = {}", pickList.getSource());
         LOG.debug("target = {}", pickList.getTarget());
         try {
-            reconstructFromPickList();
+            reconstructFromItemsToPersist();
             persist();
             refresh();
             LCUtil.showMessageInfo("État du terrain enregistré");
@@ -200,19 +276,16 @@ public class GroundConditionController implements Serializable {
 
     // ── Reconstruct helpers ───────────────────────────────────────────────────
 
-    private void reconstructFromPickList() {
+    private void reconstructFromItemsToPersist() {
         groundCondition.getStructureList().clear();
-        for (String item : pickList.getTarget()) {
+        for (String item : getItemsToPersist())
             groundCondition.getStructureList().add(makeItem(item, true));
-        }
     } // end method
 
     private void reconstructFromItemStatus() {
         groundCondition.getStructureList().clear();
-        for (Map.Entry<String, Boolean> entry : itemStatus.entrySet()) {
-            if (Boolean.FALSE.equals(entry.getValue()))
-                groundCondition.getStructureList().add(makeItem(entry.getKey(), true));
-        }
+        for (Map.Entry<String, Boolean> entry : itemStatus.entrySet())
+            groundCondition.getStructureList().add(makeItem(entry.getKey(), entry.getValue()));
     } // end method
 
     private void persist() throws Exception {
@@ -223,18 +296,19 @@ public class GroundConditionController implements Serializable {
     // ── Display — widget welcome page ─────────────────────────────────────────
 
     private void ensureLoaded() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        Integer clubId = (appContext.getClub() != null) ? appContext.getClub().getIdclub() : null;
+        Integer clubId = (workClubId != null) ? workClubId
+                       : (appContext.getClub() != null) ? appContext.getClub().getIdclub()
+                       : null;
         if (clubId == null)                 { resetDisplayEmpty(); return; }
         if (clubId.equals(loadedForClubId)) return;
-        LOG.debug("entering {} for club {}", methodName, clubId);
+        LOG.debug("ensureLoaded for club {}", clubId);
         loadDisplay(clubId);
     } // end method
 
     private void loadDisplay(Integer clubId) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        openItems         = new ArrayList<>(MASTER_ITEMS);
+        openItems         = new ArrayList<>();
         closedItems       = new ArrayList<>();
         displayLastUpdate = null;
         loadedForClubId   = clubId;
@@ -242,14 +316,9 @@ public class GroundConditionController implements Serializable {
         try {
             UnavailableStructure us = readUnavailableStructure.readSilent(clubById(clubId));
             if (us != null && !us.getStructureList().isEmpty()) {
-                Set<String> closed = new LinkedHashSet<>();
                 for (Structure s : us.getStructureList()) {
-                    closed.add(s.getItem());
-                }
-                closedItems       = new ArrayList<>(closed);
-                openItems         = new ArrayList<>();
-                for (String item : MASTER_ITEMS) {
-                    if (!closed.contains(item)) openItems.add(item);
+                    if (Boolean.FALSE.equals(s.getStatus())) closedItems.add(s.getItem());
+                    else                                      openItems.add(s.getItem());
                 }
                 displayLastUpdate = us.getLastUpdate();
                 LOG.debug("loaded {} open, {} closed items", openItems.size(), closedItems.size());
@@ -320,11 +389,55 @@ public class GroundConditionController implements Serializable {
 
     public List<String> getMasterItems()                        { return MASTER_ITEMS; }
 
+    public List<String> getGroundConditionItems() {
+        return new ArrayList<>(itemStatus.keySet());
+    } // end method
+
+    public List<String> getUnavailableItems() {
+        return itemStatus.entrySet().stream()
+                .filter(e -> Boolean.FALSE.equals(e.getValue()))
+                .map(Map.Entry::getKey)
+                .toList();
+    } // end method
+
+    public List<String> getAllItems() {
+        List<String> all = new ArrayList<>(MASTER_ITEMS);
+        all.addAll(customItemsBuffer);
+        return all;
+    }
+
+    public List<String> getItemsToPersist() {
+        if (itemsToPersist == null) {
+            itemsToPersist = new ArrayList<>(pickList.getTarget());
+            itemsToPersist.addAll(customItemsBuffer);
+        }
+        return itemsToPersist;
+    }
+
+    public String getNewCustomItemInput()                       { return newCustomItemInput; }
+    public void setNewCustomItemInput(String v)                 { this.newCustomItemInput = v; }
+
+    public List<String> getCustomItemsBuffer()                  { return customItemsBuffer; }
+
+    public int getUnavailableCount() {
+        return pickList.getTarget().size() + customItemsBuffer.size();
+    } // end method
+
     // ── Getters — display widget ──────────────────────────────────────────────
 
     public List<String>  getOpenItems()   { ensureLoaded(); return openItems;   }
     public List<String>  getClosedItems() { ensureLoaded(); return closedItems; }
     public LocalDateTime getLastUpdate()  { ensureLoaded(); return displayLastUpdate; }
     public boolean       isHasData()      { ensureLoaded(); return !openItems.isEmpty() || !closedItems.isEmpty(); }
+
+    public boolean isShowPreview()           { return showPreview; }
+    public void    setShowPreview(boolean v) { this.showPreview = v; }
+
+    public void togglePreview() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        showPreview = !showPreview;
+        if (showPreview) loadedForClubId = null;
+    } // end method
 
 } // end class
