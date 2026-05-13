@@ -7,8 +7,12 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import static interfaces.GolfInterface.DATE_BEGIN_COURSE;
+import static interfaces.GolfInterface.DATE_END_COURSE;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -67,6 +71,52 @@ public class CreateCourse implements Serializable {
             conn.commit();
 
             return true;
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    public boolean upsert(final Course course) throws SQLException {
+        final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+
+        final String query = """
+            INSERT INTO course (idcourse, CourseName, CourseHoles, CoursePar, club_idclub, CourseBeginDate, CourseEndDate, CourseModificationDate)
+            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON DUPLICATE KEY UPDATE
+                CourseName             = VALUES(CourseName),
+                CourseHoles            = VALUES(CourseHoles),
+                CoursePar              = VALUES(CoursePar),
+                club_idclub            = VALUES(club_idclub),
+                CourseBeginDate        = VALUES(CourseBeginDate),
+                CourseEndDate          = VALUES(CourseEndDate),
+                CourseModificationDate = CURRENT_TIMESTAMP
+            """;
+
+        try (Connection conn = dao.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            if (course.getIdcourse() != null && course.getIdcourse() > 0) {
+                ps.setInt(1, course.getIdcourse());
+            } else {
+                ps.setNull(1, Types.INTEGER);
+            }
+            ps.setString(2, course.getCourseName());
+            ps.setShort(3, (short) 18);
+            ps.setShort(4, course.getCoursePar());
+            ps.setInt(5, course.getClub_idclub());
+            ps.setTimestamp(6, Timestamp.valueOf(DATE_BEGIN_COURSE));
+            ps.setTimestamp(7, Timestamp.valueOf(DATE_END_COURSE));
+            LCUtil.logps(ps);
+
+            int rows = ps.executeUpdate();
+            LOG.debug("course upserted id = {} name = {} rows = {}", course.getIdcourse(), course.getCourseName(), rows);
+            return rows > 0;
 
         } catch (SQLException e) {
             handleSQLException(e, methodName);
