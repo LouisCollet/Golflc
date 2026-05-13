@@ -59,6 +59,25 @@ public class psCreateUpdateCourse {
         }
     }
 
+    public static void mapUpsert(PreparedStatement ps, Course course) throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            ps.setString(2, course.getCourseName());
+            ps.setShort(3, (short) 18);
+            ps.setShort(4, course.getCoursePar());
+            ps.setInt(5, course.getClub_idclub());
+            ps.setTimestamp(6, Timestamp.valueOf(DATE_BEGIN_COURSE));
+            ps.setTimestamp(7, Timestamp.valueOf(DATE_END_COURSE));
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
+        } catch (Exception e) {
+            String msg = "Exception in mapUpsert = " + getCurrentMethodName() + " / " + e.getMessage();
+            LOG.error(msg);
+            throw e;
+        }
+    } // end method
+
     /**
      * Prépare le PreparedStatement pour un insert de Course
      */

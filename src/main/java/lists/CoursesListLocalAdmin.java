@@ -1,22 +1,23 @@
 package lists;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import entite.Club;
 import entite.Course;
 import entite.Player;
 import entite.composite.ECourseList;
-import static interfaces.Log.LOG;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.RowMapper;
+import static interfaces.Log.LOG;
 
-/**
- * fix multi-user 2026-03-07 — cache supprimé (données per-admin dans singleton = fuite de données)
- */
 @ApplicationScoped
 public class CoursesListLocalAdmin implements Serializable {
 
@@ -24,11 +25,30 @@ public class CoursesListLocalAdmin implements Serializable {
 
     @Inject private dao.GenericDAO dao;
 
+    private transient Cache<Integer, List<ECourseList>> cache;
+
     public CoursesListLocalAdmin() { }
+
+    @PostConstruct
+    void init() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        cache = Caffeine.newBuilder()
+                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .maximumSize(100)
+                .build();
+    } // end method
 
     public List<ECourseList> list(final Player localAdmin) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
+
+        int adminId = localAdmin.getIdplayer();
+        List<ECourseList> cached = cache.getIfPresent(adminId);
+        if (cached != null) {
+            LOG.debug("returning cached list size = {}", cached.size());
+            return cached;
+        }
 
         final String query = """
             SELECT *
@@ -45,22 +65,22 @@ public class CoursesListLocalAdmin implements Serializable {
                 .club(clubMapper.map(rs))
                 .course(courseMapper.map(rs))
                 .build(),
-                localAdmin.getIdplayer());
+                adminId);
 
         if (result.isEmpty()) {
-            LOG.warn(methodName + " - empty result list");
+            LOG.warn("empty result list for adminId = {}", adminId);
         } else {
-            LOG.debug(methodName + " - list size = " + result.size());
+            LOG.debug("list size = {}", result.size());
+            cache.put(adminId, result);
         }
         return result;
     } // end method
 
-    /**
-     * No-op — cache removed (fix multi-user 2026-03-07)
-     */
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " - no-op (cache removed)");
+        LOG.debug("entering {}", methodName);
+        cache.invalidateAll();
+        LOG.debug("cache invalidated");
     } // end method
 
     /*
@@ -70,7 +90,7 @@ public class CoursesListLocalAdmin implements Serializable {
         Player localAdmin = new Player();
         localAdmin.setIdplayer(324715);
         List<ECourseList> lp = list(localAdmin);
-        LOG.debug("from main, after lp = " + lp);
+        LOG.debug("from main, after lp = {}", lp);
     } // end main
     */
 

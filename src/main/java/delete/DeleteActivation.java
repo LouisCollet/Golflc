@@ -17,6 +17,24 @@ public class DeleteActivation implements Serializable {
 
     public DeleteActivation() { }
 
+    public int deleteExpired() throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+
+        int countBefore = dao.querySingle("SELECT COUNT(*) FROM activation", rs -> rs.getInt(1));
+        LOG.info("activation count before cleanup = {}", countBefore);
+
+        int deleted = dao.execute("""
+                DELETE FROM activation
+                WHERE activation.ActivationCreationDate < DATE_SUB(CURRENT_DATE, INTERVAL 1 WEEK)
+                """);
+
+        int countAfter = dao.querySingle("SELECT COUNT(*) FROM activation", rs -> rs.getInt(1));
+        LOG.info("activation cleanup done — deleted={} remaining={}", deleted, countAfter);
+
+        return deleted;
+    } // end method
+
     public Boolean delete(String uuid) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);

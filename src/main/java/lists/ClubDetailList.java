@@ -1,20 +1,23 @@
 package lists;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import entite.Club;
 import entite.Course;
 import entite.Tee;
 import entite.composite.ECourseList;
-import static interfaces.Log.LOG;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import rowmappers.ClubRowMapper;
 import rowmappers.CourseRowMapper;
 import rowmappers.RowMapper;
 import rowmappers.TeeRowMapper;
+import static interfaces.Log.LOG;
 
 @ApplicationScoped
 public class ClubDetailList implements Serializable {
@@ -23,20 +26,30 @@ public class ClubDetailList implements Serializable {
 
     @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
-    private List<ECourseList> liste = null;
+    private transient Cache<Integer, List<ECourseList>> cache;
 
     public ClubDetailList() { }
+
+    @PostConstruct
+    void init() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        cache = Caffeine.newBuilder()
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .maximumSize(50)
+                .build();
+    } // end method
 
     public List<ECourseList> list(final Club club) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("with club = " + club);
+        LOG.debug("with club = {}", club);
 
-        // ✅ Early return — guard clause FIRST
-        if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
-            return liste;
+        int clubId = club.getIdclub();
+        List<ECourseList> cached = cache.getIfPresent(clubId);
+        if (cached != null) {
+            LOG.debug("returning cached list size = {}", cached.size());
+            return cached;
         }
 
         final String query = """
@@ -52,31 +65,27 @@ public class ClubDetailList implements Serializable {
         RowMapper<Course> courseMapper = new CourseRowMapper();
         RowMapper<Tee> teeMapper = new TeeRowMapper();
 
-        liste = new ArrayList<>(dao.queryList(query, rs -> ECourseList.builder()
+        List<ECourseList> result = dao.queryList(query, rs -> ECourseList.builder()
                 .club(clubMapper.map(rs))
                 .course(courseMapper.map(rs))
                 .tee(teeMapper.map(rs))
                 .build(),
-                club.getIdclub()));
+                clubId);
 
-        if (liste.isEmpty()) {
-            LOG.warn(methodName + " - empty result list");
+        if (result.isEmpty()) {
+            LOG.warn("empty result list for clubId = {}", clubId);
         } else {
-            LOG.debug(methodName + " - list size = " + liste.size());
+            LOG.debug("list size = {}", result.size());
+            cache.put(clubId, result);
         }
-        return liste;
+        return result;
     } // end method
 
-    // ✅ Getters/setters d'instance
-    public List<ECourseList> getListe()              { return liste; }
-    public void setListe(List<ECourseList> liste)    { this.liste = liste; }
-
-    // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        cache.invalidateAll();
+        LOG.debug("cache invalidated");
     } // end method
 
     /*
@@ -86,7 +95,7 @@ public class ClubDetailList implements Serializable {
         Club club = new Club();
         club.setIdclub(101);
         List<ECourseList> ec = new ClubDetailList().list(club);
-        LOG.debug("from main, ec = " + ec);
+        LOG.debug("from main, ec = {}", ec);
     } // end main
     */
 

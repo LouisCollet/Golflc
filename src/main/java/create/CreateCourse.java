@@ -7,12 +7,9 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
-import static interfaces.GolfInterface.DATE_BEGIN_COURSE;
-import static interfaces.GolfInterface.DATE_END_COURSE;
 import static interfaces.Log.LOG;
 import utils.LCUtil;
 
@@ -106,13 +103,7 @@ public class CreateCourse implements Serializable {
             } else {
                 ps.setNull(1, Types.INTEGER);
             }
-            ps.setString(2, course.getCourseName());
-            ps.setShort(3, (short) 18);
-            ps.setShort(4, course.getCoursePar());
-            ps.setInt(5, course.getClub_idclub());
-            ps.setTimestamp(6, Timestamp.valueOf(DATE_BEGIN_COURSE));
-            ps.setTimestamp(7, Timestamp.valueOf(DATE_END_COURSE));
-            LCUtil.logps(ps);
+            sql.preparedstatement.psCreateUpdateCourse.mapUpsert(ps, course);
 
             int rows = ps.executeUpdate();
             LOG.debug("course upserted id = {} name = {} rows = {}", course.getIdcourse(), course.getCourseName(), rows);

@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.Types;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
@@ -130,6 +131,50 @@ public class CreateClub implements Serializable {
         }
     } // end method
 
+
+    public boolean upsert(final Club club) throws SQLException {
+        final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+
+        final String query = """
+            INSERT INTO club (idclub, ClubName, clubAddress, clubCity, clubCountry, ClubLatitude, ClubLongitude, ClubWebsite, ClubZoneId, ClubLocalAdmin, ClubUnavailableStructure, ClubModificationDate)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON DUPLICATE KEY UPDATE
+                ClubName                 = VALUES(ClubName),
+                clubAddress              = VALUES(clubAddress),
+                clubCity                 = VALUES(clubCity),
+                clubCountry              = VALUES(clubCountry),
+                ClubLatitude             = VALUES(ClubLatitude),
+                ClubLongitude            = VALUES(ClubLongitude),
+                ClubWebsite              = VALUES(ClubWebsite),
+                ClubZoneId               = VALUES(ClubZoneId),
+                ClubLocalAdmin           = VALUES(ClubLocalAdmin),
+                ClubUnavailableStructure = VALUES(ClubUnavailableStructure),
+                ClubModificationDate     = CURRENT_TIMESTAMP
+            """;
+
+        try (Connection conn = dao.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            if (club.getIdclub() != null && club.getIdclub() > 0) {
+                ps.setInt(1, club.getIdclub());
+            } else {
+                ps.setNull(1, Types.INTEGER);
+            }
+            sql.preparedstatement.psCreateUpdateClub.psMapUpsert(ps, club);
+
+            int rows = ps.executeUpdate();
+            LOG.debug("club upserted id = {} name = {} rows = {}", club.getIdclub(), club.getClubName(), rows);
+            return rows > 0;
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
 
     /**
      * Main pour tests hors JSF

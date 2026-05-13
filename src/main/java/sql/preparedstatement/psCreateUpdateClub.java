@@ -23,6 +23,32 @@ public class psCreateUpdateClub implements Serializable, interfaces.Log, interfa
         OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
+ public static void psMapUpsert(PreparedStatement ps, Club club) throws Exception {
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    try {
+        String json = club.getUnavailableStructure() != null
+                ? OBJECT_MAPPER.writeValueAsString(club.getUnavailableStructure())
+                : "{}";
+        // position 1 = idclub, set by caller ; position 12 = CURRENT_TIMESTAMP in SQL
+        ps.setString(2, club.getClubName());
+        ps.setString(3, club.getAddress().getStreet());
+        ps.setString(4, club.getAddress().getZipCode() + club.getAddress().getCity());
+        ps.setString(5, club.getAddress().getCountry().getCode().toUpperCase());
+        ps.setDouble(6, club.getAddress().getLatLng().getLat());
+        ps.setDouble(7, club.getAddress().getLatLng().getLng());
+        ps.setString(8, club.getClubWebsite());
+        String zoneId = club.getAddress().getZoneId() != null ? club.getAddress().getZoneId() : "Europe/Brussels";
+        ps.setString(9, zoneId);
+        int localAdmin = club.getClubLocalAdmin() != null ? club.getClubLocalAdmin() : 324713;
+        ps.setInt(10, localAdmin);
+        ps.setString(11, json);
+        sql.PrintWarnings.print(ps.getWarnings(), methodName);
+        utils.LCUtil.logps(ps);
+    } catch (Exception e) {
+        handleGenericException(e, methodName);
+    }
+ } // end method
+
  public static PreparedStatement psMapUpdate(PreparedStatement ps, Club club) throws Exception{
     final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{

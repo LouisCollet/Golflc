@@ -30,8 +30,12 @@
         <java.version>26</java.version> <!-- mod 29-09-2025 !! used by compiler was 23  -->
         <jakartaee-api.version>11.0.0</jakartaee-api.version> <!-- mod 08-07-2025 was 10.0.0 // mod 30-07-2023 was 8.0.0 !! the great migration
             https://github.com/jakartaee/platform/blob/main/namespace/unaffected-packages.adoc -->
-        <primefaces.version>15.0.14</primefaces.version> <!-- mod 01-04-2026 was 15.0.13 -->
-        <primefaces-extension.version>15.0.14</primefaces-extension.version> <!-- mod 01-04-2026 was 15.0.13-->
+        <primefaces.version>15.0.15</primefaces.version> <!-- mod 06-05-2026 reverted from 16.0.0-SNAPSHOT: not published -->
+        
+        
+        
+        
+        <primefaces-extension.version>15.0.15</primefaces-extension.version> <!-- mod 06-05-2026 was 15.0.14-->
         <omnifaces.version>5.2.3</omnifaces.version> <!-- mod 29-04-2026 was 5.2.2 -->
         <chartjs.version>3.0.1</chartjs.version> <!-- mod 16-03-2026 was 2.9.0 -->
         <mockito.version>5.21.0</mockito.version> <!-- mod 29-12-2025 was 5.20.0-->
@@ -79,10 +83,11 @@
         <maven.archiver.plugin.version>3.6.2 </maven.archiver.plugin.version><!--mod 17-07-2024 was 3.6.0 -->
         <maven.build.helper.plugin.version>3.6.1</maven.build.helper.plugin.version> <!--mod 13-06-2025 was 3.6.0 -->
     <!--    <netbeans.compile.on.save>all</netbeans.compile.on.save>  new 27/11/2013 enlevé 08-08-2024-->
-        <netbeans.version>28</netbeans.version> <!-- only used via MANIFEST.MF see manifestEntries further-->
+        <netbeans.version>29</netbeans.version> <!-- only used via MANIFEST.MF see manifestEntries further-->
         <primeflex.version>4.0.0</primeflex.version> <!-- modify also masterTemplate - mod 16-03-2025 was 3.3.1 used also in technical info MANIFEST.MF see manifestEntries further-->
         <log4j2.version>2.25.4</log4j2.version> <!-- mod 04-03-2026  was 2.25.4 -->
         <slf4j.version>2.1.0-alpha1</slf4j.version><!-- mod 12-03-2025 was 2.0.163 -->
+        <caffeine.version>3.2.0</caffeine.version>
         <jackson.version>2.21.2</jackson.version> <!--mod 03-04-2026 was 2.21.1 -->
         <mysql-connector-j.version>9.7.0</mysql-connector-j.version>  <!-- used by RUN FILE mod 06-05-2025 was version 9.2.0-->
         <resteasy.version>7.0.1.Final</resteasy.version> <!--  mod 27-12-2025 was 7.0.0.Final -->
@@ -97,7 +102,7 @@
         <exec.inheritIo>true</exec.inheritIo><!--  mod 19-03-2023 fix NetBeans IDE pour voir la sortie support ansi color de mvn exec:java dans la console https://github.com/apache/netbeans/issues/5552 -->
         <selenium.version>4.43.0</selenium.version> <!--  mod 29-04-2026 was 4.41.0 -->
         <jollyday.version>2.6.0</jollyday.version><!--  mod 29-04-2026 was 2.5.0 -->
-        <weld.version>6.0.4.Final</weld.version> <!--  pour refactoring CDI -->
+        <weld.version>6.0.4.Final</weld.version> <!--  pour refactoring CDI version 7 pour jakarta ee 12-->
  
     </properties>
 
@@ -313,6 +318,13 @@
     <groupId>org.quartz-scheduler</groupId>
     <artifactId>quartz-jobs</artifactId>
     <version>2.5.2</version>
+</dependency>
+
+<!-- Caffeine — high-performance in-process cache (per-key TTL, multi-user safe) -->
+<dependency>
+    <groupId>com.github.ben-manes.caffeine</groupId>
+    <artifactId>caffeine</artifactId>
+    <version>${caffeine.version}</version>
 </dependency>
 
 <!-- QRGen JavaSE (QR code generator) -->
@@ -722,14 +734,14 @@
 
 <!-- weld-junit5 désactivé 2026-04-03 — aucun import trouvé dans les tests. Les tests d'intégration
      passent par Arquillian remote (WildFly), les tests unitaires par Mockito. Aucune classe
-     n'utilise @WeldSetup ou l'extension Weld JUnit 5.
+     n'utilise @WeldSetup ou l'extension Weld JUnit 5.-->
 <dependency>
     <groupId>org.jboss.weld</groupId>
     <artifactId>weld-junit5</artifactId>
     <version>5.0.3.Final</version>
     <scope>test</scope>
 </dependency>
--->
+
  </dependencies>
  
  
@@ -1212,7 +1224,17 @@ Les tests d’intégration seront exécutés lors de mvn verify ou mvn integrati
     <snapshots><enabled>true</enabled></snapshots>
   </repository>
     
-    
+   <repository> <!--  new 06-05-2026 pour PF16  -->
+    <id>sonatype-snapshots</id>
+    <name>Sonatype Snapshot Repository</name>
+    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    <releases>
+        <enabled>false</enabled>
+    </releases>
+    <snapshots>
+        <enabled>true</enabled>
+    </snapshots>
+  </repository>
     
 </repositories>
 

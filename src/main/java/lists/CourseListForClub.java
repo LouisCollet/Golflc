@@ -1,15 +1,18 @@
 package lists;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import entite.Club;
 import entite.Course;
-import static interfaces.Log.LOG;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import rowmappers.CourseRowMapper;
+import static interfaces.Log.LOG;
 
 @ApplicationScoped
 public class CourseListForClub implements Serializable {
@@ -18,20 +21,30 @@ public class CourseListForClub implements Serializable {
 
     @Inject private dao.GenericDAO dao;
 
-    // ✅ Cache d'instance — @ApplicationScoped garantit le singleton
-    private List<Course> liste = null;
+    private transient Cache<Integer, List<Course>> cache;
 
     public CourseListForClub() { }
+
+    @PostConstruct
+    void init() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        cache = Caffeine.newBuilder()
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .maximumSize(50)
+                .build();
+    } // end method
 
     public List<Course> list(final Club club) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("with club = " + club);
+        LOG.debug("with club = {}", club);
 
-        // ✅ Early return — guard clause FIRST
-        if (liste != null) {
-            LOG.debug(methodName + " - returning cached list size = " + liste.size());
-            return liste;
+        int clubId = club.getIdclub();
+        List<Course> cached = cache.getIfPresent(clubId);
+        if (cached != null) {
+            LOG.debug("returning cached list size = {}", cached.size());
+            return cached;
         }
 
         final String query = """
@@ -41,26 +54,22 @@ public class CourseListForClub implements Serializable {
             AND course.CourseEndDate >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
             """;
 
-        liste = new ArrayList<>(dao.queryList(query, new CourseRowMapper(), club.getIdclub()));
+        List<Course> result = dao.queryList(query, new CourseRowMapper(), clubId);
 
-        if (liste.isEmpty()) {
-            LOG.warn(methodName + " - empty result list");
+        if (result.isEmpty()) {
+            LOG.warn("empty result list for clubId = {}", clubId);
         } else {
-            LOG.debug(methodName + " - list size = " + liste.size());
+            LOG.debug("list size = {}", result.size());
+            cache.put(clubId, result);
         }
-        return liste;
+        return result;
     } // end method
 
-    // ✅ Getters/setters d'instance
-    public List<Course> getListe()              { return liste; }
-    public void setListe(List<Course> liste)    { this.liste = liste; }
-
-    // ✅ Invalidation explicite
     public void invalidateCache() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        this.liste = null;
-        LOG.debug(methodName + " - cache invalidated");
+        cache.invalidateAll();
+        LOG.debug("cache invalidated");
     } // end method
 
     /*
@@ -70,7 +79,7 @@ public class CourseListForClub implements Serializable {
         Club club = new Club();
         club.setIdclub(102);
         var lp = new CourseListForClub().list(club);
-        LOG.debug("from main, after lp = " + lp);
+        LOG.debug("from main, after lp = {}", lp);
     } // end main
     */
 
