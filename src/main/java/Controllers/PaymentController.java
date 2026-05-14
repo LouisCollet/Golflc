@@ -1093,6 +1093,7 @@ public class PaymentController implements Serializable {
             String comm = s.length() <= 140 ? s.toString() : s.substring(0, 137) + "...";
             cc.setCommunication(comm);
             cc.setTypePayment(LESSON());
+            cc.setCreditcardCurrency(resolveClubCurrency());
             LOG.debug("exiting completeWithLesson with creditcard = {}", cc);
             return cc;
         } catch (Exception ex) {
@@ -1116,6 +1117,7 @@ public class PaymentController implements Serializable {
             cc.setTotalPrice(cotisation.getPrice());
             cc.setCommunication(cotisation.getCommunication());
             cc.setTypePayment(COTISATION());
+            cc.setCreditcardCurrency(resolveClubCurrency());
             LOG.debug("creditcard completed with cotisation = {}", cc);
             return cc;
         } catch (Exception ex) {
@@ -1123,6 +1125,20 @@ public class PaymentController implements Serializable {
             return null;
         }
     } // end method completeWithCotisation
+
+    private String resolveClubCurrency() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            entite.Club club = appContext.getClub();
+            if (club == null || club.getAddress() == null || club.getAddress().getCountry() == null)
+                return "EUR";
+            return club.getAddress().getCountry().getCurrency();
+        } catch (Exception e) {
+            LOG.warn("resolveClubCurrency failed, defaulting to EUR: {}", e.getMessage());
+            return "EUR";
+        }
+    } // end method resolveClubCurrency
 
     private Creditcard completeWithSubscription(Subscription subscription, Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();

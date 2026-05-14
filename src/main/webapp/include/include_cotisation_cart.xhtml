@@ -19,7 +19,7 @@
 
                 <p:outputLabel value="#{msg['tarif.members.price']}"/>
                 <h:outputText value="#{b.price}">
-                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                    <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                 </h:outputText>
 
                 <p:outputLabel value="#{msg['tarif.members.choice']}"/>
@@ -27,7 +27,7 @@
 
                 <p:outputLabel value="Total"/>
                 <h:outputText value="#{b.price * b.quantity}">
-                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                    <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                 </h:outputText>
             </p:panelGrid>
             <div class="btn-group" style="margin-top:0.5rem;">
@@ -62,7 +62,7 @@
 
                 <p:outputLabel value="#{msg['tarif.members.price']}"/>
                 <h:outputText value="#{e.price}">
-                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                    <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                 </h:outputText>
 
                 <p:outputLabel value="#{msg['tarif.members.choice']}"/>
@@ -70,7 +70,7 @@
 
                 <p:outputLabel value="Total"/>
                 <h:outputText value="#{e.price * e.quantity}">
-                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                    <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                 </h:outputText>
             </p:panelGrid>
             <div class="btn-group" style="margin-top:0.5rem;">

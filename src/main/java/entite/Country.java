@@ -86,9 +86,12 @@ public class Country implements Serializable, Comparable<Country> {
         return Locale.of("", code).getDisplayCountry();
     }
         public String getCurrency() {
-      //      LOG.debug("entering currency");
-      //   LOG.debug("currency code = " + Currency.getInstance(Locale.of("", code)).getCurrencyCode()); // USD  EUR
-        return Currency.getInstance(Locale.of("", code)).getCurrencyCode();
+        if (code == null || code.isBlank()) return "EUR";
+        try {
+            return Currency.getInstance(Locale.of("", code)).getCurrencyCode();
+        } catch (Exception e) {
+            return "EUR";
+        }
     }
 
     public void setName(String name) {

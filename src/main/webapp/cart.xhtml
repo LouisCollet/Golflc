@@ -48,7 +48,7 @@
             <h:panelGroup layout="block" styleClass="mt-3" style="text-align:right;">
                 <strong>#{msg['tarif.total']}:&#160;
                     <h:outputText value="#{appContext.cotisation.price}">
-                        <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                        <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                     </h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
@@ -67,7 +67,7 @@
                           layout="block" styleClass="mt-3" style="text-align:right;">
                 <strong>#{msg['tarif.total']}:&#160;
                     <h:outputText value="#{payC.greenfeePrice}">
-                        <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                        <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                     </h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
@@ -79,7 +79,7 @@
             <h:panelGroup layout="block" styleClass="mt-3" style="text-align:right;">
                 <strong>#{msg['tarif.total']}:&#160;
                     <h:outputText value="#{appContext.subscription.subscriptionAmount}">
-                        <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                        <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                     </h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
@@ -89,7 +89,7 @@
                       layout="block" styleClass="mt-3" style="text-align:right; font-size:1.1rem; border-top:2px solid var(--golf-primary,#1a5632); padding-top:0.5rem;">
             <strong>#{msg['tarif.total']}:&#160;
                 <h:outputText value="#{payC.totalCartPrice}">
-                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                    <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                 </h:outputText></strong>
         </h:panelGroup>
 

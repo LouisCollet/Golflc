@@ -36,7 +36,7 @@
 
                 <p:outputLabel value="#{msg['lesson.amount']}"/>
                 <h:outputText value="#{c.lessonAmount}">
-                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                    <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
                 </h:outputText>
             </p:panelGrid>
             <div class="btn-group" style="margin-top:0.5rem;">
