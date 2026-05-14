@@ -2,6 +2,8 @@ package payment;
 
 import entite.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,8 +22,11 @@ public class PaymentTransaction implements Serializable {
     // Creditcard snapshot
     private Creditcard creditcard;
 
-    // Player ID (not the full Player object — avoid session coupling)
+    // Player ID
     private int playerId;
+
+    // Full Player loaded by REST (for orchestrator calls in JSF context)
+    private Player player;
 
     // Payment type
     private String savedType;
@@ -35,12 +40,15 @@ public class PaymentTransaction implements Serializable {
     private Club club;
     private Course course;
     private Inscription inscription;
-    private List<Lesson> listLessons;
+    private List<Lesson>  listLessons;
+    private List<Greenfee> listGreenfees;
+    private Professional professional;
 
     // State
     private boolean completed;
     private boolean canceled;
-    private String errorMessage;   // set par PaymentRestResource en cas d'exception — lu côté JSF
+    private String errorMessage;                                  // set by REST on exception — read by JSF
+    private final List<String> pendingInfoMessages = new ArrayList<>();  // set by REST on success — read by JSF
 
     public PaymentTransaction(String nonce) {
         this.nonce = nonce;
@@ -63,6 +71,9 @@ public class PaymentTransaction implements Serializable {
 
     public int getPlayerId() { return playerId; }
     public void setPlayerId(int playerId) { this.playerId = playerId; }
+
+    public Player getPlayer() { return player; }
+    public void setPlayer(Player player) { this.player = player; }
 
     // --- Payment type ---
 
@@ -98,6 +109,12 @@ public class PaymentTransaction implements Serializable {
     public List<Lesson> getListLessons() { return listLessons; }
     public void setListLessons(List<Lesson> listLessons) { this.listLessons = listLessons; }
 
+    public List<Greenfee> getListGreenfees() { return listGreenfees; }
+    public void setListGreenfees(List<Greenfee> listGreenfees) { this.listGreenfees = listGreenfees; }
+
+    public Professional getProfessional() { return professional; }
+    public void setProfessional(Professional professional) { this.professional = professional; }
+
     // --- State ---
 
     public boolean isCompleted() { return completed; }
@@ -108,6 +125,9 @@ public class PaymentTransaction implements Serializable {
 
     public String getErrorMessage() { return errorMessage; }
     public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+
+    public List<String> getPendingInfoMessages() { return Collections.unmodifiableList(pendingInfoMessages); }
+    public void addInfoMessage(String msg) { if (msg != null) pendingInfoMessages.add(msg); }
 
     /**
      * Check if this transaction has expired.

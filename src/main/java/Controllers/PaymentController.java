@@ -5,6 +5,11 @@ import entite.*;
 import enumeration.eTypePayment;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import static interfaces.GolfInterface.DTF_DAY_HHMM;
+import static interfaces.GolfInterface.DTF_DAY_MONTH;
+import static interfaces.GolfInterface.DTF_DAY_SLASH;
+import static interfaces.GolfInterface.ZDF_HOURS;
+import static interfaces.GolfInterface.ZDF_TIME_HHmm;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import jakarta.annotation.PostConstruct;
@@ -70,6 +75,9 @@ public class PaymentController implements Serializable {
     @Inject private cache.CacheInvalidator                       cacheInvalidator;
     @Inject private read.ReadCreditcard                          readCreditcard;       // migrated 2026-02-26 — was CreditcardController
     @Inject private payment.PaymentSubscriptionController       paymentSubscriptionController;
+    @Inject private payment.PaymentCotisationController         paymentCotisationController;
+    @Inject private payment.PaymentGreenfeeController           paymentGreenfeeController;
+    @Inject private payment.PaymentLessonController             paymentLessonController;
     @Inject private Controllers.TarifMemberController           tarifMemberController;
     @Inject private Controllers.TarifGreenfeeController         tarifGreenfeeController;
     @Inject private Controllers.MemberController          memberController;
@@ -397,8 +405,7 @@ public class PaymentController implements Serializable {
             creditcard.setTotalPrice(listGreenfees.stream().mapToDouble(Greenfee::getPrice).sum());
             LOG.debug("listGreenfees size={}, total={}", listGreenfees.size(), creditcard.getTotalPrice());
             upsertCart();
-            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            String dateStr = gf.getRoundDate() != null ? gf.getRoundDate().format(fmt) : "?";
+            String dateStr = gf.getRoundDate() != null ? gf.getRoundDate().format(ZDF_TIME_HHmm) : "?";
             showMessageInfo("✅ Créneau du " + dateStr + " ajouté — "
                     + listGreenfees.size() + " créneau(x) dans le panier. Cliquez « Paiement en ligne » pour régler.");
         } catch (Exception ex) {
@@ -627,6 +634,10 @@ public class PaymentController implements Serializable {
         return listGreenfees.stream().mapToDouble(Greenfee::getPrice).sum();
     } // end method
 
+    public double getLessonPrice() {
+        return listLessons.stream().mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0).sum();
+    } // end method
+
     // ---- has*() — basés sur le contenu des listes (utilisés par cart.xhtml MIXED) ----
     public boolean hasGreenfees()    { return !listGreenfees.isEmpty(); } // end method
     public boolean hasLessons()      { return !listLessons.isEmpty(); }   // end method
@@ -667,7 +678,7 @@ public class PaymentController implements Serializable {
             if (c != null && !c.isBlank()) { if (sb.length() > 0) sb.append(" | "); sb.append(c); }
         }
         if (!listLessons.isEmpty()) {
-            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm");
+            java.time.format.DateTimeFormatter fmt = DTF_DAY_HHMM;
             StringBuilder ls = new StringBuilder("Lesson ");
             for (int i = 0; i < listLessons.size(); i++) {
                 if (i > 0) ls.append(",");
@@ -677,7 +688,7 @@ public class PaymentController implements Serializable {
             sb.append(ls);
         }
         if (!listGreenfees.isEmpty()) {
-            java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM HH:mm");
+            java.time.format.DateTimeFormatter fmt = DTF_DAY_HHMM;
             StringBuilder gs = new StringBuilder("GF ");
             for (int i = 0; i < listGreenfees.size(); i++) {
                 if (i > 0) gs.append(",");
@@ -744,10 +755,9 @@ public class PaymentController implements Serializable {
     public java.util.List<entite.EquipmentsAndBasicAndRange> getCotisationBasicCart() {
         TarifMember t = memberController.getTarifMember();
         if (t != null && t.getBasicList() != null) {
-            java.util.List<entite.EquipmentsAndBasicAndRange> filtered = t.getBasicList().stream()
+            return t.getBasicList().stream()
                     .filter(b -> b.getQuantity() != null && b.getQuantity() > 0)
                     .toList();
-            if (!filtered.isEmpty()) return filtered;
         }
         return restoredBasicCart;
     } // end method
@@ -755,10 +765,9 @@ public class PaymentController implements Serializable {
     public java.util.List<entite.EquipmentsAndBasic> getCotisationEquipCart() {
         TarifMember t = memberController.getTarifMember();
         if (t != null && t.getEquipmentsList() != null) {
-            java.util.List<entite.EquipmentsAndBasic> filtered = t.getEquipmentsList().stream()
+            return t.getEquipmentsList().stream()
                     .filter(eq -> eq.getQuantity() != null && eq.getQuantity() > 0)
                     .toList();
-            if (!filtered.isEmpty()) return filtered;
         }
         return restoredEquipCart;
     } // end method
@@ -768,7 +777,18 @@ public class PaymentController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             item.setQuantity(0);
-            refreshCotisationCart();
+            if (getCotisationBasicCart().isEmpty()) {
+                // dernier item basic supprimé — annuler la cotisation entièrement
+                TarifMember t = memberController.getTarifMember();
+                if (t != null) {
+                    t.setBasicList(new java.util.ArrayList<>());
+                    t.setEquipmentsList(new java.util.ArrayList<>());
+                }
+                appContext.setCotisation(null);
+                LOG.debug("cotisation cancelled — basic cart empty after remove");
+            } else {
+                refreshCotisationCart();
+            }
             upsertCart();
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -780,7 +800,18 @@ public class PaymentController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             item.setQuantity(0);
-            refreshCotisationCart();
+            if (getCotisationBasicCart().isEmpty()) {
+                // plus de basic — annuler la cotisation entièrement
+                TarifMember t = memberController.getTarifMember();
+                if (t != null) {
+                    t.setBasicList(new java.util.ArrayList<>());
+                    t.setEquipmentsList(new java.util.ArrayList<>());
+                }
+                appContext.setCotisation(null);
+                LOG.debug("cotisation cancelled — no basic item left after equipment remove");
+            } else {
+                refreshCotisationCart();
+            }
             upsertCart();
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -1078,8 +1109,8 @@ public class PaymentController implements Serializable {
             LOG.debug("creditcard after prefilling = {}", cc);
             cc.setPaymentOK(false);
             cc.setTotalPrice(total);
-            java.time.format.DateTimeFormatter fmtDate = java.time.format.DateTimeFormatter.ofPattern("dd/MM");
-            java.time.format.DateTimeFormatter fmtTime = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+            java.time.format.DateTimeFormatter fmtDate = DTF_DAY_MONTH;
+            java.time.format.DateTimeFormatter fmtTime = ZDF_HOURS;
             StringBuilder s = new StringBuilder("Lesson ");
             for (int i = 0; i < lessons.size(); i++) {
                 if (i > 0) s.append(",");
@@ -1250,8 +1281,124 @@ public class PaymentController implements Serializable {
             LOG.debug("showMenu restored to true");
         }
         LOG.debug("creditcard synced from PaymentTransaction, nonce={}", completionNonce);
-        markCartCompleted();
+        // ========================================
+        // Process PENDING cart rows — inserts into payments_xxx + delete cart rows
+        // ========================================
+        try {
+            int playerId = tx.getPlayerId();
+            int clubId   = tx.getClub() != null ? tx.getClub().getIdclub() : 0;
+            entite.Player txPlayer = tx.getPlayer() != null ? tx.getPlayer() : appContext.getPlayer();
+
+            if (playerId > 0 && clubId > 0 && txPlayer != null) {
+                java.util.List<entite.Cart> carts = findCartService.findAllPending(playerId, clubId);
+                LOG.debug("cart rows PENDING count={}", carts.size());
+
+                payment.PaymentOrchestrator sharedOrchestrator = new payment.PaymentOrchestrator(
+                    this.creditcard, txPlayer,
+                    tx.getRound(), tx.getClub(), tx.getCourse(), tx.getInscription(),
+                    paymentSubscriptionController, paymentGreenfeeController,
+                    paymentCotisationController, paymentLessonController);
+
+                for (entite.Cart cart : carts) {
+                    String cartType = cart.getCartType().name();
+                    String json = cart.getCartItemsJson();
+                    LOG.debug("processing cart type={}", cartType);
+                    try {
+                        switch (cartType) {
+                        case "COTISATION" -> {
+                            @SuppressWarnings("unchecked")
+                            java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
+                            entite.Cotisation cot = new entite.Cotisation();
+                            if (m.get("idplayer")      instanceof Number n) cot.setIdplayer(n.intValue());
+                            if (m.get("idclub")        instanceof Number n) cot.setIdclub(n.intValue());
+                            if (m.get("total")         instanceof Number n) cot.setPrice(n.doubleValue());
+                            if (m.get("type")          instanceof String s) cot.setType(s);
+                            if (m.get("communication") instanceof String s) cot.setCommunication(s);
+                            if (m.get("items")         instanceof String s) cot.setItems(s);
+                            if (m.get("startDate")     instanceof String s) cot.setCotisationStartDate(java.time.LocalDateTime.parse(s));
+                            if (m.get("endDate")       instanceof String s) cot.setCotisationEndDate(java.time.LocalDateTime.parse(s));
+                            cot.setStatus(m.get("status") instanceof String s ? s : "Y");
+                            sharedOrchestrator.handle(new payment.CotisationPayment(cot));
+                            deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
+                            LOG.debug("COTISATION payment done and cart row deleted");
+                        }
+                        case "SUBSCRIPTION" -> {
+                            @SuppressWarnings("unchecked")
+                            java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
+                            entite.Subscription sub = new entite.Subscription();
+                            if (m.get("subCode")       instanceof String s) sub.setSubCode(s);
+                            if (m.get("amount")        instanceof Number n) sub.setSubscriptionAmount(n.doubleValue());
+                            if (m.get("communication") instanceof String s) sub.setCommunication(s);
+                            sub.setIdplayer(playerId);
+                            entite.Subscription subComplete = paymentSubscriptionController.complete(sub);
+                            if (subComplete != null) sub = subComplete;
+                            sharedOrchestrator.handle(new payment.SubscriptionPayment(sub));
+                            deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
+                            showMessageInfo(utils.LCUtil.prepareMessageBean("subscription.success") + sub);
+                            LOG.debug("SUBSCRIPTION payment done and cart row deleted");
+                        }
+                        case "LESSON" -> {
+                            com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.Lesson>> lessonRef =
+                                new com.fasterxml.jackson.core.type.TypeReference<>() {};
+                            java.util.List<entite.Lesson> lessons = OBJECT_MAPPER.readValue(json, lessonRef);
+                            sharedOrchestrator.handle(new payment.LessonPayment(lessons, tx.getProfessional()));
+                            tx.setListLessons(lessons);
+                            this.listLessons = lessons;
+                            deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
+                            showMessageInfo(utils.LCUtil.prepareMessageBean("lesson.success"));
+                            LOG.debug("LESSON payment done and cart row deleted");
+                        }
+                        case "GREENFEE" -> {
+                            com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.Greenfee>> gfRef =
+                                new com.fasterxml.jackson.core.type.TypeReference<>() {};
+                            java.util.List<entite.Greenfee> greenfees = OBJECT_MAPPER.readValue(json, gfRef);
+                            java.util.List<entite.Greenfee> gfDone = new java.util.ArrayList<>();
+                            for (entite.Greenfee gf : greenfees) {
+                                if (findGreenfeePaid.findByCartKeys(gf.getIdplayer(), gf.getRoundDate(), gf.getIdclub())) {
+                                    LOG.warn("GREENFEE idempotency — already in DB player={} club={} date={}",
+                                            gf.getIdplayer(), gf.getIdclub(), gf.getRoundDate());
+                                    gfDone.add(gf);
+                                    continue;
+                                }
+                                entite.Round rc = new entite.Round();
+                                rc.setRoundDate(gf.getRoundDate());
+                                rc.setRoundHoles(gf.getRoundHoles());
+                                rc.setRoundStart(gf.getRoundStart());
+                                rc.setRoundGame(gf.getRoundGame());
+                                entite.Course gfCourse = new entite.Course();
+                                gfCourse.setIdcourse(gf.getCourseId());
+                                payment.PaymentOrchestrator gfOrchestrator = new payment.PaymentOrchestrator(
+                                    this.creditcard, txPlayer, rc, tx.getClub(), gfCourse, tx.getInscription(),
+                                    paymentSubscriptionController, paymentGreenfeeController,
+                                    paymentCotisationController, paymentLessonController);
+                                gfOrchestrator.handle(new payment.GreenfeePayment(gf));
+                                gfDone.add(gf);
+                                showMessageInfo(utils.LCUtil.prepareMessageBean("greenfee.success") + gf);
+                            }
+                            tx.setListGreenfees(gfDone);
+                            this.listGreenfees = gfDone;
+                            deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
+                            LOG.debug("GREENFEE payment done count={} and cart row deleted", gfDone.size());
+                        }
+                        default -> LOG.warn("unknown cart type={} — skipped", cartType);
+                        }
+                    } catch (Exception itemEx) {
+                        String errMsg = "[" + cartType + "] "
+                            + (itemEx.getMessage() != null ? itemEx.getMessage() : itemEx.getClass().getSimpleName());
+                        LOG.error("item processing failed type={} — continuing to next item", cartType, itemEx);
+                        showMessageFatal(errMsg);
+                    }
+                }
+            } else {
+                LOG.warn("cart processing skipped playerId={} clubId={} playerNull={}", playerId, clubId, txPlayer == null);
+            }
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+
+        markCartCompleted();  // safety net: no-op if rows already deleted above
         sendPaymentMails();
+        sendLessonMails();
 
         // GREENFEE — find-or-create round après paiement ; appContext prêt pour inscription.xhtml
         if ("GREENFEE".equals(this.savedType)) {
@@ -1277,52 +1424,16 @@ public class PaymentController implements Serializable {
             }
         }
 
-        // Persist lessons + 1 payments_lesson groupé — JSF context garanti (preRenderView)
-        if (("LESSON".equals(this.savedType) || "MIXED".equals(this.savedType))
-                && tx.getListLessons() != null
-                && !tx.getListLessons().isEmpty()) {
-            try {
-                java.time.format.DateTimeFormatter fmt     = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                java.time.format.DateTimeFormatter fmtTime = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
-                int studentId = appContext.getPlayer().getIdplayer();
-                List<entite.Lesson> lessons = tx.getListLessons();
-
-                // 1. Persister chaque leçon dans la table lesson (réservation créneau)
-                boolean allOk = true;
-                for (entite.Lesson lesson : lessons) {
-                    boolean ok = createLesson.create(lesson, appContext.getPlayer());
-                    if (ok) {
-                        LOG.info("lesson persisted: {} for player={}", lesson.getEventTitle(), studentId);
-                    } else {
-                        LOG.error("failed to persist lesson: {}", lesson);
-                        allOk = false;
-                    }
-                }
-
-                // 2. UN seul enregistrement dans payments_lesson pour tout le paiement
-                StringBuilder comm = new StringBuilder();
-                comm.append("Student #").append(studentId).append("\n");
-                for (entite.Lesson lesson : lessons) {
-                    comm.append(lesson.getEventStartDate().format(fmt))
-                        .append("→").append(lesson.getEventEndDate().format(fmtTime))
-                        .append("\n");
-                }
-                comm.append("Ref: ").append(this.creditcard.getCreditcardPaymentReference()).append("\n");
-                if (this.professional == null) {
-                    LOG.warn("professional is null, skipping payments_lesson");
-                } else {
-                    createPaymentLesson.create(lessons, this.creditcard, this.professional, comm.toString());
-                }
-                LOG.info("payments_lesson persisted: {}", comm);
-
-                if (allOk) {
-                    utils.LCUtil.showMessageInfo(utils.LCUtil.prepareMessageBean("lesson.success"));
-                    sendLessonMails();
-                }
-
-            } catch (java.sql.SQLException e) {
-                handleSQLException(e, methodName);
-            }
+        // COTISATION — message détaillé avec player, période, club depuis appContext
+        if (("COTISATION".equals(this.savedType) || "MIXED".equals(this.savedType))
+                && appContext.getCotisation() != null
+                && appContext.getPlayer() != null
+                && appContext.getClub() != null) {
+            entite.Cotisation cot = appContext.getCotisation();
+            String startStr = cot.getCotisationStartDate() != null ? cot.getCotisationStartDate().format(DTF_DAY_SLASH) : "?";
+            String endStr   = cot.getCotisationEndDate()   != null ? cot.getCotisationEndDate().format(DTF_DAY_SLASH)   : "?";
+            showMessageInfo(appContext.getPlayer().getPlayerFirstName() + " " + appContext.getPlayer().getPlayerLastName()
+                    + " | " + startStr + " → " + endStr + " | " + appContext.getClub().getClubName());
         }
     } // end method
 
@@ -1566,6 +1677,11 @@ public class PaymentController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (appContext.getPlayer() == null || appContext.getClub() == null) return;
+            if (jakarta.faces.context.FacesContext.getCurrentInstance()
+                    .getPartialViewContext().isAjaxRequest()) {
+                LOG.debug("onCartLoad: skipping restore — AJAX request, session already current");
+                return;
+            }
             restoreSessionFromDb();
         } catch (Exception e) {
             LOG.warn("onCartLoad failed (non-fatal)", e);
@@ -1703,7 +1819,7 @@ public class PaymentController implements Serializable {
                             if (findLessonBooked.find(lesson)) {
                                 String msg = "[LESSON] " + utils.LCUtil.prepareMessageBean("lesson.already.booked")
                                         + " " + (lesson.getEventStartDate() != null
-                                            ? lesson.getEventStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                                            ? lesson.getEventStartDate().format(ZDF_TIME_HHmm)
                                             : "?");
                                 LOG.warn(msg);
                                 showMessageFatal(msg);
@@ -1757,20 +1873,50 @@ public class PaymentController implements Serializable {
         try {
             String type = appContext.getCreditcardType();
             if (type == null || appContext.getPlayer() == null || appContext.getClub() == null || !resolveClubId()) return;
+            int playerId = appContext.getPlayer().getIdplayer();
+            int clubId   = appContext.getClub().getIdclub();
             String json = buildCartJson(type);
-            if (json == null) return;
-            Double rawTotal = (creditcard != null) ? creditcard.getTotalPrice() : null;
-            double total = (rawTotal != null) ? rawTotal : 0.0;
-            entite.Cart cart = new entite.Cart();
-            cart.setCartPlayerId(appContext.getPlayer().getIdplayer());
-            cart.setCartClubId(appContext.getClub().getIdclub());
-            cart.setCartType(eTypePayment.valueOf(type));
-            cart.setCartItemsJson(json);
-            cart.setCartTotal(total);
-            createCartService.upsert(cart);
+            if (json != null) {
+                Double rawTotal = (creditcard != null) ? creditcard.getTotalPrice() : null;
+                double total = (rawTotal != null) ? rawTotal : 0.0;
+                entite.Cart cart = new entite.Cart();
+                cart.setCartPlayerId(playerId);
+                cart.setCartClubId(clubId);
+                cart.setCartType(eTypePayment.valueOf(type));
+                cart.setCartItemsJson(json);
+                cart.setCartTotal(total);
+                createCartService.upsert(cart);
+            }
+            cleanStaleCartRows(playerId, clubId);
 
         } catch (Exception e) {
             LOG.warn("upsertCart failed (non-fatal) type={}", appContext.getCreditcardType(), e);
+        }
+    } // end method
+
+    /** Supprime en DB les lignes de panier dont le type est vide en session. */
+    private void cleanStaleCartRows(int playerId, int clubId) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            if (listGreenfees.isEmpty()) {
+                deleteCartService.deleteByPlayerClubType(playerId, clubId, "GREENFEE");
+                LOG.debug("cleanStaleCartRows: GREENFEE row deleted");
+            }
+            if (appContext.getCotisation() == null) {
+                deleteCartService.deleteByPlayerClubType(playerId, clubId, "COTISATION");
+                LOG.debug("cleanStaleCartRows: COTISATION row deleted");
+            }
+            if (listLessons.isEmpty()) {
+                deleteCartService.deleteByPlayerClubType(playerId, clubId, "LESSON");
+                LOG.debug("cleanStaleCartRows: LESSON row deleted");
+            }
+            if (appContext.getSubscription() == null) {
+                deleteCartService.deleteByPlayerClubType(playerId, clubId, "SUBSCRIPTION");
+                LOG.debug("cleanStaleCartRows: SUBSCRIPTION row deleted");
+            }
+        } catch (Exception e) {
+            LOG.warn("cleanStaleCartRows failed (non-fatal)", e);
         }
     } // end method
 

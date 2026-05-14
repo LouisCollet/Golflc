@@ -26,9 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import payment.PaymentOrchestrator;
 import payment.PaymentStateStore;
-import payment.PaymentTarget;
 import payment.PaymentTransaction;
 
 /**
@@ -48,11 +46,7 @@ public class PaymentRestResource implements Serializable {
     @Inject private PaymentStateStore paymentStateStore;
     @Inject private entite.Settings settings;
     @Inject private manager.PaymentManager paymentManager;
-    @Inject private payment.PaymentSubscriptionController paymentSubscriptionController;
-    @Inject private payment.PaymentGreenfeeController paymentGreenfeeController;
-    @Inject private payment.PaymentCotisationController paymentCotisationController;
-    @Inject private payment.PaymentLessonController paymentLessonController;
-    @Inject private read.ReadPlayer readPlayer;   // charger le Player complet pour les mails — 2026-04-21
+    @Inject private read.ReadPlayer readPlayer;
 
     public PaymentRestResource() { } // end constructor
 
@@ -139,7 +133,8 @@ public class PaymentRestResource implements Serializable {
     } // end method
 
     // ========================================
-    // PAYMENT HANDLE — executes PaymentOrchestrator
+    // PAYMENT HANDLE — bridge only: record reference, signal JSF, redirect
+    // Business logic (DB inserts + cart cleanup) runs in PaymentController.onPaymentCompleted()
     // ========================================
 
     @jakarta.ws.rs.GET
@@ -162,33 +157,30 @@ public class PaymentRestResource implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            PaymentTransaction tx = paymentStateStore.consume(nonce);
+            // Get transaction (NOT consume — JSF will consume in onPaymentCompleted)
+            PaymentTransaction tx = paymentStateStore.get(nonce);
             if (tx == null) {
-                LOG.warn(methodName + " - SECURITY: unknown or already consumed nonce=" + nonce);
+                LOG.warn("SECURITY: unknown or already consumed nonce={}", nonce);
                 return Response.status(Response.Status.FORBIDDEN).entity("Unknown or consumed transaction").build();
             }
 
             Creditcard cc = tx.getCreditcard();
-            LOG.debug("Payment reference = " + reference);
-            LOG.debug("Path parameters = " + context.getPathParameters());
-            LOG.debug("Absolute URI = " + context.getAbsolutePath());
-            LOG.debug("Amount from cookie = " + amount);
 
             // Validate cookie amount against server-side amount
             if (amount != null && cc.getTotalPrice() > 0) {
                 double cookieAmt = Double.parseDouble(amount);
                 if (Math.abs(cookieAmt - cc.getTotalPrice()) > 0.01) {
-                    LOG.warn("SECURITY: amount mismatch in handlePayments! Server=" + cc.getTotalPrice()
-                            + " Cookie=" + cookieAmt + " for playerId=" + tx.getPlayerId());
+                    LOG.warn("SECURITY: amount mismatch! Server={} Cookie={} playerId={}",
+                            cc.getTotalPrice(), cookieAmt, tx.getPlayerId());
                 }
             }
 
+            // Record payment reference on creditcard
             cc.setCreditcardPaymentReference(reference);
             cc.setTypePayment(tx.getSavedType());
-            LOG.debug("Creditcard updated: " + cc);
+            LOG.debug("creditcard reference set: {}", reference);
 
-            // Load FULL Player from DB (firstName, lastName, email, language, etc.)
-            // sinon les mails de confirmation affichent "null" sur tous les champs — 2026-04-21
+            // Load full Player from DB (firstName, lastName, email, language for mails and orchestrator)
             Player stub = new Player();
             stub.setIdplayer(tx.getPlayerId());
             Player player = readPlayer.read(stub);
@@ -196,33 +188,20 @@ public class PaymentRestResource implements Serializable {
                 LOG.warn("Player not found in DB for idplayer={} — falling back to stub", tx.getPlayerId());
                 player = stub;
             }
+            tx.setPlayer(player);
+
+            // Record creditcard in DB (create or update)
             boolean updated = paymentManager.needsUpdate(cc, player);
-            LOG.debug("Creditcard in DB created or modified? " + updated);
+            LOG.debug("Creditcard in DB created or modified? {}", updated);
 
             cc.setPaymentOK(true);
+            LOG.info("payment acknowledged nonce={} reference={} playerId={} type={}",
+                    nonce, reference, tx.getPlayerId(), tx.getSavedType());
 
-            PaymentTarget target = switch (cc.getTypePayment()) {
-                case "SUBSCRIPTION" -> new payment.SubscriptionPayment(tx.getSubscription());
-                case "COTISATION" -> new payment.CotisationPayment(tx.getCotisation());
-                case "GREENFEE" -> new payment.GreenfeePayment(tx.getGreenfee());
-                case "LESSON" -> new payment.LessonPayment(tx.getListLessons());
-                default -> throw new IllegalArgumentException(
-                        "Unknown payment type: " + cc.getTypePayment()
-                );
-            };
-
-            LOG.debug("before PaymentOrchestrator");
-            PaymentOrchestrator orchestrator = new PaymentOrchestrator(
-                    cc, player, tx.getRound(), tx.getClub(), tx.getCourse(), tx.getInscription(),
-                    paymentSubscriptionController, paymentGreenfeeController,
-                    paymentCotisationController, paymentLessonController
-            );
-            orchestrator.handle(target);
-
+            // Redirect to Python payment_generator — which redirects user to creditcard_payment_executed.xhtml
             String paymentServiceUrl = settings.getProperty("PAYMENT_SERVICE_URL");
             if (paymentServiceUrl == null || paymentServiceUrl.isBlank()) {
-                String msg = "FATAL — PAYMENT_SERVICE_URL environment variable is not set — cannot redirect to payment_generator. "
-                           + "Set PAYMENT_SERVICE_URL (e.g. https://127.0.0.1:5000) and restart WildFly.";
+                String msg = "FATAL — PAYMENT_SERVICE_URL not set — cannot redirect to payment_generator.";
                 LOG.error(msg);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg).build();
             }
