@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+
+    <div class="lesson-item-card">
+        <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
+            <p:outputLabel value="#{msg['title.payment.subscription']}"/>
+            <h:outputText value="#{appContext.subscription.subCode}"/>
+
+            <p:outputLabel value="#{msg['subscription.communication']}"/>
+            <h:outputText value="#{appContext.subscription.communication}"/>
+
+            <p:outputLabel value="#{msg['subscription.amount']}"/>
+            <h:outputText value="#{appContext.subscription.subscriptionAmount}">
+                <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+            </h:outputText>
+        </p:panelGrid>
+        <div class="btn-group" style="margin-top:0.5rem;">
+            <p:commandButton icon="pi pi-trash"
+                             value="#{msg['button.cancel']}"
+                             styleClass="p-button-danger p-button-sm"
+                             action="#{payC.removeSubscriptionItem()}"
+                             update="form_cart"
+                             process="@this"/>
+        </div>
+    </div>
+
+</ui:composition>

@@ -2,6 +2,7 @@ package entite;
 
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.enterprise.context.RequestScoped;
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -28,9 +29,17 @@ public class Greenfee implements Serializable, interfaces.GolfInterface{
     private LocalDateTime paymentDate;
     private double price;
     private String communication;
+    @JsonAlias("item")
     private String items;
     private String status;
     private String currency;
+    // display/session fields — populated in cart, not persisted to greenfee DB table
+    private String  clubName;
+    private String  courseName;
+    private Short   roundHoles;
+    private Integer courseId;
+    private Short   roundStart;
+    private String  roundGame;
 
 public Greenfee()    // constructor
 { 
@@ -127,7 +136,23 @@ public Greenfee()    // constructor
         this.currency = currency;
     }
 
+    public String getClubName()                { return clubName; }
+    public void   setClubName(String clubName) { this.clubName = clubName; }
 
+    public String getCourseName()                  { return courseName; }
+    public void   setCourseName(String courseName) { this.courseName = courseName; }
+
+    public Short getRoundHoles()                 { return roundHoles; }
+    public void  setRoundHoles(Short roundHoles) { this.roundHoles = roundHoles; }
+
+    public Integer getCourseId()                   { return courseId; }
+    public void    setCourseId(Integer courseId)   { this.courseId = courseId; }
+
+    public Short getRoundStart()                   { return roundStart; }
+    public void  setRoundStart(Short roundStart)   { this.roundStart = roundStart; }
+
+    public String getRoundGame()                   { return roundGame; }
+    public void   setRoundGame(String roundGame)   { this.roundGame = roundGame; }
 
  @Override
 public String toString(){

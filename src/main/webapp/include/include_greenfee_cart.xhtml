@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+
+    <ui:repeat value="#{payC.listGreenfees}" var="gf">
+        <div class="lesson-item-card">
+            <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
+                <p:outputLabel value="#{msg['club.name']}"/>
+                <h:outputText value="#{gf.clubName}"/>
+
+                <p:outputLabel value="#{msg['course.name']}"/>
+                <h:outputText value="#{gf.courseName}"/>
+
+                <p:outputLabel value="#{msg['round.date']}"/>
+                <h:outputText value="#{gf.roundDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                </h:outputText>
+
+                <p:outputLabel value="#{msg['round.holes']}"/>
+                <h:outputText value="#{gf.roundHoles}"/>
+
+                <p:outputLabel value="#{msg['tarif.greenfee']}"/>
+                <h:outputText value="#{gf.price}">
+                    <f:convertNumber type="currency" currencySymbol="#{gf.currency}" groupingUsed="true"/>
+                </h:outputText>
+            </p:panelGrid>
+            <div class="btn-group" style="margin-top:0.5rem;">
+                <p:commandButton icon="pi pi-trash"
+                                 value="#{msg['button.cancel']}"
+                                 styleClass="p-button-danger p-button-sm"
+                                 action="#{payC.removeGreenfeeItem(gf)}"
+                                 update="form_cart"
+                                 process="@this"/>
+            </div>
+        </div>
+    </ui:repeat>
+
+</ui:composition>

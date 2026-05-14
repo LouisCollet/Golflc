@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+
+    <!-- Basic items -->
+    <ui:repeat value="#{payC.cotisationBasicCart}" var="b"
+               rendered="#{not empty payC.cotisationBasicCart}">
+        <div class="lesson-item-card">
+            <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
+                <p:outputLabel value="#{msg['tarif.members.item']}"/>
+                <h:outputText value="#{b.item}"/>
+
+                <p:outputLabel value="#{msg['tarif.members.rangeage']}"/>
+                <h:outputText value="#{b.range}"/>
+
+                <p:outputLabel value="#{msg['tarif.members.price']}"/>
+                <h:outputText value="#{b.price}">
+                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                </h:outputText>
+
+                <p:outputLabel value="#{msg['tarif.members.choice']}"/>
+                <h:outputText value="#{b.quantity}"/>
+
+                <p:outputLabel value="Total"/>
+                <h:outputText value="#{b.price * b.quantity}">
+                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                </h:outputText>
+            </p:panelGrid>
+            <div class="btn-group" style="margin-top:0.5rem;">
+                <p:commandButton icon="pi pi-trash"
+                                 value="#{msg['button.cancel']}"
+                                 styleClass="p-button-danger p-button-sm"
+                                 action="#{payC.removeCotisationBasicItem(b)}"
+                                 update="form_cart"
+                                 process="@this"/>
+            </div>
+        </div>
+    </ui:repeat>
+
+    <!-- Equipment items -->
+    <ui:repeat value="#{payC.cotisationEquipCart}" var="e"
+               rendered="#{not empty payC.cotisationEquipCart}">
+        <div class="lesson-item-card">
+            <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
+                <p:outputLabel value="#{msg['tarif.members.item']}"/>
+                <h:outputText value="#{e.item}"/>
+
+                <p:outputLabel value="#{msg['tarif.period']}"/>
+                <h:panelGroup>
+                    <h:outputText value="#{memC.tarifMember.startDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value=" → "/>
+                    <h:outputText value="#{memC.tarifMember.endDate}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </h:panelGroup>
+
+                <p:outputLabel value="#{msg['tarif.members.price']}"/>
+                <h:outputText value="#{e.price}">
+                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                </h:outputText>
+
+                <p:outputLabel value="#{msg['tarif.members.choice']}"/>
+                <h:outputText value="#{e.quantity}"/>
+
+                <p:outputLabel value="Total"/>
+                <h:outputText value="#{e.price * e.quantity}">
+                    <f:convertNumber type="currency" currencySymbol="€" groupingUsed="true"/>
+                </h:outputText>
+            </p:panelGrid>
+            <div class="btn-group" style="margin-top:0.5rem;">
+                <p:commandButton icon="pi pi-trash"
+                                 value="#{msg['button.cancel']}"
+                                 styleClass="p-button-danger p-button-sm"
+                                 action="#{payC.removeCotisationEquipmentItem(e)}"
+                                 update="form_cart"
+                                 process="@this"/>
+            </div>
+        </div>
+    </ui:repeat>
+
+</ui:composition>
