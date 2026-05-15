@@ -261,16 +261,22 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
            total = total + (equipment.getPrice() * equipment.getQuantity());
        }
          LOG.debug("total after equipments = {}", total);
-     cotisation.setCommunication(cotisation.getCommunication() + total);       
-         
+     StringBuilder comm = new StringBuilder(LCUtil.prepareMessageBean("cotisation.communication"));
+     for (EquipmentsAndBasicAndRange basic : tarif.getBasicList()) {
+         if (basic.getPrice() == null || basic.getQuantity() == null || basic.getQuantity() <= 0) continue;
+         comm.append(" | ").append(basic.getItem())
+             .append(": ").append(utils.LCUtil.myDoubleRound(basic.getPrice() * basic.getQuantity(), 2));
+     }
+     for (EquipmentsAndBasic equipment : tarif.getEquipmentsList()) {
+         if (equipment.getPrice() == null || equipment.getQuantity() == null || equipment.getQuantity() <= 0) continue;
+         comm.append(" | ").append(equipment.getItem())
+             .append(": ").append(utils.LCUtil.myDoubleRound(equipment.getPrice() * equipment.getQuantity(), 2));
+     }
+     comm.append(" = ").append(utils.LCUtil.myDoubleRound(total, 2));
+     cotisation.setCommunication(comm.toString());
 
      double discount = 0.0;
         LOG.debug("tarif.getDiscount = {}", tarif.getDiscount());
-        
-  //   if(tarif.getDiscount() == null){  // new 05-06-2021 pour continuer, à revoir !!
- //       tarif.setDiscount("Days");
-  //   }
-     cotisation.setCommunication(LCUtil.prepareMessageBean("cotisation.communication"));
      if(tarif.getDiscount().equals("Year") || tarif.getDiscount() == null){
 //          LOG.debug("number of days = {}", Year.of(year).length());
              LOG.debug("discount = Year - no discount !");

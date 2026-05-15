@@ -31,39 +31,48 @@ public class LessonMail implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             Player pro = playerManager.readPlayer(professional.getProPlayerId());
-            StringBuilder sb = new StringBuilder();
-            sb.append(" <br/>Lesson Payment Confirmation - GolfLC!")
-              .append(" <br/>").append(LocalDateTime.now().format(ZDF_TIME))
-              .append(" <br/>")
-              .append(" <br/><b>Student       = </b>").append(student.getPlayerFirstName()).append(" ").append(student.getPlayerLastName())
-              .append(" (").append(student.getPlayerEmail()).append(")");
 
-            if (!lessons.isEmpty()) {
-                sb.append(" <br/><b>Professional  = </b>").append(lessons.get(0).getProName());
-                if (pro != null && pro.getPlayerEmail() != null) {
-                    sb.append(" (").append(pro.getPlayerEmail()).append(")");
-                }
-                sb.append(" <br/><b>Club          = </b>").append(lessons.get(0).getEventClubName())
-                  .append(" <br/>");
-                for (Lesson lesson : lessons) {
-                    sb.append(" <br/>  🎓 ").append(lesson.getEventTitle())
-                      .append(" — ").append(lesson.getEventStartDate().format(ZDF_TIME_HHmm))
-                      .append(" → ").append(lesson.getEventEndDate().format(ZDF_TIME_HHmm));
-                }
+            String clubName = !lessons.isEmpty() ? lessons.get(0).getEventClubName() : "";
+            String proName  = !lessons.isEmpty() ? lessons.get(0).getProName() : "";
+            String proEmail = (pro != null && pro.getPlayerEmail() != null) ? pro.getPlayerEmail() : "";
+
+            StringBuilder lignes = new StringBuilder();
+            for (Lesson lesson : lessons) {
+                String start = lesson.getEventStartDate() != null ? lesson.getEventStartDate().format(ZDF_TIME_HHmm) : "?";
+                String end   = lesson.getEventEndDate()   != null ? lesson.getEventEndDate().format(ZDF_TIME_HHmm)   : "?";
+                lignes.append("<tr><td>🎓 ").append(lesson.getEventTitle()).append("</td>")
+                      .append("<td style='color:#555'>").append(start).append(" → ").append(end).append("</td>")
+                      .append("<td align='right'>")
+                      .append(String.format("%.2f %s", lesson.getLessonAmount() != null ? lesson.getLessonAmount() : 0.0,
+                              creditcard.getCreditcardCurrency() != null ? creditcard.getCreditcardCurrency() : "€"))
+                      .append("</td></tr>");
             }
 
-            sb.append(" <br/>")
-              .append(" <br/><b>Amount paid   = </b>").append(creditcard.getTotalPrice()).append(" ").append(creditcard.getCreditcardCurrency())
-              .append(" <br/><b>Card          = </b>").append(creditcard.getCreditCardNumberSecret())
-              .append(" <br/><b>Issuer        = </b>").append(creditcard.getCreditcardIssuer())
-              .append(" <br/><b>Reference     = </b>").append(creditcard.getCreditcardPaymentReference())
-              .append(" <br/>")
-              .append(" <br/> Thank you !")
-              .append(" <br/> The GolfLC team");
+            String mail = "<html><body style='font-family:Arial,sans-serif;max-width:600px'>"
+                + "<h2>🎓 Confirmation de paiement leçon — GolfLC</h2>"
+                + "<p>" + LocalDateTime.now().format(ZDF_TIME) + "</p>"
+                + "<p><b>" + student.getPlayerFirstName() + " " + student.getPlayerLastName() + "</b>"
+                + (student.getPlayerEmail() != null ? "<br/><span style='color:#555'>" + student.getPlayerEmail() + "</span>" : "") + "</p>"
+                + "<p>Professionnel : <b>" + proName + "</b>"
+                + (proEmail.isEmpty() ? "" : " — " + proEmail) + "</p>"
+                + "<p>Club : <b>" + clubName + "</b></p>"
+                + "<hr/>"
+                + "<table style='min-width:400px;border-collapse:collapse'>"
+                + lignes
+                + "<tr><td colspan='3'><hr/></td></tr>"
+                + "<tr><td colspan='2'><b>Total</b></td>"
+                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(),
+                        creditcard.getCreditcardCurrency() != null ? creditcard.getCreditcardCurrency() : "€") + "</b></td></tr>"
+                + "</table>"
+                + "<hr/>"
+                + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
+                + "<p>Référence : " + creditcard.getCreditcardPaymentReference() + "</p>"
+                + "<br/><p>Merci !<br/>L'équipe GolfLC</p>"
+                + "</body></html>";
 
-            String subject = "Your Lesson at GolfLC is paid!";
-            String to = settings.getProperty("SMTP_USERNAME"); // TODO: switch to student.getPlayerEmail() after testing
-            mailSender.sendHtmlMailAsync(subject, sb.toString(), to, null, student.getPlayerLanguage());
+            String subject = "🎓 Confirmation leçon — GolfLC";
+            String to = settings.getProperty("SMTP_USERNAME");
+            mailSender.sendHtmlMailAsync(subject, mail, to, null, student.getPlayerLanguage());
             LOG.info("lesson payment confirmation mail enqueued for {}", to);
             return true;
         } catch (Exception e) {
@@ -83,34 +92,36 @@ public class LessonMail implements Serializable {
                 return false;
             }
 
-            StringBuilder sb = new StringBuilder();
-            sb.append(" <br/>New Lesson Booking - GolfLC!")
-              .append(" <br/>").append(LocalDateTime.now().format(ZDF_TIME))
-              .append(" <br/>");
+            String clubName = !lessons.isEmpty() ? lessons.get(0).getEventClubName() : "";
 
-            if (!lessons.isEmpty()) {
-                sb.append(" <br/><b>Professional  = </b>").append(lessons.get(0).getProName())
-                  .append(" <br/><b>Club          = </b>").append(lessons.get(0).getEventClubName())
-                  .append(" <br/>");
-                for (Lesson lesson : lessons) {
-                    sb.append(" <br/>  🎓 ").append(lesson.getEventTitle())
-                      .append(" — ").append(lesson.getEventStartDate().format(ZDF_TIME_HHmm))
-                      .append(" → ").append(lesson.getEventEndDate().format(ZDF_TIME_HHmm));
-                }
+            StringBuilder lignes = new StringBuilder();
+            for (Lesson lesson : lessons) {
+                String start = lesson.getEventStartDate() != null ? lesson.getEventStartDate().format(ZDF_TIME_HHmm) : "?";
+                String end   = lesson.getEventEndDate()   != null ? lesson.getEventEndDate().format(ZDF_TIME_HHmm)   : "?";
+                lignes.append("<tr><td>🎓 ").append(lesson.getEventTitle()).append("</td>")
+                      .append("<td style='color:#555'>").append(start).append(" → ").append(end).append("</td></tr>");
             }
 
-            sb.append(" <br/>")
-              .append(" <br/><b>Student       = </b>").append(student.getPlayerFirstName()).append(" ").append(student.getPlayerLastName())
-              .append(" <br/><b>Student email = </b>").append(student.getPlayerEmail())
-              .append(" <br/>")
-              .append(" <br/><b>Amount paid   = </b>").append(creditcard.getTotalPrice()).append(" ").append(creditcard.getCreditcardCurrency())
-              .append(" <br/><b>Reference     = </b>").append(creditcard.getCreditcardPaymentReference())
-              .append(" <br/>")
-              .append(" <br/> The GolfLC team");
+            String mail = "<html><body style='font-family:Arial,sans-serif;max-width:600px'>"
+                + "<h2>📬 Nouvelle réservation de leçon — GolfLC</h2>"
+                + "<p>" + LocalDateTime.now().format(ZDF_TIME) + "</p>"
+                + "<p>Club : <b>" + clubName + "</b></p>"
+                + "<hr/>"
+                + "<p><b>Étudiant :</b> " + student.getPlayerFirstName() + " " + student.getPlayerLastName()
+                + (student.getPlayerEmail() != null ? " — <a href='mailto:" + student.getPlayerEmail() + "'>" + student.getPlayerEmail() + "</a>" : "") + "</p>"
+                + "<table style='min-width:360px;border-collapse:collapse'>"
+                + lignes
+                + "</table>"
+                + "<hr/>"
+                + "<p>Montant payé : <b>" + String.format("%.2f %s", creditcard.getTotalPrice(),
+                        creditcard.getCreditcardCurrency() != null ? creditcard.getCreditcardCurrency() : "€") + "</b></p>"
+                + "<p>Référence : " + creditcard.getCreditcardPaymentReference() + "</p>"
+                + "<br/><p>L'équipe GolfLC</p>"
+                + "</body></html>";
 
-            String subject = "New lesson booked by " + student.getPlayerFirstName() + " " + student.getPlayerLastName();
-            String to = settings.getProperty("SMTP_USERNAME"); // TODO: switch to pro.getPlayerEmail() after testing
-            mailSender.sendHtmlMailAsync(subject, sb.toString(), to, null, pro.getPlayerLanguage());
+            String subject = "📬 Nouvelle leçon — " + student.getPlayerFirstName() + " " + student.getPlayerLastName();
+            String to = settings.getProperty("SMTP_USERNAME");
+            mailSender.sendHtmlMailAsync(subject, mail, to, null, pro.getPlayerLanguage());
             LOG.info("pro notification mail enqueued for {}", to);
             return true;
         } catch (Exception e) {

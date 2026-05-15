@@ -479,6 +479,7 @@ public class PaymentController implements Serializable {
                 payment.PaymentTransaction tx = new payment.PaymentTransaction(nonce);
                 tx.setCreditcard(creditcard);
                 tx.setPlayerId(appContext.getPlayer().getIdplayer());
+                tx.setPlayer(appContext.getPlayer());
                 tx.setSavedType(savedType);
                 tx.setCreditcardType(appContext.getCreditcardType());
                 tx.setSubscription(appContext.getSubscription());
@@ -1048,7 +1049,7 @@ public class PaymentController implements Serializable {
                 if (errorTx.getListLessons() != null && !errorTx.getListLessons().isEmpty()) {
                     cartController.setListLessons(errorTx.getListLessons());
                 }
-                sendPaymentMails();
+                sendPaymentMails(errorTx);
                 sendLessonMails();
             }
 
@@ -1065,7 +1066,7 @@ public class PaymentController implements Serializable {
                     showMessageInfo(msg);
                 }
             }
-            sendPaymentMails();
+            sendPaymentMails(errorTx);
             sendLessonMails();
             // Inscription auto faite côté REST - confirme N fois (une par greenfee)
             if (this.creditcard != null) {
@@ -1204,16 +1205,31 @@ public class PaymentController implements Serializable {
         }
 
         cartController.markCartCompleted(savedType);  // safety net: no-op if rows already deleted above
-        sendPaymentMails();
+        sendPaymentMails(tx);
         sendLessonMails();
 
-        // GREENFEE - find-or-create round après paiement ; appContext prêt pour inscription.xhtml
+        // GREENFEE - find-or-create round pour chaque greenfee après paiement
         if ("GREENFEE".equals(this.savedType)) {
-            processOneGreenfeePostPayment(
-                tx.getRound()  != null ? tx.getRound()  : appContext.getRound(),
-                tx.getCourse() != null ? tx.getCourse() : appContext.getCourse(),
-                tx.getClub()   != null ? tx.getClub()   : appContext.getClub()
-            );
+            Club club = tx.getClub() != null ? tx.getClub() : appContext.getClub();
+            java.util.List<Greenfee> gfList = tx.getListGreenfees();
+            if (gfList != null && !gfList.isEmpty()) {
+                for (Greenfee gf : gfList) {
+                    Round rc = new Round();
+                    rc.setRoundDate(gf.getRoundDate());
+                    rc.setRoundHoles(gf.getRoundHoles());
+                    rc.setRoundStart(gf.getRoundStart());
+                    rc.setRoundGame(gf.getRoundGame());
+                    Course course = new Course();
+                    course.setIdcourse(gf.getCourseId());
+                    processOneGreenfeePostPayment(rc, course, club);
+                }
+            } else {
+                processOneGreenfeePostPayment(
+                    tx.getRound()  != null ? tx.getRound()  : appContext.getRound(),
+                    tx.getCourse() != null ? tx.getCourse() : appContext.getCourse(),
+                    club
+                );
+            }
         }
 
         // MIXED - post-payment pour chaque greenfee de la liste
@@ -1231,16 +1247,33 @@ public class PaymentController implements Serializable {
             }
         }
 
-        // COTISATION - message détaillé avec player, période, club depuis appContext
+        // COTISATION - message détaillé avec player, période, club depuis snapshot tx
+        entite.Cotisation txCot  = tx.getCotisation() != null ? tx.getCotisation() : appContext.getCotisation();
+        entite.Player     cotPl  = tx.getPlayer()     != null ? tx.getPlayer()     : appContext.getPlayer();
+        Club              cotClub = tx.getClub()      != null ? tx.getClub()       : appContext.getClub();
         if (("COTISATION".equals(this.savedType) || "MIXED".equals(this.savedType))
-                && appContext.getCotisation() != null
-                && appContext.getPlayer() != null
-                && appContext.getClub() != null) {
-            entite.Cotisation cot = appContext.getCotisation();
-            String startStr = cot.getCotisationStartDate() != null ? cot.getCotisationStartDate().format(DTF_DAY_SLASH) : "?";
-            String endStr   = cot.getCotisationEndDate()   != null ? cot.getCotisationEndDate().format(DTF_DAY_SLASH)   : "?";
-            showMessageInfo(appContext.getPlayer().getPlayerFirstName() + " " + appContext.getPlayer().getPlayerLastName()
-                    + " | " + startStr + " �?' " + endStr + " | " + appContext.getClub().getClubName());
+                && txCot != null && cotPl != null && cotClub != null) {
+            String startStr = txCot.getCotisationStartDate() != null ? txCot.getCotisationStartDate().format(DTF_DAY_SLASH) : "?";
+            String endStr   = txCot.getCotisationEndDate()   != null ? txCot.getCotisationEndDate().format(DTF_DAY_SLASH)   : "?";
+            showMessageInfo(utils.LCUtil.prepareMessageBean("cotisation.confirmed") + " "
+                    + cotPl.getPlayerFirstName() + " " + cotPl.getPlayerLastName()
+                    + " — " + cotClub.getClubName()
+                    + " — " + startStr + " → " + endStr);
+        }
+
+        // LESSON - message détaillé avec player, pro, club depuis snapshot tx
+        java.util.List<entite.Lesson> txLessons = tx.getListLessons() != null ? tx.getListLessons() : cartController.getListLessons();
+        entite.Player lesPl = tx.getPlayer() != null ? tx.getPlayer() : appContext.getPlayer();
+        if (("LESSON".equals(this.savedType) || "MIXED".equals(this.savedType))
+                && txLessons != null && !txLessons.isEmpty() && lesPl != null) {
+            entite.Lesson first = txLessons.get(0);
+            String proName  = first.getProName()       != null ? first.getProName()       : "";
+            String clubName = first.getEventClubName() != null ? first.getEventClubName() : "";
+            String count    = txLessons.size() > 1 ? " (" + txLessons.size() + "x)" : "";
+            showMessageInfo(utils.LCUtil.prepareMessageBean("lesson.confirmed") + " "
+                    + lesPl.getPlayerFirstName() + " " + lesPl.getPlayerLastName()
+                    + " — " + proName
+                    + " — " + clubName + count);
         }
     } // end method
 
@@ -1336,33 +1369,36 @@ public class PaymentController implements Serializable {
      * LESSON mails are handled separately by sendLessonMails().
      * Non-fatal - errors are logged and swallowed.
      */
-    private void sendPaymentMails() {
+    private void sendPaymentMails(payment.PaymentTransaction tx) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (creditcard == null || appContext.getPlayer() == null) return;
         String type = savedType != null ? savedType : creditcard.getTypePayment();
         if (type == null) return;
         boolean mixed = "MIXED".equals(type);
+        entite.Player player = (tx != null && tx.getPlayer() != null) ? tx.getPlayer() : appContext.getPlayer();
+        Club          club   = (tx != null && tx.getClub()   != null) ? tx.getClub()   : appContext.getClub();
         try {
             if ("COTISATION".equals(type) || (mixed && hasCotisation())) {
-                if (appContext.getCotisation() != null) {
-                    creditcardMail.sendMailCotisation(appContext.getPlayer(), creditcard,
-                        appContext.getCotisation(), appContext.getClub(), memberController.getTarifMember());
-                    LOG.info("cotisation mail enqueued player={}", appContext.getPlayer().getIdplayer());
+                entite.Cotisation cot = (tx != null && tx.getCotisation() != null) ? tx.getCotisation() : appContext.getCotisation();
+                if (cot != null) {
+                    creditcardMail.sendMailCotisation(player, creditcard, cot, club, memberController.getTarifMember());
+                    LOG.info("cotisation mail enqueued player={}", player.getIdplayer());
                 }
             }
             if ("SUBSCRIPTION".equals(type) || (mixed && hasSubscription())) {
-                if (appContext.getSubscription() != null) {
-                    creditcardMail.sendMailSubscription(appContext.getPlayer(), creditcard,
-                        appContext.getSubscription());
-                    LOG.info("subscription mail enqueued player={}", appContext.getPlayer().getIdplayer());
+                entite.Subscription sub = (tx != null && tx.getSubscription() != null) ? tx.getSubscription() : appContext.getSubscription();
+                if (sub != null) {
+                    creditcardMail.sendMailSubscription(player, creditcard, sub);
+                    LOG.info("subscription mail enqueued player={}", player.getIdplayer());
                 }
             }
             if ("GREENFEE".equals(type) || (mixed && hasGreenfees())) {
-                for (Greenfee gf : cartController.getListGreenfees()) {
-                    creditcardMail.sendMailGreenfee(appContext.getPlayer(), creditcard, gf, appContext.getClub());
+                java.util.List<Greenfee> gfList = (tx != null && tx.getListGreenfees() != null) ? tx.getListGreenfees() : cartController.getListGreenfees();
+                for (Greenfee gf : gfList) {
+                    creditcardMail.sendMailGreenfee(player, creditcard, gf, club);
                 }
-                LOG.info("greenfee mail(s) enqueued player={} count={}", appContext.getPlayer().getIdplayer(), cartController.getListGreenfees().size());
+                LOG.info("greenfee mail(s) enqueued player={} count={}", player.getIdplayer(), gfList.size());
             }
         } catch (Exception e) {
             LOG.warn("sendPaymentMails non-fatal error", e);

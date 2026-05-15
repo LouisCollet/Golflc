@@ -40,6 +40,7 @@ public class LoginController implements Serializable {
     @Inject private find.FindLastAudit                            findLastAudit;
     @Inject private update.UpdateAudit                            updateAudit;
     @Inject private Controllers.PaymentController           payC;
+    @Inject private read.ReadClub                           readClubService;
 
     private boolean showForceLogoutButton   = false;
     private boolean showForceReconnectButton = false;
@@ -172,7 +173,9 @@ public class LoginController implements Serializable {
 
             LOG.debug("4. initialisations diverses");
             appContext.setConnected(true);
-            appContext.getClub().setIdclub(epp.player().getPlayerHomeClub());
+            entite.Club homeClub = new entite.Club();
+            homeClub.setIdclub(epp.player().getPlayerHomeClub());
+            appContext.setClub(readClubService.read(homeClub));
             appContext.getPlayer().setShowMenu(true);
             LOG.debug("showmenu = {}", appContext.getPlayer().isShowMenu());
 

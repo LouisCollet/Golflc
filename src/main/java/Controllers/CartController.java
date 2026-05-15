@@ -54,6 +54,7 @@ public class CartController implements Serializable {
     @Inject private find.FindGreenfeePaid                        findGreenfeePaid;
     @Inject private find.FindLessonBooked                        findLessonBooked;
     @Inject private payment.PaymentSubscriptionController        paymentSubscriptionController;
+    @Inject private read.ReadClub                                readClubService;
 
     // ========================================
     // ETAT PANIER
@@ -665,6 +666,10 @@ public class CartController implements Serializable {
                 if (!listGreenfees.isEmpty()) greenfee = listGreenfees.get(0);
                 LOG.debug("greenfees restored size={}", listGreenfees.size());
             } else if ("COTISATION".equals(type)) {
+                entite.Club cotClub = new entite.Club();
+                cotClub.setIdclub(cart.getCartClubId());
+                appContext.setClub(readClubService.read(cotClub));
+                LOG.debug("cotisation restore: club loaded from cartClubId={}", cart.getCartClubId());
                 @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
                 String basicJson = OBJECT_MAPPER.writeValueAsString(m.get("basic"));
@@ -802,10 +807,17 @@ public class CartController implements Serializable {
 
     private boolean resolveClubId() {
         if (appContext.getClub().getIdclub() != null) return true;
-        Integer homeClub = (appContext.getPlayer() != null) ? appContext.getPlayer().getPlayerHomeClub() : null;
-        if (homeClub == null) return false;
-        appContext.getClub().setIdclub(homeClub);
-        LOG.debug("club id resolved from player home club = {}", homeClub);
+        Integer homeClubId = (appContext.getPlayer() != null) ? appContext.getPlayer().getPlayerHomeClub() : null;
+        if (homeClubId == null) return false;
+        try {
+            entite.Club c = new entite.Club();
+            c.setIdclub(homeClubId);
+            appContext.setClub(readClubService.read(c));
+        } catch (Exception e) {
+            LOG.warn("resolveClubId: could not load home club id={}", homeClubId, e);
+            return false;
+        }
+        LOG.debug("club resolved from player home club id={}", homeClubId);
         return true;
     } // end method
 
