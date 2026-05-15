@@ -71,16 +71,4 @@ public class ReadParArray implements Serializable {
         }
     } // end method
 
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        // nécessite contexte CDI — DataSource injecté par WildFly
-        // Player player = new Player(); player.setIdplayer(324713);
-        // Course course = new Course(); course.setIdcourse(86);
-        // int[] t = new ReadParArray().read(player, course);
-        // LOG.debug("main result = {}", Arrays.toString(t));
-    } // end main
-    */
-
 } // end class

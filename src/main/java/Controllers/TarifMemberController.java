@@ -29,7 +29,7 @@ public class TarifMemberController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject private Controller.refact.PlayerController playerController;
+    @Inject private Controllers.PlayerController playerController;
 
     public TarifMemberController() { }
 
@@ -39,11 +39,17 @@ public TarifMember inputTarifMembersCotisation(TarifMember tarifMember) throws S
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
 try{
-    LOG.debug("with inputTarifMembersCotisation with tarifMember = !"+ tarifMember);
+    LOG.debug("with inputTarifMembersCotisation with tarifMember = {}", tarifMember);
     LOG.debug("workRangeAge = {}", tarifMember.getWorkRangeAge());
     if (tarifMember.getStartDate() == null || tarifMember.getEndDate() == null) {
         String msg = "period not created — cannot add cotisation item";
         LOG.error(msg);
+        showMessageFatal(msg);
+        return tarifMember;
+    }
+    if (tarifMember.getWorkItem() == null || tarifMember.getWorkItem().isBlank()) {
+        String msg = LCUtil.prepareMessageBean("tarif.member.item.required");
+        LOG.warn(msg);
         showMessageFatal(msg);
         return tarifMember;
     }
@@ -71,9 +77,8 @@ try{
     tarifMember.setWorkItem(null); // pour le prochain affichage
     tarifMember.setWorkPrice(null);
     tarifMember.setWorkRangeAge(null);
-    String msg = "inputTarifMembers updated = " + tarifMember.getBasicList();
-        LOG.debug(msg);
-        showMessageInfo(msg);
+    LOG.debug("inputTarifMembers updated = {}", tarifMember.getBasicList());
+        showMessageInfo("inputTarifMembers updated = " + tarifMember.getBasicList());
    return tarifMember;
 } catch (Exception e) {
     handleGenericException(e, methodName);
@@ -85,7 +90,13 @@ public TarifMember inputTarifMembersEquipments(TarifMember tarifMember) throws S
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
 try{
-    LOG.debug("with inputTarifMembersEquipments with tarifMember = "+ tarifMember);
+    LOG.debug("with inputTarifMembersEquipments with tarifMember = {}", tarifMember);
+    if (tarifMember.getWorkItem() == null || tarifMember.getWorkItem().isBlank()) {
+        String msg = LCUtil.prepareMessageBean("tarif.member.item.required");
+        LOG.warn(msg);
+        showMessageFatal(msg);
+        return tarifMember;
+    }
     EquipmentsAndBasic equipments = new EquipmentsAndBasic( // mod 09/05/2022
             tarifMember.getWorkItem(),
             "H", // season default ??
@@ -95,9 +106,8 @@ try{
  // house keeping
     tarifMember.setWorkItem(null); // init pour le prochain affichage
     tarifMember.setWorkPrice(null);
-    String msg = "Tarif Member Equipments updated= " + tarifMember.getEquipmentsList();
-    LOG.info(msg);
-    showMessageInfo(msg);
+    LOG.info("Tarif Member Equipments updated = {}", tarifMember.getEquipmentsList());
+    showMessageInfo("Tarif Member Equipments updated = " + tarifMember.getEquipmentsList());
   return tarifMember; 
 } catch (Exception e) {
     handleGenericException(e, methodName);
@@ -147,7 +157,8 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, LocalDate
        for(int i = 0 ; i < tarif.getBasicList().size() ; i++) {
                 var v = tarif.getBasicList().get(i);
                 if (v.getQuantity() == null || v.getQuantity() <= 0) continue; // skip unselected
-                sb.append(v.getItem())
+                String itemLabel = (v.getItem() != null && !v.getItem().isBlank()) ? v.getItem() : "item";
+                sb.append(itemLabel)
                   .append(" (")
                   .append(v.getPrice())
                   .append("*").append(v.getQuantity())
@@ -159,7 +170,8 @@ public Cotisation completeCotisation(TarifMember tarif, Player player, LocalDate
        for(int i = 0 ; i < tarif.getEquipmentsList().size() ; i++) {
                 var v = tarif.getEquipmentsList().get(i);
                 if (v.getQuantity() == null || v.getQuantity() <= 0) continue; // skip unselected
-                sb.append(v.getItem())
+                String itemLabel = (v.getItem() != null && !v.getItem().isBlank()) ? v.getItem() : "item";
+                sb.append(itemLabel)
                   .append(" (")
                   .append(v.getPrice())
                   .append("*")
@@ -224,8 +236,7 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
                 LOG.debug("end for this item = {}", endRange);
  // to do : ne pas aller vers creditcard !!               
              if(yourAge < startRange || yourAge > endRange){
-                String msg = "Rejected !!wrong cotisation range : " + range + " for your age = " + yourAge;
-                LOG.info(msg);
+                LOG.info("Rejected: wrong cotisation range {} for age {}", range, yourAge);
             //    showMessageInfo(msg);
             //    cotisation.setCotisationError(true);  //attention ici !!
             //    Integer [] arr = tarif.getMembersChoice();
@@ -239,12 +250,14 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
 // int quantity = 0;
          LOG.debug("calculating cotisation -----------------");
      for(EquipmentsAndBasicAndRange basic : tarif.getBasicList()) {
+         if (basic.getPrice() == null || basic.getQuantity() == null || basic.getQuantity() <= 0) continue;
          total = total + (basic.getPrice() * basic.getQuantity());
      }
         LOG.debug("total after cotisation member= {}", total);
 
        LOG.debug("calculating equipments- 07/05/2022----------------");
        for (EquipmentsAndBasic equipment : tarif.getEquipmentsList()) {
+           if (equipment.getPrice() == null || equipment.getQuantity() == null || equipment.getQuantity() <= 0) continue;
            total = total + (equipment.getPrice() * equipment.getQuantity());
        }
          LOG.debug("total after equipments = {}", total);

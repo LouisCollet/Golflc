@@ -1,7 +1,6 @@
 
 package Controllers;
 
-import Controller.refact.PlayerController;
 import context.ApplicationContext;
 import delete.DeleteActivation;
 import entite.Activation;
@@ -24,7 +23,7 @@ public class ActivationController implements Serializable, interfaces.Log{
     @Inject
     private delete.DeleteActivation deleteActivation;                            // migrated 2026-02-24
     @Inject
-    private Controller.refact.PlayerController playerC;                          // migrated 2026-02-24
+    private Controllers.PlayerController playerC;                          // migrated 2026-02-24
     @Inject
     private mail.ActivationMail activationMail;                                  // migrated 2026-02-26
 // key = le nom de la field dans http://localhost:8080/HelloGolf-1.0-SNAPSHOT/activation_check.xhtml?key="keyLC"

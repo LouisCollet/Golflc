@@ -48,9 +48,8 @@ public class ReadPlayer implements Serializable {
             LOG.debug("Player loaded: {}", p);
             return p;
         }
-        String msg = "Player not found in " + methodName;
-        LOG.warn(msg);
-        LCUtil.showMessageFatal(msg);
+        LOG.warn("Player not found in {}", methodName);
+        LCUtil.showMessageFatal("Player not found in " + methodName);
         return null;
     } // end method
 
@@ -83,9 +82,8 @@ public class ReadPlayer implements Serializable {
                     result = new EPlayerPassword(player, password);
                     LOG.debug("EPlayerPassword loaded: {}", result);
                 } else {
-                    String msg = "Player not found in " + methodName;
-                    LOG.warn(msg);
-                    LCUtil.showMessageFatal(msg);
+                    LOG.warn("Player not found in {}", methodName);
+                    LCUtil.showMessageFatal("Player not found in " + methodName);
                 }
                 return result;
             }

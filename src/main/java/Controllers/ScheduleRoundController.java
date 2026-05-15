@@ -1,6 +1,9 @@
 
 package Controllers;
 
+import static interfaces.GolfInterface.ZDF_HOURS;
+import static interfaces.GolfInterface.ZDF_TIME_HHmm;
+import static interfaces.ScheduleColors.*;
 import context.ApplicationContext;
 import entite.Club;
 import entite.Cotisation;
@@ -56,6 +59,7 @@ public class ScheduleRoundController implements Serializable {
     // ========================================
 
     @Inject private ApplicationContext                    appContext;
+    @Inject private cache.CacheInvalidator                cacheInvalidator;
     @Inject private lists.SunriseSunsetList               sunriseSunsetList;
     @Inject private find.FindCotisationAtRoundDate        findCotisationAtRoundDate;
     @Inject private find.FindRoundBySlot                  findRoundBySlot;
@@ -66,8 +70,8 @@ public class ScheduleRoundController implements Serializable {
     @Inject private lists.ParticipantsRoundList           participantsRoundList;
     @Inject private manager.RoundManager                  roundManager;
     @Inject private find.FindTarifGreenfeeData            findTarifGreenfeeData;
-    @Inject private Controller.refact.MemberController    memberController;
-    @Inject private Controller.refact.PaymentController   payC;
+    @Inject private Controllers.MemberController    memberController;
+    @Inject private Controllers.PaymentController   payC;
     @Inject private read.ReadUnavailablePeriod            readUnavailablePeriod;
 
     // ========================================
@@ -121,6 +125,10 @@ public class ScheduleRoundController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             ScheduleEvent<Object> evt = event.getObject();
+            if (evt == null) {
+                LOG.warn("onEventSelect: event object is null — ignored");
+                return;
+            }
             Object fullObj = evt.getDynamicProperties() != null ? evt.getDynamicProperties().get("full") : null;
             boolean full = Boolean.TRUE.equals(fullObj);
             selectedFlightStart = evt.getStartDate();
@@ -136,7 +144,7 @@ public class ScheduleRoundController implements Serializable {
             if (full) {
                 showMessageFatal("Créneau complet : "
                         + MAX_PLAYERS_PER_SLOT + " joueurs déjà inscrits à "
-                        + selectedFlightStart.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                        + selectedFlightStart.format(ZDF_TIME_HHmm)
                         + ". Merci de choisir un autre créneau.");
                 selectedFlightStart = null;
                 org.primefaces.PrimeFaces.current().ajax().addCallbackParam("full", true);
@@ -203,7 +211,7 @@ public class ScheduleRoundController implements Serializable {
 
                     // ADMIN (strict, pas localadmin) — noms des joueurs déjà inscrits pour affichage
                     if (isAdminStrict()) {
-                        participantsRoundList.invalidateCache();
+                        cacheInvalidator.invalidateParticipantsRound();
                         java.util.List<entite.composite.ECourseList> parts = participantsRoundList.list(existing);
                         java.util.List<String> names = new java.util.ArrayList<>();
                         for (entite.composite.ECourseList e : parts) {
@@ -310,7 +318,7 @@ public class ScheduleRoundController implements Serializable {
             Round existingSlot = findRoundBySlot.find(course.getIdcourse(), round.getRoundDate(),
                     java.time.ZoneId.of(club.getAddress().getZoneId()));
             if (existingSlot != null) {
-                participantsRoundList.invalidateCache();
+                cacheInvalidator.invalidateParticipantsRound();
                 int inscrits = participantsRoundList.list(existingSlot).size();
                 if (inscrits >= MAX_PLAYERS_PER_SLOT) {
                     showMessageFatal("Créneau complet : " + inscrits + "/" + MAX_PLAYERS_PER_SLOT
@@ -324,7 +332,10 @@ public class ScheduleRoundController implements Serializable {
             TarifGreenfee tarif = findTarifGreenfeeData.find(round);
             pickChoosenFromSlot(tarif, selectedFlightStart);
             memberController.setTarifGreenfee(tarif);
-            return payC.manageGreenfee(); // → creditcard.xhtml
+            payC.addGreenfeeToCart();
+            selectedFlightStart = null;
+            scheduleModel.clear();
+            return null; // stay on schedule_round.xhtml — paiement groupé via bouton "Paiement en ligne"
 
         } catch (SQLException e) {
             handleSQLException(e, methodName);
@@ -343,7 +354,18 @@ public class ScheduleRoundController implements Serializable {
 
     private void reportInscribeResult(InscribeResult r) {
         switch (r) {
-            case CREATED           -> showMessageInfo(utils.LCUtil.prepareMessageBean("inscription.confirmation.mail"));
+            case CREATED -> {
+                Player player = appContext.getPlayer();
+                Round  round  = appContext.getRound();
+                Club   club   = appContext.getClub();
+                String detail = "";
+                if (player != null && round != null && club != null && round.getRoundDate() != null) {
+                    String date = round.getRoundDate().format(ZDF_TIME_HHmm);
+                    detail = "\n" + player.getPlayerFirstName() + " " + player.getPlayerLastName()
+                           + " | " + date + " | " + club.getClubName();
+                }
+                showMessageInfo(utils.LCUtil.prepareMessageBean("inscription.confirmation.mail", detail));
+            }
             case ALREADY_INSCRIBED -> showMessageInfo("✅ Vous êtes déjà inscrit à ce créneau.");
             case FAILED            -> showMessageFatal("❌ L'inscription n'a pas pu être créée.");
         }
@@ -356,7 +378,7 @@ public class ScheduleRoundController implements Serializable {
             LOG.debug("player {} déjà inscrit au round {} — skip", player.getIdplayer(), round.getIdround());
             return InscribeResult.ALREADY_INSCRIBED;
         }
-        findTeeStart.invalidateCache();
+        cacheInvalidator.invalidateFindTeeStart();
         java.util.List<String> teeStarts = findTeeStart.find(course, player, round);
         if (teeStarts == null || teeStarts.isEmpty() || !teeStarts.get(0).contains("/")) {
             showMessageFatal("Aucun tee trouvé pour le genre " + player.getPlayerGender()
@@ -388,7 +410,7 @@ public class ScheduleRoundController implements Serializable {
                 java.time.ZoneId.of(club.getAddress().getZoneId()));
         if (existing != null) {
             // Vérifie la capacité via ParticipantsRoundList (source d'inscriptions par round)
-            participantsRoundList.invalidateCache();   // données fraîches — concurrence
+            cacheInvalidator.invalidateParticipantsRound();   // données fraîches — concurrence
             int inscrits = participantsRoundList.list(existing).size();
             if (inscrits >= MAX_PLAYERS_PER_SLOT) {
                 showMessageFatal("Créneau complet : " + inscrits + "/" + MAX_PLAYERS_PER_SLOT + " joueurs déjà inscrits.");
@@ -416,7 +438,7 @@ public class ScheduleRoundController implements Serializable {
      * Utilise sunrise/sunset du lundi de la plage comme référence pour toute la semaine.
      */
     private static final DateTimeFormatter ID_FMT = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
-    private static final DateTimeFormatter HHMM   = DateTimeFormatter.ofPattern("HH:mm");
+
 
     private void loadFlightsForRange(LocalDate start, LocalDate end) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -446,7 +468,7 @@ public class ScheduleRoundController implements Serializable {
             Round dummyRound = new Round();
             dummyRound.setRoundDate(monday.atStartOfDay());
 
-            sunriseSunsetList.invalidateCache();
+            cacheInvalidator.invalidateSunriseSunset();
             Flight baseFlight = sunriseSunsetList.list(dummyRound, club);
             if (baseFlight == null) {
                 LOG.warn("baseFlight is null — sunrise/sunset API unavailable");
@@ -499,7 +521,7 @@ public class ScheduleRoundController implements Serializable {
                             ? (slotInfo != null ? slotInfo.count : 0)
                             : roundCounts.getOrDefault(slotStart, 0);
                     boolean full = inscrits >= MAX_PLAYERS_PER_SLOT;
-                    String title = HHMM.format(t) + " — " + priceLabel
+                    String title = ZDF_HOURS.format(t) + " — " + priceLabel
                             + " (" + inscrits + "/" + MAX_PLAYERS_PER_SLOT + ")";
                     // Pour ADMIN : noms concaténés (séparés par saut de ligne) pour tooltip hover natif
                     String namesTooltip = (admin && slotInfo != null && !slotInfo.names.isEmpty())
@@ -658,7 +680,7 @@ public class ScheduleRoundController implements Serializable {
         round.setRoundDate(start);
         round.setRoundHoles((short)(holes != null ? holes : 18));
         round.setRoundGame(game);
-        round.setRoundName("Round " + start.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        round.setRoundName("Round " + start.format(ZDF_TIME_HHmm));
         round.setRoundQualifying("N");
         round.setRoundStart((short)(roundStartHole != null ? roundStartHole : 1));
         if (course != null) round.setCourseIdcourse(course.getIdcourse());
@@ -667,9 +689,9 @@ public class ScheduleRoundController implements Serializable {
 
     private String periodColor(String period) {
         return switch (period) {
-            case "A" -> "#28a745";   // matin — vert
-            case "C" -> "#0d6efd";   // après-midi — bleu
-            default  -> "#fd7e14";   // midi B — orange
+            case "A" -> GREEN_BG;   // matin
+            case "C" -> BLUE_BG;    // après-midi
+            default  -> ORANGE_BG;  // midi B
         };
     } // end method
 

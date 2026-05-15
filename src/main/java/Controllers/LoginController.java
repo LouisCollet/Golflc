@@ -1,4 +1,4 @@
-package Controller.refact;
+package Controllers;
 
 import context.ApplicationContext;
 import entite.Subscription;
@@ -39,6 +39,7 @@ public class LoginController implements Serializable {
     @Inject private Controllers.ActiveLocale                      activeLocale;
     @Inject private find.FindLastAudit                            findLastAudit;
     @Inject private update.UpdateAudit                            updateAudit;
+    @Inject private Controllers.PaymentController           payC;
 
     private boolean showForceLogoutButton   = false;
     private boolean showForceReconnectButton = false;
@@ -49,7 +50,7 @@ public class LoginController implements Serializable {
 
     public void onReset(@Observes events.ResetEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} — source: {}", event.getSource());
+        LOG.debug("entering {} — source: {}", methodName, event.getSource());
         LOG.debug("LoginController reset done");
     } // end method
 
@@ -90,6 +91,7 @@ public class LoginController implements Serializable {
         try {
             LOG.debug("player = {}", epp.getPlayer());
             appContext.setPlayer(epp.getPlayer());
+            payC.initCartOnLogin();
 
             if (appContext.getPlayer().getIdplayer() == null) {
                 String err = "player is null = " + appContext.getPlayer();
@@ -144,7 +146,7 @@ public class LoginController implements Serializable {
             boolean anotherPlayerInSameBrowser = sessionPlayerId != null && !newPlayerId.equals(sessionPlayerId);
 
             LOG.debug("sessionAuditId={} sessionPlayerId={} newPlayerId={} samePlayerReconnecting={} anotherPlayerInSameBrowser={}",
-                    methodName, sessionAuditId, sessionPlayerId, newPlayerId, samePlayerReconnecting, anotherPlayerInSameBrowser);
+                    sessionAuditId, sessionPlayerId, newPlayerId, samePlayerReconnecting, anotherPlayerInSameBrowser);
 
             if (anotherPlayerInSameBrowser) {
                 LOG.warn("player {} already in session, blocking player {}", sessionPlayerId, newPlayerId);

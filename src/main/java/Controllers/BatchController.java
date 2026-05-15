@@ -33,13 +33,12 @@ import static utils.LCUtil.showMessageFatal;
 //@RequestScoped  enlevé 25-08-2023
 public class BatchController implements Serializable{
     
-    private static JobOperator jobOperator = BatchRuntime.getJobOperator();
+    private JobOperator jobOperator = BatchRuntime.getJobOperator();
     private long executionId;
     private List<Batch> listeBatch;// = new ArrayList<>();
     @Inject private Batch batch;
     @Inject private entite.Settings settings;        // ✅ injection CDI
     @Inject private create.CreatePlayer createPlayer;  // migrated 2026-02-24
-    @Inject private Controller.refact.NavigationController navigationController; // migrated 2026-02-28
     private static int recordWritten;
     private static int recordReaded;
 
@@ -66,17 +65,20 @@ try{
     File destinationDir = new File(settings.getProperty("THUMBNAILS_LIBRARY"));
     Path path = destinationDir.toPath();
 //        LOG.debug("destination directory = {} length = {}", destinationDir, destinationDir.length());  // size in bytes
-        LOG.debug("destination directory = {} contains files = {}", destinationDir, destinationDir.list().length); // number of files
+        String[] preList = destinationDir.list();
+        LOG.debug("destination directory = {} contains files = {}", destinationDir, preList != null ? preList.length : 0);
     Files.walk(path)
                 .map(Path::toFile)
                 .forEach(File::delete);
-      LOG.debug("destination directory after delete = {} contains files = {}", destinationDir, destinationDir.list().length);
+        String[] postList = destinationDir.list();
+        LOG.debug("destination directory after delete = {} contains files = {}", destinationDir, postList != null ? postList.length : 0);
 
     Thumbnails.of(source.listFiles())
         .scale(0.30)
      // enlevé 29-09-2023   .outputFormat("jpg")
         .toFiles(destinationDir, Rename.PREFIX_DOT_THUMBNAIL); // ajoute "thumbnail." au début du file name
-    msg = "finishing thumbs ...number of thumbnails generated 2 = " + destinationDir.list().length;
+        String[] finalList = destinationDir.list();
+    msg = "finishing thumbs ...number of thumbnails generated 2 = " + (finalList != null ? finalList.length : 0);
     LOG.info( msg);
     LCUtil.showMessageInfo(msg);
 } catch (Exception e) {
@@ -454,15 +456,5 @@ public long getExecID() {
     // ========================================
     // NAVIGATION — migrated 2026-02-28
     // ========================================
-
-    /**
-     * Navigation vers jobSubmitter.xhtml
-     */
-    public String to_jobSubmitter_xhtml() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        navigationController.reset("Reset to_jobSubmitter");
-        return "jobSubmitter.xhtml?faces-redirect=true";
-    } // end method
 
 } //end class

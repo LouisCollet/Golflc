@@ -124,20 +124,4 @@ public class ReadRound implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new ReadRound().read(round, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #read(Round)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Round round = new Round();
-        round.setIdround(630);
-        round = read(round);
-        LOG.debug("loaded round = {}", round);
-    } // end main
-    */
-
 } // end class

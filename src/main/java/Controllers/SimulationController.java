@@ -1,4 +1,4 @@
-package Controller.refact;
+package Controllers;
 
 import entite.Club;
 import entite.Player;
@@ -9,6 +9,7 @@ import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
 import java.sql.SQLException;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -29,6 +30,7 @@ public class SimulationController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private context.ApplicationContext          appContext;
+    @Inject private cache.CacheInvalidator              cacheInvalidator;
     @Inject private find.FindTarifGreenfeeData          findTarifGreenfeeData;
     @Inject private calc.CalcTarifGreenfee              calcTarifGreenfee;
     @Inject private lists.ClubList                      clubList;
@@ -97,6 +99,17 @@ public class SimulationController implements Serializable {
     public String toSimulation() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
+        resetState();
+        return "greenfee_simulation.xhtml?faces-redirect=true";
+    } // end method
+
+    public void onReset(@Observes events.ResetEvent event) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        resetState();
+    } // end method
+
+    private void resetState() {
         simClubId        = null;
         simCourseId      = null;
         simDateTime      = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
@@ -104,7 +117,6 @@ public class SimulationController implements Serializable {
         simBirthDate     = null;
         simTarifGreenfee = null;
         simError         = null;
-        return "greenfee_simulation.xhtml?faces-redirect=true";
     } // end method
 
     // ── Simulate ─────────────────────────────────────────────────────────────
@@ -190,7 +202,7 @@ public class SimulationController implements Serializable {
         LOG.debug("entering {}", methodName);
         this.simClubId = simClubId;
         this.simCourseId = null;            // reset course when club changes
-        courseListForClub.invalidateCache(); // reload courses for new club
+        cacheInvalidator.invalidateCourseListForClub(); // reload courses for new club
         try {
             getCoursesForSim();             // triggers auto-select if single course
         } catch (Exception e) {

@@ -153,14 +153,6 @@ public class ChartController implements Serializable{
             .setFullSize(Boolean.TRUE)
             .setPosition("top")
             .setFont(titleFont);
- /*/ === Font de la légende ===
-    final Font legendFont = new Font()
-            .setFamily("Verdana")
-            .setStyle(FontStyle.BOLD)
-            .setWeight(36)
-            .setSize(14);
-       //     .setStyle("italic");
- */
  //   --- Plugins + Options ---
     final Plugins plugins = new Plugins()
            .setTooltip(new TooltipOptions().setMode("index"))
@@ -390,74 +382,4 @@ try{
 }
 	} //end method
 
-  //  public static void main(final String[] args){
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-    } // end main
-    */
-
 } // end class
-
-    //    return new LineChart(data, options).toJson();
-		//	this.getWebContainer(),
-		//	"SpanGaps"     
-        
-/* pas trouvé de solution élégante, conservé le hard coding pour setData!
-        String lineModelCourse = new LineChart()
-                .setData(new LineData()  // Par
-                    .addDataset(new LineDataset()
-                        .setData(List.of(
-                                listAverage.get(0).getAvgPar(),valuesPar.get(1),valuesPar.get(2),valuesPar.get(3),valuesPar.get(4),valuesPar.get(5),
-                                valuesPar.get(6),valuesPar.get(7),valuesPar.get(8),valuesPar.get(9),valuesPar.get(10),valuesPar.get(11),valuesPar.get(12),
-                                valuesPar.get(13),valuesPar.get(14),valuesPar.get(15),valuesPar.get(16),valuesPar.get(17)
-                                         ) 
-                                )
-                        .setLabel("Par")
-                        .setBorderWidth(3)
-                        .setBorderColor(RGBAColor.GREEN)
-                        .setBackgroundColor(RGBAColor.CHOCOLATE)
-                        .setLineTension(0.1f)
-                    //    .setYAxisID("left-y-axis")   
-                        .setFill(false))
-                    .addDataset(new LineDataset() // strokes
-                        .setData(listAverage.get(0).getAvgStroke(),valuesStrokes.get(1),valuesStrokes.get(2),valuesStrokes.get(3),valuesStrokes.get(4),
-                                valuesStrokes.get(5),valuesStrokes.get(6),valuesStrokes.get(7),valuesStrokes.get(8),
-                                 valuesStrokes.get(9),valuesStrokes.get(10),valuesStrokes.get(11),valuesStrokes.get(12),
-                                 valuesStrokes.get(13),valuesStrokes.get(14),valuesStrokes.get(15),valuesStrokes.get(16),valuesStrokes.get(17) )
-                        .setLabel("Strokes")
-                        .setBorderWidth(3)
-                        .setBorderColor(RGBAColor.RED)
-                        .setBackgroundColor(RGBAColor.ORANGE)
-                        .setLineTension(0.1f)
-                      //  .setYAxisID("right-y-axis")   
-                        .setFill(false))
-                    .addDataset(new LineDataset() // points
-                        .setData(listAverage.get(0).getAvgPoints(),valuesPoints.get(1),valuesPoints.get(2),valuesPoints.get(3),valuesPoints.get(4),
-                                valuesPoints.get(5),valuesPoints.get(6),valuesPoints.get(7),valuesPoints.get(8),
-                                 valuesPoints.get(9),valuesPoints.get(10),valuesPoints.get(11),valuesPoints.get(12),
-                                 valuesPoints.get(13),valuesPoints.get(14),valuesPoints.get(15),valuesPoints.get(16),valuesPoints.get(17) )
-                        .setLabel("Points")
-                        .setBorderWidth(3)
-                        .setBorderColor(RGBAColor.BLUE)
-                        .setBackgroundColor(RGBAColor.DARK_BLUE)
-                        .setLineTension(0.1f)
-                        .setFill(false))    
-                .setLabels(holes) ) // end SetData
-                .setOptions(new LineOptions()
-                        .setResponsive(true)
-                        .setMaintainAspectRatio(false)
-                        .setPlugins(new Plugins()
-                            .setTooltip(new TooltipOptions().setMode("index"))
-                            .setTitle(new Title()
-                               .setDisplay(true)
-                               // .setFont(Font("Aptos")
-                               .setText("Average per Course")) // end Title
-                        ) //end Plugins
-                ).toJson();
-        LOG.debug("output = {}", lineModelCourse);
-        return lineModelCourse;
-  //  return lineModel;
-                */
-

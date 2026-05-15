@@ -1,4 +1,4 @@
-package Controller.refact;
+package Controllers;
 
 import entite.Audit;
 import static exceptions.LCException.handleGenericException;
@@ -98,7 +98,7 @@ public class NavigationController implements Serializable {
      */
     public String to_selectPurpose_xhtml(String menuSelection) {
         final String methodName = LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", menuSelection);
+        LOG.debug("entering {} with string = {}", methodName, menuSelection);
         reset("Reset from to_selectPurpose_xhtml, with : " + menuSelection);
 
         // 1. Resolve purpose from menu code

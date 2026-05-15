@@ -30,15 +30,15 @@ public class ErrorController {
 
         if (status != null) {
             if (status >= 500) {
-                LOG.debug("status > 500, HTTP {0}", status);
+                LOG.debug("status >= 500, HTTP {}", status);
                 if (ex != null) {
                     LOG.debug(ex.getMessage(), ex);
                     notifyAdmin(ex);
                 }
             } else if (status >= 400) {
-                LOG.debug("status > 400,HTTP {0}", status);
+                LOG.debug("status >= 400, HTTP {}", status);
             } else {
-                LOG.debug("HTTP {0}", status);
+                LOG.debug("HTTP {}", status);
             }
         } else if (ex != null) {
             LOG.debug("Exception non mappée", ex);

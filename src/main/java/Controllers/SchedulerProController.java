@@ -1,36 +1,31 @@
 package Controllers;
 
-import Controller.refact.PlayerController;
+import static interfaces.GolfInterface.ZDF_TIME_HHmm;
+import static interfaces.ScheduleColors.*;
 import context.ApplicationContext;
 import entite.Club;
 import entite.Player;
 import entite.Lesson;
 import entite.composite.ECourseList;
 import enumeration.WorkingDay;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.schedule.ScheduleEntryMoveEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
 import static interfaces.GolfInterface.ZDF_TIME_HHmm;
 import static interfaces.Log.LOG;
 import manager.PlayerManager;
 import static exceptions.LCException.handleGenericException;
-import static interfaces.Log.NEW_LINE;
-import jakarta.faces.application.FacesMessage;
 import static utils.LCUtil.showDialogFatal;
 import static utils.LCUtil.showDialogInfo;
 import static utils.LCUtil.showMessageInfo;
@@ -47,8 +42,9 @@ public class SchedulerProController implements Serializable {
     @Inject private read.ReadLesson readLessons;           // migrated 2026-02-23
     @Inject private cache.CacheInvalidator cacheInvalidator; // 2026-03-29
     @Inject private DialogController dialogC;
-    @Inject private Controller.refact.PaymentController payC; // panier leçons — 2026-03-29
+    @Inject private Controllers.PaymentController payC; // panier leçons — 2026-03-29
     @Inject private update.UpdateLesson updateLessonService;
+    @Inject private calc.CalcLessonPrice calcLessonPrice;
   
     // @Inject  enlevé 14-02-2026
     private Club club;
@@ -66,6 +62,7 @@ public class SchedulerProController implements Serializable {
     private String selectedClubName    = "";
     private String selectedProName     = "";
     private String selectedStudentName = "";
+    private Double selectedLessonAmount = null;
     private int idCurrentPlayer;
     private boolean scheduleLoaded = false; // guard preRenderView — 2026-03-29
 
@@ -92,7 +89,7 @@ public class SchedulerProController implements Serializable {
                 LOG.debug("idCurrentPlayer set from appContext = {}", idCurrentPlayer);
             }
             if (professional != null) {
-                scheduleModel = readLessons.read(professional);
+                scheduleModel = readLessons.read(professional, club);
                 LOG.debug("schedule loaded, events = {}", scheduleModel.getEventCount());
             } else {
                 LOG.warn("professional is null in appContext, schedule not loaded");
@@ -104,17 +101,14 @@ public class SchedulerProController implements Serializable {
         }
     } // end method
 
-    // Méthode principale pour lire les leçons depuis ECourseList2
+    // Méthode principale pour lire les leçons depuis ECourseList
     public String readLessons(ECourseList ecp, int idplayer) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
 
             appContext.getPlayer().setIdplayer(idplayer);
-         //   playerC.setPlayer(new read.ReadPlayer().read(playerC.getPlayer(), conn));
-         // autre modification 
-          //  appContext.readPlayer(appContext.getPlayer().getIdplayer());
-             playerManager.readPlayer(appContext.getPlayer().getIdplayer());
+            playerManager.readPlayer(appContext.getPlayer().getIdplayer());
             
             LOG.debug("Player read: {}", appContext.getPlayer());
 
@@ -140,19 +134,22 @@ public class SchedulerProController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             selectedEvent = DefaultScheduleEvent.<Object>builder()
-                    .startDate(event.getObject())
-                    .endDate(event.getObject().plusMinutes(30))
-                    .description("")
-                    .backgroundColor("#dc3545")
-                    .borderColor("#bd2130")
-                    .textColor("white")
-                    .dynamicProperty("lesson-object", null) // pending event — no DB lesson yet
-                    .build();
-            // Populate display fields for the dialog
+                .startDate(event.getObject())
+                .endDate(event.getObject().plusMinutes(30))
+                .description("")
+                .backgroundColor(RED_BG)
+                .borderColor(RED_BORDER)
+                .textColor("white")
+                .dynamicProperty("lesson-object", null) // pending event — no DB lesson yet
+                .build();
+        // Populate display fields for the dialog
             selectedClubName    = club != null && club.getClubName() != null ? club.getClubName() : "";
             selectedProName     = buildPlayerName(appContext.getPlayerPro());
             selectedStudentName = buildPlayerName(appContext.getPlayer());
-            LOG.debug("dateSelect: club={} pro={} student={}", selectedClubName, selectedProName, selectedStudentName);
+         //   selectedLessonAmount = null; // prix inconnu avant réservation
+            selectedLessonAmount = calcLessonPrice.calc(professional, event.getObject(), club); // mod LC 11-05-2026 plus fort que IA !
+            LOG.debug("dateSelect: club={} pro={} student={} amount={}", selectedClubName, selectedProName, selectedStudentName, selectedLessonAmount);
+ 
             dialogC.showLessonDialog();
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -209,10 +206,13 @@ public class SchedulerProController implements Serializable {
             return;
         }
 
-        selectedClubName    = lesson.getEventClubName()  != null ? lesson.getEventClubName()  : "";
-        selectedProName     = lesson.getProName()         != null ? lesson.getProName()         : "";
-        selectedStudentName = lesson.getStudentName()     != null ? lesson.getStudentName()     : "";
-        LOG.debug("club={} pro={} student={} paid={}", selectedClubName, selectedProName, selectedStudentName, lesson.isLessonPaid());
+        selectedClubName    = lesson.getEventClubName() != null ? lesson.getEventClubName() : "";
+        selectedProName     = lesson.getProName()       != null ? lesson.getProName()        : "";
+        selectedStudentName = lesson.getStudentName()   != null ? lesson.getStudentName()    : "";
+        selectedLessonAmount = lesson.getLessonAmount() != null
+                ? lesson.getLessonAmount()
+                : calcLessonPrice.calc(professional, lesson.getEventStartDate(), club);
+        LOG.debug("club={} pro={} student={} amount={} paid={}", selectedClubName, selectedProName, selectedStudentName, selectedLessonAmount, lesson.isLessonPaid());
         dialogC.showLessonDialog();
     }
 
@@ -231,10 +231,7 @@ public class SchedulerProController implements Serializable {
                 .build();
          showMessageInfo("Date Selected", "View:" + event.toString());
     }
-    
-    
-    
-    
+
     public boolean modifyEvent(LocalDateTime ldt) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -334,16 +331,36 @@ public class SchedulerProController implements Serializable {
             lesson.setEventEndDate(selectedEvent.getEndDate());
             lesson.setEventTitle(selectedEvent.getTitle());
             lesson.setEventProId(professional.getProId());
-            lesson.setLessonAmount(professional.getProAmount());
+            lesson.setLessonAmount(calcLessonPrice.calc(professional, selectedEvent.getStartDate(), club));
             lesson.setProName(buildPlayerName(appContext.getPlayerPro()));
             lesson.setStudentName(buildPlayerName(appContext.getPlayer()));
             lesson.setEventClubName(club != null ? club.getClubName() : "");
 
             payC.addLesson(lesson);
+            selectedEvent = org.primefaces.model.DefaultScheduleEvent.<Object>builder()
+                    .title(lesson.getEventTitle())
+                    .startDate(lesson.getEventStartDate())
+                    .endDate(lesson.getEventEndDate())
+                    .description(selectedEvent.getDescription() != null ? selectedEvent.getDescription() : "")
+                    .dynamicProperty("lesson-booked", true)
+                    .dynamicProperty("lesson-paid",   false)
+                    .dynamicProperty("lesson-object", lesson)
+                    .textColor("white")
+                    .backgroundColor(GREEN_BG)
+                    .borderColor(GREEN_BORDER)
+                    .overlapAllowed(false)
+                    .resizable(false)
+                    .build();
             scheduleModel.addEvent(selectedEvent);
-            String msg = "Lesson added to cart: " + lesson.getEventTitle();
-            LOG.info(msg);
-            showMessageInfo(msg);
+            LOG.info("lesson added to scheduleModel: {}", selectedEvent);
+            String date = lesson.getEventStartDate() != null
+                    ? lesson.getEventStartDate().format(ZDF_TIME_HHmm)
+                    : "?";
+            showMessageInfo("✅ Lesson booked"
+                    + "\n" + lesson.getStudentName()
+                    + " | Pro: " + lesson.getProName()
+                    + " | " + date
+                    + " | " + lesson.getEventClubName());
             dialogC.hideLessonDialog();
             return null;
         } catch (Exception e) {
@@ -403,6 +420,10 @@ public class SchedulerProController implements Serializable {
         this.selectedEvent = selectedEvent;
     }
 
+    public Double getSelectedLessonAmount() { return selectedLessonAmount; }
+    public void   setSelectedLessonAmount(Double v) {
+        selectedLessonAmount = v; }
+
     
     public ScheduleModel getScheduleModel() { return scheduleModel; }
     public void setScheduleModel(ScheduleModel m) { scheduleModel = m; }
@@ -428,7 +449,7 @@ public class SchedulerProController implements Serializable {
     public String getSelectedProName()     { return selectedProName; }
     public String getSelectedStudentName() { return selectedStudentName; }
 
-    /**
+    /*
      * Returns a JSON array of FullCalendar day indices (0=Sun..6=Sat) for days the pro does NOT work.
      * Used in initSchedule() extender: this.cfg.options.hiddenDays = #{schedulerC.hiddenDaysJson};
      */

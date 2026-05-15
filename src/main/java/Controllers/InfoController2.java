@@ -138,17 +138,6 @@ public class InfoController2 implements Serializable {
         return manifestValue("omnifaces");
     }
 
-    /* ===================== DATABASE ===================== 
-
-    public String getMySqlInfo() throws SQLException, Exception {
-        try (Connection c = new DBConnection().getConnection()) {
-            return c.getMetaData().getDatabaseProductName() + " " +
-                   c.getMetaData().getDatabaseProductVersion() +
-                   " / " + c.getMetaData().getDriverName() + " " +
-                   c.getMetaData().getDriverVersion();
-        }
-    }*/
-
 public String getMySQLInfo() {
     LOG.debug("entering getMySQLInfo");
     ExecutorService executor = Executors.newSingleThreadExecutor();

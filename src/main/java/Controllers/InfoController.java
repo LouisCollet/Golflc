@@ -56,7 +56,7 @@ public class InfoController implements Serializable, interfaces.GolfInterface{
    @Inject private info_test.GeoDetector geoDetector; // migrated from static 2026-03-22
     private Attributes manifestAttributes = null; // fix multi-user 2026-03-07 — was static
 
-public InfoController() throws IOException { //  constructor ! le faire private ??
+public InfoController() {
     //  LOG.debug("entering Infocontroller constructor");
        // voir pom.xml manifestEntries pour les fields !!
 try{
@@ -105,28 +105,6 @@ public String getClientIPv6Address() throws UnknownHostException{
 
 public String getClientMacAddress() throws UnknownHostException{
 try{
-    
-    /*
-    InetAddress ip = InetAddress.getLocalHost(); //getByName("192.168.46.53");
-    StringBuilder sb = new StringBuilder();
-
-    NetworkInterface ni = NetworkInterface.getByInetAddress(ip);
-    if (ni != null)    {
-      byte[] mac = ni.getHardwareAddress();
-      if (mac != null) {
-
-         for (int i = 0; i < mac.length; i++){
-           //             System.out.format("%02X%s",
-           //                     mac[i], (i < mac.length - 1) ? "-" : "");
-           sb.append(String.format("%02X%s",mac[i], (i < mac.length - 1) ? "-" : "") );
-         }
-      }else{
-              LOG.debug("Address doesn't exist or is not accessible.");
-         }
-     }else{ // ni = null
-          LOG.debug("Network Interface for the specified address is not found.");
-      }
-    */
 return "fake mac";
 }catch (Exception e){
 	LOG.debug("UnknowHostException = {}", e);
@@ -140,18 +118,6 @@ return "yes, Louis : Mac adress";
 public String getGlobalAddress() throws UnknownHostException{
     return Arrays.deepToString(InetAddress.getAllByName("localhost"));
 }
-/*
-public String getMySql() throws SQLException, Exception{
- //      LOG.debug("search version mySql");
-   Connection conn = new connection_package.DBConnection().getConnection();
-   String s = conn.getMetaData().getDatabaseProductName()
-    + " / " + conn.getMetaData().getDatabaseProductVersion()
-    + NEW_LINE + conn.getMetaData().getDriverName()
-    + " / " + conn.getMetaData().getDriverVersion();
-    connection_package.DBConnection.closeQuietly(conn, null, null,null);
-    return s;
- }
-*/
 @Resource(lookup = "java:jboss/datasources/golflc")
 private DataSource dataSource;
 
@@ -185,16 +151,6 @@ public String getMongoDB() throws SQLException, Exception{
         }
     return "Driver version = " + MongoDriverVersion.VERSION + " - DB version = " + document.getString("version");
  }
-/*
-public void putMyStrings(){
-    //info coming from 
-    LOG.debug("entering putMyStrings");
- //  Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-   JQueryVersion = FacesContext.getCurrentInstance().getExternalContext()
-           .getRequestParameterMap().get("JQueryVersion");
-   LOG.debug("JQueryVersion is now = {}", JQueryVersion);
-}
-*/
     public String getJQueryVersion() {
         return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("JQueryVersion");
     }
@@ -278,45 +234,6 @@ public String getOsVersion(){
     return System.getProperty("os.name") + " " + System.getProperty("os.version")
             + " " + System.getProperty("os.arch");
 }
-/*
-public static void ListAllSystemProperties() {
-    //https://docs.oracle.com/javase/tutorial/essential/environment/env.html
-try{
-   System.getenv().forEach((k, v) -> {
-       LOG.debug("Environment Variable = {}", k + TAB + v);
-    });
- 
-   System.getProperties().entrySet().stream()
-            .map(e -> e.getKey() + ": " + e.getValue())
-            .forEach(e -> LOG.debug("System Property {}", TAB + e));
-// liste.forEach(item -> LOG.debug("Flight list {}", item));  // java 8 lambda
-
-}catch (Exception e){
-    String msg = "error listallasystemproperties = " + e ;
-        LOG.error("error = {}", msg);
-        }
-} // end listallsytemproperti
-
- public static void printManifestAttributes() {
-   try {
-       Manifest manifest;
-       try (  InputStream in = getResourceAsStream("/META-INF/MANIFEST.MF")) { // sous /src/main/resources
-           manifest = new Manifest(in);
-       }
-    Attributes attributes = manifest.getMainAttributes();
-    
-    Iterator<Object> it = attributes.keySet().iterator();
-    while(it.hasNext()) {
-       String key = it.next().toString();
-       String value = attributes.getValue(key);
-        LOG.debug("manifest attribute = {} / {}", key, value);
-    }
-   } catch (Exception ex) {
-       LOG.debug("error printattributes{}", ex);
-   }
- } //end method
-*/
-
 // ========================================
 // Methods merged from InfoController2 — 2026-03-07
 // ========================================

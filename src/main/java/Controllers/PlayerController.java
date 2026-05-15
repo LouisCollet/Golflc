@@ -1,4 +1,4 @@
-package Controller.refact;
+package Controllers;
 
 import context.ApplicationContext;
 import entite.Activation;
@@ -999,7 +999,7 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
     public Activation getActivation() { return activation; }
     public void setActivation(Activation activation) {
         this.activation = activation;
-        LOG.debug("activation set to {}", "setActivation", activation);
+        LOG.debug("activation set to {}", activation);
     } // end method
 
     public String getUuid() { return uuid; }

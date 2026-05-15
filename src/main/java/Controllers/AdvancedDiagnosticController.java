@@ -152,7 +152,7 @@ public class AdvancedDiagnosticController implements Serializable {
                     is.close();
                     return true;
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) { LOG.warn("Resource check failed for {}: {}", rp, e.getMessage()); }
             return false;
         });
     }

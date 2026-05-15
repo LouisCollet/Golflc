@@ -46,17 +46,4 @@ public class ReadUnavailablePeriod implements Serializable {
         return period;
     } // end method
 
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        // nécessite contexte CDI — DataSource injecté par WildFly
-        // Club club = new Club(); club.setIdclub(1122);
-        // Round round = new Round(); round.setIdround(102);
-        // round.setRoundDate(LocalDateTime.of(2020, Month.FEBRUARY, 17, 12, 15));
-        // UnavailablePeriod period = new ReadUnavailablePeriod().read(club, round);
-        // LOG.debug("unavailable found = {}", period);
-    } // end main
-    */
-
 } // end class

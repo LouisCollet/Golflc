@@ -50,7 +50,7 @@ public class ReadScoreArray implements Serializable {
                 while (rs.next()) {
                     int rowNum = rs.getRow() - 1;
                     if (rs.getInt("RoundStart") == 1) {
-                        strokes[rs.getRow() - 1] = rs.getInt("ScoreStroke");
+                        strokes[rowNum] = rs.getInt("ScoreStroke");
                     } else {
                         strokes[rowNum + 9] = rs.getInt("ScoreStroke");
                     }
@@ -67,17 +67,5 @@ public class ReadScoreArray implements Serializable {
             return new int[0];
         }
     } // end method
-
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        // nécessite contexte CDI — DataSource injecté par WildFly
-        // Player player = new Player(); player.setIdplayer(324713);
-        // Round round = new Round(); round.setIdround(676);
-        // int[] i = new ReadScoreArray().load(player, round);
-        // LOG.debug("result main = {}", Arrays.toString(i));
-    } // end main
-    */
 
 } // end class

@@ -136,24 +136,6 @@ public UtilsController() throws IOException {// constructor
 			cell.setCellStyle(cellStyle);
 		}
 	}
-/* enlevé 06/03/0206 mismatch entre versions enleve 3.0.0 en faveur 2.2.2
-public void preProcessPDF(Object document) throws IOException, BadElementException, DocumentException {
-try{
-    Document pdf = (Document) document;
-        pdf.open();
-        pdf.setPageSize(PageSize.A4);
-   //     pdf.setPageSize(PageSize.A4.rotate());
-
-        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-           LOG.debug("path for logo = {}", externalContext.getRealPath(""));
-        String logo = externalContext.getRealPath("") + File.separator + "resources"
-                + File.separator + "demo" + File.separator + "images" + File.separator + "prime_logo.png";
-	pdf.add(Image.getInstance(logo));
- } catch (Exception ex) {
-       LOG.debug("preProcessPDF{}", ex);
- }
-} //end preProcessPDF       
-*/
 
 // utilisé dans datePicker, yearRange
  public int dateYear(int year){ 

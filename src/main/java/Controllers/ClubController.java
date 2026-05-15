@@ -1,10 +1,9 @@
-package Controller.refact;
+package Controllers;
 
 import Controllers.DialogController;
 import context.ApplicationContext;
 import entite.*;
 import entite.composite.ECourseList;
-import entite.composite.EPlayerPassword;
 import entite.composite.EUnavailable;
 import enumeration.SelectionPurpose;
 import static exceptions.LCException.handleGenericException;
@@ -50,7 +49,7 @@ public class ClubController implements Serializable {
     @Inject private Controllers.UnavailableController unavailableController; // migrated 2026-02-25
     // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
     @Inject private read.ReadUnavailableStructure readUnavailableStructure; // migrated 2026-02-25
-    @Inject private Controller.refact.NavigationController navigationController; // renamed from CourseController 2026-02-28
+    @Inject private Controllers.NavigationController navigationController; // renamed from CourseController 2026-02-28
     @Inject private create.CreateUnavailablePeriod createUnavailablePeriodService; // migrated 2026-02-25 — Groupe D
     @Inject private update.UpdateUnavailablePeriod updateUnavailablePeriodService;
     @Inject private lists.UnavailableListForDate unavailableListForDate; // migrated 2026-02-25 — Groupe D
@@ -58,13 +57,13 @@ public class ClubController implements Serializable {
     @Inject private lists.ClubDetailList clubDetailList; // migrated 2026-02-25 — Groupe B
     @Inject private lists.CourseList courseListService; // migrated 2026-02-25 — Groupe B
     @Inject private find.FindTarifMembersData findTarifMembersData; // migrated 2026-02-25 — Groupe C
-    @Inject private Controller.refact.PlayerController playerController; // migrated 2026-02-25 — Groupe C (createModifyPlayer)
+    @Inject private Controllers.PlayerController playerController; // migrated 2026-02-25 — Groupe C (createModifyPlayer)
     @Inject private Controllers.ChartController chartController; // migrated 2026-02-26
     @Inject private lists.ProfessionalListForClub professionalListForClub; // migrated 2026-02-28 from NavigationController
     @Inject private create.CreateProfessional createProfessionalService; // migrated 2026-02-28 from CourseController
     @Inject private update.UpdateProfessional updateProfessionalService;
     @Inject private lists.ClubsListLocalAdmin clubsListLocalAdmin;
-    @Inject private Controller.refact.MemberController memberController; // added 2026-04-22 — cotisation flow restoration
+    @Inject private Controllers.MemberController memberController; // added 2026-04-22 — cotisation flow restoration
     @Inject private find.FindUnavailablePeriodOverlapping findUnavailablePeriodOverlapping; // added 2026-04-25
 
     private entite.Professional selectedProfessional = new entite.Professional();
@@ -138,8 +137,19 @@ private int cptFlight = 0;
     // ========================================
 
     public Club getClub() {
-        return appContext.getClub(); 
-    }
+        Club club = appContext.getClub();
+        if (club != null && club.getIdclub() != null && club.getIdclub() > 0
+                && (club.getClubName() == null || club.getClubName().isBlank())) {
+            try {
+                club = readClubService.read(club);
+                appContext.setClub(club);
+                LOG.debug("getClub: lazy-loaded clubName={} for idclub={}", club.getClubName(), club.getIdclub());
+            } catch (Exception e) {
+                LOG.warn("getClub: could not lazy-load club name for idclub={}", club.getIdclub());
+            }
+        }
+        return club;
+    } // end method
 
     public void setClub(Club club) {
         appContext.setClub(club);   
@@ -878,7 +888,7 @@ public List<ECourseList> listClubsCoursesTees(String param) {
                 .findFirst()
                 .ifPresent(c -> {
                     appContext.setClub(c);
-                    courseListForClubService.invalidateCache();
+                    cacheInvalidator.invalidateCourseListForClub();
                     cachedCoursesForClub = null;
                     resetCourse();
                     autoSelectCourseIfSingle();
@@ -2000,6 +2010,13 @@ public void convertYtoM() {
     public entite.Professional getSelectedProfessional() { return selectedProfessional; }
     public void setSelectedProfessional(entite.Professional p) { this.selectedProfessional = p; }
 
+    public String navigateToTarifPro(entite.Professional professional) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        appContext.setProfessional(professional);
+        return enumeration.SelectionPurpose.TARIF_PRO.navigationToFinal();
+    } // end method
+
     public List<ECourseList> listCoursesPublic() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -2672,6 +2689,17 @@ public void convertYtoM() {
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
+    } // end method
+
+    public String getClubTimeZone() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        Club club = appContext.getClub();
+        if (club != null && club.getAddress() != null && club.getAddress().getZoneId() != null) {
+            return club.getAddress().getZoneId();
+        }
+        LOG.warn("clubZoneId not found, falling back to UTC");
+        return "UTC";
     } // end method
 
 } // end class

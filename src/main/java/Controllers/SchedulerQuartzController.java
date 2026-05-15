@@ -56,13 +56,6 @@ public class SchedulerQuartzController implements Serializable{
  
 public void run() throws Exception {
   try {
-/*			Trigger trigger = TriggerBuilder.newTrigger()
-					.withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                                        .withIntervalInSeconds(5)
-                                        .repeatForever())
-					.build();
-			
- */
 LOG.debug("entering run scheduler");
        JobDataMap jobDataMap = new JobDataMap();
        jobDataMap.put("param", "12345 param ");
@@ -129,12 +122,5 @@ ClassLoader clo = Thread.currentThread().getContextClassLoader();
 //      LOG.debug("IOException Exception {}", e);;
  //   }
 } //end run
-
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-    } // end main
-    */
 
 } // end class

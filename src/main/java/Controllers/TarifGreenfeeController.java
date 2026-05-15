@@ -19,6 +19,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.Serializable;
 import utils.LCUtil;
 import static utils.LCUtil.myDoubleRound;
@@ -26,6 +27,7 @@ import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 import utils.TimeOverlap;
 
+@Named("tarifGreenfeeC")
 @ApplicationScoped
 public class TarifGreenfeeController implements Serializable {
 
@@ -77,12 +79,10 @@ try{
             datesSeasons.setSeason(tarifGreenfee.getSeason()); 
    
      tarifGreenfee.getDatesSeasonsList().add(datesSeasons);
-     String msg = "Period introduced = " + datesSeasons;
-     LOG.info(msg);
-     showMessageInfo(msg);
-     msg = "SeasonsList after add = " + tarifGreenfee.getDatesSeasonsList();
-     LOG.info(msg);
-     showMessageInfo(msg);
+     LOG.info("Period introduced = {}", datesSeasons);
+     showMessageInfo("Period introduced = " + datesSeasons);
+     LOG.info("SeasonsList after add = {}", tarifGreenfee.getDatesSeasonsList());
+     showMessageInfo("SeasonsList after add = " + tarifGreenfee.getDatesSeasonsList());
  // house keeping
     tarifGreenfee.setStartDate(null); // init pour affichage
     tarifGreenfee.setEndDate(null);

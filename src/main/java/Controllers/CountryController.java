@@ -105,8 +105,7 @@ public String getExtendedCountry(String S2) // migrated from static 2026-03-22
   //       LOG.debug("return extendedCountry = {}",  ret);
     return ret;
   } catch (Exception e) {
-            String msg = "Â£ Exception in getExendedCountry = " + e.getMessage();
-            LOG.error(msg);
+            LOG.error("Exception in getExtendedCountry: {}", e.getMessage());
         //    LCUtil.showMessageFatal(msg);
             return null;
         }  
@@ -128,34 +127,13 @@ try{
         } // end for 
           return map;
     } catch (Exception e) {
-            String msg = "Â£ Exception in createMap = " + e.getMessage();
-            LOG.error(msg);
+            LOG.error("Exception in createMap: {}", e.getMessage());
         //    LCUtil.showMessageFatal(msg);
             return null;
         } finally {
   //          LOG.debug("Done");
         }      
     } // end method
-/*
-public List<Country> completeCountry(String query) { // autocomplete used in club.xhtml/player.xhtml
-    LOG.debug("entering CountryController completeCountry with query = {}", query);
-        String queryLowerCase = query.toLowerCase();
-  //      LOG.debug("countryService = {}", countryService);
-           if(countryService == null){
-               LOG.debug("countryService was null");
-                countryService = new CountryService();
-  //             LOG.debug("new countryService = {}", countryService);
-          }
-        List<Country> countries = countryService.getCountries();
-        LOG.debug("returned from completeCountry = {}", countries);
-        return countries.stream()
-                .filter(t -> t.getName()
-                        .toLowerCase()
-                        .contains(queryLowerCase))
-                        .collect(Collectors.toList());
- //       return countries;
-    } // end method
-*/
 public List<Country> completeCountry(String query) {
         try {
              LOG.debug("entering CountryController completeCountry with query = {}", query);

@@ -1,4 +1,4 @@
-package Controller.refact;
+package Controllers;
 
 import context.ApplicationContext;
 import Controllers.DialogController;
@@ -128,10 +128,10 @@ public class RoundController implements Serializable {
     @Inject private Controllers.MongoCalculationsController mongoCalculationsController;
 
     // ✅ Injection NavigationController — renamed from CourseController 2026-02-28
-    @Inject private Controller.refact.NavigationController        navigationController;
+    @Inject private Controllers.NavigationController        navigationController;
 
     // ✅ Injection PlayerController — session cache invalidation 2026-03-19
-    @Inject private Controller.refact.PlayerController             playerController;
+    @Inject private Controllers.PlayerController             playerController;
 
     // ✅ Injections Phase 3A — Competition management — migrated 2026-02-25
     @Inject private create.CreateCompetitionDescription createCompetitionDescriptionService; // Phase 3A
@@ -685,6 +685,8 @@ public class RoundController implements Serializable {
                 p = appContext.getPlayer();
             }
 
+            updateRoundGameQualifyingService.update(round);
+
             RoundManager.SaveResult result = roundManager.saveScoreStableford(score, round, p);
 
             if (result.isSuccess()) {
@@ -778,13 +780,17 @@ public class RoundController implements Serializable {
 
     public List<Matchplay> listMatchplayRounds(final String formula) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} for formula = {}", formula);
+        LOG.debug("entering {} for formula = {}", methodName, formula);
         if (cachedMatchplayRounds != null) {
             LOG.debug("returning cached list size = {}", cachedMatchplayRounds.size());
             return cachedMatchplayRounds;
         }
         try {
             listmatchplay = matchplayList.getList("MP_");
+            if (listmatchplay == null || listmatchplay.size() < 2) {
+                LOG.warn("listmatchplay empty or too short (size={})", listmatchplay == null ? 0 : listmatchplay.size());
+                return Collections.emptyList();
+            }
             Course course = appContext.getCourse();
             Club club = appContext.getClub();
             Round round = appContext.getRound();
@@ -815,7 +821,7 @@ public class RoundController implements Serializable {
 
     public List<ScoreScramble> listScrambleRounds(final String formula) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with formula = {}", formula);
+        LOG.debug("entering {} with formula = {}", methodName, formula);
         if (cachedScrambleRounds != null) {
             LOG.debug("returning cached list size = {}", cachedScrambleRounds.size());
             return cachedScrambleRounds;
@@ -823,6 +829,10 @@ public class RoundController implements Serializable {
         try {
             listscr = scrambleList.getList(formula);
             LOG.debug("listscr = {}", listscr);
+            if (listscr == null || listscr.isEmpty()) {
+                LOG.warn("listscr empty for formula={}", formula);
+                return Collections.emptyList();
+            }
             LOG.debug("listscr rounds = {}", listscr.size());
             Course course = appContext.getCourse();
             Club club = appContext.getClub();

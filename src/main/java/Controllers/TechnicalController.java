@@ -1,5 +1,5 @@
 
-package Controller.refact;
+package Controllers;
 
 import context.ApplicationContext;
 import entite.Club;
@@ -7,6 +7,7 @@ import entite.Course;
 import entite.Player;
 import entite.Round;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
@@ -225,11 +226,10 @@ public class TechnicalController implements Serializable {
         }
     } // end method
 
-    public String to_page_xhtml(String page) {
+    public void onReset(@Observes events.ResetEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with page = {}", page);
-        navigationController.reset("Reset to_page " + page);
-        return page + ".xhtml?faces-redirect=true";
+        LOG.debug("entering {}", methodName);
+        filterMeta = new ArrayList<>();
     } // end method
 
     /**

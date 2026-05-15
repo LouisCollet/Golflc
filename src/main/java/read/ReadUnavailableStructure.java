@@ -33,9 +33,8 @@ public class ReadUnavailableStructure implements Serializable {
 
         UnavailableStructure structure = dao.querySingle(query, new UnavailableStructureRowMapper(), club.getIdclub());
         if (structure == null) {
-            String msg = "No Structure found for club = " + club.getIdclub();
-            LOG.error("- {}", msg);
-            utils.LCUtil.showMessageFatal(msg);
+            LOG.error("No Structure found for club = {}", club.getIdclub());
+            utils.LCUtil.showMessageFatal("No Structure found for club = " + club.getIdclub());
             return null;
         }
         LOG.debug("found structure, items size = {}", structure.getStructureList().size());

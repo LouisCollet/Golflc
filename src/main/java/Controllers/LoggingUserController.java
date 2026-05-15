@@ -28,10 +28,7 @@ public class LoggingUserController implements Serializable {
     public LoggingUserController() { }
 
     public static void write(String text) {
-        writeText("<p"
-                + "style='fontsize:1.5em;color:black;>'"
-                + text
-                + "</p>");
+        writeText("<p style='font-size:1.5em;color:black;'>" + text + "</p>");
     } // end method
 
     public static void write(String text, String param) {
@@ -62,10 +59,9 @@ public class LoggingUserController implements Serializable {
             boolean b = mongoCalculationsController.create(logging);
             return false;
         } catch (Exception e) {
-            String msg = "exception in read !!" + e + "No calculations available !";
-            LOG.info(msg);
-            write(msg);
-            showMessageInfo(msg);
+            LOG.error("exception in createUpdateLoggingUser: {}", e.getMessage());
+            write("exception in read: " + e.getMessage());
+            showMessageInfo("No calculations available");
             return false;
         }
     } // end method

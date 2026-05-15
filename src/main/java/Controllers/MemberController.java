@@ -1,4 +1,4 @@
-package Controller.refact;
+package Controllers;
 
 import context.ApplicationContext;
 import entite.*;
@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import static interfaces.GolfInterface.DTF_DAY_MONTH;
 import static interfaces.GolfInterface.ZDF_DAY;
 import static interfaces.Log.LOG;
 import static utils.LCUtil.prepareMessageBean;
@@ -52,7 +53,6 @@ public class MemberController implements Serializable {
     @Inject private lists.SystemAdminSubscriptionList    systemAdminSubscriptionList;
     @Inject private lists.LocalAdminCotisationList       localAdminCotisationList;
     @Inject private update.UpdateSubscription            updateSubscription;
-    @Inject private Controller.refact.NavigationController navigationController;  // renamed 2026-02-28
     @Inject private lists.ClubsListLocalAdmin            clubsListLocalAdmin;   // migrated 2026-02-25
     @Inject private lists.CoursesListLocalAdmin          coursesListLocalAdmin; // migrated 2026-02-25
     @Inject private lists.SubscriptionRenewalList        subscriptionRenewalList; // migrated 2026-02-25
@@ -64,7 +64,7 @@ public class MemberController implements Serializable {
     @Inject private lists.TarifGreenfeeList            tarifGreenfeeList;              // added for admin tarif list
     @Inject private update.UpdateTarifGreenfee         updateTarifGreenfeeJsonService; // added for add period to existing tarif
     @Inject private dao.GenericDAO                     dao;                            // added for wizard club lookup
-    @Inject private Controller.refact.PlayerController playerController;               // added 2026-04-22 — age delegation
+    @Inject private Controllers.PlayerController playerController;               // added 2026-04-22 — age delegation
 
     // ========================================
     // ETAT UI LOCAL
@@ -387,7 +387,7 @@ public class MemberController implements Serializable {
             }
         //    LOG.debug("with club = {}", club); // devrait être null
             if (createTarifGreenfeeService.create(tarifGreenfee, appContext.getClub())) { // mod LC 06/03/2026
-                tarifGreenfeeList.invalidateCache(); // invalidate after CREATE
+                cacheInvalidator.invalidateTarifGreenfee(); // invalidate after CREATE
                 String msg = " TarifGreenfee Created ! " + tarifGreenfee; // mod LC 16-04-2026
                 LOG.info(msg);
                 showMessageInfo(msg);
@@ -426,7 +426,7 @@ public class MemberController implements Serializable {
             if (deleteTarifGreenfeeService.deleteById(db.getTarifId())) {
                 LOG.info("TarifGreenfee deleted, tarifId = {}", db.getTarifId());
                 tarifGreenfeeDB = null; // invalidate cache
-                tarifGreenfeeList.invalidateCache(); // invalidate after DELETE
+                cacheInvalidator.invalidateTarifGreenfee(); // invalidate after DELETE
             } else {
                 LOG.error("deleteById returned false for tarifId = {}", db.getTarifId());
             }
@@ -500,10 +500,10 @@ public class MemberController implements Serializable {
         try {
             LOG.debug("local admin = {}", appContext.getPlayer());
             LOG.debug("role = {}", appContext.getPlayer().getPlayerRole());
-            if (appContext.getInputSelectPaiement().equals("Greenfees")) {
+            if (s.equals("Greenfees")) {
                 return localAdminGreenfeeList.list(appContext.getPlayer());
             }
-            LOG.debug("error in inputSelectPaiement : INVALID");
+            LOG.debug("error in param : INVALID");
             return Collections.emptyList();
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -530,13 +530,10 @@ public class MemberController implements Serializable {
         try {
             LOG.debug("local admin = {}", appContext.getPlayer());
             LOG.debug("role = {}", appContext.getPlayer().getPlayerRole());
-            if (appContext.getInputSelectPaiement().equals("Greenfees")) {
-                return localAdminGreenfeeList.list(appContext.getPlayer());
-            }
-            if (appContext.getInputSelectPaiement().equals("Members")) {
+            if (s.equals("Members")) {
                 return localAdminCotisationList.list(appContext.getPlayer());
             }
-            LOG.debug("error in inputSelectPaiement : INVALID");
+            LOG.debug("error in param : INVALID");
             return Collections.emptyList();
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -616,81 +613,6 @@ public class MemberController implements Serializable {
             LCUtil.showDialogInfo(msg);
         } catch (Exception e) {
             handleGenericException(e, methodName);
-        }
-    } // end method
-
-    // ========================================
-    // NAVIGATION to_* (4 methodes)
-    // migrated from CourseController 2026-02-25
-    // ========================================
-
-    /**
-     * Navigation vers subscription.xhtml
-     * Migré depuis menu.xhtml url= — 2026-02-28
-     */
-    public String to_subscription_xhtml(String s) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", s);
-        try {
-            navigationController.reset(s);
-            return "subscription.xhtml?faces-redirect=true";
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
-    } // end method
-
-    public String to_selectLocalAdmin_xhtml(String s) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", s);
-        try {
-            navigationController.reset("Reset to_selectLocalAdmin" + s);
-            appContext.setInputSelectPaiement(s);
-            if (s.equals("Members")) {
-                return "local_administrator_cotisations.xhtml?faces-redirect=true";
-            }
-            if (s.equals("Greenfees")) {
-                return "local_administrator_greenfees.xhtml?faces-redirect=true";
-            }
-            if (s.equals("Professionals")) {
-                return "local_administrator_professionals.xhtml?faces-redirect=true";
-            }
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
-    } // end method
-
-    public String to_selectSystemAdmin_xhtml(String s) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", s);
-        try {
-            navigationController.reset("Reset to_selectSystemAdmin" + s);
-            appContext.setInputSelectSubscriptions(s);
-            return "system_administrator_subscriptions.xhtml?faces-redirect=true";
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
-    } // end method
-
-    public String to_selectPro_xhtml(String s) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", s);
-        try {
-            navigationController.reset("Reset to_selectPro" + s);
-            appContext.setInputSelectPaiement(s);
-            if (s.equals("Lessons")) {
-                return "professional_lessons_paid.xhtml?faces-redirect=true";
-            }
-            if (s.equals("Inscription")) {
-                return "selectPro.xhtml?faces-redirect=true&cmd=" + s; // mod 29-03-2026
-            }
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
         }
     } // end method
 
@@ -842,7 +764,7 @@ public class MemberController implements Serializable {
                 .findFirst()
                 .ifPresent(c -> {
                     appContext.setClub(c);
-                    courseListForClub.invalidateCache();
+                    cacheInvalidator.invalidateCourseListForClub();
                     if (tarifGreenfee != null) tarifGreenfee.setTarifCourseId(new java.util.ArrayList<>());
                 });
             // auto-select after club change (getCoursesForWizard handles initial load)
@@ -1088,7 +1010,7 @@ public class MemberController implements Serializable {
 
             boolean ok = updateTarifGreenfeeJsonService.update(tarifGreenfee);
             if (ok) {
-                tarifGreenfeeList.invalidateCache();
+                cacheInvalidator.invalidateTarifGreenfee();
                 // reset work fields
                 tarifGreenfee.setSeason(null);
                 tarifGreenfee.setStartDate(null);
@@ -1179,8 +1101,7 @@ public class MemberController implements Serializable {
                 .filter(ds -> season.equals(ds.getSeason()))
                 .findFirst()
                 .map(ds -> {
-                    java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd/MM");
-                    return ds.getStartDate().format(fmt) + " – " + ds.getEndDate().format(fmt);
+                    return ds.getStartDate().format(DTF_DAY_MONTH) + " – " + ds.getEndDate().format(DTF_DAY_MONTH);
                 })
                 .orElse("");
     } // end method
@@ -1513,7 +1434,7 @@ public class MemberController implements Serializable {
         if (tarifGreenfee != null && tarifGreenfee.getTarifId() != null) {
             boolean ok = updateTarifGreenfeeJsonService.update(tarifGreenfee);
             if (ok) {
-                tarifGreenfeeList.invalidateCache();
+                cacheInvalidator.invalidateTarifGreenfee();
                 LOG.debug("{} - DB updated and cache invalidated", callerMethodName);
             }
         }

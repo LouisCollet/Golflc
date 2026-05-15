@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import static interfaces.ScheduleColors.*;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleModel;
@@ -19,11 +20,12 @@ public class ReadLesson implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject private lists.LessonProList lessonProList; // migrated 2026-02-23
+    @Inject private lists.LessonProList   lessonProList;   // migrated 2026-02-23
+    @Inject private calc.CalcLessonPrice  calcLessonPrice;
 
     public ReadLesson() { }
 
-    public ScheduleModel read(Professional professional) throws SQLException {
+    public ScheduleModel read(Professional professional, entite.Club club) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         LOG.debug("with Professional = {}", professional);
@@ -34,6 +36,9 @@ public class ReadLesson implements Serializable {
             LOG.debug("number of lessons = {}", listLessons.size());
 
             for (Lesson lesson : listLessons) {
+                var v = calcLessonPrice.calc(professional, lesson.getEventStartDate(), club);
+                LOG.debug("lesson price var v = {}", v);
+                lesson.setLessonAmount(v);
                 boolean paid = lesson.isLessonPaid();
                 org.primefaces.model.ScheduleEvent<?> scheduleEvent = DefaultScheduleEvent.builder()
                         .title(lesson.getEventTitle())
@@ -45,9 +50,9 @@ public class ReadLesson implements Serializable {
                         .dynamicProperty("lesson-paid",     paid)
                         .allDay(lesson.isEventAllDay())
                         .textColor("white")
-                        .backgroundColor(paid ? "#0d6efd" : "#28a745")  // blue=paid, green=booked
+                        .backgroundColor(paid ? BLUE_BG : GREEN_BG)
                         .styleClass("ui-custompanelgrid")
-                        .borderColor(paid ? "#0a58ca" : "#1e7e34")
+                        .borderColor(paid ? BLUE_BORDER : GREEN_BORDER)
                         .overlapAllowed(false)
                         .resizable(false)
                         .build();

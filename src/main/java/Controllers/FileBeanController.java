@@ -88,30 +88,4 @@ LOG.debug("entering getDownloadValue");
     LOG.debug("PREP = {}", download.getName());
     return download;
 }
-/*
-    public StreamedContent downloadFileTemplate() {
-    try {
-        //    // <p:fileDownload value="#{bean.downloadFileTemplate()}" />
-        FileInputStream inputStream = new FileInputStream(new File(getClass().getClassLoader()
-                       .getResource("path_to_resource/myfile.xlsx").getFile()));
-
-        StreamedContent fileTemplate = new DefaultStreamedContent(
-                inputStream
-                , "application/vnd.ms-excel"
-                , "my_file.xlsx");
-
-        return fileTemplate;
-    } catch (Exception e) {
-        LOG.error("Error on download...", e);
-        return null;
-    }
-} // end method
-*/
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-    } // end main
-    */
-
 } // end class

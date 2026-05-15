@@ -22,8 +22,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ValueChangeEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-// servlet imports removed 2026-03-21 — no longer needed after JAX-RS extraction
-// JAX-RS server annotations removed 2026-03-21 — moved to rest.PaymentRestResource
+// servlet imports removed 2026-03-21 - no longer needed after JAX-RS extraction
+// JAX-RS server annotations removed 2026-03-21 - moved to rest.PaymentRestResource
 // JAX-RS client imports kept for testWebService()
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Invocation;
@@ -44,7 +44,7 @@ import static enumeration.eTypePayment.GREENFEE;
 import static enumeration.eTypePayment.LESSON;
 import static enumeration.eTypePayment.SUBSCRIPTION;
 import java.util.Objects;
-// PaymentOrchestrator/PaymentTarget imports removed 2026-03-21 — moved to PaymentRestResource
+// PaymentOrchestrator/PaymentTarget imports removed 2026-03-21 - moved to PaymentRestResource
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
@@ -73,17 +73,17 @@ public class PaymentController implements Serializable {
 
     @Inject private ApplicationContext                          appContext;
     @Inject private cache.CacheInvalidator                       cacheInvalidator;
-    @Inject private read.ReadCreditcard                          readCreditcard;       // migrated 2026-02-26 — was CreditcardController
+    @Inject private read.ReadCreditcard                          readCreditcard;       // migrated 2026-02-26 - was CreditcardController
     @Inject private payment.PaymentSubscriptionController       paymentSubscriptionController;
     @Inject private payment.PaymentCotisationController         paymentCotisationController;
     @Inject private payment.PaymentGreenfeeController           paymentGreenfeeController;
     @Inject private payment.PaymentLessonController             paymentLessonController;
     @Inject private Controllers.TarifMemberController           tarifMemberController;
     @Inject private Controllers.TarifGreenfeeController         tarifGreenfeeController;
-    @Inject private Controllers.MemberController          memberController;
-    // SchedulerProController removed — @ViewScoped can't be injected in @SessionScoped. Data via appContext. // 2026-03-22
+    @Inject private Controllers.MemberController                memberController;
+    @Inject private Controllers.CartController                  cartController;       // cart state extracted 2026-05-14
+    // SchedulerProController removed - @ViewScoped can't be injected in @SessionScoped. Data via appContext. // 2026-03-22
     @Inject private create.CreateLesson                         createLesson;
-    @Inject private create.CreatePaymentLesson                  createPaymentLesson; // payments_lesson — 2026-03-29
     @Inject private find.FindRoundBySlot                        findRoundBySlot;
     @Inject private find.FindInscriptionRound                   findInscriptionRound;
     @Inject private lists.ParticipantsRoundList                 participantsRoundList;
@@ -91,19 +91,14 @@ public class PaymentController implements Serializable {
     @Inject private manager.PlayerManager                       playerManager;
     @Inject private read.ReadClub                               readClubService;
     @Inject private Controllers.HttpController                  httpController;
-    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
+    // @Inject @SessionMap sessionMap - removed 2026-02-28, migrated to appContext
     @Inject private mail.CreditcardMail                         creditcardMail;  // migrated 2026-02-26
     @Inject private mail.LessonMail                             lessonMail;
     @Inject private entite.Settings                             settings;        // security audit 2026-03-18
     @Inject private payment.PaymentStateStore                   paymentStateStore; // architecture REST/JSF separation 2026-03-21
-    @Inject private create.CreateCart                           createCartService;      // cart persistence 2026-05-07
     @Inject private find.FindCart                               findCartService;        // cart persistence 2026-05-07
-    @Inject private update.UpdateCartStatus                     updateCartStatusService; // cart persistence 2026-05-07
     @Inject private delete.DeleteCart                           deleteCartService;      // cart persistence 2026-05-07
-    @Inject private find.FindCotisationOverlapping              findCotisationOverlapping;
-    @Inject private find.FindSubscriptionOverlapping            findSubscriptionOverlapping;
     @Inject private find.FindGreenfeePaid                       findGreenfeePaid;
-    @Inject private find.FindLessonBooked                       findLessonBooked;
 
     // ========================================
     // ETAT UI LOCAL
@@ -112,19 +107,10 @@ public class PaymentController implements Serializable {
     private Creditcard    creditcard;
     private String        savedType;
     private Integer       progress1 = 0;
-    private Greenfee        greenfee;
-    private List<Greenfee>  listGreenfees = new ArrayList<>();
-    private Professional    professional;
-    private List<Lesson>    listLessons = new ArrayList<>();
-    private Lesson        selectedLesson;
     private Player        playerPro;
-    private boolean running = false;  // new 09-03-2026
-    private boolean proFree = false;  // true when student is also an active pro → free lesson
-    private String completionNonce;   // architecture REST/JSF separation 2026-03-21
-    private boolean lessonMailsSent = false; // guard — prevents double-send on page refresh
-    private boolean sessionRestored  = false; // true once restoreSessionFromDb() ran
-    private java.util.List<entite.EquipmentsAndBasicAndRange> restoredBasicCart = new ArrayList<>();
-    private java.util.List<entite.EquipmentsAndBasic>         restoredEquipCart = new ArrayList<>();
+    private boolean       running = false;
+    private String        completionNonce;   // architecture REST/JSF separation 2026-03-21
+    private boolean       lessonMailsSent = false; // guard - prevents double-send on page refresh
 
     public PaymentController() { }
 
@@ -132,37 +118,29 @@ public class PaymentController implements Serializable {
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        creditcard    = new Creditcard();
-        greenfee      = new Greenfee();
-        listGreenfees = new ArrayList<>();
-        progress1     = 0;
+        creditcard = new Creditcard();
+        progress1  = 0;
         LOG.debug("PaymentController initialized");
     } // end method
 
     // ========================================
-    // CDI EVENT — ResetEvent observer — 2026-02-26
+    // CDI EVENT - ResetEvent observer - 2026-02-26
     // ========================================
 
     public void onReset(@Observes events.ResetEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        creditcard    = new Creditcard();
-        savedType     = null;
-        progress1     = 0;
-        greenfee      = new Greenfee();
-        listGreenfees = new ArrayList<>();
-        professional  = null;
-        listLessons   = new ArrayList<>();
-        selectedLesson  = null;
+        creditcard      = new Creditcard();
+        savedType       = null;
+        progress1       = 0;
         playerPro       = null;
-        completionNonce   = null;
-        restoredBasicCart = new ArrayList<>();
-        restoredEquipCart = new ArrayList<>();
+        completionNonce = null;
+        lessonMailsSent = false;
         LOG.debug("PaymentController reset done");
     } // end method
 
     // ========================================
-    // METHODES D'ACTION — migrées depuis CourseController 2026-02-25
+    // METHODES D'ACTION - migrées depuis CourseController 2026-02-25
     // ========================================
 
     public String manageCotisation() throws SQLException { // called from cotisation.xhtml
@@ -209,11 +187,11 @@ public class PaymentController implements Serializable {
             LOG.debug("cotisation type : spontaneous ou round ? {}", cotisation.getType());
             LOG.debug("amount non ZERO payment COTISATION needed !");
             appContext.setCotisation(cotisation);
-            creditcard = completeWithCotisation(cotisation, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
+            creditcard = completeWithCotisation(cotisation, appContext.getPlayer()); // migrated 2026-02-26 - was creditcardController
             if (creditcard != null) {
                 String msg = "creditcard completed with Cotisation ! ";
                 LOG.info(msg);
-                upsertCart();
+                cartController.upsertCart();
                 return "cart.xhtml?faces-redirect=true";
             } else {
                 String msg = "paiement par creditcard KO : quelle conclusion ?";
@@ -237,7 +215,8 @@ public class PaymentController implements Serializable {
             appContext.setCreditcardType(LESSON());
             LOG.debug("creditcardType = {}", appContext.getCreditcardType());
 
-            professional = appContext.getProfessional();
+            cartController.setProfessional(appContext.getProfessional());
+            Professional professional = cartController.getProfessional();
             LOG.debug("professional coming from appContext = {}", professional);
 
             Club club = appContext.getClub();
@@ -253,32 +232,32 @@ public class PaymentController implements Serializable {
             // Both pros must be active: teaching pro guaranteed by ProfessionalListForClub filter;
             // student pro guaranteed by FindCountListProfessional date filter (ProClubStartDate/EndDate)
             if (!playerManager.findProfessionals(appContext.getPlayer()).isEmpty()) {
-                for (Lesson lesson : listLessons) {
+                for (Lesson lesson : cartController.getListLessons()) {
                     if (!createLesson.create(lesson, appContext.getPlayer())) {
                         showMessageFatal("error: free lesson not registered");
                         return null;
                     }
                     LOG.info("free lesson created: {}", lesson.getEventTitle());
                 } // end for
-                listLessons.clear();
+                cartController.getListLessons().clear();
                 cacheInvalidator.invalidateProfessionalCaches();
                 showMessageInfo(utils.LCUtil.prepareMessageBean("lesson.pro.free"));
                 return null; // stay on schedule_pro.xhtml
             } // end if Professional
 
-            listLessons.forEach(item -> LOG.debug("lesson start date: {}", item.getEventStartDate()));
-            boolean anyPriceConfigured = listLessons.stream()
+            cartController.getListLessons().forEach(item -> LOG.debug("lesson start date: {}", item.getEventStartDate()));
+            boolean anyPriceConfigured = cartController.getListLessons().stream()
                     .anyMatch(l -> l.getLessonAmount() != null && l.getLessonAmount() > 0);
             if (!anyPriceConfigured) {
                 LOG.warn("lesson tarif not configured for proId={}", professional.getProId());
                 showMessageFatal(utils.LCUtil.prepareMessageBean("lesson.tarif.unknown"));
-                listLessons.clear();
+                cartController.getListLessons().clear();
                 return null;
             } // end if
-            creditcard = completeWithLesson(professional, listLessons, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
+            creditcard = completeWithLesson(professional, cartController.getListLessons(), appContext.getPlayer()); // migrated 2026-02-26 - was creditcardController
             if (creditcard != null) {
                 LOG.info("creditcard with lesson = {}", creditcard);
-                upsertCart();
+                cartController.upsertCart();
                 return "cart.xhtml?faces-redirect=true";
             } else {
                 String msg = "paiement par creditcard KO : quelle conclusion ?";
@@ -302,37 +281,19 @@ public class PaymentController implements Serializable {
     public String confirmProFreeLesson() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
-            for (Lesson lesson : listLessons) {
-                if (createLesson.create(lesson, appContext.getPlayer())) {
-                    LOG.info("free lesson created: {}", lesson.getEventTitle());
-                } else {
-                    showMessageFatal("error: free lesson not registered");
-                    return null;
-                }
-            }
-            proFree = false;
-            clearCartFromDb();
-            listLessons.clear();
-            return "welcome.xhtml?faces-redirect=true";
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
+        return cartController.confirmProFreeLesson();
     } // end method
 
-    public boolean isProFree() { return proFree; }
+    public boolean isProFree() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        return cartController.isProFree();
+    } // end method
 
     public String cancelCart() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        setCanceledCart();
-        listLessons.clear();
-        proFree = false;
-        if (isGreenfee()) {
-            return "schedule_round.xhtml?faces-redirect=true";
-        }
-        return "schedule_pro.xhtml?faces-redirect=true";
+        return cartController.cancelCart();
     } // end method
 
     public String manageGreenfee() { // called from price_round_greenfee.xhtml
@@ -340,12 +301,12 @@ public class PaymentController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             LOG.debug("with creditcard = {}", creditcard);
-            LOG.debug("with greenfee = {}", greenfee);
+            LOG.debug("with greenfee = {}", cartController.getGreenfee());
 
             appContext.setCreditcardType(GREENFEE());
             LOG.debug("creditcardType = {}", appContext.getCreditcardType());
 
-            // 1. complete greenfee with price — use memC.tarifGreenfee (loaded by findTarifGreenfee)
+            // 1. complete greenfee with price - use memC.tarifGreenfee (loaded by findTarifGreenfee)
             Greenfee gf = tarifGreenfeeController.completeGreenfee(memberController.getTarifGreenfee(), appContext.getClub(), appContext.getRound(), appContext.getPlayer());
             LOG.debug("Greenfee completed with tarif data = {}", gf);
             if (gf.getPrice() == 0) {
@@ -361,14 +322,14 @@ public class PaymentController implements Serializable {
             gf.setCourseId(appContext.getCourse()   != null ? appContext.getCourse().getIdcourse()    : null);
             gf.setRoundStart(appContext.getRound()  != null ? appContext.getRound().getRoundStart()   : null);
             gf.setRoundGame(appContext.getRound()   != null ? appContext.getRound().getRoundGame()    : null);
-            listGreenfees.add(gf);
-            greenfee = gf; // kept for backward compat
-            LOG.debug("listGreenfees size={}", listGreenfees.size());
+            cartController.getListGreenfees().add(gf);
+            cartController.setGreenfee(gf);
+            LOG.debug("listGreenfees size={}", cartController.getListGreenfees().size());
             // 3. complete creditcard with running total
-            creditcard = completeWithGreenfee(gf, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
-            creditcard.setTotalPrice(listGreenfees.stream().mapToDouble(Greenfee::getPrice).sum());
+            creditcard = completeWithGreenfee(gf, appContext.getPlayer()); // migrated 2026-02-26 - was creditcardController
+            creditcard.setTotalPrice(cartController.getListGreenfees().stream().mapToDouble(Greenfee::getPrice).sum());
             LOG.debug("creditcard Greenfee total = {}", creditcard.getTotalPrice());
-            upsertCart();
+            cartController.upsertCart();
             return "cart.xhtml?faces-redirect=true";
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
@@ -398,16 +359,16 @@ public class PaymentController implements Serializable {
             gf.setCourseId(appContext.getCourse()   != null ? appContext.getCourse().getIdcourse()   : null);
             gf.setRoundStart(appContext.getRound()  != null ? appContext.getRound().getRoundStart()  : null);
             gf.setRoundGame(appContext.getRound()   != null ? appContext.getRound().getRoundGame()   : null);
-            listGreenfees.add(gf);
-            greenfee = gf;
+            cartController.getListGreenfees().add(gf);
+            cartController.setGreenfee(gf);
             if (creditcard == null) creditcard = new Creditcard();
             creditcard = completeWithGreenfee(gf, appContext.getPlayer());
-            creditcard.setTotalPrice(listGreenfees.stream().mapToDouble(Greenfee::getPrice).sum());
-            LOG.debug("listGreenfees size={}, total={}", listGreenfees.size(), creditcard.getTotalPrice());
-            upsertCart();
+            creditcard.setTotalPrice(cartController.getListGreenfees().stream().mapToDouble(Greenfee::getPrice).sum());
+            LOG.debug("listGreenfees size={}, total={}", cartController.getListGreenfees().size(), creditcard.getTotalPrice());
+            cartController.upsertCart();
             String dateStr = gf.getRoundDate() != null ? gf.getRoundDate().format(ZDF_TIME_HHmm) : "?";
-            showMessageInfo("✅ Créneau du " + dateStr + " ajouté — "
-                    + listGreenfees.size() + " créneau(x) dans le panier. Cliquez « Paiement en ligne » pour régler.");
+            showMessageInfo("�o. Créneau du " + dateStr + " ajouté - "
+                    + cartController.getListGreenfees().size() + " créneau(x) dans le panier. Cliquez « Paiement en ligne » pour régler.");
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
         }
@@ -418,7 +379,7 @@ public class PaymentController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (!hasMixedCart()) {
-            showMessageFatal("Panier vide — sélectionnez d'abord un créneau.");
+            showMessageFatal("Panier vide - sélectionnez d'abord un créneau.");
             return null;
         }
         return "cart.xhtml?faces-redirect=true";
@@ -446,9 +407,9 @@ public class PaymentController implements Serializable {
                     LOG.debug("getSubCode()is MONTHLY or YEARLY");
                     subscription = paymentSubscriptionController.complete(subscription); // migrated 2026-02-25
                     appContext.setSubscription(subscription);
-                    creditcard = completeWithSubscription(subscription, appContext.getPlayer()); // migrated 2026-02-26 — was creditcardController
+                    creditcard = completeWithSubscription(subscription, appContext.getPlayer()); // migrated 2026-02-26 - was creditcardController
                     LOG.debug("creditcard completed with subscription = {}", creditcard);
-                    upsertCart();
+                    cartController.upsertCart();
                     return "cart.xhtml?faces-redirect=true"; // goes to cart for MIXED support
                 }
                 default -> {
@@ -493,12 +454,12 @@ public class PaymentController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         LOG.debug("coming from creditcard_accepted.xhtml");
-        progress1 = 0;  // ← reset pour la prochaine visite
+        progress1 = 0;  // �?� reset pour la prochaine visite
         running = false; // new 09-03-2026
         try {
             creditcard.setTypePayment(appContext.getCreditcardType());
             savedType = creditcard.getTypePayment();
-            if (!validateCartBeforePayment()) {
+            if (!cartController.validateCartBeforePayment()) {
                 FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(true);
                 FacesContext.getCurrentInstance().getExternalContext().redirect("cart.xhtml");
                 FacesContext.getCurrentInstance().responseComplete();
@@ -513,7 +474,7 @@ public class PaymentController implements Serializable {
                 LOG.info(msg);
                 LOG.debug("creditcardType in onCompletePayment = {}", appContext.getCreditcardType());
 
-                // Store transaction snapshot in PaymentStateStore — architecture REST/JSF separation 2026-03-21
+                // Store transaction snapshot in PaymentStateStore - architecture REST/JSF separation 2026-03-21
                 String nonce = creditcard.getPaymentNonce(); // set by HttpController.sendPaymentServer
                 payment.PaymentTransaction tx = new payment.PaymentTransaction(nonce);
                 tx.setCreditcard(creditcard);
@@ -522,7 +483,7 @@ public class PaymentController implements Serializable {
                 tx.setCreditcardType(appContext.getCreditcardType());
                 tx.setSubscription(appContext.getSubscription());
                 tx.setCotisation(appContext.getCotisation());
-                tx.setGreenfee(greenfee);
+                tx.setGreenfee(cartController.getGreenfee());
                 tx.setRound(appContext.getRound());
                 // Reload club from DB to guarantee ZoneId is present (cache may be stale)
                 Club txClub = appContext.getClub();
@@ -543,15 +504,15 @@ public class PaymentController implements Serializable {
                 tx.setClub(txClub);
                 tx.setCourse(appContext.getCourse());
                 tx.setInscription(appContext.getInscription());
-                tx.setListLessons(listLessons);
-                tx.setListGreenfees(listGreenfees);
-                tx.setProfessional(professional);
+                tx.setListLessons(cartController.getListLessons());
+                tx.setListGreenfees(cartController.getListGreenfees());
+                tx.setProfessional(cartController.getProfessional());
                 paymentStateStore.store(nonce, tx);
                 LOG.debug("PaymentTransaction stored with nonce={}", nonce);
 
                 String paymentServiceUrl = settings.getProperty("PAYMENT_SERVICE_URL");
                 if (paymentServiceUrl == null || paymentServiceUrl.isBlank()) {
-                    msg = "FATAL — PAYMENT_SERVICE_URL environment variable is not set — cannot redirect to payment server /about. "
+                    msg = "FATAL - PAYMENT_SERVICE_URL environment variable is not set - cannot redirect to payment server /about. "
                                + "Set PAYMENT_SERVICE_URL (e.g. https://127.0.0.1:5000) and restart WildFly.";
                     LOG.error(msg);
                     showMessageFatal(msg);
@@ -574,7 +535,7 @@ public class PaymentController implements Serializable {
         }
     } // end method onCompletePayment
 
-    // handlePayments — moved to rest.PaymentRestResource 2026-03-21
+    // handlePayments - moved to rest.PaymentRestResource 2026-03-21
 
     //  utilisé dans creditcard_accepted.xhtml
     public void onStart() {
@@ -606,7 +567,7 @@ public class PaymentController implements Serializable {
     } // end method
 
     // ========================================
-    // CART — generic helpers (cotisation + lesson branches) — 2026-04-22
+    // CART - generic helpers (cotisation + lesson branches) - 2026-04-22
     // ========================================
 
     public boolean isCotisation() {
@@ -630,79 +591,18 @@ public class PaymentController implements Serializable {
         return "MIXED".equals(appContext.getCreditcardType());
     } // end method
 
-    public double getGreenfeePrice() {
-        return listGreenfees.stream().mapToDouble(Greenfee::getPrice).sum();
-    } // end method
+    public double getGreenfeePrice() { return cartController.getGreenfeePrice(); } // end method
 
-    public double getLessonPrice() {
-        return listLessons.stream().mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0).sum();
-    } // end method
+    public double getLessonPrice() { return cartController.getLessonPrice(); } // end method
 
-    // ---- has*() — basés sur le contenu des listes (utilisés par cart.xhtml MIXED) ----
-    public boolean hasGreenfees()    { return !listGreenfees.isEmpty(); } // end method
-    public boolean hasLessons()      { return !listLessons.isEmpty(); }   // end method
-    public boolean hasCotisation() {
-        String type = appContext.getCreditcardType();
-        if (!"COTISATION".equals(type) && !"MIXED".equals(type)) return false;
-        return !getCotisationBasicCart().isEmpty() || !getCotisationEquipCart().isEmpty()
-            || (appContext.getCotisation() != null && appContext.getCotisation().getPrice() > 0);
-    } // end method
-    public boolean hasSubscription() {
-        // subCode null = subscription du login (accès), pas un item du panier
-        return appContext.getSubscription() != null
-            && appContext.getSubscription().getSubCode() != null
-            && appContext.getSubscription().getSubscriptionAmount() > 0;
-    } // end method
-    public boolean hasMixedCart()    { return hasGreenfees() || hasLessons() || hasCotisation() || hasSubscription(); } // end method
+    // ---- has*() - basés sur le contenu des listes (utilisés par cart.xhtml MIXED) ----
+    public boolean hasGreenfees()    { return cartController.hasGreenfees(); }    // end method
+    public boolean hasLessons()      { return cartController.hasLessons(); }      // end method
+    public boolean hasCotisation()   { return cartController.hasCotisation(); }   // end method
+    public boolean hasSubscription() { return cartController.hasSubscription(); } // end method
+    public boolean hasMixedCart()    { return cartController.hasMixedCart(); }    // end method
 
-    public double getTotalCartPrice() {
-        double total = listGreenfees.stream().mapToDouble(Greenfee::getPrice).sum();
-        total += listLessons.stream().mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0).sum();
-        if (hasCotisation() && appContext.getCotisation() != null)
-            total += appContext.getCotisation().getPrice();
-        if (hasSubscription() && appContext.getSubscription() != null)
-            total += appContext.getSubscription().getSubscriptionAmount();
-        return total;
-    } // end method
-
-    private String buildMixedCommunication() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        StringBuilder sb = new StringBuilder();
-        if (hasCotisation() && appContext.getCotisation() != null) {
-            String c = appContext.getCotisation().getCommunication();
-            if (c != null && !c.isBlank()) sb.append(c);
-        }
-        if (hasSubscription() && appContext.getSubscription() != null) {
-            String c = appContext.getSubscription().getCommunication();
-            if (c != null && !c.isBlank()) { if (sb.length() > 0) sb.append(" | "); sb.append(c); }
-        }
-        if (!listLessons.isEmpty()) {
-            java.time.format.DateTimeFormatter fmt = DTF_DAY_HHMM;
-            StringBuilder ls = new StringBuilder("Lesson ");
-            for (int i = 0; i < listLessons.size(); i++) {
-                if (i > 0) ls.append(",");
-                ls.append(listLessons.get(i).getEventStartDate().format(fmt));
-            }
-            if (sb.length() > 0) sb.append(" | ");
-            sb.append(ls);
-        }
-        if (!listGreenfees.isEmpty()) {
-            java.time.format.DateTimeFormatter fmt = DTF_DAY_HHMM;
-            StringBuilder gs = new StringBuilder("GF ");
-            for (int i = 0; i < listGreenfees.size(); i++) {
-                if (i > 0) gs.append(",");
-                gs.append(listGreenfees.get(i).getRoundDate() != null
-                        ? listGreenfees.get(i).getRoundDate().format(fmt) : "?");
-            }
-            if (sb.length() > 0) sb.append(" | ");
-            sb.append(gs);
-        }
-        String comm = sb.toString();
-        if (comm.length() > 140) comm = comm.substring(0, 137) + "...";
-        LOG.debug("mixed communication built, length={}", comm.length());
-        return comm;
-    } // end method
+    public double getTotalCartPrice() { return cartController.getTotalCartPrice(); } // end method
 
     public String payMixedCart() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -711,8 +611,8 @@ public class PaymentController implements Serializable {
             appContext.setCreditcardType("MIXED");
             creditcard = prefilling(appContext.getPlayer());
             creditcard.setPaymentOK(false);
-            creditcard.setTotalPrice(getTotalCartPrice());
-            creditcard.setCommunication(buildMixedCommunication());
+            creditcard.setTotalPrice(cartController.getTotalCartPrice());
+            creditcard.setCommunication(cartController.buildMixedCommunication());
             creditcard.setTypePayment("MIXED");
             LOG.debug("MIXED creditcard total={}", creditcard.getTotalPrice());
             return "creditcard.xhtml?faces-redirect=true";
@@ -722,175 +622,82 @@ public class PaymentController implements Serializable {
         }
     } // end method
 
-    public List<Greenfee> getListGreenfees() { return listGreenfees; } // end method
+    public List<Greenfee> getListGreenfees() { return cartController.getListGreenfees(); } // end method
 
     public void removeSubscriptionItem() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
-            appContext.setSubscription(null);
-            if (appContext.getPlayer() != null && appContext.getClub() != null) {
-                deleteCartService.deleteByPlayerClubType(
-                    appContext.getPlayer().getIdplayer(),
-                    appContext.getClub().getIdclub(),
-                    "SUBSCRIPTION");
-            }
-            LOG.info("subscription removed from cart");
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-        }
+        cartController.removeSubscriptionItem();
     } // end method
 
     public void removeGreenfeeItem(Greenfee gf) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        listGreenfees.remove(gf);
+        cartController.getListGreenfees().remove(gf);
         if (creditcard != null) {
-            creditcard.setTotalPrice(listGreenfees.stream().mapToDouble(Greenfee::getPrice).sum());
+            creditcard.setTotalPrice(cartController.getListGreenfees().stream().mapToDouble(Greenfee::getPrice).sum());
         }
-        upsertCart();
-        LOG.debug("greenfee removed, list size={}", listGreenfees.size());
+        cartController.upsertCart();
+        LOG.debug("greenfee removed, list size={}", cartController.getListGreenfees().size());
     } // end method
 
     public java.util.List<entite.EquipmentsAndBasicAndRange> getCotisationBasicCart() {
-        TarifMember t = memberController.getTarifMember();
-        if (t != null && t.getBasicList() != null) {
-            return t.getBasicList().stream()
-                    .filter(b -> b.getQuantity() != null && b.getQuantity() > 0)
-                    .toList();
-        }
-        return restoredBasicCart;
+        return cartController.getCotisationBasicCart();
     } // end method
 
     public java.util.List<entite.EquipmentsAndBasic> getCotisationEquipCart() {
-        TarifMember t = memberController.getTarifMember();
-        if (t != null && t.getEquipmentsList() != null) {
-            return t.getEquipmentsList().stream()
-                    .filter(eq -> eq.getQuantity() != null && eq.getQuantity() > 0)
-                    .toList();
-        }
-        return restoredEquipCart;
+        return cartController.getCotisationEquipCart();
     } // end method
 
     public void removeCotisationBasicItem(entite.EquipmentsAndBasicAndRange item) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
-            item.setQuantity(0);
-            if (getCotisationBasicCart().isEmpty()) {
-                // dernier item basic supprimé — annuler la cotisation entièrement
-                TarifMember t = memberController.getTarifMember();
-                if (t != null) {
-                    t.setBasicList(new java.util.ArrayList<>());
-                    t.setEquipmentsList(new java.util.ArrayList<>());
-                }
-                appContext.setCotisation(null);
-                LOG.debug("cotisation cancelled — basic cart empty after remove");
-            } else {
-                refreshCotisationCart();
-            }
-            upsertCart();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-        }
+        cartController.removeCotisationBasicItem(item);
     } // end method
 
     public void removeCotisationEquipmentItem(entite.EquipmentsAndBasic item) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
-            item.setQuantity(0);
-            if (getCotisationBasicCart().isEmpty()) {
-                // plus de basic — annuler la cotisation entièrement
-                TarifMember t = memberController.getTarifMember();
-                if (t != null) {
-                    t.setBasicList(new java.util.ArrayList<>());
-                    t.setEquipmentsList(new java.util.ArrayList<>());
-                }
-                appContext.setCotisation(null);
-                LOG.debug("cotisation cancelled — no basic item left after equipment remove");
-            } else {
-                refreshCotisationCart();
-            }
-            upsertCart();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-        }
-    } // end method
-
-    private void refreshCotisationCart() throws Exception {
-        Cotisation c = tarifMemberController.completeCotisation(
-                memberController.getTarifMember(), appContext.getPlayer(), java.time.LocalDate.now());
-        if (c == null) return;
-        c.setIdplayer(appContext.getPlayer().getIdplayer());
-        c.setIdclub(appContext.getClub().getIdclub());
-        c.setCommunication(appContext.getClub().getClubName() + " : " + c.getCommunication());
-        c.setType(appContext.getCotisation() != null ? appContext.getCotisation().getType() : "spontaneous");
-        appContext.setCotisation(c);
-        if (c.getPrice() > 0.0) {
-            creditcard = completeWithCotisation(c, appContext.getPlayer());
-        }
-        LOG.debug("cotisation cart refreshed — new total = {}", c.getPrice());
+        cartController.removeCotisationEquipmentItem(item);
     } // end method
 
     public void deleteLesson() { // used in cart.xhtml
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        this.listLessons.remove(this.selectedLesson);
-        String msg = "Lesson removed = = " + this.selectedLesson;
-        this.selectedLesson = null;
+        cartController.getListLessons().remove(cartController.getSelectedLesson());
+        String msg = "Lesson removed = " + cartController.getSelectedLesson();
+        cartController.setSelectedLesson(null);
         LOG.info(msg);
         showMessageInfo(msg);
-        creditcard.setTotalPrice(listLessons.stream()
+        creditcard.setTotalPrice(cartController.getListLessons().stream()
                 .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0)
                 .sum());
         msg = "recalculated totalPrice is now " + creditcard.getTotalPrice();
         LOG.info(msg);
         showMessageInfo(msg);
-        upsertCart();
+        cartController.upsertCart();
         org.primefaces.PrimeFaces.current().ajax().update("form_cart:growl-msg", "form_cart:listLessons", "form_cart:messages");
     } // end method
 
-    /** Called from SchedulerProController — adds a pending lesson to the cart. */
+    /** Called from SchedulerProController - adds a pending lesson to the cart. */
     public void addLesson(Lesson lesson) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        listLessons.add(lesson);
-        LOG.info("lesson added to cart, cart size={}", listLessons.size());
-        showMessageInfo("Lesson added, cart size=" + listLessons.size());
-        appContext.setCreditcardType(LESSON());
-        upsertCart();
+        cartController.addLesson(lesson);
     } // end method
 
-    /** Called from SchedulerProController — removes a pending lesson from the cart. */
+    /** Called from SchedulerProController - removes a pending lesson from the cart. */
     public void removeLesson(Lesson lesson) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        listLessons.removeIf(l -> Objects.equals(l.getEventProId(), lesson.getEventProId())
-                && l.getEventStartDate() != null
-                && l.getEventStartDate().equals(lesson.getEventStartDate()));
-        LOG.info("lesson removed from cart, cart size={}", listLessons.size());
-        appContext.setCreditcardType(LESSON());
-        upsertCart();
+        cartController.removeLesson(lesson);
     } // end method
 
-    /** Called from SchedulerProController on drag-drop — updates a pending lesson in the cart. */
+    /** Called from SchedulerProController on drag-drop - updates a pending lesson in the cart. */
     public void updatePendingLesson(Lesson before, Lesson after) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        listLessons.replaceAll(l -> {
-            if (Objects.equals(l.getEventProId(), before.getEventProId())
-                    && before.getEventStartDate() != null
-                    && before.getEventStartDate().equals(l.getEventStartDate())) {
-                l.setEventStartDate(after.getEventStartDate());
-                l.setEventEndDate(after.getEventEndDate());
-                l.setEventTitle(after.getEventTitle());
-            }
-            return l;
-        });
-        LOG.debug("pending lesson updated in cart");
-        appContext.setCreditcardType(LESSON());
-        upsertCart();
+        cartController.updatePendingLesson(before, after);
     } // end method
 
     public String to_creditcard_test_xhtml(String s) {
@@ -926,7 +733,7 @@ public class PaymentController implements Serializable {
     } // end method
 
     // ========================================
-    // TEST METHODS — migrées depuis CourseController 2026-02-25
+    // TEST METHODS - migrées depuis CourseController 2026-02-25
     // ========================================
 
     public String testWebServiceHttp() {
@@ -1023,7 +830,7 @@ public class PaymentController implements Serializable {
     } // end method
 
     // ========================================
-    // PROGRESS BAR — migrée depuis CourseController 2026-02-25
+    // PROGRESS BAR - migrée depuis CourseController 2026-02-25
     // ========================================
 
     private Integer updateProgress(Integer progress) {
@@ -1040,7 +847,7 @@ public class PaymentController implements Serializable {
     } // end method
 
     // ========================================
-    // METHODES METIER PRIVEES — migrées depuis CreditcardController 2026-02-26
+    // METHODES METIER PRIVEES - migrées depuis CreditcardController 2026-02-26
     // ========================================
 
     private Creditcard prefilling(Player player) throws Exception {
@@ -1117,7 +924,7 @@ public class PaymentController implements Serializable {
                 s.append(lessons.get(i).getEventStartDate().format(fmtDate))
                  .append(" ")
                  .append(lessons.get(i).getEventStartDate().format(fmtTime))
-                 .append("→")
+                 .append("�?'")
                  .append(lessons.get(i).getEventEndDate().format(fmtTime));
             } // end for
             s.append(" #").append(professional.getProPlayerId());
@@ -1193,17 +1000,17 @@ public class PaymentController implements Serializable {
         }
     } // end method completeWithSubscription
 
-    // needsUpdate — moved to PaymentManager.needsUpdate 2026-03-21
-    // handlePaymentSubscription — moved to PaymentOrchestrator/SubscriptionRegistrar 2026-03-21
+    // needsUpdate - moved to PaymentManager.needsUpdate 2026-03-21
+    // handlePaymentSubscription - moved to PaymentOrchestrator/SubscriptionRegistrar 2026-03-21
 
     // ========================================
-    // JAX-RS ENDPOINTS — moved to rest.PaymentRestResource 2026-03-21
+    // JAX-RS ENDPOINTS - moved to rest.PaymentRestResource 2026-03-21
     // Architecture separation: REST callbacks are now @RequestScoped
     // and use PaymentStateStore instead of @SessionScoped state.
     // ========================================
 
     // ========================================
-    // PAYMENT COMPLETION — sync REST result back to JSF session
+    // PAYMENT COMPLETION - sync REST result back to JSF session
     // Called via f:viewParam/preRenderView on creditcard_payment_executed.xhtml
     // ========================================
 
@@ -1229,17 +1036,17 @@ public class PaymentController implements Serializable {
 
             // Items traités avec succès AVANT l'erreur : afficher leurs messages + envoyer les mails
             if (!errorTx.getPendingInfoMessages().isEmpty()) {
-                LOG.debug("partial success: {} item(s) processed before error — notifying user", errorTx.getPendingInfoMessages().size());
+                LOG.debug("partial success: {} item(s) processed before error - notifying user", errorTx.getPendingInfoMessages().size());
                 for (String msg : errorTx.getPendingInfoMessages()) {
                     showMessageInfo(msg);
                 }
                 this.creditcard = errorTx.getCreditcard();
                 this.savedType  = errorTx.getSavedType();
                 if (errorTx.getListGreenfees() != null && !errorTx.getListGreenfees().isEmpty()) {
-                    this.listGreenfees = errorTx.getListGreenfees();
+                    cartController.setListGreenfees(errorTx.getListGreenfees());
                 }
                 if (errorTx.getListLessons() != null && !errorTx.getListLessons().isEmpty()) {
-                    this.listLessons = errorTx.getListLessons();
+                    cartController.setListLessons(errorTx.getListLessons());
                 }
                 sendPaymentMails();
                 sendLessonMails();
@@ -1250,8 +1057,8 @@ public class PaymentController implements Serializable {
         }
         payment.PaymentTransaction tx = paymentStateStore.consume(completionNonce);
         if (tx == null) {
-            LOG.warn("transaction not found for nonce={} — syncing skipped, sending mails from session", completionNonce);
-            markCartCompleted();
+            LOG.warn("transaction not found for nonce={} - syncing skipped, sending mails from session", completionNonce);
+            cartController.markCartCompleted(savedType);
             // Afficher les messages success stockés par REST dans la tx (encore accessible via get())
             if (errorTx != null) {
                 for (String msg : errorTx.getPendingInfoMessages()) {
@@ -1260,11 +1067,11 @@ public class PaymentController implements Serializable {
             }
             sendPaymentMails();
             sendLessonMails();
-            // Inscription auto faite côté REST — confirme N fois (une par greenfee)
+            // Inscription auto faite côté REST - confirme N fois (une par greenfee)
             if (this.creditcard != null) {
                 String t = this.creditcard.getTypePayment();
-                if ("GREENFEE".equals(t) || ("MIXED".equals(t) && !listGreenfees.isEmpty())) {
-                    int count = listGreenfees.isEmpty() ? 1 : listGreenfees.size();
+                if ("GREENFEE".equals(t) || ("MIXED".equals(t) && !cartController.getListGreenfees().isEmpty())) {
+                    int count = cartController.getListGreenfees().isEmpty() ? 1 : cartController.getListGreenfees().size();
                     for (int i = 0; i < count; i++) {
                         showMessageInfo(utils.LCUtil.prepareMessageBean("inscription.confirmation.mail"));
                     }
@@ -1275,14 +1082,14 @@ public class PaymentController implements Serializable {
         // Sync creditcard data from the transaction back to the JSF session
         this.creditcard = tx.getCreditcard();
         this.savedType = tx.getSavedType();
-        // Restore menu visibility — may have been lost if session was recreated during payment flow
+        // Restore menu visibility - may have been lost if session was recreated during payment flow
         if (appContext.getPlayer() != null) {
             appContext.getPlayer().setShowMenu(true);
             LOG.debug("showMenu restored to true");
         }
         LOG.debug("creditcard synced from PaymentTransaction, nonce={}", completionNonce);
         // ========================================
-        // Process PENDING cart rows — inserts into payments_xxx + delete cart rows
+        // Process PENDING cart rows - inserts into payments_xxx + delete cart rows
         // ========================================
         try {
             int playerId = tx.getPlayerId();
@@ -1343,7 +1150,7 @@ public class PaymentController implements Serializable {
                             java.util.List<entite.Lesson> lessons = OBJECT_MAPPER.readValue(json, lessonRef);
                             sharedOrchestrator.handle(new payment.LessonPayment(lessons, tx.getProfessional()));
                             tx.setListLessons(lessons);
-                            this.listLessons = lessons;
+                            cartController.setListLessons(lessons);
                             deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
                             showMessageInfo(utils.LCUtil.prepareMessageBean("lesson.success"));
                             LOG.debug("LESSON payment done and cart row deleted");
@@ -1355,7 +1162,7 @@ public class PaymentController implements Serializable {
                             java.util.List<entite.Greenfee> gfDone = new java.util.ArrayList<>();
                             for (entite.Greenfee gf : greenfees) {
                                 if (findGreenfeePaid.findByCartKeys(gf.getIdplayer(), gf.getRoundDate(), gf.getIdclub())) {
-                                    LOG.warn("GREENFEE idempotency — already in DB player={} club={} date={}",
+                                    LOG.warn("GREENFEE idempotency - already in DB player={} club={} date={}",
                                             gf.getIdplayer(), gf.getIdclub(), gf.getRoundDate());
                                     gfDone.add(gf);
                                     continue;
@@ -1376,16 +1183,16 @@ public class PaymentController implements Serializable {
                                 showMessageInfo(utils.LCUtil.prepareMessageBean("greenfee.success") + gf);
                             }
                             tx.setListGreenfees(gfDone);
-                            this.listGreenfees = gfDone;
+                            cartController.setListGreenfees(gfDone);
                             deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
                             LOG.debug("GREENFEE payment done count={} and cart row deleted", gfDone.size());
                         }
-                        default -> LOG.warn("unknown cart type={} — skipped", cartType);
+                        default -> LOG.warn("unknown cart type={} - skipped", cartType);
                         }
                     } catch (Exception itemEx) {
                         String errMsg = "[" + cartType + "] "
                             + (itemEx.getMessage() != null ? itemEx.getMessage() : itemEx.getClass().getSimpleName());
-                        LOG.error("item processing failed type={} — continuing to next item", cartType, itemEx);
+                        LOG.error("item processing failed type={} - continuing to next item", cartType, itemEx);
                         showMessageFatal(errMsg);
                     }
                 }
@@ -1396,11 +1203,11 @@ public class PaymentController implements Serializable {
             handleGenericException(e, methodName);
         }
 
-        markCartCompleted();  // safety net: no-op if rows already deleted above
+        cartController.markCartCompleted(savedType);  // safety net: no-op if rows already deleted above
         sendPaymentMails();
         sendLessonMails();
 
-        // GREENFEE — find-or-create round après paiement ; appContext prêt pour inscription.xhtml
+        // GREENFEE - find-or-create round après paiement ; appContext prêt pour inscription.xhtml
         if ("GREENFEE".equals(this.savedType)) {
             processOneGreenfeePostPayment(
                 tx.getRound()  != null ? tx.getRound()  : appContext.getRound(),
@@ -1409,7 +1216,7 @@ public class PaymentController implements Serializable {
             );
         }
 
-        // MIXED — post-payment pour chaque greenfee de la liste
+        // MIXED - post-payment pour chaque greenfee de la liste
         if ("MIXED".equals(this.savedType) && tx.getListGreenfees() != null) {
             Club club = tx.getClub() != null ? tx.getClub() : appContext.getClub();
             for (Greenfee gf : tx.getListGreenfees()) {
@@ -1424,7 +1231,7 @@ public class PaymentController implements Serializable {
             }
         }
 
-        // COTISATION — message détaillé avec player, période, club depuis appContext
+        // COTISATION - message détaillé avec player, période, club depuis appContext
         if (("COTISATION".equals(this.savedType) || "MIXED".equals(this.savedType))
                 && appContext.getCotisation() != null
                 && appContext.getPlayer() != null
@@ -1433,7 +1240,7 @@ public class PaymentController implements Serializable {
             String startStr = cot.getCotisationStartDate() != null ? cot.getCotisationStartDate().format(DTF_DAY_SLASH) : "?";
             String endStr   = cot.getCotisationEndDate()   != null ? cot.getCotisationEndDate().format(DTF_DAY_SLASH)   : "?";
             showMessageInfo(appContext.getPlayer().getPlayerFirstName() + " " + appContext.getPlayer().getPlayerLastName()
-                    + " | " + startStr + " → " + endStr + " | " + appContext.getClub().getClubName());
+                    + " | " + startStr + " �?' " + endStr + " | " + appContext.getClub().getClubName());
         }
     } // end method
 
@@ -1442,7 +1249,7 @@ public class PaymentController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (roundCandidate == null || course == null || club == null) {
-            LOG.warn("GREENFEE post-payment: round/course/club missing — cannot create round");
+            LOG.warn("GREENFEE post-payment: round/course/club missing - cannot create round");
             return;
         }
         try {
@@ -1454,7 +1261,7 @@ public class PaymentController implements Serializable {
                 int inscrits = participantsRoundList.list(existing).size();
                 if (inscrits >= 4) {
                     LOG.error("GREENFEE post-payment: slot already full (inscrits={})", inscrits);
-                    showMessageFatal("Créneau complet après paiement — contactez le support.");
+                    showMessageFatal("Créneau complet après paiement - contactez le support.");
                     return;
                 }
                 ready = existing;
@@ -1463,7 +1270,7 @@ public class PaymentController implements Serializable {
                 manager.RoundManager.SaveResult res = roundManager.createRound(
                         roundCandidate, course, club, new UnavailablePeriod());
                 if (!res.isSuccess()) {
-                    LOG.error("GREENFEE post-payment: round creation failed — {}", res.getMessage());
+                    LOG.error("GREENFEE post-payment: round creation failed - {}", res.getMessage());
                     showMessageFatal("Round creation failed: " + res.getMessage());
                     return;
                 }
@@ -1477,13 +1284,13 @@ public class PaymentController implements Serializable {
                 auto.setInscriptionTeeStart(null); // tee différé
                 Inscription r = roundManager.createInscription(ready, currentPlayer, currentPlayer, auto, club, course, "A");
                 if (r == null || r.isInscriptionError()) {
-                    LOG.warn("GREENFEE auto-inscription failed — user can retry via Register Score");
+                    LOG.warn("GREENFEE auto-inscription failed - user can retry via Register Score");
                 } else {
                     LOG.info("GREENFEE auto-inscription created (no tee) player={} round={}", currentPlayer.getIdplayer(), ready.getIdround());
                     showMessageInfo(utils.LCUtil.prepareMessageBean("inscription.confirmation.mail"));
                 }
             } else {
-                LOG.debug("GREENFEE: player already inscribed — skip auto-inscription");
+                LOG.debug("GREENFEE: player already inscribed - skip auto-inscription");
                 showMessageInfo(utils.LCUtil.prepareMessageBean("inscription.confirmation.mail"));
             }
         } catch (SQLException e) {
@@ -1496,27 +1303,27 @@ public class PaymentController implements Serializable {
     /**
      * Sends lesson payment confirmation mails using session data.
      * Called by preRenderView on creditcard_payment_executed.xhtml.
-     * Independent of PaymentStateStore — uses session fields directly.
+     * Independent of PaymentStateStore - uses session fields directly.
      * Guard lessonMailsSent prevents double-send on page refresh.
      */
     public void sendLessonMails() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering");
         if (lessonMailsSent) {
-            LOG.debug("mails already sent — skipping");
+            LOG.debug("mails already sent - skipping");
             return;
         }
-        if (listLessons == null || listLessons.isEmpty()) {
-            LOG.debug("no lessons in session — not a lesson payment");
+        if (cartController.getListLessons() == null || cartController.getListLessons().isEmpty()) {
+            LOG.debug("no lessons in session - not a lesson payment");
             return;
         }
-        if (professional == null) {
-            LOG.warn("professional is null — lesson mails not sent");
+        if (cartController.getProfessional() == null) {
+            LOG.warn("professional is null - lesson mails not sent");
             return;
         }
         try {
-            lessonMail.sendPaymentConfirmation(appContext.getPlayer(), professional, listLessons, creditcard);
-            lessonMail.sendProNotification(appContext.getPlayer(), professional, listLessons, creditcard);
+            lessonMail.sendPaymentConfirmation(appContext.getPlayer(), cartController.getProfessional(), cartController.getListLessons(), creditcard);
+            lessonMail.sendProNotification(appContext.getPlayer(), cartController.getProfessional(), cartController.getListLessons(), creditcard);
             lessonMailsSent = true;
             LOG.info("lesson mails enqueued for player={}", appContext.getPlayer().getIdplayer());
         } catch (Exception e) {
@@ -1527,7 +1334,7 @@ public class PaymentController implements Serializable {
     /**
      * Sends confirmation mails for GREENFEE, SUBSCRIPTION and COTISATION payments.
      * LESSON mails are handled separately by sendLessonMails().
-     * Non-fatal — errors are logged and swallowed.
+     * Non-fatal - errors are logged and swallowed.
      */
     private void sendPaymentMails() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -1552,10 +1359,10 @@ public class PaymentController implements Serializable {
                 }
             }
             if ("GREENFEE".equals(type) || (mixed && hasGreenfees())) {
-                for (Greenfee gf : listGreenfees) {
+                for (Greenfee gf : cartController.getListGreenfees()) {
                     creditcardMail.sendMailGreenfee(appContext.getPlayer(), creditcard, gf, appContext.getClub());
                 }
-                LOG.info("greenfee mail(s) enqueued player={} count={}", appContext.getPlayer().getIdplayer(), listGreenfees.size());
+                LOG.info("greenfee mail(s) enqueued player={} count={}", appContext.getPlayer().getIdplayer(), cartController.getListGreenfees().size());
             }
         } catch (Exception e) {
             LOG.warn("sendPaymentMails non-fatal error", e);
@@ -1566,456 +1373,51 @@ public class PaymentController implements Serializable {
     public void setCompletionNonce(String completionNonce) { this.completionNonce = completionNonce; } // end method
 
     // ========================================
-    // CART PERSISTENCE — 2026-05-07
+    // CART PERSISTENCE - 2026-05-07
     // ========================================
 
     /**
-     * Compteur badge panier — calculé depuis les listes en mémoire (chargées à la connexion).
+     * Compteur badge panier - délégué à CartController.
      */
     public int getCartBadgeCount() {
-        return listGreenfees.size() + listLessons.size()
-                + (hasCotisation() ? 1 : 0)
-                + (hasSubscription() ? 1 : 0);
+        return cartController.getCartBadgeCount();
     } // end method
 
     /**
      * Restaure le panier depuis la DB au moment de l'identification du joueur.
-     * Appelé par LoginController.selectPlayer() dès que idplayer est connu.
      */
     public void initCartOnLogin() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        if (sessionRestored) return;
-        try { restoreSessionFromDb(); sessionRestored = true; }
-        catch (Exception e) { LOG.warn("initCartOnLogin failed (non-fatal)", e); }
+        cartController.initCartOnLogin();
     } // end method
 
-    /**
-     * Core restore — loads ALL pending DB rows into session. No navigation, no message.
-     * @return number of rows restored
-     */
-    private int restoreSessionFromDb() throws Exception {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        if (appContext.getPlayer() == null || appContext.getPlayer().getIdplayer() == null) return 0;
-        java.util.List<entite.Cart> carts = findCartService.findAllPendingByPlayer(
-            appContext.getPlayer().getIdplayer());
-        for (entite.Cart cart : carts) {
-            String type = cart.getCartType().name();
-            String json  = cart.getCartItemsJson();
-            if (json == null) continue;
-            if ("LESSON".equals(type)) {
-                com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.Lesson>> ref =
-                    new com.fasterxml.jackson.core.type.TypeReference<>() {};
-                listLessons = OBJECT_MAPPER.readValue(json, ref);
-                LOG.debug("lessons restored size={}", listLessons.size());
-            } else if ("GREENFEE".equals(type)) {
-                com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.Greenfee>> ref =
-                    new com.fasterxml.jackson.core.type.TypeReference<>() {};
-                listGreenfees = OBJECT_MAPPER.readValue(json, ref);
-                if (!listGreenfees.isEmpty()) greenfee = listGreenfees.get(0);
-                LOG.debug("greenfees restored size={}", listGreenfees.size());
-            } else if ("COTISATION".equals(type)) {
-                @SuppressWarnings("unchecked")
-                java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
-                entite.Cotisation c = appContext.getCotisation() != null
-                    ? appContext.getCotisation() : new entite.Cotisation();
-                // 1. Restaurer les items depuis le JSON
-                String basicJson = OBJECT_MAPPER.writeValueAsString(m.get("basic"));
-                String equipJson = OBJECT_MAPPER.writeValueAsString(m.get("equipment"));
-                com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.EquipmentsAndBasicAndRange>> basicRef =
-                    new com.fasterxml.jackson.core.type.TypeReference<>() {};
-                com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.EquipmentsAndBasic>> equipRef =
-                    new com.fasterxml.jackson.core.type.TypeReference<>() {};
-                restoredBasicCart = basicJson.equals("null") ? new ArrayList<>() : OBJECT_MAPPER.readValue(basicJson, basicRef);
-                restoredEquipCart = equipJson.equals("null") ? new ArrayList<>() : OBJECT_MAPPER.readValue(equipJson, equipRef);
-                // 2. Injecter les items sur TarifMember — source de vérité pour completeCotisation()
-                memberController.getTarifMember().setBasicList(new java.util.ArrayList<>(restoredBasicCart));
-                memberController.getTarifMember().setEquipmentsList(new java.util.ArrayList<>(restoredEquipCart));
-                // 3. Restaurer les dates pour include_summary_cotisation
-                if (!restoredBasicCart.isEmpty() && restoredBasicCart.get(0).getStartDate() != null) {
-                    memberController.getTarifMember().setStartDate(restoredBasicCart.get(0).getStartDate());
-                    memberController.getTarifMember().setEndDate(restoredBasicCart.get(0).getEndDate());
-                }
-                // 4. Pré-positionner le type (spontaneous/round) pour refreshCotisationCart()
-                if (m.get("type") instanceof String typeVal) {
-                    entite.Cotisation temp = new entite.Cotisation();
-                    temp.setType(typeVal);
-                    appContext.setCotisation(temp);
-                }
-                // 5. Recompute depuis la source (dates, paymentRef, items, communication, status)
-                refreshCotisationCart();
-                LOG.debug("cotisation restored via refreshCotisationCart basic={} equip={}", restoredBasicCart.size(), restoredEquipCart.size());
-            } else if ("SUBSCRIPTION".equals(type)) {
-                @SuppressWarnings("unchecked")
-                java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
-                entite.Subscription sub = new entite.Subscription();
-                if (m.get("subCode") instanceof String s) sub.setSubCode(s);
-                if (m.get("amount")  instanceof Number n) sub.setSubscriptionAmount(n.doubleValue());
-                if (m.get("communication") instanceof String s) sub.setCommunication(s);
-                sub.setIdplayer(appContext.getPlayer().getIdplayer());
-                // complete() est appelé par createPayment() au moment du paiement — pas ici
-                appContext.setSubscription(sub);
-                LOG.debug("subscription restored code={}", sub.getSubCode());
-            }
-        }
-        if (!carts.isEmpty()) {
-            if (creditcard == null) creditcard = new Creditcard();
-            creditcard.setTotalPrice(getTotalCartPrice());
-            appContext.setCreditcardType(carts.size() == 1 ? carts.get(0).getCartType().name() : "MIXED");
-        }
-        LOG.debug("restoreSessionFromDb: {} row(s) processed", carts.size());
-        return carts.size();
-    } // end method
-
-    /**
-     * preRenderView listener on cart.xhtml — rebuilds session from DB on every load.
-     * Ensures all PENDING rows are visible regardless of session state.
-     */
     public void onCartLoad() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
-            if (appContext.getPlayer() == null || appContext.getClub() == null) return;
-            if (jakarta.faces.context.FacesContext.getCurrentInstance()
-                    .getPartialViewContext().isAjaxRequest()) {
-                LOG.debug("onCartLoad: skipping restore — AJAX request, session already current");
-                return;
-            }
-            restoreSessionFromDb();
-        } catch (Exception e) {
-            LOG.warn("onCartLoad failed (non-fatal)", e);
-        }
+        cartController.onCartLoad();
     } // end method
 
-    /**
-     * Restaure tous les paniers PENDING depuis la DB et navigue vers cart.xhtml.
-     * Appelé depuis le badge header ou le bouton "Restaurer" de cart.xhtml.
-     */
     public String restoreCartFromDb() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
-            int restored = restoreSessionFromDb();
-            if (restored == 0) {
-                showMessageInfo(utils.LCUtil.prepareMessageBean("cart.empty.message"));
-                return null;
-            }
-            showMessageInfo(utils.LCUtil.prepareMessageBean("cart.restore.message"));
-            LOG.info("cart restored {} type(s)", restored);
-            return "cart.xhtml?faces-redirect=true";
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
+        return cartController.restoreCartFromDb();
     } // end method
 
-    /**
-     * Garantit que appContext.getClub().getIdclub() est non-null.
-     * Si le club n'est pas encore positionné, utilise le club home du joueur.
-     * @return true si l'idclub est disponible après résolution, false sinon.
-     */
-    private boolean resolveClubId() {
-        if (appContext.getClub().getIdclub() != null) return true;
-        Integer homeClub = (appContext.getPlayer() != null) ? appContext.getPlayer().getPlayerHomeClub() : null;
-        if (homeClub == null) return false;
-        appContext.getClub().setIdclub(homeClub);
-        LOG.debug("club id resolved from player home club = {}", homeClub);
-        return true;
-    } // end method
-
-    /** Supprime le panier DB du type courant. Pour MIXED, supprime tous les types. */
     public void clearCartFromDb() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        try {
-            if (appContext.getPlayer() == null || appContext.getClub() == null || !resolveClubId()) return;
-            String type = appContext.getCreditcardType();
-            if (type == null) return;
-            int playerId = appContext.getPlayer().getIdplayer();
-            int clubId   = appContext.getClub().getIdclub();
-            if ("MIXED".equals(type)) {
-                deleteCartService.deleteAllByPlayerClub(playerId, clubId);
-            } else {
-                deleteCartService.deleteByPlayerClubType(playerId, clubId, type);
-            }
-
-            LOG.info("cart cleared from DB type={}", type);
-        } catch (Exception e) {
-            LOG.warn("clearCartFromDb failed (non-fatal)", e);
-        }
+        cartController.clearCartFromDb();
     } // end method
 
-    /*
-     * Vérifie les overlaps COTISATION et SUBSCRIPTION avant d'envoyer au serveur de paiement.
-     * En contexte JSF : OverlapChecker.showMessageFatal() fonctionne — le message s'affiche sur cart.xhtml.
-     * @return true si le panier est valide, false si au moins un overlap a été détecté et supprimé.
-     */
-    /** Lit la table cart, vérifie les doublons/chevauchements, supprime la ligne en cas de problème.
-     *  @return true si le panier est valide, false si au moins une ligne a été supprimée. */
-    private boolean validateCartBeforePayment() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        if (appContext.getPlayer() == null || appContext.getClub() == null || !resolveClubId()) return true;
-        int playerId = appContext.getPlayer().getIdplayer();
-        int clubId   = appContext.getClub().getIdclub();
-        boolean valid = true;
-        try {
-            java.util.List<entite.Cart> carts = findCartService.findAllPending(playerId, clubId);
-            for (entite.Cart cart : carts) {
-                String cartType = cart.getCartType().name();
-                String json = cart.getCartItemsJson();
-                switch (cartType) {
-                    case "COTISATION" -> {
-                        @SuppressWarnings("unchecked")
-                        java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
-                        entite.Cotisation cot = new entite.Cotisation();
-                        if (m.get("idplayer")  instanceof Number n) cot.setIdplayer(n.intValue());
-                        if (m.get("idclub")    instanceof Number n) cot.setIdclub(n.intValue());
-                        if (m.get("startDate") instanceof String s) cot.setCotisationStartDate(java.time.LocalDateTime.parse(s));
-                        if (m.get("endDate")   instanceof String s) cot.setCotisationEndDate(java.time.LocalDateTime.parse(s));
-                        if (cot.getIdplayer() != null && cot.getIdclub() != null && cot.getCotisationStartDate() != null) {
-                            if (findCotisationOverlapping.find(cot)) {
-                                String msg = "[COTISATION] " + utils.LCUtil.prepareMessageBean("create.cotisation.duplicate")
-                                        + " player=" + cot.getIdplayer() + " club=" + cot.getIdclub();
-                                LOG.warn(msg);
-                                showMessageFatal(msg);
-                                showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
-                                deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
-                    
-                                valid = false;
-                            }
-                        }
-                    }
-                    case "SUBSCRIPTION" -> {
-                        @SuppressWarnings("unchecked")
-                        java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
-                        entite.Subscription sub = new entite.Subscription();
-                        if (m.get("subCode") instanceof String s) sub.setSubCode(s);
-                        if (m.get("amount")  instanceof Number n) sub.setSubscriptionAmount(n.doubleValue());
-                        sub.setIdplayer(playerId);
-                        if (sub.getSubCode() != null) {
-                            entite.Subscription subComplete = paymentSubscriptionController.complete(sub);
-                            if (subComplete != null && subComplete.getStartDate() != null) {
-                                if (findSubscriptionOverlapping.find(subComplete)) {
-                                    String msg = "[SUBSCRIPTION] " + utils.LCUtil.prepareMessageBean("create.subscription.duplicate")
-                                            + " player=" + playerId + " code=" + sub.getSubCode();
-                                    LOG.warn(msg);
-                                    showMessageFatal(msg);
-                                    showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
-                                    deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
-                        
-                                    valid = false;
-                                }
-                            }
-                        }
-                    }
-                    case "LESSON" -> {
-                        com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.Lesson>> lessonRef =
-                            new com.fasterxml.jackson.core.type.TypeReference<>() {};
-                        java.util.List<entite.Lesson> lessons = OBJECT_MAPPER.readValue(json, lessonRef);
-                        boolean anyBooked = false;
-                        for (entite.Lesson lesson : lessons) {
-                            if (findLessonBooked.find(lesson)) {
-                                String msg = "[LESSON] " + utils.LCUtil.prepareMessageBean("lesson.already.booked")
-                                        + " " + (lesson.getEventStartDate() != null
-                                            ? lesson.getEventStartDate().format(ZDF_TIME_HHmm)
-                                            : "?");
-                                LOG.warn(msg);
-                                showMessageFatal(msg);
-                                anyBooked = true;
-                                valid = false;
-                            }
-                        }
-                        if (anyBooked) {
-                            showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
-                            deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
-                
-                        }
-                    }
-                    case "GREENFEE" -> {
-                        com.fasterxml.jackson.core.type.TypeReference<java.util.List<entite.Greenfee>> ref =
-                            new com.fasterxml.jackson.core.type.TypeReference<>() {};
-                        java.util.List<entite.Greenfee> greenfees = OBJECT_MAPPER.readValue(json, ref);
-                        boolean anyDuplicate = false;
-                        for (entite.Greenfee gf : greenfees) {
-                            if (gf.getRoundDate() == null || gf.getIdclub() == null || gf.getIdplayer() == null) continue;
-                            boolean duplicate = findGreenfeePaid.findByCartKeys(gf.getIdplayer(), gf.getRoundDate(), gf.getIdclub());
-                            if (duplicate) {
-                                String msg = "[GREENFEE] " + utils.LCUtil.prepareMessageBean("create.greenfee.duplicate")
-                                        + " " + gf.getRoundDate().toLocalDate() + " club=" + gf.getIdclub();
-                                LOG.warn(msg);
-                                showMessageFatal(msg);
-                                anyDuplicate = true;
-                                valid = false;
-                            }
-                        }
-                        if (anyDuplicate) {
-                            showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
-                            deleteCartService.deleteByPlayerClubType(playerId, clubId, cartType);
-                
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return false;
-        }
-        LOG.debug("validateCartBeforePayment result={}", valid);
-        return valid;
-    } // end method
-
-    /** Persiste ou met à jour le panier courant en DB (non-fatal si erreur). */
-    private void upsertCart() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            String type = appContext.getCreditcardType();
-            if (type == null || appContext.getPlayer() == null || appContext.getClub() == null || !resolveClubId()) return;
-            int playerId = appContext.getPlayer().getIdplayer();
-            int clubId   = appContext.getClub().getIdclub();
-            String json = buildCartJson(type);
-            if (json != null) {
-                Double rawTotal = (creditcard != null) ? creditcard.getTotalPrice() : null;
-                double total = (rawTotal != null) ? rawTotal : 0.0;
-                entite.Cart cart = new entite.Cart();
-                cart.setCartPlayerId(playerId);
-                cart.setCartClubId(clubId);
-                cart.setCartType(eTypePayment.valueOf(type));
-                cart.setCartItemsJson(json);
-                cart.setCartTotal(total);
-                createCartService.upsert(cart);
-            }
-            cleanStaleCartRows(playerId, clubId);
-
-        } catch (Exception e) {
-            LOG.warn("upsertCart failed (non-fatal) type={}", appContext.getCreditcardType(), e);
-        }
-    } // end method
-
-    /** Supprime en DB les lignes de panier dont le type est vide en session. */
-    private void cleanStaleCartRows(int playerId, int clubId) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            if (listGreenfees.isEmpty()) {
-                deleteCartService.deleteByPlayerClubType(playerId, clubId, "GREENFEE");
-                LOG.debug("cleanStaleCartRows: GREENFEE row deleted");
-            }
-            if (appContext.getCotisation() == null) {
-                deleteCartService.deleteByPlayerClubType(playerId, clubId, "COTISATION");
-                LOG.debug("cleanStaleCartRows: COTISATION row deleted");
-            }
-            if (listLessons.isEmpty()) {
-                deleteCartService.deleteByPlayerClubType(playerId, clubId, "LESSON");
-                LOG.debug("cleanStaleCartRows: LESSON row deleted");
-            }
-            if (appContext.getSubscription() == null) {
-                deleteCartService.deleteByPlayerClubType(playerId, clubId, "SUBSCRIPTION");
-                LOG.debug("cleanStaleCartRows: SUBSCRIPTION row deleted");
-            }
-        } catch (Exception e) {
-            LOG.warn("cleanStaleCartRows failed (non-fatal)", e);
-        }
-    } // end method
-
-    /** Sérialise les items du panier selon le type. Retourne null si type inconnu. */
-    private String buildCartJson(String type) throws Exception {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        LOG.debug("type={}", type);
-        return switch (type) {
-            case "COTISATION" -> {
-                java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
-                m.put("basic",     getCotisationBasicCart());
-                m.put("equipment", getCotisationEquipCart());
-                entite.Cotisation cot = appContext.getCotisation();
-                m.put("total",    cot != null ? cot.getPrice() : 0.0);
-                m.put("type",     cot != null ? cot.getType() : "spontaneous");
-                m.put("idplayer", appContext.getPlayer() != null ? appContext.getPlayer().getIdplayer() : null);
-                m.put("idclub",   appContext.getClub() != null ? appContext.getClub().getIdclub() : null);
-                if (cot != null) {
-                    m.put("startDate",     cot.getCotisationStartDate());
-                    m.put("endDate",       cot.getCotisationEndDate());
-                    m.put("communication", cot.getCommunication() != null ? cot.getCommunication() : "");
-                    m.put("items",         cot.getItems() != null ? cot.getItems() : "");
-                    m.put("status",        cot.getStatus() != null ? cot.getStatus() : "Y");
-                }
-                yield OBJECT_MAPPER.writeValueAsString(m);
-            }
-            case "GREENFEE" -> OBJECT_MAPPER.writeValueAsString(listGreenfees);
-            case "LESSON" -> OBJECT_MAPPER.writeValueAsString(listLessons);
-            case "SUBSCRIPTION" -> {
-                entite.Subscription sub = appContext.getSubscription();
-                java.util.Map<String, Object> m = new java.util.LinkedHashMap<>();
-                if (sub != null) {
-                    m.put("subCode",       sub.getSubCode());
-                    m.put("amount",        sub.getSubscriptionAmount());
-                    m.put("communication", sub.getCommunication() != null ? sub.getCommunication() : "");
-                }
-                yield OBJECT_MAPPER.writeValueAsString(m);
-            }
-            case "MIXED" -> null; // individual type rows already in DB — no dedicated MIXED row
-            default -> null;
-        };
-    } // end method
-
-    /** Marque le panier PENDING comme COMPLETED après paiement réussi (non-fatal). */
-    private void markCartCompleted() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            if (savedType == null || appContext.getPlayer() == null || appContext.getClub() == null) return;
-            int playerId = appContext.getPlayer().getIdplayer();
-            int clubId   = appContext.getClub().getIdclub();
-            if ("MIXED".equals(savedType)) {
-                for (String t : new String[]{"GREENFEE", "LESSON", "COTISATION", "SUBSCRIPTION"}) {
-                    updateCartStatusService.setCompletedByPlayerClubType(playerId, clubId, t);
-                }
-            } else {
-                updateCartStatusService.setCompletedByPlayerClubType(playerId, clubId, savedType);
-            }
-
-            LOG.info("cart marked COMPLETED type={}", savedType);
-        } catch (Exception e) {
-            LOG.warn("markCartCompleted failed (non-fatal)", e);
-        }
-    } // end method
-
-    /** Supprime définitivement le panier DB et navigue hors du panier. */
     public String clearCartAndExit() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        boolean hadGreenfees = hasGreenfees();
-        clearCartFromDb();
-        listGreenfees.clear();
-        listLessons.clear();
-        proFree = false;
-        if (hadGreenfees || isGreenfee()) return "schedule_round.xhtml?faces-redirect=true";
-        return "schedule_pro.xhtml?faces-redirect=true";
-    } // end method
-
-    /** Marque le panier PENDING comme CANCELED (appelé depuis cancelCart). */
-    private void setCanceledCart() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            String type = appContext.getCreditcardType();
-            if (type == null || appContext.getPlayer() == null || appContext.getClub() == null || !resolveClubId()) return;
-            updateCartStatusService.setCanceledByPlayerClubType(
-                appContext.getPlayer().getIdplayer(),
-                appContext.getClub().getIdclub(),
-                type);
-
-            LOG.info("cart marked CANCELED type={}", type);
-        } catch (Exception e) {
-            LOG.warn("setCanceledCart failed (non-fatal)", e);
-        }
+        return cartController.clearCartAndExit();
     } // end method
 
     // ========================================
-    // PAYMENT TYPE — titre et include résolu côté bean
+    // PAYMENT TYPE - titre et include résolu côté bean
     // ========================================
 
     public String getPaymentTitle() {
@@ -2078,38 +1480,6 @@ public class PaymentController implements Serializable {
         this.progress1 = progress1;
     } // end method
 
-    public Greenfee getGreenfee() {
-        return greenfee;
-    } // end method
-
-    public void setGreenfee(Greenfee greenfee) {
-        this.greenfee = greenfee;
-    } // end method
-
-    public Professional getProfessional() {
-        return professional;
-    } // end method
-
-    public void setProfessional(Professional professional) {
-        this.professional = professional;
-    } // end method
-
-    public List<Lesson> getListLessons() {
-        return listLessons;
-    } // end method
-
-    public void setListLessons(List<Lesson> listLessons) {
-        this.listLessons = listLessons;
-    } // end method
-
-    public Lesson getSelectedLesson() {
-        return selectedLesson;
-    } // end method
-
-    public void setSelectedLesson(Lesson selectedLesson) {
-        this.selectedLesson = selectedLesson;
-    } // end method
-
     public Player getPlayerPro() {
         return playerPro;
     } // end method
@@ -2119,3 +1489,4 @@ public class PaymentController implements Serializable {
     } // end method
 
 } // end class
+
