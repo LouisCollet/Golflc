@@ -76,7 +76,6 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
                              holeNumber, par, strokeIndex, holeData[3]);
 
                     sql.preparedstatement.psUpdateHole.psMapUpdate(psUpdate, par, strokeIndex, tee.getIdtee(), holeNumber);
-                    LCUtil.logps(psUpdate);
                     int row = psUpdate.executeUpdate();
 
                     if (row != 0) {
@@ -86,7 +85,6 @@ public class UpdateHole implements Serializable, interfaces.GolfInterface {
                         LOG.info("hole #{} not found for tee {} — inserting", holeNumber, tee.getIdtee());
                         sql.preparedstatement.psUpdateHole.psMapInsert(psInsert, holeNumber, par, strokeIndex,
                                 tee.getIdtee(), tee.getCourse_idcourse());
-                        LCUtil.logps(psInsert);
                         int inserted = psInsert.executeUpdate();
 
                         if (inserted != 0) {

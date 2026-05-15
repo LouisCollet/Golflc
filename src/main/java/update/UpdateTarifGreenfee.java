@@ -68,8 +68,6 @@ public class UpdateTarifGreenfee implements Serializable {
             var ldfin = tarif.getDatesSeasonsList().get(last).getEndDate().truncatedTo(ChronoUnit.DAYS);
 
             sql.preparedstatement.psUpdateTarifGreenfee.psMapUpdate(ps, json, lddeb.getYear(), lddeb, ldfin, tarif.getTarifId());
-            LCUtil.logps(ps);
-
             int rows = ps.executeUpdate();
             LOG.debug("rows updated = {}", rows);
             if (rows == 0) {

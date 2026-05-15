@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import static interfaces.GolfInterface.ZDF_DAY;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -18,41 +19,59 @@ public class CreatePaymentCotisation implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private dao.GenericDAO dao;
+    @Inject private find.FindCotisationOverlapping findCotisationOverlapping;
 
     public CreatePaymentCotisation() { }
 
-    public boolean create(final Cotisation cotisation) throws SQLException {
+    public boolean create(final Cotisation cotisation) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         LOG.debug("with cotisation = {}", cotisation);
 
+        if (findCotisationOverlapping.find(cotisation)) {
+            String period = ZDF_DAY.format(cotisation.getCotisationStartDate())
+                    + " - " + ZDF_DAY.format(cotisation.getCotisationEndDate());
+            String label = LCUtil.prepareMessageBean("tarif.overlapping");
+            String msg = "[COTISATION] " + (label != null ? label : "Cotisation overlap:") + " " + period;
+            LOG.warn("overlap rejected player={} period={}", cotisation.getIdplayer(), period);
+            throw new Exception(msg);
+        }
+
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "payments_cotisation");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                sql.preparedstatement.psCreatePaymentCotisation.psMapCreate(ps, cotisation);
-                utils.LCUtil.logps(ps);
+                PreparedStatement mapped = sql.preparedstatement.psCreatePaymentCotisation.psMapCreate(ps, cotisation);
+                if (mapped == null) {
+                    LOG.error("psMapCreate returned null — cotisation has null fields: idclub={} idplayer={} startDate={} endDate={} paymentRef={} status={}",
+                        cotisation.getIdclub(), cotisation.getIdplayer(),
+                        cotisation.getCotisationStartDate(), cotisation.getCotisationEndDate(),
+                        cotisation.getPaymentReference(), cotisation.getStatus());
+                    return false;
+                }
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     LOG.debug("cotisation payment created = {}", cotisation);
                     return true;
                 } else {
-                    LOG.error("insert payments_cotisation returned 0 rows");
-                    LCUtil.showMessageFatal(LCUtil.prepareMessageBean("create.cotisation.error"));
+                    LOG.error("[COTISATION] insert payments_cotisation returned 0 rows");
+                    LCUtil.showMessageFatal("[COTISATION] " + LCUtil.prepareMessageBean("create.cotisation.error"));
                     return false;
                 }
             }
         } catch (SQLException sqle) {
             if (sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062) {
-                String msg = LCUtil.prepareMessageBean("create.cotisation.duplicate");
-                LOG.error("duplicate cotisation player={} club={}", cotisation.getIdplayer(), cotisation.getIdclub());
-                LCUtil.showMessageFatal(msg);
-                return false;
+                String msg = "[COTISATION] Duplicate cotisation — already registered for player="
+                    + cotisation.getIdplayer() + " club=" + cotisation.getIdclub();
+                LOG.error(msg);
+                throw new Exception(msg, sqle);
             }
-            handleSQLException(sqle, methodName);
-            return false;
+            String msg = "[COTISATION] SQL error: " + sqle.getMessage()
+                + " (state=" + sqle.getSQLState() + " code=" + sqle.getErrorCode() + ")";
+            LOG.error(msg);
+            throw new Exception(msg, sqle);
         } catch (Exception e) {
             handleGenericException(e, methodName);
-            return false;
+            throw e;
         }
     } // end method
 

@@ -88,8 +88,6 @@ public class UpdateClub implements Serializable, interfaces.GolfInterface {
                 
                 // Mapper les données
                 sql.preparedstatement.psCreateUpdateClub.psMapUpdate(ps, club);
-                LCUtil.logps(ps);
-                
                 // Exécuter l'update
                 int rowsAffected = ps.executeUpdate();
                 LOG.debug("Rows affected: {}", rowsAffected);
@@ -260,8 +258,6 @@ public class UpdateClub implements Serializable, interfaces.GolfInterface {
                 
                 // Mapper les données
                 sql.preparedstatement.psCreateUpdateClub.psMapUpdate(ps, club);
-                LCUtil.logps(ps);
-                
                 // Exécuter l'update
                 int rowsAffected = ps.executeUpdate();
                 LOG.debug("Rows affected: {}", rowsAffected);

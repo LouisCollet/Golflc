@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-public class psUpdateHole implements Serializable, interfaces.Log, interfaces.GolfInterface {
+public class psUpdateHole implements Serializable{
 
     /**
      * UPDATE hole SET HolePar=?, HoleDistance=?, HoleStrokeIndex=?
@@ -56,7 +56,8 @@ public class psUpdateHole implements Serializable, interfaces.Log, interfaces.Go
             ps.setInt      (5, teeId);
             ps.setInt      (6, courseId);
             ps.setTimestamp(7, Timestamp.from(Instant.now()));
-            ps.getWarnings();
+            sql.PrintWarnings.print(ps.getWarnings(), methodName);
+            utils.LCUtil.logps(ps);
             return ps;
         } catch (Exception e) {
             handleGenericException(e, methodName);

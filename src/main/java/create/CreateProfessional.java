@@ -43,7 +43,6 @@ public class CreateProfessional implements Serializable, interfaces.Log, interfa
             final String query = utils.LCUtil.generateInsertQuery(conn, "professional");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 sql.preparedstatement.psCreateProfessional.psMapCreate(ps, professional);
-                utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     professional.setProId(generatedKey(conn));

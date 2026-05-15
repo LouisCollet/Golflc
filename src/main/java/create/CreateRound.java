@@ -54,7 +54,6 @@ public class CreateRound implements Serializable {
             LOG.debug("ZoneId = {}, UTC = {}", club.getAddress().getZoneId(), ldt);
 
             sql.preparedstatement.psCreateRound.psMapCreate(ps, round, course, ldt);
-            utils.LCUtil.logps(ps);
             int x = ps.executeUpdate();
 
             if (x != 0) {
@@ -95,14 +94,14 @@ public class CreateRound implements Serializable {
             }
             LocalDateTime cb = course.getCourseBeginDate();
             LOG.debug("courseBegin = {}", cb);
-            if (round.getRoundDate().isBefore(cb)) {
+            if (cb != null && round.getRoundDate().isBefore(cb)) {
                 LOG.error("roundDate {} before courseBegin {}", round.getRoundDate(), cb);
                 showMessageFatal(utils.LCUtil.prepareMessageBean("round.notopened"));
                 return false;
             }
             LocalDateTime ce = course.getCourseEndDate();
             LOG.debug("courseEnd = {}", ce);
-            if (round.getRoundDate().isAfter(ce)) {
+            if (ce != null && round.getRoundDate().isAfter(ce)) {
                 LOG.error("roundDate {} after courseEnd {}", round.getRoundDate(), ce);
                 showMessageFatal(utils.LCUtil.prepareMessageBean("round.closed"));
                 return false;

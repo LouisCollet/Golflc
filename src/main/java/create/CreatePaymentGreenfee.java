@@ -32,21 +32,20 @@ public class CreatePaymentGreenfee implements Serializable, interfaces.GolfInter
             final String query = LCUtil.generateInsertQuery(conn, "payments_greenfee");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 sql.preparedstatement.psCreatePaymentGreenfee.psMapCreate(ps, player, greenfee);
-                utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     LOG.debug("greenfee payment created price={} round={}", greenfee.getPrice(), greenfee.getIdround());
                     return true;
                 } else {
-                    LOG.error("insert payments_greenfee returned 0 rows player={} round={}", player.getIdplayer(), greenfee.getIdround());
-                    LCUtil.showMessageFatal(LCUtil.prepareMessageBean("greenfee.error"));
+                    LOG.error("[GREENFEE] insert payments_greenfee returned 0 rows player={} round={}", player.getIdplayer(), greenfee.getIdround());
+                    LCUtil.showMessageFatal("[GREENFEE] " + LCUtil.prepareMessageBean("greenfee.error"));
                     return false;
                 }
             }
         } catch (SQLException sqle) {
             String msg;
             if (sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062) {
-                msg = LCUtil.prepareMessageBean("create.greenfee.duplicate")
+                msg = "[GREENFEE] " + LCUtil.prepareMessageBean("create.greenfee.duplicate")
                         + "player = " + player.getIdplayer() + " club = " + greenfee.getIdclub();
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);

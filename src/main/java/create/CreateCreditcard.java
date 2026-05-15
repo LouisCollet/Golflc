@@ -31,7 +31,6 @@ public class CreateCreditcard implements Serializable {
       //      final String query = LCUtil.generateInsertQuery(conn, "creditcard");
             try (PreparedStatement ps = conn.prepareStatement(LCUtil.generateInsertQuery(conn, "creditcard"))) {
                 sql.preparedstatement.psCreateCreditcard.psMapCreate(ps, creditcard);
-                utils.LCUtil.logps(ps);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     LOG.debug("creditcard created for player={}", creditcard.getCreditCardIdPlayer());

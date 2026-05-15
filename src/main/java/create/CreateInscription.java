@@ -29,7 +29,7 @@ public class CreateInscription implements Serializable {
 
     @Inject private dao.GenericDAO dao;
 
-    @Inject private find.FindInscriptionRound      findInscriptionRound;
+    @Inject private find.FindInscriptionRound       findInscriptionRound;
     @Inject private find.FindCotisationAtRoundDate  findCotisationAtRoundDate;
     @Inject private find.FindGreenfeePaid           findGreenfeePaid;
     @Inject private lists.RoundPlayersList          roundPlayersList;
@@ -99,8 +99,6 @@ public class CreateInscription implements Serializable {
                 }
 
                 sql.preparedstatement.psCreateInscription.psMapCreate(ps, round, player, invitedBy, inscription);
-                utils.LCUtil.logps(ps);
-
                 int row = ps.executeUpdate();
                 if (row == 1) {
                     LOG.debug("InscriptionId created = {}", LCUtil.generatedKey(conn));
@@ -191,7 +189,7 @@ public class CreateInscription implements Serializable {
                 v.setStatus2("04");
                 return v;
             }
-
+/* enlevé 11-05-2026
             if ("ADMIN".equals(player.getPlayerRole())) {
                 v.setStatus0(ValidationStatus.APPROVED.toString());
                 String msg = LCUtil.prepareMessageBean("inscription.administrator");
@@ -199,7 +197,7 @@ public class CreateInscription implements Serializable {
                 v.setStatus2("00");
                 return v;
             }
-
+*/
             Cotisation cotisation = findCotisationAtRoundDate.find(player, club, round);
             LOG.debug("cotisation at round date = {}", cotisation);
             LOG.debug("cotisation status = {}", (cotisation != null ? cotisation.getStatus() : "null"));

@@ -58,10 +58,9 @@ public class CreatePaymentLesson implements Serializable {
                 final String insertQuery = LCUtil.generateInsertQuery(conn, "payments_lesson");
                 try (PreparedStatement ps = conn.prepareStatement(insertQuery)) {
                     sql.preparedstatement.psCreatePaymentLesson.psMapCreate(ps, lessons, creditcard, professional, lessonCommunication);
-                    utils.LCUtil.logps(ps);
                     int row = ps.executeUpdate();
                     if (row == 0) {
-                        String msg = "ERROR insert payments_lesson";
+                        String msg = "[LESSON] ERROR insert payments_lesson";
                         LOG.error(msg);
                         LCUtil.showMessageFatal(msg);
                         conn.rollback();
@@ -79,7 +78,6 @@ public class CreatePaymentLesson implements Serializable {
                 try (PreparedStatement psUpdate = conn.prepareStatement(updateQuery)) {
                     for (Lesson lesson : lessons) {
                         sql.preparedstatement.psUpdateLessonPaymentsId.psMapUpdate(psUpdate, generatedKey, lesson, creditcard.getCreditCardIdPlayer());
-                        utils.LCUtil.logps(psUpdate);
                         int updated = psUpdate.executeUpdate();
                         LOG.debug("PaymentsLessonId={} for proId={} playerId={} start={} rows={}",
                             generatedKey, lesson.getEventProId(),
@@ -99,7 +97,7 @@ public class CreatePaymentLesson implements Serializable {
             }
         } catch (SQLException sqle) {
             if (sqle.getSQLState().equals("23000") && sqle.getErrorCode() == 1062) {
-                String msg = LCUtil.prepareMessageBean("create.lesson.duplicate");
+                String msg = "[LESSON] " + LCUtil.prepareMessageBean("create.lesson.duplicate");
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
                 return false;
