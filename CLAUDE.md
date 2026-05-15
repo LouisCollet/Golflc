@@ -380,7 +380,9 @@ JAX-RS est activé via `rest/RestActivator.java`. `PaymentRestResource` est la s
 | `/cdi-code-patterns` | Templates complets Service, List simple, List Caffeine, Controller, Settings |
 | `/cdi-migration-guide` | Règles NEVER/ALWAYS, cache map, checklist, erreurs courantes, imports |
 | `/jsf-xhtml-guide` | Patterns XHTML/PrimeFaces avec exemples de code |
-| `/testing-sql-guide` | Patterns IT tests + bonnes pratiques SQL |
+| `/xhtml-screens` | Structure écrans (login-card, form-card, btn-group, info-grid, icônes) |
+| `/look-and-feel` | CSS variables, dark mode, Saga/Arya, WCAG, menu mobile, règles CSS |
+| `/testing-sql-guide` | Patterns unit tests Mockito, IT tests, FK cascade, SQL bonnes pratiques |
 
 ---
 
