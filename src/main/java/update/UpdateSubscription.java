@@ -65,12 +65,11 @@ public class UpdateSubscription implements Serializable {
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            sql.preparedstatement.psUpdateSubscription.psMapUpdate(ps, subscription, endDate);
-            utils.LCUtil.logps(ps);
+            sql.preparedstatement.psCreateUpdatePaymentSubscription.psMapUpdate(ps, subscription, endDate);
 
             int row = ps.executeUpdate();
             if (row != 0) {
-                String msg = LCUtil.prepareMessageBean("subscription.success") + subscription.getEndDate().format(ZDF_DAY);
+                String msg = LCUtil.prepareMessageBean("subscription.success") + subscription; //mod lc 11-05-2026.getEndDate().format(ZDF_DAY);
                 LOG.debug(msg);
                 LCUtil.showMessageInfo(msg);
                 return true;

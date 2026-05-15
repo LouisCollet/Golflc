@@ -1,21 +1,15 @@
 package create;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Distance;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Arrays;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
@@ -25,13 +19,6 @@ import static utils.LCUtil.showMessageInfo;
 public class CreateDistances implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private static final ObjectMapper OBJECT_MAPPER;
-    static {
-        OBJECT_MAPPER = new ObjectMapper();
-        OBJECT_MAPPER.registerModule(new JavaTimeModule());
-        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
 
     @Inject private dao.GenericDAO dao;
 
@@ -53,12 +40,7 @@ public class CreateDistances implements Serializable {
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "distances");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setInt(1, distance.getIdTee());
-                String json = OBJECT_MAPPER.writeValueAsString(distance);
-                LOG.debug("distances converted in json format = {}", NEW_LINE + json);
-                ps.setString(2, json);
-                ps.setTimestamp(3, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdateDistances.psMapCreate(ps, distance);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     String msg = LCUtil.prepareMessageBean("distance.create") + distance;

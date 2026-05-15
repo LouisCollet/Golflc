@@ -10,8 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -31,12 +29,7 @@ public class CreateBlocking implements Serializable, interfaces.Log {
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "blocking");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setInt(1, player.getIdplayer());
-                ps.setTimestamp(2, Timestamp.from(Instant.now())); // BlockingLastAttempt
-                ps.setInt(3, 1);
-                ps.setTimestamp(4, Timestamp.from(Instant.now()));
-                ps.setTimestamp(5, Timestamp.from(Instant.now())); // ModificationDate
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdateBlocking.psMapCreate(ps, player);
                 int rows = ps.executeUpdate();
                 if (rows != 0) {
                     String msg = "Tentative 1 - Après 3 erreurs successives, vous serez bloqué pendant 15 minutes ";

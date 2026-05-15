@@ -1,39 +1,23 @@
 package create;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.UnavailablePeriod;
 import entite.ValidationsLC;
 import entite.ValidationsLC.ValidationStatus;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
 public class CreateUnavailablePeriod implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private static final ObjectMapper OBJECT_MAPPER;
-    static {
-        OBJECT_MAPPER = new ObjectMapper();
-        OBJECT_MAPPER.registerModule(new JavaTimeModule());
-        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        OBJECT_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
-        OBJECT_MAPPER.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-    }
 
     @Inject private dao.GenericDAO dao;
 
@@ -55,24 +39,10 @@ public class CreateUnavailablePeriod implements Serializable {
 
         try (Connection conn = dao.getConnection()) {
             unavailable.setItemPeriod(utils.LCUtil.removeNull1DBoolean(unavailable.getItemPeriod()));
-            String json;
-            try {
-                json = OBJECT_MAPPER.writeValueAsString(unavailable);
-            } catch (Exception ex) {
-                handleGenericException(ex, methodName);
-                return false;
-            }
-            LOG.debug("Unavailable Period converted in json format = {}", NEW_LINE + json);
 
             final String query = LCUtil.generateInsertQuery(conn, "unavailable_periods");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setNull(1, java.sql.Types.INTEGER);  // autoincrement
-                ps.setInt(2, unavailable.getIdclub());
-                ps.setObject(3, unavailable.getStartDate(), JDBCType.TIMESTAMP);
-                ps.setTimestamp(4, Timestamp.valueOf(unavailable.getEndDate()));
-                ps.setString(5, json);
-                ps.setTimestamp(6, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdateUnavailablePeriod.psMapCreate(ps, unavailable);
                 int row = ps.executeUpdate();
                 LOG.debug("row created = {}", row);
                 if (row != 0) {

@@ -16,8 +16,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import utils.LCUtil;
@@ -97,21 +95,7 @@ public class CreateCompetitionInscriptions implements Serializable {
 
                 try (PreparedStatement ps = conn.prepareStatement(query)) {
                     LOG.debug("starting createOneInscription");
-                    ps.setNull(1, java.sql.Types.INTEGER);
-                    ps.setInt(2, cda.getCmpDataRoundId());
-                    ps.setInt(3, cda.getCmpDataPlayerId());
-                    ps.setInt(4, 0); // Final Results initial value
-                    ps.setInt(5, 0); // NotUsed1 initial value
-                    ps.setInt(6, 0); // NotUsed2 initial value
-                    ps.setString(7, cda.getCmpDataTeeStart());
-                    String TeeStart = cda.getCmpDataTeeStart();
-                    int tee = Integer.valueOf(TeeStart
-                            .substring(TeeStart.lastIndexOf("/") + 2, TeeStart.length()));
-                    LOG.debug("tee extracted from inscriptionTeeStart = {}", tee);
-                    ps.setInt(8, tee);
-                    ps.setInt(9, cda.getCmpDataPlayerId());
-                    ps.setTimestamp(10, Timestamp.from(Instant.now()));
-                    utils.LCUtil.logps(ps);
+                    sql.preparedstatement.psCreateCompetitionInscriptions.psMapCreate(ps, cda);
 
                     int x = ps.executeUpdate();
                     if (x != 0) {

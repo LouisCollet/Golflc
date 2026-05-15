@@ -15,8 +15,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import utils.LCUtil;
@@ -117,23 +115,7 @@ public class CreateCompetitionRounds implements Serializable {
                     LOG.debug("starting createOneRound");
                     LocalDateTime ldt = de.getCompetitionDate().toLocalDate()
                             .atTime(ec.competitionData().getCmpDataFlightStart());
-                    ps.setNull(1, java.sql.Types.INTEGER);
-                    ps.setTimestamp(2, Timestamp.valueOf(ldt));
-                    ps.setString(3, de.getCompetitionGame());
-                    ps.setInt(4, 0);
-                    ps.setString(5, de.getCompetitionName());
-                    ps.setString(6, de.getCompetitionQualifying());
-                    ps.setInt(7, 18);
-                    ps.setInt(8, de.getCompetitionStartHole());
-                    String e = "0";
-                    byte[] b = e.getBytes();
-                    ps.setBytes(9, b);
-                    ps.setString(10, "no MP score");
-                    ps.setInt(11, 0);
-                    ps.setString(12, de.getCompetitionName());
-                    ps.setInt(13, de.getCompetitionCourseId());
-                    ps.setTimestamp(14, Timestamp.from(Instant.now()));
-                    utils.LCUtil.logps(ps);
+                    sql.preparedstatement.psCreateCompetitionRounds.psMapCreate(ps, de, ldt);
 
                     int x = ps.executeUpdate();
                     if (x != 0) {

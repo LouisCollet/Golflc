@@ -13,8 +13,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Arrays;
 import utils.LCUtil;
 
@@ -40,15 +38,7 @@ public class CreateHolesGlobal implements Serializable {
                 LOG.debug("handling index i = {}", i);
                 LOG.debug("handling holesGlobal = {}", Arrays.toString(holesGlobal.getDataHoles()[i]));
                 try (PreparedStatement ps = conn.prepareStatement(query)) {
-                    ps.setNull(1, java.sql.Types.INTEGER); // idhole
-                    ps.setShort(2, (short) holesGlobal.getDataHoles()[i][0]); // holenumber
-                    ps.setShort(3, (short) holesGlobal.getDataHoles()[i][1]); // Par
-                    ps.setInt(4, 0); // distance
-                    ps.setShort(5, (short) holesGlobal.getDataHoles()[i][2]); // stroke index
-                    ps.setInt(6, tee.getIdtee());
-                    ps.setInt(7, course.getIdcourse());
-                    ps.setTimestamp(8, Timestamp.from(Instant.now()));
-                    utils.LCUtil.logps(ps);
+                    sql.preparedstatement.psCreateHolesGlobal.psMapCreate(ps, holesGlobal.getDataHoles()[i], tee, course);
                     int row = ps.executeUpdate();
                     if (row != 0) {
                         LOG.debug("Successfull update Hole for hole={} tee={} row={}", holesGlobal.getDataHoles()[i][0], tee.getIdtee(), row);

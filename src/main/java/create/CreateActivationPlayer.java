@@ -10,8 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.UUID;
 import utils.LCUtil;
 import static utils.LCUtil.printSQLException;
@@ -37,11 +35,7 @@ public class CreateActivationPlayer implements Serializable {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 String uuid = UUID.randomUUID().toString();
                 LOG.debug("Universally Unique Identifier uuid = {}", uuid);
-                ps.setString(1, uuid); // ActivationKey
-                ps.setInt(2, player.getIdplayer());
-                ps.setString(3, player.getPlayerLanguage());
-                ps.setTimestamp(4, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateActivation.psMapCreate(ps, uuid, player);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     String href = utils.LCUtil.firstPartUrl()

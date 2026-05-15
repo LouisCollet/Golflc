@@ -10,8 +10,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
+import static interfaces.GolfInterface.ZDF_DAY;
 import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 
@@ -21,35 +20,36 @@ public class CreatePaymentSubscription implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private dao.GenericDAO dao;
+    @Inject private find.FindSubscriptionOverlapping findSubscriptionOverlapping;
 
     public CreatePaymentSubscription() { }
 
-    public boolean create(final Subscription subscription) throws SQLException {
+    public boolean create(final Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         LOG.debug("for subscription  = {}", subscription);
 
+        if (findSubscriptionOverlapping.find(subscription)) {
+            String period = ZDF_DAY.format(subscription.getStartDate())
+                    + " - " + ZDF_DAY.format(subscription.getEndDate());
+            String label = LCUtil.prepareMessageBean("tarif.overlapping");
+            String msg = "[SUBSCRIPTION] " + (label != null ? label : "Subscription overlap:") + " " + period;
+            LOG.warn("overlap rejected player={} period={}", subscription.getIdplayer(), period);
+            throw new Exception(msg);
+        }
+
         try (Connection conn = dao.getConnection()) {
             final String query = LCUtil.generateInsertQuery(conn, "payments_subscription");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setNull(1, java.sql.Types.INTEGER);
-                ps.setInt(2, subscription.getIdplayer());
-                ps.setTimestamp(3, Timestamp.valueOf(subscription.getStartDate()));
-                ps.setTimestamp(4, Timestamp.valueOf(subscription.getEndDate()));
-                ps.setInt(5, subscription.getTrialCount());
-                ps.setString(6, subscription.getPaymentReference());
-                ps.setString(7, subscription.getCommunication());
-                ps.setDouble(8, subscription.getSubscriptionAmount());
-                ps.setTimestamp(9, Timestamp.from(Instant.now()));
-                LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdatePaymentSubscription.psMapCreate(ps, subscription);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     String msg = "Subscription created = " + subscription;
                     LOG.debug(msg);
                     return true;
                 } else {
-                    String msg = "<br/><br/>ERROR in Create for subscription : " + subscription;
-                    LOG.debug(msg);
+                    String msg = "[SUBSCRIPTION] ERROR in Create for subscription : " + subscription;
+                    LOG.error(msg);
                     showMessageFatal(msg);
                     return false;
                 }

@@ -10,8 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -38,13 +36,7 @@ public class CreateTarifSubscription implements Serializable {
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(utils.LCUtil.generateInsertQuery(conn, "tarif_subscription"))) {
 
-            ps.setNull(1, java.sql.Types.INTEGER);                // TarifSubscriptionId auto-increment
-            ps.setString(2, tarif.getCode());
-            ps.setDouble(3, tarif.getPrice());
-            ps.setTimestamp(4, Timestamp.valueOf(tarif.getStartDate()));
-            ps.setTimestamp(5, Timestamp.valueOf(tarif.getEndDate()));
-            ps.setTimestamp(6, Timestamp.from(Instant.now()));
-            LCUtil.logps(ps);
+            sql.preparedstatement.psCreateTarifSubscription.psMapCreate(ps, tarif);
 
             int row = ps.executeUpdate();
             if (row != 0) {

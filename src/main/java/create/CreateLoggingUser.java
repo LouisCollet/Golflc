@@ -10,8 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
@@ -32,12 +30,7 @@ public class CreateLoggingUser implements Serializable {
         try (Connection conn = dao.getConnection()) {
             final String query = utils.LCUtil.generateInsertQuery(conn, "logging_user");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setInt(1, logging.getLoggingIdPlayer());
-                ps.setInt(2, logging.getLoggingIdRound());
-                ps.setString(3, logging.getLoggingType());
-                ps.setString(4, logging.getLoggingCalculations());
-                ps.setTimestamp(5, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdateLoggingUser.psMapCreate(ps, logging);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     String msg = "LoggingUser Created = " + logging;

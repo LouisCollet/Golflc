@@ -44,13 +44,7 @@ public class UpdateHandicapIndex implements Serializable {
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setBigDecimal(1, handicapIndex.getHandicapWHS());
-            ps.setString(2, "UPD-" + handicapIndex.getHandicapComment());
-            ps.setString(3, handicapIndex.getHandicapSoftHardCap());
-            ps.setShort(4, handicapIndex.getHandicapExceptionalScoreReduction());
-            ps.setDouble(5, handicapIndex.getLowHandicapIndex());
-            ps.setInt(6, handicapIndex.getHandicapId());
-            utils.LCUtil.logps(ps);
+            sql.preparedstatement.psCreateUpdateHandicapIndex.psMapUpdate(ps, handicapIndex);
 
             int row = ps.executeUpdate();
             if (row != 0) {

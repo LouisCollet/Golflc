@@ -10,9 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -32,26 +29,9 @@ public class CreateCompetitionData implements Serializable {
         try (Connection conn = dao.getConnection()) {
 
             final String query = LCUtil.generateInsertQuery(conn, "competition_data");
-            int index = 0;
 
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setNull(++index, java.sql.Types.INTEGER); // CmpDataId
-                ps.setInt(2, data.getCmpDataCompetitionId());
-                ps.setInt(3, data.getCmpDataPlayerId());
-                ps.setShort(4, (short) 0); // playingHandicap
-                ps.setDouble(5, 0); // handicap
-                ps.setTime(6, Time.valueOf("00:00:00")); // flight start
-                ps.setShort(7, (short) 0); // flight number
-                ps.setShort(8, (short) 0); // scorepoints
-                ps.setString(9, data.getCmpDataLastHoles());
-                ps.setString(10, data.getCmpDataPlayerFirstLastName());
-                ps.setString(11, data.getCmpDataAskedStartTime());
-                ps.setString(12, data.getCmpDataPlayerGender());
-                ps.setInt(13, 0); // CmpDataRoundId
-                ps.setString(14, ""); // CmpDataTeeStart
-                ps.setDouble(15, 0); // score differential
-                ps.setTimestamp(16, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdateCompetitionData.psMapCreate(ps, data);
 
                 int row = ps.executeUpdate();
                 if (row != 0) {

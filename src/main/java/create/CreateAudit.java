@@ -12,9 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @ApplicationScoped
 public class CreateAudit implements Serializable, interfaces.Log {
@@ -37,12 +34,7 @@ public class CreateAudit implements Serializable, interfaces.Log {
         try (Connection conn = dao.getConnection()) {
             final String query = sql.SqlFactory.generateInsertQuery(conn, "audit");
             try (PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setNull(1, java.sql.Types.INTEGER); // auto-increment
-                ps.setInt(2, player.getIdplayer());
-                ps.setTimestamp(3, Timestamp.from(Instant.now())); // AuditStartDate
-                ps.setNull(4, java.sql.Types.TIMESTAMP); // AuditEndDate — NULL until logout
-                ps.setTimestamp(5, Timestamp.from(Instant.now())); // ModificationDate
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateAudit.psMapCreate(ps, player);
                 ps.executeUpdate();
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {

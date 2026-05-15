@@ -10,9 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -36,22 +33,7 @@ public class UpdateCompetitionData implements Serializable {
             final String query = "UPDATE competition_data SET " + co + " WHERE CmpDataId = ?";
 
             try (PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setInt(1, cda.getCmpDataPlayerId());
-                ps.setShort(2, cda.getCmpDataPlayingHandicap());
-                ps.setDouble(3, cda.getCmpDataHandicap());
-                ps.setTime(4, Time.valueOf(cda.getCmpDataFlightStart()));
-                ps.setShort(5, cda.getCmpDataFlightNumber());
-                ps.setShort(6, cda.getCmpDataScorePoints());
-                ps.setString(7, cda.getCmpDataLastHoles());
-                ps.setString(8, cda.getCmpDataPlayerFirstLastName());
-                ps.setString(9, cda.getCmpDataAskedStartTime());
-                ps.setString(10, cda.getCmpDataPlayerGender());
-                ps.setInt(11, cda.getCmpDataRoundId());
-                ps.setString(12, cda.getCmpDataTeeStart());
-                ps.setDouble(13, cda.getCmpDataScoreDifferential());
-                ps.setTimestamp(14, Timestamp.from(Instant.now()));
-                ps.setInt(15, cda.getCmpDataId());
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateUpdateCompetitionData.psMapUpdate(ps, cda);
 
                 int row = ps.executeUpdate();
                 LOG.debug("rows modified = {}", row);

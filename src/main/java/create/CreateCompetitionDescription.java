@@ -1,24 +1,17 @@
 package create;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.CompetitionDescription;
 import entite.ValidationsLC;
 import entite.ValidationsLC.ValidationStatus;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.time.Instant;
 import utils.LCUtil;
 import static utils.LCUtil.LocalDateTimeToDate;
 
@@ -26,13 +19,6 @@ import static utils.LCUtil.LocalDateTimeToDate;
 public class CreateCompetitionDescription implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private static final ObjectMapper OBJECT_MAPPER;
-    static {
-        OBJECT_MAPPER = new ObjectMapper();
-        OBJECT_MAPPER.registerModule(new JavaTimeModule());
-        OBJECT_MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-    }
 
     @Inject private dao.GenericDAO dao;
 
@@ -57,35 +43,8 @@ public class CreateCompetitionDescription implements Serializable {
             try (Connection conn = dao.getConnection()) {
 
                 final String query = LCUtil.generateInsertQuery(conn, "competition_description");
-                int index = 0;
-
                 try (PreparedStatement ps = conn.prepareStatement(query)) {
-                    ps.setNull(++index, java.sql.Types.INTEGER); // CompetitionId
-                    ps.setTimestamp(2, Timestamp.valueOf(competition.getCompetitionDate()));
-                    ps.setString(3, competition.getCompetitionName());
-                    ps.setTimestamp(4, Timestamp.valueOf(competition.getStartInscriptionDate()));
-                    ps.setTimestamp(5, Timestamp.valueOf(competition.getEndInscriptionDate()));
-                    ps.setInt(6, competition.getCompetitionClubId());
-                    ps.setString(7, competition.getCompetitionCourseIdName());
-                    ps.setString(8, competition.getCompetitionGender());
-                    ps.setString(9, competition.getCompetitionGame());
-                    ps.setShort(10, competition.getCompetitionStartHole());
-                    ps.setShort(11, competition.getFlightNumberPlayers());
-                    ps.setString(12, competition.getTimeSlots());
-                    String json = OBJECT_MAPPER.writeValueAsString(competition);
-                    LOG.debug("seriesHandicap converted in json = {}", NEW_LINE + json);
-                    ps.setString(13, json);
-                    ps.setString(14, competition.getCompetitionQualifying());
-                    ps.setTime(15, Time.valueOf(competition.getPriceGivingTime()));
-                    ps.setTimestamp(16, Timestamp.valueOf(competition.getStartingListDate()));
-                    ps.setTimestamp(17, Timestamp.valueOf(competition.getClassmentDate()));
-                    ps.setShort(18, (short) 72); // CompetitionPar
-                    ps.setString(19, "0"); // CompetitionStatus
-                    ps.setShort(20, competition.getCompetitionAgeLadies());
-                    ps.setShort(21, competition.getCompetitionAgeMens());
-                    ps.setShort(22, competition.getCompetitionMaximumPlayers());
-                    ps.setTimestamp(23, Timestamp.from(Instant.now()));
-                    utils.LCUtil.logps(ps);
+                    sql.preparedstatement.psCreateCompetitionDescription.psMapCreate(ps, competition);
 
                     int row = ps.executeUpdate();
                     if (row != 0) {

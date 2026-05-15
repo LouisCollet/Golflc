@@ -43,10 +43,7 @@ public class UpdateLoggingUser implements Serializable {
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setString(1, logging.getLoggingCalculations());
-            ps.setInt(2, logging.getLoggingIdPlayer());
-            ps.setInt(3, logging.getLoggingIdRound());
-            utils.LCUtil.logps(ps);
+            sql.preparedstatement.psCreateUpdateLoggingUser.psMapUpdate(ps, logging);
 
             int row = ps.executeUpdate();
             if (row != 0) {

@@ -10,9 +10,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import utils.LCUtil;
 
 /**
@@ -45,17 +42,8 @@ public class UpdateBlocking implements Serializable, interfaces.GolfInterface {
         try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setTimestamp(1, Timestamp.from(Instant.now()));
             LOG.debug("there where attempts = {}", blocking.getBlockingAttempts());
-            ps.setShort(2, blocking.getBlockingAttempts());
-            if (blocking.getBlockingAttempts() > 2) {
-                ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now().plusMinutes(15)));
-            } else {
-                ps.setTimestamp(3, Timestamp.from(Instant.now()));
-                LOG.debug("There are attempts now = {}", blocking.getBlockingAttempts());
-            }
-            ps.setInt(4, blocking.getBlockingPlayerId());
-            utils.LCUtil.logps(ps);
+            sql.preparedstatement.psCreateUpdateBlocking.psMapUpdate(ps, blocking);
 
             int row = ps.executeUpdate();
             if (row != 0) {

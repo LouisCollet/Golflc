@@ -9,8 +9,6 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -37,11 +35,7 @@ public class CreateActivationPassword implements Serializable, interfaces.GolfIn
             final String query = LCUtil.generateInsertQuery(conn, "activation");
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 String uuid = UUID.randomUUID().toString();
-                ps.setString(1, uuid); // ActivationKey
-                ps.setInt(2, player.getIdplayer());
-                ps.setString(3, player.getPlayerLanguage());
-                ps.setTimestamp(4, Timestamp.from(Instant.now()));
-                utils.LCUtil.logps(ps);
+                sql.preparedstatement.psCreateActivation.psMapCreate(ps, uuid, player);
                 int row = ps.executeUpdate();
                 if (row != 0) {
                     LocalDateTime localDateTime = LocalDateTime.now().plusMinutes(10);
