@@ -16,32 +16,32 @@
         <div style="text-align:center; padding:0.5rem 0;">
             <i class="pi pi-shopping-cart" style="font-size:3rem; color:#ffffff; display:block; margin-bottom:0.4rem;"/>
             <h1>
-                <h:outputText value="#{msg['title.payment.cotisation']}" rendered="#{payC.cotisation}"/>
-                <h:outputText value="#{msg['title.payment.lesson']}"     rendered="#{payC.lesson}"/>
-                <h:outputText value="#{msg['title.payment.round']}"      rendered="#{payC.greenfee}"/>
-                <h:outputText value="#{msg['title.payment.subscription']}" rendered="#{payC.subscription}"/>
-                <h:outputText value="#{msg['title.payment.mixed']}"      rendered="#{payC.mixed}"/>
+                <h:outputText value="#{msg['title.payment.cotisation']}" rendered="#{cartC.cotisation}"/>
+                <h:outputText value="#{msg['title.payment.lesson']}"     rendered="#{cartC.lesson}"/>
+                <h:outputText value="#{msg['title.payment.round']}"      rendered="#{cartC.greenfee}"/>
+                <h:outputText value="#{msg['title.payment.subscription']}" rendered="#{cartC.subscription}"/>
+                <h:outputText value="#{msg['title.payment.mixed']}"      rendered="#{cartC.mixed}"/>
             </h1>
         </div>
     </f:facet>
 
     <h:form id="form_cart">
-        <f:event type="preRenderView" listener="#{payC.onCartLoad}"/>
+        <f:event type="preRenderView" listener="#{cartC.onCartLoad}"/>
 
         <!-- ============== RESTORE BLOCK — visible quand badge > 0 et aucun panier actif ============== -->
-        <h:panelGroup rendered="#{payC.cartBadgeCount gt 0 and not payC.hasMixedCart()}"
+        <h:panelGroup rendered="#{cartC.cartBadgeCount gt 0 and not cartC.hasMixedCart()}"
                       layout="block"
                       style="text-align:center; padding:1.5rem; background:var(--golf-primary-bg,#f0fdf4); border-radius:8px; margin-bottom:1rem;">
             <i class="pi pi-history" style="font-size:2rem; color:var(--golf-primary,#1a5632); display:block; margin-bottom:0.5rem;"/>
             <p:commandButton value="#{msg['cart.restore.button']}"
                              icon="pi pi-refresh"
                              ajax="false"
-                             action="#{payC.restoreCartFromDb()}"
+                             action="#{cartC.restoreCartFromDb()}"
                              styleClass="p-button-success"/>
         </h:panelGroup>
 
         <!-- ============== COTISATION BLOCK ============== -->
-        <h:panelGroup rendered="#{payC.hasCotisation()}" layout="block">
+        <h:panelGroup rendered="#{cartC.hasCotisation()}" layout="block">
             <ui:include src="include/include_summary_cotisation.xhtml"/>
             <ui:include src="include/include_cotisation_cart.xhtml"/>
 
@@ -51,28 +51,28 @@
         </h:panelGroup>
 
         <!-- ============== LESSON BLOCK ============== -->
-        <h:panelGroup rendered="#{payC.hasLessons()}" layout="block">
+        <h:panelGroup rendered="#{cartC.hasLessons()}" layout="block">
             <ui:include src="include/include_summary_pro.xhtml"/>
             <ui:include src="include/include_lesson_cart.xhtml"/>
 
-            <h:panelGroup rendered="#{not payC.proFree}"
+            <h:panelGroup rendered="#{not cartC.proFree}"
                           layout="block" styleClass="cart-total-line">
-                <strong>#{msg['title.payment.lesson']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{payC.lessonPrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
+                <strong>#{msg['title.payment.lesson']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{cartC.lessonPrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
 
         <!-- ============== GREENFEE BLOCK ============== -->
-        <h:panelGroup id="greenfee_section" rendered="#{payC.hasGreenfees()}" layout="block">
+        <h:panelGroup id="greenfee_section" rendered="#{cartC.hasGreenfees()}" layout="block">
             <ui:include src="include/include_greenfee_cart.xhtml"/>
 
-            <h:panelGroup rendered="#{not empty payC.listGreenfees}"
+            <h:panelGroup rendered="#{not empty cartC.listGreenfees}"
                           layout="block" styleClass="cart-total-line">
-                <strong>#{msg['title.payment.round']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{payC.greenfeePrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
+                <strong>#{msg['title.payment.round']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{cartC.greenfeePrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
 
         <!-- ============== SUBSCRIPTION BLOCK ============== -->
-        <h:panelGroup rendered="#{payC.hasSubscription()}" layout="block">
+        <h:panelGroup rendered="#{cartC.hasSubscription()}" layout="block">
             <ui:include src="include/include_subscription_cart.xhtml"/>
 
             <h:panelGroup layout="block" styleClass="cart-total-line">
@@ -81,38 +81,38 @@
         </h:panelGroup>
 
         <!-- ============== TOTAL ============== -->
-        <h:panelGroup id="cart_grand_total" rendered="#{payC.hasMixedCart()}"
+        <h:panelGroup id="cart_grand_total" rendered="#{cartC.hasMixedCart()}"
                       layout="block" styleClass="cart-grand-total">
-            <strong>#{msg['tarif.total']}:&#160;<h:outputText value="#{payC.totalCartPrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
+            <strong>#{msg['tarif.total']}:&#160;<h:outputText value="#{cartC.totalCartPrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
         </h:panelGroup>
 
         <!-- ============== COMMON BUTTONS ============== -->
         <div class="btn-group" style="margin-top:1rem;">
             <p:commandButton value="#{msg['button.confirm']}"
                              id="commandButtonConfirmFree"
-                             rendered="#{payC.hasLessons() and payC.proFree}"
+                             rendered="#{cartC.hasLessons() and cartC.proFree}"
                              ajax="false"
                              icon="pi pi-check"
-                             action="#{payC.confirmProFreeLesson()}"
+                             action="#{cartC.confirmProFreeLesson()}"
                              styleClass="p-button-success"/>
             <p:commandButton value="#{msg['payment.selected']}"
                              id="commandButtonPayment"
-                             rendered="#{not (payC.hasLessons() and payC.proFree)}"
+                             rendered="#{not (cartC.hasLessons() and cartC.proFree)}"
                              ajax="false"
                              icon="pi pi-credit-card"
-                             action="#{payC.payMixedCart()}"
+                             action="#{payC.payCart()}"
                              styleClass="p-button-warning"/>
             <p:commandButton value="#{msg['button.cancel']}"
                              ajax="false"
                              icon="pi pi-times"
-                             action="#{payC.cancelCart()}"
+                             action="#{cartC.cancelCart()}"
                              styleClass="p-button-secondary"
                              immediate="true"/>
             <p:commandButton value="#{msg['cart.clear.button']}"
-                             rendered="#{payC.hasMixedCart()}"
+                             rendered="#{cartC.hasMixedCart()}"
                              ajax="false"
                              icon="pi pi-trash"
-                             action="#{payC.clearCartAndExit()}"
+                             action="#{cartC.clearCartAndExit()}"
                              styleClass="p-button-danger p-button-outlined"
                              immediate="true"/>
             <p:button value="#{msg['welcome.back']}"
@@ -134,7 +134,7 @@
                              onclick="PF('deleteProductDialog').hide()"/>
             <p:commandButton value="#{msg['button.yes']}"
                              icon="pi pi-check"
-                             actionListener="#{payC.deleteLesson}"
+                             actionListener="#{cartC.deleteLesson}"
                              process="@this"
                              update="form_cart"
                              oncomplete="PF('deleteProductDialog').hide()"/>

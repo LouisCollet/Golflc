@@ -41,7 +41,6 @@ public class CartController implements Serializable {
     // ========================================
 
     @Inject private ApplicationContext                           appContext;
-    @Inject private cache.CacheInvalidator                       cacheInvalidator;
     @Inject private Controllers.TarifMemberController            tarifMemberController;
     @Inject private Controllers.MemberController                 memberController;
     @Inject private create.CreateLesson                          createLesson;
@@ -123,8 +122,6 @@ public class CartController implements Serializable {
     public boolean hasLessons()     { return !listLessons.isEmpty(); }    // end method
 
     public boolean hasCotisation() {
-        String type = appContext.getCreditcardType();
-        if (!"COTISATION".equals(type) && !"MIXED".equals(type)) return false;
         return !getCotisationBasicCart().isEmpty() || !getCotisationEquipCart().isEmpty()
             || (appContext.getCotisation() != null && appContext.getCotisation().getPrice() > 0);
     } // end method
@@ -166,7 +163,7 @@ public class CartController implements Serializable {
     } // end method
 
     // ========================================
-    // MIXED COMMUNICATION — called by PaymentController.payMixedCart()
+    // MIXED COMMUNICATION — called by PaymentController.payCart()
     // ========================================
 
     public String buildMixedCommunication() {
@@ -686,13 +683,21 @@ public class CartController implements Serializable {
                     memberController.getTarifMember().setStartDate(restoredBasicCart.get(0).getStartDate());
                     memberController.getTarifMember().setEndDate(restoredBasicCart.get(0).getEndDate());
                 }
-                if (m.get("type") instanceof String typeVal) {
-                    entite.Cotisation temp = new entite.Cotisation();
-                    temp.setType(typeVal);
-                    appContext.setCotisation(temp);
-                }
-                refreshCotisationCart();
-                LOG.debug("cotisation restored basic={} equip={}", restoredBasicCart.size(), restoredEquipCart.size());
+                // Rebuild Cotisation directly from cart JSON (authoritative source — avoids fragile TarifMember recalc)
+                entite.Cotisation cot = new entite.Cotisation();
+                cot.setIdplayer(appContext.getPlayer().getIdplayer());
+                cot.setIdclub(cart.getCartClubId());
+                if (m.get("startDate")     instanceof String s) cot.setCotisationStartDate(java.time.LocalDateTime.parse(s));
+                if (m.get("endDate")       instanceof String s) cot.setCotisationEndDate(java.time.LocalDateTime.parse(s));
+                if (m.get("total")         instanceof Number n) cot.setPrice(n.doubleValue());
+                if (m.get("type")          instanceof String s) cot.setType(s);
+                if (m.get("communication") instanceof String s) cot.setCommunication(s);
+                if (m.get("items")         instanceof String s) cot.setItems(s);
+                if (m.get("status")        instanceof String s) cot.setStatus(s);
+                appContext.setCotisation(cot);
+                LOG.debug("cotisation restored basic={} equip={} startDate={} endDate={}",
+                    restoredBasicCart.size(), restoredEquipCart.size(),
+                    cot.getCotisationStartDate(), cot.getCotisationEndDate());
             } else if ("SUBSCRIPTION".equals(type)) {
                 @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);

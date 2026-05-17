@@ -37,6 +37,9 @@ public class LessonMail implements Serializable {
             String proEmail = (pro != null && pro.getPlayerEmail() != null) ? pro.getPlayerEmail() : "";
 
             String cs = currSymbol(creditcard);
+            double lessonTotal = lessons.stream()
+                .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0)
+                .sum();
             StringBuilder lignes = new StringBuilder();
             for (Lesson lesson : lessons) {
                 String start = lesson.getEventStartDate() != null ? lesson.getEventStartDate().format(ZDF_TIME_HHmm) : "?";
@@ -61,7 +64,7 @@ public class LessonMail implements Serializable {
                 + lignes
                 + "<tr><td colspan='3'><hr/></td></tr>"
                 + "<tr><td colspan='2'><b>Total</b></td>"
-                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(), cs) + "</b></td></tr>"
+                + "<td align='right'><b>" + String.format("%.2f %s", lessonTotal, cs) + "</b></td></tr>"
                 + "</table>"
                 + "<hr/>"
                 + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
@@ -92,6 +95,9 @@ public class LessonMail implements Serializable {
             }
 
             String clubName = !lessons.isEmpty() ? lessons.get(0).getEventClubName() : "";
+            double lessonTotal = lessons.stream()
+                .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0)
+                .sum();
 
             StringBuilder lignes = new StringBuilder();
             for (Lesson lesson : lessons) {
@@ -112,7 +118,7 @@ public class LessonMail implements Serializable {
                 + lignes
                 + "</table>"
                 + "<hr/>"
-                + "<p>Montant payé : <b>" + String.format("%.2f %s", creditcard.getTotalPrice(), currSymbol(creditcard)) + "</b></p>"
+                + "<p>Montant payé : <b>" + String.format("%.2f %s", lessonTotal, currSymbol(creditcard)) + "</b></p>"
                 + "<p>Référence : " + creditcard.getCreditcardPaymentReference() + "</p>"
                 + "<br/><p>L'équipe GolfLC</p>"
                 + "</body></html>";
