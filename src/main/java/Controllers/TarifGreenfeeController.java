@@ -555,8 +555,18 @@ try{
     if ("DA".equals(tarif.getGreenfeeType())) {
         LOG.debug("inputtype = DA");
         greenfee.setStatus("Y");
-        LOG.debug("status changed to  = {}", greenfee.getStatus());
-        sb.append(String.format("Greenfee — %.2f %s", tarif.getPriceGreenfee(), currSymbol)).append(", ");
+        for (var day : tarif.getDayChoosen()) {
+            sb.append(String.format("Greenfee — %.2f %s", day.getPrice(), currSymbol))
+              .append(" (").append(day.getSeason()).append("), ");
+        }
+    }
+    if ("HO".equals(tarif.getGreenfeeType())) {
+        LOG.debug("inputtype = HO");
+        greenfee.setStatus("Y");
+        for (var t : tarif.getTeeTimeChoosen()) {
+            sb.append(String.format("Greenfee — %.2f %s", t.getPrice(), currSymbol))
+              .append(" (").append(t.getSeason()).append("), ");
+        }
     }
     for (var v : tarif.getBasicList()) {
         sb.append(v.getItem())

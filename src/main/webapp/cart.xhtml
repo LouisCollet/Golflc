@@ -45,11 +45,8 @@
             <ui:include src="include/include_summary_cotisation.xhtml"/>
             <ui:include src="include/include_cotisation_cart.xhtml"/>
 
-            <h:panelGroup layout="block" styleClass="mt-3" style="text-align:right;">
-                <strong>#{msg['tarif.total']}:&#160;
-                    <h:outputText value="#{appContext.cotisation.price}">
-                        <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
-                    </h:outputText></strong>
+            <h:panelGroup layout="block" styleClass="cart-total-line">
+                <strong>#{msg['title.payment.cotisation']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{appContext.cotisation.price}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
 
@@ -57,18 +54,20 @@
         <h:panelGroup rendered="#{payC.hasLessons()}" layout="block">
             <ui:include src="include/include_summary_pro.xhtml"/>
             <ui:include src="include/include_lesson_cart.xhtml"/>
+
+            <h:panelGroup rendered="#{not payC.proFree}"
+                          layout="block" styleClass="cart-total-line">
+                <strong>#{msg['title.payment.lesson']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{payC.lessonPrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
+            </h:panelGroup>
         </h:panelGroup>
 
         <!-- ============== GREENFEE BLOCK ============== -->
-        <h:panelGroup rendered="#{payC.hasGreenfees()}" layout="block">
+        <h:panelGroup id="greenfee_section" rendered="#{payC.hasGreenfees()}" layout="block">
             <ui:include src="include/include_greenfee_cart.xhtml"/>
 
             <h:panelGroup rendered="#{not empty payC.listGreenfees}"
-                          layout="block" styleClass="mt-3" style="text-align:right;">
-                <strong>#{msg['tarif.total']}:&#160;
-                    <h:outputText value="#{payC.greenfeePrice}">
-                        <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
-                    </h:outputText></strong>
+                          layout="block" styleClass="cart-total-line">
+                <strong>#{msg['title.payment.round']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{payC.greenfeePrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
 
@@ -76,21 +75,15 @@
         <h:panelGroup rendered="#{payC.hasSubscription()}" layout="block">
             <ui:include src="include/include_subscription_cart.xhtml"/>
 
-            <h:panelGroup layout="block" styleClass="mt-3" style="text-align:right;">
-                <strong>#{msg['tarif.total']}:&#160;
-                    <h:outputText value="#{appContext.subscription.subscriptionAmount}">
-                        <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
-                    </h:outputText></strong>
+            <h:panelGroup layout="block" styleClass="cart-total-line">
+                <strong>#{msg['title.payment.subscription']} — #{msg['tarif.total']}:&#160;<h:outputText value="#{appContext.subscription.subscriptionAmount}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
             </h:panelGroup>
         </h:panelGroup>
 
         <!-- ============== TOTAL ============== -->
-        <h:panelGroup rendered="#{payC.hasMixedCart()}"
-                      layout="block" styleClass="mt-3" style="text-align:right; font-size:1.1rem; border-top:2px solid var(--golf-primary,#1a5632); padding-top:0.5rem;">
-            <strong>#{msg['tarif.total']}:&#160;
-                <h:outputText value="#{payC.totalCartPrice}">
-                    <f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/>
-                </h:outputText></strong>
+        <h:panelGroup id="cart_grand_total" rendered="#{payC.hasMixedCart()}"
+                      layout="block" styleClass="cart-grand-total">
+            <strong>#{msg['tarif.total']}:&#160;<h:outputText value="#{payC.totalCartPrice}"><f:convertNumber type="currency" currencyCode="#{payC.creditcard.creditcardCurrency}" groupingUsed="true"/></h:outputText></strong>
         </h:panelGroup>
 
         <!-- ============== COMMON BUTTONS ============== -->

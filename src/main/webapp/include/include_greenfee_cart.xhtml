@@ -46,7 +46,7 @@
                                  value="#{msg['button.cancel']}"
                                  styleClass="p-button-danger p-button-sm"
                                  action="#{payC.removeGreenfeeItem(gf)}"
-                                 update="form_cart"
+                                 update=":form_cart:greenfee_section :form_cart:cart_grand_total"
                                  process="@this"/>
             </div>
         </div>

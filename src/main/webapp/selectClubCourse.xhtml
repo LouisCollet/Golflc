@@ -29,7 +29,7 @@
                 <f:selectItem itemLabel="-- #{msg['message.selectclub']} --" itemValue="#{null}" noSelectionOption="true"/>
                 <f:selectItems value="#{clubC.listClubsDialog('any')}"
                                var="cl"
-                               itemLabel="#{cl.clubName}"
+                               itemLabel="#{cl.clubName} (#{cl.idclub})"
                                itemValue="#{cl.idclub}"/>
                 <f:validateBean disabled="true"/>
                 <p:ajax event="change" update="panel1" process="@this"/>
@@ -46,7 +46,7 @@
                 <f:selectItem itemLabel="-- #{msg['message.selectcourse']} --" itemValue="#{null}" noSelectionOption="true"/>
                 <f:selectItems value="#{clubC.coursesForSelect}"
                                var="c"
-                               itemLabel="#{c.courseName}"
+                               itemLabel="#{c.courseName} (#{c.idcourse})"
                                itemValue="#{c.idcourse}"/>
                 <f:validateBean disabled="true"/>
             </p:selectOneMenu>
