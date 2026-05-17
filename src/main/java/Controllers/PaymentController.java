@@ -639,6 +639,17 @@ public class PaymentController implements Serializable {
         cartController.removeSubscriptionItem();
     } // end method
 
+    public String editGreenfeeEquipments(Greenfee gf) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        removeGreenfeeItem(gf);
+        entite.TarifGreenfee tarif = memberController.getTarifGreenfee();
+        if (tarif != null && tarif.getEquipmentsList() != null) {
+            tarif.getEquipmentsList().forEach(e -> e.setQuantity(0));
+        }
+        return "greenfee_equipment.xhtml?faces-redirect=true";
+    } // end method
+
     public void removeGreenfeeItem(Greenfee gf) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);

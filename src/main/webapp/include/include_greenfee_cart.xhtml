@@ -23,12 +23,25 @@
                 <p:outputLabel value="#{msg['round.holes']}"/>
                 <h:outputText value="#{gf.roundHoles}"/>
 
-                <p:outputLabel value="#{msg['tarif.greenfee']}"/>
+                <!-- Détail greenfee + équipements sélectionnés -->
+                <p:outputLabel value="#{msg['tarif.detail']}"
+                               rendered="#{not empty gf.items}"/>
+                <h:outputText value="#{gf.items}"
+                              rendered="#{not empty gf.items}"
+                              style="font-size:0.88em;color:#555"/>
+
+                <p:outputLabel value="#{msg['tarif.total']}"/>
                 <h:outputText value="#{gf.price}">
                     <f:convertNumber type="currency" currencyCode="#{gf.currency}" groupingUsed="true"/>
                 </h:outputText>
             </p:panelGrid>
             <div class="btn-group" style="margin-top:0.5rem;">
+                <p:commandButton icon="pi pi-pencil"
+                                 value="#{msg['greenfee.equipment.title']}"
+                                 rendered="#{not empty memC.tarifGreenfee.equipmentsList}"
+                                 styleClass="p-button-info p-button-sm"
+                                 ajax="false"
+                                 action="#{payC.editGreenfeeEquipments(gf)}"/>
                 <p:commandButton icon="pi pi-trash"
                                  value="#{msg['button.cancel']}"
                                  styleClass="p-button-danger p-button-sm"

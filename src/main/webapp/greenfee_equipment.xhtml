@@ -25,7 +25,11 @@
         <span>#{msg['club.name']}</span>
         <span>#{appContext.club.clubName}</span>
         <span>#{msg['greenfee.equipment.slot']}</span>
-        <span>#{appContext.round.roundDate}</span>
+        <span>
+            <h:outputText value="#{appContext.round.roundDate}">
+                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+            </h:outputText>
+        </span>
     </div>
 
     <hr/>
@@ -54,7 +58,7 @@
 
         <p:column headerText="#{msg['greenfee.equipment.qty']}" style="text-align:center;width:100px">
             <p:spinner value="#{equip.quantity}" min="0" max="9" size="3">
-                <p:ajax event="change" update="total-panel"/>
+                <p:ajax event="change" process="@this" update=":greenfee_equipment_form:total-panel"/>
             </p:spinner>
         </p:column>
 
