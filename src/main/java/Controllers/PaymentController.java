@@ -1395,9 +1395,7 @@ public class PaymentController implements Serializable {
             }
             if ("GREENFEE".equals(type) || (mixed && hasGreenfees())) {
                 java.util.List<Greenfee> gfList = (tx != null && tx.getListGreenfees() != null) ? tx.getListGreenfees() : cartController.getListGreenfees();
-                for (Greenfee gf : gfList) {
-                    creditcardMail.sendMailGreenfee(player, creditcard, gf, club);
-                }
+                creditcardMail.sendMailGreenfee(player, creditcard, gfList, club);
                 LOG.info("greenfee mail(s) enqueued player={} count={}", player.getIdplayer(), gfList.size());
             }
         } catch (Exception e) {

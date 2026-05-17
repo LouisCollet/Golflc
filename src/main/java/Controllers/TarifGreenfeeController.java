@@ -539,48 +539,30 @@ try{
      greenfee.setStatus("N"); // sera mis à Y ci-après si dans le paiement est compris un greenfee (et pas uniquement des equipements
   // créer la liste des items pour stockage DB
   // à faire ultérieurement : noter les quantités : 2 greenfees, 3 buggys, etc...
-    StringBuilder sb = new StringBuilder("");
-      if("DA".equals(tarif.getGreenfeeType())){
-           LOG.debug("inputtype = DA");
-         greenfee.setStatus("Y");
-           LOG.debug("status changed to  = {}", greenfee.getStatus());
-         sb.append("Greenfee (")
-         .append(tarif.getPriceGreenfee())
-         .append("),");
-      }
-/// constitution liste items pour greenfee
-       for(int i = 0 ; i < tarif.getBasicList().size() ; i++) {
-           var v = tarif.getBasicList().get(i);
-                sb.append(v.getItem()) // item
-                  .append(" (")
-                  .append(v.getPrice())
-                  .append(v.getSeason())
-                  .append(v.getQuantity())
-                  .append("),");
-     //           LOG.debug("after append sb = {}", sb.toString());
-                        greenfee.setStatus("Y"); // le player a payé son greenfee et pas uniquement des équipements
-    //          } //end if
-         } //end for
- //      sb.deleteCharAt(sb.lastIndexOf(","));// delete dernière virgule
-            LOG.debug("final Items for greenfee = {}", sb);
-            
-  /// constitution liste items pour equipments
-        for(int i = 0 ; i < tarif.getEquipmentsList().size() ; i++) { 
-                 var v = tarif.getEquipmentsList().get(i);
-                  sb.append(v.getItem()) // item      
-                  .append(" (")
-                  .append(v.getSeason())
-                  .append(v.getSeason())
-                  .append(v.getQuantity())
-                  .append("),");
-     //           LOG.debug("after append sb = {}", sb.toString());
-       //       } //end if 
-         } //end for
-   //    LOG.debug("after for loop");
-       int lastComma = sb.lastIndexOf(",");
-       if (lastComma >= 0) { sb.deleteCharAt(lastComma); } // delete dernière virgule
-            LOG.debug("final Items for greenfee and equipments = {}", sb);
-      greenfee.setItems(sb.toString());
+    StringBuilder sb = new StringBuilder();
+    if ("DA".equals(tarif.getGreenfeeType())) {
+        LOG.debug("inputtype = DA");
+        greenfee.setStatus("Y");
+        LOG.debug("status changed to  = {}", greenfee.getStatus());
+        sb.append(String.format("Greenfee — %.2f €", tarif.getPriceGreenfee())).append(", ");
+    }
+    for (var v : tarif.getBasicList()) {
+        sb.append(v.getItem())
+          .append(String.format(" — %.2f €", v.getPrice()))
+          .append(" (").append(v.getSeason())
+          .append(" ×").append(v.getQuantity()).append("), ");
+        greenfee.setStatus("Y");
+    }
+    LOG.debug("final Items for greenfee = {}", sb);
+    for (var v : tarif.getEquipmentsList()) {
+        sb.append(v.getItem())
+          .append(String.format(" — %.2f €", v.getPrice()))
+          .append(" (").append(v.getSeason())
+          .append(" ×").append(v.getQuantity()).append("), ");
+    }
+    if (sb.length() >= 2) { sb.setLength(sb.length() - 2); }
+    LOG.debug("final Items for greenfee and equipments = {}", sb);
+    greenfee.setItems(sb.toString());
   return greenfee;
   
 } catch (Exception e) {

@@ -15,6 +15,9 @@ import entite.TarifMember;
 import static exceptions.LCException.handleGenericException;
 import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.GolfInterface.ZDF_TIME_DAY;
+import static interfaces.GolfInterface.ZDF_TIME_HHmm;
+import java.util.Collections;
+import java.util.List;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -180,20 +183,30 @@ public class CreditcardMail implements Serializable {
 
     public Boolean sendMailGreenfee(Player player, Creditcard creditcard, Greenfee greenfee, Club club)
             throws MessagingException, Exception {
+        return sendMailGreenfee(player, creditcard, Collections.singletonList(greenfee), club);
+    } // end method
+
+    public Boolean sendMailGreenfee(Player player, Creditcard creditcard, List<Greenfee> greenfees, Club club)
+            throws MessagingException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            String dateStr = greenfee.getRoundDate() != null ? greenfee.getRoundDate().format(ZDF_TIME_DAY) : "?";
-            String holes   = greenfee.getRoundHoles() != null ? greenfee.getRoundHoles() + " trous" : "";
-
             StringBuilder lignes = new StringBuilder();
-            lignes.append("<tr><td>Greenfee").append(holes.isEmpty() ? "" : " — " + holes).append("</td>")
-                  .append("<td align='right'>")
-                  .append(String.format("%.2f €", greenfee.getPrice()))
-                  .append("</td></tr>");
-            if (greenfee.getItems() != null && !greenfee.getItems().isBlank()) {
-                lignes.append("<tr><td colspan='2' style='font-size:0.9em;color:#555'>")
-                      .append(greenfee.getItems()).append("</td></tr>");
+            for (int i = 0; i < greenfees.size(); i++) {
+                Greenfee gf = greenfees.get(i);
+                if (i > 0) {
+                    lignes.append("<tr><td colspan='2'><hr style='border:none;border-top:1px dashed #ccc;margin:4px 0'/></td></tr>");
+                }
+                String dateStr = gf.getRoundDate() != null ? gf.getRoundDate().format(ZDF_TIME_HHmm) : "?";
+                String holes   = gf.getRoundHoles()  != null ? " — " + gf.getRoundHoles() + " trous" : "";
+                lignes.append("<tr><td colspan='2' style='padding-top:4px;font-size:0.9em;color:#777'>Date : <b>")
+                      .append(dateStr).append("</b></td></tr>");
+                lignes.append("<tr><td>Greenfee").append(holes).append("</td>")
+                      .append("<td align='right'>").append(String.format("%.2f €", gf.getPrice())).append("</td></tr>");
+                if (gf.getItems() != null && !gf.getItems().isBlank()) {
+                    lignes.append("<tr><td colspan='2' style='font-size:0.9em;color:#555'>")
+                          .append(gf.getItems()).append("</td></tr>");
+                }
             }
 
             String mail = "<html><body style='font-family:Arial,sans-serif;max-width:600px'>"
@@ -201,7 +214,6 @@ public class CreditcardMail implements Serializable {
                 + "<p>" + LocalDateTime.now().format(ZDF_TIME) + "</p>"
                 + "<p><b>" + player.getPlayerFirstName() + " " + player.getPlayerLastName() + "</b><br/>"
                 + club.getClubName() + " — " + club.getAddress().getCity() + "</p>"
-                + "<p>Date : <b>" + dateStr + "</b></p>"
                 + "<hr/>"
                 + "<table style='min-width:320px;border-collapse:collapse'>"
                 + lignes
