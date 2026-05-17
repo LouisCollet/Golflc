@@ -281,69 +281,6 @@ public class MemberController implements Serializable {
         }
     } // end method
 
-    /* obsolete 2026-03-27 — remplacé par inputTarifGreenfeeWizard() — pages multi-step en parking
-    public String inputTarifGreenfee(String param) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            LOG.debug("with param {}", param);
-            LOG.debug("with tarif = {}", tarifGreenfee);
-            switch (param) {
-                case "PE" -> {
-                    // tarifCourseId is now set from the wizard's course selector
-                    tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeePeriods(tarifGreenfee);
-                    return "tarif_greenfee_periods.xhtml?faces-redirect=true";
-                }
-                case "BA" -> {
-                    tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeBasic(tarifGreenfee);
-                    return "tarif_greenfee_basic.xhtml?faces-redirect=true";
-                }
-                case "DA" -> {
-                    tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeDays(tarifGreenfee);
-                    return "tarif_greenfee_days.xhtml?faces-redirect=true";
-                }
-                case "EQ" -> {
-                    tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeEquipments(tarifGreenfee);
-                    return "tarif_greenfee_equipments.xhtml?faces-redirect=true";
-                }
-                case "HO" -> {
-                    tarifGreenfee = tarifGreenfeeController.inputTarifGreenfeeHours(tarifGreenfee);
-                    return "tarif_greenfee_hours.xhtml?faces-redirect=true";
-                }
-                case "PR" -> {
-                    showMessageInfo(tarifGreenfee.toString());
-                    return null;
-                }
-                default -> {
-                    String msg = "failed in default switch";
-                    LOG.error(msg);
-                    showMessageFatal(msg);
-                    return null;
-                }
-            } // end switch
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
-    } // end method
-    */
-
-    /* obsolete 2026-03-27 — remplacé par inputTarifMemberWizard('EQ') — aucun XHTML actif
-    public String inputTarifMembersEquipments() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            LOG.debug("for club = {}", club);
-            LOG.debug("tarifMembers = {}", tarifMember);
-            tarifMember = tarifMemberController.inputTarifMembersEquipments(tarifMember);
-            return null;
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
-    } // end method
-    */
-
     // ========================================
     // TARIF CREATE / DELETE / SHOW (5 methodes)
     // migrated from CourseController 2026-02-25
@@ -640,7 +577,15 @@ public class MemberController implements Serializable {
 
     public double getTarifGreenfeeTotal() {
         if (tarifGreenfee == null) return 0.0;
-        return tarifGreenfeeController.calcGreenfeePrice(tarifGreenfee);
+        double base = tarifGreenfeeController.calcGreenfeePrice(tarifGreenfee);
+        if (tarifGreenfee.getEquipmentsList() != null) {
+            for (var e : tarifGreenfee.getEquipmentsList()) {
+                if (e.getQuantity() != null && e.getQuantity() > 0 && e.getPrice() != null) {
+                    base += e.getPrice() * e.getQuantity();
+                }
+            }
+        }
+        return base;
     } // end method
 
     public String getGreenfeeIncludeSrc() {

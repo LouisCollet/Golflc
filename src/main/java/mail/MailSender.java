@@ -27,6 +27,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
@@ -56,7 +57,8 @@ public class MailSender implements Serializable {
 
     // Queue interne — transient car @ApplicationScoped n'est pas passivé
     private transient final LinkedBlockingQueue<MailMessage> mailQueue    = new LinkedBlockingQueue<>();
-    private transient final AtomicBoolean                   workerActive = new AtomicBoolean(false);
+    private transient final AtomicBoolean                   workerActive   = new AtomicBoolean(false);
+    private transient final Semaphore                       smtpSemaphore  = new Semaphore(3);
 
     public MailSender() { }
 
@@ -155,7 +157,7 @@ public class MailSender implements Serializable {
         List<MailMessage> batch = new ArrayList<>();
         mailQueue.drainTo(batch);
         if (!batch.isEmpty()) {
-            LOG.debug("flushing {} mail(s) over one Transport", batch.size());
+            LOG.debug("flushing {} mail(s) in parallel", batch.size());
             try {
                 sendBatch(batch);
             } catch (Exception e) {
@@ -176,36 +178,50 @@ public class MailSender implements Serializable {
     private void sendBatch(List<MailMessage> mails) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {} count={}", methodName, mails.size());
-        final String username = settings.getProperty("SMTP_USERNAME");
-        final String password = settings.getProperty("SMTP_PASSWORD");
-        Session session = buildSession(username, password);
 
         long startNanos = System.nanoTime();
-        try (Transport transport = session.getTransport("smtp")) {
-            transport.connect(MAILSERVER, username, password);
-            for (MailMessage mail : mails) {
-                MimeMessage msg = buildMimeMessage(session, mail, username);
-                if (msg != null) {
-                    msg.saveChanges();
-                    transport.sendMessage(msg, msg.getAllRecipients());
-                    LOG.info("mail sent to {}", mail.recipient()); 
-                    // Ajouter infos dans le JSON
-                    ThreadContext.put("recipient", mail.recipient());
-                    ThreadContext.put("subject", mail.title());
-                    LOG.info("mail sent");
-                    // Nettoyer ThreadContext pour éviter les fuites
-                    ThreadContext.clearAll();
-                    
-                    
-                    
-                }
-            }
-        }
+
+        List<CompletableFuture<Void>> futures = mails.stream()
+            .map(mail -> CompletableFuture.runAsync(() -> sendOne(mail), mailExecutor))
+            .toList();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0])).join();
+
         double elapsedMillis = (System.nanoTime() - startNanos) / 1_000_000.0;
         LOG.debug("batch of {} mail(s) sent in {} ms", mails.size(), elapsedMillis);
 
         if (jakarta.faces.context.FacesContext.getCurrentInstance() != null) {
             showMessageInfo(mails.size() + " mail(s) sent in " + elapsedMillis + " ms");
+        }
+    } // end method
+
+    private void sendOne(MailMessage mail) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            smtpSemaphore.acquire();
+            try {
+                final String username = settings.getProperty("SMTP_USERNAME");
+                final String password = settings.getProperty("SMTP_PASSWORD");
+                Session session = buildSession(username, password);
+                try (Transport transport = session.getTransport("smtp")) {
+                    transport.connect(MAILSERVER, username, password);
+                    MimeMessage msg = buildMimeMessage(session, mail, username);
+                    if (msg != null) {
+                        msg.saveChanges();
+                        transport.sendMessage(msg, msg.getAllRecipients());
+                        ThreadContext.put("recipient", mail.recipient());
+                        ThreadContext.put("subject",   mail.title());
+                        LOG.info("mail sent to {}", mail.recipient());
+                        LOG.info("mail sent");
+                        ThreadContext.clearAll();
+                    }
+                }
+            } finally {
+                smtpSemaphore.release();
+            }
+        } catch (Exception e) {
+            LOG.error("sendOne failed for {}: {}", mail.recipient(), e.getMessage(), e);
         }
     } // end method
 

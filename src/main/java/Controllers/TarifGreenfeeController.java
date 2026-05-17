@@ -519,6 +519,13 @@ try{
 try{
         LOG.debug("with tarif = {}", tarif);
      double d = this.calcGreenfeePrice(tarif);
+     if (tarif.getEquipmentsList() != null) {
+         for (var eq : tarif.getEquipmentsList()) {
+             if (eq.getQuantity() != null && eq.getQuantity() > 0 && eq.getPrice() != null) {
+                 d += eq.getPrice() * eq.getQuantity();
+             }
+         }
+     }
         LOG.debug("le prix du greenfee et des équipements est {}", d);
      greenfee.setPrice(d);
 /*     if(greenfee.getPrice() == 0.0){
@@ -537,26 +544,32 @@ try{
    //  greenfee.setCurrency(club.getAddress().getCountry().getCurrency());
      greenfee.setCurrency(tarif.getCurrency());
      greenfee.setStatus("N"); // sera mis à Y ci-après si dans le paiement est compris un greenfee (et pas uniquement des equipements
-  // créer la liste des items pour stockage DB
-  // à faire ultérieurement : noter les quantités : 2 greenfees, 3 buggys, etc...
+    String currSymbol = "€";
+    try {
+        if (tarif.getCurrency() != null && !tarif.getCurrency().isBlank()) {
+            currSymbol = java.util.Currency.getInstance(tarif.getCurrency()).getSymbol();
+        }
+    } catch (IllegalArgumentException ignored) { }
+
     StringBuilder sb = new StringBuilder();
     if ("DA".equals(tarif.getGreenfeeType())) {
         LOG.debug("inputtype = DA");
         greenfee.setStatus("Y");
         LOG.debug("status changed to  = {}", greenfee.getStatus());
-        sb.append(String.format("Greenfee — %.2f €", tarif.getPriceGreenfee())).append(", ");
+        sb.append(String.format("Greenfee — %.2f %s", tarif.getPriceGreenfee(), currSymbol)).append(", ");
     }
     for (var v : tarif.getBasicList()) {
         sb.append(v.getItem())
-          .append(String.format(" — %.2f €", v.getPrice()))
+          .append(String.format(" — %.2f %s", v.getPrice(), currSymbol))
           .append(" (").append(v.getSeason())
           .append(" ×").append(v.getQuantity()).append("), ");
         greenfee.setStatus("Y");
     }
     LOG.debug("final Items for greenfee = {}", sb);
     for (var v : tarif.getEquipmentsList()) {
+        if (v.getQuantity() == null || v.getQuantity() <= 0) continue;
         sb.append(v.getItem())
-          .append(String.format(" — %.2f €", v.getPrice()))
+          .append(String.format(" — %.2f %s", v.getPrice(), currSymbol))
           .append(" (").append(v.getSeason())
           .append(" ×").append(v.getQuantity()).append("), ");
     }

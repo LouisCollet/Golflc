@@ -36,6 +36,7 @@ public class LessonMail implements Serializable {
             String proName  = !lessons.isEmpty() ? lessons.get(0).getProName() : "";
             String proEmail = (pro != null && pro.getPlayerEmail() != null) ? pro.getPlayerEmail() : "";
 
+            String cs = currSymbol(creditcard);
             StringBuilder lignes = new StringBuilder();
             for (Lesson lesson : lessons) {
                 String start = lesson.getEventStartDate() != null ? lesson.getEventStartDate().format(ZDF_TIME_HHmm) : "?";
@@ -43,8 +44,7 @@ public class LessonMail implements Serializable {
                 lignes.append("<tr><td>🎓 ").append(lesson.getEventTitle()).append("</td>")
                       .append("<td style='color:#555'>").append(start).append(" → ").append(end).append("</td>")
                       .append("<td align='right'>")
-                      .append(String.format("%.2f %s", lesson.getLessonAmount() != null ? lesson.getLessonAmount() : 0.0,
-                              creditcard.getCreditcardCurrency() != null ? creditcard.getCreditcardCurrency() : "€"))
+                      .append(String.format("%.2f %s", lesson.getLessonAmount() != null ? lesson.getLessonAmount() : 0.0, cs))
                       .append("</td></tr>");
             }
 
@@ -61,8 +61,7 @@ public class LessonMail implements Serializable {
                 + lignes
                 + "<tr><td colspan='3'><hr/></td></tr>"
                 + "<tr><td colspan='2'><b>Total</b></td>"
-                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(),
-                        creditcard.getCreditcardCurrency() != null ? creditcard.getCreditcardCurrency() : "€") + "</b></td></tr>"
+                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(), cs) + "</b></td></tr>"
                 + "</table>"
                 + "<hr/>"
                 + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
@@ -113,8 +112,7 @@ public class LessonMail implements Serializable {
                 + lignes
                 + "</table>"
                 + "<hr/>"
-                + "<p>Montant payé : <b>" + String.format("%.2f %s", creditcard.getTotalPrice(),
-                        creditcard.getCreditcardCurrency() != null ? creditcard.getCreditcardCurrency() : "€") + "</b></p>"
+                + "<p>Montant payé : <b>" + String.format("%.2f %s", creditcard.getTotalPrice(), currSymbol(creditcard)) + "</b></p>"
                 + "<p>Référence : " + creditcard.getCreditcardPaymentReference() + "</p>"
                 + "<br/><p>L'équipe GolfLC</p>"
                 + "</body></html>";
@@ -128,6 +126,16 @@ public class LessonMail implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
+    } // end method
+
+    private String currSymbol(Creditcard creditcard) {
+        try {
+            String code = creditcard.getCreditcardCurrency();
+            if (code != null && !code.isBlank()) {
+                return java.util.Currency.getInstance(code).getSymbol();
+            }
+        } catch (IllegalArgumentException ignored) { }
+        return "€";
     } // end method
 
     /*

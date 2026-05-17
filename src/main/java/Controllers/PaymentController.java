@@ -374,6 +374,14 @@ public class PaymentController implements Serializable {
         }
     } // end method addGreenfeeToCart
 
+    /** Depuis greenfee_equipment.xhtml : valide les équipements et retourne sur schedule_round. */
+    public String confirmGreenfeeEquipments() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        addGreenfeeToCart();
+        return "schedule_round.xhtml?faces-redirect=true";
+    } // end method
+
     /** Navigue vers cart.xhtml si le panier contient au moins un greenfee. */
     public String goToCart() {
         final String methodName = utils.LCUtil.getCurrentMethodName();

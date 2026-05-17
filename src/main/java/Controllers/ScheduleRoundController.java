@@ -331,11 +331,18 @@ public class ScheduleRoundController implements Serializable {
             appContext.setRound(round);   // sans idround — créé après paiement
             TarifGreenfee tarif = findTarifGreenfeeData.find(round);
             pickChoosenFromSlot(tarif, selectedFlightStart);
+            if (tarif.getEquipmentsList() != null) {
+                tarif.getEquipmentsList().forEach(e -> e.setQuantity(0));
+            }
             memberController.setTarifGreenfee(tarif);
-            payC.addGreenfeeToCart();
             selectedFlightStart = null;
-            scheduleModel.clear();
-            return null; // stay on schedule_round.xhtml — paiement groupé via bouton "Paiement en ligne"
+
+            if (tarif.getEquipmentsList() == null || tarif.getEquipmentsList().isEmpty()) {
+                payC.addGreenfeeToCart();
+                scheduleModel.clear();
+                return null;
+            }
+            return "greenfee_equipment.xhtml?faces-redirect=true";
 
         } catch (SQLException e) {
             handleSQLException(e, methodName);
@@ -637,13 +644,19 @@ public class ScheduleRoundController implements Serializable {
         LocalTime t   = slotStart.toLocalTime();
         DayOfWeek dow = slotStart.getDayOfWeek();
 
+        String cs = "€";
+        try {
+            String code = tarif.getCurrency();
+            if (code != null && !code.isBlank()) cs = java.util.Currency.getInstance(code).getSymbol();
+        } catch (IllegalArgumentException ignored) { }
+
         // Type HO : teeTimesList avec plages horaires
         ArrayList<TarifGreenfee.TeeTimes> teeList = tarif.getTeeTimesList();
         if (teeList != null) {
             for (TarifGreenfee.TeeTimes tt : teeList) {
                 if (tt.getStartTime() != null && tt.getEndTime() != null && tt.getPrice() != null) {
                     if (!t.isBefore(tt.getStartTime()) && t.isBefore(tt.getEndTime())) {
-                        return String.format("%.0f€", tt.getPrice());
+                        return String.format("%.0f%s", tt.getPrice(), cs);
                     }
                 }
             }
@@ -653,7 +666,7 @@ public class ScheduleRoundController implements Serializable {
         ArrayList<EquipmentsAndBasic> basicList = tarif.getBasicList();
         if (basicList != null && !basicList.isEmpty()) {
             Double p = basicList.get(0).getPrice();
-            if (p != null) return String.format("%.0f€", p);
+            if (p != null) return String.format("%.0f%s", p, cs);
         }
 
         // Type DA : daysList — prix selon jour de la semaine
@@ -667,7 +680,7 @@ public class ScheduleRoundController implements Serializable {
                     default       -> 0;   // lundi/semaine
                 };
                 if (idx < prices.length && prices[idx] != null) {
-                    return String.format("%.0f€", prices[idx]);
+                    return String.format("%.0f%s", prices[idx], cs);
                 }
             }
         }

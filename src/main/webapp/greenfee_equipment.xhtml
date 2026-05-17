@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<ui:composition
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="jakarta.faces.core"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces"
+      template="templates/masterTemplate.xhtml">
+
+<ui:param name="hideMenu" value="true"/>
+<ui:define name="title">#{msg['greenfee.equipment.title']}</ui:define>
+<ui:define name="content">
+
+<h:form id="greenfee_equipment_form">
+<div class="login-container">
+<p:panel styleClass="login-card form-card">
+
+    <h2>⛳ #{msg['greenfee.equipment.title']}</h2>
+
+    <!-- Récap créneau -->
+    <div class="info-grid">
+        <span>#{msg['player.name']}</span>
+        <span>#{playerC.player.playerFirstName} #{playerC.player.playerLastName}</span>
+        <span>#{msg['club.name']}</span>
+        <span>#{appContext.club.clubName}</span>
+        <span>#{msg['greenfee.equipment.slot']}</span>
+        <span>#{appContext.round.roundDate}</span>
+    </div>
+
+    <hr/>
+
+    <!-- Liste des équipements disponibles -->
+    <p:dataTable id="equip_table"
+                 value="#{memC.tarifGreenfee.equipmentsList}"
+                 var="equip"
+                 styleClass="equip-table"
+                 rendered="#{not empty memC.tarifGreenfee.equipmentsList}">
+
+        <p:column headerText="#{msg['greenfee.equipment.item']}">
+            <h:outputText value="#{equip.item}"/>
+            <h:outputText value=" (#{equip.season})"
+                          rendered="#{not empty equip.season}"
+                          style="font-size:0.85em;color:#777"/>
+        </p:column>
+
+        <p:column headerText="#{msg['greenfee.equipment.price']}" style="text-align:right;width:120px">
+            <h:outputText value="#{equip.price}">
+                <f:convertNumber type="currency"
+                                 currencyCode="#{not empty memC.tarifGreenfee.currency ? memC.tarifGreenfee.currency : 'EUR'}"
+                                 maxFractionDigits="2"/>
+            </h:outputText>
+        </p:column>
+
+        <p:column headerText="#{msg['greenfee.equipment.qty']}" style="text-align:center;width:100px">
+            <p:spinner value="#{equip.quantity}" min="0" max="9" size="3">
+                <p:ajax event="change" update="total-panel"/>
+            </p:spinner>
+        </p:column>
+
+    </p:dataTable>
+
+    <hr/>
+
+    <!-- Total dynamique -->
+    <h:panelGroup id="total-panel" layout="block">
+        <div class="info-grid" style="font-size:1.1em">
+            <span><b>#{msg['greenfee.equipment.total']}</b></span>
+            <span><b>
+                <h:outputText value="#{memC.tarifGreenfeeTotal}">
+                    <f:convertNumber type="currency"
+                                     currencyCode="#{not empty memC.tarifGreenfee.currency ? memC.tarifGreenfee.currency : 'EUR'}"
+                                     maxFractionDigits="2"/>
+                </h:outputText>
+            </b></span>
+        </div>
+    </h:panelGroup>
+
+    <!-- Boutons -->
+    <div class="btn-group">
+        <p:commandButton value="#{msg['btn.confirm']}"
+                         widgetVar="confirmEquipBtn"
+                         action="#{payC.confirmGreenfeeEquipments()}"
+                         ajax="false"
+                         onerror="PF('confirmEquipBtn').enable()"
+                         styleClass="btn-primary"/>
+        <p:commandButton value="#{msg['btn.cancel']}"
+                         action="schedule_round.xhtml?faces-redirect=true"
+                         ajax="false"
+                         immediate="true"
+                         styleClass="btn-secondary"/>
+    </div>
+
+</p:panel>
+</div>
+</h:form>
+
+</ui:define>
+</ui:composition>

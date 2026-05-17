@@ -44,11 +44,12 @@ public class CreditcardMail implements Serializable {
             String holes   = round.getRoundHoles() != null ? round.getRoundHoles() + " trous" : "";
             String game    = round.getRoundGame()  != null ? " — " + round.getRoundGame() : "";
 
+            String cs = currSymbol(creditcard);
             StringBuilder lignes = new StringBuilder();
             if (tarif.getWorkItem() != null) {
                 lignes.append("<tr><td>").append(tarif.getWorkItem()).append("</td>")
                       .append("<td align='right'>")
-                      .append(String.format("%.2f €", tarif.getPriceGreenfee()))
+                      .append(String.format("%.2f %s", tarif.getPriceGreenfee(), cs))
                       .append("</td></tr>");
             }
             if (tarif.getEquipmentChoosen() != null) {
@@ -56,7 +57,7 @@ public class CreditcardMail implements Serializable {
                     if (e.getPrice() == null || e.getQuantity() == null || e.getQuantity() <= 0) continue;
                     lignes.append("<tr><td>").append(e.getItem()).append("</td>")
                           .append("<td align='right'>")
-                          .append(String.format("%.2f €", e.getPrice() * e.getQuantity()))
+                          .append(String.format("%.2f %s", e.getPrice() * e.getQuantity(), cs))
                           .append("</td></tr>");
                 }
             }
@@ -71,7 +72,7 @@ public class CreditcardMail implements Serializable {
                 + lignes
                 + "<tr><td colspan='2'><hr/></td></tr>"
                 + "<tr><td><b>Total</b></td>"
-                + "<td align='right'><b>" + String.format("%.2f €", creditcard.getTotalPrice()) + "</b></td></tr>"
+                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(), cs) + "</b></td></tr>"
                 + "</table>"
                 + "<hr/>"
                 + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
@@ -97,6 +98,7 @@ public class CreditcardMail implements Serializable {
             String endStr   = subscription.getEndDate()   != null ? subscription.getEndDate().format(ZDF_TIME_DAY)   : "?";
             String desc     = subscription.getCommunication() != null ? subscription.getCommunication() : subscription.getSubCode();
 
+            String cs = currSymbol(creditcard);
             String mail = "<html><body style='font-family:Arial,sans-serif;max-width:600px'>"
                 + "<h2>✅ Confirmation de paiement abonnement — GolfLC</h2>"
                 + "<p>" + LocalDateTime.now().format(ZDF_TIME) + "</p>"
@@ -105,7 +107,7 @@ public class CreditcardMail implements Serializable {
                 + "<hr/>"
                 + "<table style='min-width:320px;border-collapse:collapse'>"
                 + "<tr><td>" + desc + "</td>"
-                + "<td align='right'><b>" + String.format("%.2f €", creditcard.getTotalPrice()) + "</b></td></tr>"
+                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(), cs) + "</b></td></tr>"
                 + "</table>"
                 + "<hr/>"
                 + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
@@ -134,21 +136,21 @@ public class CreditcardMail implements Serializable {
             String endStr   = cotisation.getCotisationEndDate()   != null
                     ? cotisation.getCotisationEndDate().format(ZDF_TIME_DAY)   : "?";
 
-            // Détail des lignes (cotisation de base + équipements sélectionnés)
+            String cs = currSymbol(creditcard);
             StringBuilder lignes = new StringBuilder();
             if (tarifMember != null) {
                 for (EquipmentsAndBasicAndRange b : tarifMember.getBasicList()) {
                     if (b.getPrice() == null || b.getQuantity() == null || b.getQuantity() <= 0) continue;
                     lignes.append("<tr><td>").append(b.getItem()).append("</td>")
                           .append("<td align='right'>")
-                          .append(String.format("%.2f €", b.getPrice() * b.getQuantity()))
+                          .append(String.format("%.2f %s", b.getPrice() * b.getQuantity(), cs))
                           .append("</td></tr>");
                 }
                 for (EquipmentsAndBasic e : tarifMember.getEquipmentsList()) {
                     if (e.getPrice() == null || e.getQuantity() == null || e.getQuantity() <= 0) continue;
                     lignes.append("<tr><td>").append(e.getItem()).append("</td>")
                           .append("<td align='right'>")
-                          .append(String.format("%.2f €", e.getPrice() * e.getQuantity()))
+                          .append(String.format("%.2f %s", e.getPrice() * e.getQuantity(), cs))
                           .append("</td></tr>");
                 }
             }
@@ -164,7 +166,7 @@ public class CreditcardMail implements Serializable {
                 + lignes
                 + "<tr><td colspan='2'><hr/></td></tr>"
                 + "<tr><td><b>Total</b></td>"
-                + "<td align='right'><b>" + String.format("%.2f €", creditcard.getTotalPrice()) + "</b></td></tr>"
+                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(), cs) + "</b></td></tr>"
                 + "</table>"
                 + "<hr/>"
                 + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
@@ -191,6 +193,7 @@ public class CreditcardMail implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
+            String cs = currSymbol(creditcard);
             StringBuilder lignes = new StringBuilder();
             for (int i = 0; i < greenfees.size(); i++) {
                 Greenfee gf = greenfees.get(i);
@@ -202,7 +205,7 @@ public class CreditcardMail implements Serializable {
                 lignes.append("<tr><td colspan='2' style='padding-top:4px;font-size:0.9em;color:#777'>Date : <b>")
                       .append(dateStr).append("</b></td></tr>");
                 lignes.append("<tr><td>Greenfee").append(holes).append("</td>")
-                      .append("<td align='right'>").append(String.format("%.2f €", gf.getPrice())).append("</td></tr>");
+                      .append("<td align='right'>").append(String.format("%.2f %s", gf.getPrice(), cs)).append("</td></tr>");
                 if (gf.getItems() != null && !gf.getItems().isBlank()) {
                     lignes.append("<tr><td colspan='2' style='font-size:0.9em;color:#555'>")
                           .append(gf.getItems()).append("</td></tr>");
@@ -219,7 +222,7 @@ public class CreditcardMail implements Serializable {
                 + lignes
                 + "<tr><td colspan='2'><hr/></td></tr>"
                 + "<tr><td><b>Total</b></td>"
-                + "<td align='right'><b>" + String.format("%.2f €", creditcard.getTotalPrice()) + "</b></td></tr>"
+                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(), cs) + "</b></td></tr>"
                 + "</table>"
                 + "<hr/>"
                 + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
@@ -235,6 +238,16 @@ public class CreditcardMail implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
+    } // end method
+
+    private String currSymbol(Creditcard creditcard) {
+        try {
+            String code = creditcard.getCreditcardCurrency();
+            if (code != null && !code.isBlank()) {
+                return java.util.Currency.getInstance(code).getSymbol();
+            }
+        } catch (IllegalArgumentException ignored) { }
+        return "€";
     } // end method
 
 /*
