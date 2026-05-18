@@ -500,9 +500,15 @@ public class CartController implements Serializable {
     // ========================================
 
     public int getCartBadgeCount() {
-        return getListGreenfees().size() + getListLessons().size()
-                + (hasCotisation() ? 1 : 0)
-                + (hasSubscription() ? 1 : 0);
+        List<entite.Cart> rows = getPendingRows();
+        // Keep creditcardType in sync with DB so cart.xhtml renders correctly at session start
+        if (!rows.isEmpty()) {
+            java.util.Set<String> types = rows.stream()
+                .map(c -> c.getCartType().name())
+                .collect(java.util.stream.Collectors.toSet());
+            appContext.setCreditcardType(types.size() == 1 ? types.iterator().next() : "MIXED");
+        }
+        return rows.size();
     } // end method
 
     // ========================================
@@ -513,10 +519,10 @@ public class CartController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            if (appContext.getPlayer() == null || appContext.getClub() == null) return;
+            if (appContext.getPlayer() == null) return;
             if (FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest()) return;
             invalidateCache();
-            refreshCotisationAndSubscriptionFromDb();
+            refreshAppContextFromCart();
             java.util.Set<String> types = getPendingRows().stream()
                 .map(c -> c.getCartType().name())
                 .collect(java.util.stream.Collectors.toSet());
@@ -538,7 +544,7 @@ public class CartController implements Serializable {
                 showMessageInfo(utils.LCUtil.prepareMessageBean("cart.empty.message"));
                 return null;
             }
-            refreshCotisationAndSubscriptionFromDb();
+            refreshAppContextFromCart();
             showMessageInfo(utils.LCUtil.prepareMessageBean("cart.restore.message"));
             LOG.info("cart restored {} row(s)", count);
             return "cart.xhtml?faces-redirect=true";
@@ -710,15 +716,28 @@ public class CartController implements Serializable {
         catch (Exception e) { LOG.warn("parseLesson failed: {}", e.getMessage()); return null; }
     } // end method
 
-    private void refreshCotisationAndSubscriptionFromDb() {
+    private void refreshAppContextFromCart() {
+        // Restore club from first cart row that carries a clubId (all types store it)
+        if (appContext.getClub() == null) {
+            getPendingRows().stream()
+                .filter(c -> c.getCartClubId() > 0)
+                .findFirst()
+                .ifPresent(c -> {
+                    try {
+                        entite.Club club = new entite.Club();
+                        club.setIdclub(c.getCartClubId());
+                        appContext.setClub(readClubService.read(club));
+                        LOG.debug("club restored from cart clubId={}", c.getCartClubId());
+                    } catch (Exception e) {
+                        LOG.warn("club restore from cart failed", e);
+                    }
+                });
+        }
         for (entite.Cart cart : getPendingRows()) {
             try {
                 String json = cart.getCartItemsJson();
                 if (json == null) continue;
                 if (cart.getCartType() == enumeration.eTypePayment.COTISATION) {
-                    entite.Club cotClub = new entite.Club();
-                    cotClub.setIdclub(cart.getCartClubId());
-                    appContext.setClub(readClubService.read(cotClub));
                     @SuppressWarnings("unchecked")
                     java.util.Map<String, Object> m = OBJECT_MAPPER.readValue(json, java.util.Map.class);
                     // Restore TarifMember lists
@@ -763,7 +782,7 @@ public class CartController implements Serializable {
                     LOG.debug("subscription refreshed from DB code={}", sub.getSubCode());
                 }
             } catch (Exception e) {
-                LOG.warn("refreshCotisationAndSubscriptionFromDb failed for type={}", cart.getCartType(), e);
+                LOG.warn("refreshAppContextFromCart failed for type={}", cart.getCartType(), e);
             }
         }
     } // end method
