@@ -95,6 +95,7 @@ public class PaymentController implements Serializable {
     @Inject private payment.PaymentStateStore                   paymentStateStore; // architecture REST/JSF separation 2026-03-21
     @Inject private find.FindCart                               findCartService;        // cart persistence 2026-05-07
     @Inject private delete.DeleteCart                           deleteCartService;      // cart persistence 2026-05-07
+    @Inject private update.UpdateCartStatus                     updateCartStatusService; // cart status 2026-05-18
     @Inject private find.FindGreenfeePaid                       findGreenfeePaid;
 
     // ========================================
@@ -1041,7 +1042,7 @@ public class PaymentController implements Serializable {
                             cot.setStatus(m.get("status") instanceof String s ? s : "Y");
                             tx.setCotisation(cot);
                             sharedOrchestrator.handle(new payment.CotisationPayment(cot));
-                            deleteCartService.deleteById(cart.getIdCart());
+                            updateCartStatusService.setCompleted(cart.getIdCart());
                             String cotStart = cot.getCotisationStartDate() != null ? cot.getCotisationStartDate().format(DTF_DAY_SLASH) : "?";
                             String cotEnd   = cot.getCotisationEndDate()   != null ? cot.getCotisationEndDate().format(DTF_DAY_SLASH)   : "?";
                             showMessageInfo(utils.LCUtil.prepareMessageBean("cotisation.confirmed") + " "
@@ -1062,7 +1063,7 @@ public class PaymentController implements Serializable {
                             entite.Subscription subComplete = paymentSubscriptionController.complete(sub);
                             if (subComplete != null) sub = subComplete;
                             sharedOrchestrator.handle(new payment.SubscriptionPayment(sub));
-                            deleteCartService.deleteById(cart.getIdCart());
+                            updateCartStatusService.setCompleted(cart.getIdCart());
                             showMessageInfo(utils.LCUtil.prepareMessageBean("subscription.success") + sub);
                             processedSub = sub;
                             LOG.debug("SUBSCRIPTION payment done idCart={}", cart.getIdCart());
@@ -1079,7 +1080,7 @@ public class PaymentController implements Serializable {
                                 LOG.warn("GREENFEE idempotency - already in DB player={} club={} date={}",
                                         gf.getIdplayer(), gf.getIdclub(), gf.getRoundDate());
                                 processedGreenfees.add(gf);
-                                deleteCartService.deleteById(cart.getIdCart());
+                                updateCartStatusService.setCompleted(cart.getIdCart());
                             } else {
                                 entite.Round rc = new entite.Round();
                                 rc.setRoundDate(gf.getRoundDate());
@@ -1095,7 +1096,7 @@ public class PaymentController implements Serializable {
                                 gfOrchestrator.handle(new payment.GreenfeePayment(gf));
                                 processOneGreenfeePostPayment(rc, gfCourse, tx.getClub());
                                 processedGreenfees.add(gf);
-                                deleteCartService.deleteById(cart.getIdCart());
+                                updateCartStatusService.setCompleted(cart.getIdCart());
                                 showMessageInfo(utils.LCUtil.prepareMessageBean("greenfee.success") + gf);
                                 LOG.debug("GREENFEE payment done idCart={}", cart.getIdCart());
                             }
@@ -1114,7 +1115,7 @@ public class PaymentController implements Serializable {
                 if (!pendingLessons.isEmpty()) {
                     try {
                         sharedOrchestrator.handle(new payment.LessonPayment(pendingLessons, tx.getProfessional()));
-                        for (int lcId : lessonCartIds) deleteCartService.deleteById(lcId);
+                        for (int lcId : lessonCartIds) updateCartStatusService.setCompleted(lcId);
                         showMessageInfo(utils.LCUtil.prepareMessageBean("lesson.success"));
                         entite.Lesson first = pendingLessons.get(0);
                         String count = pendingLessons.size() > 1 ? " (" + pendingLessons.size() + "x)" : "";
@@ -1138,7 +1139,6 @@ public class PaymentController implements Serializable {
             handleGenericException(e, methodName);
         }
 
-        cartController.markCartCompleted(savedType);
         dispatchMails(tx.getPlayer() != null ? tx.getPlayer() : appContext.getPlayer(),
                       tx.getClub()   != null ? tx.getClub()   : appContext.getClub(),
                       processedGreenfees, processedLessons, processedCotisation, processedSub,
@@ -1221,6 +1221,8 @@ public class PaymentController implements Serializable {
             if (!lessons.isEmpty() && professional != null) {
                 lessonMail.sendProNotification(player, professional, lessons, this.creditcard);
                 LOG.info("pro notification mail enqueued count={}", lessons.size());
+            } else if (!lessons.isEmpty()) {
+                LOG.warn("pro notification skipped — professional is null, lessons count={}", lessons.size());
             }
         } catch (Exception e) {
             LOG.warn("dispatchMails non-fatal error", e);

@@ -41,7 +41,7 @@ public class PaymentConfirmationMail implements Serializable {
         try {
             String cs = currSymbol(creditcard);
             boolean hasGreenfee     = greenfees    != null && !greenfees.isEmpty();
-            boolean hasLesson       = lessons      != null && !lessons.isEmpty() && professional != null;
+            boolean hasLesson       = lessons      != null && !lessons.isEmpty();
             boolean hasCotisation   = cotisation   != null;
             boolean hasSubscription = subscription != null;
             int sectionCount = (hasGreenfee ? 1 : 0) + (hasLesson ? 1 : 0)
