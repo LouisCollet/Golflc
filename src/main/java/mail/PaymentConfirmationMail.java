@@ -47,18 +47,12 @@ public class PaymentConfirmationMail implements Serializable {
             int sectionCount = (hasGreenfee ? 1 : 0) + (hasLesson ? 1 : 0)
                              + (hasCotisation ? 1 : 0) + (hasSubscription ? 1 : 0);
 
-            String clubLine = (club != null && club.getClubName() != null)
-                ? club.getClubName() + (club.getAddress() != null && club.getAddress().getCity() != null
-                    ? " — " + club.getAddress().getCity() : "")
-                : "";
-
             StringBuilder body = new StringBuilder();
             body.append("<html><body style='font-family:Arial,sans-serif;max-width:600px'>")
                 .append("<h2>✅ Confirmation de paiement — GolfLC</h2>")
                 .append("<p>").append(LocalDateTime.now().format(ZDF_TIME)).append("</p>")
-                .append("<p><b>").append(player.getPlayerFirstName()).append(" ").append(player.getPlayerLastName()).append("</b>")
-                .append(clubLine.isEmpty() ? "" : "<br/>" + clubLine)
-                .append("</p>");
+                .append("<p><b>").append(player.getPlayerFirstName()).append(" ").append(player.getPlayerLastName()).append("</b></p>")
+                .append("<p>").append(clubBlock(club)).append("</p>");
 
             if (hasGreenfee) {
                 double greenfeeTotal = greenfees.stream().mapToDouble(Greenfee::getPrice).sum();
@@ -142,7 +136,7 @@ public class PaymentConfirmationMail implements Serializable {
             if (hasLesson) {
                 String proName  = !lessons.isEmpty() ? lessons.get(0).getProName() : "";
                 double lessonTotal = lessons.stream()
-                    .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0).sum();
+                    .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount().doubleValue() : 0.0).sum();
                 body.append("<hr/>");
                 if (sectionCount > 1) body.append("<h3>🎓 Leçon(s)</h3>");
                 if (proName != null && !proName.isBlank()) {
@@ -155,7 +149,7 @@ public class PaymentConfirmationMail implements Serializable {
                     body.append("<tr><td>🎓 ").append(lesson.getEventTitle()).append("</td>")
                         .append("<td style='color:#555'>").append(start).append(" → ").append(end).append("</td>")
                         .append("<td align='right'>")
-                        .append(String.format("%.2f %s", lesson.getLessonAmount() != null ? lesson.getLessonAmount() : 0.0, cs))
+                        .append(String.format("%.2f %s", lesson.getLessonAmount() != null ? lesson.getLessonAmount().doubleValue() : 0.0, cs))
                         .append("</td></tr>");
                 }
                 body.append("<tr><td colspan='3'><hr/></td></tr>")
@@ -188,6 +182,26 @@ public class PaymentConfirmationMail implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
+    } // end method
+
+    private String clubBlock(entite.Club club) {
+        if (club == null) return "";
+        StringBuilder sb = new StringBuilder();
+        if (club.getClubName() != null) sb.append("<b>").append(club.getClubName()).append("</b><br/>");
+        entite.Address addr = club.getAddress();
+        if (addr != null) {
+            if (addr.getStreet() != null && !addr.getStreet().isBlank())
+                sb.append(addr.getStreet()).append("<br/>");
+            String cityLine = (addr.getZipCode() != null ? addr.getZipCode() + " " : "")
+                            + (addr.getCity() != null ? addr.getCity() : "");
+            if (!cityLine.isBlank()) sb.append(cityLine).append("<br/>");
+            if (addr.getCountry() != null && addr.getCountry().getName() != null)
+                sb.append(addr.getCountry().getName()).append("<br/>");
+        }
+        if (club.getClubWebsite() != null && !club.getClubWebsite().isBlank())
+            sb.append("<a href='").append(club.getClubWebsite()).append("' style='color:#0066cc'>")
+              .append(club.getClubWebsite()).append("</a>");
+        return sb.toString();
     } // end method
 
     private String buildSubject(int sectionCount, boolean hasGreenfee, boolean hasCotisation,

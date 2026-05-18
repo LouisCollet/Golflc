@@ -484,18 +484,15 @@ public class CartController implements Serializable {
         setCanceledCart();
         proFree = false;
         invalidateCache();
-        if (isGreenfee()) return "schedule_round.xhtml?faces-redirect=true";
-        return "schedule_pro.xhtml?faces-redirect=true";
+        return "welcome.xhtml?faces-redirect=true";
     } // end method
 
     public String clearCartAndExit() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        boolean hadGreenfees = hasGreenfees();
         clearCartFromDb();
         proFree = false;
-        if (hadGreenfees || isGreenfee()) return "schedule_round.xhtml?faces-redirect=true";
-        return "schedule_pro.xhtml?faces-redirect=true";
+        return "welcome.xhtml?faces-redirect=true";
     } // end method
 
     // ========================================

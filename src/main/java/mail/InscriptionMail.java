@@ -49,8 +49,8 @@ public class InscriptionMail implements Serializable {
             String mail = "<html><body style='font-family:Arial,sans-serif;max-width:600px'>"
                 + "<h2>✅ Confirmation d'inscription — GolfLC</h2>"
                 + "<p>" + LocalDateTime.now().format(ZDF_TIME) + "</p>"
-                + "<p><b>" + player.getPlayerFirstName() + " " + player.getPlayerLastName() + "</b><br/>"
-                + club.getClubName() + " — " + club.getAddress().getCity() + "</p>"
+                + "<p><b>" + player.getPlayerFirstName() + " " + player.getPlayerLastName() + "</b></p>"
+                + "<p>" + clubBlock(club) + "</p>"
                 + "<hr/>"
                 + "<table style='min-width:320px;border-collapse:collapse;line-height:1.8'>"
                 + "<tr><td>Date</td><td><b>" + dateStr + "</b></td></tr>"
@@ -95,8 +95,8 @@ public class InscriptionMail implements Serializable {
             String content = "<html><body style='font-family:Arial,sans-serif;max-width:600px'>"
                 + "<h2>❌ Annulation d'inscription — GolfLC</h2>"
                 + "<p>" + LocalDateTime.now().format(ZDF_TIME) + "</p>"
-                + "<p><b>" + player.getPlayerFirstName() + " " + player.getPlayerLastName() + "</b><br/>"
-                + club.getClubName() + " — " + club.getAddress().getCity() + "</p>"
+                + "<p><b>" + player.getPlayerFirstName() + " " + player.getPlayerLastName() + "</b></p>"
+                + "<p>" + clubBlock(club) + "</p>"
                 + "<hr/>"
                 + "<table style='min-width:320px;border-collapse:collapse;line-height:1.8'>"
                 + "<tr><td>Date annulée</td><td><b>" + dateStr + "</b></td></tr>"
@@ -121,6 +121,26 @@ public class InscriptionMail implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
+    } // end method
+
+    private String clubBlock(entite.Club club) {
+        if (club == null) return "";
+        StringBuilder sb = new StringBuilder();
+        if (club.getClubName() != null) sb.append("<b>").append(club.getClubName()).append("</b><br/>");
+        entite.Address addr = club.getAddress();
+        if (addr != null) {
+            if (addr.getStreet() != null && !addr.getStreet().isBlank())
+                sb.append(addr.getStreet()).append("<br/>");
+            String cityLine = (addr.getZipCode() != null ? addr.getZipCode() + " " : "")
+                            + (addr.getCity() != null ? addr.getCity() : "");
+            if (!cityLine.isBlank()) sb.append(cityLine).append("<br/>");
+            if (addr.getCountry() != null && addr.getCountry().getName() != null)
+                sb.append(addr.getCountry().getName()).append("<br/>");
+        }
+        if (club.getClubWebsite() != null && !club.getClubWebsite().isBlank())
+            sb.append("<a href='").append(club.getClubWebsite()).append("' style='color:#0066cc'>")
+              .append(club.getClubWebsite()).append("</a>");
+        return sb.toString();
     } // end method
 
 } // end class

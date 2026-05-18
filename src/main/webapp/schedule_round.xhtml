@@ -33,25 +33,42 @@
     </h:panelGroup>
 
     <div class="login-container" style="min-height:auto; align-items:flex-start;">
-    <p:panel id="roundSchedulePanel" styleClass="login-card form-card" style="max-width:100%;">
+    <p:panel id="roundSchedulePanel"
+             styleClass="login-card form-card"
+             style="max-width:100%;">
         <f:facet name="header">
-            <h1 style="margin:0;">#{msg['menu.schedule.round']}</h1>
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+                <h1 style="margin:0;">#{msg['menu.inscription.schedule']}</h1>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <h:outputText value="🛒 #{cartC.listGreenfees.size()} #{msg['round.in.cart']}"
+                                  rendered="#{not empty cartC.listGreenfees}"
+                                  styleClass="lesson-cart-badge"/>
+                    <p:commandButton value="#{msg['menu.ground.condition']}"
+                                     icon="pi pi-map"
+                                     process="@none"
+                                     update="gcDialog"
+                                     oncomplete="PF('gcDialog').show();"
+                                     styleClass="p-button-info p-button-outlined p-button-sm"/>
+                    <p:button value="#{msg['welcome.back']}"
+                              outcome="welcome.xhtml"
+                              icon="pi pi-home"
+                              styleClass="p-button-secondary p-button-outlined p-button-sm"/>
+                </div>
+            </div>
         </f:facet>
 
+        <!-- Bouton paiement caché — déclenché par le custom button FullCalendar -->
+        <p:commandButton id="btnPayCart"
+                         style="display:none"
+                         ajax="false"
+                         action="#{payC.goToCart()}"
+                         process="@this"/>
+
         <!-- Légende périodes -->
-        <div style="display:flex; gap:1rem; margin-bottom:0.75rem; align-items:center;">
-            <span style="display:inline-flex; align-items:center; gap:0.3rem;">
-                <span style="width:14px;height:14px;border-radius:3px;background:#28a745;display:inline-block;"></span>
-                <span style="font-size:0.85rem;">Matin (A)</span>
-            </span>
-            <span style="display:inline-flex; align-items:center; gap:0.3rem;">
-                <span style="width:14px;height:14px;border-radius:3px;background:#fd7e14;display:inline-block;"></span>
-                <span style="font-size:0.85rem;">Midi (B)</span>
-            </span>
-            <span style="display:inline-flex; align-items:center; gap:0.3rem;">
-                <span style="width:14px;height:14px;border-radius:3px;background:#0d6efd;display:inline-block;"></span>
-                <span style="font-size:0.85rem;">Après-midi (C)</span>
-            </span>
+        <div class="slot-legend">
+            <span class="slot-legend-item"><span class="slot-legend-swatch morning"/><span>Matin (A)</span></span>
+            <span class="slot-legend-item"><span class="slot-legend-swatch noon"/><span>Midi (B)</span></span>
+            <span class="slot-legend-item"><span class="slot-legend-swatch afternoon"/><span>Après-midi (C)</span></span>
         </div>
 
         <!-- Calendrier des créneaux -->
@@ -178,7 +195,7 @@
                                          icon="pi pi-check"
                                          action="#{schedRoundC.confirmRound()}"
                                          process="@form"
-                                         update=":round_schedule_form:roundSchedulePanel,growl-msg"
+                                         update=":round_schedule_form:roundSchedulePanel,:form_header:cartBadgePanel,growl-msg"
                                          oncomplete="if(args &amp;&amp; !args.validationFailed) PF('roundDialog').hide()"
                                          disabled="#{schedRoundC.slotAlreadyInscribed or schedRoundC.slotUnavailable}"
                                          styleClass="p-button-success"/>
@@ -214,10 +231,18 @@
             this.cfg.options.eventStartEditable = false;
             this.cfg.options.eventDurationEditable = false;
             this.cfg.options.displayEventTime = false;
+            this.cfg.options.customButtons = {
+                payCart: {
+                    text: '💳 #{msg['payment.selected']}',
+                    click: function() {
+                        document.getElementById('round_schedule_form:btnPayCart').click();
+                    }
+                }
+            };
             this.cfg.options.headerToolbar = {
                 left:   'prev,next today',
                 center: 'title',
-                right:  'timeGridWeek,timeGridDay'
+                right:  'payCart timeGridWeek,timeGridDay'
             };
             this.cfg.options.buttonText = {
                 today: 'Aujourd\'hui',
@@ -267,6 +292,23 @@
             };
         }
         </script>
+
+        <!-- Dialog ground condition du club courant -->
+        <p:dialog id="gcDialog"
+                  widgetVar="gcDialog"
+                  header="#{msg['menu.ground.condition']} — #{appContext.club.clubName}"
+                  modal="false"
+                  resizable="false"
+                  draggable="true"
+                  style="width:420px; max-width:95vw;">
+            <ui:include src="include/include_ground_condition_display.xhtml"/>
+            <f:facet name="footer">
+                <p:commandButton value="#{msg['button.close']}"
+                                 icon="pi pi-times"
+                                 onclick="PF('gcDialog').hide(); return false;"
+                                 styleClass="p-button-secondary"/>
+            </f:facet>
+        </p:dialog>
 
     </p:panel>
     </div>

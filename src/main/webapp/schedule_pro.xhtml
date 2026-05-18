@@ -23,9 +23,15 @@
         <f:facet name="header">
             <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
                 <h1 style="margin:0;">#{msg['message.lesson']}</h1>
-                <h:outputText value="🛒 #{payC.listLessons.size()} #{msg['lesson.in.cart']}"
-                              rendered="#{not empty payC.listLessons}"
-                              styleClass="lesson-cart-badge"/>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <h:outputText value="🛒 #{cartC.listLessons.size()} #{msg['lesson.in.cart']}"
+                                  rendered="#{not empty cartC.listLessons}"
+                                  styleClass="lesson-cart-badge"/>
+                    <p:button value="#{msg['welcome.back']}"
+                              outcome="welcome.xhtml"
+                              icon="pi pi-home"
+                              styleClass="p-button-secondary p-button-outlined p-button-sm"/>
+                </div>
             </div>
         </f:facet>
 
@@ -47,8 +53,8 @@
                         styleClass="ui-custompanelgrid"
                         view="timeGridWeek"
                         extender="initSchedule"
-                        clientTimeZone="Europe/Brussels"
-                        timeZone="Europe/Brussels">
+                        clientTimeZone="#{clubC.clubTimeZone}"
+                        timeZone="#{clubC.clubTimeZone}">
                 <p:ajax event="dateSelect"
                         listener="#{schedulerC.dateSelect}"
                         update=":schedule_form:dialog1,growl-msg"/>
@@ -149,7 +155,18 @@
 
                 <p:outputLabel for="@next" value="#{msg['lesson.status']}"/>
                 <h:outputText id="paidEvent"
-                              value="#{schedulerC.selectedEvent.dynamicProperties['lesson-paid'] ? msg['lesson.paid'] : msg['lesson.booked']}"/>
+                              value="#{schedulerC.selectedEvent.dynamicProperties['lesson-paid'] ? msg['lesson.paid']
+                                     : (schedulerC.selectedEvent.dynamicProperties['lesson-booked'] ? msg['lesson.booked']
+                                     : msg['lesson.available'])}"/>
+
+                <!--   -->
+                
+                <p:outputLabel value="#{msg['lesson.amount']}"
+                               rendered="#{not empty schedulerC.selectedLessonAmount}"/>
+                <h:outputText value="#{schedulerC.selectedLessonAmount}"
+                              rendered="#{schedulerC.selectedLessonAmount != null}">
+                    <f:convertNumber minFractionDigits="2" maxFractionDigits="2" groupingUsed="true"/>
+                </h:outputText>
                 
                 <p:outputLabel for="@next" value="#{msg['lesson.startdate']}"/>
                 <p:datePicker id="from"
@@ -183,7 +200,7 @@
                                          value="#{msg['lesson.reserve']}"
                                          process="@form"
                                          action="#{schedulerC.createLesson()}"
-                                         update="panelId,growl-msg"
+                                         update="panelId,growl-msg,:form_header:cartBadgePanel"
                                          onclick="_pfScheduleLockedDate=new Date(PF('myschedule').calendar.view.currentStart.getTime());"
                                          disabled="#{schedulerC.selectedEvent.dynamicProperties['lesson-booked']}"
                                          styleClass="p-button-success"/>
@@ -215,7 +232,7 @@
                              icon="pi pi-check"
                              action="#{schedulerC.deleteLesson(idplayer)}"
                              process="@this"
-                             update="panelId,growl-msg"
+                             update="panelId,growl-msg,:form_header:cartBadgePanel"
                              onclick="_pfScheduleLockedDate=new Date(PF('myschedule').calendar.view.currentStart.getTime());"
                              oncomplete="PF('deleteDialogSchedule').hide();"/>
         </p:confirmDialog>
@@ -229,7 +246,7 @@
             <p:menuitem value="#{msg['lesson.cancel']}"
                         icon="pi pi-times"
                         styleClass="p-menuitem-danger"
-                        update="panelId,growl-msg"
+                        update="panelId,growl-msg,:form_header:cartBadgePanel"
                         action="#{schedulerC.deleteLesson(idplayer)}"/>
         </p:contextMenu>
 
