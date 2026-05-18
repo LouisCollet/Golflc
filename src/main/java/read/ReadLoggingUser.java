@@ -4,6 +4,7 @@ import entite.LoggingUser;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.LoggingUserRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -31,7 +32,7 @@ public class ReadLoggingUser implements Serializable {
                 AND LoggingType = ?
                 """;
 
-        LoggingUser result = dao.querySingle(query, rs -> LoggingUser.map(rs),
+        LoggingUser result = dao.querySingle(query, new LoggingUserRowMapper(),
                 logging.getLoggingIdPlayer(), logging.getLoggingIdRound(), logging.getLoggingType().toUpperCase());
         if (result == null) {
             LOG.debug("- {}", utils.LCUtil.prepareMessageBean("logging.notfound"));

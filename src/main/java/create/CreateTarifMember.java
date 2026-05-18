@@ -40,7 +40,7 @@ public class CreateTarifMember implements Serializable {
         }
 
         try (Connection conn = dao.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.SqlFactory.generateInsertQuery(conn, "tarif_members"))) {
+             PreparedStatement ps = conn.prepareStatement(sql.SqlFactory.generateInsertQuery(conn, "tarif_cotisation"))) {
             sql.preparedstatement.psCreateTarifMember.mapCreate(ps, tarif);
             int row = ps.executeUpdate();
             if (row != 0) {

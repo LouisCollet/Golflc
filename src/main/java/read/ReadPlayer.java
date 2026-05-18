@@ -2,6 +2,7 @@ package read;
 
 import entite.Player;
 import entite.composite.EPlayerPassword;
+import rowmappers.PasswordRowMapper;
 import rowmappers.PlayerRowMapper;
 import rowmappers.RowMapper;
 import static interfaces.Log.LOG;
@@ -78,7 +79,7 @@ public class ReadPlayer implements Serializable {
 
                 if (rs.next()) {
                     Player player = playerMapper.map(rs);
-                    var password = entite.Password.map(rs);
+                    var password = new PasswordRowMapper().map(rs);
                     result = new EPlayerPassword(player, password);
                     LOG.debug("EPlayerPassword loaded: {}", result);
                 } else {

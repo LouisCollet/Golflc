@@ -30,26 +30,4 @@ public class LatlngClubRowMapper extends AbstractRowMapper<LatLng> {
             return null;
         }
     }
-}
-
-
-/*
-public class LatlngClubRowMapper extends AbstractRowMapper<LatLng> {
-
-    @Override
-    public LatLng map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-
-        try {
-            var latLng = new LatLng();
-            latLng.setLat(getDouble(rs, "ClubLatitude"));
-            latLng.setLng(getDouble(rs, "ClubLongitude"));
-            return latLng;
-
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
-    }
-}
-*/
+} //end class

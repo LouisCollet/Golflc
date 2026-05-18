@@ -114,9 +114,6 @@ final String query = """
     handleGenericException(e, methodName);
     return null;
 }
-finally{
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
 } //end method
 
 public static void main(String[] args) throws Exception, SQLException{

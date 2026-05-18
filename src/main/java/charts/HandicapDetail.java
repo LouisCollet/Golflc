@@ -5,57 +5,36 @@ import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class HandicapDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public HandicapDetail() { }
 
     public List<Handicap> getStatHcp(final Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " with player = " + player);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
-            SELECT PlayerFirstName, PlayerLastName, idhandicap, HandicapPlayer
-            FROM player, handicap
-            WHERE player.idplayer=?
-            AND handicap.player_idplayer = player.idplayer
+            SELECT idhandicap, HandicapPlayerEGA
+            FROM handicap
+            WHERE player_idplayer = ?
             """;
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-
-            ps.setInt(1, player.getIdplayer());
-            utils.LCUtil.logps(ps);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                List<Handicap> liste = new ArrayList<>();
-                while (rs.next()) {
-                    Handicap handicap = new Handicap();
-                    handicap.setHandicapStart(rs.getDate("idhandicap"));
-                    handicap.setHandicapPlayerEGA(rs.getBigDecimal("HandicapPlayerEGA"));
-                    liste.add(handicap);
-                }
-                LOG.debug("liste after while = " + liste.toString());
-                return liste;
-            }
-
+        try {
+            List<Handicap> liste = dao.queryList(query, new rowmappers.HandicapRowMapper(), player.getIdplayer());
+            LOG.debug("list size = {}", liste.size());
+            return liste;
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return Collections.emptyList();

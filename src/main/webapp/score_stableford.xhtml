@@ -27,6 +27,15 @@
                      columnClasses="col1Flex, col2Flex"
                      style="margin-bottom:0.75rem;">
 
+            <!-- 0 — Nom du tour -->
+            <p:outputLabel for="@next" value="#{msg['round.name']} :"/>
+            <p:inputText id="roundName"
+                         value="#{roundC.round.roundName}"
+                         size="45"
+                         title="#{msg['tooltip.round.RoundName']}">
+                <p:ajax event="blur" update="growl-msg"/>
+            </p:inputText>
+
             <!-- 1 — Tee de départ -->
             <p:outputLabel for="@next" value="#{msg['tee.start']} :"/>
             <p:selectOneMenu id="teeStartSelect"

@@ -7,7 +7,6 @@ import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.concurrent.ManagedExecutorService;
 import jakarta.inject.Inject;
-import jakarta.mail.Address;
 import jakarta.mail.Authenticator;
 import jakarta.mail.BodyPart;
 import jakarta.mail.Message;
@@ -178,50 +177,42 @@ public class MailSender implements Serializable {
     private void sendBatch(List<MailMessage> mails) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {} count={}", methodName, mails.size());
+        if (mails.isEmpty()) return;
 
         long startNanos = System.nanoTime();
+        final String username = settings.getProperty("SMTP_USERNAME");
+        final String password = settings.getProperty("SMTP_PASSWORD");
 
-        List<CompletableFuture<Void>> futures = mails.stream()
-            .map(mail -> CompletableFuture.runAsync(() -> sendOne(mail), mailExecutor))
-            .toList();
-
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0])).join();
+        smtpSemaphore.acquire();
+        try {
+            Session session = buildSession(username, password);
+            try (Transport transport = session.getTransport("smtp")) {
+                transport.connect(MAILSERVER, username, password);
+                for (MailMessage mail : mails) {
+                    try {
+                        MimeMessage msg = buildMimeMessage(session, mail, username);
+                        if (msg != null) {
+                            msg.saveChanges();
+                            transport.sendMessage(msg, msg.getAllRecipients());
+                            ThreadContext.put("recipient", mail.recipient());
+                            ThreadContext.put("subject",   mail.title());
+                            LOG.info("mail sent to {}", mail.recipient());
+                            ThreadContext.clearAll();
+                        }
+                    } catch (Exception mailEx) {
+                        LOG.error("sendBatch: failed for {}: {}", mail.recipient(), mailEx.getMessage(), mailEx);
+                    }
+                }
+            }
+        } finally {
+            smtpSemaphore.release();
+        }
 
         double elapsedMillis = (System.nanoTime() - startNanos) / 1_000_000.0;
         LOG.debug("batch of {} mail(s) sent in {} ms", mails.size(), elapsedMillis);
 
         if (jakarta.faces.context.FacesContext.getCurrentInstance() != null) {
             showMessageInfo(mails.size() + " mail(s) sent in " + elapsedMillis + " ms");
-        }
-    } // end method
-
-    private void sendOne(MailMessage mail) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            smtpSemaphore.acquire();
-            try {
-                final String username = settings.getProperty("SMTP_USERNAME");
-                final String password = settings.getProperty("SMTP_PASSWORD");
-                Session session = buildSession(username, password);
-                try (Transport transport = session.getTransport("smtp")) {
-                    transport.connect(MAILSERVER, username, password);
-                    MimeMessage msg = buildMimeMessage(session, mail, username);
-                    if (msg != null) {
-                        msg.saveChanges();
-                        transport.sendMessage(msg, msg.getAllRecipients());
-                        ThreadContext.put("recipient", mail.recipient());
-                        ThreadContext.put("subject",   mail.title());
-                        LOG.info("mail sent to {}", mail.recipient());
-                        LOG.info("mail sent");
-                        ThreadContext.clearAll();
-                    }
-                }
-            } finally {
-                smtpSemaphore.release();
-            }
-        } catch (Exception e) {
-            LOG.error("sendOne failed for {}: {}", mail.recipient(), e.getMessage(), e);
         }
     } // end method
 

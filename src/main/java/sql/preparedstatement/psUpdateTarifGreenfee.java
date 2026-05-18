@@ -6,9 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-public class psUpdateTarifGreenfee implements Serializable, interfaces.Log, interfaces.GolfInterface {
+public class psUpdateTarifGreenfee implements Serializable{
 
-    /**
+    /*
      * @param json        TarifGreenfee serialized as JSON
      * @param year        year from first season start date
      * @param startDate   first season start date (truncated to day)

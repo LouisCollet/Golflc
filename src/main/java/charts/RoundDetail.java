@@ -5,9 +5,10 @@ import entite.Player;
 import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import rowmappers.AverageRowMapper;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,25 +17,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
-/**
- * @deprecated Not currently used — kept for potential future use.
- */
 @Deprecated
 @ApplicationScoped
 public class RoundDetail implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public RoundDetail() { }
 
     public List<Average> getRoundDetail(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " with player = " + player + " //round  = " + round);
+        LOG.debug("entering {}", methodName);
 
         final String query = """
             SELECT scorehole, scorepar, scorestrokeindex, scoreextrastroke,
@@ -50,7 +46,7 @@ public class RoundDetail implements Serializable {
             ORDER by scorehole
             """;
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = dao.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, round.getIdround());
@@ -60,10 +56,10 @@ public class RoundDetail implements Serializable {
             try (ResultSet rs = ps.executeQuery()) {
                 List<Average> listAverage = new ArrayList<>();
                 while (rs.next()) {
-                    Average average = entite.Average.map(rs);
+                    Average average = new AverageRowMapper().map(rs);
                     listAverage.add(average);
                 }
-                LOG.debug("listavg after while = " + listAverage.toString());
+                LOG.debug("list size = {}", listAverage.size());
                 return listAverage;
             }
 

@@ -167,9 +167,6 @@ final String query = """
  } catch (Exception e) {
             String msg = "££ Exception in main = " + e.getMessage();
             LOG.error(msg);
-   }finally{
-         DBConnection.closeQuietly(conn, null, null , null);
-          }
    } // end main//
 } //end class
 */

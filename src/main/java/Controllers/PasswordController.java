@@ -179,15 +179,4 @@ public EPlayerPassword resetPassword(Activation activation) throws Exception{
    }
 } // end resetPassword
 
-/*
-    void main() throws Exception {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Activation activation = new Activation();
-        activation.setActivationPlayerId(324720);
-        activation.setActivationKey("fcb35e1e-970d-46fc-88f0-929a8555d0d8");
-        EPlayerPassword epp = new PasswordController().resetPassword(activation);
-        LOG.debug("from main, after !! = {}", epp);
-    } // end main
-*/
 } // end class

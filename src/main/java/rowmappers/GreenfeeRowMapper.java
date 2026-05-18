@@ -2,11 +2,8 @@ package rowmappers;
 
 import entite.Greenfee;
 import static exceptions.LCException.handleGenericException;
-import static interfaces.Log.LOG;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class GreenfeeRowMapper extends AbstractRowMapper<Greenfee> {
 
@@ -31,7 +28,8 @@ public class GreenfeeRowMapper extends AbstractRowMapper<Greenfee> {
             greenfee.setItems(getString(rs, "GreenfeeItems"));
             greenfee.setPrice(getDouble(rs, "GreenfeeAmount"));
             greenfee.setStatus(getString(rs, "GreenfeeStatus"));
-            greenfee.setCurrency(getString(rs, "GreenfeeCurrency")); // currency 28-04-2025
+            String cur = getString(rs, "GreenfeeCurrency");
+            greenfee.setCurrency(cur != null ? cur.toUpperCase(java.util.Locale.ROOT) : "EUR"); // currency 28-04-2025
 
             return greenfee;
 
@@ -40,4 +38,4 @@ public class GreenfeeRowMapper extends AbstractRowMapper<Greenfee> {
             return null;
         }
     }
-}
+} //end class

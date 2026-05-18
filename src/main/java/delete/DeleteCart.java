@@ -19,6 +19,13 @@ public class DeleteCart implements Serializable {
 
     public DeleteCart() { }
 
+    public void deleteById(int idCart) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {} idCart={}", methodName, idCart);
+        int rows = dao.execute("DELETE FROM cart WHERE idCart = ?", idCart);
+        LOG.debug("cart deleted by id rows={} idCart={}", rows, idCart);
+    } // end method
+
     public void deleteByPlayerClubType(int playerId, int clubId, String type) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {} playerId={} type={}", methodName, playerId, type);
@@ -35,6 +42,15 @@ public class DeleteCart implements Serializable {
         int rows = dao.execute(
             "DELETE FROM cart WHERE cartPlayerId = ? AND cartClubId = ?",
             playerId, clubId);
+        LOG.debug("all carts deleted rows={} playerId={}", rows, playerId);
+    } // end method
+
+    public void deleteAllByPlayer(int playerId) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {} playerId={}", methodName, playerId);
+        int rows = dao.execute(
+            "DELETE FROM cart WHERE cartPlayerId = ?",
+            playerId);
         LOG.debug("all carts deleted rows={} playerId={}", rows, playerId);
     } // end method
 /*

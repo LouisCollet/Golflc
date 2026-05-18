@@ -26,8 +26,8 @@ public class DeleteTarifMember implements Serializable {
 
         final String query = """
                 DELETE
-                FROM tarif_members
-                WHERE tarif_members.TarifMemberIdClub = ?
+                FROM tarif_cotisation
+                WHERE tarif_cotisation.TarifMemberIdClub = ?
                 AND DATE(TarifMemberStartDate) = DATE(?)
                 """;
 

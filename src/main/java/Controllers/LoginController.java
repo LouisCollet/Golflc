@@ -17,11 +17,6 @@ import java.util.Locale;
 import java.util.Optional;
 import static utils.LCUtil.showMessageFatal;
 
-/**
- * Controller JSF pour le flux login.
- * Migré depuis PlayerController 2026-04-03.
- * Gère : sélection joueur, double-login, session fixation, audit, dialog retour.
- */
 @Named("loginC")
 @SessionScoped
 public class LoginController implements Serializable {
@@ -39,7 +34,7 @@ public class LoginController implements Serializable {
     @Inject private Controllers.ActiveLocale                      activeLocale;
     @Inject private find.FindLastAudit                            findLastAudit;
     @Inject private update.UpdateAudit                            updateAudit;
-    @Inject private Controllers.PaymentController           payC;
+    @Inject private Controllers.CartController              cartC;
     @Inject private read.ReadClub                           readClubService;
 
     private boolean showForceLogoutButton   = false;
@@ -60,10 +55,6 @@ public class LoginController implements Serializable {
     // Migrated from connection_package.LoginBean 2026-04-04
     // ========================================
 
-    /**
-     * Initialise la session avant la page de login.
-     * Reset appContext player/playerPro/localAdmin/playerTemp, et locale à EN.
-     */
     public void prepareLogin() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -81,18 +72,12 @@ public class LoginController implements Serializable {
     // LOGIN FLOW
     // ========================================
 
-    /**
-     * Login flow — sélection d'un joueur dans la dataTable (selectPlayer.xhtml).
-     * Vérifie password, blocking, subscription, double-login, puis redirige vers welcome.xhtml.
-     * @return 
-     */
     public String selectPlayer(EPlayerPassword epp) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
             LOG.debug("player = {}", epp.getPlayer());
             appContext.setPlayer(epp.getPlayer());
-            payC.initCartOnLogin();
 
             if (appContext.getPlayer().getIdplayer() == null) {
                 String err = "player is null = " + appContext.getPlayer();
@@ -197,11 +182,6 @@ public class LoginController implements Serializable {
         }
     } // end method
 
-    /**
-     * Login raccourci via le player selector (include_player_selector.xhtml).
-     * Cherche l'EPlayerPassword correspondant à playerTemp.idplayer dans la liste,
-     * puis délègue à selectPlayer(epp) pour le flux login standard.
-     */
     public String selectPlayerById() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -231,13 +211,9 @@ public class LoginController implements Serializable {
     // DIALOG
     // ========================================
 
-    /**
-     * Sélection d'un joueur via dialog (dialogPlayer.xhtml).
-     * Gère LOCAL_ADMIN, CREATE_PRO, CREATE_PLAYER selon SelectionPurpose.
-     */
     public String selectedPlayerFromDialog(EPlayerPassword epp) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with player = {}", epp.getPlayer());
+        LOG.debug("entering {}", methodName);
         LOG.debug("with playerTemp = {}", appContext.getPlayerTemp());
         try {
             SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose())
@@ -266,17 +242,11 @@ public class LoginController implements Serializable {
             LOG.warn("unhandled purpose: {}", purpose);
             return null;
         } catch (Exception e) {
-            LOG.error("exception: {}", e.getMessage(), e);
-            showMessageFatal("Exception in " + methodName + ": " + e.getMessage());
+            handleGenericException(e, methodName);
             return null;
         }
     } // end method
 
-    /**
-     * Listener pour dialogReturn du player selector.
-     * Si le dialog renvoie un EPlayerPassword (mode login), lance le flux login complet
-     * et redirige la page parent vers welcome.xhtml (ou password_create, subscription...).
-     */
     public void onPlayerDialogReturn(org.primefaces.event.SelectEvent<Object> event) throws java.io.IOException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -294,10 +264,6 @@ public class LoginController implements Serializable {
         }
     } // end method
 
-    /**
-     * Force logout — ferme l'audit du joueur actuellement en session et invalide la session.
-     * Appelé quand un joueur différent tente de se connecter sur une session déjà occupée.
-     */
     public String forceLogout() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -326,12 +292,9 @@ public class LoginController implements Serializable {
         }
     } // end method
 
-    /**
-     * Force reconnect — ferme l'audit existant du joueur (autre session/PC) et relance le login.
-     */
     public String forceReconnect() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering");
+        LOG.debug("entering {}", methodName);
         try {
             if (pendingEpp == null) {
                 showMessageFatal("No pending login — please select your player again");

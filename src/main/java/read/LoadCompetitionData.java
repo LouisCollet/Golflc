@@ -4,6 +4,7 @@ import entite.CompetitionData;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.CompetitionDataRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -29,7 +30,7 @@ public class LoadCompetitionData implements Serializable {
                 WHERE CmpDataId = ?
                 """;
 
-        return dao.querySingle(query, rs -> CompetitionData.map(rs), competition.getCmpDataId());
+        return dao.querySingle(query, new CompetitionDataRowMapper(), competition.getCmpDataId());
     } // end method
 
     /*

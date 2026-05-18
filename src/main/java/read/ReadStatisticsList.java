@@ -148,9 +148,6 @@ return statisticsList;
     LOG.error("Exception ! {}", ex);
     LCUtil.showMessageFatal("Exception in readStatisticsList = " + ex.toString() );
      return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps); //mod 14/08/2014
-}
 } //end method
 
 void main() throws SQLException, Exception {

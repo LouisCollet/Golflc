@@ -6,7 +6,6 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
 <ui:define name="title">System Administrator Subscriptions</ui:define>
 <ui:define name="content">
@@ -22,12 +21,10 @@
 <h:form id="form_local_admin_cotisations">
    <ui:include src="/include/include_summary_player.xhtml"/>
 
-<c:set var="select" value="#{appContext.inputSelectPaiement}"/>
-
    <p:dataTable id="TableSubscriptions"
                 var="c"
                 widgetVar="subscriptionTable"
-                value="#{memC.listSystemAdminSubscription(select)}"
+                value="#{memC.listSystemAdminSubscription('')}"
                 filteredValue="#{memC.filteredCars}"
                 multiViewState="true"
                 scrollable="true"

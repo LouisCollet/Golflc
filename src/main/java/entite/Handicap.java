@@ -117,22 +117,6 @@ public class Handicap implements Serializable, interfaces.GolfInterface{
  //   public void setFilteredHandicaps(List<?> filteredHandicaps) {
  //       this.filteredHandicaps = filteredHandicaps;
  //   }
- public static Handicap map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Handicap h = new Handicap();
-        h.setHandicapStart(rs.getTimestamp("idhandicap")) ;
-        h.setHandicapEnd(rs.getTimestamp("HandicapEnd") );
-        h.setHandicapPlayerEGA(rs.getBigDecimal("HandicapPlayerEGA") );
-   return h;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map   
-
  @Override
 public String toString(){ 
     LOG.debug("starting toString for Handicap!");

@@ -15,11 +15,12 @@ public class ProfessionalRowMapper extends AbstractRowMapper<Professional> {
             Professional pro = new Professional();
             pro.setProId(getInteger(rs,"ProId"));
             pro.setProClubId(getInteger(rs,"ProClubId"));
-            pro.setProStartDate(getTimestamp(rs,"ProClubStartDate").toLocalDateTime());
-            pro.setProEndDate(getTimestamp(rs,"ProClubEndDate").toLocalDateTime());
+            pro.setProStartDate(getLocalDateTime(rs, "ProClubStartDate"));
+            pro.setProEndDate(getLocalDateTime(rs, "ProClubEndDate"));
             pro.setProPlayerId(getInteger(rs,"ProPlayerId"));
             pro.setProAmount(getDouble(rs,"ProAmount"));
             pro.setProWorkDays(rs.getInt("ProWorkDays"));
+            pro.setProTarif(getString(rs, "ProTarif"));
     //           LOG.debug("Professional event returned from map = " + pro);
             return pro;
 

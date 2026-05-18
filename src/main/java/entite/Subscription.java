@@ -153,26 +153,4 @@ public String toString(){
         return msg;
   }
 }
-/*
-public static Subscription map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Subscription s = new Subscription();
-        s.setIdplayer(rs.getInt("SubscriptionIdPlayer") );
-        s.setStartDate(rs.getTimestamp("SubscriptionStartDate").toLocalDateTime());
-        s.setEndDate(rs.getTimestamp("SubscriptionEndDate").toLocalDateTime());
-        s.setTrialCount(rs.getShort("SubscriptionTrialCount"));
-        s.setPaymentReference(rs.getString("SubscriptionPaymentReference"));
-        s.setCommunication(rs.getString("SubscriptionCommunication")); // new 03-03-2024
-        s.setSubscriptionAmount(rs.getDouble("SubscriptionAmount")); // new 22-02-2024
-        s.setPaymentDate(rs.getTimestamp("SubscriptionModificationDate").toLocalDateTime());
-   return s;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
-*/
 } // end class

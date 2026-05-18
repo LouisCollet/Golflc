@@ -8,7 +8,7 @@ import java.util.List;
  * PaymentTarget wrapping a list of lessons to be paid.
  * NOTE: entite.LessonPayment is the DB record; this is the payment-flow target.
  */
-public record LessonPayment(List<Lesson> lessons) implements PaymentTarget {
+public record LessonPayment(List<Lesson> lessons, entite.Professional professional) implements PaymentTarget {
 
     @Override
     public void setPaymentReference(String reference) {

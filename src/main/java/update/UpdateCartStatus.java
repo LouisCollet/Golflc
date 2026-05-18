@@ -37,6 +37,36 @@ public class UpdateCartStatus implements Serializable {
         setStatusByPlayerClubType(playerId, clubId, type, enumeration.CartStatus.EXPIRED);
     } // end method
 
+    public void setCompletedByPlayer(int playerId) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {} playerId={}", methodName, playerId);
+        try {
+            dao.execute("""
+                UPDATE cart SET cartStatus = 'COMPLETED', cartModificationDate = CURRENT_TIMESTAMP
+                WHERE cartPlayerId = ? AND cartStatus = 'PENDING'
+                """, playerId);
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
+    public void setCanceledByPlayer(int playerId) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {} playerId={}", methodName, playerId);
+        try {
+            dao.execute("""
+                UPDATE cart SET cartStatus = 'CANCELED', cartModificationDate = CURRENT_TIMESTAMP
+                WHERE cartPlayerId = ? AND cartStatus = 'PENDING'
+                """, playerId);
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
+
     private void setStatusById(int idCart, enumeration.CartStatus status) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);

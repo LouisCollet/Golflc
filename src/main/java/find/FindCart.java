@@ -11,6 +11,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +34,7 @@ public class FindCart implements Serializable {
         LOG.debug("playerId={} type={}", playerId, type);
 
         final String query = """
-            SELECT idCart, cartPlayerId, cartClubId, cartType, cartItemsJson,
+            SELECT idCart, cartPlayerId, cartClubId, cartStartDate, cartType, cartItemsJson,
                    cartTotal, cartStatus, cartCreatedAt, cartModificationDate
             FROM cart
             WHERE cartPlayerId = ? AND cartClubId = ? AND cartType = ? AND cartStatus = 'PENDING'
@@ -68,7 +70,7 @@ public class FindCart implements Serializable {
         LOG.debug("playerId={}", playerId);
 
         final String query = """
-            SELECT idCart, cartPlayerId, cartClubId, cartType, cartItemsJson,
+            SELECT idCart, cartPlayerId, cartClubId, cartStartDate, cartType, cartItemsJson,
                    cartTotal, cartStatus, cartCreatedAt, cartModificationDate
             FROM cart
             WHERE cartPlayerId = ? AND cartStatus = 'PENDING'
@@ -104,7 +106,7 @@ public class FindCart implements Serializable {
         LOG.debug("playerId={}", playerId);
 
         final String query = """
-            SELECT idCart, cartPlayerId, cartClubId, cartType, cartItemsJson,
+            SELECT idCart, cartPlayerId, cartClubId, cartStartDate, cartType, cartItemsJson,
                    cartTotal, cartStatus, cartCreatedAt, cartModificationDate
             FROM cart
             WHERE cartPlayerId = ? AND cartClubId = ? AND cartStatus = 'PENDING'
@@ -165,6 +167,44 @@ public class FindCart implements Serializable {
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return 0;
+        }
+    } // end method
+
+    public Optional<Cart> findByPlayerClubTypeStartDate(int playerId, int clubId, String type,
+            LocalDateTime startDate) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("playerId={} type={} startDate={}", playerId, type, startDate);
+
+        final String query = """
+            SELECT idCart, cartPlayerId, cartClubId, cartStartDate, cartType, cartItemsJson,
+                   cartTotal, cartStatus, cartCreatedAt, cartModificationDate
+            FROM cart
+            WHERE cartPlayerId = ? AND cartClubId = ? AND cartType = ?
+              AND cartStartDate = ? AND cartStatus = 'PENDING'
+            LIMIT 1
+            """;
+
+        try (Connection conn = dao.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, playerId);
+            ps.setInt(2, clubId);
+            ps.setString(3, type);
+            ps.setTimestamp(4, Timestamp.valueOf(startDate));
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(new CartRowMapper().map(rs));
+                }
+                return Optional.empty();
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return Optional.empty();
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Optional.empty();
         }
     } // end method
 

@@ -133,7 +133,7 @@ public Greenfee()    // constructor
     }
 
     public void setCurrency(String currency) {
-        this.currency = currency;
+        this.currency = (currency != null) ? currency.toUpperCase(java.util.Locale.ROOT) : "EUR";
     }
 
     public String getClubName()                { return clubName; }
@@ -183,29 +183,4 @@ public String toString(){
         return msg;
   }
 }
-/*
-public static Greenfee map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Greenfee greenfee = new Greenfee();
-        greenfee.setIdclub(rs.getInt("GreenfeeIdClub"));
-        greenfee.setIdplayer(rs.getInt("GreenfeeIdPlayer"));
-        greenfee.setIdround(rs.getInt("GreenfeeIdRound"));
-        greenfee.setRoundDate(rs.getTimestamp("GreenfeeRoundDate").toLocalDateTime());
-        greenfee.setPaymentDate(rs.getTimestamp("GreenfeeModificationDate").toLocalDateTime());
-        greenfee.setPaymentReference(rs.getString("GreenfeePaymentReference"));
-        greenfee.setCommunication(rs.getString("GreenfeeCommunication"));
-        greenfee.setItems(rs.getString("GreenfeeItems"));
-        greenfee.setPrice(rs.getDouble("GreenfeeAmount"));
-        greenfee.setStatus(rs.getString("GreenfeeStatus"));
-        greenfee.setCurrency(rs.getString("GreenfeeCurrency")); // new 28-04-2025
-   return greenfee;
- }catch(Exception e){
-    String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-    LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
-*/
 } // end class

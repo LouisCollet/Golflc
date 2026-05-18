@@ -100,7 +100,9 @@ LocalDateTime START_DATE_WHS = LocalDateTime.of(2020,Month.NOVEMBER,03,0,0);
 // java.text.DateFormat sdf_timeHHmmss  = new SimpleDateFormat("dd/MM/yyyy HH:mm:SSS");
 
 // Thread-safe replacements (DateTimeFormatter is immutable)
-DateTimeFormatter DTF_DAY_SLASH = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+DateTimeFormatter DTF_DAY_SLASH  = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+DateTimeFormatter DTF_DAY_MONTH  = DateTimeFormatter.ofPattern("dd/MM");
+DateTimeFormatter DTF_DAY_HHMM   = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 DateTimeFormatter DTF_TIME_FULL = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 DateTimeFormatter DTF_TIME_HHMM_SSS = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:SSS");
 DateTimeFormatter ZDF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm a");

@@ -7,10 +7,18 @@
       xmlns:p="primefaces">
 
     <!-- Basic items -->
-    <ui:repeat value="#{payC.cotisationBasicCart}" var="b"
-               rendered="#{not empty payC.cotisationBasicCart}">
+    <ui:repeat id="repeat_basic"
+               value="#{cartC.cotisationBasicCart}"
+               var="b"
+               rendered="#{not empty cartC.cotisationBasicCart}">
         <div class="lesson-item-card">
-            <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
+            <p:panelGrid id="panelgrid-cotisation"
+                         layout="flex"
+                         columns="2"
+                         columnClasses="col1Flex,col2Flex">
+                <p:outputLabel value="#{msg['club.name']}"/>
+                <h:outputText value="#{clubC.club.clubName}"/>
+
                 <p:outputLabel value="#{msg['tarif.members.item']}"/>
                 <h:outputText value="#{b.item}"/>
 
@@ -34,7 +42,7 @@
                 <p:commandButton icon="pi pi-trash"
                                  value="#{msg['button.cancel']}"
                                  styleClass="p-button-danger p-button-sm"
-                                 action="#{payC.removeCotisationBasicItem(b)}"
+                                 action="#{cartC.removeCotisationBasicItem(b)}"
                                  update="form_cart"
                                  process="@this"/>
             </div>
@@ -42,23 +50,14 @@
     </ui:repeat>
 
     <!-- Equipment items -->
-    <ui:repeat value="#{payC.cotisationEquipCart}" var="e"
-               rendered="#{not empty payC.cotisationEquipCart}">
+    <ui:repeat id="repeat_equipment"
+               value="#{cartC.cotisationEquipCart}"
+               var="e"
+               rendered="#{not empty cartC.cotisationEquipCart}">
         <div class="lesson-item-card">
             <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
                 <p:outputLabel value="#{msg['tarif.members.item']}"/>
                 <h:outputText value="#{e.item}"/>
-
-                <p:outputLabel value="#{msg['tarif.period']}"/>
-                <h:panelGroup>
-                    <h:outputText value="#{memC.tarifMember.startDate}">
-                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
-                    </h:outputText>
-                    <h:outputText value=" → "/>
-                    <h:outputText value="#{memC.tarifMember.endDate}">
-                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
-                    </h:outputText>
-                </h:panelGroup>
 
                 <p:outputLabel value="#{msg['tarif.members.price']}"/>
                 <h:outputText value="#{e.price}">
@@ -77,7 +76,7 @@
                 <p:commandButton icon="pi pi-trash"
                                  value="#{msg['button.cancel']}"
                                  styleClass="p-button-danger p-button-sm"
-                                 action="#{payC.removeCotisationEquipmentItem(e)}"
+                                 action="#{cartC.removeCotisationEquipmentItem(e)}"
                                  update="form_cart"
                                  process="@this"/>
             </div>

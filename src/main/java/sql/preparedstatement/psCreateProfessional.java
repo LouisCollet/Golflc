@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-public class psCreateProfessional implements Serializable, interfaces.Log, interfaces.GolfInterface{
+public class psCreateProfessional implements Serializable{
     
  public static PreparedStatement psMapCreate(PreparedStatement ps, Professional professional) throws Exception{
     final String methodName = utils.LCUtil.getCurrentMethodName(); 

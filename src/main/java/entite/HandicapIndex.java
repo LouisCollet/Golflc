@@ -175,35 +175,7 @@ public class HandicapIndex implements Serializable {
     public void setHandicapExpectedSD9Holes(double handicapExpectedSD9Holes) {
         this.handicapExpectedSD9Holes = handicapExpectedSD9Holes;
     }
-/*
-public static HandicapIndex map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        HandicapIndex h = new HandicapIndex();
-        h.setHandicapId(rs.getInt("HandicapId") );
-        h.setHandicapPlayerId(rs.getInt("HandicapPlayerId"));
-        h.setHandicapRoundId(rs.getInt("HandicapRoundId"));
-        h.setHandicapScoreDifferential(rs.getBigDecimal("HandicapScoreDifferential") );
-        h.setHandicapExpectedSD9Holes(rs.getDouble("HandicapExpectedSD9Holes") );  // new 15-04-2025
-        h.setHandicapHolesNotPlayed(rs.getShort("HandicapHolesNotPlayed") );  // new 15-04-2025
-        h.setHandicapDate(rs.getTimestamp("HandicapDate").toLocalDateTime());
-        h.setHandicapWHS(rs.getBigDecimal("HandicapWHS"));
-        h.setHandicapExceptionalScoreReduction(rs.getShort("HandicapExceptionalScoreReduction"));
-        h.setHandicapSoftHardCap(rs.getString("HandicapSoftHardCap"));
-        h.setHandicapComment(rs.getString("HandicapComment"));
-        h.setHandicapPlayedStrokes(rs.getShort("HandicapPlayedStrokes"));
-        h.setLowHandicapIndex(rs.getDouble("HandicapPreviousLowHandicap"));
-        
-//) );
-   return h;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method    
-*/
+
 @Override
     public String toString(){
  //   final String methodName = utils.LCUtil.getCurrentMethodName(); 

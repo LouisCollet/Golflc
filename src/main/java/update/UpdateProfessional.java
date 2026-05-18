@@ -84,4 +84,36 @@ public class UpdateProfessional implements Serializable {
         }
     } // end method
 
+    public boolean updateTarif(final Integer proId, final String proTarifJson) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+
+        final String query = """
+                UPDATE professional
+                SET ProTarif = ?
+                WHERE ProId = ?
+                """;
+
+        try (Connection conn = dao.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, proTarifJson);
+            ps.setInt(2, proId);
+            utils.LCUtil.logps(ps);
+            int row = ps.executeUpdate();
+            if (row != 0) {
+                LOG.info("ProTarif updated for ProId={}", proId);
+                return true;
+            } else {
+                LOG.warn("no row updated for ProId={}", proId);
+                return false;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
 } // end class

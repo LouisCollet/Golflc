@@ -15,7 +15,6 @@ http://middlewaremagic.com/jboss/?p=1050
  -->
 
   <!-- utilisée dans golflc attention &amp; !!!!!
-
 port est devenu 3308 à partir version mysql 8.2 le 31-10-2023  
     -->
 <!--  → c’est le nom du datasource utilisé dans l’API de management  et ce que tu passes à DatasourceMonitor.
@@ -52,10 +51,12 @@ port est devenu 3308 à partir version mysql 8.2 le 31-10-2023
     </security>
  
      <validation>   <!-- ← évite connexions zombie balise ouvrante manquante -->
+        <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
         <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
         <background-validation>true</background-validation>
         <background-validation-millis>60000</background-validation-millis>
-        <validate-on-match>false</validate-on-match>
+   <!--     <validate-on-match>false</validate-on-match>   -->
+        <validate-on-match>true</validate-on-match>
         <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
     </validation>
   </datasource>
@@ -63,5 +64,9 @@ port est devenu 3308 à partir version mysql 8.2 le 31-10-2023
 <!--  
 https://stackoverflow.com/questions/27887392/add-new-datasource-mysql-wildfly
 https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/6.4/html/administration_and_configuration_guide/sect-database_connection_validation
-
+<validation>
+    <check-valid-connection-sql>SELECT 1</check-valid-connection-sql>
+    <background-validation>true</background-validation>
+    <background-validation-millis>30000</background-validation-millis>
+</validation>
  -->

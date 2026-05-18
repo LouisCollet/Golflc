@@ -4,6 +4,8 @@ import entite.CompetitionDescription;
 import entite.composite.ECompetition;
 import entite.HandicapIndex;
 import static interfaces.Log.LOG;
+import rowmappers.CompetitionDataRowMapper;
+import rowmappers.CompetitionDescriptionRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -52,13 +54,9 @@ public class CompetitionInscriptionsList implements Serializable {
             """;
 
         List<ECompetition> rows = dao.queryList(query, rs -> {
-            try {
-                var description = entite.CompetitionDescription.map(rs);
-                var data = entite.CompetitionData.map(rs);
-                return new ECompetition(description, data);
-            } catch (Exception e) {
-                throw new java.sql.SQLException(e);
-            }
+            var description = new CompetitionDescriptionRowMapper().map(rs);
+            var data = new CompetitionDataRowMapper().map(rs);
+            return new ECompetition(description, data);
         }, cd.getCompetitionId());
 
         liste = new ArrayList<>();

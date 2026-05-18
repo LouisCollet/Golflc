@@ -11,9 +11,6 @@ import static interfaces.Log.LOG;
 import java.io.*;
 import java.sql.SQLException;
 import static utils.LCUtil.prepareMessageBean;
-
-import static utils.LCUtil.showMessageFatal;
-import static utils.LCUtil.showMessageInfo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -40,66 +37,46 @@ try{
            LOG.debug("with cotisation = " + cotisation);
 
   // 1. Register payment  faut le faire avant car l'inscription va vérifier !!!
-          if(! payment(cotisation)){ 
-               String msg = "Create Payment Cotisation FAILED !";
+          if(! payment(cotisation)){
+               String msg = "Create Payment Cotisation FAILED — " + cotisation;
                LOG.error(msg);
-               showMessageFatal(msg);
                throw new Exception(msg);
           }
-// true
-             String msg = "Payment aand Inscription registered"; 
-           LOG.debug(msg);
-  // 2. Register Inscription 
-          //    Inscription inscription = new Inscription();
-          
-          // à modifier et en faire un paramètre !!
-             //  if(sessionMap.get("inputSelectCourse").equals("PaymentCotisationSpontaneous")){
-            if(cotisation.getType().equalsIgnoreCase("spontaneous")){  
-                 msg = "Spontaneous payment accepted - NO inscription";
-                 LOG.debug(msg);
-                 showMessageInfo(msg);
+             LOG.debug("payment registered");
+            if(cotisation.getType().equalsIgnoreCase("spontaneous")){
+                 LOG.debug("spontaneous payment accepted - no inscription");
                  return true;
             }
                LOG.debug("inscription error = " + inscription.isInscriptionError());
                LOG.debug("inscription OK = " + inscription.isInscriptionOK());
-           // inscription = new create.CreateInscription().create(round, player, player, inscription, club, course, "A", conn);
               inscription = createInscriptionService.create(round, player, player,
                       inscription,
                       club, course, "A"); // migrated 2026-02-25
-              if( ! inscription.isInscriptionError()){  // no errors
-                  msg = "no error :  Inscription done";
-                  LOG.info(msg);
-                  showMessageInfo(msg);
+              if( ! inscription.isInscriptionError()){
+                  LOG.info("inscription done");
                   return true;
-              }else{ // error inscription
-                  msg = "FATAL error : we cannot create the Inscription BUT the payment is registered - refund needed !!";
+              }else{
+                  String msg = "FATAL error : inscription failed BUT payment registered — refund needed";
                   LOG.error(msg);
-                  showMessageFatal(msg);
                   throw new Exception(msg);
               }
-        //      return "welcome.xhtml?faces-redirect=true";
 }catch (Exception e) {
-            String msg = "££ Exception in RegisterPaymentandInscription = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
+            LOG.error("Exception in RegisterPaymentandInscription = {}", e.getMessage());
             throw e; // rethrow so REST can propagate real cause to the user via PaymentStateStore
    }
 } //end method
 
 
 private boolean payment(Cotisation cotisation) throws Exception {
-    LOG.debug("entering createPaymentCotisation");
-    LOG.debug("with cotisation = " + cotisation);
+    final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering {}", methodName);
+    LOG.debug("cotisation = {}", cotisation);
 
     if (createPaymentCotisationService.create(cotisation)) { // migrated 2026-02-26
-        String msg = prepareMessageBean("subscription.success") + cotisation + " for club = " + cotisation.getIdclub();
-        LOG.info(msg);
-        showMessageInfo(msg);
+        LOG.info("payments_cotisation created for club={}", cotisation.getIdclub());
         return true;
     }
-    String msg = "Error : payment cotisation NOT done !";
-    LOG.error(msg);
-    showMessageFatal(msg);
+    LOG.error("payments_cotisation creation failed — cotisation={}", cotisation);
     return false;
 } //end method createPaymentCotisation
 

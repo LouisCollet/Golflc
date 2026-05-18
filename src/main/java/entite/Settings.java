@@ -72,8 +72,7 @@ public class Settings implements Serializable {
             String webapp    = userDir  + "/src/main/webapp/";
             String resources = webapp   + "resources/";
 
-            LOG.debug(methodName + " - env.MAVEN_PROJECTBASEDIR = "
-                    + System.getenv("env.MAVEN_PROJECTBASEDIR"));
+            LOG.debug(methodName + " - env.MAVEN_PROJECTBASEDIR = " + System.getenv("env.MAVEN_PROJECTBASEDIR"));
 
             // ✅ Construction de la map
             settings.clear();

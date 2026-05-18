@@ -82,13 +82,13 @@
 
     <!-- Boutons -->
     <div class="btn-group">
-        <p:commandButton value="#{msg['btn.confirm']}"
+        <p:commandButton value="#{msg['button.confirm']}"
                          widgetVar="confirmEquipBtn"
                          action="#{payC.confirmGreenfeeEquipments()}"
                          ajax="false"
                          onerror="PF('confirmEquipBtn').enable()"
                          styleClass="btn-primary"/>
-        <p:commandButton value="#{msg['btn.cancel']}"
+        <p:commandButton value="#{msg['button.cancel']}"
                          action="schedule_round.xhtml?faces-redirect=true"
                          ajax="false"
                          immediate="true"

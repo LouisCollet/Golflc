@@ -23,9 +23,12 @@
              GOLF — visible par tous (joueur)
              ═══════════════════════════════════════ -->
         <p:submenu label="⛳ GOLF" icon="pi pi-sun">
-            <p:menuitem value="#{msg['menu.schedule.round']}"
+            <p:menuitem value="#{msg['menu.inscription.schedule']}"
                         action="#{navC.to_selectPurpose_xhtml('ScheduleRound')}"
                         icon="pi pi-calendar"/>
+            <p:menuitem value="#{msg['menu.ground.condition']}"
+                        action="#{navC.to_selectPurpose_xhtml('GroundConditionDisplay')}"
+                        icon="pi pi-map"/>
             <p:menuitem value="Register Score"
                         action="#{navC.to_selectPurpose_xhtml('STABLEFORD')}"
                         icon="pi pi-check-circle"/>
@@ -36,7 +39,7 @@
                         action="#{navC.to_selectPurpose_xhtml('PARTICIPANTS')}"
                         icon="pi pi-list"/>
             <p:menuitem value="#{msg['menu.simulation.greenfee']}"
-                        action="#{simC.toSimulation()}"
+                        action="#{navC.to_selectPurpose_xhtml('SimulationGreenfee')}"
                         icon="pi pi-calculator"/>
         </p:submenu>
 
@@ -75,20 +78,22 @@
         <!-- ═══════════════════════════════════════
              PROFESSIONAL — visible par tous (items conditionnels)
              ═══════════════════════════════════════ -->
-        <p:submenu label="🎓 PROFESSIONAL" icon="pi pi-briefcase">
+        <p:submenu label="🎓 LESSON PROFESSIONAL"
+                   icon="pi pi-briefcase">
             <p:menuitem value="Inscription Pro lesson"
-                        action="#{memC.to_selectPro_xhtml('Inscription')}"
+                        action="#{navC.to_selectPurpose_xhtml('ProInscription')}"
                         icon="pi pi-search-plus"/>
             <p:menuitem value="#{msg['menu.list.pro']}"
                         rendered="#{playerC.isProfessional()}"
-                        action="#{memC.to_selectPro_xhtml('Lessons')}"
+                        action="#{navC.to_selectPurpose_xhtml('ProLessons')}"
                         icon="pi pi-euro"/>
         </p:submenu>
 
         <!-- ═══════════════════════════════════════
              PAYMENTS — visible par tous
              ═══════════════════════════════════════ -->
-        <p:submenu label="💳 PAYMENTS" icon="pi pi-credit-card">
+        <p:submenu label="💳 PAYMENTS"
+                   icon="pi pi-credit-card">
             <p:menuitem value="Subscription = #{memC.subscription.endDate}"
                         action="#{navC.to_selectPurpose_xhtml('PaymentSubscription')}"
                         icon="pi pi-wallet"/>
@@ -100,7 +105,8 @@
         <!-- ═══════════════════════════════════════
              STATS — visible par tous
              ═══════════════════════════════════════ -->
-        <p:submenu label="📊 STATS" icon="pi pi-chart-bar">
+        <p:submenu label="📊 STATS"
+                   icon="pi pi-chart-bar">
             <p:menuitem value="Stats Round"
                         action="#{navC.to_selectPurpose_xhtml('CHART')}"
                         icon="pi pi-chart-bar"/>
@@ -131,19 +137,22 @@
             <p:menuitem value="#{msg['menu.create.pro']}"
                         action="#{navC.to_selectPurpose_xhtml('CreatePro')}"
                         icon="pi pi-user-plus"/>
+            <p:menuitem value="#{msg['menu.tarif.pro']}"
+                        action="#{navC.to_selectPurpose_xhtml('TarifPro')}"
+                        icon="pi pi-dollar"/>
             <p:menuitem value="#{msg['menu.local.admin.pros']}"
-                        action="#{memC.to_selectLocalAdmin_xhtml('Professionals')}"
+                        action="#{navC.to_selectPurpose_xhtml('LocalAdminProfessionals')}"
                         icon="pi pi-user-edit"/>
             <p:menuitem value="#{msg['menu.list.greenfees']}"
-                        action="#{memC.to_selectLocalAdmin_xhtml('Greenfees')}"
+                        action="#{navC.to_selectPurpose_xhtml('LocalAdminGreenfees')}"
                         icon="pi pi-list"/>
             <p:menuitem value="#{msg['menu.list.members']}"
-                        action="#{memC.to_selectLocalAdmin_xhtml('Members')}"
+                        action="#{navC.to_selectPurpose_xhtml('LocalAdminMembers')}"
                         icon="pi pi-users"/>
-            <p:menuitem value="Etat du terrain"
+            <p:menuitem value="#{msg['unavailable.period.create']}"  
                         action="#{navC.to_selectPurpose_xhtml('MenuUnavailable')}"
                         icon="pi pi-sun"/>
-            <p:menuitem value="#{msg['menu.ground.condition']}"
+            <p:menuitem value="#{msg['menu.ground.condition.structure']}"
                         action="#{navC.to_selectPurpose_xhtml('GroundConditionWizard')}"
                         icon="pi pi-map"/>
             <p:menuitem value="#{msg['menu.ground.condition.update']}"
@@ -178,7 +187,7 @@
                         action="#{navC.to_selectPurpose_xhtml('LocalAdministrator')}"
                         icon="pi pi-shield"/>
             <p:menuitem value="#{msg['menu.list.subscriptions']}"
-                        action="#{memC.to_selectSystemAdmin_xhtml('ListSubscriptions')}"
+                        action="#{navC.to_selectPurpose_xhtml('SystemAdminSubscriptions')}"
                         icon="pi pi-list"/>
             <p:menuitem value="Tarif Subscription"
                         action="#{navC.to_selectPurpose_xhtml('CreateTarifSubscription')}"
@@ -208,13 +217,13 @@
              ═══════════════════════════════════════ -->
         <p:submenu label="❓ HELP" icon="pi pi-question-circle">
             <p:menuitem value="Technical Info"
-                        action="#{techC.to_page_xhtml('technical_info')}"
+                        action="#{navC.to_selectPurpose_xhtml('TechnicalInfo')}"
                         icon="pi pi-info-circle"/>
             <p:menuitem value="Advanced Diagnostic"
-                        action="#{techC.to_page_xhtml('admin_advanced')}"
+                        action="#{navC.to_selectPurpose_xhtml('AdminAdvanced')}"
                         icon="pi pi-cog"/>
             <p:menuitem value="Connection History"
-                        action="#{techC.to_page_xhtml('audit_connections')}"
+                        action="#{navC.to_selectPurpose_xhtml('AuditConnections')}"
                         icon="pi pi-clock"
                         rendered="#{playerC.isAdmin()}"/>
         </p:submenu>
@@ -233,7 +242,7 @@
                         action="#{batchC.importPlayers()}"
                         icon="pi pi-upload"/>
             <p:menuitem value="Batch Imports"
-                        action="#{batchC.to_jobSubmitter_xhtml()}"
+                        action="#{navC.to_selectPurpose_xhtml('JobSubmitter')}"
                         icon="pi pi-database"/>
         </p:submenu>
 
@@ -245,7 +254,7 @@
                    styleClass="menu-admin"
                    rendered="#{playerC.isAdmin()}">
             <p:menuitem value="Math Calculator"
-                        action="#{techC.to_page_xhtml('calculator_css')}"
+                        action="#{navC.to_selectPurpose_xhtml('CalculatorCss')}"
                         icon="pi pi-calculator"/>
             <p:menuitem value="Creditcard Test"
                         action="#{payC.to_creditcard_test_xhtml('creditcard')}"
@@ -263,11 +272,15 @@
                         action="#{memC.listSubscriptionRenewal('next month')}"
                         icon="pi pi-calendar"/>
             <p:menuitem value="Search Golf Courses"
-                        action="#{techC.to_page_xhtml('search_golf')}"
+                        action="#{navC.to_selectPurpose_xhtml('SearchGolf')}"
                         icon="pi pi-search"/>
             <p:menuitem value="Thumbnails"
                         action="#{thumbnailsC.thumbs('from menu')}"
                         icon="pi pi-image"/>
+            <p:menuitem value="GitHub"
+                        url="https://github.com/LouisCollet/Golflc.git"
+                        icon="pi pi-github"/>
+            
         </p:submenu>
 
         <!-- ═══════════════════════════════════════
@@ -275,12 +288,9 @@
              ═══════════════════════════════════════ -->
         <p:submenu label="📚 Resources" icon="pi pi-external-link">
             <p:menuitem value="Download"
-                        action="#{techC.to_page_xhtml('download')}"
+                        action="#{navC.to_selectPurpose_xhtml('Download')}"
                         icon="pi pi-download"/>
-            <p:menuitem value="GitHub"
-                        url="https://github.com/LouisCollet/Golflc.git"
-                        icon="pi pi-github"
-                        rendered="#{playerC.isAdmin()}"/>
+           
         </p:submenu>
 
     </p:panelMenu>

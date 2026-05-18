@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TAB 1 : Period — displays the professional's contract dates (read-only) -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces">
+
+    <p:tab id="ProPeriodTab"
+           title="📅 #{msg['tarif.period']}"
+           titletip="#{msg['tarif.period']}">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['title.period.tarif']}</h1>
+            </f:facet>
+
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex,col2Flex">
+
+                <p:outputLabel value="#{msg['professional.name']} :"/>
+                <h:outputText value="#{tarifProC.professional.proPlayerId}"/>
+
+                <p:outputLabel value="#{msg['start.date']} :"/>
+                <h:outputText value="#{tarifProC.professional.proStartDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                </h:outputText>
+
+                <p:outputLabel value="#{msg['end.date']} :"/>
+                <h:outputText value="#{tarifProC.professional.proEndDate}">
+                    <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy"/>
+                </h:outputText>
+
+            </p:panelGrid>
+
+            <f:facet name="footer">
+                <div class="btn-group"/>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</ui:composition>

@@ -3,13 +3,10 @@ package entite;
 
 import static interfaces.Log.LOG;
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 // import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
 // import jakarta.inject.Named;  // migrated 2026-02-24
-import utils.LCUtil;
 
 // @Named  // migrated 2026-02-24
 // @RequestScoped  // migrated 2026-02-24
@@ -135,24 +132,4 @@ LOG.debug("starting toString for Audit!");
         return msg;
   }
 }
-public static Audit mapAudit(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
- try{
-        LOG.debug("entering mapAudit");
-    Audit a = new Audit();
-    a.setIdaudit(rs.getInt("AuditId"));
-    a.setAuditPlayerId(rs.getInt("AuditPlayerId"));
-    a.setAuditStartDate(rs.getTimestamp("auditStartDate").toLocalDateTime());
-    java.sql.Timestamp endTs = rs.getTimestamp("auditEndDate");
-    a.setAuditEndDate(endTs != null ? endTs.toLocalDateTime() : null);
-        LOG.debug ("audit returned = " + a);
-   return a;
- }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
-
 } //end class

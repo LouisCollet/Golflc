@@ -44,7 +44,6 @@ private boolean showCoordinatesManual = false;
 private Integer clubLocalAdmin; // new 14-02-2018
 private UnavailableStructure unavailableStructure;
 private String clubUnavailableStructure;
-private String clubZoneId; 
 private String Region;
     public Club(){   ///  // No-args constructor
       unavailableStructure = new UnavailableStructure();

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TAB 2 : Pricing — weekday and weekend lesson prices -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="primefaces">
+
+    <p:tab id="ProPricingTab"
+           title="💶 #{msg['tarif.pricing']}"
+           titletip="#{msg['tarif.pricing']}">
+        <p:panel styleClass="tarif-step-panel">
+            <f:facet name="header">
+                <h1>#{msg['tarif.pricing']}</h1>
+            </f:facet>
+
+            <p:panelGrid columns="2"
+                         layout="flex"
+                         columnClasses="col1Flex,col2Flex">
+
+                <p:outputLabel for="weekdayPrice" value="#{msg['professional.tarif.weekday']} :"/>
+                <p:inputNumber id="weekdayPrice"
+                               value="#{tarifProC.proTarif.weekdayPrice}"
+                               symbol=" €"
+                               symbolPosition="s"
+                               decimalPlaces="2"
+                               minValue="0"
+                               required="true"
+                               requiredMessage="#{msg['professional.tarif.weekday.required']}"/>
+
+                <p:outputLabel for="weekendPrice" value="#{msg['professional.tarif.weekend']} :"/>
+                <p:inputNumber id="weekendPrice"
+                               value="#{tarifProC.proTarif.weekendPrice}"
+                               symbol=" €"
+                               symbolPosition="s"
+                               decimalPlaces="2"
+                               minValue="0"
+                               required="true"
+                               requiredMessage="#{msg['professional.tarif.weekend.required']}"/>
+
+            </p:panelGrid>
+
+            <f:facet name="footer">
+                <div class="btn-group">
+                    <p:commandButton id="btnSaveTarif"
+                                     value="#{msg['button.save']}"
+                                     icon="pi pi-check"
+                                     action="#{tarifProC.saveTarif()}"
+                                     process="@form"
+                                     styleClass="p-button-success"/>
+                </div>
+            </f:facet>
+        </p:panel>
+    </p:tab>
+
+</ui:composition>

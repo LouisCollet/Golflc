@@ -13,8 +13,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import manager.PlayerManager;
+import static utils.LCUtil.prepareMessageBean;
 import static utils.LCUtil.showMessageFatal;
+import static utils.LCUtil.showMessageInfo;
 
 @ApplicationScoped
 public class CreateLesson implements Serializable {
@@ -22,9 +23,6 @@ public class CreateLesson implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Inject private dao.GenericDAO dao;
- //   @Inject private PlayerManager playerManager;
-
- //   private static final rowmappers.LessonRowMapper ROW_MAPPER = new rowmappers.LessonRowMapper();
 
     public CreateLesson() { }
 
@@ -49,7 +47,9 @@ public class CreateLesson implements Serializable {
                             LOG.debug("generated EventId = {}", lesson.getEventId());
                         }
                     }
-                    LOG.info("Lesson Created = {}", lesson);
+                    String msg = prepareMessageBean("lesson.success") + lesson;
+                    LOG.info(msg);
+                    showMessageInfo(msg);
                     return true;
                 } else {
                     String msg = "ERROR insert Lesson : " + lesson;
@@ -60,8 +60,8 @@ public class CreateLesson implements Serializable {
             }
         } catch (SQLException e) {
             if (e.getErrorCode() == 1062 || (e.getSQLState() != null && e.getSQLState().startsWith("23"))) {
-                String msg = utils.LCUtil.prepareMessageBean("lesson.already.booked") + " "
-                           + lesson.getEventStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+                String msg = utils.LCUtil.prepareMessageBean("lesson.already.booked") + lesson ;
+                       //    + lesson.getEventStartDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
                 LOG.warn("- {}", msg);
                 showMessageFatal(msg);
                 return false;
@@ -73,23 +73,5 @@ public class CreateLesson implements Serializable {
             return false;
         }
     } // end method
-
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Lesson event = new Lesson();
-        event.setEventStartDate(LocalDateTime.parse("2021-05-30T15:45:00"));
-        event.setEventEndDate(LocalDateTime.parse("2021-05-30T16:15:00"));
-        event.setEventProId(3);
-        event.setEventAllDay(true);
-        event.setEventTitle("Golf lesson Bernard Nicolay");
-        Player player = new Player();
-        player.setIdplayer(206658);
-        player = playerManager.readPlayer(player.getIdplayer());
-        boolean lp = new CreateLesson().create(event, player);
-        LOG.debug("from main, after lp = {}", lp);
-    } // end main
-    */
 
 } // end class

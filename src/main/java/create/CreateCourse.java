@@ -85,13 +85,14 @@ public class CreateCourse implements Serializable {
         final String query = """
             INSERT INTO course (idcourse, CourseName, CourseHoles, CoursePar, club_idclub, CourseBeginDate, CourseEndDate, CourseModificationDate)
             VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            AS vals
             ON DUPLICATE KEY UPDATE
-                CourseName             = VALUES(CourseName),
-                CourseHoles            = VALUES(CourseHoles),
-                CoursePar              = VALUES(CoursePar),
-                club_idclub            = VALUES(club_idclub),
-                CourseBeginDate        = VALUES(CourseBeginDate),
-                CourseEndDate          = VALUES(CourseEndDate),
+                CourseName             = vals.CourseName,
+                CourseHoles            = vals.CourseHoles,
+                CoursePar              = vals.CoursePar,
+                club_idclub            = vals.club_idclub,
+                CourseBeginDate        = vals.CourseBeginDate,
+                CourseEndDate          = vals.CourseEndDate,
                 CourseModificationDate = CURRENT_TIMESTAMP
             """;
 

@@ -38,7 +38,7 @@ public class ModifyCreditcard implements Serializable {
                 SET CreditcardHolder = ?,
                     CreditcardNumber = ?,
                     CreditcardExpirationDate = ?,
-                    CreditcardType = ?,
+                    CreditcardBrand = ?,
                     CreditcardVerificationCode = ?
                 WHERE
                     CreditcardIdPlayer=?
@@ -50,7 +50,7 @@ public class ModifyCreditcard implements Serializable {
             ps.setString(1, creditcard.getCreditcardHolder());
             ps.setString(2, creditcard.getCreditcardNumber());
             ps.setTimestamp(3, Timestamp.valueOf(creditcard.getCreditCardExpirationDateLdt()));
-            ps.setString(4, creditcard.getCreditcardType());
+            ps.setString(4, creditcard.getCreditcardType().name());
             ps.setShort(5, creditcard.getCreditcardVerificationCode());
             ps.setInt(6, creditcard.getCreditCardIdPlayer());
             utils.LCUtil.logps(ps);

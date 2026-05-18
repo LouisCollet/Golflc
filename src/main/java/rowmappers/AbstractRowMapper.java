@@ -5,7 +5,6 @@ import static interfaces.Log.LOG;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -101,13 +100,9 @@ public abstract class AbstractRowMapper<T> implements RowMapper<T> {
     // Dates / heures
     // =========================================================
 
-    protected Timestamp getTimestamp(ResultSet rs, String column) throws SQLException {
-        return hasColumn(rs, column) ? rs.getTimestamp(column) : null;
-    }
-
     protected LocalDateTime getLocalDateTime(ResultSet rs, String column) throws SQLException {
-        Timestamp ts = getTimestamp(rs, column);
-        return ts != null ? ts.toLocalDateTime() : null;
+        if (!hasColumn(rs, column)) return null;
+        return rs.getObject(column, LocalDateTime.class);
     }
 
     protected ZonedDateTime getZonedDateTime(ResultSet rs, String column, ZoneId zone)

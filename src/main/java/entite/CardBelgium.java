@@ -231,40 +231,5 @@ public String toString(){
         
         );
 }   
-/*
-public static CardBelgium map(ResultSet rs) throws SQLException{
- //   final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        CardBelgium c = new CardBelgium();
-/*        c.setIdclub(rs.getInt("idclub") );
-        c.setClubName(rs.getString("clubName") );
-        c.setClubCity(rs.getString("clubCity") );
-        c.setClubCountry(rs.getString("clubCountry") );
-        c.setClubAddress(rs.getString("clubAddress") );
-      // new 22-10-2018    
-                        TimeZone gtz = new TimeZone();
-                   //     tz.setTimeZoneName(NEW_LINE);
-                        gtz.setTimeZoneId(rs.getString("ClubZoneId"));
-                        if(gtz.getTimeZoneId() == null){
-                              gtz.setTimeZoneId("Europe/Brussels"); // le même pour tous ! par defaut
-                         }
-         c.setClubTimeZone(gtz);
-         c.setClubLatitude(rs.getBigDecimal("ClubLatitude") );
-         c.setClubLongitude(rs.getBigDecimal("ClubLongitude") );
-         c.setClubWebsite(rs.getString("ClubWebsite"));
-         c.setClubZoneId(rs.getString("ClubZoneId"));
-         c.setClubLocalAdmin(rs.getInt("ClubLocalAdmin") );
-
-   return c;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + "mapresult" + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-  //  LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
-*/
-
-
 
 } // end class

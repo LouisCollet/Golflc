@@ -79,21 +79,4 @@ public String toString(){
         return msg;
   }
 }
-public static Activation map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Activation a = new Activation();
-            a.setActivationKey(rs.getString("ActivationKey") );
-            a.setActivationPlayerId(rs.getInt("ActivationPlayerId") );
-            a.setActivationLanguage(rs.getString("ActivationPlayerLanguage") );
-            a.setActivationCreationDate(rs.getTimestamp("activationCreationDate").toLocalDateTime());
-
-   return a;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
 } //end class

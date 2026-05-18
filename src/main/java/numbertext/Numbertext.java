@@ -472,8 +472,8 @@ public String kernel(String[] args) throws IOException {
                     case LANGUAGE -> {
                         lang = args[i];
                         if (numbertext("1", lang) == null) {
-                            LOG.debug("system exit 1");
-                            System.exit(1);
+                            LOG.error("module not found for lang = {}", lang);
+                            return null;
                         }
                         state= PARAM;
                     }

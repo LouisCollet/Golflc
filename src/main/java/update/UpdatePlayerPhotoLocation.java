@@ -128,9 +128,6 @@ try{
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return false;
-}finally{
-        DBConnection.closeQuietly(null, null, null, ps);
-}
 } //end method
 } //end class
 */

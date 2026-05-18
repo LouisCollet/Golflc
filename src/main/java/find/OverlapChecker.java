@@ -33,7 +33,17 @@ public class OverlapChecker implements Serializable {
         void set(PreparedStatement ps) throws SQLException;
     }
 
+    /** Surcharge sans label — callers existants inchangés. */
     public <T> boolean check(
+            LocalDateTime newStart, LocalDateTime newEnd,
+            String query, ParamSetter params, RowMapper<T> mapper,
+            Function<T, LocalDateTime> getStart, Function<T, LocalDateTime> getEnd) throws SQLException {
+        return check(null, newStart, newEnd, query, params, mapper, getStart, getEnd);
+    } // end method
+
+    /** Avec label de type de paiement (ex: "[COTISATION]") préfixé dans le message utilisateur. */
+    public <T> boolean check(
+            String label,
             LocalDateTime newStart,
             LocalDateTime newEnd,
             String query,
@@ -68,12 +78,13 @@ public class OverlapChecker implements Serializable {
                     LocalDateTime epEnd   = getEnd.apply(ep);
                     if (epStart == null || epEnd == null) continue;
 
-                    boolean isOverlap = !(newEnd.isBefore(epStart) || epEnd.isBefore(newStart));
+                    boolean isOverlap = !(newEnd.isBefore(epStart) || epEnd.isBefore(newStart)); // magic here
                     LOG.debug("overlap check: new [{} - {}] vs existing [{} - {}] = {}",
                             newStart, newEnd, epStart, epEnd, isOverlap);
 
                     if (isOverlap) {
-                        String msg = LCUtil.prepareMessageBean("tarif.overlapping")
+                        String prefix = (label != null && !label.isBlank()) ? label + " " : "";
+                        String msg = prefix + LCUtil.prepareMessageBean("tarif.overlapping")
                                 + ZDF_DAY.format(newStart) + " - " + ZDF_DAY.format(newEnd)
                                 + " against <br/>"
                                 + ZDF_DAY.format(epStart)  + " - " + ZDF_DAY.format(epEnd);

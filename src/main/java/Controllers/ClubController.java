@@ -152,13 +152,24 @@ private int cptFlight = 0;
     } // end method
 
     public void setClub(Club club) {
-        appContext.setClub(club);   
+        appContext.setClub(club);
         if (club != null && club.getIdclub() != null && club.getIdclub() > 0) {
             loadCoursesForClub(club.getIdclub());
         } else {
             courseListForClub = Collections.emptyList();
         }
     }
+
+    public Integer getClubId() {
+        return appContext.getClub().getIdclub();
+    } // end method
+
+    public void setClubId(Integer id) {
+        Club c = new Club();
+        c.setIdclub(id);
+        appContext.setClub(c);
+        LOG.debug("setClubId: fresh club set with idclub={}", id);
+    } // end method
 
     public Course getCourse() {
         return appContext.getCourse();

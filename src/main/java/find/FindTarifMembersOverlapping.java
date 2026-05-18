@@ -25,7 +25,7 @@ public class FindTarifMembersOverlapping implements Serializable {
         try {
             return overlapChecker.check(
                     tarif.getStartDate(), tarif.getEndDate(),
-                    "SELECT * FROM tarif_members WHERE TarifMemberIdClub = ?",
+                    "SELECT * FROM tarif_cotisation WHERE TarifMemberIdClub = ?",
                     ps -> ps.setInt(1, tarif.getTarifMemberIdClub()),
                     new rowmappers.TarifMemberRowMapper(),
                     TarifMember::getStartDate,

@@ -172,30 +172,4 @@ public String toString(){
   }
 }
 
-public static Password map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-  //  LOG.debug("starting mapPassword for player = "); // + player);
-        Password password = new Password();
-    //   on récupère l'array avec les anciens mots de passe
-        String s = rs.getString("PlayerPreviousPasswords");
-        if(s != null){
-            password = OBJECT_MAPPER.readValue(s,Password.class);
-            List<String> list = new ArrayList<>(Arrays.asList(password.getArrayPasswords()));
-            password.setPreviousPasswords(list);
-  //       LOG.debug("at the end of mapper Password = " + pa);
-        }else{
-  //          LOG.debug("s is null");
-        }
-          // on récupère le mot de passe actuel (se trouve dans Player)
-            password.setPlayerPassword(rs.getString("PlayerPassword"));
-   //           LOG.debug("at the very end Password = " + pa);
-   return password;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
 } // end class

@@ -63,6 +63,20 @@
                                  rendered="#{settings.getProperty('EXECUTION') eq 'Development'}"
                                  onclick="PF('sidebarDown').show()" />
 
+                <!-- Cart badge — visible when pending carts exist -->
+                <h:panelGroup id="cartBadgePanel"
+                              layout="block"
+                              style="display:inline-block;">
+                    <h:link outcome="/cart.xhtml"
+                            styleClass="cart-header-link"
+                            title="#{msg['cart.badge.title']}">
+                        <p:badge value="#{cartC.cartBadgeCount}"
+                                 severity="danger">
+                            <i class="pi pi-shopping-cart" style="font-size:1.3rem;"/>
+                        </p:badge>
+                    </h:link>
+                </h:panelGroup>
+
                 <!-- Dark/Light mode toggle -->
                 <p:commandButton id="themeToggle"
                                  icon="pi pi-moon"

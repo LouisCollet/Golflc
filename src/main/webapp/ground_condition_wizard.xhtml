@@ -35,6 +35,8 @@
         <div class="tarif-step-border"><p:panel styleClass="tarif-step-panel tarif-step-panel-wide">
             <f:facet name="header">
                 <h1>#{msg['ground.condition.items.tab']}</h1>
+                <p:badge value="#{groundC.unavailableCount}"
+                         severity="#{groundC.unavailableCount gt 0 ? 'warn' : 'info'}"/>
             </f:facet>
 
             <p:panelGrid id="panelGridOne"
@@ -187,39 +189,10 @@
                 <h1>#{msg['title.cotisation.comment']}</h1>
             </f:facet>
 
-            <p:textEditor id="groundEditor"
-                          widgetVar="groundEditorVar"
-                          value="#{groundC.groundCondition.comment}"
-                          height="70px"
-                          styleClass="w-full"
-                          placeholder="Enter here your content"/>
-
-            <p:dialog id="dialogGroundComment"
-                      width="auto" height="auto"
-                      header="#{msg['title.cotisation.comment']}"
-                      widgetVar="dlgGroundComment"
-                      showEffect="fade" hideEffect="fade">
-                <p:outputPanel id="displayGroundComment">
-                    <h:outputText value="#{groundC.groundCondition.comment}" escape="false"/>
-                </p:outputPanel>
-            </p:dialog>
-
-            <f:facet name="footer">
-                <div class="btn-group">
-                    <p:commandButton id="btnSaveGroundComment"
-                                     value="#{msg['tarif.members.add.comment']}"
-                                     process="@this groundEditor"
-                                     update="displayGroundComment, growl-msg"
-                                     oncomplete="PF('dlgGroundComment').show()"
-                                     icon="pi pi-database"
-                                     styleClass="p-button-outlined"/>
-                    <p:commandButton value="Clear"
-                                     type="button"
-                                     onclick="PF('groundEditorVar').clear();"
-                                     icon="pi pi-times"
-                                     styleClass="p-button-outlined"/>
-                </div>
-            </f:facet>
+            <ui:include src="include/include_text_editor_comment.xhtml">
+                <ui:param name="editorValue"  value="#{groundC.groundCondition.comment}"/>
+                <ui:param name="dialogHeader" value="#{msg['title.cotisation.comment']}"/>
+            </ui:include>
         </p:panel></div>
     </p:tab>
 
@@ -230,6 +203,8 @@
         <div class="tarif-step-border"><p:panel id="confirmPanel" styleClass="tarif-step-panel">
             <f:facet name="header">
                 <h1>#{msg['menu.ground.condition']}</h1>
+                <p:badge value="#{groundC.itemsToPersist.size()}"
+                         severity="#{groundC.itemsToPersist.empty ? 'info' : 'success'}"/>
             </f:facet>
 
             <p:dataTable id="confirmItemsTable"

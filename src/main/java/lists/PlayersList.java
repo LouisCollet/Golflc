@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import rowmappers.PasswordRowMapper;
 import rowmappers.PlayerRowMapper;
 import rowmappers.RowMapper;
 import utils.LCUtil;
@@ -50,7 +51,7 @@ public class PlayersList implements Serializable {
 
         RowMapper<EPlayerPassword> compositeMapper = rs -> {
             var player   = new PlayerRowMapper().map(rs);
-            var password = entite.Password.map(rs);
+            var password = new PasswordRowMapper().map(rs);
             return new EPlayerPassword(player, password);
         };
 

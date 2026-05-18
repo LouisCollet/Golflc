@@ -1,6 +1,7 @@
 package entite;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import enumeration.eTypePayment;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 // import jakarta.enterprise.context.SessionScoped;  // migrated 2026-02-24
@@ -45,8 +46,8 @@ public class Creditcard implements Serializable{
   private String creditCardExpirationDate;  // nom imposé par Amazone Inc!!
   private Short creditcardVerificationCode; 
   @NotNull(message="{creditcard.type.notnull}")
-  private String creditcardType; // input from end user
-  private String creditcardIssuer;  // calculated for validation equality with creditCardType
+  private enumeration.CreditcardBrand creditcardType;
+  private enumeration.CreditcardBrand creditcardIssuer;
   private String creditcardCurrency; // new 29-04-2025
 @JsonIgnore private String creditCardExpirationDateString; // from Card solution javascript    
 @JsonIgnore private LocalDateTime creditCardExpirationDateLdt; 
@@ -58,7 +59,7 @@ public class Creditcard implements Serializable{
 @JsonIgnore private String typePayment;
 @JsonIgnore private YearMonth expirationDateYearMonth;  // new 22-08-2025
 @JsonIgnore private String paymentNonce;  // security audit 2026-03-19 — unique token per transaction
-
+/* transféré to enumeration.* le 12-05-2026
    public enum etypePayment{
        SUBSCRIPTION, GREENFEE, COTISATION, LESSON;
        
@@ -67,19 +68,21 @@ public class Creditcard implements Serializable{
        }
        
    }
-
+*/
+   
    // SUBSCRIPTION à GolfLC
    // GREENFEE pour inscription à une partie (green fee et accessoires)
    // COTISATION devenir membre d'un club
    // LESSON pour payer le cours d'un Pro
    
 @JsonIgnore
-    private final Creditcard.etypePayment stat = Creditcard.etypePayment.SUBSCRIPTION; // Default priority
+  //  private final Creditcard.etypePayment stat = Creditcard.etypePayment.SUBSCRIPTION; // Default priority
+     private final eTypePayment stat = eTypePayment.SUBSCRIPTION; // Default priority
 
 //@JsonIgnore private String errorMessage; // new 28-04-2025
 
 public Creditcard(){ // constructor 1
-    creditcardCurrency = "eur"; // new 30-07-2025
+    creditcardCurrency = "EUR";
 }
 // see http://javaevangelist.blogspot.com.es/2017/
 @JsonIgnore
@@ -87,16 +90,16 @@ public List<SelectItem> getCards() {
     if(CARDS.isEmpty()){
  //       List<SelectItem> items = new ArrayList<>();
     //        LOG.debug("cards is empty");
-        CARDS.add(new SelectItem("", ""));
-        CARDS.add(new SelectItem("VISA", "Visa"));  // field 1=selected, field 2 = affiché écran
-        CARDS.add(new SelectItem("MAESTRO", "Maestro"));
-        CARDS.add(new SelectItem("MASTERCARD", "Mastercard"));
-        CARDS.add(new SelectItem("JCB", "Jcb"));
-        CARDS.add(new SelectItem("UPI", "Upi"));
-        CARDS.add(new SelectItem("DINERS_CLUB", "Diners Club"));
-        CARDS.add(new SelectItem("AMERICAN_EXPRESS", "American Express"));
-        CARDS.add(new SelectItem("DISCOVER", "Discover"));
-        CARDS.add(new SelectItem("CHINA_UNION_PAY", "China Union Pay"));
+        CARDS.add(new SelectItem(null, ""));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.VISA,             "Visa"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.MAESTRO,          "Maestro"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.MASTERCARD,       "Mastercard"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.JCB,              "Jcb"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.UPI,              "Upi"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.DINERS_CLUB,      "Diners Club"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.AMERICAN_EXPRESS, "American Express"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.DISCOVER,         "Discover"));
+        CARDS.add(new SelectItem(enumeration.CreditcardBrand.CHINA_UNION_PAY,  "China Union Pay"));
     }    
     return CARDS;
     }
@@ -168,9 +171,8 @@ public YearMonth expirationDate(final int year, final int month) {
      //      LOG.debug("Major card identifier = " + lc.golfnew.MajorIndustryIdentifier.MIIfrom(creditCardNumber).toString());
         setCreditCardMajorIndustryIdentifier(lc.golfnew.MajorIndustryIdentifier.MIIfrom(creditCardNumber).toString()); //from(creditCardNumber);
      //     LOG.debug("issuer detected = " + enums.CardType.detect(creditCardNumber));
-// mod 22-08-2025        setCreditcardIssuer(enums.CardType.detect(creditcardNumber).toString());
-        setCreditcardIssuer(enumeration.CardBrand.from(creditCardNumber).toString()); // mod 22-08-2025
-           LOG.debug("issuer CardBrand detected = " + getCreditcardIssuer());
+        setCreditcardIssuer(enumeration.CreditcardBrand.from(creditCardNumber));
+           LOG.debug("issuer detected = {}", getCreditcardIssuer());
     }
 @JsonIgnore
     public String getCreditCardNumberSecret() {
@@ -187,19 +189,19 @@ public YearMonth expirationDate(final int year, final int month) {
     }
 
 
-    public String getCreditcardType() {
+    public enumeration.CreditcardBrand getCreditcardType() {
         return creditcardType;
     }
 
-    public void setCreditcardType(String creditcardType) {
+    public void setCreditcardType(enumeration.CreditcardBrand creditcardType) {
         this.creditcardType = creditcardType;
     }
 
-    public String getCreditcardIssuer() {
+    public enumeration.CreditcardBrand getCreditcardIssuer() {
         return creditcardIssuer;
     }
 
-    public void setCreditcardIssuer(String creditcardIssuer) {
+    public void setCreditcardIssuer(enumeration.CreditcardBrand creditcardIssuer) {
         this.creditcardIssuer = creditcardIssuer;
     }
 
@@ -274,7 +276,7 @@ public YearMonth expirationDate(final int year, final int month) {
     }
 
     public void setCreditcardCurrency(String creditcardCurrency) {
-        this.creditcardCurrency = creditcardCurrency;
+        this.creditcardCurrency = (creditcardCurrency != null) ? creditcardCurrency.toUpperCase(java.util.Locale.ROOT) : "EUR";
     }
 
 //    public String getErrorMessage() {
@@ -314,73 +316,7 @@ public void setMyStrings(){
         this.creditCardExpirationDateLdt = creditCardExpirationDateLdt;
     }
 
-    /*   mod 31-07-2025
-    public void setCreditCardExpirationDateString(String creditCardExpirationDateString) {
-    //     LOG.debug("setCreditCardExpirationDateString = " + creditCardExpirationDateString);
-    // générer une LocalDateTime
-    String[] s = creditCardExpirationDateString.split("/");
-    //        LOG.debug("s = " + Arrays.toString(s));
-    //   LOG.debug("s[0] = " + s[0] + ":");
-    //   LOG.debug("s[1] = " + s[1] + ":");
-    s[0] = s[0].replaceAll(" ", ""); // MM
-    //            LOG.debug("s[0] Replaced = " + ":" + s[0] + ":");
-    s[1] = s[1].replaceAll(" ", "");
-    //            LOG.debug("s[1] replaced = "  +":" + s[1] + ":");
-    int month = Integer.parseInt(s[0]);
-    int year  = Integer.parseInt(s[1]); // + 2000; // yyyy
-    year = year + 2000;
-    int day = 01;
-    //        String str = "2016-03-04 11:30";
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d HH:mm");
-    String str = year + "-" + month + "-" + day + " 00:00";
-    //            LOG.debug ("dateExpiration formatted = " + str);
-    LocalDateTime ldt = LocalDateTime.parse(str, formatter);
-    //            LOG.debug("LocalDateTime = " + ldt);
-    // attention astuce !!
-    setCreditCardExpirationDate(ldt);
-    LOG.debug("CreditCardExpirationDate setted from setCreditCardExpirationDateString = " + getCreditCardExpirationDate());
-    this.creditCardExpirationDateString = creditCardExpirationDateString;
-    }
-     */
  
-/*
-    public static Creditcard map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        try{
-            Creditcard c = new Creditcard();
-            c.setCreditCardIdPlayer(rs.getInt("CreditcardIdPlayer"));
-            c.setCreditcardHolder(rs.getString("CreditcardHolder"));
-            c.setCreditcardNumber(rs.getString("CreditcardNumber"));
-            c.setCreditCardExpirationDateLdt(rs.getTimestamp("CreditcardExpirationDate").toLocalDateTime());
-            c.setCreditcardVerificationCode(rs.getShort("CreditcardVerificationCode"));
-            c.setCreditcardType(rs.getString("CreditcardType"));
-            // new 31-07-2025 compléter date version String
-            c.setCreditCardExpirationDateString(
-                    c.getCreditCardExpirationDateLdt().getMonthValue() + "/" +   // if you just wanted the two-digit number,
-                            c.getCreditCardExpirationDateLdt().getYear()% 100
-            );
-             LOG.debug("expiration dateString = " +  c.getCreditCardExpirationDateString());
-       //     LOG.debug("expirationDateYearMonth fixed = " +  YearMonth.of(2025,02));  // expirationDateYearMonth = 2025-02
-             // Create a YearMonth object
-        YearMonth thisYearMonth =
-                YearMonth.of(
-                c.getCreditCardExpirationDateLdt().getYear(),
-                c.getCreditCardExpirationDateLdt().getMonthValue());
-        // Create a DateTimeFormatter string
-    //    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy/MM");  // MM/yy
-        // Format this year-month
-        LOG.debug("expirationDateYearMonth formatted from Ldt = " + thisYearMonth.format(DateTimeFormatter.ofPattern("MM/yy")));
-            c.setExpirationDateYearMonth(thisYearMonth);
-            
-            return c;
-        }catch(Exception e){
-            String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-  }
-    } //end method
-*/
  @Override
 public String toString(){
     final String methodName = utils.LCUtil.getCurrentMethodName();

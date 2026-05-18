@@ -229,9 +229,6 @@ try{
 }catch (Exception e){
      handleGenericException(e, methodName);
      return null;
-}finally{
-        DBConnection.closeQuietly(null, null, rs, ps);
-}
 }else{
     //     LOG.debug("escaped to listinscription repetition thanks to lazy loading");
     return liste;  //plusieurs fois ??

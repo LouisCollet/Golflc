@@ -1,5 +1,6 @@
 package entite;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import enumeration.WorkingDay;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
@@ -30,6 +31,9 @@ private Integer proClubId;
 // private int proWorkDays = 127; // defautl = tous les jours travaillés
 @Min(value = 1, message = "{professional.workdays.min}")
 private int proWorkDays = 0; // defaut = aucun jour travaillé
+
+/** JSON column — weekday/weekend lesson prices */
+private String proTarif;
 public Professional(){ // constructor
  //  LOG.debug("constructor Professional executed !");
     } // end constructor
@@ -125,6 +129,21 @@ public void setSelectedDays(List<String> days) {
     public boolean isWorkingOn(java.time.DayOfWeek dow) {
         return (proWorkDays & WorkingDay.from(dow).mask()) != 0;
     }
+
+    public String getProTarif()              { return proTarif; }
+    public void   setProTarif(String proTarif) { this.proTarif = proTarif; }
+
+    /** Parse proTarif JSON, or return null if absent/unparseable. */
+    public ProTarif getProTarifObject() {
+        if (proTarif == null || proTarif.isBlank()) return null;
+        try {
+            return new ObjectMapper().readValue(proTarif, ProTarif.class);
+        } catch (Exception e) {
+            LOG.warn("cannot parse ProTarif JSON: {}", proTarif);
+            return null;
+        }
+    } // end method
+
 
  @Override
 public String toString(){

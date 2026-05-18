@@ -557,7 +557,7 @@ try{
         greenfee.setStatus("Y");
         for (var day : tarif.getDayChoosen()) {
             sb.append(String.format("Greenfee — %.2f %s", day.getPrice(), currSymbol))
-              .append(" (").append(day.getSeason()).append("), ");
+              .append(", ");
         }
     }
     if ("HO".equals(tarif.getGreenfeeType())) {
@@ -565,23 +565,21 @@ try{
         greenfee.setStatus("Y");
         for (var t : tarif.getTeeTimeChoosen()) {
             sb.append(String.format("Greenfee — %.2f %s", t.getPrice(), currSymbol))
-              .append(" (").append(t.getSeason()).append("), ");
+              .append(", ");
         }
     }
     for (var v : tarif.getBasicList()) {
         sb.append(v.getItem())
-          .append(String.format(" — %.2f %s", v.getPrice(), currSymbol))
-          .append(" (").append(v.getSeason())
-          .append(" ×").append(v.getQuantity()).append("), ");
+          .append(String.format(" — %.2f %s ×%d", v.getPrice(), currSymbol, v.getQuantity()))
+          .append(", ");
         greenfee.setStatus("Y");
     }
     LOG.debug("final Items for greenfee = {}", sb);
     for (var v : tarif.getEquipmentsList()) {
         if (v.getQuantity() == null || v.getQuantity() <= 0) continue;
         sb.append(v.getItem())
-          .append(String.format(" — %.2f %s", v.getPrice(), currSymbol))
-          .append(" (").append(v.getSeason())
-          .append(" ×").append(v.getQuantity()).append("), ");
+          .append(String.format(" — %.2f %s ×%d", v.getPrice(), currSymbol, v.getQuantity()))
+          .append(", ");
     }
     if (sb.length() >= 2) { sb.setLength(sb.length() - 2); }
     LOG.debug("final Items for greenfee and equipments = {}", sb);

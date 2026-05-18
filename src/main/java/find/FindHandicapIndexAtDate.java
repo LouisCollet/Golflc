@@ -187,9 +187,6 @@ try{
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
      return null;
-}finally{
-    DBConnection.closeQuietly(null, null, rs, ps); // new 14/08/2014
-}
 // return false;
 }//end method
 

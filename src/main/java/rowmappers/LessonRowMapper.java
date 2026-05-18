@@ -30,5 +30,4 @@ public class LessonRowMapper extends AbstractRowMapper<Lesson> {
             return null;
         }
     } // end map
-
 } // end class

@@ -5,6 +5,7 @@ import entite.Player;
 import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import rowmappers.MatchplayPlayerResultRowMapper;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -54,7 +55,7 @@ public class FindMatchplayResult implements Serializable {
             try (ResultSet rs = ps.executeQuery()) {
                 List<MatchplayPlayerResult> liste = new ArrayList<>();
                 while (rs.next()) {
-                    liste.add(entite.MatchplayPlayerResult.map(rs));
+                    liste.add(new MatchplayPlayerResultRowMapper().map(rs));
                 }
                 if (liste.isEmpty()) {
                     LOG.warn(methodName + " - empty result for player = " + player.getIdplayer());

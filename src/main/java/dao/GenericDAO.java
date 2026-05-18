@@ -14,12 +14,11 @@ import java.util.Collections;
 import java.util.List;
 import javax.sql.DataSource;
 import rowmappers.RowMapper;
+import utils.LCUtil;
 
 @ApplicationScoped
 public class GenericDAO implements Serializable {
-
     private static final long serialVersionUID = 1L;
-
     private static final long SLOW_QUERY_MS = 100;
     private static final long VERY_SLOW_QUERY_MS = 500;
 
@@ -32,25 +31,20 @@ public class GenericDAO implements Serializable {
     // QUERY LIST
     // =========================
     public <T> List<T> queryList(String sql, RowMapper<T> mapper, Object... params) throws SQLException {
-
+        final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         long start = System.nanoTime();
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
+            PreparedStatement ps = conn.prepareStatement(sql)) {
             bindParams(ps, params);
-
             try (ResultSet rs = ps.executeQuery()) {
-
                 List<T> result = new ArrayList<>();
-
                 while (rs.next()) {
                     result.add(mapper.map(rs));
                 }
-
                 return result;
             }
-
         } catch (SQLException e) {
             handleSQLException(e, "GenericDAO.queryList");
             return Collections.emptyList();
@@ -68,29 +62,24 @@ public class GenericDAO implements Serializable {
     // QUERY SINGLE
     // =========================
     public <T> T querySingle(String sql, RowMapper<T> mapper, Object... params) throws SQLException {
-
+        final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         long start = System.nanoTime();
-
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             bindParams(ps, params);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapper.map(rs);
                 }
                 return null;
             }
-
         } catch (SQLException e) {
             handleSQLException(e, "GenericDAO.querySingle");
             return null;
-
         } catch (Exception e) {
             handleGenericException(e, "GenericDAO.querySingle");
             return null;
-
         } finally {
             logExecution("querySingle", sql, params, start);
         }
@@ -100,24 +89,20 @@ public class GenericDAO implements Serializable {
     // EXECUTE (INSERT/UPDATE/DELETE)
     // =========================
     public int execute(String sql, Object... params) throws SQLException {
-
+        final String methodName = LCUtil.getCurrentMethodName();
+        LOG.debug("entering INSERT/UPDATE/DELETE {}", methodName);
         long start = System.nanoTime();
-
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
+          //    LOG.info("DAO connection = {}", conn);
             bindParams(ps, params);
-
             return ps.executeUpdate();
-
         } catch (SQLException e) {
             handleSQLException(e, "GenericDAO.execute");
             return 0;
-
         } catch (Exception e) {
             handleGenericException(e, "GenericDAO.execute");
             return 0;
-
         } finally {
             logExecution("execute", sql, params, start);
         }
@@ -143,27 +128,21 @@ public class GenericDAO implements Serializable {
     // 🔥 DAO INTERCEPTOR CORE
     // =========================
     private void logExecution(String type, String sql, Object[] params, long startNano) {
-
         long durationMs = (System.nanoTime() - startNano) / 1_000_000;
-
         if (durationMs > VERY_SLOW_QUERY_MS) {
-
             LOG.error("\nVERY SLOW SQL [{}] {} ms | SQL={} | params={}",
             type,
             durationMs,
             sql,
             formatParams(params)
             );
-
         } else if (durationMs > SLOW_QUERY_MS) {
-
           LOG.warn("\nSLOW SQL [{}] {} ms | SQL={} | params={}",
             type,
             durationMs,
             sql,
             formatParams(params)
             );
-
         } else {
             LOG.debug("SQL [{}] {} ms", type, durationMs);
         }
@@ -173,22 +152,18 @@ public class GenericDAO implements Serializable {
     // FORMAT PARAMS
     // =========================
     private String formatParams(Object[] params) {
-
         if (params == null || params.length == 0) {
             return "[]";
         }
-
         StringBuilder sb = new StringBuilder("[");
-
         for (int i = 0; i < params.length; i++) {
             sb.append(params[i]);
             if (i < params.length - 1) {
                 sb.append(", ");
             }
         }
-
         sb.append("]");
         return sb.toString();
-    }
+    } // end method
 
-}
+} // end class

@@ -6,6 +6,7 @@ import entite.Round;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.HandicapRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -35,7 +36,7 @@ public class LoadHandicap implements Serializable {
                     AND handicap.handicapend
                 """;
 
-        return dao.querySingle(query, rs -> entite.Handicap.map(rs),
+        return dao.querySingle(query, new HandicapRowMapper(),
                 player.getIdplayer(), Timestamp.valueOf(round.getRoundDate()));
     } // end method
 

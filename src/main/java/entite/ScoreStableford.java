@@ -306,24 +306,6 @@ public class Score{
             this.distances = distances;
         }
         
-  public static ScoreStableford.Score map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-         ScoreStableford.Score score = new ScoreStableford().new Score();
-         score.setHole(rs.getInt("ScoreHole"));
-         score.setPar(rs.getInt("ScorePar"));
-         score.setIndex(rs.getInt("ScoreStrokeIndex"));
-         score.setExtra(rs.getInt("ScoreExtraStroke"));
-         score.setStrokes(rs.getInt("ScoreStroke"));
-         score.setPoints(rs.getInt("ScorePoints"));
-   return score;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map   
  public String toString(){
  try {
 //      LOG.debug("starting toString TarifGreenfee !");

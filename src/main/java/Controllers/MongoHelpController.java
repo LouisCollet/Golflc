@@ -289,18 +289,4 @@ public class MongoHelpController implements Serializable {
         }
     } // end method
 
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        HelpView helpview = new HelpView();
-        helpview.setId("test_cotisation_4");
-        helpview.setHelpViewText("CREATED this is the text from main");
-        helpview.setHelpViewLanguage("es");
-        helpview.setHelpViewModificationDate(LocalDateTime.now());
-        boolean bo = insertOne(helpview);
-        LOG.debug("inserted result = {}", bo);
-    } // end main
-    */
-
 } // end class

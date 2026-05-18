@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.UnavailablePeriod;
 import static exceptions.LCException.handleGenericException;
-import static interfaces.Log.LOG;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -25,9 +24,8 @@ public class UnavailablePeriodRowMapper extends AbstractRowMapper<UnavailablePer
      try {
         UnavailablePeriod period = OBJECT_MAPPER.readValue(rs.getString("UnavailableItems"), UnavailablePeriod.class);
         period.setIdclub(getInteger(rs,"UnavailableIdClub"));
-        period.setStartDate(getTimestamp(rs,"UnavailableStartDate").toLocalDateTime());
-   //        LOG.debug("start date column = " + rs.getTimestamp("UnavailableStartDate").toLocalDateTime());
-        period.setEndDate(getTimestamp(rs,"UnavailableEndDate").toLocalDateTime());
+        period.setStartDate(getLocalDateTime(rs, "UnavailableStartDate"));
+        period.setEndDate(getLocalDateTime(rs, "UnavailableEndDate"));
    //        LOG.debug("end date column = " + rs.getTimestamp("UnavailableEndDate").toLocalDateTime());
    return period;
     } catch (Exception e) {
@@ -35,4 +33,4 @@ public class UnavailablePeriodRowMapper extends AbstractRowMapper<UnavailablePer
     return null;
         }
     }
-}
+} //end class

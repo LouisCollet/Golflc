@@ -78,25 +78,6 @@ public Average(){
     public void setCountRounds(Short countRounds) {
         this.countRounds = countRounds;
     }
-public static Average map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Average a = new Average();
-            a.setAvgHole(rs.getShort("ScoreHole") );
-            a.setAvgPar(rs.getShort("ScorePar") );
-            a.setAvgStrokeIndex(rs.getShort("ScoreStrokeIndex") );
-            a.setAvgExtraStroke(rs.getShort("ScoreExtraStroke") );
-            a.setAvgStroke(rs.getDouble("averageStroke") );  // was Short
-            a.setAvgPoints(rs.getDouble("averagePoints") );
-            a.setCountRounds(rs.getShort("countround") );
-   return a;
-  }catch(Exception e){
-   String msg = "£££ Exception in mapAverage = " + methodName + " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} // end map
 
 @Override
 public String toString(){ 

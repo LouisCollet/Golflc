@@ -216,53 +216,5 @@ public String toString(){
         return msg;
   }
 }
-/* enlevé 25/01/2026
-public static Cotisation map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Cotisation c = new Cotisation(); // différence avec @Inject Cotisation.cotisation ??
-        c.setIdclub(rs.getInt("CotisationIdClub"));
-        c.setIdplayer(rs.getInt("CotisationIdPlayer"));
-        c.setCotisationStartDate(rs.getTimestamp("CotisationStartDate").toLocalDateTime());
-        c.setCotisationEndDate(rs.getTimestamp("CotisationEndDate").toLocalDateTime());
-        c.setPaymentReference(rs.getString("CotisationPaymentReference"));
-        c.setCommunication(rs.getString("CotisationCommunication"));
-        c.setPrice(rs.getDouble("CotisationAmount"));
-        c.setItems(rs.getString("CotisationItems"));
-        c.setStatus(rs.getString("CotisationStatus"));
-        c.setPaymentDate(rs.getTimestamp("CotisationModificationDate").toLocalDateTime());
-   return c;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
-*/
-/* enlevé 23-01-2023
-public static Cotisation mapGreenfee(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Cotisation c = new Cotisation(); // différence avec @Inject Cotisation.cotisation ??
-        c.setIdclub(rs.getInt("GreenfeeIdClub"));
-        c.setIdplayer(rs.getInt("GreenfeeIdPlayer"));
-        c.setCotisationStartDate(rs.getTimestamp("GreenfeeRoundDate").toLocalDateTime());
-     //  c.setCotisationEndDate(rs.getTimestamp("GreenfeeRoundDate").toLocalDateTime()); // endDate not used
-        c.setPaymentReference(rs.getString("GreenfeePaymentReference"));
-        c.setCommunication(rs.getString("GreenfeeCommunication"));
-        c.setPrice(rs.getDouble("GreenfeeAmount"));
-        c.setItems(rs.getString("GreenfeeItems"));
-        c.setStatus(rs.getString("GreenfeeStatus"));
-        c.setPaymentDate(rs.getTimestamp("GreenfeeModificationDate").toLocalDateTime());
-   return c;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
-*/
 
 } // end class

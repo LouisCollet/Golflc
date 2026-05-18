@@ -2,6 +2,7 @@ package lists;
 
 import entite.LoggingUser;
 import static interfaces.Log.LOG;
+import rowmappers.LoggingUserRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -35,7 +36,7 @@ public class LogginUserList implements Serializable {
                 FROM logging_user
                 """;
 
-        liste = dao.queryList(query, rs -> LoggingUser.map(rs));
+        liste = dao.queryList(query, new LoggingUserRowMapper());
         return liste;
     } // end method
 

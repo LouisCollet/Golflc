@@ -16,13 +16,13 @@ public class SubscriptionRowMapper extends AbstractRowMapper<Subscription> {
            //LOG.debug("entering map for method = " + methodName);
         Subscription subscription = new Subscription();
         subscription.setIdplayer(getInteger(rs,"SubscriptionIdPlayer") );
-        subscription.setStartDate(getTimestamp(rs,"SubscriptionStartDate").toLocalDateTime());
-        subscription.setEndDate(getTimestamp(rs,"SubscriptionEndDate").toLocalDateTime());
+        subscription.setStartDate(getLocalDateTime(rs, "SubscriptionStartDate"));
+        subscription.setEndDate(getLocalDateTime(rs, "SubscriptionEndDate"));
         subscription.setTrialCount(getShort(rs,"SubscriptionTrialCount"));
         subscription.setPaymentReference(getString(rs,"SubscriptionPaymentReference"));
         subscription.setCommunication(getString(rs,"SubscriptionCommunication"));
         subscription.setSubscriptionAmount(getDouble(rs,"SubscriptionAmount"));
-        subscription.setPaymentDate(getTimestamp(rs,"SubscriptionModificationDate").toLocalDateTime());
+        subscription.setPaymentDate(getLocalDateTime(rs, "SubscriptionModificationDate"));
    return subscription;
  }catch(Exception e){
         handleGenericException(e, methodName);

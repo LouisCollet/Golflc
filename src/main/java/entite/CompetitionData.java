@@ -197,31 +197,4 @@ public String toString(){
   }
 }
 
-public static CompetitionData map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        CompetitionData c = new CompetitionData();
-        c.setCmpDataId(rs.getInt("CmpDataId") );
-        c.setCmpDataCompetitionId(rs.getInt("CmpDataCompetitionId"));
-        c.setCmpDataPlayerId(rs.getInt("CmpDataPlayerId") );
-        c.setCmpDataPlayingHandicap(rs.getShort("CmpDataPlayingHandicap"));
-        c.setCmpDataHandicap(rs.getDouble("CmpDataHandicap"));
-        c.setCmpDataFlightStart(rs.getTime("CmpDataFlightStart").toLocalTime());
-        c.setCmpDataFlightNumber(rs.getShort("CmpDataFlightNumber"));
-        c.setCmpDataScorePoints(rs.getShort("CmpDataScorePoints"));
-        c.setCmpDataLastHoles(rs.getString("CmpDataLastHoles"));
-        c.setCmpDataPlayerFirstLastName(rs.getString("CmpDataPlayerFirstLastName"));
-        c.setCmpDataAskedStartTime(rs.getString("CmpDataAskedStartTime"));
-        c.setCmpDataPlayerGender(rs.getString("CmpDataPlayerGender"));
-        c.setCmpDataRoundId(rs.getInt("CmpDataRoundId"));
-        c.setCmpDataTeeStart(rs.getString("CmpDataTeeStart"));
-        c.setCmpDataScoreDifferential(rs.getDouble("CmpDataScoreDifferential"));
-   return c;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName+ " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
 } // end class

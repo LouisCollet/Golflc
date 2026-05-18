@@ -14,7 +14,7 @@ import java.time.Instant;
 import utils.LCUtil;
 
 
-public class psCreateUpdateClub implements Serializable, interfaces.Log, interfaces.GolfInterface{
+public class psCreateUpdateClub implements Serializable{
 
     private static final ObjectMapper OBJECT_MAPPER;
     static {
@@ -25,6 +25,7 @@ public class psCreateUpdateClub implements Serializable, interfaces.Log, interfa
 
  public static void psMapUpsert(PreparedStatement ps, Club club) throws Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
+    LOG.debug("entering {}", methodName);
     try {
         String json = club.getUnavailableStructure() != null
                 ? OBJECT_MAPPER.writeValueAsString(club.getUnavailableStructure())
@@ -53,13 +54,12 @@ public class psCreateUpdateClub implements Serializable, interfaces.Log, interfa
     final String methodName = utils.LCUtil.getCurrentMethodName(); 
   try{
       // voir aussi http://www.javased.com/index.php?source_dir=archaius/archaius-core/src/main/java/com/netflix/config/sources/JDBCConfigurationSource.java
-      int index = 0;
       // mod 16-12-2025
         String json = club.getUnavailableStructure() != null
               ? OBJECT_MAPPER.writeValueAsString(club.getUnavailableStructure())
               : "{}";                   // ✅ JSON vide par défaut
-           LOG.debug("UnavailableStructure data converted in json format = " + NEW_LINE + json);
-            ps.setString(++index, club.getClubName());   // 1
+           LOG.debug("UnavailableStructure data converted in json format = {}{}", NEW_LINE, json);
+            ps.setString(1, club.getClubName());   // 1
             ps.setString(2, club.getAddress().getStreet());
             ps.setString(3, club.getAddress().getCity());
             ps.setString(4, club.getAddress().getCountry().getCode().toUpperCase());
@@ -92,7 +92,7 @@ return ps;
             ps.setString(2, club.getClubName());
             ps.setString(3, club.getAddress().getStreet());
             ps.setString(4, club.getAddress().getZipCode() + club.getAddress().getCity()); // zipcode ajouté 19-12-2025
-              LOG.debug("Club country too long ? = " + club.getAddress().getCountry().getCode().toUpperCase());
+              LOG.debug("Club country too long ? = {}", club.getAddress().getCountry().getCode().toUpperCase());
             ps.setString(5, club.getAddress().getCountry().getCode().toUpperCase()); // chipotage transitoire !!
             ps.setDouble(6, club.getAddress().getLatLng().getLat()); 
             ps.setDouble(7, club.getAddress().getLatLng().getLng());
@@ -111,9 +111,7 @@ return ps;
             utils.LCUtil.logps(ps);
 return ps;
   }catch(Exception e){
-   String msg = "£££ Exception in psClubCreate = " + methodName + " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
+    handleGenericException(e, methodName);
     return null;
   }
 } //end method

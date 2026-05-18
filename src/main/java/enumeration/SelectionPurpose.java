@@ -19,6 +19,8 @@ public enum SelectionPurpose {
     MENU_UNAVAILABLE("MenuUnavailable", "unavailable_wizard.xhtml", "unavailable_wizard.xhtml", "title.unavailable.structure"),
     GROUND_CONDITION_WIZARD("GroundConditionWizard", "ground_condition_wizard.xhtml", "ground_condition_wizard.xhtml", "menu.ground.condition"),
     GROUND_CONDITION_UPDATE("GroundConditionUpdate", "ground_condition_update.xhtml", "ground_condition_update.xhtml", "menu.ground.condition.update"),
+    GROUND_CONDITION_DISPLAY("GroundConditionDisplay", "ground_condition_display.xhtml", "ground_condition_display.xhtml", "menu.ground.condition"),
+    SIMULATION_GREENFEE("SimulationGreenfee", "greenfee_simulation.xhtml", "greenfee_simulation.xhtml", "menu.simulation.greenfee"),
   //  CREATE_ROUND("CreateRound", "selectClubCourse.xhtml", "round.xhtml");  // OK 04-02-2026
     CREATE_ROUND("CreateRound", "round.xhtml", "??round.xhtml", "message.for.round"),  // OK 13-02-2026
     UPDATE_CLUB("clubUpdate", "selectClubModify.xhtml", "??round.xhtml"),  // OK 14-02-2026
@@ -34,12 +36,30 @@ public enum SelectionPurpose {
     ROUND_CHART("CHART", "selectRound.xhtml", "not used", "message.for.stat"),
 
     // Round calendar — selectClubCourse → schedule_round.xhtml — 2026-04-19
-    SCHEDULE_ROUND("ScheduleRound", "selectClubCourse.xhtml", "schedule_round.xhtml", "message.for.schedule.round"),
+    SCHEDULE_ROUND("ScheduleRound", "selectClubCourse.xhtml", "schedule_round.xhtml", "menu.schedule.round"),
+
+    // Direct-navigation pages — no selector — 2026-05-04
+    JOB_SUBMITTER("JobSubmitter", "jobSubmitter.xhtml", "jobSubmitter.xhtml"),
+    TECHNICAL_INFO("TechnicalInfo", "technical_info.xhtml", "technical_info.xhtml"),
+    ADMIN_ADVANCED("AdminAdvanced", "admin_advanced.xhtml", "admin_advanced.xhtml"),
+    AUDIT_CONNECTIONS("AuditConnections", "audit_connections.xhtml", "audit_connections.xhtml"),
+    CALCULATOR_CSS("CalculatorCss", "calculator_css.xhtml", "calculator_css.xhtml"),
+    SEARCH_GOLF("SearchGolf", "search_golf.xhtml", "search_golf.xhtml"),
+    DOWNLOAD("Download", "download.xhtml", "download.xhtml"),
 
     // Playing Hcp — direct navigation, no selector page — 2026-03-23
     PLAYING_HCP_STABLEFORD("PlayingHcpStableford", "stableford_playing_hcp.xhtml", "not used"),
     PLAYING_HCP_SCRAMBLE("PlayingHcpScramble", "scramble_playing_hcp.xhtml", "not used"),
-    PLAYING_HCP_OTHER("PlayingHcpOther", "othergames_playing_hcp.xhtml", "not used");
+    PLAYING_HCP_OTHER("PlayingHcpOther", "othergames_playing_hcp.xhtml", "not used"),
+
+    // Professional & Local/System Admin — direct navigation, no selector — 2026-05-04
+    PRO_INSCRIPTION("ProInscription", "selectPro.xhtml", "selectPro.xhtml"),
+    PRO_LESSONS("ProLessons", "professional_lessons_paid.xhtml", "professional_lessons_paid.xhtml"),
+    LOCAL_ADMIN_PROFESSIONALS("LocalAdminProfessionals", "local_administrator_professionals.xhtml", "local_administrator_professionals.xhtml"),
+    LOCAL_ADMIN_MEMBERS("LocalAdminMembers", "local_administrator_cotisations.xhtml", "local_administrator_cotisations.xhtml"),
+    LOCAL_ADMIN_GREENFEES("LocalAdminGreenfees", "local_administrator_greenfees.xhtml", "local_administrator_greenfees.xhtml"),
+    SYSTEM_ADMIN_SUBSCRIPTIONS("SystemAdminSubscriptions", "system_administrator_subscriptions.xhtml", "system_administrator_subscriptions.xhtml"),
+    TARIF_PRO("TarifPro", "selectPro.xhtml", "tarif_professional_wizard.xhtml", "menu.tarif.pro");
     
     // First field = menu String code - index
     // Second field = selection facelet

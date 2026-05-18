@@ -1,6 +1,6 @@
 package ical;
 
-import Controller.refact.PlayerController;
+import Controllers.PlayerController;
 import context.ApplicationContext;
 import entite.Club;
 import entite.Course;

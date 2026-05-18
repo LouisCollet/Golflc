@@ -10,11 +10,11 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-public class psCreateUpdateScoreStableford implements Serializable, interfaces.Log, interfaces.GolfInterface {
+public class psCreateUpdateScoreStableford implements Serializable{
 
     private static final long serialVersionUID = 1L;
 
-    /**
+    /*
      * INSERT score — all 15 columns, fairway/green/putts/bunker/penalty set to 0 on creation.
      */
     public static PreparedStatement psMapCreate(

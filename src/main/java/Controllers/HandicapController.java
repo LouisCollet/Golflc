@@ -76,15 +76,4 @@ public class HandicapController implements Serializable, interfaces.GolfInterfac
         }
     } // end method
 
-    /*
-    void main() throws SQLException, Exception {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        Round round = new Round();
-        round.setIdround(437);
-    } // end main
-    */
-
 } // end class

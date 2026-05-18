@@ -38,7 +38,7 @@ public class LessonMail implements Serializable {
 
             String cs = currSymbol(creditcard);
             double lessonTotal = lessons.stream()
-                .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0)
+                .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount().doubleValue() : 0.0)
                 .sum();
             StringBuilder lignes = new StringBuilder();
             for (Lesson lesson : lessons) {
@@ -47,7 +47,7 @@ public class LessonMail implements Serializable {
                 lignes.append("<tr><td>🎓 ").append(lesson.getEventTitle()).append("</td>")
                       .append("<td style='color:#555'>").append(start).append(" → ").append(end).append("</td>")
                       .append("<td align='right'>")
-                      .append(String.format("%.2f %s", lesson.getLessonAmount() != null ? lesson.getLessonAmount() : 0.0, cs))
+                      .append(String.format("%.2f %s", lesson.getLessonAmount() != null ? lesson.getLessonAmount().doubleValue() : 0.0, cs))
                       .append("</td></tr>");
             }
 
@@ -96,7 +96,7 @@ public class LessonMail implements Serializable {
 
             String clubName = !lessons.isEmpty() ? lessons.get(0).getEventClubName() : "";
             double lessonTotal = lessons.stream()
-                .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount() : 0.0)
+                .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount().doubleValue() : 0.0)
                 .sum();
 
             StringBuilder lignes = new StringBuilder();

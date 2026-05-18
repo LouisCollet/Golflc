@@ -15,14 +15,14 @@ public class CotisationRowMapper extends AbstractRowMapper<Cotisation> {
         Cotisation c = new Cotisation();
         c.setIdclub(getInteger(rs,"CotisationIdClub"));
         c.setIdplayer(getInteger(rs,"CotisationIdPlayer"));
-        c.setCotisationStartDate(getTimestamp(rs,"CotisationStartDate").toLocalDateTime());
-        c.setCotisationEndDate(getTimestamp(rs,"CotisationEndDate").toLocalDateTime());
+        c.setCotisationStartDate(getLocalDateTime(rs, "CotisationStartDate"));
+        c.setCotisationEndDate(getLocalDateTime(rs, "CotisationEndDate"));
         c.setPaymentReference(getString(rs,"CotisationPaymentReference"));
         c.setCommunication(getString(rs,"CotisationCommunication"));
         c.setPrice(getDouble(rs,"CotisationAmount"));
         c.setItems(getString(rs,"CotisationItems"));
         c.setStatus(getString(rs,"CotisationStatus"));
-        c.setPaymentDate(getTimestamp(rs,"CotisationModificationDate").toLocalDateTime());
+        c.setPaymentDate(getLocalDateTime(rs, "CotisationModificationDate"));
         return c;
         } catch (Exception e) {
             handleGenericException(e, getCurrentMethodName());

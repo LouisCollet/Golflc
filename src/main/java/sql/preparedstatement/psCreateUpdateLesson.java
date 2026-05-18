@@ -10,11 +10,11 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 
-public class psCreateUpdateLesson implements Serializable, interfaces.Log, interfaces.GolfInterface {
+public class psCreateUpdateLesson implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
+    /*
      * INSERT lesson — PaymentsLessonId set to null on creation.
      */
     public static PreparedStatement psMapCreate(

@@ -176,24 +176,5 @@ public class Inscription implements Serializable{
             showMessageFatal(msg);
             return msg;
         } }
-  /*
-public static Inscription map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-    Inscription i = new Inscription();
-    i.setInscriptionFinalResult(rs.getShort("InscriptionFinalResult"));
-    i.setInscriptionTeeStart(rs.getString("InscriptionTeeStart"));
-    i.setInscriptionInvitedBy(rs.getString("InscriptionInvitedBy"));
-    i.setInscriptionIdTee(rs.getInt("InscriptionIdTee")); // new 31-03-2019
-    i.setInscriptionMatchplayTeam(rs.getString("In‌scriptionMatchplayTeam")); // new 20-09-2021
 
-   return i;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
-*/
 } // end class

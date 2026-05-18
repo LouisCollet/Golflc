@@ -5,6 +5,7 @@ import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.AuditRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -42,7 +43,7 @@ public class FindLastLogin implements Serializable {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return entite.Audit.mapAudit(rs);
+                    return new AuditRowMapper().map(rs);
                 }
                 LOG.debug(methodName + " - no audit found for player " + player.getIdplayer());
                 return null;

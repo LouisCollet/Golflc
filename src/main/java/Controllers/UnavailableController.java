@@ -138,17 +138,5 @@ try{
     return null;
 } // end method
   
- /*
- void main() throws SQLException, Exception{
-      Club club = new Club();
-      club.setIdclub(101); // la cala
-      Round round = new Round();
-      round.setIdround(698);  // 19/05/2022 16:01
-   // changing data for testing purpose
-      round.setCourseIdcourse(90);  // other course was 101
-      Structure str = new UnavailableController().isRoundUnavailable(club, round, null);
-        LOG.debug("from main, after lp = {}", str);
-   } // end main
- */     
-      
+
 } //end Class

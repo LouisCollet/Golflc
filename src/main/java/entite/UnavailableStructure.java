@@ -169,14 +169,6 @@ public UnavailableStructure(){    // constructor
         this.lastUpdate = lastUpdate;
     }
 
-/*
-    public void RemoveNull(){
-   //     LOG.debug("itemstructure = " + itemStructure.toString());
-   //     LOG.debug("itemstructure length = " + itemStructure.length);
-    //    itemStructure = utils.LCUtil.removeNull1D(itemStructure);
-         LOG.debug("null removed from all Arrays");
-}
-*/
  @Override
 public String toString(){ 
     if(structureList.isEmpty()){ // == null){
@@ -190,29 +182,6 @@ public String toString(){
                + " <br/>,structureList: " + structureList.toString() 
         );
 }
-/*
-public static UnavailableStructure map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-         String structure = rs.getString("ClubUnavailableStructure");
-            LOG.debug("String structure from DB = " + structure);
-         if(rs.getString("ClubUnavailableStructure") == null){
-            LOG.debug("map - Unavailable Structure is null !! Null returned");
-            return null;
-         }
-         UnavailableStructure str = OBJECT_MAPPER.readValue(structure,UnavailableStructure.class);
-            LOG.debug("UnavailableStructure extracted from database = "  + str);
-            LOG.debug("nombre d'items structure = " + str.getStructureList().size());
- //           LOG.debug("array items structure = " + Arrays.deepToString(str.getItemStructure()));
-         str.setIdclub(rs.getInt("IdClub"));
-            LOG.debug("idclub setted = " + str.getIdclub());
-   return str;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage(); //+ " for player = " + p.getPlayerLastName();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-  */
+
 } //end method
 //} // end class

@@ -56,25 +56,6 @@ public class MatchplayPlayerResult{
         this.playerLastFirst = playerLastFirst;
     }
 
-public static MatchplayPlayerResult map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-              MatchplayPlayerResult result = new MatchplayPlayerResult();
-              result.setPlayerId(rs.getInt("idplayer"));
-              result.setHole(rs.getInt("ScoreHole")); 
-              result.setStrokes(rs.getInt("ScoreStroke"));
-              result.setResult(null); // complété ultérieurement
-    //            String first = rs.getString("PlayerFirstName");
-    //            String last  = rs.getString("PlayerLastName");
-              result.setPlayerLastFirst(rs.getString("PlayerLastName") + ", " + rs.getString("PlayerFirstName"));
-   return result;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
  @Override
 public String toString()
 { return 

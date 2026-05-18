@@ -15,6 +15,7 @@ public class CartRowMapper extends AbstractRowMapper<Cart> {
             c.setIdCart(getInteger(rs, "idCart"));
             c.setCartPlayerId(getInteger(rs, "cartPlayerId"));
             c.setCartClubId(getInteger(rs, "cartClubId"));
+            c.setCartStartDate(getLocalDateTime(rs, "cartStartDate"));
             c.setCartType(enumeration.eTypePayment.valueOf(getString(rs, "cartType")));
             c.setCartItemsJson(getString(rs, "cartItemsJson"));
             c.setCartTotal(getDouble(rs, "cartTotal"));

@@ -314,6 +314,30 @@ td.ui-panelgrid-cell.col2Flex {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* Schedule — légende des créneaux (A/B/C) */
+.slot-legend {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    align-items: center;
+}
+.slot-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.85rem;
+}
+.slot-legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+    flex-shrink: 0;
+}
+.slot-legend-swatch.morning   { background: #28a745; }
+.slot-legend-swatch.noon      { background: #fd7e14; }
+.slot-legend-swatch.afternoon { background: #0d6efd; }
+
 /* Lesson payment — vertical card per lesson (price_pro.xhtml) */
 .lesson-item-card {
     background: var(--surface-card, #fff);
@@ -337,6 +361,21 @@ td.ui-panelgrid-cell.col2Flex {
 .lesson-item-card td.ui-panelgrid-cell.col2Flex {
     background-color: var(--surface-hover, var(--golf-surface));
     padding: 0.4rem 0.75rem;
+}
+
+/* Cart — total lines */
+.cart-total-line {
+    text-align: right;
+    white-space: nowrap;
+    margin-top: 0.75rem;
+}
+.cart-grand-total {
+    text-align: right;
+    white-space: nowrap;
+    font-size: 1.1rem;
+    border-top: 2px solid var(--golf-primary, #1a5632);
+    padding-top: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 /* Schedule dialog — lesson details */
@@ -1467,4 +1506,27 @@ html[data-theme="dark"] .form-card.ui-panel .ui-panel-titlebar {
       width: 70%;
       margin: 0 auto;
   }
+.ground-display-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.28rem 0.75rem;
+    font-size: 0.84rem;
+    border-bottom: 1px solid #f2f2f2;
+}
+.ground-row-open  { background:#fff;    border-left:3px solid #198754; color:#198754; }
 
+/* ============================================================
+   CART BADGE — header
+   ============================================================ */
+.cart-header-link {
+    display: inline-flex;
+    align-items: center;
+    padding: .35rem .45rem;
+    color: var(--text-color, #334155);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background .15s;
+}
+.cart-header-link:hover { background: var(--surface-hover, #f1f5f9); }
+.ground-row-closed{ background:#f8f9fa; border-left:3px solid #dc3545; color:#dc3545; }

@@ -63,7 +63,7 @@
             </h:outputText>
         </p:column>
 
-        <p:column headerText="" width="9%" style="text-align:center">
+        <p:column headerText="" width="15%" style="text-align:center">
             <p:commandButton icon="pi pi-user-edit"
                              styleClass="p-button-text p-button-sm p-button-rounded"
                              process="@this"
@@ -71,6 +71,11 @@
                              oncomplete="PF('editProDlg').show()">
                 <f:setPropertyActionListener value="#{c.professional}" target="#{clubC.selectedProfessional}"/>
             </p:commandButton>
+            <p:commandButton icon="pi pi-dollar"
+                             title="#{msg['menu.tarif.pro']}"
+                             styleClass="p-button-text p-button-sm p-button-rounded p-button-warning"
+                             process="@this"
+                             action="#{clubC.navigateToTarifPro(c.professional)}"/>
         </p:column>
 
     </p:dataTable>

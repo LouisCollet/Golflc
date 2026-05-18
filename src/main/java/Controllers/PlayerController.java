@@ -438,22 +438,6 @@ public void textCalculationIndex() {
 } // end method
 
 
-/*/ ✅ Getters / Setters état UI
-public ECourseList2 getSelectedHandicap() {
-    return selectedHandicap;
-}
-
-public void setSelectedHandicap(ECourseList2 selectedHandicap) {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    this.selectedHandicap = selectedHandicap;
-    if (selectedHandicap != null) {
-        // ✅ Synchronise ApplicationContext si nécessaire
-        appContext.setHandicapIndex(selectedHandicap.handicapIndex());
-        LOG.debug("selectedHandicap = {}", selectedHandicap);
-    }
-} // end method
-*/
 // ✅ Dans PlayerController — délégation pure, pas de champ local
 public ECourseList getSelectedHandicap() {
     final String methodName = utils.LCUtil.getCurrentMethodName();

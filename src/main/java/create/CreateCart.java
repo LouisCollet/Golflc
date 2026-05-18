@@ -21,11 +21,11 @@ public class CreateCart implements Serializable {
     public void upsert(final Cart cart) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("type={} total={}", cart.getCartType().name(), cart.getCartTotal());
+        LOG.debug("type={} startDate={} total={}", cart.getCartType().name(), cart.getCartStartDate(), cart.getCartTotal());
 
         final String query = """
-            INSERT INTO cart (cartPlayerId, cartClubId, cartType, cartItemsJson, cartTotal)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO cart (cartPlayerId, cartClubId, cartStartDate, cartType, cartItemsJson, cartTotal)
+            VALUES (?, ?, ?, ?, ?, ?)
             AS vals
             ON DUPLICATE KEY UPDATE
                 cartItemsJson = vals.cartItemsJson,
@@ -38,6 +38,7 @@ public class CreateCart implements Serializable {
             dao.execute(query,
                 cart.getCartPlayerId(),
                 cart.getCartClubId(),
+                java.sql.Timestamp.valueOf(cart.getCartStartDate()),
                 cart.getCartType().name(),
                 cart.getCartItemsJson(),
                 cart.getCartTotal());

@@ -5,11 +5,8 @@ import static interfaces.Log.LOG;
 // import jakarta.enterprise.context.RequestScoped;  // migrated 2026-02-24
 // import jakarta.inject.Named;  // migrated 2026-02-24
 import java.io.Serializable;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import org.primefaces.PrimeFaces;
-import utils.LCUtil;
 // @Named  // migrated 2026-02-24
 // @RequestScoped  // migrated 2026-02-24
 public class Blocking implements Serializable, interfaces.Log, interfaces.GolfInterface{
@@ -89,21 +86,4 @@ LOG.debug("starting toString for Blocking!");
         return msg;
   }
 }
-public static Blocking mapBlocking(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Blocking b = new Blocking();
-            b.setBlockingPlayerId(rs.getInt("BlockingPlayerId") );
-            b.setBlockingLastAttempt(rs.getTimestamp("BlockingLastAttempt").toLocalDateTime());
-            b.setBlockingAttempts(rs.getShort("BlockingAttempts") );
-            b.setBlockingRetryTime(rs.getTimestamp("BlockingRetryTime").toLocalDateTime());
-           
-   return b;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
 } //end class

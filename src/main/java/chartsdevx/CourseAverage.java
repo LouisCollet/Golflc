@@ -5,9 +5,10 @@ import entite.Course;
 import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import rowmappers.AverageRowMapper;
 import static interfaces.Log.LOG;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,23 +17,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.sql.DataSource;
 
 @ApplicationScoped
 public class CourseAverage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(lookup = "java:jboss/datasources/golflc")
-    private DataSource dataSource;
+    @Inject private dao.GenericDAO dao;
 
     public CourseAverage() { }
 
     public List<Average> stat(final Player player, final Course course) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("  with player = " + player);
-        LOG.debug("  with course = " + course);
 
         // CTE Common Table Expression — disable ONLY_FULL_GROUP_BY for this session
         final String queryMode = """
@@ -57,7 +54,7 @@ public class CourseAverage implements Serializable {
             GROUP BY scorehole;
             """;
 
-        try (Connection conn = dataSource.getConnection()) {
+        try (Connection conn = dao.getConnection()) {
             // First: disable ONLY_FULL_GROUP_BY
             try (PreparedStatement psMode = conn.prepareStatement(queryMode)) {
                 utils.LCUtil.logps(psMode);
@@ -76,9 +73,9 @@ public class CourseAverage implements Serializable {
                     int i = 0;
                     while (rs.next()) {
                         i++;
-                        liste.add(entite.Average.map(rs));
+                        liste.add(new AverageRowMapper().map(rs));
                     } // end while
-                    LOG.debug("ResultSet getStatAvg has " + i + " lines.");
+                    LOG.debug("list size = {}", i);
                     return liste;
                 }
             }

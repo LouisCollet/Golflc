@@ -92,34 +92,6 @@ public class psCreateUpdateTee {
         //    if (tee.getCourse_idcourse() == null || tee.getCourse_idcourse() == 0) {
         //        throw new IllegalArgumentException("Course ID is required for tee creation");
         //    }
-            
-            // ========================================
-            // Normalisation et valeurs par défaut
-            // ========================================
-      /*      Integer distance = (tee.getTeeDistanceTee() != null) ? tee.getTeeDistanceTee() : 0;
-            
-            // Valeurs par défaut si null (depuis le constructeur)
-            String gender = (tee.getTeeGender() != null) ? tee.getTeeGender() : "M";
-            String start = (tee.getTeeStart() != null) ? tee.getTeeStart() : "YELLOW";
-            Integer clubHandicap = (tee.getTeeClubHandicap() != null) ? tee.getTeeClubHandicap() : 0;
-            String holesPlayed = (tee.getTeeHolesPlayed() != null) ? tee.getTeeHolesPlayed() : "01-18";
-            
-            // ========================================
-            // Mapping (dans l'ordre de la table SQL)
-            // ========================================
-            ps.setInt(++index, tee.getIdtee());                   // idtee (peut être 0 pour auto-increment)
-            ps.setString(++index, gender);                        // TeeGender
-            ps.setString(++index, start);                         // TeeStart
-            ps.setShort(++index, tee.getTeeSlope());              // TeeSlope
-            ps.setBigDecimal(++index, tee.getTeeRating());        // TeeRating
-            ps.setInt(++index, clubHandicap);                     // TeeClubHandicap
-            ps.setString(++index, holesPlayed);                   // TeeHolesPlayed
-            ps.setShort(++index, tee.getTeePar());                // TeePar
-            ps.setInt(++index, tee.getCourse_idcourse());         // course_idcourse (FK)
-            ps.setInt(++index, tee.getTeeMasterTee());            // TeeMasterTee
-            ps.setInt(++index, distance);                         // TeeDistanceTee
-            ps.setTimestamp(++index, Timestamp.from(Instant.now())); // creationDate (si la table l'a)
-*/
     ps.setNull(1, java.sql.Types.INTEGER);
     ps.setString(2, tee.getTeeGender());
     ps.setString(3, tee.getTeeStart());
@@ -137,7 +109,7 @@ public class psCreateUpdateTee {
     
     ps.setTimestamp(12, Timestamp.from(Instant.now()));
             
-             LOG.debug("PreparedStatement for tee creation completed with {} parameters", index);
+             LOG.debug("PreparedStatement for tee creation completed");
             
             
          //--------   

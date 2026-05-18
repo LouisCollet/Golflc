@@ -41,8 +41,8 @@ public class FindTarifMembersData implements Serializable {
 
         final String query = """
             SELECT *
-            FROM tarif_members
-            WHERE tarif_members.TarifMemberIdClub = ?
+            FROM tarif_cotisation
+            WHERE tarif_cotisation.TarifMemberIdClub = ?
             AND ? BETWEEN TarifMemberStartDate AND TarifMemberEndDate
             """;
 

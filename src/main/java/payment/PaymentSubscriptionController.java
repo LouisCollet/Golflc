@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import static utils.LCUtil.showMessageFatal;
-import static utils.LCUtil.showMessageInfo;
 import static utils.LCUtil.prepareMessageBean;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
@@ -52,7 +50,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
                         + " player = " + subscription.getIdplayer()
                         + " , trial  = <h1>" + subscription.getTrialCount() + "</h1>";
                 LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.warn("trial limit reached for player={}", subscription.getIdplayer());
             }
 
             return subscription;
@@ -142,7 +140,12 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
         LOG.debug("entering {}", methodName);
 
         try {
-            Subscription latest = findLatestSubscription(subscription.getIdplayer()); // migrated 2026-02-25
+            Integer idplayer = subscription.getIdplayer();
+            if (idplayer == null) {
+                LOG.error("complete() — null idplayer, subscription={}", subscription);
+                return subscription;
+            }
+            Subscription latest = findLatestSubscription(idplayer); // migrated 2026-02-25
 
             switch (subscription.getSubCode()) {
                 case "INITIAL" -> initSubscription(subscription);
@@ -173,7 +176,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
     /**
      * Crée un paiement pour un abonnement.
      */
-    public boolean createPayment(Subscription subscription) throws SQLException {
+    public boolean createPayment(Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
 
@@ -182,18 +185,18 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
             boolean success = createPaymentSubscription.create(subscription); // migrated 2026-02-25
 
             if (success) {
-                showMessageInfo(prepareMessageBean("subscription.success") + subscription);
+                LOG.info("payments_subscription created player={}", subscription.getIdplayer());
             } else {
-                showMessageFatal("Error: payment subscription NOT done!");
+                LOG.error("[SUBSCRIPTION] payments_subscription creation failed player={}", subscription.getIdplayer());
             }
 
             return success;
         } catch (SQLException e) {
             handleSQLException(e, methodName);
-            return false;
+            throw e;
         } catch (Exception e) {
             handleGenericException(e, methodName);
-            return false;
+            throw e;
         }
     } // end method
 
@@ -213,8 +216,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
                     LOG.debug(methodName + " - tarif found in DB: " + tarif);
                     yield tarif.getPrice();
                 }
-                LOG.error(methodName + " - no active tarif in DB for " + subscription.getSubCode());
-                showMessageFatal("No active tarif found for " + subscription.getSubCode());
+                LOG.error("no active tarif in DB for subCode={}", subscription.getSubCode());
                 yield 0.0;
             }
             case "TRIAL", "INITIAL" -> 0.0;

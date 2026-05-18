@@ -4,6 +4,7 @@ import entite.CompetitionDescription;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.CompetitionDescriptionRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -29,13 +30,7 @@ public class LoadCompetitionDescription implements Serializable {
                 WHERE CompetitionId = ?
                 """;
 
-        return dao.querySingle(query, rs -> {
-            try {
-                return CompetitionDescription.map(rs);
-            } catch (Exception e) {
-                throw new SQLException(e);
-            }
-        }, competition.getCompetitionId());
+        return dao.querySingle(query, new CompetitionDescriptionRowMapper(), competition.getCompetitionId());
     } // end method
 
     /*

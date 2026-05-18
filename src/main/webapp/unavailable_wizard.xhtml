@@ -183,7 +183,7 @@
         </p:panel></div>
     </p:tab>
 
-    <!-- =================== TAB 3: STRUCTURE =================== -->
+    <!-- =================== TAB 3: STRUCTURE (commenté 2026-05-04) ===================
     <p:tab id="StructureTab"
            title="📋 Structure (#{clubC.unavailable.structure.structureList.size()})"
            titletip="#{msg['title.unavailable.structure']}">
@@ -203,7 +203,7 @@
                 </h:panelGroup>
                 <p:selectOneMenu id="workCourseId"
                                  value="#{clubC.unavailable.structure.workCourseId}">
-                    <f:selectItem itemLabel="-- Select --" itemValue=" "/>
+                    <f:selectItem itemLabel="- - Select - -" itemValue=" "/>
                     <f:selectItem itemLabel="#{msg['unavailable.structure.allcourses']}" itemValue="9999"/>
                     <f:selectItems value="#{clubC.courseListForClub}"
                                    var="c"
@@ -293,13 +293,14 @@
                         <i class="pi pi-trash"/> #{msg['button.delete']}
                         <p:confirm type="popup"
                                    header="#{msg['message.confirm.delete']}"
-                                   message="#{msg['title.unavailable.structure']} — #{appContext.club.clubName} ?"
+                                   message="#{msg['title.unavailable.structure']} - - #{appContext.club.clubName} ?"
                                    icon="pi pi-exclamation-triangle"/>
                     </p:commandLink>
                 </div>
             </f:facet>
         </p:panel></div>
     </p:tab>
+    =================== FIN TAB 3 =================== -->
 
     <!-- =================== TAB 4: COMMENT (EDITOR) =================== -->
     <p:tab id="EditorTab"
@@ -310,42 +311,10 @@
                 <h1>#{msg['title.cotisation.comment']}</h1>
             </f:facet>
 
-            <p:textEditor id="textEditor"
-                          widgetVar="editorVar"
-                          value="#{clubC.unavailable.period.comment}"
-                          height="70px"
-                          styleClass="w-full"
-                          placeholder="Enter here your content"/>
-
-            <p:dialog id="dialogComment"
-                      width="auto"
-                      height="auto"
-                      header="#{msg['title.cotisation.comment']}"
-                      widgetVar="dlgComment"
-                      showEffect="fade"
-                      hideEffect="fade">
-                <p:outputPanel id="displayComment">
-                    <h3>#{msg['tarif.members.add.comment']}</h3>
-                    <h:outputText value="#{clubC.unavailable.period.comment}" escape="false"/>
-                </p:outputPanel>
-            </p:dialog>
-
-            <f:facet name="footer">
-                <div class="btn-group">
-                    <p:commandButton id="btnSaveComment"
-                                     value="#{msg['tarif.members.add.comment']}"
-                                     process="@this textEditor"
-                                     update="displayComment"
-                                     oncomplete="PF('dlgComment').show()"
-                                     icon="pi pi-database"
-                                     styleClass="p-button-outlined"/>
-                    <p:commandButton value="Clear"
-                                     type="button"
-                                     onclick="PF('editorVar').clear();"
-                                     icon="pi pi-times"
-                                     styleClass="p-button-outlined"/>
-                </div>
-            </f:facet>
+            <ui:include src="include/include_text_editor_comment.xhtml">
+                <ui:param name="editorValue"  value="#{clubC.unavailable.period.comment}"/>
+                <ui:param name="dialogHeader" value="#{msg['title.cotisation.comment']}"/>
+            </ui:include>
         </p:panel></div>
     </p:tab>
 

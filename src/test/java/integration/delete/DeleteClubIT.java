@@ -27,37 +27,46 @@ public class DeleteClubIT {
         try (Connection conn = new JdbcConnectionProvider().getConnection()) {
             conn.setAutoCommit(false);
             try {
-                // Niveau le plus bas en premier
-                int rowScore        = execute(conn, """
-                        DELETE FROM score WHERE (inscription_player_idplayer, inscription_round_idround) IN (
-                            SELECT InscriptionIdPlayer, InscriptionIdRound FROM inscription WHERE round_idround IN (
-                                SELECT idround FROM round WHERE course_idcourse IN (
-                                    SELECT idcourse FROM course WHERE club_idclub = ?)))""");
+                int rowScore = execute(conn, """
+                    DELETE score FROM score
+                    INNER JOIN inscription ON score.inscription_player_idplayer = inscription.InscriptionIdPlayer
+                                          AND score.inscription_round_idround   = inscription.InscriptionIdRound
+                    INNER JOIN round ON inscription.round_idround = round.idround
+                    INNER JOIN course ON round.course_idcourse = course.idcourse
+                    WHERE course.club_idclub = ?
+                    """);
 
-                int rowInscription  = execute(conn, """
-                        DELETE FROM inscription WHERE round_idround IN (
-                            SELECT idround FROM round WHERE course_idcourse IN (
-                                SELECT idcourse FROM course WHERE club_idclub = ?))""");
+                int rowInscription = execute(conn, """
+                    DELETE inscription FROM inscription
+                    INNER JOIN round ON inscription.round_idround = round.idround
+                    INNER JOIN course ON round.course_idcourse = course.idcourse
+                    WHERE course.club_idclub = ?
+                    """);
 
-                int rowRound        = execute(conn, """
-                        DELETE FROM round WHERE course_idcourse IN (
-                            SELECT idcourse FROM course WHERE club_idclub = ?)""");
+                int rowRound = execute(conn, """
+                    DELETE round FROM round
+                    INNER JOIN course ON round.course_idcourse = course.idcourse
+                    WHERE course.club_idclub = ?
+                    """);
 
-                int rowHole         = execute(conn, """
-                        DELETE FROM hole WHERE course_idcourse IN (
-                            SELECT idcourse FROM course WHERE club_idclub = ?)""");
+                int rowHole = execute(conn, """
+                    DELETE hole FROM hole
+                    INNER JOIN course ON hole.course_idcourse = course.idcourse
+                    WHERE course.club_idclub = ?
+                    """);
 
-                int rowTee          = execute(conn, """
-                        DELETE FROM tee WHERE course_idcourse IN (
-                            SELECT idcourse FROM course WHERE club_idclub = ?)""");
+                int rowTee = execute(conn, """
+                    DELETE tee FROM tee
+                    INNER JOIN course ON tee.course_idcourse = course.idcourse
+                    WHERE course.club_idclub = ?
+                    """);
 
                 int rowCourse       = execute(conn, "DELETE FROM course               WHERE club_idclub = ?");
                 int rowSubscription = execute(conn, "DELETE FROM payments_subscription WHERE SubscriptionClubId = ?");
 
-                // SET NULL sur ClubLocalAdmin avant delete club (contrainte FK)
-                execute(conn,                       "UPDATE club SET ClubLocalAdmin = NULL WHERE idclub = ?");
+                execute(conn, "UPDATE club SET ClubLocalAdmin = NULL WHERE idclub = ?");
 
-                int rowClub         = execute(conn, "DELETE FROM club WHERE idclub = ?");
+                int rowClub = execute(conn, "DELETE FROM club WHERE idclub = ?");
 
                 assertNotEquals(0, rowClub, "Club " + CLUB_ID + " not exists");
                 conn.commit();

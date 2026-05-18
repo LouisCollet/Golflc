@@ -156,26 +156,7 @@ public String getComment(){
         return msg;
         }
   } //end method
-/* vers row mapper        
-public static UnavailablePeriod map(ResultSet rs) throws SQLException{
-  final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        ObjectMapper om = new ObjectMapper();
-        UnavailablePeriod period = om.readValue(rs.getString("UnavailableItems"), UnavailablePeriod.class);
-        period.setIdclub(rs.getInt("UnavailableIdClub"));
-        period.setStartDate(rs.getTimestamp("UnavailableStartDate").toLocalDateTime());
-   //        LOG.debug("start date column = " + rs.getTimestamp("UnavailableStartDate").toLocalDateTime());
-        period.setEndDate(rs.getTimestamp("UnavailableEndDate").toLocalDateTime());
-   //        LOG.debug("end date column = " + rs.getTimestamp("UnavailableEndDate").toLocalDateTime());
-   return period;
-  }catch(Exception e){
-      String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
-  }
-} //end method
-*/
+
 // new 26-03-2020 experimental !!
 public static PreparedStatement psUnavailablePeriodCreate(PreparedStatement ps, Club club){
     final String methodName = utils.LCUtil.getCurrentMethodName(); 

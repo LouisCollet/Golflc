@@ -6,7 +6,6 @@
       xmlns:h="jakarta.faces.html"
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces"
-      xmlns:c="jakarta.tags.core"
       template="templates/masterTemplate.xhtml">
 
 <ui:define name="title">Local Administrator Greenfees</ui:define>
@@ -16,21 +15,17 @@
 <p:panel styleClass="login-card form-card" style="max-width:100%;">
 <f:facet name="header">
     <h1>
-        <h:outputText
-            id="RndHeader"
-            rendered="#{appContext.inputSelectPaiement eq 'Greenfees'}"
-            value="#{msg['message.for.paiement.greenfee']}"/>
+        <h:outputText value="#{msg['message.for.paiement.greenfee']}"/>
     </h1>
 </f:facet>
 
 <h:form id="form_local_admin_greenfee">
    <ui:include src="/include/include_summary_player.xhtml"/>
 
- <c:set var="select" value="#{appContext.inputSelectPaiement}"/>
    <p:dataTable id="TableLocalAdmin"
                 var="c"
                 widgetVar="customersTable"
-                value="#{memC.listLocalAdminGreenfee(select)}"
+                value="#{memC.listLocalAdminGreenfee('Greenfees')}"
                 sortBy="#{c.club.idclub}"
                 filteredValue="#{memC.filteredCars}"
                 styleClass="compact-table" >

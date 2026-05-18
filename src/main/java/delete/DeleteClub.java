@@ -374,9 +374,6 @@ try{
     LOG.error(msg);
   //  LCUtil.showMessageFatal(msg);
     return false;
-}finally{
-        connection_package.DBConnection.closeQuietly(null, null, null, ps);
-}
 } //end method
 
   public boolean deleteClubAndChilds(final Club club,final Connection conn) throws Exception{
@@ -521,9 +518,6 @@ try{
     LOG.error(msg);
     LCUtil.showMessageFatal(msg);
     return false;
-}finally{
-     //   utils.DBConnection.closeQuietly(null, null, null, ps);
-}
 } //end method
 
 
@@ -540,9 +534,6 @@ try{
             String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
       //      LCUtil.showMessageFatal(msg);
-   }finally{
-     //  DBConnection.closeQuietly(conn, null, null, null);
-          }
 } // end method main
 } //end class
 */

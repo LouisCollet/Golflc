@@ -83,22 +83,4 @@ public String toString(){
         return msg;
   }
 }
-// à modifier ultérieurement !!
-  public static LoggingUser map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        LoggingUser logging = new LoggingUser();
-        logging.setLoggingIdPlayer(rs.getInt("LoggingIdPlayer"));
-        logging.setLoggingIdRound(rs.getInt("LoggingIdRound") );
-        logging.setLoggingType(rs.getString("LoggingType") );
-        logging.setLoggingCalculations(rs.getString("LoggingCalculations"));
-        logging.setLoggingModificationDate(LocalDateTime.now()); // 16/08/2022 for reprise vers mongoDB
-      return logging;
-  }catch(Exception e){
-      String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
-      LOG.error(msg);
-      LCUtil.showMessageFatal(msg);
-      return null;
-  }
-} //end method map
 } // end class

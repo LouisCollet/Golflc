@@ -78,6 +78,15 @@
                                          process="@this"/>
                     </p:column>
 
+                    <p:column headerText="#{msg['menu.tarif.pro']}"
+                              width="12%">
+                        <p:commandButton value="#{msg['menu.tarif.pro']}"
+                                         icon="pi pi-dollar"
+                                         styleClass="p-button-warning p-button-outlined p-button-sm"
+                                         process="@this"
+                                         action="#{clubC.navigateToTarifPro(c.professional)}"/>
+                    </p:column>
+
                 </p:dataTable>
 
                 <p:dialog id="editProAmountDialog"

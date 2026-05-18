@@ -41,7 +41,8 @@ public class UpdateRoundGameQualifying implements Serializable {
         final String query = """
             UPDATE round
                SET RoundGame       = ?,
-                   RoundQualifying = ?
+                   RoundQualifying = ?,
+                   RoundName       = ?
              WHERE idround = ?
             """;
 
@@ -50,7 +51,8 @@ public class UpdateRoundGameQualifying implements Serializable {
 
             ps.setString(1, round.getRoundGame());
             ps.setString(2, round.getRoundQualifying());
-            ps.setInt(3, round.getIdround());
+            ps.setString(3, round.getRoundName());
+            ps.setInt(4, round.getIdround());
             utils.LCUtil.logps(ps);
 
             int rows = ps.executeUpdate();

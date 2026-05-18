@@ -117,6 +117,16 @@
                                  action="#{memC.createMemberPeriod()}"
                                  update="tarif_member_wizard:wizardTarifMember"
                                  styleClass="p-button-outlined"/>
+                <p:commandButton id="btnDeleteAll"
+                                 value="#{msg['button.delete']}"
+                                 icon="pi pi-trash"
+                                 rendered="#{memC.tarifMember.startDate != null}"
+                                 action="#{memC.deleteTarifMember()}"
+                                 update="tarif_member_wizard"
+                                 process="@this"
+                                 styleClass="p-button-danger">
+                    <p:confirm icon="pi pi-exclamation-triangle"/>
+                </p:commandButton>
             </f:facet>
         </p:panel></div>
     </p:tab>
@@ -160,7 +170,7 @@
                                placeholder="9999.9"
                                thousandSeparator=""
                                minValue="0"
-                               maxValue="2000.0"
+                               maxValue="3000.0"
                                lang="#{languageC.locale}">
                     <f:validateBean disabled="true"/>
                 </p:inputNumber>
@@ -207,9 +217,12 @@
                     <p:cellEditor>
                         <f:facet name="output"><h:outputText value="#{b.price}"/></f:facet>
                         <f:facet name="input">
-                            <p:inputNumber value="#{b.price}" size="6"
-                                           decimalPlaces="1" decimalSeparator="."
-                                           minValue="0" maxValue="2000.0">
+                            <p:inputNumber value="#{b.price}"
+                                           size="6"
+                                           decimalPlaces="1"
+                                           decimalSeparator="."
+                                           minValue="0"
+                                           maxValue="3000.0">
                                 <f:validateBean disabled="true"/>
                             </p:inputNumber>
                         </f:facet>
@@ -368,42 +381,10 @@
                 <h1>#{msg['title.cotisation.comment']}</h1>
             </f:facet>
 
-            <p:textEditor id="textEditor"
-                          widgetVar="editorVar"
-                          value="#{memC.tarifMember.comment}"
-                          height="70px"
-                          styleClass="w-full"
-                          placeholder="Enter here your content"/>
-
-            <p:dialog id="dialog1"
-                      width="auto"
-                      height="auto"
-                      header="Content of comment"
-                      footer="this is the footer"
-                      widgetVar="dlg"
-                      showEffect="fade"
-                      hideEffect="fade">
-                <p:outputPanel id="displayComment">
-                    <h3>Comment registered !</h3>
-                    <h:outputText value="#{memC.tarifMember.comment}" escape="false"/>
-                </p:outputPanel>
-            </p:dialog>
-
-            <f:facet name="footer">
-              <div class="btn-group">
-                <p:commandButton id="btnSaveComment"
-                                 value="#{msg['tarif.members.add.comment']}"
-                                 update="displayComment"
-                                 oncomplete="PF('dlg').show()"
-                                 icon="pi pi-database"
-                                 styleClass="p-button-outlined"/>
-                <p:commandButton value="Clear"
-                                 type="button"
-                                 onclick="PF('editorVar').clear();"
-                                 icon="pi pi-times"
-                                 styleClass="p-button-outlined"/>
-              </div>
-            </f:facet>
+            <ui:include src="include/include_text_editor_comment.xhtml">
+                <ui:param name="editorValue"  value="#{memC.tarifMember.comment}"/>
+                <ui:param name="dialogHeader" value="#{msg['title.cotisation.comment']}"/>
+            </ui:include>
         </p:panel></div>
     </p:tab>
 
@@ -449,14 +430,6 @@
                                  action="#{memC.createTarifMember()}"
                                  styleClass="p-button-success"/>
 
-                <p:commandButton id="btnDeleteAll"
-                                 value="#{msg['button.delete']}"
-                                 icon="pi pi-trash"
-                                 action="#{memC.deleteTarifMember()}"
-                                 update="tarif_member_wizard"
-                                 styleClass="p-button-danger">
-                    <p:confirm icon="pi pi-exclamation-triangle"/>
-                </p:commandButton>
               </div>
             </f:facet>
         </p:panel></div>

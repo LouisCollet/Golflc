@@ -1,5 +1,7 @@
 package entite;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.io.Serializable;
@@ -9,6 +11,7 @@ import java.time.LocalDateTime;
 import jakarta.validation.constraints.NotNull;
 import utils.LCUtil;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Lesson implements Serializable{
 
     private Integer eventId;
@@ -109,6 +112,7 @@ public Lesson(){ } // end constructor
         this.eventClubId = eventClubId;
     }
 
+    @JsonIgnore
     public boolean isLessonPaid() {
         return paymentsLessonId != null;
     }
@@ -135,25 +139,6 @@ public Lesson(){ } // end constructor
     public String getStudentName()                    { return studentName; }
     public void   setStudentName(String studentName)  { this.studentName = studentName; }
 
-    public static Lesson map(ResultSet rs) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        try{
-            Lesson event = new Lesson();
-            event.setEventStartDate(rs.getTimestamp("EventStartDate").toLocalDateTime());
-            event.setEventEndDate(rs.getTimestamp("EventEndDate").toLocalDateTime());
-            event.setEventProId(rs.getInt("EventProId"));
-            event.setEventPlayerId(rs.getInt("EventPlayerId"));
-            event.setEventAllDay(rs.getBoolean("EventAllDay"));
-            event.setEventTitle(rs.getString("EventTitle"));
-            event.setEventDescription(rs.getString("EventDescription"));
- //              LOG.debug("ScheduleEvent event returned from map = " + event);
-            return event;
-        }catch(Exception e){
-            String msg = "£££ Exception in rs = " + methodName + " / "+ e.getMessage();
-            LOG.error(msg);
-            LCUtil.showMessageFatal(msg);
-            return null;
-        } } //end method
  @Override
 public String toString(){
  try {

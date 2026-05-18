@@ -155,26 +155,5 @@ public String toString(){
         return msg;
   }
 }
-/*
-  public static Hole map(ResultSet rs) throws SQLException{
-      final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Hole h = new Hole();
-        h.setIdhole(rs.getInt("idhole"));
-        h.setHoleNumber(rs.getShort("HoleNumber") );
-        h.setHolePar(rs.getShort("HolePar") );
-        h.setHoleDistance(rs.getShort("HoleDistance") );
-        h.setHoleStrokeIndex(rs.getShort("HoleStrokeIndex") );
-        h.setTee_idtee(rs.getInt("tee_idtee"));
-        h.setTee_course_idcourse(rs.getInt("tee_course_idcourse"));
-        return h;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + " /" + e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method map
-*/
 
 } // end class

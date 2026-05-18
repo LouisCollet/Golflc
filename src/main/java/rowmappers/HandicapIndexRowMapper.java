@@ -20,7 +20,7 @@ public class HandicapIndexRowMapper extends AbstractRowMapper<HandicapIndex> {
         h.setHandicapScoreDifferential(getBigDecimal(rs,"HandicapScoreDifferential") );
         h.setHandicapExpectedSD9Holes(getDouble(rs,"HandicapExpectedSD9Holes") );  // new 15-04-2025
         h.setHandicapHolesNotPlayed(getShort(rs,"HandicapHolesNotPlayed") );  // new 15-04-2025
-        h.setHandicapDate(getTimestamp(rs,"HandicapDate").toLocalDateTime());
+        h.setHandicapDate(getLocalDateTime(rs, "HandicapDate"));
         h.setHandicapWHS(getBigDecimal(rs,"HandicapWHS"));
         h.setHandicapExceptionalScoreReduction(getShort(rs,"HandicapExceptionalScoreReduction"));
         h.setHandicapSoftHardCap(getString(rs,"HandicapSoftHardCap"));
@@ -34,4 +34,4 @@ public class HandicapIndexRowMapper extends AbstractRowMapper<HandicapIndex> {
             return null;
         }
     }
-}
+} // end class

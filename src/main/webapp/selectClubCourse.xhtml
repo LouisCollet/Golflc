@@ -26,7 +26,8 @@
             <!-- ── Club dropdown ──────────────────────────────────────────── -->
             <p:outputLabel for="clubDropdown" value="#{msg['club.name']} :"/>
             <p:selectOneMenu id="clubDropdown" value="#{clubC.selectedClubId}">
-                <f:selectItem itemLabel="-- #{msg['message.selectclub']} --" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItem itemLabel="-- #{msg['message.selectclub']} --"
+                              itemValue="#{null}" noSelectionOption="true"/>
                 <f:selectItems value="#{clubC.listClubsDialog('any')}"
                                var="cl"
                                itemLabel="#{cl.clubName} (#{cl.idclub})"

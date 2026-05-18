@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
-public class psCreateRound implements Serializable, interfaces.Log, interfaces.GolfInterface {
+public class psCreateRound implements Serializable{
 
     /**
      * @param ldt RoundDate convertie en UTC par l'appelant avant insertion

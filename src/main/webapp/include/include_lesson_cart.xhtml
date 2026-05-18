@@ -6,13 +6,13 @@
       xmlns:ui="jakarta.faces.facelets"
       xmlns:p="primefaces">
 
-    <h:panelGroup rendered="#{payC.proFree}" layout="block"
+    <h:panelGroup rendered="#{cartC.proFree}" layout="block"
                   style="background:var(--golf-primary-light,#e8f5e9); border-left:4px solid var(--golf-primary,#2e7d32); padding:0.75rem 1rem; margin-bottom:1rem; border-radius:4px;">
         <i class="pi pi-check-circle" style="color:var(--golf-primary,#2e7d32); margin-right:0.5rem;"/>
         <strong>#{msg['lesson.pro.free']}</strong>
     </h:panelGroup>
 
-    <ui:repeat value="#{payC.listLessons}" var="c">
+    <ui:repeat value="#{cartC.listLessons}" var="c">
         <div class="lesson-item-card">
             <p:panelGrid layout="flex" columns="2" columnClasses="col1Flex,col2Flex">
                 <p:outputLabel value="#{msg['lesson.startdate']}"/>
@@ -45,7 +45,7 @@
                                  styleClass="p-button-danger p-button-sm"
                                  process="@this"
                                  oncomplete="PF('deleteProductDialog').show()">
-                    <f:setPropertyActionListener value="#{c}" target="#{payC.selectedLesson}"/>
+                    <f:setPropertyActionListener value="#{c}" target="#{cartC.selectedLesson}"/>
                 </p:commandButton>
             </div>
         </div>

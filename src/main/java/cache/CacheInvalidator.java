@@ -83,6 +83,7 @@ public class CacheInvalidator implements Serializable {
     @Inject private lists.LocalAdminCotisationList             localAdminCotisationList;   // migrated to @ApplicationScoped 2026-03-22
     @Inject private lists.LocalAdminGreenfeeList               localAdminGreenfeeList;     // migrated to @ApplicationScoped 2026-03-22
     @Inject private lists.SystemAdminSubscriptionList          systemAdminSubscriptionList; // migrated to @ApplicationScoped 2026-03-22
+    @Inject private lists.TarifGreenfeeList                    tarifGreenfeeList;
 
     // ========================================
     // Lists — Professionals
@@ -252,6 +253,52 @@ public class CacheInvalidator implements Serializable {
         findInfoStableford.invalidateCache();
         findCurrentSubscription.invalidateCache();
         findTeeStart.invalidateCache();
+    } // end method
+
+    // ========================================
+    // 🎯 INVALIDATIONS UNITAIRES
+    // ========================================
+
+    /** participantsRoundList uniquement — vérification de capacité / race condition */
+    public void invalidateParticipantsRound() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        participantsRoundList.invalidateCache();
+    } // end method
+
+    /** findTeeStart uniquement — avant auto-inscription */
+    public void invalidateFindTeeStart() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        findTeeStart.invalidateCache();
+    } // end method
+
+    /** sunriseSunsetList uniquement — reload hebdomadaire */
+    public void invalidateSunriseSunset() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        sunriseSunsetList.invalidateCache();
+    } // end method
+
+    /** courseListForClub uniquement — changement de club */
+    public void invalidateCourseListForClub() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        courseListForClub.invalidateCache();
+    } // end method
+
+    /** playersList uniquement — mise à jour du mot de passe */
+    public void invalidatePlayersList() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        playersList.invalidateCache();
+    } // end method
+
+    /** tarifGreenfeeList uniquement — après CREATE/UPDATE/DELETE d'un tarif greenfee */
+    public void invalidateTarifGreenfee() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        tarifGreenfeeList.invalidateCache();
     } // end method
 
 } // end class

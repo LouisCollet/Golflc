@@ -28,7 +28,6 @@ public final class SubscriptionRegistrar implements PaymentRegistrar<Subscriptio
     public boolean register(SubscriptionPayment payment) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        // return new payment.PaymentSubscriptionController().createPayment(payment.subscription(), conn);
         return paymentSubscriptionController.createPayment(payment.subscription()); // migrated 2026-02-25
     } // end method
 } // end class

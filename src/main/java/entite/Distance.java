@@ -66,24 +66,6 @@ public Distance(){ // constructor
             LOG.debug("sanitizer started ! = " );
     }
 
-public static Distance map(ResultSet rs) throws SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName(); 
-  try{
-        Distance tm = new Distance();
-   //     tm = om.readValue(rs.getString("TarifMemberJson"),TarifMember.class);
- //             LOG.debug("TarifMember extracted from database = "  + tm.toString());
-   //     tm.setStartDate(rs.getTimestamp("TarifMemberStartDate").toLocalDateTime());
-   //     tm.setEndDate(rs.getTimestamp("TarifMemberEndDate").toLocalDateTime());
-    //    tm.setTarifMemberIdClub(rs.getInt("TarifMemberIdClub"));
-      LOG.debug("Distance tm returned from map = " + tm);
-   return tm;
-}catch(Exception e){
-   String msg = "£££ Exception in " + methodName + " / "+ e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
  @Override
 public String toString(){
  try {

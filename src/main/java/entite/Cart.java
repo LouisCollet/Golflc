@@ -12,6 +12,7 @@ public class Cart implements Serializable {
     private int           idCart;
     private int           cartPlayerId;
     private int           cartClubId;
+    private LocalDateTime cartStartDate;
     private eTypePayment  cartType;
     private String        cartItemsJson;
     private double        cartTotal;
@@ -29,6 +30,9 @@ public class Cart implements Serializable {
 
     public int           getCartClubId()       { return cartClubId; }
     public void          setCartClubId(int v)  { this.cartClubId = v; }
+
+    public LocalDateTime getCartStartDate()    { return cartStartDate; }
+    public void          setCartStartDate(LocalDateTime v) { this.cartStartDate = v; }
 
     public enumeration.eTypePayment getCartType()                    { return cartType; }
     public void                setCartType(enumeration.eTypePayment v) { this.cartType = v; }
@@ -51,8 +55,8 @@ public class Cart implements Serializable {
     @Override
     public String toString() {
         return "Cart{idCart=" + idCart + ", playerId=" + cartPlayerId
-             + ", clubId=" + cartClubId + ", type=" + cartType
-             + ", total=" + cartTotal + ", status=" + cartStatus + "}";
+             + ", clubId=" + cartClubId + ", startDate=" + cartStartDate
+             + ", type=" + cartType + ", total=" + cartTotal + ", status=" + cartStatus + "}";
     }
 
 } // end class

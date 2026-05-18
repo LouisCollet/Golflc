@@ -5,7 +5,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import entite.Address;
 import entite.Club;
 import entite.Player;
-import entite.UnavailablePeriod;
 import entite.UnavailableStructure;
 import static exceptions.LCException.handleGenericException;
 import java.sql.ResultSet;

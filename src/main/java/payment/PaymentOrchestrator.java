@@ -53,7 +53,7 @@ public final class PaymentOrchestrator {
         };
 
         if (!success) {
-            throw new Exception("Payment already registered for " + target);
+            throw new Exception("Payment registration failed for " + target);
         }
     }
 }

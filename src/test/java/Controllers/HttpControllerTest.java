@@ -250,7 +250,7 @@ class HttpControllerTest {
             entite.Creditcard cc = new entite.Creditcard();
             cc.setCreditCardExpirationDateLdt(LocalDateTime.of(2027, 6, 1, 0, 0));
             cc.setCreditcardHolder("TEST HOLDER");
-            cc.setCreditcardType("VISA");
+            cc.setCreditcardType(enumeration.CreditcardBrand.VISA);
             cc.setCreditcardVerificationCode((short) 123);
             cc.setTotalPrice(100.0);
             cc.setCommunication("test-comm");

@@ -11,7 +11,7 @@ import java.time.Instant;
 import static utils.LCUtil.getCurrentMethodName;
 
 /**
- * PreparedStatement mapper pour tarif_members (INSERT).
+ * PreparedStatement mapper pour tarif_cotisation (INSERT).
  *
  * Colonnes (ordre INSERT généré par SqlFactory.generateInsertQuery) :
  *  1. TarifMemberId           — NULL (autoincrement)
@@ -33,7 +33,7 @@ public class psCreateTarifMember {
     }
 
     /**
-     * Remplit le PreparedStatement pour un INSERT dans tarif_members.
+     * Remplit le PreparedStatement pour un INSERT dans tarif_cotisation.
      *
      * @param ps    PreparedStatement déjà préparé
      * @param tarif objet TarifMember à insérer

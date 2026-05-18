@@ -2,6 +2,7 @@ package lists;
 
 import entite.CompetitionDescription;
 import static interfaces.Log.LOG;
+import rowmappers.CompetitionDescriptionRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -35,15 +36,7 @@ public class CompetitionDescriptionList implements Serializable {
             FROM competition_description
             """;
 
-        liste = dao.queryList(query, rs -> {
-            try {
-                return entite.CompetitionDescription.map(rs);
-            } catch (SQLException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new SQLException("CompetitionDescription.map failed", e);
-            }
-        });
+        liste = dao.queryList(query, new CompetitionDescriptionRowMapper());
         return liste;
     } // end method
 

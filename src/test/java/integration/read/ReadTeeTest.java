@@ -1,4 +1,4 @@
-package read;
+package integration.read;
 
 import entite.Tee;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import read.ReadTee;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;

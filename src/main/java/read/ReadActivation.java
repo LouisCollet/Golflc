@@ -4,6 +4,7 @@ import entite.Activation;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.ActivationRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -30,7 +31,7 @@ public class ReadActivation implements Serializable {
                 WHERE activationkey = ?
                 """;
 
-        Activation a = dao.querySingle(query, rs -> entite.Activation.map(rs), activation.getActivationKey());
+        Activation a = dao.querySingle(query, new ActivationRowMapper(), activation.getActivationKey());
         if (a == null || a.getActivationKey() == null) {
             String msg = "Votre enregistrement à Golflc ou votre demande de password reset n'ont pas été trouvés !!";
             LOG.error("- {}", msg);

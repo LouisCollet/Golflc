@@ -4,6 +4,7 @@ import entite.Audit;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.AuditRowMapper;
 import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
@@ -57,16 +58,13 @@ public class AuditConnectionList implements Serializable {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setTimestamp(1, Timestamp.valueOf(
-                    java.time.LocalDateTime.now().minusDays(30)));
+            ps.setTimestamp(1, Timestamp.valueOf(java.time.LocalDateTime.now().minusDays(30)));
             utils.LCUtil.logps(ps);
 
             try (ResultSet rs = ps.executeQuery()) {
                 List<Audit> liste = new ArrayList<>();
                 while (rs.next()) {
-                    Audit a = Audit.mapAudit(rs);
-                    a.setPlayerName(rs.getString("playerName")); // colonne extra de cette requête uniquement
-                    liste.add(a);
+                    liste.add(new AuditRowMapper().map(rs));
                 }
                 LOG.debug(methodName + " - found " + liste.size() + " audit entries");
                 return liste;

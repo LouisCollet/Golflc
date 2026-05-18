@@ -3,6 +3,7 @@ package lists;
 import entite.CompetitionData;
 import entite.CompetitionDescription;
 import static interfaces.Log.LOG;
+import rowmappers.CompetitionDataRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -41,7 +42,7 @@ public class CompetitionDataList implements Serializable {
             """;
 
         liste = new ArrayList<>(dao.queryList(query,
-                rs -> entite.CompetitionData.map(rs),
+                new CompetitionDataRowMapper(),
                 cd.getCompetitionId()));
 
         if (liste.isEmpty()) {

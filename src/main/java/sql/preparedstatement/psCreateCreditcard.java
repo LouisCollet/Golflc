@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-public class psCreateCreditcard implements Serializable, interfaces.Log, interfaces.GolfInterface {
+public class psCreateCreditcard implements Serializable {
 
     public static PreparedStatement psMapCreate(
             PreparedStatement ps,
@@ -19,7 +19,7 @@ public class psCreateCreditcard implements Serializable, interfaces.Log, interfa
             ps.setString(3, creditcard.getCreditcardHolder());                                         // CreditcardHolder
             ps.setString(4, creditcard.getCreditcardNumber());                                         // CreditcardNumber
             ps.setTimestamp(5, Timestamp.valueOf(creditcard.getCreditCardExpirationDateLdt()));        // CreditcardExpirationDate
-            ps.setString(6, creditcard.getCreditcardType());                                           // CreditcardType
+            ps.setString(6, creditcard.getCreditcardType().name());                                     // CreditcardBrand
             ps.setShort(7, creditcard.getCreditcardVerificationCode());                                // CreditcardVerificationCode
             ps.setTimestamp(8, Timestamp.from(Instant.now()));                                        // CreditcardModificationDate
            sql.PrintWarnings.print(ps.getWarnings(), methodName);// TarifModificationDate

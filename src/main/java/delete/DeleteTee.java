@@ -179,9 +179,6 @@ try{
     LOG.error(msg);
     showMessageFatal(msg);
     return false;
-}finally{
-        connection_package.DBConnection.closeQuietly(null, null, null, ps);
-}
 } //end method
 
  void main() throws SQLException, Exception{
@@ -195,9 +192,6 @@ try{
         String msg = "Â£Â£ Exception in main = " + e.getMessage();
             LOG.error(msg);
       //      LCUtil.showMessageFatal(msg);
-   }finally{
-       DBConnection.closeQuietly(conn, null, null, null);
-          }
 } // end method main
 } //end class
 */

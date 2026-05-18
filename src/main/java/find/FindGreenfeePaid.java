@@ -1,5 +1,6 @@
 package find;
 
+import entite.Greenfee;
 import entite.Player;
 import entite.Round;
 import static exceptions.LCException.handleGenericException;
@@ -12,6 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 @ApplicationScoped
 public class FindGreenfeePaid implements Serializable {
@@ -21,6 +23,50 @@ public class FindGreenfeePaid implements Serializable {
     @Inject private dao.GenericDAO dao;
 
     public FindGreenfeePaid() { }
+
+    /** Cart duplicate check — compares cart keys (idplayer + roundDate + idclub) against payments_greenfee. */
+    public boolean findByCartKeys(final Integer idplayer, final LocalDateTime roundDate, final Integer idclub) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for idplayer={} idclub={} roundDate={}", idplayer, idclub, roundDate);
+
+        if (idplayer == null || roundDate == null || idclub == null) {
+            LOG.debug("one of the cart keys is null — skipping check");
+            return false;
+        }
+
+        final String query = """
+            SELECT COUNT(*)
+            FROM payments_greenfee
+            WHERE GreenfeeIdPlayer  = ?
+              AND GreenfeeRoundDate  = ?
+              AND GreenfeeIdClub     = ?
+            """;
+
+        try (Connection conn = dao.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, idplayer);
+            ps.setObject(2, roundDate);
+            ps.setInt(3, idclub);
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    LOG.debug("greenfee already paid idplayer={} idclub={} roundDate={}", idplayer, idclub, roundDate);
+                    return true;
+                }
+                return false;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
 
     public boolean find(final Player player, final Round round) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -57,6 +103,45 @@ public class FindGreenfeePaid implements Serializable {
                 }
                 LOG.debug("greenfee found for player={} round={}", player.getIdplayer(), round.getIdround());
                 return true;
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e, methodName);
+            return false;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return false;
+        }
+    } // end method
+
+    public boolean find(final Greenfee greenfee) throws SQLException {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("for greenfee player={} club={} roundDate={}", greenfee.getIdplayer(), greenfee.getIdclub(), greenfee.getRoundDate());
+
+        final String query = """
+            SELECT COUNT(*)
+            FROM payments_greenfee
+            WHERE GreenfeeRoundDate = ?
+              AND GreenfeeIdClub    = ?
+              AND GreenfeeIdPlayer  = ?
+            """;
+
+        try (Connection conn = dao.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setObject(1, greenfee.getRoundDate());
+            ps.setInt(2, greenfee.getIdclub());
+            ps.setInt(3, greenfee.getIdplayer());
+            utils.LCUtil.logps(ps);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    LOG.debug("greenfee already paid player={} club={} roundDate={}",
+                        greenfee.getIdplayer(), greenfee.getIdclub(), greenfee.getRoundDate());
+                    return true;
+                }
+                return false;
             }
 
         } catch (SQLException e) {

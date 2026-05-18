@@ -5,6 +5,7 @@ import entite.Player;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import rowmappers.BlockingRowMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -30,7 +31,7 @@ public class LoadBlocking implements Serializable {
                 WHERE BlockingPlayerId = ?
                 """;
 
-        return dao.querySingle(query, rs -> entite.Blocking.mapBlocking(rs), player.getIdplayer());
+        return dao.querySingle(query, new BlockingRowMapper(), player.getIdplayer());
     } // end method
 
     /*

@@ -40,10 +40,10 @@ public class FindCotisationAtRoundDate implements Serializable {
 
         Cotisation cotisation = new Cotisation();
         // new 15-09-2021
-        if (club.getIdclub().equals(1159)) {  // Whistling Straits Ryder Cup 2021 — accès non payant
-            cotisation.setStatus("Y");
-            return cotisation;
-        }
+   //     if (club.getIdclub().equals(1159)) {  // Whistling Straits Ryder Cup 2021 — accès non payant
+   //         cotisation.setStatus("Y");
+   //         return cotisation;
+   //     }
 
         final String query = """
             SELECT *

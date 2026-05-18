@@ -86,8 +86,7 @@ public class CreateClub implements Serializable {
                 
                 // Mapper les données
                 sql.preparedstatement.psCreateUpdateClub.psMapCreate(ps, club);
-                LCUtil.logps(ps);
-                
+
                 // Exécuter l'insert
                 int row = ps.executeUpdate();
                 
@@ -137,20 +136,21 @@ public class CreateClub implements Serializable {
         LOG.debug("entering {}", methodName);
 
         final String query = """
-            INSERT INTO club (idclub, ClubName, clubAddress, clubCity, clubCountry, ClubLatitude, ClubLongitude, ClubWebsite, ClubZoneId, ClubLocalAdmin, ClubUnavailableStructure, ClubModificationDate)
+            INSERT INTO club (idclub, ClubName, clubAddress, clubCity, clubCountry, ClubLatitude, ClubLongitude, ClubWebsite, ClubZoneId, ClubLocalAdmin, GroundCondition, ClubModificationDate)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            AS vals
             ON DUPLICATE KEY UPDATE
-                ClubName                 = VALUES(ClubName),
-                clubAddress              = VALUES(clubAddress),
-                clubCity                 = VALUES(clubCity),
-                clubCountry              = VALUES(clubCountry),
-                ClubLatitude             = VALUES(ClubLatitude),
-                ClubLongitude            = VALUES(ClubLongitude),
-                ClubWebsite              = VALUES(ClubWebsite),
-                ClubZoneId               = VALUES(ClubZoneId),
-                ClubLocalAdmin           = VALUES(ClubLocalAdmin),
-                ClubUnavailableStructure = VALUES(ClubUnavailableStructure),
-                ClubModificationDate     = CURRENT_TIMESTAMP
+                ClubName             = vals.ClubName,
+                clubAddress          = vals.clubAddress,
+                clubCity             = vals.clubCity,
+                clubCountry          = vals.clubCountry,
+                ClubLatitude         = vals.ClubLatitude,
+                ClubLongitude        = vals.ClubLongitude,
+                ClubWebsite          = vals.ClubWebsite,
+                ClubZoneId           = vals.ClubZoneId,
+                ClubLocalAdmin       = vals.ClubLocalAdmin,
+                GroundCondition      = vals.GroundCondition,
+                ClubModificationDate = CURRENT_TIMESTAMP
             """;
 
         try (Connection conn = dao.getConnection();
@@ -176,143 +176,4 @@ public class CreateClub implements Serializable {
         }
     } // end method
 
-    /**
-     * Main pour tests hors JSF
-     * Note: Non fonctionnel sans container CDI
- 
-    public static void main(String[] args) {
-        try {
-            Country country = new Country();
-            country.setCode("BE");
-            
-            LatLng latlng = new LatLng();
-            latlng.setLat(50.8262290);
-            latlng.setLng(4.3571460);
-            
-            Address address = new Address();
-            address.setCity("Brussels");
-            address.setZipCode("1060");
-            address.setCountry(country);
-            address.setStreet("Rue de l'Amazone 55");
-            address.setLatLng(latlng);
-            
-            Club club = new Club();
-            club.setClubName("Club de test");
-            club.setAddress(address);
-            club.setClubLocalAdmin(324713);
-            club.setClubWebsite("https://golf-empereur.com/");
-            
-            LOG.debug("Main ready (CDI required for execution)");
-            LOG.debug("Test club: {}", club);
-            
-        } catch (Exception e) {
-            LOG.error("Exception in main: {}", e.getMessage(), e);
-            LCUtil.showMessageFatal("Exception in main: " + e.getMessage());
-        }
-    }
-    * */
 } // end class
-
-/*package create;
-
-import entite.Address;
-import entite.Club;
-import entite.Country;
-import entite.LatLng;
-import static exceptions.LCException.handleGenericException;
-import static exceptions.LCException.handleSQLException;
-import static interfaces.Log.LOG;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLWarning;
-import java.util.Arrays;
-import connection_package.DBConnection;
-import utils.LCUtil;
-
-
-public class CreateClub {
-    // 
-private String[] status = new String [2];
-
-
-    public boolean create(final Club club, final Connection conn) throws SQLException, Exception{ 
-         final String methodName = utils.LCUtil.getCurrentMethodName();
-     PreparedStatement ps = null;
-  //   status[0] = "false";
-     try{
-               LOG.debug("entering Createclub.create with club  = {}", club.toString());
-            final String query = LCUtil.generateInsertQuery(conn, "club");
-       // try{ PreparedStatement ps = conn.prepareStatement(query)) {   
-            ps = conn.prepareStatement(query);
-            ps.getWarnings(); // new 27-04-2025
-            SQLWarning warning = ps.getWarnings();
-            while (warning != null) {
-               LOG.warn("SQLWarning: {}", warning.getMessage());
-               warning = warning.getNextWarning();
-            }
-            ps = sql.preparedstatement.psCreateUpdateClub.psMapCreate(ps,club);
-            utils.LCUtil.logps(ps);
-            int row = ps.executeUpdate(); // write into database
-            if (row != 0){
-                club.setIdclub(LCUtil.generatedKey(conn));
-                String msg = "Club Created  = " + club;
-                LOG.debug(msg);
-                LCUtil.showMessageInfo(msg);
-            //    status[0] = "true";
-             //   status[1] = Integer.toString(club.getIdclub());
-             //   LOG.debug("status = {}", Arrays.toString(status));
-               // return true;
-                return true;
-            }else{
-                String msg = "<br/><br/>NOT NOT Successful insert for club = " + club.getIdclub();
-                LOG.debug(msg);
-                LCUtil.showMessageFatal(msg);
-                //status[0] = "false";
-                return false;
-            }
-   //     } // end try preparedStatement
-  }catch (SQLException e){
-        handleSQLException(e, methodName);
-        return false;
-  }catch (Exception e){
-        handleGenericException(e, methodName);
-        return false;
-  } finally {
-         connection_package.DBConnection.closeQuietly(conn, null, null, ps); // not used because of try-with-resources
-        }
-    } // end method createClub
-    
-    void main() throws SQLException, Exception {
-   Connection conn = new DBConnection().getConnection();
-   try {
-       Country country = new Country();
-        country.setCode("BE");
-       LatLng latlng = new LatLng();
-        latlng.setLat(50.8262290);
-        latlng.setLng(4.3571460);
-       Address address = new Address();
-        address.setCity("Brussels");
-        address.setZipCode("B-1060");
-        address.setCountry(country);
-        address.setStreet("Rue de l'Amazone 55");
-        address.setLatLng(latlng);
-        address.setZipCode("1060");
-       Club club = new Club();
-        club.setClubName("Club de test");
-        club.setAddress(address);
-        club.setClubLocalAdmin(324713);
-        club.setClubWebsite("https://golf-empereur.com/");
- 
-       var v = new CreateClub().create(club,conn);
-            LOG.debug("from main, CreateAudit = {}", v);
-        } catch (Exception e) {
-            String msg = "££ Exception in main CreateAudit = " + e.getMessage();
-            LOG.error(msg);
-            //      LCUtil.showMessageFatal(msg);
-        } finally {
-            DBConnection.closeQuietly(conn, null, null, null);
-        }
-    } // end main//
-} //end Class
-*/

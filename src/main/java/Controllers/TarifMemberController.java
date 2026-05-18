@@ -35,7 +35,7 @@ public class TarifMemberController implements Serializable {
 
  
  
-public TarifMember inputTarifMembersCotisation(TarifMember tarifMember) throws SQLException, Exception{  // used in tarif_members.xhtml
+public TarifMember inputTarifMembersCotisation(TarifMember tarifMember) throws SQLException {  // used in tarif_members.xhtml
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
 try{
@@ -86,7 +86,7 @@ try{
 }
 } // end method
 
-public TarifMember inputTarifMembersEquipments(TarifMember tarifMember) throws SQLException, Exception{  // used in tarif_equipments.xhtml
+public TarifMember inputTarifMembersEquipments(TarifMember tarifMember) throws SQLException {  // used in tarif_equipments.xhtml
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
 try{

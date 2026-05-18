@@ -200,11 +200,4 @@ public class MongoCalculationsController implements Serializable {
         }
     } // end method
 
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-    } // end main
-    */
-
 } // end class

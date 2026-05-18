@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 import java.util.List;
 
 // enlevé 11-02-2026 @Named("player")
@@ -121,7 +121,7 @@ public enum LanguageType {
 .{8,} at least 8 characters
 */
 
-  private Date playerModificationDate;
+private LocalDateTime playerModificationDate;
 // coming from Subscription entite and not from data entry
 @JsonIgnore private LocalDate endDate; // mod 30/01/2017
 
@@ -276,12 +276,10 @@ public boolean isShowMenu() {
         this.eID = eID;
     }
 
-public Date getPlayerModificationDate(){
-        return playerModificationDate;
-    }
-    public void setPlayerModificationDate(Date playerModificationDate) {
-        this.playerModificationDate = playerModificationDate;
-   }
+public LocalDateTime getPlayerModificationDate() { return playerModificationDate; }
+public void setPlayerModificationDate(LocalDateTime playerModificationDate) {
+    this.playerModificationDate = playerModificationDate;
+}
 
     public LocalDate getEndDate() {
         return endDate;

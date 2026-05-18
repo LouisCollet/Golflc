@@ -6,6 +6,7 @@ import entite.ScoreStableford;
 import entite.Tee;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import rowmappers.ScoreRowMapper;
 import static interfaces.Log.LOG;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,7 +58,7 @@ public class ReadScoreList implements Serializable {
                 int i = 0;
 
                 while (rs.next()) {
-                    scoreList.add(entite.ScoreStableford.Score.map(rs));
+                    scoreList.add(new ScoreRowMapper().map(rs));
                     i++;
                 }
 

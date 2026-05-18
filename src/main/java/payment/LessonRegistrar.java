@@ -21,7 +21,7 @@ public final class LessonRegistrar implements PaymentRegistrar<LessonPayment> {
 
     @Override
     public boolean register(LessonPayment payment) throws Exception {
-        return paymentLessonController.registerPayment(creditcard, payment.lessons(), player, club);
+        return paymentLessonController.registerPayment(creditcard, payment.lessons(), payment.professional(), player, club);
     }
 
 } // end class

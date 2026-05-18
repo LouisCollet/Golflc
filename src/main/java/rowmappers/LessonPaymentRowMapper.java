@@ -15,9 +15,9 @@ public class LessonPaymentRowMapper extends AbstractRowMapper<LessonPayment> {
      try {
             LessonPayment lp = new LessonPayment();
         //        LOG.debug("starting LessonPayment");
-            lp.setPaymentStartDate(getTimestamp(rs,"LessonStartDate").toLocalDateTime());
-            lp.setPaymentEndDate(getTimestamp(rs,"LessonEndDate").toLocalDateTime());
-            lp.setPaymentDate(getTimestamp(rs,"LessonModificationDate").toLocalDateTime());
+            lp.setPaymentStartDate(getLocalDateTime(rs, "LessonStartDate"));
+            lp.setPaymentEndDate(getLocalDateTime(rs, "LessonEndDate"));
+            lp.setPaymentDate(getLocalDateTime(rs, "LessonModificationDate"));
             lp.setPaymentCommunication(getString(rs,"LessonCommunication"));
             lp.setPaymentAmount(getDouble(rs,"LessonAmount"));
             lp.setPaymentIdStudent(getInteger(rs,"LessonIdStudent")); // mod 02-02-2023

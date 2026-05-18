@@ -96,22 +96,6 @@ public class DialogController implements Serializable {
 
     public void showSelectClub(String purpose) {
         LOG.debug("entering showSelectClub purpose={}", purpose);
-    /*        LOG.debug("=== BEFORE showSelectClub ===");
-        FacesContext ctx = FacesContext.getCurrentInstance();
-    
-        // Afficher les messages actuels
-        List<FacesMessage> messages = ctx.getMessageList();
-            LOG.debug("Messages count: {}", messages.size());
-        for (FacesMessage msg : messages) {
-            LOG.debug("Message: {}", msg.getSummary());
-        }
-        // Effacer les messages
-        ctx.getMessageList().clear();
-        LOG.debug("Messages cleared");
-        
- //       FacesContext.getCurrentInstance().getMessageList().clear(); // new 13-02-2026
- //       LOG.debug("messages cleared");
-        */
         PrimeFaces.current().dialog()
                 .openDynamic("dialogClub.xhtml",
                         modal("50%", "70%", false, false, "dlg-select"),

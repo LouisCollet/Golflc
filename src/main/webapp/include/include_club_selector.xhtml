@@ -6,10 +6,12 @@
     xmlns:h="jakarta.faces.html">
 
             <p:outputLabel for="@next" value="#{msg['club.id']} :" />
-            <h:panelGroup layout="block" styleClass="selector-row" id="containerClub">
+            <h:panelGroup layout="block"
+                          styleClass="selector-row"
+                          id="containerClub">
                 <p:inputNumber id="inputClubId"
                                label="inputClub"
-                               value="#{clubC.club.idclub}"
+                               value="#{clubC.clubId}"
                                size="5"
                                lang="#{languageC.locale}"
                                decimalPlaces="0"

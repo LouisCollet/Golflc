@@ -472,45 +472,4 @@ public String toString(){
   }
 }
 
-public static CompetitionDescription map(ResultSet rs) throws Exception, SQLException{
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-  try{
-        CompetitionDescription c = new CompetitionDescription();
-        c.setCompetitionId(rs.getInt("CompetitionId") );
-        c.setCompetitionDate(rs.getTimestamp("CompetitionDate").toLocalDateTime());
-        c.setCompetitionName(rs.getString("CompetitionName") );
-        c.setStartInscriptionDate(rs.getTimestamp("CompetitionStartInscription").toLocalDateTime());
-        c.setEndInscriptionDate(rs.getTimestamp("CompetitionEndInscription").toLocalDateTime());
-        c.setCompetitionClubId(rs.getInt("CompetitionClubId"));
-        c.setCompetitionCourseIdName(rs.getString("CompetitionCourseIdName")); // attention is a string id - name
-          String s = c.getCompetitionCourseIdName();
-          s = s.substring(0,s.lastIndexOf("-")-1); // example String s = "1 - English Course";
- //            LOG.debug("courseId extracted = " + s);
-        c.setCompetitionCourseId(Integer.parseInt(s));
-        c.setCompetitionGender(rs.getString("CompetitionGender"));
-        c.setCompetitionGame(rs.getString("CompetitionGame"));
-        c.setCompetitionStartHole(rs.getShort("CompetitionStartHole"));
-        c.setFlightNumberPlayers(rs.getShort("CompetitionFlightNumberPlayers"));
-        c.setTimeSlots(rs.getString("CompetitionTimeSlots"));
-        CompetitionDescription cd = OBJECT_MAPPER.readValue(rs.getString("CompetitionHandicapLimitsJson"),CompetitionDescription.class);
-//           LOG.debug("cd handicap series from om = " + Arrays.deepToString(cd.getSeriesHandicap()));
-        c.setSeriesHandicap(cd.getSeriesHandicap());
-//           LOG.debug("cd handicap setted to c = " + Arrays.deepToString(c.getSeriesHandicap()));
-        c.setCompetitionQualifying(rs.getString("CompetitionQualifying"));
-        c.setPriceGivingTime(rs.getTime("CompetitionPrizeGivingTime").toLocalTime());
-        c.setStartingListDate(rs.getTimestamp("CompetitionStartingListDate").toLocalDateTime());
-        c.setClassmentDate(rs.getTimestamp("CompetitionClassmentDate").toLocalDateTime());
-        c.setCompetitionStatus(rs.getString("CompetitionStatus"));
-        c.setCompetitionPar(rs.getShort("CompetitionPar"));
-        c.setCompetitionAgeLadies(rs.getShort("CompetitionAgeLadies"));
-        c.setCompetitionAgeMens(rs.getShort("CompetitionAgeMens"));
-        c.setCompetitionMaximumPlayers(rs.getShort("CompetitionMaximumPlayers"));
-   return c;
-  }catch(Exception e){
-   String msg = "£££ Exception in rs = " + methodName + e.getMessage();
-   LOG.error(msg);
-    LCUtil.showMessageFatal(msg);
-    return null;
-  }
-} //end method
 } // end class
