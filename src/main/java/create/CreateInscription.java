@@ -113,6 +113,7 @@ public class CreateInscription implements Serializable {
                             LOG.error("mail failed: {}", mailEx.getMessage());
                         }
                     }
+                    // batch="P" = inscription via paiement greenfee — mail géré par PaymentConfirmationMail
                     inscription.setInscriptionError(false);
                     inscription.setErrorStatus("00");
                     return inscription;

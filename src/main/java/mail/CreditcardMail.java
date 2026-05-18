@@ -141,14 +141,20 @@ public class CreditcardMail implements Serializable {
             if (tarifMember != null) {
                 for (EquipmentsAndBasicAndRange b : tarifMember.getBasicList()) {
                     if (b.getPrice() == null || b.getQuantity() == null || b.getQuantity() <= 0) continue;
-                    lignes.append("<tr><td>").append(b.getItem()).append("</td>")
+                    String label = b.getQuantity() > 1
+                        ? b.getItem() + " (" + b.getQuantity() + " × " + String.format("%.2f %s", b.getPrice(), cs) + ")"
+                        : b.getItem();
+                    lignes.append("<tr><td>").append(label).append("</td>")
                           .append("<td align='right'>")
                           .append(String.format("%.2f %s", b.getPrice() * b.getQuantity(), cs))
                           .append("</td></tr>");
                 }
                 for (EquipmentsAndBasic e : tarifMember.getEquipmentsList()) {
                     if (e.getPrice() == null || e.getQuantity() == null || e.getQuantity() <= 0) continue;
-                    lignes.append("<tr><td>").append(e.getItem()).append("</td>")
+                    String label = e.getQuantity() > 1
+                        ? e.getItem() + " (" + e.getQuantity() + " × " + String.format("%.2f %s", e.getPrice(), cs) + ")"
+                        : e.getItem();
+                    lignes.append("<tr><td>").append(label).append("</td>")
                           .append("<td align='right'>")
                           .append(String.format("%.2f %s", e.getPrice() * e.getQuantity(), cs))
                           .append("</td></tr>");
@@ -194,6 +200,7 @@ public class CreditcardMail implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             String cs = currSymbol(creditcard);
+            double greenfeeTotal = greenfees.stream().mapToDouble(Greenfee::getPrice).sum();
             StringBuilder lignes = new StringBuilder();
             for (int i = 0; i < greenfees.size(); i++) {
                 Greenfee gf = greenfees.get(i);
@@ -222,7 +229,7 @@ public class CreditcardMail implements Serializable {
                 + lignes
                 + "<tr><td colspan='2'><hr/></td></tr>"
                 + "<tr><td><b>Total</b></td>"
-                + "<td align='right'><b>" + String.format("%.2f %s", creditcard.getTotalPrice(), cs) + "</b></td></tr>"
+                + "<td align='right'><b>" + String.format("%.2f %s", greenfeeTotal, cs) + "</b></td></tr>"
                 + "</table>"
                 + "<hr/>"
                 + "<p>" + creditcard.getCreditcardIssuer() + " " + creditcard.getCreditCardNumberSecret() + "</p>"
