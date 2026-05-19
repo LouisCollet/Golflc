@@ -40,13 +40,6 @@ import utils.LCUtil;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
-/**
- * Controller pour la gestion des joueurs
- * ✅ Délègue l'accès au Player à ApplicationContext
- * ✅ Les vues continuent à utiliser #{playerC.player}
- * ✅ handicapIndex délégué à ApplicationContext
- * ✅ Standards CDI : methodName + handleGenericException
- */
 @Named("playerC")
 @SessionScoped
 public class PlayerController implements Serializable {
@@ -57,61 +50,46 @@ public class PlayerController implements Serializable {
     @Inject private CoordinatesService coordinatesService;
     @Inject private ApplicationContext appContext;
     @Inject private cache.CacheInvalidator cacheInvalidator;
-    @Inject private find.FindLastLogin findLastLoginService; // migrated 2026-02-25
-    @Inject private Controllers.LanguageController         languageController; // fix multi-user 2026-03-07
-    @Inject private lists.PlayersList                     playersListService; // fix password cache bug 2026-03-07
+    @Inject private find.FindLastLogin findLastLoginService;
+    @Inject private Controllers.LanguageController languageController;
+    @Inject private lists.PlayersList playersListService;
 
-    // ✅ Injections ajoutées — migration player methods 2026-02-25
-    @Inject private Controllers.PasswordController                 passwordController;
-    @Inject private update.UpdatePlayer                            updatePlayer;
-    @Inject private update.UpdateClub                              updateClub;
-    @Inject private lists.HandicapList                             handicapList;
-    @Inject private read.LoadBlocking                              loadBlocking;         // migrated 2026-02-25
-    @Inject private create.CreateBlocking                          createBlocking;       // migrated 2026-02-25
-    @Inject private update.UpdateBlocking                          updateBlocking;       // migrated 2026-02-25
-    @Inject private update.UpdatePassword                          updatePassword;       // migrated 2026-02-25
-    @Inject private find.FindPassword                              findPassword;         // migrated 2026-02-25
-    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
-    // @ApplicationMap removed 2026-03-22 — unused
+    @Inject private Controllers.PasswordController passwordController;
+    @Inject private update.UpdatePlayer updatePlayer;
+    @Inject private update.UpdateClub updateClub;
+    @Inject private lists.HandicapList handicapList;
+    @Inject private read.LoadBlocking loadBlocking;
+    @Inject private create.CreateBlocking createBlocking;
+    @Inject private update.UpdateBlocking updateBlocking;
+    @Inject private update.UpdatePassword updatePassword;
+    @Inject private find.FindPassword findPassword;
 
     private EPlayerPassword selectedPlayerEPP = null;
-    private Blocking blocking; // migrated from CourseController 2026-02-25
-    private boolean nextPanelPlayer = false; // migrated from CourseController 2026-02-25
+    private Blocking blocking;
+    private boolean nextPanelPlayer = false;
     private boolean showPlayerList = false;
-    private String createModifyPlayer = "C"; // C=Create, M=Modify — migrated from CourseController 2026-02-25
-    private int deletePlayer = 0; // migrated from CourseController 2026-02-25
-    private Password password = new Password(); // migrated from CourseController 2026-02-25
-// ✅ Ajouté dans PlayerController
-//    private ECourseList selectedHandicap = null;
+    private String createModifyPlayer = "C"; // C=Create, M=Modify
+    private int deletePlayer = 0;
+    private Password password = new Password();
     private List<ECourseList> filteredPlayedRound = null;
 
-    // ✅ Session-level cache — avoid repeated DB queries on JSF re-render
+    // Session-level cache — avoid repeated DB queries on JSF re-render
     private List<ECourseList>    cachedHandicapWHS    = null;
     private List<ECourseList>    cachedPlayedRounds   = null;
     private List<EPlayerPassword> cachedPlayers       = null;
     private List<Professional>   cachedProfessionals  = null;
+
     @Inject private Controllers.MongoCalculationsController mongoCalculationsController;
+    @Inject private read.ReadActivation readActivation;
+    @Inject private create.CreateActivationPassword createActivationPassword;
+    @Inject private Controllers.ActivationController activationController;
+    @Inject private read.ReadClub readClubService;
+    @Inject private lists.RoundPlayersList roundPlayersListService;
 
-    // ✅ Injections Activation/Password — migrated 2026-02-26 from CourseController
-    @Inject private read.ReadActivation                             readActivation;
-    @Inject private create.CreateActivationPassword                 createActivationPassword;
-    @Inject private Controllers.ActivationController                activationController;
-    @Inject private read.ReadClub                                   readClubService;      // added 2026-03-19 for homeClubName
-    @Inject private lists.RoundPlayersList                          roundPlayersListService; // added 2026-03-26 for rowPlayerSelect limit
-
-    // ✅ Injections logout/loginAPI/selectedPlayerFromDialog — migrated 2026-02-27
- //   @Inject private find.FindLastAudit                              findLastAudit;
- //   @Inject private update.UpdateAudit                              updateAudit;
-    // externalContext injection removed — fix multi-user 2026-03-07 (request-scoped, must not be cached in @SessionScoped)
-  //  @Inject private Controller.refact.NavigationController            navigationController; // renamed 2026-02-28
     // ========================================
     // DÉLÉGATION — Player (pour les vues)
     // ========================================
 
-    /**
-     * Les vues continuent à utiliser #{playerC.player}
-     * Délègue à ApplicationContext
-     */
     public Player getPlayer()              { return appContext.getPlayer(); }
     public void   setPlayer(Player player) { appContext.setPlayer(player); }
 
@@ -129,15 +107,11 @@ public class PlayerController implements Serializable {
         return (int) ChronoUnit.YEARS.between(birthDate.toLocalDate(), firstDayOfYear);
     } // end method
 
-    /**
-     * Listener for player language change — fix multi-user 2026-03-07
-     * Moved from Player POJO (cannot call CDI from POJO)
-     */
     public void playerLanguageListener(ValueChangeEvent e) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         String newLanguage = e.getNewValue().toString();
-        LOG.debug("playerLanguage NewValue = {}", newLanguage);
+        LOG.debug("playerLanguage newValue={}", newLanguage);
         appContext.getPlayer().setPlayerLanguage(newLanguage);
         languageController.setLanguage(newLanguage);
     } // end method
@@ -150,21 +124,19 @@ public class PlayerController implements Serializable {
 
     public Player getPlayerTemp()              { return appContext.getPlayerTemp(); }
     public void   setPlayerTemp(Player player) { appContext.setPlayerTemp(player); }
-    
-    // ✅ État UI — dans PlayerController, pas dans l'entité HandicapIndex
+
     private List<ECourseList> filteredHandicaps = null;
 
-    // ✅ State Activation/Password — migrated 2026-02-26 from CourseController
     private Activation activation = new Activation();
     private String uuid;
 
     // ========================================
-    // CDI EVENT — ResetEvent observer — 2026-02-26
+    // CDI EVENT — ResetEvent observer
     // ========================================
 
     public void onReset(@Observes events.ResetEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} — source: {}", event.getSource());
+        LOG.debug("entering {} source={}", methodName, event.getSource());
         selectedPlayerEPP    = null;
         blocking             = null;
         nextPanelPlayer      = false;
@@ -179,19 +151,12 @@ public class PlayerController implements Serializable {
         LOG.debug("PlayerController reset done");
     } // end method
 
-
     // ========================================
     // DÉLÉGATION — HandicapIndex (pour les vues)
-    // ✅ courseC.handicapIndex → playerC.handicapIndex
     // ========================================
 
-    public HandicapIndex getHandicapIndex() {
-        return appContext.getHandicapIndex();
-    }
-
-    public void setHandicapIndex(HandicapIndex handicapIndex) {
-        appContext.setHandicapIndex(handicapIndex);
-    }
+    public HandicapIndex getHandicapIndex() { return appContext.getHandicapIndex(); }
+    public void setHandicapIndex(HandicapIndex handicapIndex) { appContext.setHandicapIndex(handicapIndex); }
 
     // ========================================
     // MÉTHODES HELPER
@@ -200,35 +165,30 @@ public class PlayerController implements Serializable {
     public boolean hasPlayer() {
         Player p = appContext.getPlayer();
         return p != null && p.getIdplayer() != null;
-    }
+    } // end method
 
     public boolean isAdmin() {
         Player p = appContext.getPlayer();
         return p != null && "ADMIN".equals(p.getPlayerRole());
-    }
+    } // end method
 
     public boolean isLocalAdmin() {
         Player p = appContext.getPlayer();
         return p != null && "admin".equalsIgnoreCase(p.getPlayerRole());
-    }
+    } // end method
 
     public boolean isRegularPlayer() {
         Player p = appContext.getPlayer();
         return p != null && "PLAYER".equalsIgnoreCase(p.getPlayerRole());
-    }
+    } // end method
 
-    public boolean isProfessional() {
-        return !getProfessionals().isEmpty();
-    }
-
-    public int getProfessionalCount() {
-        return getProfessionals().size();
-    }
+    public boolean isProfessional() { return !getProfessionals().isEmpty(); }
+    public int getProfessionalCount() { return getProfessionals().size(); }
 
     public boolean canShowMenu() {
         Player p = appContext.getPlayer();
         return p != null && p.isShowMenu();
-    }
+    } // end method
 
     // ========================================
     // ACTIONS JSF
@@ -248,18 +208,14 @@ public class PlayerController implements Serializable {
 
             Player player = getPlayer();
             player.setPlayerHomeClub(clubId);
-            LOG.debug("player before creation = {}", player);
+            LOG.debug("player before creation={}", player);
 
-            SaveResult result = playerManager.createPlayer(
-                player,
-                appContext.getHandicapIndex()        // ✅ via appContext
-            );
+            SaveResult result = playerManager.createPlayer(player, appContext.getHandicapIndex());
 
             if (result.isSuccess()) {
                 LOG.debug("player created successfully");
                 appContext.setPlayer(result.getPlayer());
                 appContext.setNextPlayer(true);
-        // dans playerManager        showMessageInfo(result.getMessage());
             } else {
                 LOG.error("player creation failed");
                 showMessageFatal(result.getMessage());
@@ -277,15 +233,12 @@ public class PlayerController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             SaveResult result = playerManager.modifyPlayer(appContext.getPlayer());
-
             if (result.isSuccess()) {
-                LOG.debug(result.getMessage());
-        //        showMessageInfo(result.getMessage());
+                LOG.debug("{}", result.getMessage());
             } else {
-                 LOG.debug(result.getMessage());
+                LOG.debug("{}", result.getMessage());
                 showMessageFatal(result.getMessage());
             }
-
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -310,11 +263,11 @@ public class PlayerController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (cachedPlayers != null) {
-            LOG.debug("returning cached list size = {}", cachedPlayers.size());
+            LOG.debug("returning cached list size={}", cachedPlayers.size());
             return cachedPlayers;
         }
         try {
-            cachedPlayers = playerManager.listPlayers();                     // ✅ via manager
+            cachedPlayers = playerManager.listPlayers();
             return cachedPlayers;
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -326,7 +279,7 @@ public class PlayerController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (cachedProfessionals != null) {
-            LOG.debug("returning cached list size = {}", cachedProfessionals.size());
+            LOG.debug("returning cached list size={}", cachedProfessionals.size());
             return cachedProfessionals;
         }
         try {
@@ -337,174 +290,142 @@ public class PlayerController implements Serializable {
             return Collections.emptyList();
         }
     } // end method
-/**
- * Liste les HandicapIndex WHS — appelé depuis le XHTML
- * #{playerC.listHandicapWHS()}
- */
-public List<ECourseList> listHandicapWHS() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    if (cachedHandicapWHS != null) {
-        LOG.debug("returning cached list size = {}", cachedHandicapWHS.size());
-        return cachedHandicapWHS;
-    }
-    try {
-        cachedHandicapWHS = playerManager.listHandicapWHS(appContext.getPlayer()); // ✅ via manager
-        return cachedHandicapWHS;
-    } catch (Exception e) {
-        handleGenericException(e, methodName);
-        return Collections.emptyList();
-    }
-} // end method
-public List<ECourseList> listPlayedRound() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    if (cachedPlayedRounds != null) {
-        LOG.debug("returning cached list size = {}", cachedPlayedRounds.size());
-        appContext.setPlayedRounds(cachedPlayedRounds);
-        return cachedPlayedRounds;
-    }
-    try {
-        cachedPlayedRounds = playerManager.listPlayedRounds(appContext.getPlayer()); // ✅ via manager
-        appContext.setPlayedRounds(cachedPlayedRounds);          // ✅ synchronise ApplicationContext
-        return cachedPlayedRounds;
-    } catch (Exception e) {
-        handleGenericException(e, methodName);
-        return Collections.emptyList();
-    }
-} // end method
 
-public List<ECourseList> listPlayedRounds() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    if (cachedPlayedRounds != null) {
-        LOG.debug("returning cached list size = {}", cachedPlayedRounds.size());
-        appContext.setPlayedRounds(cachedPlayedRounds);
-        return cachedPlayedRounds;
-    }
-    try {
-        cachedPlayedRounds = playerManager.listPlayedRounds(appContext.getPlayer()); // ✅ via manager
-        appContext.setPlayedRounds(cachedPlayedRounds);              // ✅ synchronise ApplicationContext
-        return cachedPlayedRounds;
-    } catch (Exception e) {
-        handleGenericException(e, methodName);
-        return Collections.emptyList();                 // ✅ jamais null
-    }
-} // end method
-
-/**
- * Invalide les caches session pour les listes per-user.
- * Appelé quand les données handicap/rounds changent.
- */
-public void invalidatePlayerCaches() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    this.cachedHandicapWHS   = null;
-    this.cachedPlayedRounds  = null;
-    this.cachedPlayers       = null;
-    this.cachedProfessionals = null;
-    LOG.debug("player session caches invalidated");
-} // end method
-
-public void textCalculationIndex() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    try {
-        // ✅ Null check — selectedHandicap peut être null
-        ECourseList selected = appContext.getSelectedHandicap();
-        if (selected == null) {
-            LOG.warn("selectedHandicap is null — action skipped");
-            return;
+    public List<ECourseList> listHandicapWHS() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (cachedHandicapWHS != null) {
+            LOG.debug("returning cached list size={}", cachedHandicapWHS.size());
+            return cachedHandicapWHS;
         }
+        try {
+            cachedHandicapWHS = playerManager.listHandicapWHS(appContext.getPlayer());
+            return cachedHandicapWHS;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
 
-        LOG.debug("handicapIndex  = {}", appContext.getHandicapIndex());
-        LOG.debug("roundId        = {}", selected.round().getIdround());
-        LOG.debug("playerId       = {}", appContext.getPlayer().getIdplayer());
+    public List<ECourseList> listPlayedRound() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (cachedPlayedRounds != null) {
+            LOG.debug("returning cached list size={}", cachedPlayedRounds.size());
+            appContext.setPlayedRounds(cachedPlayedRounds);
+            return cachedPlayedRounds;
+        }
+        try {
+            cachedPlayedRounds = playerManager.listPlayedRounds(appContext.getPlayer());
+            appContext.setPlayedRounds(cachedPlayedRounds);
+            return cachedPlayedRounds;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
 
-        // ✅ LoggingUser est un POJO — new correct ici
-        LoggingUser logging = new LoggingUser();
-        logging.setLoggingIdPlayer(appContext.getPlayer().getIdplayer());
-        logging.setLoggingIdRound(selected.round().getIdround());  // ✅ record accessor
-        logging.setLoggingType("H");
+    public List<ECourseList> listPlayedRounds() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        if (cachedPlayedRounds != null) {
+            LOG.debug("returning cached list size={}", cachedPlayedRounds.size());
+            appContext.setPlayedRounds(cachedPlayedRounds);
+            return cachedPlayedRounds;
+        }
+        try {
+            cachedPlayedRounds = playerManager.listPlayedRounds(appContext.getPlayer());
+            appContext.setPlayedRounds(cachedPlayedRounds);
+            return cachedPlayedRounds;
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+            return Collections.emptyList();
+        }
+    } // end method
 
-        // ✅ Via injection — plus de new MongoCalculationsController()
-        appContext.getHandicapIndex().setCalculations(mongoCalculationsController.read(logging));
+    public void invalidatePlayerCaches() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        this.cachedHandicapWHS   = null;
+        this.cachedPlayedRounds  = null;
+        this.cachedPlayers       = null;
+        this.cachedProfessionals = null;
+        LOG.debug("player session caches invalidated");
+    } // end method
 
-        LOG.debug("calculations loaded");
+    public void textCalculationIndex() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        try {
+            ECourseList selected = appContext.getSelectedHandicap();
+            if (selected == null) {
+                LOG.warn("selectedHandicap is null — action skipped");
+                return;
+            }
+            LOG.debug("handicapIndex={}", appContext.getHandicapIndex());
+            LOG.debug("roundId={}", selected.round().getIdround());
+            LOG.debug("playerId={}", appContext.getPlayer().getIdplayer());
 
-    } catch (Exception e) {
-        handleGenericException(e, methodName);
-    }
-} // end method
+            LoggingUser logging = new LoggingUser();
+            logging.setLoggingIdPlayer(appContext.getPlayer().getIdplayer());
+            logging.setLoggingIdRound(selected.round().getIdround());
+            logging.setLoggingType("H");
 
+            appContext.getHandicapIndex().setCalculations(mongoCalculationsController.read(logging));
+            LOG.debug("calculations loaded");
+        } catch (Exception e) {
+            handleGenericException(e, methodName);
+        }
+    } // end method
 
-// ✅ Dans PlayerController — délégation pure, pas de champ local
-public ECourseList getSelectedHandicap() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    return appContext.getSelectedHandicap();
-} // end method
+    public ECourseList getSelectedHandicap() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        return appContext.getSelectedHandicap();
+    } // end method
 
-public void setSelectedHandicap(ECourseList selectedHandicap) {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    appContext.setSelectedHandicap(selectedHandicap);
-    LOG.debug("selectedHandicap = {}", selectedHandicap);
-} // end method
+    public void setSelectedHandicap(ECourseList selectedHandicap) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        appContext.setSelectedHandicap(selectedHandicap);
+        LOG.debug("selectedHandicap={}", selectedHandicap);
+    } // end method
 
-// ✅ Dans PlayerController — délégation pure, pas de champ local
-public ECourseList getSelectedPlayedRound() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    return appContext.getSelectedPlayedRound();
-} // end method
+    public ECourseList getSelectedPlayedRound() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        return appContext.getSelectedPlayedRound();
+    } // end method
 
-public void setSelectedPlayedRound(ECourseList selectedPlayedRound) {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    appContext.setSelectedPlayedRound(selectedPlayedRound);
-    LOG.debug("selectedPlayedRound = {}", selectedPlayedRound);
-} // end method
+    public void setSelectedPlayedRound(ECourseList selectedPlayedRound) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        appContext.setSelectedPlayedRound(selectedPlayedRound);
+        LOG.debug("selectedPlayedRound={}", selectedPlayedRound);
+    } // end method
 
-public List<ECourseList> getFilteredHandicaps() {
-    return filteredHandicaps;
-}
-
-public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
-    this.filteredHandicaps = filteredHandicaps;
-} // end method
+    public List<ECourseList> getFilteredHandicaps() { return filteredHandicaps; }
+    public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) { this.filteredHandicaps = filteredHandicaps; }
 
     // ========================================
     // SELECTION — dataTable
     // ========================================
 
-    public EPlayerPassword getSelectedPlayerEPP() {
-        return selectedPlayerEPP;
-    }
+    public EPlayerPassword getSelectedPlayerEPP() { return selectedPlayerEPP; }
 
     public void setSelectedPlayerEPP(EPlayerPassword selectedPlayerEPP) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         this.selectedPlayerEPP = selectedPlayerEPP;
         if (selectedPlayerEPP != null) {
-            appContext.setPlayer(selectedPlayerEPP.getPlayer()); // ✅ synchronise ApplicationContext
-            LOG.debug("selectedPlayerEPP = {}", selectedPlayerEPP);
+            appContext.setPlayer(selectedPlayerEPP.getPlayer());
+            LOG.debug("selectedPlayerEPP={}", selectedPlayerEPP);
         }
     } // end method
 
-    // ========================================
-    // SELECTION — filtering
-    // ========================================
+    public List<ECourseList> getFilteredPlayedRound() { return filteredPlayedRound; }
+    public void setFilteredPlayedRound(List<ECourseList> filteredPlayedRound) { this.filteredPlayedRound = filteredPlayedRound; }
 
-    public List<ECourseList> getFilteredPlayedRound() {
-        return filteredPlayedRound;
-    }
-
-    public void setFilteredPlayedRound(List<ECourseList> filteredPlayedRound) {
-        this.filteredPlayedRound = filteredPlayedRound;
-    }
-    
-    
     // ========================================
     // CHARGEMENT
     // ========================================
@@ -514,14 +435,13 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         LOG.debug("entering {}", methodName);
         try {
             if (idplayer <= 0) {
-                showMessageFatal(methodName + " - Invalid player ID = " + idplayer);
+                LOG.warn("invalid player ID={}", idplayer);
+                showMessageFatal("Invalid player ID: " + idplayer);
                 return;
             }
-
             Player player = playerManager.readPlayer(idplayer);
             appContext.setPlayer(player);
-            LOG.debug("player loaded = {}", player.getPlayerLastName());
-
+            LOG.debug("player loaded={}", player.getPlayerLastName());
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -532,14 +452,13 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         LOG.debug("entering {}", methodName);
         try {
             if (idplayer <= 0) {
-                showMessageFatal(methodName + " - Invalid player ID = " + idplayer);
+                LOG.warn("invalid player ID={}", idplayer);
+                showMessageFatal("Invalid player ID: " + idplayer);
                 return;
             }
-
             EPlayerPassword epp = playerManager.readPlayerWithPassword(idplayer);
             appContext.setPlayer(epp.player());
             LOG.debug("player with password loaded");
-
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -553,37 +472,28 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
     } // end method
 
     // ========================================
-    // MÉTHODES SIMPLES — migrées de CourseController 2026-02-25
+    // MÉTHODES SIMPLES
     // ========================================
 
-    /**
-     * Valide le joueur et affiche le 2e panelGrid (player_modify.xhtml)
-     */
     public void validatePlayer() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         setNextPanelPlayer(true);
     } // end method
 
-    /**
-     * Prépare le mode modification du joueur (f:viewAction dans player_modify.xhtml)
-     */
     public void to_player_modify(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", s);
+        LOG.debug("entering {} s={}", methodName, s);
         createModifyPlayer = s;
     } // end method
 
-    /**
-     * Dernière session du joueur (welcome.xhtml)
-     */
     public String lastSession(int idplayer) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with idplayer = {}", idplayer);
+        LOG.debug("entering {} idplayer={}", methodName, idplayer);
         try {
             Audit audit = findLastLoginService.find(appContext.getPlayer());
             if (audit != null && audit.getAuditStartDate() != null) {
-                LOG.debug("date last connection = {}", audit.getAuditStartDate().format(ZDF_TIME_HHmm));
+                LOG.debug("date last connection={}", audit.getAuditStartDate().format(ZDF_TIME_HHmm));
                 return audit.getAuditStartDate().format(ZDF_TIME_HHmm);
             } else {
                 return "First Connection for this player";
@@ -594,14 +504,10 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         }
     } // end method
 
-    /**
-     * Delete cascading player — stub (delete_cascading_player.xhtml)
-     */
     public void deleteCascadingPlayer() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            // TODO: implémenter la suppression cascadée via PlayerManager
             LOG.warn("not yet implemented");
             showMessageFatal("Delete cascading player not yet implemented");
         } catch (Exception ex) {
@@ -609,19 +515,16 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         }
     } // end method
 
-    /**
-     * Auto-load player quand l'ID change (local_administrator.xhtml)
-     */
     public void onPlayerIdChanged() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with localAdmin = {}", appContext.getLocalAdmin());
+        LOG.debug("entering {} localAdmin={}", methodName, appContext.getLocalAdmin());
         if (appContext.getLocalAdmin().getIdplayer() == null || appContext.getLocalAdmin().getIdplayer() <= 0) {
             LOG.debug("localAdmin null or 0");
             return;
         }
         try {
             Player loadedPlayer = playerManager.readPlayer(appContext.getLocalAdmin().getIdplayer());
-            LOG.debug("loadedPlayer = {}", loadedPlayer);
+            LOG.debug("loadedPlayer={}", loadedPlayer);
             if (loadedPlayer != null) {
                 appContext.setLocalAdmin(loadedPlayer);
                 showMessageInfo("Player loaded: " + appContext.getLocalAdmin().getPlayerLastName());
@@ -629,15 +532,11 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
                 showMessageFatal("Player not found");
             }
         } catch (Exception e) {
-            LOG.error("Error loading player", e);
-            showMessageFatal("Error loading player " + e);
+            handleGenericException(e, methodName);
         }
     } // end method
 
-    /**
-     * Validation sélection multi-joueurs (select_other_players.xhtml)
-     * Limite = 4 (ou 2 pour MP_SINGLE) moins les joueurs déjà inscrits.
-     */
+    // max 4 players (or 2 for MP_SINGLE) minus already inscribed
     public void rowPlayerSelect(SelectEvent<Object> event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -650,7 +549,7 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
             java.util.List<entite.composite.EPlayerPassword> selected = appContext.getPlayer().getDraggedPlayers();
             LOG.debug("selected={} inscribed={} remaining={}", selected.size(), inscribed, remaining);
             if (selected.size() > remaining) {
-                selected.remove(selected.size() - 1); // retire le dernier cochés
+                selected.remove(selected.size() - 1);
                 String msg = "Maximum " + remaining + " joueur(s) supplémentaire(s) autorisé(s)";
                 LOG.warn("{}", msg);
                 showMessageFatal(msg);
@@ -660,10 +559,6 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         }
     } // end method
 
-    /**
-     * Validation "Select All" (select_other_players.xhtml)
-     * Tronque la sélection au nombre de places restantes.
-     */
     public void rowPlayerSelectAll() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -689,31 +584,25 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         }
     } // end method
 
-    /**
-     * Listener mot de passe joueur (password_modify.xhtml)
-     */
     public void playerPasswordListener(ValueChangeEvent e) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("OldValue = {}", e.getOldValue());
-        LOG.debug("NewValue = {}", e.getNewValue());
+        LOG.debug("oldValue={}", e.getOldValue());
+        LOG.debug("newValue={}", e.getNewValue());
         password.setCurrentPassword(e.getNewValue().toString());
         LOG.debug("playerPassword set");
     } // end method
 
-    /**
-     * Listener confirmation mot de passe joueur (password_modify.xhtml)
-     */
     public void playerConfirmPasswordListener(ValueChangeEvent e) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("OldValue = {}", e.getOldValue());
-        LOG.debug("NewValue = {}", e.getNewValue());
+        LOG.debug("oldValue={}", e.getOldValue());
+        LOG.debug("newValue={}", e.getNewValue());
         password.setWrkconfirmpassword(e.getNewValue().toString());
     } // end method
 
     // ========================================
-    // GETTERS / SETTERS — migrés de CourseController 2026-02-25
+    // GETTERS / SETTERS
     // ========================================
 
     public boolean isNextPanelPlayer() { return nextPanelPlayer; }
@@ -731,67 +620,54 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
     public Password getPassword() { return password; }
     public void setPassword(Password password) { this.password = password; }
 
-    // ✅ Délégation — nextPlayer (pour player_modify.xhtml #{playerC.nextPlayer})
     public boolean isNextPlayer() { return appContext.isNextPlayer(); }
     public void setNextPlayer(boolean b) { appContext.setNextPlayer(b); }
 
-    // ✅ Délégation — connected (pour header.xhtml si migration future)
     public boolean isConnected() { return appContext.isConnected(); }
     public void setConnected(boolean b) { appContext.setConnected(b); }
 
     // ========================================
-    // MÉTHODES MIGRÉES DE CourseController — 2026-02-25
+    // MÉTHODES MIGRÉES
     // ========================================
 
-
-    /**
-     * Enregistre un joueur via eID belge (register_eID_player.xhtml)
-     */
     public String registereIDPlayer() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
             appContext.setPlayer(new smartCard.SmartcardBelgium().initClient());
-            LOG.debug("back from external resource with cardBelgium = {}", appContext.getPlayer());
+            LOG.debug("back from eID card player={}", appContext.getPlayer());
             if (appContext.getPlayer() == null) {
-                String msg = "eid Card Belgium not found";
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("eID card Belgium not found");
+                showMessageFatal("eID Card Belgium not found");
                 return null;
             }
             return "player.xhtml?faces-redirect=true";
         } catch (Exception ex) {
-            String msg = "Exception in registereIDPlayer " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
+            LOG.error("exception in registereIDPlayer", ex);
+            showMessageFatal("eID card registration failed: " + ex.getMessage());
             return null;
         }
     } // end method
 
-    /**
-     * Crée un administrateur local pour un club (local_administrator.xhtml)
-     */
     public String createLocalAdministrator() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
             Club club = appContext.getClub();
-            LOG.debug("for club = {}", club);
-            LOG.debug("with playerTemp = {}", appContext.getPlayerTemp());
+            LOG.debug("club={}", club);
+            LOG.debug("playerTemp={}", appContext.getPlayerTemp());
 
             Player localAdmin = playerManager.readPlayer(appContext.getPlayerTemp().getIdplayer());
-            LOG.debug("player role = {}", localAdmin.getPlayerRole());
+            LOG.debug("player role={}", localAdmin.getPlayerRole());
 
             if (localAdmin.getPlayerRole().equals("PLAYER")) {
-                localAdmin.setPlayerRole("admin"); // Local Administrator
+                localAdmin.setPlayerRole("admin");
                 if (updatePlayer.update(localAdmin)) {
-                    String msg = "Update Player with localAdmin = OK " + localAdmin;
-                    LOG.info(msg);
-                    showMessageInfo(msg);
+                    LOG.info("localAdmin role updated player={}", localAdmin);
+                    showMessageInfo("Local administrator role set — " + localAdmin);
                 } else {
-                    String msg = "FAILURE Update player for localAdmin ! = " + localAdmin;
-                    LOG.error(msg);
-                    showMessageFatal(msg);
+                    LOG.error("FAILURE updating player role player={}", localAdmin);
+                    showMessageFatal("FAILURE Update player for localAdmin! — " + localAdmin);
                     return null;
                 }
             } else {
@@ -800,28 +676,21 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
 
             club.setClubLocalAdmin(localAdmin.getIdplayer());
             if (updateClub.update(club)) {
-                String msg = "Club updated local administrator created <br> = "
+                LOG.info("club localAdmin updated club={} player={}", club.getIdclub(), localAdmin.getIdplayer());
+                showMessageInfo("Club updated — local administrator: "
                         + localAdmin.getIdplayer() + " / " + localAdmin.getPlayerLastName()
-                        + "<br> for club = " + club.getIdclub() + " / " + club.getClubName();
-                LOG.info(msg);
-                showMessageInfo(msg);
+                        + " for club " + club.getIdclub() + " / " + club.getClubName());
             } else {
-                String msg = "FAILURE modify club localAdmin ! = " + club;
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("FAILURE modify club localAdmin club={}", club);
+                showMessageFatal("FAILURE modify club localAdmin! — " + club);
             }
             return null;
         } catch (Exception ex) {
-            String msg = "Exception in createLocalAdministrator " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
+            handleGenericException(ex, methodName);
             return null;
         }
     } // end method
 
-    /**
-     * Liste handicaps pour un joueur (appelé depuis Java)
-     */
     public List<ECourseList> listHandicaps() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -833,9 +702,6 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         }
     } // end method
 
-    /**
-     * Callback wizard player (player.xhtml)
-     */
     public void savePlayer(ActionEvent actionEvent) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -843,9 +709,6 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         FacesContext.getCurrentInstance().addMessage(null, msg);
     } // end method
 
-    /**
-     * Dialog callback — sélection d'un joueur via dialog (local_administrator.xhtml)
-     */
     public void onPlayerSelected(SelectEvent<?> event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -855,43 +718,39 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
                 Player p = (Player) dr.data();
                 appContext.setLocalAdmin(p);
             }
-            case String s -> LOG.warn("Dialog returned String: {}", s);
-            default -> LOG.error("Unexpected dialog return type: {}", obj.getClass());
+            case String s -> LOG.warn("dialog returned String: {}", s);
+            default -> LOG.error("unexpected dialog return type: {}", obj.getClass());
         }
     } // end method
 
     // ========================================
-    // MÉTHODES PASSWORD — migrées de CourseController 2026-02-25
+    // MÉTHODES PASSWORD
     // ========================================
 
-    /**
-     * Valide le mot de passe existant avant modification (password_modify.xhtml)
-     */
     public String validateExistingPassword() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            LOG.debug("player = {}", appContext.getPlayer());
-            LOG.debug("password = {}", password);
-            LOG.debug("currentPassword provided = {}", password.getCurrentPassword() != null);
+            LOG.debug("player={}", appContext.getPlayer());
+            LOG.debug("currentPassword provided={}", password.getCurrentPassword() != null);
             Password passwordtrf = password;
 
             EPlayerPassword epp = new EPlayerPassword(appContext.getPlayer(), password);
-            LOG.debug("password transferred to ReadPlayer = {}", epp.password());
+            LOG.debug("password transferred to ReadPlayer={}", epp.password());
 
             epp = playerManager.readPlayerWithPassword(epp.getPlayer().getIdplayer());
-            LOG.debug("epp returned from LoadPlayer = {}", epp);
+            LOG.debug("epp returned from LoadPlayer={}", epp);
 
             password = epp.password();
             password.setCurrentPassword(passwordtrf.getCurrentPassword());
             epp = epp.withPassword(password);
 
             if (findPassword.passwordMatch(epp)) {
-                LOG.debug("existing password correct !");
+                LOG.debug("existing password correct");
                 passwordVerification("OK");
                 return "password_create.xhtml?faces-redirect=true";
             } else {
-                LOG.error("old password NOT correct !");
+                LOG.error("old password NOT correct");
                 passwordVerification("KO");
                 return null;
             }
@@ -901,16 +760,13 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         }
     } // end method
 
-    /**
-     * Vérifie le résultat de la saisie du mot de passe et gère le blocking (appelé par validateExistingPassword)
-     */
     public String passwordVerification(String OK_KO) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with = {}", OK_KO);
+        LOG.debug("entering {} ok_ko={}", methodName, OK_KO);
         try {
-            LOG.debug("for player = {}", appContext.getPlayer());
+            LOG.debug("for player={}", appContext.getPlayer());
             if ("OK".equals(OK_KO)) {
-                LOG.debug("Password Correct");
+                LOG.debug("password correct");
                 return null;
             }
             if ("KO".equals(OK_KO)) {
@@ -918,11 +774,11 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
                 LOG.info(msg);
                 showMessageInfo(msg);
                 blocking = loadBlocking.load(appContext.getPlayer());
-                LOG.debug("returned blocking = {}", blocking);
+                LOG.debug("returned blocking={}", blocking);
                 if (blocking == null) {
-                    LOG.debug("il n'existe pas de record blocage — création");
+                    LOG.debug("no blocking record — creating");
                     boolean b = createBlocking.create(appContext.getPlayer());
-                    LOG.debug("record blocking written ? = {}", b);
+                    LOG.debug("blocking record written={}", b);
                     return "selectPlayer.xhtml?faces-redirect=true";
                 }
                 if (blocking.getBlockingAttempts() > 2) {
@@ -932,39 +788,35 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
                 } else {
                     short s = blocking.getBlockingAttempts();
                     blocking.setBlockingAttempts(s += 1);
-                    boolean b = updateBlocking.update(blocking);
+                    updateBlocking.update(blocking);
                     return "selectPlayer.xhtml?faces-redirect=true";
                 }
             }
             return null;
         } catch (Exception e) {
-            LOG.error("exception for player = {}: {}", appContext.getPlayer().getPlayerLastName(), e.getMessage(), e);
+            LOG.error("exception in passwordVerification player={}", appContext.getPlayer().getPlayerLastName(), e);
             showMessageFatal("Exception in passwordVerification: " + e.getMessage());
             return null;
         }
     } // end method
 
-    /**
-     * Modifie le mot de passe (include_password.xhtml)
-     */
     public String modifyPassword() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            LOG.debug("with entite Password = {}", password);
+            LOG.debug("password={}", password);
             EPlayerPassword epp = new EPlayerPassword(appContext.getPlayer(), password);
             if (updatePassword.update(epp)) {
-                LOG.debug("boolean returned from modifyPassword is 'true'");
-                cacheInvalidator.invalidatePlayerCaches(); // centralized 2026-03-22
+                LOG.debug("modifyPassword returned true");
+                cacheInvalidator.invalidatePlayerCaches();
                 return "login.xhtml?faces-redirect=true";
             } else {
-                LOG.debug("boolean returned from modifyPassword is 'false'");
+                LOG.debug("modifyPassword returned false");
                 return null;
             }
         } catch (Exception ex) {
-            String msg = "modify Password Exception ! " + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
+            LOG.error("exception in modifyPassword", ex);
+            showMessageFatal("modify Password Exception: " + ex.getMessage());
             return null;
         }
     } // end method
@@ -977,13 +829,13 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
     public void setBlocking(Blocking blocking) { this.blocking = blocking; }
 
     // ========================================
-    // ACTIVATION / PASSWORD — migrated 2026-02-26 from CourseController
+    // ACTIVATION / PASSWORD
     // ========================================
 
     public Activation getActivation() { return activation; }
     public void setActivation(Activation activation) {
         this.activation = activation;
-        LOG.debug("activation set to {}", activation);
+        LOG.debug("activation set={}", activation);
     } // end method
 
     public String getUuid() { return uuid; }
@@ -1006,36 +858,32 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            LOG.debug("uuid = {}", uuid);
-            LOG.debug("current player = {}", appContext.getPlayer());
-            LOG.debug("Activation resetPassword = {}", activation);
+            LOG.debug("uuid={}", uuid);
+            LOG.debug("current player={}", appContext.getPlayer());
+            LOG.debug("activation={}", activation);
             Duration difference = Duration.between(activation.getActivationCreationDate(), LocalDateTime.now());
             long differenceInMinutes = difference.toMinutes();
-            LOG.debug("difference in minutes = {}", differenceInMinutes);
+            LOG.debug("difference in minutes={}", differenceInMinutes);
             if (differenceInMinutes < 10) {
                 String msg = LCUtil.prepareMessageBean("password.reset.ok") + (10 - differenceInMinutes) + " minutes";
                 LOG.info(msg);
                 LCUtil.showMessageInfo(msg);
             } else {
-                LOG.debug("too late for reinitialisation password");
+                LOG.debug("too late for password reinitialisation");
                 appContext.getPlayer().setIdplayer(null);
-                String msg = "You are " + differenceInMinutes + " minutes too late for the reset of your Password "
-                        + activation.getActivationPlayerId();
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
+                LOG.error("password reset too late player={} minutes={}", activation.getActivationPlayerId(), differenceInMinutes);
+                LCUtil.showMessageFatal("You are " + differenceInMinutes + " minutes too late for the reset of your Password.");
                 return "login.xhtml?faces-redirect=true";
             }
             var v = passwordController.resetPassword(activation);
             appContext.setPlayer(v.getPlayer());
             if (appContext.getPlayer() != null) {
-                String msg = ("The password reset was asked by " + appContext.getPlayer().getIdplayer());
-                LOG.info(msg);
-                showMessageInfo(msg);
+                LOG.info("password reset requested by player={}", appContext.getPlayer().getIdplayer());
+                showMessageInfo("The password reset was asked by " + appContext.getPlayer().getIdplayer());
                 return "login.xhtml?faces-redirect=true";
             } else {
-                String msg = "Activation record not found : you already had done this work in a recent past !";
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("activation record not found nonce={}", activation);
+                showMessageFatal("Activation record not found : you already had done this work in a recent past!");
                 return null;
             }
         } catch (Exception e) {
@@ -1046,14 +894,14 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
 
     public void completeActivation(String UUID) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with UUID = {}", UUID);
+        LOG.debug("entering {} UUID={}", methodName, UUID);
         try {
             activation.setActivationKey(UUID);
             activation = readActivation.read(activation);
             if (activation == null) {
-                LOG.debug("Activation is null, not found !");
+                LOG.debug("activation not found");
             } else {
-                LOG.debug("Activation found = {}", activation);
+                LOG.debug("activation found={}", activation);
             }
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -1062,15 +910,15 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
 
     public String activateNewPlayer() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with activation = {}", activation);
+        LOG.debug("entering {} activation={}", methodName, activation);
         try {
             if (activation == null) {
-                LOG.debug("activation is null - return");
+                LOG.debug("activation is null — return");
                 return null;
             }
             Duration difference = Duration.between(activation.getActivationCreationDate(), LocalDateTime.now());
             long differenceInMinutes = difference.toMinutes();
-            LOG.debug("difference in minutes = {}", differenceInMinutes);
+            LOG.debug("difference in minutes={}", differenceInMinutes);
             if (differenceInMinutes < 10) {
                 String msg = "Votre Enregistrement à GolfLC est activé !!! <br/> You Respected the deadline of 10 minutes :"
                         + " it was remaining = " + (10 - differenceInMinutes);
@@ -1078,23 +926,20 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
                 LCUtil.showMessageInfo(msg);
             } else {
                 appContext.getPlayer().setIdplayer(null);
-                String msg = "You are " + differenceInMinutes + " minutes too late for your Registration activation or the reset of your Password "
-                        + activation;
-                LOG.error(msg);
-                LCUtil.showMessageFatal(msg);
+                LOG.error("activation too late player={} minutes={}", activation, differenceInMinutes);
+                LCUtil.showMessageFatal("You are " + differenceInMinutes + " minutes too late for your Registration activation.");
                 return "login.xhtml?faces-redirect=true";
             }
             String s = activationController.check(activation);
-            LOG.debug("string s = {}", s);
+            LOG.debug("activation check result={}", s);
             if (appContext.getPlayer() != null) {
                 String msg = LCUtil.prepareMessageBean("player.welcome" + appContext.getPlayer().getPlayerFirstName());
                 LOG.info(msg);
                 showMessageInfo(msg);
                 return "login.xhtml?faces-redirect=true";
             } else {
-                String msg = "Activation record not found : you already had done this work in a recent past !";
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("activation record not found — already used activation={}", activation);
+                showMessageFatal("Activation record not found : you already had done this work in a recent past!");
                 return null;
             }
         } catch (Exception e) {
@@ -1103,13 +948,6 @@ public void setFilteredHandicaps(List<ECourseList> filteredHandicaps) {
         }
     } // end method
 
-    // logout() moved to NavigationController 2026-03-07 — session lifecycle action
-    // login flow moved to LoginController 2026-04-03
-
-    /**
-     * Retourne le nom du home club du joueur connecté.
-     * Utilisé dans welcome.xhtml.
-     */
     public String getHomeClubName() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
