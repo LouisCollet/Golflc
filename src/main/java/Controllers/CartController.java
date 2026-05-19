@@ -361,7 +361,6 @@ public class CartController implements Serializable {
             appContext.setCreditcardType(LESSON());
             invalidateCache();
             LOG.info("lesson added to cart startDate={}", lesson.getEventStartDate());
-         //   showMessageInfo("Lesson added to cart"); // mod 18-05-2026 
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -390,10 +389,9 @@ public class CartController implements Serializable {
         LOG.debug("entering {}", methodName);
         if (selectedLesson == null) return;
         removeLesson(selectedLesson);
-        String msg = "Lesson removed = " + selectedLesson;
+        LOG.info("lesson removed lesson={}", selectedLesson);
+        showMessageInfo("Lesson removed = " + selectedLesson);
         selectedLesson = null;
-        LOG.info(msg);
-        showMessageInfo(msg);
         org.primefaces.PrimeFaces.current().ajax().update("form_cart:growl-msg", "form_cart:listLessons", "form_cart:messages");
     } // end method
 
@@ -500,6 +498,8 @@ public class CartController implements Serializable {
     // ========================================
 
     public int getCartBadgeCount() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         List<entite.Cart> rows = getPendingRows();
         // Keep creditcardType in sync with DB so cart.xhtml renders correctly at session start
         if (!rows.isEmpty()) {
@@ -600,10 +600,9 @@ public class CartController implements Serializable {
                         if (m.get("endDate")   instanceof String s) cot.setCotisationEndDate(java.time.LocalDateTime.parse(s));
                         if (cot.getIdplayer() != null && cot.getIdclub() != null && cot.getCotisationStartDate() != null) {
                             if (findCotisationOverlapping.find(cot)) {
-                                String msg = "[COTISATION] " + utils.LCUtil.prepareMessageBean("create.cotisation.duplicate")
-                                        + " player=" + cot.getIdplayer() + " club=" + cot.getIdclub();
-                                LOG.warn(msg);
-                                showMessageFatal(msg);
+                                LOG.warn("duplicate cotisation player={} club={}", cot.getIdplayer(), cot.getIdclub());
+                                showMessageFatal("[COTISATION] " + utils.LCUtil.prepareMessageBean("create.cotisation.duplicate")
+                                        + " player=" + cot.getIdplayer() + " club=" + cot.getIdclub());
                                 showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
                                 deleteCartService.deleteById(cart.getIdCart());
                                 valid = false;
@@ -621,10 +620,9 @@ public class CartController implements Serializable {
                             entite.Subscription subComplete = paymentSubscriptionController.complete(sub);
                             if (subComplete != null && subComplete.getStartDate() != null) {
                                 if (findSubscriptionOverlapping.find(subComplete)) {
-                                    String msg = "[SUBSCRIPTION] " + utils.LCUtil.prepareMessageBean("create.subscription.duplicate")
-                                            + " player=" + playerId() + " code=" + sub.getSubCode();
-                                    LOG.warn(msg);
-                                    showMessageFatal(msg);
+                                    LOG.warn("duplicate subscription player={} code={}", playerId(), sub.getSubCode());
+                                    showMessageFatal("[SUBSCRIPTION] " + utils.LCUtil.prepareMessageBean("create.subscription.duplicate")
+                                            + " player=" + playerId() + " code=" + sub.getSubCode());
                                     showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
                                     deleteCartService.deleteById(cart.getIdCart());
                                     valid = false;
@@ -635,11 +633,10 @@ public class CartController implements Serializable {
                     case "LESSON" -> {
                         Lesson lesson = OBJECT_MAPPER.readValue(json, Lesson.class);
                         if (findLessonBooked.find(lesson)) {
-                            String msg = "[LESSON] " + utils.LCUtil.prepareMessageBean("lesson.already.booked")
+                            LOG.warn("duplicate lesson startDate={}", lesson.getEventStartDate());
+                            showMessageFatal("[LESSON] " + utils.LCUtil.prepareMessageBean("lesson.already.booked")
                                     + " " + (lesson.getEventStartDate() != null
-                                        ? lesson.getEventStartDate().format(ZDF_TIME_HHmm) : "?");
-                            LOG.warn(msg);
-                            showMessageFatal(msg);
+                                        ? lesson.getEventStartDate().format(ZDF_TIME_HHmm) : "?"));
                             showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
                             deleteCartService.deleteById(cart.getIdCart());
                             valid = false;
@@ -649,10 +646,9 @@ public class CartController implements Serializable {
                         Greenfee gf = OBJECT_MAPPER.readValue(json, Greenfee.class);
                         if (gf.getRoundDate() != null && gf.getIdclub() != null && gf.getIdplayer() != null) {
                             if (findGreenfeePaid.findByCartKeys(gf.getIdplayer(), gf.getRoundDate(), gf.getIdclub())) {
-                                String msg = "[GREENFEE] " + utils.LCUtil.prepareMessageBean("create.greenfee.duplicate")
-                                        + " " + gf.getRoundDate().toLocalDate() + " club=" + gf.getIdclub();
-                                LOG.warn(msg);
-                                showMessageFatal(msg);
+                                LOG.warn("duplicate greenfee player={} club={} date={}", gf.getIdplayer(), gf.getIdclub(), gf.getRoundDate().toLocalDate());
+                                showMessageFatal("[GREENFEE] " + utils.LCUtil.prepareMessageBean("create.greenfee.duplicate")
+                                        + " " + gf.getRoundDate().toLocalDate() + " club=" + gf.getIdclub());
                                 showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
                                 deleteCartService.deleteById(cart.getIdCart());
                                 valid = false;
@@ -717,6 +713,8 @@ public class CartController implements Serializable {
     } // end method
 
     private void refreshAppContextFromCart() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         // Restore club from first cart row that carries a clubId (all types store it)
         if (appContext.getClub() == null) {
             getPendingRows().stream()
@@ -788,6 +786,8 @@ public class CartController implements Serializable {
     } // end method
 
     private void refreshCotisationCart() throws Exception {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         Cotisation c = tarifMemberController.completeCotisation(
                 memberController.getTarifMember(), appContext.getPlayer(), java.time.LocalDate.now());
         if (c == null) return;
@@ -813,6 +813,8 @@ public class CartController implements Serializable {
     } // end method
 
     private boolean resolveClubId() {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         if (appContext.getClub() == null) return false;
         if (appContext.getClub().getIdclub() != null) return true;
         Integer homeClubId = (appContext.getPlayer() != null) ? appContext.getPlayer().getPlayerHomeClub() : null;
