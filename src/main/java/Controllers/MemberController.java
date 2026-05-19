@@ -571,6 +571,7 @@ public class MemberController implements Serializable {
         };
     } // end method
 
+    // Lazy load — reads existing DB tarif for current course. Returns null if none exists yet.
     public TarifGreenfee getTarifGreenfeeDB() {
         if (tarifGreenfeeDB != null) {
             return tarifGreenfeeDB; // cached — called many times per render, no log
@@ -703,6 +704,7 @@ public class MemberController implements Serializable {
 
     public String getWizardCourseDisplay() { return wizardCourseDisplay; }
 
+    // Reads from courseNameCache (populated by getCoursesForWizard) — no external call during render.
     public String getTarifGreenfeeCourseDisplay() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -712,6 +714,7 @@ public class MemberController implements Serializable {
                 .collect(java.util.stream.Collectors.joining(", "));
     } // end method
 
+    // Uses courseListForClub (Java-level cache) to avoid one JDBC roundtrip per table row.
     public String courseNameFor(Integer courseId) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -959,6 +962,7 @@ public class MemberController implements Serializable {
         }
     } // end method
 
+    // HO mode → filtered by season + slot; other modes → filtered by season only.
     public java.util.List<entite.EquipmentsAndBasic> getEquipmentsForDisplay() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1056,6 +1060,7 @@ public class MemberController implements Serializable {
         }
     } // end method
 
+    // "A" (all-seasons) entries are always included alongside the current season's entries.
     public java.util.List<entite.EquipmentsAndBasic> getEquipmentsForCurrentSeason() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1067,6 +1072,7 @@ public class MemberController implements Serializable {
                 .collect(java.util.stream.Collectors.toList());
     } // end method
 
+    // Only active in HO mode — filters by both season and linked slot key.
     public java.util.List<entite.EquipmentsAndBasic> getEquipmentsForCurrentSlot() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1110,6 +1116,7 @@ public class MemberController implements Serializable {
                 .collect(java.util.stream.Collectors.toList());
     } // end method
 
+    // PrimeFaces SelectOneMenu keeps the stale slotKey after an ajax season change — must clear it explicitly.
     public void resetSlotKeyOnSeasonChange() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1650,6 +1657,7 @@ public class MemberController implements Serializable {
 
     // =========================================================================
     // EquipmentDisplayRow — flat row DTO for the period → slot → equipment view
+    // firstOfSeason/firstOfSlot flags drive p:headerRow rendering in the table.
     // =========================================================================
 
     public static class EquipmentDisplayRow implements java.io.Serializable {
@@ -1679,6 +1687,9 @@ public class MemberController implements Serializable {
         public boolean isFirstOfSlot()    { return firstOfSlot; }
     } // end class EquipmentDisplayRow
 
+    // Builds a flat sorted list for the hierarchy view.
+    // Order: datesSeasonsList order → teeTimesList order → equipment item.
+    // Works for both HO (with slots) and non-HO (no slot level).
     public java.util.List<EquipmentDisplayRow> buildEquipmentDisplayRows(entite.TarifGreenfee tarif) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
