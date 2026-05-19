@@ -2,7 +2,6 @@ package payment;
 
 import entite.*;
 import static interfaces.Log.LOG;
-// import java.sql.Connection; // removed 2026-02-25
 
 public final class PaymentOrchestrator {
 
@@ -36,17 +35,18 @@ public final class PaymentOrchestrator {
     }
 
     public void handle(PaymentTarget target) throws Exception {
-        LOG.debug("entering handle with target = " + target);
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("target={}", target);
         target.setPaymentReference(creditcard.getCreditcardPaymentReference());
 
         boolean success = switch (target) {
             case CotisationPayment cp ->
                 new CotisationRegistrar(creditcard, player, round, club, course, inscription, paymentCotisationController).register(cp);
             case SubscriptionPayment sp ->
-             //   new SubscriptionRegistrar(creditcard, player, club, conn).register(sp);
-                new SubscriptionRegistrar(creditcard, player, club, paymentSubscriptionController).register(sp); // migrated 2026-02-25
+                new SubscriptionRegistrar(creditcard, player, club, paymentSubscriptionController).register(sp);
             case GreenfeePayment gf ->
-                new GreenfeeRegistrar(creditcard, player, round, club, course, inscription, paymentGreenfeeController).register(gf); // migrated 2026-02-25
+                new GreenfeeRegistrar(creditcard, player, round, club, course, inscription, paymentGreenfeeController).register(gf);
             case LessonPayment lp ->
                 new LessonRegistrar(creditcard, player, club, paymentLessonController).register(lp);
             default -> throw new IllegalArgumentException("Type de paiement inconnu: " + target.getClass());
@@ -55,5 +55,6 @@ public final class PaymentOrchestrator {
         if (!success) {
             throw new Exception("Payment registration failed for " + target);
         }
-    }
-}
+    } // end method
+
+} // end class

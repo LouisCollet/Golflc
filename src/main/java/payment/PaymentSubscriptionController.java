@@ -6,7 +6,6 @@ import entite.Subscription.etypeSubscription;
 import static interfaces.Log.LOG;
 import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ import static exceptions.LCException.handleSQLException;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class PaymentSubscriptionController implements Serializable, interfaces.Log {
+public class PaymentSubscriptionController implements Serializable {
 
     @Inject private find.FindCurrentSubscription findCurrentSubscription;
     @Inject private find.FindSubscriptionStatus findSubscriptionStatus;
@@ -28,15 +27,17 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
 
     public PaymentSubscriptionController() {}
 
-    /**
-     * Complète un abonnement trial avec les informations du dernier abonnement.
-     */
-    private static Subscription completeTrial(Subscription subscription, Subscription previous) {
+    private Subscription completeTrial(Subscription subscription, Subscription previous) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         try {
-            LOG.debug("Entering completeTrial with subscription = {}", subscription);
-
             Short t = previous.getTrialCount();
             subscription.setTrialCount((short) (t + 1));
+
+            if (subscription.getTrialCount() > 5) {
+                LOG.warn("trial limit reached player={} count={}", subscription.getIdplayer(), subscription.getTrialCount());
+                return null;
+            }
 
             LocalTime startTime = LocalTime.of(0, 0);
             LocalTime endTime = LocalTime.of(23, 59, 59);
@@ -45,48 +46,30 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
             subscription.setStartDate(LocalDateTime.of(now, startTime));
             subscription.setEndDate(LocalDateTime.of(now, endTime));
 
-            if (subscription.getTrialCount() > 5 && LocalDateTime.now().isAfter(subscription.getEndDate())) {
-                String msg = prepareMessageBean("subscription.create.toomuchtrials")
-                        + " player = " + subscription.getIdplayer()
-                        + " , trial  = <h1>" + subscription.getTrialCount() + "</h1>";
-                LOG.error(msg);
-                LOG.warn("trial limit reached for player={}", subscription.getIdplayer());
-            }
-
             return subscription;
         } catch (Exception ex) {
-            LOG.error("Exception in completeTrial: {}", ex.getMessage());
+            LOG.error("exception in completeTrial", ex);
             return null;
         }
-    }
+    } // end method
 
-    /**
-     * Trouve le dernier abonnement d’un joueur.
-     */
     private Subscription findLatestSubscription(int idplayer) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         Player player = new Player();
         player.setIdplayer(idplayer);
-        List<Subscription> list = findCurrentSubscription.payments(player, "latest"); // migrated 2026-02-25
+        List<Subscription> list = findCurrentSubscription.payments(player, "latest");
         return (list == null || list.isEmpty()) ? null : list.get(0);
     } // end method
 
-    /**
-     * Initialise un abonnement INITIAL.
-     */
-    private void initSubscription(Subscription subscription) { // payement initial dans createPlayer
+    private void initSubscription(Subscription subscription) {
         subscription.setStartDate(LocalDateTime.now());
         subscription.setEndDate(subscription.getStartDate().plusMonths(1));
         subscription.setTrialCount((short) 1);
         subscription.setPaymentReference("Initial - No reference");
         subscription.setCommunication("Initial fake subscription");
+    } // end method
 
-    }
-
-    /**
-     * Définit startDate et endDate pour les abonnements non-trial.
-     */
     private Subscription setStartEndDates(Subscription subscription, Subscription previous) {
         if (previous != null && LocalDateTime.now().isBefore(previous.getEndDate())) {
             subscription.setStartDate(previous.getEndDate().plusDays(1));
@@ -100,13 +83,11 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
         }
 
         return subscription;
-    }
+    } // end method
 
-    /**
-     * Complète prix et communication selon le type d’abonnement.
-     */
     public Subscription completePriceAndCommunication(Subscription subscription) throws Exception {
-        LOG.debug("entering completePriceAndCommunication");
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         double price = findTarif(subscription);
         subscription.setSubscriptionAmount(price);
 
@@ -124,17 +105,13 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
             case "INITIAL" -> {
                 subscription.setPaymentReference("Initial - No reference");
                 subscription.setTrialCount((short) 1);
-             //   subscription.setCommunication(prepareMessageBean("subscription.initial"));
                 subscription.setCommunication("Initial subscription one month free");
             }
         }
-        LOG.debug("subscription completed = " + subscription);
+        LOG.debug("subscription completed={}", subscription);
         return subscription;
-    }
+    } // end method
 
-    /**
-     * Complète un abonnement (dates, prix, communication, trial).
-     */
     public Subscription complete(Subscription subscription) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -142,16 +119,19 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
         try {
             Integer idplayer = subscription.getIdplayer();
             if (idplayer == null) {
-                LOG.error("complete() — null idplayer, subscription={}", subscription);
+                LOG.error("complete() — null idplayer subscription={}", subscription);
                 return subscription;
             }
-            Subscription latest = findLatestSubscription(idplayer); // migrated 2026-02-25
+            Subscription latest = findLatestSubscription(idplayer);
 
             switch (subscription.getSubCode()) {
                 case "INITIAL" -> initSubscription(subscription);
                 case "TRIAL" -> {
                     if (latest != null) {
                         subscription = completeTrial(subscription, latest);
+                        if (subscription == null) {
+                            throw new Exception("Trial subscription limit reached");
+                        }
                     }
                 }
                 default -> subscription = setStartEndDates(subscription, latest);
@@ -173,16 +153,13 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
         }
     } // end method
 
-    /**
-     * Crée un paiement pour un abonnement.
-     */
     public boolean createPayment(Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
 
         try {
-            subscription = complete(subscription); // migrated 2026-02-25
-            boolean success = createPaymentSubscription.create(subscription); // migrated 2026-02-25
+            subscription = complete(subscription);
+            boolean success = createPaymentSubscription.create(subscription);
 
             if (success) {
                 LOG.info("payments_subscription created player={}", subscription.getIdplayer());
@@ -200,11 +177,6 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
         }
     } // end method
 
-    /**
-     * Retourne le tarif d’un abonnement selon son type.
-     * Lit le prix depuis la table tarif_subscription (tarif actif pour le code).
-     * Fallback sur le fichier subscription.properties si pas trouvé en DB.
-     */
     public double findTarif(Subscription subscription) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -213,7 +185,7 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
             case "MONTHLY", "YEARLY" -> {
                 entite.TarifSubscription tarif = findTarifSubscription.findActive(subscription.getSubCode());
                 if (tarif != null) {
-                    LOG.debug(methodName + " - tarif found in DB: " + tarif);
+                    LOG.debug("tarif found in DB tarif={}", tarif);
                     yield tarif.getPrice();
                 }
                 LOG.error("no active tarif in DB for subCode={}", subscription.getSubCode());
@@ -222,11 +194,8 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
             case "TRIAL", "INITIAL" -> 0.0;
             default -> 99.0;
         };
-    }
+    } // end method
 
-    /**
-     * Vérifie si un abonnement existe pour un joueur.
-     */
     public Subscription isExists(Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -235,9 +204,9 @@ public class PaymentSubscriptionController implements Serializable, interfaces.L
         subscription.setIdplayer(player.getIdplayer());
 
         try {
-            boolean found = findSubscriptionStatus.find(subscription, player); // migrated 2026-02-25
+            boolean found = findSubscriptionStatus.find(subscription, player);
             if (found) {
-                List<Subscription> list = findCurrentSubscription.payments(player, "now"); // migrated 2026-02-25
+                List<Subscription> list = findCurrentSubscription.payments(player, "now");
                 subscription = list.isEmpty() ? subscription : list.get(0);
                 subscription.setErrorStatus(false);
             } else {

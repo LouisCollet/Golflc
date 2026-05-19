@@ -5,13 +5,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Server-side store for pending payment transactions.
- * Bridges the gap between JSF session state and stateless REST callbacks.
- *
- * Keyed by nonce (unique per transaction).
- * Auto-evicts expired entries on every access (lazy cleanup).
- */
 @ApplicationScoped
 public class PaymentStateStore implements Serializable {
 
@@ -24,79 +17,64 @@ public class PaymentStateStore implements Serializable {
 
     public PaymentStateStore() { } // end constructor
 
-    /**
-     * Store a new payment transaction.
-     */
     public void store(String nonce, PaymentTransaction tx) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " - nonce=" + nonce);
+        LOG.debug("entering {}", methodName);
         cleanup();
         store.put(nonce, tx);
-        LOG.debug(methodName + " - stored transaction, store size=" + store.size());
+        LOG.debug("stored transaction size={}", store.size());
     } // end method
 
-    /**
-     * Retrieve a transaction by nonce. Returns null if not found or expired.
-     */
     public PaymentTransaction get(String nonce) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " - nonce=" + nonce);
+        LOG.debug("entering {}", methodName);
         if (nonce == null) {
-            LOG.warn(methodName + " - nonce is null");
+            LOG.warn("nonce is null");
             return null;
         }
         PaymentTransaction tx = store.get(nonce);
         if (tx == null) {
-            LOG.warn(methodName + " - transaction not found for nonce=" + nonce);
+            LOG.warn("transaction not found nonce={}", nonce);
             return null;
         }
         if (tx.isExpired(TTL_MILLIS)) {
-            LOG.warn(methodName + " - transaction expired for nonce=" + nonce);
+            LOG.warn("transaction expired nonce={}", nonce);
             store.remove(nonce);
             return null;
         }
         return tx;
     } // end method
 
-    /**
-     * Retrieve and mark as completed (one-time consume).
-     * Returns null if not found, expired, or already completed.
-     */
     public PaymentTransaction consume(String nonce) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " - nonce=" + nonce);
+        LOG.debug("entering {}", methodName);
         PaymentTransaction tx = get(nonce);
         if (tx == null) {
             return null;
         }
         if (tx.isCompleted()) {
-            LOG.warn(methodName + " - SECURITY: transaction already consumed for nonce=" + nonce);
+            LOG.warn("SECURITY: transaction already consumed nonce={}", nonce);
             return null;
         }
         tx.setCompleted(true);
-        LOG.debug(methodName + " - transaction consumed for nonce=" + nonce);
+        LOG.debug("transaction consumed nonce={}", nonce);
         return tx;
     } // end method
 
-    /**
-     * Remove a transaction from the store.
-     */
     public void remove(String nonce) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + " - nonce=" + nonce);
+        LOG.debug("entering {}", methodName);
         store.remove(nonce);
     } // end method
 
-    /**
-     * Lazy cleanup — remove all expired entries.
-     */
     private void cleanup() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         int before = store.size();
         store.entrySet().removeIf(entry -> entry.getValue().isExpired(TTL_MILLIS));
         int removed = before - store.size();
         if (removed > 0) {
-            LOG.debug(methodName + " - cleaned up " + removed + " expired transactions");
+            LOG.debug("cleaned up {} expired transactions", removed);
         }
     } // end method
 

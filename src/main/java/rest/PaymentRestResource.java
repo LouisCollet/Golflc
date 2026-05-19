@@ -3,14 +3,12 @@ package rest;
 import entite.*;
 import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
-import static interfaces.Log.NEW_LINE;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.CookieParam;
-import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
@@ -29,14 +27,6 @@ import javax.crypto.spec.SecretKeySpec;
 import payment.PaymentStateStore;
 import payment.PaymentTransaction;
 
-/**
- * JAX-RS resource for payment callbacks from the Python payment server.
- * Stateless (@RequestScoped) — all transaction data is retrieved from PaymentStateStore by nonce.
- * This class does NOT inject any @SessionScoped beans.
- *
- * Replaces the JAX-RS endpoints previously in PaymentController.
- * Refactored 2026-03-21 — architecture separation REST/JSF.
- */
 @jakarta.ws.rs.Path("payment")
 @RequestScoped
 public class PaymentRestResource implements Serializable {
@@ -61,31 +51,30 @@ public class PaymentRestResource implements Serializable {
             @Context HttpServletRequest servletRequest,
             @Context ServletContext servletContext,
             @Context UriInfo uriInfo,
-            @CookieParam("JSESSIONID") String sessionid,
             @CookieParam("Amount") String amount,
             @CookieParam("PaymentReference") String reference,
             @QueryParam("nonce") String nonce,
             @QueryParam("sig") String sig
     ) throws IOException, WebApplicationException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + ", coming from payment server");
+        LOG.debug("entering {}", methodName);
         try {
             // Verify callback signature (HMAC + nonce)
             PaymentTransaction tx = paymentStateStore.get(nonce);
             if (tx == null) {
-                LOG.warn(methodName + " - SECURITY: unknown nonce=" + nonce);
+                LOG.warn("SECURITY: unknown nonce={}", nonce);
                 return Response.status(Response.Status.FORBIDDEN).entity("Unknown transaction").build();
             }
             if (!verifyCallbackSignature(tx, nonce, sig, param)) {
-                LOG.warn(methodName + " - SECURITY: unauthorized callback rejected for phase=" + param);
+                LOG.warn("SECURITY: unauthorized callback rejected phase={}", param);
                 return Response.status(Response.Status.FORBIDDEN).entity("Invalid callback signature").build();
             }
 
-            LOG.debug("with param = " + param);
-            LOG.debug("with UriInfo = " + uriInfo.getRequestUri().toString());
-            LOG.debug("Amount = " + amount);
-            LOG.debug("PaymentReference = " + reference);
-            LOG.debug("ServletContext getContextPath = " + servletContext.getContextPath());
+            LOG.debug("param={}", param);
+            LOG.debug("uriInfo={}", uriInfo.getRequestUri());
+            LOG.debug("amount={}", amount);
+            LOG.debug("reference={}", reference);
+            LOG.debug("contextPath={}", servletContext.getContextPath());
 
             String appBaseUrl = settings.getProperty("APP_BASE_URL");
             if (appBaseUrl == null || appBaseUrl.isBlank()) {
@@ -96,10 +85,9 @@ public class PaymentRestResource implements Serializable {
             }
             String href = appBaseUrl + servletContext.getContextPath();
             String location = href + "/rest/payment";
-            LOG.debug("location = " + location);
+            LOG.debug("location={}", location);
 
             if (param.equals("phase1")) {
-                LOG.debug("handling param phase1 = " + param);
                 return Response
                         .status(Response.Status.FOUND)
                         .location(java.net.URI.create(location + "/payment_canceled/101?nonce=" + nonce))
@@ -108,7 +96,6 @@ public class PaymentRestResource implements Serializable {
             } // end phase 1
 
             if (param.equals("phase2")) {
-                LOG.debug("handling param phase2 = " + param);
                 return Response
                         .status(Response.Status.FOUND)
                         .location(java.net.URI.create(location + "/payment_confirmed?nonce=" + nonce))
@@ -116,7 +103,6 @@ public class PaymentRestResource implements Serializable {
             } // end phase 2
 
             if (param.equals("phase3")) {
-                LOG.debug("handling param phase3 = " + param);
                 return Response
                         .status(Response.Status.FOUND)
                         .location(java.net.URI.create(location + "/payment_handle/101?nonce=" + nonce))
@@ -126,7 +112,7 @@ public class PaymentRestResource implements Serializable {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("redirect from payment_choice - unknown param or not yet implemented").build();
         } catch (Exception e) {
-            LOG.error("Exception in paymentChoice: " + e.getMessage());
+            handleGenericException(e, methodName);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Internal error").build();
         }
@@ -146,13 +132,10 @@ public class PaymentRestResource implements Serializable {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context UriInfo context,
-            @CookieParam("JSESSIONID") String sessionid,
             @CookieParam("PaymentReference") String reference,
             @CookieParam("Amount") String amount,
             @CookieParam("Currency") String currency,
-            @QueryParam("nonce") String nonce,
-            @DefaultValue("2") @QueryParam("step") int step,
-            @DefaultValue("true") @QueryParam("min-m") boolean hasMin
+            @QueryParam("nonce") String nonce
     ) throws IOException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -211,10 +194,9 @@ public class PaymentRestResource implements Serializable {
                     .build();
 
         } catch (Exception e) {
-            LOG.error("Exception in handlePayments: " + e.getMessage(), e);
+            handleGenericException(e, methodName);
             String detail = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
 
-            // Propage le message d'erreur vers la session JSF via PaymentStateStore — lu dans onPaymentCompleted
             PaymentTransaction errTx = paymentStateStore.get(nonce);
             if (errTx != null) {
                 errTx.setErrorMessage("Payment processing error: " + detail);
@@ -222,7 +204,6 @@ public class PaymentRestResource implements Serializable {
                 LOG.debug("errorMessage stored on transaction nonce={}", nonce);
             }
 
-            // Redirige le user vers la page JSF canceled — le message sera affiché via onPaymentCompleted
             String scheme = request.getScheme();
             String host   = request.getServerName();
             int port      = request.getServerPort();
@@ -246,17 +227,16 @@ public class PaymentRestResource implements Serializable {
             @PathParam("isbn") String id,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
-            @CookieParam("JSESSIONID") String sessionid,
             @HeaderParam("type") String type,
             @CookieParam("Amount") String amount,
             @QueryParam("nonce") String nonce
     ) throws IOException, WebApplicationException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + ", coming from python server");
+        LOG.debug("entering {}", methodName);
         try {
             PaymentTransaction tx = paymentStateStore.get(nonce);
             if (tx == null) {
-                LOG.warn(methodName + " - unknown nonce=" + nonce);
+                LOG.warn("unknown nonce={}", nonce);
                 response.sendRedirect(request.getContextPath() + "/creditcard_payment_canceled.xhtml");
                 return Response.status(Response.Status.FORBIDDEN).entity("Unknown transaction").build();
             }
@@ -268,10 +248,9 @@ public class PaymentRestResource implements Serializable {
             cacheControl.setMustRevalidate(true);
             cacheControl.setPrivate(true);
 
-            LOG.debug("PathParam isbn converted to id = " + id);
-            LOG.debug("JSESSIONID = " + sessionid);
-            LOG.debug("Amount = " + amount);
-            LOG.debug("@HeaderParam type = " + type);
+            LOG.debug("id={}", id);
+            LOG.debug("amount={}", amount);
+            LOG.debug("type={}", type);
 
             tx.getCreditcard().setCreditcardPaymentReference(null);
             tx.getCreditcard().setCommunication("Payment refused by User Client");
@@ -288,7 +267,7 @@ public class PaymentRestResource implements Serializable {
                     .cacheControl(cacheControl)
                     .build();
         } catch (Exception e) {
-            LOG.error("Exception in paymentCancel: " + e.getMessage());
+            handleGenericException(e, methodName);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Internal error").build();
         }
@@ -304,7 +283,6 @@ public class PaymentRestResource implements Serializable {
             @Context HttpServletRequest request,
             @Context HttpServletResponse response,
             @Context HttpHeaders headers,
-            @CookieParam("JSESSIONID") String sessionid,
             @HeaderParam("User-Agent") String whichBrowser,
             @CookieParam("User") String user,
             @CookieParam("PaymentReference") String reference,
@@ -313,31 +291,34 @@ public class PaymentRestResource implements Serializable {
             @QueryParam("nonce") String nonce
     ) throws IOException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering " + methodName + ", coming from python server");
+        LOG.debug("entering {}", methodName);
         try {
             PaymentTransaction tx = paymentStateStore.get(nonce);
             if (tx == null) {
-                LOG.warn(methodName + " - unknown nonce=" + nonce);
+                LOG.warn("unknown nonce={}", nonce);
                 response.sendRedirect(request.getContextPath()
                         + "/creditcard_payment_canceled.xhtml?message=Unknown+transaction");
                 return Response.status(Response.Status.FORBIDDEN).entity("Unknown transaction").build();
             }
 
             Creditcard cc = tx.getCreditcard();
-            LOG.debug(NEW_LINE);
-            LOG.debug("JSESSIONID = " + sessionid);
-            LOG.debug("creditcard = " + cc);
-            LOG.debug("browser = " + whichBrowser);
-            LOG.debug("User = " + user);
-            LOG.debug("Amount from cookie = " + amount);
+            LOG.debug("browser={}", whichBrowser);
+            LOG.debug("user={}", user);
+            LOG.debug("amount from cookie={}", amount);
 
             // Validate amount against server-side value
+            if (amount == null || amount.isBlank()) {
+                LOG.warn("Amount cookie missing nonce={}", nonce);
+                response.sendRedirect(request.getContextPath()
+                        + "/creditcard_payment_canceled.xhtml?nonce=" + nonce + "&message=Amount+missing");
+                return Response.status(Response.Status.FORBIDDEN).entity("Amount cookie missing").build();
+            }
             double cookieAmount = Double.parseDouble(amount);
             double serverAmount = cc.getTotalPrice();
-            LOG.debug("Server-side amount = " + serverAmount + ", cookie amount = " + cookieAmount);
+            LOG.debug("server amount={} cookie amount={}", serverAmount, cookieAmount);
             if (Math.abs(cookieAmount - serverAmount) > 0.01) {
-                LOG.warn("SECURITY: payment amount mismatch! Server=" + serverAmount + " Cookie=" + cookieAmount
-                        + " for playerId=" + tx.getPlayerId());
+                LOG.warn("SECURITY: payment amount mismatch! Server={} Cookie={} playerId={}",
+                        serverAmount, cookieAmount, tx.getPlayerId());
                 cc.setPaymentOK(false);
                 cc.setCommunication("Payment rejected: amount tampered");
                 response.sendRedirect(request.getContextPath()
@@ -352,7 +333,7 @@ public class PaymentRestResource implements Serializable {
                     + "/creditcard_payment_executed.xhtml?nonce=" + nonce);
             return Response.status(Response.Status.ACCEPTED).build();
         } catch (Exception e) {
-            LOG.error("Exception in paymentConfirmed: " + e.getMessage());
+            handleGenericException(e, methodName);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Internal error").build();
         }
@@ -362,24 +343,19 @@ public class PaymentRestResource implements Serializable {
     // CALLBACK SIGNATURE VERIFICATION
     // ========================================
 
-    /**
-     * Verifies the HMAC signature on a callback from the Python payment server.
-     * The signature is computed as HMAC-SHA256(nonce + phase) using the shared secret.
-     * Returns true if the signature is valid AND the nonce matches the stored transaction nonce.
-     */
     private boolean verifyCallbackSignature(PaymentTransaction tx, String nonce, String sig, String phase) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
 
         if (nonce == null || sig == null || phase == null) {
-            LOG.warn(methodName + " - missing callback signature parameters");
+            LOG.warn("missing callback signature parameters");
             return false;
         }
 
         // Verify nonce matches the one generated at payment initiation
         String expectedNonce = tx.getCreditcard().getPaymentNonce();
         if (expectedNonce == null || !expectedNonce.equals(nonce)) {
-            LOG.warn(methodName + " - SECURITY: nonce mismatch! expected=" + expectedNonce + " received=" + nonce);
+            LOG.warn("SECURITY: nonce mismatch expected={} received={}", expectedNonce, nonce);
             return false;
         }
 
@@ -387,7 +363,7 @@ public class PaymentRestResource implements Serializable {
         try {
             String secret = settings.getProperty("PAYMENT_HMAC_SECRET");
             if (secret == null) {
-                LOG.error(methodName + " - PAYMENT_HMAC_SECRET not set");
+                LOG.error("PAYMENT_HMAC_SECRET not set");
                 return false;
             }
             String payload = nonce + phase;
@@ -396,22 +372,14 @@ public class PaymentRestResource implements Serializable {
             String expected = HexFormat.of().formatHex(mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
             boolean valid = expected.equals(sig);
             if (!valid) {
-                LOG.warn(methodName + " - SECURITY: invalid callback signature for phase=" + phase);
+                LOG.warn("SECURITY: invalid callback signature phase={}", phase);
             }
-            LOG.debug("callback signature validated = " + expected.toString());
+            LOG.debug("callback signature validated={}", valid);
             return valid;
         } catch (Exception e) {
-            LOG.error(methodName + " - error verifying callback signature: " + e.getMessage());
+            LOG.error("error verifying callback signature", e);
             return false;
         }
     } // end method
-
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        // tests locaux
-    } // end main
-    */
 
 } // end class

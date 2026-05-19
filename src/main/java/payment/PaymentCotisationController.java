@@ -8,33 +8,28 @@ import entite.Inscription;
 import entite.Player;
 import entite.Round;
 import static interfaces.Log.LOG;
-import java.io.*;
+import java.io.Serializable;
 import java.sql.SQLException;
-import static utils.LCUtil.prepareMessageBean;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 @ApplicationScoped
-public class PaymentCotisationController implements Serializable, interfaces.Log{
+public class PaymentCotisationController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Inject private create.CreateInscription createInscriptionService; // migrated 2026-02-25
-    @Inject private create.CreatePaymentCotisation createPaymentCotisationService; // migrated 2026-02-26
+    @Inject private create.CreateInscription createInscriptionService;
+    @Inject private create.CreatePaymentCotisation createPaymentCotisationService;
 
-public PaymentCotisationController(){ } // constructor
-
-// new 21-01-2023 vient de courseController
-//@Inject @SessionMap
-//  private Map<String, Object> sessionMap;
+    public PaymentCotisationController() { }
 
 public boolean RegisterPaymentandInscription(final Creditcard creditcard, final Cotisation cotisation, final Player player, final Round round, final Club club,
         final Course course,
-        Inscription inscription) throws SQLException, Exception { // Connection conn removed 2026-02-28 — unused
+        Inscription inscription) throws SQLException, Exception {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
 try{
-           LOG.debug("with cotisation = " + cotisation);
+           LOG.debug("cotisation={}", cotisation);
 
   // 1. Register payment  faut le faire avant car l'inscription va vérifier !!!
           if(! payment(cotisation)){
@@ -47,8 +42,8 @@ try{
                  LOG.debug("spontaneous payment accepted - no inscription");
                  return true;
             }
-               LOG.debug("inscription error = " + inscription.isInscriptionError());
-               LOG.debug("inscription OK = " + inscription.isInscriptionOK());
+               LOG.debug("inscription error={}", inscription.isInscriptionError());
+               LOG.debug("inscription ok={}", inscription.isInscriptionOK());
               inscription = createInscriptionService.create(round, player, player,
                       inscription,
                       club, course, "A"); // migrated 2026-02-25
@@ -79,12 +74,5 @@ private boolean payment(Cotisation cotisation) throws Exception {
     LOG.error("payments_cotisation creation failed — cotisation={}", cotisation);
     return false;
 } //end method createPaymentCotisation
-
-    /*
-    void main() throws Exception, Throwable {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-    } // end main
-    */
 
 } // end class
