@@ -196,8 +196,9 @@ public class MemberController implements Serializable {
                 LOG.error(msg);
                 showMessageFatal(msg);
             } else {
-                LOG.info("tarifGreenfee={}", tarifGreenfee);
-                showMessageInfo("Tarif returned = " + tarifGreenfee);
+                String msg = "Tarif returned = " + tarifGreenfee;
+                LOG.info(msg);
+                showMessageInfo(msg);
             }
             return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
         } catch (Exception e) {
@@ -296,7 +297,7 @@ public class MemberController implements Serializable {
             LOG.debug("tarifGreenfee = {}", tarifGreenfee);
             if (tarifGreenfee.getGreenfeeType() == null) {
                 String msg = "Pricing type (BA/HO/DA) must be selected before saving the tarif.";
-                LOG.error("{}", msg);
+                LOG.error(msg);
                 showMessageFatal(msg);
                 return null;
             }
@@ -730,6 +731,7 @@ public class MemberController implements Serializable {
         }
     } // end method
 
+    // Overload for multi-course tarifs — joins names with " + ".
     public String courseNameFor(java.util.List<Integer> courseIds) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -850,6 +852,7 @@ public class MemberController implements Serializable {
         }
     } // end method
 
+    // Pre-populates wizardClubId from the tarif's courseId so the course selector shows the correct club.
     public String loadTarifForWizard(int tarifId) throws java.sql.SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {} - tarifId={}", methodName, tarifId);
@@ -1165,11 +1168,15 @@ public class MemberController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (tarifGreenfee.getWorkItem() == null || tarifGreenfee.getWorkItem().isBlank()) {
-                showMessageFatal(LCUtil.prepareMessageBean("tarif.equipment.item.required"));
+                String msg = LCUtil.prepareMessageBean("tarif.equipment.item.required");
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (tarifGreenfee.getWorkPrice() == null) {
-                showMessageFatal(LCUtil.prepareMessageBean("tarif.equipment.price.required"));
+                String msg = LCUtil.prepareMessageBean("tarif.equipment.price.required");
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             editingEquipment.setSeason(tarifGreenfee.getWorkSeason());
@@ -1239,11 +1246,15 @@ public class MemberController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (tarifGreenfee.getStartDate() == null || tarifGreenfee.getEndDate() == null) {
-                showMessageFatal("Start date and end date are required.");
+                String msg = "Start date and end date are required.";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (!tarifGreenfee.getStartDate().isBefore(tarifGreenfee.getEndDate())) {
-                showMessageFatal(LCUtil.prepareMessageBean("tarif.member.endbeforestart"));
+                String msg = LCUtil.prepareMessageBean("tarif.member.endbeforestart");
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             // overlap check en excluant la période en cours d'édition
@@ -1278,7 +1289,9 @@ public class MemberController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (tarifGreenfee.getDatesSeasonsList().size() <= 1) {
-                showMessageFatal(LCUtil.prepareMessageBean("tarif.period.last"));
+                String msg = LCUtil.prepareMessageBean("tarif.period.last");
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             tarifGreenfee.getDatesSeasonsList().remove(item);
@@ -1528,27 +1541,39 @@ public class MemberController implements Serializable {
             LOG.debug("tarifSubscription = {}", tarifSubscription);
 
             if (code == null || code.isBlank()) {
-                showMessageFatal("Subscription type is required");
+                String msg = "Subscription type is required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (tarifSubscription.getWorkPrice() == null || tarifSubscription.getWorkPrice() <= 0) {
-                showMessageFatal("Price must be greater than 0");
+                String msg = "Price must be greater than 0";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (tarifSubscription.getWorkStartDate() == null) {
-                showMessageFatal("Start date is required");
+                String msg = "Start date is required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (tarifSubscription.getWorkEndDate() == null) {
-                showMessageFatal("End date is required");
+                String msg = "End date is required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (tarifSubscription.getWorkEndDate().isBefore(tarifSubscription.getWorkStartDate())) {
-                showMessageFatal("End date must be after start date");
+                String msg = "End date must be after start date";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (tarifSubscription.getWorkEndDate().isEqual(tarifSubscription.getWorkStartDate())) {
-                showMessageFatal("End date must be different from start date");
+                String msg = "End date must be different from start date";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
 

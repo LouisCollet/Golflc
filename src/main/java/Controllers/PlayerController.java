@@ -107,6 +107,7 @@ public class PlayerController implements Serializable {
         return (int) ChronoUnit.YEARS.between(birthDate.toLocalDate(), firstDayOfYear);
     } // end method
 
+    // Moved from Player POJO — CDI beans cannot be injected into POJOs.
     public void playerLanguageListener(ValueChangeEvent e) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -201,7 +202,9 @@ public class PlayerController implements Serializable {
             Integer clubId = appContext.getClub().getIdclub();
 
             if (clubId == null || clubId == 0) {
-                showMessageFatal("Please select a club first");
+                String msg = "Please select a club first";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 appContext.setNextPlayer(false);
                 return;
             }
@@ -217,8 +220,9 @@ public class PlayerController implements Serializable {
                 appContext.setPlayer(result.getPlayer());
                 appContext.setNextPlayer(true);
             } else {
-                LOG.error("player creation failed");
-                showMessageFatal(result.getMessage());
+                String msg = result.getMessage();
+                LOG.error(msg);
+                showMessageFatal(msg);
                 appContext.setNextPlayer(false);
             }
 
@@ -236,8 +240,9 @@ public class PlayerController implements Serializable {
             if (result.isSuccess()) {
                 LOG.debug("{}", result.getMessage());
             } else {
-                LOG.debug("{}", result.getMessage());
-                showMessageFatal(result.getMessage());
+                String msg = result.getMessage();
+                LOG.error(msg);
+                showMessageFatal(msg);
             }
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -435,8 +440,9 @@ public class PlayerController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (idplayer <= 0) {
-                LOG.warn("invalid player ID={}", idplayer);
-                showMessageFatal("Invalid player ID: " + idplayer);
+                String msg = "Invalid player ID: " + idplayer;
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             Player player = playerManager.readPlayer(idplayer);
@@ -452,8 +458,9 @@ public class PlayerController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (idplayer <= 0) {
-                LOG.warn("invalid player ID={}", idplayer);
-                showMessageFatal("Invalid player ID: " + idplayer);
+                String msg = "Invalid player ID: " + idplayer;
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             EPlayerPassword epp = playerManager.readPlayerWithPassword(idplayer);
@@ -529,7 +536,9 @@ public class PlayerController implements Serializable {
                 appContext.setLocalAdmin(loadedPlayer);
                 showMessageInfo("Player loaded: " + appContext.getLocalAdmin().getPlayerLastName());
             } else {
-                showMessageFatal("Player not found");
+                String msg = "Player not found";
+                LOG.warn(msg);
+                showMessageFatal(msg);
             }
         } catch (Exception e) {
             handleGenericException(e, methodName);

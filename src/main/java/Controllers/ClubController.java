@@ -193,7 +193,9 @@ public class ClubController implements Serializable {
             LOG.debug("club={}", club);
 
             if (club.getClubName() == null || club.getClubName().trim().isEmpty()) {
-                showMessageFatal("Club name is required");
+                String msg = "Club name is required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
 
@@ -226,11 +228,15 @@ public class ClubController implements Serializable {
             Club club = appContext.getClub();
 
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
-                showMessageFatal("No club selected for modification");
+                String msg = "No club selected for modification";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (club.getClubName() == null || club.getClubName().trim().isEmpty()) {
-                showMessageFatal("Club name is required");
+                String msg = "Club name is required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
 
@@ -298,11 +304,15 @@ public class ClubController implements Serializable {
             LOG.debug("start to create course clubID={}", club.getIdclub());
 
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
-                showMessageFatal("Please select a club first");
+                String msg = "Please select a club first";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (course.getCourseName() == null || course.getCourseName().trim().isEmpty()) {
-                showMessageFatal("Course name is required");
+                String msg = "Course name is required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
 
@@ -338,15 +348,21 @@ public class ClubController implements Serializable {
             LOG.debug("course to be modified = {}", course.toString());
 
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
-                showMessageFatal("No club selected");
+                String msg = "No club selected";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
-                showMessageFatal("No course selected for modification");
+                String msg = "No course selected for modification";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (course.getCourseName() == null || course.getCourseName().trim().isEmpty()) {
-                showMessageFatal("Course name is required");
+                String msg = "Course name is required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
 
@@ -409,11 +425,15 @@ public class ClubController implements Serializable {
             LOG.debug("course = {}", course);
             LOG.debug("tee = {}", tee);
             if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
-                showMessageFatal("Please select a course first");
+                String msg = "Please select a course first";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (tee.getTeeSlope() == null || tee.getTeeRating() == null) {
-                showMessageFatal("Tee slope and rating are required");
+                String msg = "Tee slope and rating are required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
 
@@ -479,15 +499,21 @@ public class ClubController implements Serializable {
             LOG.debug("tee to be modified = {}", tee.toString());
 
             if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
-                showMessageFatal("No course selected");
+                String msg = "No course selected";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (tee == null || tee.getIdtee() == null || tee.getIdtee() == 0) {
-                showMessageFatal("No tee selected for modification");
+                String msg = "No tee selected for modification";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (tee.getTeeSlope() == null || tee.getTeeRating() == null) {
-                showMessageFatal("Tee slope and rating are required");
+                String msg = "Tee slope and rating are required";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
 
@@ -519,7 +545,9 @@ public class ClubController implements Serializable {
         LOG.debug("for {}", ecl.tee());
         Tee tee = ecl.tee();
         if (tee == null || tee.getIdtee() == null || tee.getIdtee() == 0) {
-            showMessageFatal("No tee selected for deletion");
+            String msg = "No tee selected for deletion";
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return;
         }
         int teeId = tee.getIdtee();
@@ -547,15 +575,21 @@ public class ClubController implements Serializable {
             LOG.debug("course = {}", course);
             LOG.debug("tee = {}", tee);
             if (tee == null || tee.getIdtee() == null || tee.getIdtee() == 0) {
-                showMessageFatal("Please select a tee first");
+                String msg = "Please select a tee first";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (course == null || course.getIdcourse() == null) {
-                showMessageFatal("Please select a course first");
+                String msg = "Please select a course first";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             if (hole.getHoleNumber() == null || hole.getHoleNumber() < 1 || hole.getHoleNumber() > 18) {
-                showMessageFatal("Hole number must be between 1 and 18");
+                String msg = "Hole number must be between 1 and 18";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
 
@@ -598,19 +632,27 @@ public class ClubController implements Serializable {
                 LOG.debug("tee = {}", tee);
                 LOG.debug("holesGlobal = {}", holesGlobal);
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
-                showMessageFatal("No club selected");
+                String msg = "No club selected";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
-                showMessageFatal("No course selected");
+                String msg = "No course selected";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (tee == null || tee.getIdtee() == null || tee.getIdtee() == 0) {
-                showMessageFatal("No tee selected");
+                String msg = "No tee selected";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (holesGlobal == null || holesGlobal.getDataHoles() == null) {
-                showMessageFatal("No holes data provided");
+                String msg = "No holes data provided";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
 
@@ -665,7 +707,12 @@ public class ClubController implements Serializable {
     public void loadClub(int clubId) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        if (clubId <= 0) { LOG.warn("Invalid club ID: {}", clubId); showMessageFatal("Invalid club ID"); return; }
+        if (clubId <= 0) {
+            String msg = "Invalid club ID: " + clubId;
+            LOG.warn(msg);
+            showMessageFatal(msg);
+            return;
+        }
         try {
             Club club = clubManager.readClub(clubId);
             appContext.setClub(club);
@@ -1020,7 +1067,9 @@ public String findClubWebsite() {
         LOG.debug("yards = {}", yards);
 
         if (yards == null || yards == 0) {
-            showMessageFatal("Distance must be completed");
+            String msg = "Distance must be completed";
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return;
         }
 

@@ -134,10 +134,10 @@ public class ScheduleRoundController implements Serializable {
             LOG.debug("selectedFlightStart = {}, full = {}", selectedFlightStart, full);
 
             if (full) {
-                showMessageFatal("Créneau complet : "
-                        + MAX_PLAYERS_PER_SLOT + " joueurs déjà inscrits à "
-                        + selectedFlightStart.format(ZDF_TIME_HHmm)
-                        + ". Merci de choisir un autre créneau.");
+                String msg = "Créneau complet : " + MAX_PLAYERS_PER_SLOT + " joueurs déjà inscrits à "
+                        + selectedFlightStart.format(ZDF_TIME_HHmm) + ". Merci de choisir un autre créneau.";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 selectedFlightStart = null;
                 org.primefaces.PrimeFaces.current().ajax().addCallbackParam("full", true);
                 return;
@@ -195,9 +195,13 @@ public class ScheduleRoundController implements Serializable {
                         LOG.debug("slotAlreadyPaid={}, slotAlreadyInscribed={}",
                                 slotAlreadyPaid, slotAlreadyInscribed);
                         if (slotAlreadyInscribed) {
-                            showMessageInfo("✅ Vous êtes déjà inscrit à ce créneau — rien à faire.");
+                            String msg = "✅ Vous êtes déjà inscrit à ce créneau — rien à faire.";
+                            LOG.info(msg);
+                            showMessageInfo(msg);
                         } else if (slotAlreadyPaid) {
-                            showMessageInfo("💳 Paiement déjà effectué pour ce créneau — confirmez pour finaliser l'inscription.");
+                            String msg = "💳 Paiement déjà effectué pour ce créneau — confirmez pour finaliser l'inscription.";
+                            LOG.info(msg);
+                            showMessageInfo(msg);
                         }
                     }
 
@@ -229,6 +233,8 @@ public class ScheduleRoundController implements Serializable {
         return p != null && "ADMIN".equals(p.getPlayerRole());
     } // end method
 
+    // Flux : 1) paiement (non-membre seulement) → 2) find-or-create round → 3) inscription reportée au menu Register Score.
+    // Pour un non-membre, la création du round a lieu dans PaymentController.onPaymentCompleted() après succès paiement.
     public String confirmRound() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -302,8 +308,9 @@ public class ScheduleRoundController implements Serializable {
                 cacheInvalidator.invalidateParticipantsRound();
                 int inscrits = participantsRoundList.list(existingSlot).size();
                 if (inscrits >= MAX_PLAYERS_PER_SLOT) {
-                    showMessageFatal("Créneau complet : " + inscrits + "/" + MAX_PLAYERS_PER_SLOT
-                            + " joueurs déjà inscrits. Paiement annulé.");
+                    String msg = "Créneau complet : " + inscrits + "/" + MAX_PLAYERS_PER_SLOT + " joueurs déjà inscrits. Paiement annulé.";
+                    LOG.warn(msg);
+                    showMessageFatal(msg);
                     selectedFlightStart = null;
                     return null;
                 }
@@ -357,6 +364,7 @@ public class ScheduleRoundController implements Serializable {
         }
     } // end method
 
+    // Idempotent — skip si le joueur est déjà inscrit pour ce round.
     private InscribeResult autoInscribe(Round round, Player player, Club club, Course course) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -383,6 +391,8 @@ public class ScheduleRoundController implements Serializable {
         return InscribeResult.CREATED;
     } // end method
 
+    // Idempotent — cherche un round existant au slot (course + date exacte) ; le crée si absent.
+    // Vérifie la contrainte MAX_PLAYERS_PER_SLOT avant création.
     private Round findOrCreateRound(Round candidate, Course course, Club club) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -531,6 +541,8 @@ public class ScheduleRoundController implements Serializable {
         }
     } // end method
 
+    // Pré-remplit le tableau Choosen approprié (quantité=1) pour que calcGreenfeePrice() retourne le prix du slot.
+    // BA → quantity=1 sur le premier basicList ; HO → ajoute le TeeTimes dans teeTimeChoosen ; DA → crée un DaysWeek dans dayChoosen.
     private void pickChoosenFromSlot(TarifGreenfee tarif, LocalDateTime slotStart) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
