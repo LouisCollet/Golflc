@@ -54,7 +54,7 @@
                     <f:selectItem itemLabel="-- #{msg['message.selectclub']} --"
                                   itemValue="#{null}"
                                   noSelectionOption="true"/>
-                    <f:selectItems value="#{clubC.clubsForUnavailableWizard}"
+                    <f:selectItems value="#{unavailableClubC.clubsForUnavailableWizard}"
                                    var="cl"
                                    itemLabel="#{cl.clubName} (#{cl.idclub})"
                                    itemValue="#{cl.idclub}"/>

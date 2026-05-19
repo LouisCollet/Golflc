@@ -48,9 +48,6 @@ public class ClubController implements Serializable {
     @Inject private Controllers.UnavailableController unavailableController;
     @Inject private read.ReadUnavailableStructure readUnavailableStructure;
     @Inject private Controllers.NavigationController navigationController;
-    @Inject private create.CreateUnavailablePeriod createUnavailablePeriodService;
-    @Inject private update.UpdateUnavailablePeriod updateUnavailablePeriodService;
-    @Inject private lists.UnavailableListForDate unavailableListForDate;
     @Inject private lists.CourseListOnly courseListOnly;
     @Inject private lists.ClubDetailList clubDetailList;
     @Inject private lists.CourseList courseListService;
@@ -62,7 +59,6 @@ public class ClubController implements Serializable {
     @Inject private update.UpdateProfessional updateProfessionalService;
     @Inject private lists.ClubsListLocalAdmin clubsListLocalAdmin;
     @Inject private Controllers.MemberController memberController;
-    @Inject private find.FindUnavailablePeriodOverlapping findUnavailablePeriodOverlapping;
 
     private entite.Professional selectedProfessional = new entite.Professional();
     private List<Flight> flightList = Collections.emptyList();
@@ -87,7 +83,6 @@ public class ClubController implements Serializable {
     private List<ECourseList> filteredCourses = null;
     private String lineModelCourse;
     private TarifMember tarifMember;
-    private EUnavailable unavailableDB = null; // DB snapshot for viz comparison — unavailable wizard
     @PostConstruct
     public void init() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -149,13 +144,15 @@ public class ClubController implements Serializable {
     } // end method
 
     public void setClub(Club club) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         appContext.setClub(club);
         if (club != null && club.getIdclub() != null && club.getIdclub() > 0) {
             loadCoursesForClub(club.getIdclub());
         } else {
             courseListForClub = Collections.emptyList();
         }
-    }
+    } // end method
 
     public Integer getClubId() {
         return appContext.getClub().getIdclub();
@@ -170,16 +167,18 @@ public class ClubController implements Serializable {
 
     public Course getCourse() {
         return appContext.getCourse();
-    }
+    } // end method
 
     public void setCourse(Course course) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         appContext.setCourse(course);
         if (course != null && course.getIdcourse() != null && course.getIdcourse() > 0) {
             loadTeesForCourse(course.getIdcourse());
         } else {
             teeListForCourse = Collections.emptyList();
         }
-    }
+    } // end method
 
     // ========================================
     // CREATE - Club
@@ -269,7 +268,9 @@ public class ClubController implements Serializable {
             LOG.debug("for {}", ecl.club());
             Club club = ecl.club();
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
-                showMessageFatal("No club selected for deletion");
+                String msg = "No club selected for deletion";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             int clubId = club.getIdclub();
@@ -301,7 +302,6 @@ public class ClubController implements Serializable {
 
             LOG.debug("club={}", club);
             LOG.debug("course={}", course);
-            LOG.debug("start to create course clubID={}", club.getIdclub());
 
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
                 String msg = "Please select a club first";
@@ -345,8 +345,6 @@ public class ClubController implements Serializable {
             Club club     = appContext.getClub();
             Course course = appContext.getCourse();
 
-            LOG.debug("course to be modified = {}", course.toString());
-
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
                 String msg = "No club selected";
                 LOG.warn(msg);
@@ -365,12 +363,14 @@ public class ClubController implements Serializable {
                 showMessageFatal(msg);
                 return null;
             }
+            LOG.debug("course to be modified = {}", course);
 
             ClubManager.SaveResult result = clubManager.modifyCourse(course, club.getIdclub());
 
             if (result.isSuccess()) {
-                LOG.info("course modified");
-                showMessageInfo("course Modified !!");
+                String msg = "course Modified";
+                LOG.info(msg);
+                showMessageInfo(msg);
                 invalidateClubCaches();
             } else {
                 LOG.error("Course modification failed: {}", result.getMessage());
@@ -394,7 +394,9 @@ public class ClubController implements Serializable {
             LOG.debug("for {}", ecl.course());
             Course course = ecl.course();
             if (course == null || course.getIdcourse() == null || course.getIdcourse() == 0) {
-                showMessageFatal("No course selected for deletion");
+                String msg = "No course selected for deletion";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             int courseId = course.getIdcourse();
@@ -471,8 +473,9 @@ public class ClubController implements Serializable {
                     return "holes_distance.xhtml?faces-redirect=true";
 
                 } else {
-                    LOG.info("no holes registration needed — non-master tee");
-                    showMessageInfo("No holes registration needed : we already have all the information with MasterTee and DistanceTee");
+                    String msg = "No holes registration needed : we already have all the information with MasterTee and DistanceTee";
+                    LOG.info(msg);
+                    showMessageInfo(msg);
                     return null;
                 }
             } else {
@@ -624,13 +627,12 @@ public class ClubController implements Serializable {
         try {
             LOG.debug("with param = {}", param);
 
-            Club club     = appContext.getClub(); 
+            Club club     = appContext.getClub();
             Course course = appContext.getCourse();
-            
-                LOG.debug("for club = {}", club);
-                LOG.debug("course = {}", course);
-                LOG.debug("tee = {}", tee);
-                LOG.debug("holesGlobal = {}", holesGlobal);
+            LOG.debug("for club = {}", club);
+            LOG.debug("course = {}", course);
+            LOG.debug("tee = {}", tee);
+            LOG.debug("holesGlobal = {}", holesGlobal);
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
                 String msg = "No club selected";
                 LOG.warn(msg);
@@ -664,8 +666,9 @@ public class ClubController implements Serializable {
                 showMessageInfo(utils.LCUtil.prepareMessageBean("hole.global.create"));
                 loadHolesForTee(tee.getIdtee());
             } else {
-                LOG.error("createHolesGlobal failed");
-                showMessageFatal("FAILURE Create Holes Global !!");
+                String msg = "FAILURE Create Holes Global";
+                LOG.error(msg);
+                showMessageFatal(msg);
             }
             return null;
         } catch (Exception ex) {
@@ -964,14 +967,16 @@ public class ClubController implements Serializable {
         Course course = appContext.getCourse();
         LOG.debug("round={} club={} course={}", round, club, course);
         if (round.getRoundDate() == null) {
-            LOG.error("round date is null");
-            showMessageFatal("Fatal error — round date is null");
+            String msg = "Fatal error — round date is null";
+            LOG.error(msg);
+            showMessageFatal(msg);
             return Collections.emptyList();
         }
 
         if (club.getAddress().getLatLng().getLat() == 0) {
-            LOG.error("club latitude is unknown");
-            showMessageFatal("Club latitude is unknown");
+            String msg = "Club latitude is unknown";
+            LOG.error(msg);
+            showMessageFatal(msg);
             return Collections.emptyList();
         }
 
@@ -1013,7 +1018,9 @@ public String findClubWebsite() {
         LOG.debug("for club = {}", club);
 
         if (club.getClubWebsite() == null || club.getClubWebsite().trim().isEmpty()) {
-            showMessageFatal("Website must be completed !");
+            String msg = "Website must be completed";
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return null;
         }
 
@@ -1026,11 +1033,15 @@ public String findClubWebsite() {
         java.net.URI uri = new java.net.URI(url);
         String scheme = uri.getScheme();
         if (scheme == null || (!scheme.equals("http") && !scheme.equals("https"))) {
-            showMessageFatal("Invalid website URL");
+            String msg = "Invalid website URL";
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return null;
         }
         if (uri.getHost() == null || uri.getHost().isBlank()) {
-            showMessageFatal("Invalid website URL");
+            String msg = "Invalid website URL";
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return null;
         }
 
@@ -1098,8 +1109,9 @@ public String findClubWebsite() {
                 club.setCreateModify(false);
                 return "club.xhtml?faces-redirect=true&operation=modify";
             } else {
-                LOG.error("club not retrieved for loadClub");
-                showMessageFatal("error : club not retrieved !!");
+                String msg = "error : club not retrieved";
+                LOG.error(msg);
+                showMessageFatal(msg);
                 return null;
             }
         } catch (Exception ex) {
@@ -1135,8 +1147,9 @@ public String findClubWebsite() {
             LOG.debug("idclub after loadCourse= {}", club.getIdclub());
             if (club.getIdclub() == null) {
                 club.setIdclub(course.getClub_idclub());
-                LOG.error("Idclub forced because it was null");
-                showMessageFatal("Idclub forced because it was null");
+                String msg = "Idclub forced because it was null";
+                LOG.error(msg);
+                showMessageFatal(msg);
             }
             if (course != null) {
                 appContext.setCourse(course);
@@ -1297,30 +1310,30 @@ public String findClubWebsite() {
     // ========================================
 
     public void resetClub() {
-        appContext.setClub(new Club());                     // ✅ current supprimé
+        appContext.setClub(new Club());
         courseListForClub = Collections.emptyList();
         resetCourse();
         LOG.debug("Club reset");
-    }
+    } // end method
 
     public void resetCourse() {
-        appContext.setCourse(new Course());                 // ✅ current supprimé
+        appContext.setCourse(new Course());
         teeListForCourse = Collections.emptyList();
         resetTee();
         LOG.debug("Course reset");
-    }
+    } // end method
 
     public void resetTee() {
         tee = new Tee();
         holeListForTee = Collections.emptyList();
         resetHole();
         LOG.debug("Tee reset");
-    }
+    } // end method
 
     public void resetHole() {
         hole = new Hole();
         LOG.debug("Hole reset");
-    }
+    } // end method
 
     public void resetAll() {
         resetClub();
@@ -1328,7 +1341,7 @@ public String findClubWebsite() {
         holesGlobal = new HolesGlobal();
         filteredClubs = Collections.emptyList();
         LOG.debug("Complete club context reset");
-    }
+    } // end method
 
     // ========================================
     // Utilitaires
@@ -1421,8 +1434,9 @@ public String findClubWebsite() {
                 tee.setCreateModify(false);
                 return "hole.xhtml?faces-redirect=true&operation=modify hole";
             } else {
-                LOG.error("tee not retrieved");
-                showMessageFatal("Error: tee not retrieved");
+                String msg = "Error: tee not retrieved";
+                LOG.error(msg);
+                showMessageFatal(msg);
                 return null;
             }
         } catch (SQLException e) {
@@ -1463,10 +1477,10 @@ public String findClubWebsite() {
                 appContext.setCourse(ecl.course());
             }
 
-            LOG.debug("select travel ok club={} course={}", appContext.getClub().getClubName(), appContext.getCourse().getCourseName());
-            showMessageInfo("Select Travel Successful"
-                    + " <br/> Club name = " + appContext.getClub().getClubName()
-                    + " <br/> Course name = " + appContext.getCourse().getCourseName());
+            String msg = "Select Travel Successful — Club: " + appContext.getClub().getClubName()
+                    + " / Course: " + appContext.getCourse().getCourseName();
+            LOG.info(msg);
+            showMessageInfo(msg);
             LOG.debug("inputSelectCourse = {}", appContext.getInputSelectCourse());
             return "maps_home_club.xhtml?faces-redirect=true";
         } catch (Exception e) {
@@ -1484,12 +1498,11 @@ public String findClubWebsite() {
                 appContext.setClub(ecl.club());
                 appContext.setCourse(ecl.course());
             }
-            LOG.debug("select chart ok club={} course={}", appContext.getClub().getClubName(), appContext.getCourse().getCourseName());
-            showMessageInfo("Select Course Successful"
-                    + " <br/> Club name = " + appContext.getClub().getClubName()
-                    + " <br/> Course name = " + appContext.getCourse().getCourseName());
+            String msg = "Select Course Successful — Club: " + appContext.getClub().getClubName()
+                    + " / Course: " + appContext.getCourse().getCourseName();
+            LOG.info(msg);
+            showMessageInfo(msg);
             LOG.debug("inputSelectCourse = {}", appContext.getInputSelectCourse());
-            // new Controllers.ChartController().lineModelCourse(conn, ...)
             String v = chartController.lineModelCourse(appContext.getPlayer(), appContext.getCourse());
             setLineModelCourse(v);
             LOG.debug("Chart returned = {}", getLineModelCourse());
@@ -1661,8 +1674,9 @@ public String findClubWebsite() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         navigationController.reset(ini);
-        LOG.debug("reset player done ini={}", ini);
-        showMessageInfo("Reset PLAYER done = " + ini);
+        String msg = "Reset PLAYER done = " + ini;
+        LOG.info(msg);
+        showMessageInfo(msg);
     } // end method
 
     // ========================================
@@ -1698,11 +1712,13 @@ public String findClubWebsite() {
             appContext.getProfessional().setProPlayerId(appContext.getPlayerTemp().getIdplayer());
 
             if (createProfessionalService.create(appContext.getProfessional())) {
-                LOG.info("professional created");
-                showMessageInfo("professional created");
+                String msg = "professional created";
+                LOG.info(msg);
+                showMessageInfo(msg);
             } else {
-                LOG.error("professional NOT created professional={}", appContext.getProfessional());
-                showMessageFatal("FATAL error : professional NOT created - " + appContext.getProfessional());
+                String msg = "FATAL error : professional NOT created — " + appContext.getProfessional();
+                LOG.error(msg);
+                showMessageFatal(msg);
             }
             return null;
         } catch (Exception ex) {
@@ -1731,7 +1747,9 @@ public String findClubWebsite() {
                 LOG.info("professional updated id={}", selectedProfessional.getProId());
                 showMessageInfo("Professional updated: " + selectedProfessional.getProId());
             } else {
-                showMessageFatal("Error updating Professional ProId=" + selectedProfessional.getProId());
+                String msg = "Error updating Professional ProId=" + selectedProfessional.getProId();
+                LOG.error(msg);
+                showMessageFatal(msg);
             }
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
@@ -1747,7 +1765,9 @@ public String findClubWebsite() {
                 LOG.info("proAmount updated amount={}", selectedProfessional.getProAmount());
                 showMessageInfo("ProAmount updated: " + selectedProfessional.getProAmount());
             } else {
-                showMessageFatal("Error updating ProAmount for ProId=" + selectedProfessional.getProId());
+                String msg = "Error updating ProAmount for ProId=" + selectedProfessional.getProId();
+                LOG.error(msg);
+                showMessageFatal(msg);
             }
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
@@ -1790,7 +1810,6 @@ public String findClubWebsite() {
         try {
             Club c = new Club();
             c.setIdclub(Integer.valueOf(id));
-            cacheInvalidator.invalidateClubCaches();
             return clubDetailList.list(c);
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
@@ -1806,8 +1825,9 @@ public String findClubWebsite() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (c == null) {
-            LOG.warn("Selected club param is null!");
-            showMessageFatal("Aucun club sélectionné !");
+            String msg = "No club selected";
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return null;
         }
         LOG.debug("with param club = {}", c);
@@ -1891,7 +1911,9 @@ public String findClubWebsite() {
             appContext.setCourse(c);
             LOG.debug("course is now = {}", appContext.getCourse());
             LOG.debug("course selected name={}", appContext.getCourse().getCourseName());
-            showMessageInfo("Select Course Successfull = <br/> CourseName = " + appContext.getCourse().getCourseName());
+            String msgCourse = "Select Course Successful — " + appContext.getCourse().getCourseName();
+            LOG.info(msgCourse);
+            showMessageInfo(msgCourse);
             LOG.debug(": inputSelectClub = {}", appContext.getInputSelectClub());
 
             dialogController.closeDialog(null);
@@ -1959,8 +1981,9 @@ public String findClubWebsite() {
                    
               }
             if (appContext.getInputSelectCourse() == null) {
-                LOG.error("no InputSelectCourse set");
-                showMessageFatal("No InputSelectCourse !");
+                String msg = "No InputSelectCourse set";
+                LOG.error(msg);
+                showMessageFatal(msg);
                 return null;
             }
             if (select.equals("CreatePro")) {
@@ -1985,23 +2008,13 @@ public String findClubWebsite() {
             }
 
             if (purpose == SelectionPurpose.CREATE_TARIF_GREENFEE) {
-                     LOG.debug("purpose is CREATE_TARIF_GREENFEE");
-                     LOG.debug(" return TO tarif_greenfee_wizard.xhtml");
-                     return purpose.navigationToFinal(); //
-                 }
-            if (select.equals("createTarifGreenfee")) { // old solution
-                return "tarif_greenfee_wizard.xhtml?faces-redirect=true";
+                LOG.debug("purpose is CREATE_TARIF_GREENFEE — return to tarif_greenfee_wizard.xhtml");
+                return purpose.navigationToFinal();
             }
 
-                 if (purpose == SelectionPurpose.CREATE_TARIF_MEMBER) {
-                     LOG.debug("purpose is CREATE_TARIF_MEMBER");
-                       LOG.debug(" return TO tarif_member_wizard.xhtml");
-                     return purpose.navigationToFinal();
-                 }
-            
-            if (select.equals("createTarifMember")) { // old solution
-                LOG.debug("select.equals(createTarifMember"); // si équivalence, alors on n'a plus besoin de select
-                return "tarif_member_wizard.xhtml?faces-redirect=true";
+            if (purpose == SelectionPurpose.CREATE_TARIF_MEMBER) {
+                LOG.debug("purpose is CREATE_TARIF_MEMBER — return to tarif_member_wizard.xhtml");
+                return purpose.navigationToFinal();
             }
 
             if (select.equals("PaymentCotisationSpontaneous")) {
@@ -2025,411 +2038,6 @@ public String findClubWebsite() {
             return null;
         }
         return null;
-    } // end method
-
-
-    // ========================================
-    // Unavailable methods
-    // ========================================
-
-    public String createUnavailablePeriod() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            EUnavailable unavailable = appContext.getUnavailable();
-            if (appContext.getClub() == null || appContext.getClub().getIdclub() == null) {
-                showMessageFatal(LCUtil.prepareMessageBean("message.selectclub"));
-                return null;
-            }
-            if (unavailable.period().getStartDate() == null || unavailable.period().getEndDate() == null) {
-                showMessageFatal(LCUtil.prepareMessageBean("tarif.member.period.dates.required"));
-                return null;
-            }
-            unavailable.period().setIdclub(appContext.getClub().getIdclub());
-            unavailable.structure().setPeriodSaved(true);
-            unavailable.structure().setMenuLaunched(true);
-            LOG.debug("period saved to bean: start={}, end={}", unavailable.period().getStartDate(), unavailable.period().getEndDate());
-            showMessageInfo(unavailable.period().getStartDate() + " → " + unavailable.period().getEndDate());
-            return null;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public String updateUnavailablePeriodAvailability() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            EUnavailable unavailable = appContext.getUnavailable();
-            if (unavailable.period().getUnavailabilityType() == null
-                    || unavailable.period().getUnavailabilityType().isBlank()) {
-                showMessageFatal(LCUtil.prepareMessageBean("unavailable.type.required"));
-                return null;
-            }
-            LOG.debug("availability saved to bean: type={}, label={}",
-                    unavailable.period().getUnavailabilityType(),
-                    unavailable.period().getUnavailabilityLabel());
-            showMessageInfo(unavailable.period().getUnavailabilityType()
-                    + (unavailable.period().getUnavailabilityLabel() != null
-                       ? " — " + unavailable.period().getUnavailabilityLabel() : ""));
-            return null;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public String saveFullUnavailability() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            if (appContext.getClub() == null || appContext.getClub().getIdclub() == null) {
-                showMessageFatal(LCUtil.prepareMessageBean("message.selectclub"));
-                return null;
-            }
-            EUnavailable unavailable = appContext.getUnavailable();
-            Club club = appContext.getClub();
-
-            // 1. Period (insert si pas encore persisté en DB)
-            if (unavailable.period().getStartDate() == null || unavailable.period().getEndDate() == null) {
-                showMessageFatal(LCUtil.prepareMessageBean("tarif.member.period.dates.required"));
-                return null;
-            }
-            unavailable.period().setIdclub(club.getIdclub());
-            if (!unavailable.structure().isPeriodPersistedToDB()) {
-                if (findUnavailablePeriodOverlapping.find(unavailable.period())) {
-                    return null; // message already shown by the service
-                }
-                if (createUnavailablePeriodService.create(unavailable.period())) {
-                    unavailable.structure().setPeriodSaved(true);
-                    unavailable.structure().setMenuLaunched(true);
-                    unavailable.structure().setPeriodPersistedToDB(true);
-                    LOG.debug("period inserted to DB");
-                } else {
-                    showMessageFatal(LCUtil.prepareMessageBean("unavailable.availability.notsaved"));
-                    return null;
-                }
-            }
-
-            // 2. Availability type/label (update le record le plus récent du club)
-            if (unavailable.period().getUnavailabilityType() != null
-                    && !unavailable.period().getUnavailabilityType().isBlank()) {
-                if (!updateUnavailablePeriodService.updateAvailability(unavailable.period())) {
-                    LOG.warn("updateAvailability returned false — type/label not persisted");
-                }
-            }
-
-            // 3. Structure → club.GroundCondition
-            if (unavailableController.updateClub(unavailable, club)) {
-                unavailable.structure().setStructureExists(true);
-                showMessageInfo(LCUtil.prepareMessageBean("unavailable.availability.saved"));
-            } else {
-                showMessageFatal(LCUtil.prepareMessageBean("unavailable.availability.notsaved"));
-            }
-            return null;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public String inputUnvailableStructure() throws SQLException, Exception {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            LOG.debug("for club = {}", appContext.getClub());
-            EUnavailable unavailable = appContext.getUnavailable();
-            LOG.debug("for unavailable = {}", unavailable);
-            unavailable = unavailableController.inputUnvailableStructure(unavailable);
-            appContext.setUnavailable(unavailable);
-            LOG.debug("back with unavailable = {}", unavailable);
-            return null;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public String showUnavailableStructure() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            EUnavailable unavailable = appContext.getUnavailable();
-            LOG.debug("for unavailable = {}", unavailable);
-            LOG.info("unavailable structure={}", unavailable.structure().getStructureList());
-            showMessageInfo(LCUtil.prepareMessageBean("unavailable.structure.show")
-                    + "<br/> Unavailable Structure = " + unavailable.structure().getStructureList().toString());
-            return null;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public String showUnavailablePeriod() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            LOG.debug("for club = {}", appContext.getClub());
-            if (appContext.getClub() == null) {
-                LOG.warn("club is null, skipping unavailable check");
-                return null;
-            }
-            EUnavailable lun = unavailableListForDate.list(LocalDateTime.now(), appContext.getClub());
-            if (lun == null) {
-                LOG.debug("pas de période d'indisponibilité");
-                appContext.setUnavailable(null);
-            } else {
-                appContext.setUnavailable(lun);
-                LOG.debug("unavailable period found={}", lun);
-                showMessageInfo("Unavailable period: " + lun.toString());
-                return "ground_condition_show.xhtml?faces-redirect=true";
-            }
-            return null;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public EUnavailable showUnavailablePeriods() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            LOG.debug("for club = {}", appContext.getClub());
-            EUnavailable unavailable = unavailableListForDate.list(LocalDateTime.now(), appContext.getClub());
-            appContext.setUnavailable(unavailable);
-            return unavailable;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public String showUnavailablePeriods(Club c) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering for club input = {}", c);
-        try {
-            EUnavailable lun = unavailableListForDate.list(LocalDateTime.now(), c);
-            if (lun == null) {
-                LOG.debug("lun is null");
-                LOG.debug("no unavailabilities known");
-                appContext.setUnavailable(null);
-                return "ground_condition_show.xhtml?faces-redirect=true";
-            } else {
-                appContext.setUnavailable(lun);
-                LOG.debug("showUnavailablePeriods - element is = {}", lun);
-                return "ground_condition_show.xhtml?faces-redirect=true";
-            }
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    public String showUnavailablePeriods(ECourseList ecl) throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            appContext.setClub(ecl.club());
-            EUnavailable lun = unavailableListForDate.list(LocalDateTime.now(), ecl.club());
-            LOG.debug("showUnavailablePeriods - element of list is = {}", lun);
-            appContext.setUnavailable(lun);
-            return "ground_condition_show.xhtml?faces-redirect=true";
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method
-
-    // ========================================
-    // Wizard unavailable — flow + helpers
-    // ========================================
-
-    public String onUnavailableWizardFlow(org.primefaces.event.FlowEvent event) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        LOG.debug("oldStep = {}, newStep = {}", event.getOldStep(), event.getNewStep());
-        try {
-            // Period → Availability: dates required then period must be saved
-            if ("PeriodTab".equals(event.getOldStep()) && "AvailabilityTab".equals(event.getNewStep())) {
-                EUnavailable unavailable = appContext.getUnavailable();
-                if (!unavailable.structure().isPeriodSaved()) {
-                    if (unavailable.period().getStartDate() == null || unavailable.period().getEndDate() == null) {
-                        showMessageFatal(LCUtil.prepareMessageBean("tarif.member.period.dates.required"));
-                    } else {
-                        showMessageFatal(LCUtil.prepareMessageBean("unavailable.period.required"));
-                    }
-                    return event.getOldStep();
-                }
-                LOG.debug("PeriodTab validated — periodSaved=true");
-            }
-            // Availability → Structure: validate type is selected
-            if ("AvailabilityTab".equals(event.getOldStep()) && "StructureTab".equals(event.getNewStep())) {
-                EUnavailable unavailable = appContext.getUnavailable();
-                if (unavailable == null || unavailable.period() == null
-                        || unavailable.period().getUnavailabilityType() == null
-                        || unavailable.period().getUnavailabilityType().isBlank()) {
-                    showMessageFatal(LCUtil.prepareMessageBean("unavailable.type.required"));
-                    return event.getOldStep();
-                }
-                LOG.debug("AvailabilityTab validated — type = {}", unavailable.period().getUnavailabilityType());
-            }
-            // Structure → Editor: validate at least one item in structure
-            if ("StructureTab".equals(event.getOldStep()) && "EditorTab".equals(event.getNewStep())) {
-                EUnavailable unavailable = appContext.getUnavailable();
-                if (unavailable == null || unavailable.structure() == null
-                        || unavailable.structure().getStructureList() == null
-                        || unavailable.structure().getStructureList().isEmpty()) {
-                    showMessageFatal(LCUtil.prepareMessageBean("unavailable.structure.notfound"));
-                    return event.getOldStep();
-                }
-                LOG.debug("StructureTab validated — {} items", unavailable.structure().getStructureList().size());
-            }
-            return event.getNewStep();
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return event.getOldStep();
-        }
-    } // end method
-
-    public void initUnavailableWizard() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        unavailableDB = null;
-        EUnavailable unavailable = appContext.getUnavailable();
-        if (unavailable == null) {
-            appContext.setUnavailable(new EUnavailable(new entite.UnavailableStructure(), new entite.UnavailablePeriod()));
-            LOG.debug("EUnavailable initialized fresh");
-        } else {
-            unavailable.structure().setPeriodSaved(false);
-            unavailable.structure().setPeriodPersistedToDB(false);
-            unavailable.structure().setMenuLaunched(false);
-            unavailable.period().setStartDate(null);
-            unavailable.period().setEndDate(null);
-            LOG.debug("EUnavailable reset for new wizard session");
-        }
-    } // end method
-
-    public List<Club> getClubsForUnavailableWizard() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            return clubsListLocalAdmin.list(appContext.getPlayer());
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return Collections.emptyList();
-        }
-    } // end method
-
-    public Integer getUnavailableWizardClubId() {
-        Club club = appContext.getClub();
-        return (club != null) ? club.getIdclub() : null;
-    } // end method
-
-    public void setUnavailableWizardClubId(Integer clubId) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        if (clubId == null) return;
-        try {
-            List<Club> clubs = clubsListLocalAdmin.list(appContext.getPlayer());
-            Club selected = clubs.stream()
-                    .filter(c -> clubId.equals(c.getIdclub()))
-                    .findFirst()
-                    .orElse(null);
-            if (selected != null) {
-                appContext.setClub(selected);
-                LOG.debug("unavailable wizard club set to {}", selected.getClubName());
-            }
-            courseListForClub = Collections.emptyList();
-            findCourseListForClub();
-            // Fresh EUnavailable for this club — load existing structure from DB
-            EUnavailable fresh = new EUnavailable(new entite.UnavailableStructure(), new entite.UnavailablePeriod());
-            entite.UnavailableStructure v = readUnavailableStructure.read(appContext.getClub());
-            if (v != null && !v.getStructureList().isEmpty()) {
-                fresh.structure().setStructureList(v.getStructureList());
-                fresh.structure().setStructureExists(true);
-                fresh.structure().setItemExists(true);
-            }
-            appContext.setUnavailable(fresh);
-            unavailableDB = null;
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-        }
-    } // end method
-
-    public Integer getUnavailableWizardCourseId() {
-        entite.UnavailablePeriod p = appContext.getUnavailable() != null ? appContext.getUnavailable().period() : null;
-        if (p == null) return null;
-        return p.isAllCourses() ? Integer.valueOf(9999) : p.getCourseId();
-    } // end method
-
-    public void setUnavailableWizardCourseId(Integer value) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        entite.UnavailablePeriod p = appContext.getUnavailable() != null ? appContext.getUnavailable().period() : null;
-        if (p == null) return;
-        if (value == null) {
-            p.setAllCourses(false);
-            p.setCourseId(null);
-        } else if (value == 9999) {
-            p.setAllCourses(true);
-            p.setCourseId(null);
-        } else {
-            p.setAllCourses(false);
-            p.setCourseId(value);
-        }
-        LOG.debug("allCourses = {}, courseId = {}", p.isAllCourses(), p.getCourseId());
-    } // end method
-
-    public void resetUnavailableDB() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        unavailableDB = null;
-    } // end method
-
-    public EUnavailable getUnavailableDB() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        if (unavailableDB != null) return unavailableDB;
-        try {
-            unavailableDB = unavailableListForDate.list(java.time.LocalDateTime.now(), appContext.getClub());
-            if (unavailableDB == null) {
-                unavailableDB = new EUnavailable(new entite.UnavailableStructure(), null);
-            }
-            LOG.debug("unavailableDB loaded from DB");
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            unavailableDB = new EUnavailable(new entite.UnavailableStructure(), null);
-        }
-        return unavailableDB;
-    } // end method
-
-    public void removeStructureItem(entite.Structure item) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        try {
-            EUnavailable unavailable = appContext.getUnavailable();
-            unavailable.structure().getStructureList().remove(item);
-            if (unavailable.structure().getStructureList().isEmpty()) {
-                unavailable.structure().setItemExists(false);
-            }
-            LOG.debug("structureList size after remove = {}", unavailable.structure().getStructureList().size());
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-        }
-    } // end method
-
-    public String getClubTimeZone() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Club club = appContext.getClub();
-        if (club != null && club.getAddress() != null && club.getAddress().getZoneId() != null) {
-            return club.getAddress().getZoneId();
-        }
-        LOG.warn("clubZoneId not found, falling back to UTC");
-        return "UTC";
     } // end method
 
 } // end class

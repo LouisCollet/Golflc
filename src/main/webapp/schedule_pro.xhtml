@@ -53,8 +53,8 @@
                         styleClass="ui-custompanelgrid"
                         view="timeGridWeek"
                         extender="initSchedule"
-                        clientTimeZone="#{clubC.clubTimeZone}"
-                        timeZone="#{clubC.clubTimeZone}">
+                        clientTimeZone="#{unavailableClubC.clubTimeZone}"
+                        timeZone="#{unavailableClubC.clubTimeZone}">
                 <p:ajax event="dateSelect"
                         listener="#{schedulerC.dateSelect}"
                         update=":schedule_form:dialog1,growl-msg"/>

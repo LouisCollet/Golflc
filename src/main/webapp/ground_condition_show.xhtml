@@ -30,7 +30,7 @@
                     <h:outputText value="#{msg['unavailable.period.start']} : "/>
                     <i class="pi pi-calendar"></i>
                 </h:panelGroup>
-                <h:outputText value="#{clubC.unavailable.period.startDate}">
+                <h:outputText value="#{unavailableClubC.unavailable.period.startDate}">
                     <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
                 </h:outputText>
 
@@ -38,17 +38,17 @@
                     <h:outputText value="#{msg['unavailable.period.end']} : "/>
                     <i class="pi pi-calendar"></i>
                 </h:panelGroup>
-                <h:outputText value="#{clubC.unavailable.period.endDate}">
+                <h:outputText value="#{unavailableClubC.unavailable.period.endDate}">
                     <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
                 </h:outputText>
 
                 <h:outputText value="Comment : "/>
-                <h:outputText value="#{clubC.unavailable.period.comment}"
+                <h:outputText value="#{unavailableClubC.unavailable.period.comment}"
                               escape="false"/>
             </p:panelGrid>
 
             <p:dataTable id="tableShow"
-                         value="#{clubC.unavailable.structure.structureList}"
+                         value="#{unavailableClubC.unavailable.structure.structureList}"
                          var="var"
                          style="margin: 0 auto;width:400px"
                          rowIndexVar="row"
@@ -67,16 +67,16 @@
                 <p:column headerText="#{msg['unavailable.title']}"
                           width="15%">
                     <h:panelGroup
-                        rendered="#{clubC.unavailable.period.itemPeriod[row] eq true}">
+                        rendered="#{unavailableClubC.unavailable.period.itemPeriod[row] eq true}">
                         <h:outputText id="PeriodItemY${i}"
-                                      value="#{clubC.unavailable.period.itemPeriod[row]}"/>
+                                      value="#{unavailableClubC.unavailable.period.itemPeriod[row]}"/>
                         <i class="pi pi-check" style="font-size:30px;color:green"> </i>
                         <i class="pi pi-thumbs-up" style="font-size:30px;color:green;"> </i>
                     </h:panelGroup>
                     <h:panelGroup id="panelN${i}"
-                        rendered="#{clubC.unavailable.period.itemPeriod[row] eq false}">
+                        rendered="#{unavailableClubC.unavailable.period.itemPeriod[row] eq false}">
                         <h:outputText id="PeriodItemN${i}"
-                                      value="#{clubC.unavailable.period.itemPeriod[row]}"/>
+                                      value="#{unavailableClubC.unavailable.period.itemPeriod[row]}"/>
                         <i class="pi pi-times" style="font-size:30px;color:red;"> </i>
                         <i class="pi pi-thumbs-down" style="font-size:3px;color:red;"> </i>
                     </h:panelGroup>
