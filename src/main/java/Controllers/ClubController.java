@@ -38,37 +38,35 @@ public class ClubController implements Serializable {
     @Inject private ApplicationContext appContext;
     @Inject private cache.CacheInvalidator cacheInvalidator;
     @Inject private DialogController dialogController;
-    @Inject private lists.CourseListForClub courseListForClubService; // migrated 2026-02-24
-    // externalContext injection removed — fix multi-user 2026-03-07 (request-scoped, must not be cached in @SessionScoped)
+    @Inject private lists.CourseListForClub courseListForClubService;
     @Inject private CoordinatesService coordinatesService;
-    @Inject private contexte.SelectionContextBean clubSelectionContext; // migrated 2026-02-25
-    @Inject private read.ReadClub readClubService; // migrated 2026-02-25
-    @Inject private read.ReadCourse readCourseService; // migrated 2026-02-25
-    @Inject private read.ReadTee readTeeService; // migrated 2026-02-25
-    @Inject private read.ReadHole readHoleService; // migrated 2026-02-25
-    @Inject private Controllers.UnavailableController unavailableController; // migrated 2026-02-25
-    // @Inject @SessionMap sessionMap — removed 2026-02-28, migrated to appContext
-    @Inject private read.ReadUnavailableStructure readUnavailableStructure; // migrated 2026-02-25
-    @Inject private Controllers.NavigationController navigationController; // renamed from CourseController 2026-02-28
-    @Inject private create.CreateUnavailablePeriod createUnavailablePeriodService; // migrated 2026-02-25 — Groupe D
+    @Inject private contexte.SelectionContextBean clubSelectionContext;
+    @Inject private read.ReadClub readClubService;
+    @Inject private read.ReadCourse readCourseService;
+    @Inject private read.ReadTee readTeeService;
+    @Inject private read.ReadHole readHoleService;
+    @Inject private Controllers.UnavailableController unavailableController;
+    @Inject private read.ReadUnavailableStructure readUnavailableStructure;
+    @Inject private Controllers.NavigationController navigationController;
+    @Inject private create.CreateUnavailablePeriod createUnavailablePeriodService;
     @Inject private update.UpdateUnavailablePeriod updateUnavailablePeriodService;
-    @Inject private lists.UnavailableListForDate unavailableListForDate; // migrated 2026-02-25 — Groupe D
-    @Inject private lists.CourseListOnly courseListOnly; // migrated 2026-02-25 — Groupe B
-    @Inject private lists.ClubDetailList clubDetailList; // migrated 2026-02-25 — Groupe B
-    @Inject private lists.CourseList courseListService; // migrated 2026-02-25 — Groupe B
-    @Inject private find.FindTarifMembersData findTarifMembersData; // migrated 2026-02-25 — Groupe C
-    @Inject private Controllers.PlayerController playerController; // migrated 2026-02-25 — Groupe C (createModifyPlayer)
-    @Inject private Controllers.ChartController chartController; // migrated 2026-02-26
-    @Inject private lists.ProfessionalListForClub professionalListForClub; // migrated 2026-02-28 from NavigationController
-    @Inject private create.CreateProfessional createProfessionalService; // migrated 2026-02-28 from CourseController
+    @Inject private lists.UnavailableListForDate unavailableListForDate;
+    @Inject private lists.CourseListOnly courseListOnly;
+    @Inject private lists.ClubDetailList clubDetailList;
+    @Inject private lists.CourseList courseListService;
+    @Inject private find.FindTarifMembersData findTarifMembersData;
+    @Inject private Controllers.PlayerController playerController;
+    @Inject private Controllers.ChartController chartController;
+    @Inject private lists.ProfessionalListForClub professionalListForClub;
+    @Inject private create.CreateProfessional createProfessionalService;
     @Inject private update.UpdateProfessional updateProfessionalService;
     @Inject private lists.ClubsListLocalAdmin clubsListLocalAdmin;
-    @Inject private Controllers.MemberController memberController; // added 2026-04-22 — cotisation flow restoration
-    @Inject private find.FindUnavailablePeriodOverlapping findUnavailablePeriodOverlapping; // added 2026-04-25
+    @Inject private Controllers.MemberController memberController;
+    @Inject private find.FindUnavailablePeriodOverlapping findUnavailablePeriodOverlapping;
 
     private entite.Professional selectedProfessional = new entite.Professional();
-private List<Flight> flightList = Collections.emptyList();
-private int cptFlight = 0;
+    private List<Flight> flightList = Collections.emptyList();
+    private int cptFlight = 0;
 
     // ✅ Session-level cache — avoid repeated DB queries on JSF re-render
     private List<ECourseList> cachedClubsCoursesTees = null;
@@ -86,9 +84,9 @@ private int cptFlight = 0;
     private List<Club> filteredClubs;
 
     private boolean STROKEINDEX = true;
-    private List<ECourseList> filteredCourses = null; // PrimeFaces DataTable filtering
-    private String lineModelCourse; // migrated 2026-02-25 from CourseController
-    private TarifMember tarifMember; // migrated 2026-02-25 from CourseController
+    private List<ECourseList> filteredCourses = null;
+    private String lineModelCourse;
+    private TarifMember tarifMember;
     private EUnavailable unavailableDB = null; // DB snapshot for viz comparison — unavailable wizard
     @PostConstruct
     public void init() {
@@ -108,12 +106,12 @@ private int cptFlight = 0;
     } // end method
 
     // ========================================
-    // CDI EVENT — ResetEvent observer — 2026-02-26
+    // CDI EVENT — ResetEvent observer
     // ========================================
 
     public void onReset(@Observes events.ResetEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} — source: {}", event.getSource());
+        LOG.debug("entering {} source={}", methodName, event.getSource());
         flightList        = Collections.emptyList();
         cptFlight         = 0;
         tee               = new Tee();
@@ -128,7 +126,6 @@ private int cptFlight = 0;
         filteredCourses   = null;
         lineModelCourse   = null;
         tarifMember       = new TarifMember();
-//        selectedPlayerEPP = null;
         LOG.debug("ClubController reset done");
     } // end method
 
@@ -193,8 +190,7 @@ private int cptFlight = 0;
         LOG.debug("entering {}", methodName);
         try {
             Club club = appContext.getClub();
-            LOG.debug("with club = {}", club);
-            LOG.debug("alternative via délégation with club = {}", getClub());
+            LOG.debug("club={}", club);
 
             if (club.getClubName() == null || club.getClubName().trim().isEmpty()) {
                 showMessageFatal("Club name is required");
@@ -205,9 +201,8 @@ private int cptFlight = 0;
 
             if (result.isSuccess()) {
                 LOG.debug("club created : we go to course !!");
-                Course course = appContext.getCourse();     // ✅ current supprimé
+                Course course = appContext.getCourse();
                 course.setNextCourse(true);
-             //   showMessageInfo(result.getMessage());
                 return "course.xhtml?faces-redirect=true";
             } else {
                 LOG.error("Club creation failed: {}", result.getMessage());
@@ -243,7 +238,7 @@ private int cptFlight = 0;
 
             if (result.isSuccess()) {
                 LOG.debug("club is Modified !!");
-                Course course = appContext.getCourse();     // ✅ current supprimé
+                Course course = appContext.getCourse();
                 course.setNextCourse(false);
                 showMessageInfo(result.getMessage());
             } else {
@@ -298,10 +293,9 @@ private int cptFlight = 0;
             Club club     = appContext.getClub(); 
             Course course = appContext.getCourse();
 
-            LOG.debug("with club = {}", club);
-            LOG.debug("alternative via délégation with club = {}", getClub());
-            LOG.debug("with course = {}", course);
-            LOG.debug("start to create course, clubID = {}", club.getIdclub());
+            LOG.debug("club={}", club);
+            LOG.debug("course={}", course);
+            LOG.debug("start to create course clubID={}", club.getIdclub());
 
             if (club == null || club.getIdclub() == null || club.getIdclub() == 0) {
                 showMessageFatal("Please select a club first");
@@ -315,11 +309,8 @@ private int cptFlight = 0;
             ClubManager.SaveResult result = clubManager.createCourse(course, club.getIdclub());
 
             if (result.isSuccess()) {
-
                 tee.setNextTee(true);
                 invalidateClubCaches();
-               // showMessageInfo(result.getMessage());
-                LOG.debug(result.getMessage());
                 LOG.debug("course created, next step = tee");
                 return "tee.xhtml?faces-redirect=true";
             } else {
@@ -362,9 +353,8 @@ private int cptFlight = 0;
             ClubManager.SaveResult result = clubManager.modifyCourse(course, club.getIdclub());
 
             if (result.isSuccess()) {
-                String msg = "course Modified !!";
-                LOG.info(msg);
-                showMessageInfo(msg);
+                LOG.info("course modified");
+                showMessageInfo("course Modified !!");
                 invalidateClubCaches();
             } else {
                 LOG.error("Course modification failed: {}", result.getMessage());
@@ -446,8 +436,7 @@ private int cptFlight = 0;
                 }
 
                 invalidateClubCaches();
-               // showMessageInfo(result.getMessage());
-                LOG.debug(result.getMessage());
+                LOG.debug("{}", result.getMessage());
 
                 if (tee.getTeeStart().equals("YELLOW") &&
                     tee.getTeeGender().equals("M") &&
@@ -462,9 +451,8 @@ private int cptFlight = 0;
                     return "holes_distance.xhtml?faces-redirect=true";
 
                 } else {
-                    String msg = "No holes registration needed : we already have all the information with MasterTee and DistanceTee";
-                    LOG.info(msg);
-                    showMessageInfo(msg);
+                    LOG.info("no holes registration needed — non-master tee");
+                    showMessageInfo("No holes registration needed : we already have all the information with MasterTee and DistanceTee");
                     return null;
                 }
             } else {
@@ -486,7 +474,7 @@ private int cptFlight = 0;
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            Course course = appContext.getCourse();         // ✅ current supprimé
+            Course course = appContext.getCourse();
 
             LOG.debug("tee to be modified = {}", tee.toString());
 
@@ -582,8 +570,7 @@ private int cptFlight = 0;
                 setNextStep(true);
                 loadHolesForTee(tee.getIdtee());
                 hole = new Hole();
-              //  showMessageInfo(result.getMessage());
-                LOG.debug(result.getMessage());
+                LOG.debug("hole created");
             } else {
                 LOG.error("Hole creation failed: {}", result.getMessage());
                 showMessageFatal(result.getMessage());
@@ -631,14 +618,12 @@ private int cptFlight = 0;
             ClubManager.SaveResult result = clubManager.updateHolesGlobal(holesGlobal, tee);
 
             if (result.isSuccess()) {
-                String msg = utils.LCUtil.prepareMessageBean("hole.global.create");
-                LOG.info(msg);
-                showMessageInfo(msg);
+                LOG.info("hole global created");
+                showMessageInfo(utils.LCUtil.prepareMessageBean("hole.global.create"));
                 loadHolesForTee(tee.getIdtee());
             } else {
-                String msg = "FAILURE Create Holes Global !!";
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("createHolesGlobal failed");
+                showMessageFatal("FAILURE Create Holes Global !!");
             }
             return null;
         } catch (Exception ex) {
@@ -648,81 +633,16 @@ private int cptFlight = 0;
     } // end method
 
     // ========================================
-    // DELETE - Holes
-    // ========================================
-/*
-    public String deleteHoles(ECourseList2 ecl) {
-        try {
-            LOG.debug("entering deleteHoles for Tee = {}", ecl.tee());
-            Tee tee = ecl.tee();
-            if (tee == null || tee.getIdtee() == null || tee.getIdtee() == 0) {
-                showMessageFatal("No tee selected");
-                return null;
-            }
-            int teeId = tee.getIdtee();
-            ClubManager.SaveResult result = clubManager.deleteAllHolesForTee(teeId);
-            boolean OK = result.isSuccess();
-            LOG.debug("result of deleteHoles = {}", OK);
-            if (OK) {
-                // was: lists.CourseList.setListe(null);
-                cacheInvalidator.invalidateClubCaches();
-                listCourses();
-                showMessageInfo(result.getMessage());
-                return "deleteClubCourseTee.xhtml?faces-redirect=true";
-            } else {
-                showMessageFatal(result.getMessage());
-                return null;
-            }
-        } catch (Exception ex) {
-            String msg = "Exception in deleteHoles" + ex;
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        }
-    }
-*/
-    // ========================================
-    // Autocomplete - Pays
-    // ========================================
-/* transférée countryController
-    public List<Country> completeCountry(String query) {
-        try {
-            if (query == null || query.trim().isEmpty()) return Collections.emptyList();
-
-            List<Country> allCountries = countryService.getCountries();
-            if (allCountries == null || allCountries.isEmpty()) {
-                LOG.warn("Country list is empty from CountryService");
-                return Collections.emptyList();
-            }
-
-            String lowerQuery = query.toLowerCase();
-            List<Country> filtered = allCountries.stream()
-                .filter(c -> c.getName() != null &&
-                            c.getName().toLowerCase().contains(lowerQuery))
-                .limit(10)
-                .collect(Collectors.toList());
-
-            LOG.debug("Found {} countries matching '{}'", filtered.size(), query);
-            return filtered;
-        } catch (Exception e) {
-            LOG.error("Error in completeCountry", e);
-            return Collections.emptyList();
-        }
-    } // end method
-*/
-
-
-    // ========================================
     // Helpers
     // ========================================
 
     public boolean hasClub() {
-        Club c = appContext.getClub();                      // ✅ current supprimé
+        Club c = appContext.getClub();
         return c != null && c.getIdclub() != null && c.getIdclub() > 0;
     }
 
     public boolean hasCourse() {
-        Course c = appContext.getCourse();                  // ✅ current supprimé
+        Course c = appContext.getCourse();
         return c != null && c.getIdcourse() != null && c.getIdcourse() > 0;
     }
 
@@ -748,7 +668,7 @@ private int cptFlight = 0;
         if (clubId <= 0) { LOG.warn("Invalid club ID: {}", clubId); showMessageFatal("Invalid club ID"); return; }
         try {
             Club club = clubManager.readClub(clubId);
-            appContext.setClub(club);                       // ✅ current supprimé
+            appContext.setClub(club);
             loadCoursesForClub(clubId);
             LOG.debug("Club loaded: {} (ID: {})", club.getClubName(), clubId);
             showMessageInfo("Club loaded: " + club.getClubName());
@@ -776,7 +696,7 @@ private int cptFlight = 0;
         if (courseId <= 0) { LOG.warn("Invalid course ID: {}", courseId); return; }
         try {
             Course course = clubManager.readCourse(courseId);
-            appContext.setCourse(course);                   // ✅ current supprimé
+            appContext.setCourse(course);
             loadTeesForCourse(courseId);
             LOG.debug("Course loaded: {} (ID: {})", course.getCourseName(), courseId);
         } catch (Exception e) {
@@ -825,7 +745,7 @@ private int cptFlight = 0;
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            Club club = appContext.getClub();               // ✅ current supprimé
+            Club club = appContext.getClub();
             if (club != null && club.getIdclub() != null && club.getIdclub() > 0) {
                 loadCoursesForClub(club.getIdclub());
                 LOG.debug("Course list refreshed for club {}", club.getIdclub());
@@ -835,15 +755,9 @@ private int cptFlight = 0;
         }
     } // end method
 
-// ========== MÉTHODE MIGRÉE 19-02-2026 ==========
-/**
- * Liste les clubs/courses/tees selon le paramètre
- * ✅ Plus de Connection, plus de throws SQLException
- * ✅ Délègue à ClubManager
- */
-public List<ECourseList> listClubsCoursesTees(String param) {
+    public List<ECourseList> listClubsCoursesTees(String param) {
     final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {} with param={}", param);
+    LOG.debug("entering {} param={}", methodName, param);
     if (cachedClubsCoursesTees != null) {
         LOG.debug("returning cached list size = {}", cachedClubsCoursesTees.size());
         return cachedClubsCoursesTees;
@@ -864,11 +778,6 @@ public List<ECourseList> listClubsCoursesTees(String param) {
             return cachedClubsCoursesTees;
         }
 
-        // all_clubs commenté dans l'original — conservé commenté
-        // if ("all_clubs".equals(param)) {
-        //     return clubManager.listAllClubsCoursesTees();
-        // }
-
         LOG.warn("unknown param: {}", param);
         return Collections.emptyList();
 
@@ -877,13 +786,8 @@ public List<ECourseList> listClubsCoursesTees(String param) {
         return Collections.emptyList();
     }
 } // end method
-// ========== MÉTHODE MIGRÉE ==========
-/* 19-02-2026
- * Sélection d'un club depuis un dialogue de sélection
- * @param selectedClub le club sélectionné
- * @return null (reste sur la même page)
- */
-// ── Dropdown-based club / course selection (selectClubCourse.xhtml) ─────────
+
+    // ── Dropdown-based club / course selection (selectClubCourse.xhtml) ─────────
 
     public Integer getSelectedClubId() {
         return appContext.getClub() != null ? appContext.getClub().getIdclub() : null;
@@ -953,61 +857,32 @@ public List<ECourseList> listClubsCoursesTees(String param) {
         }
     } // end method
 
-// ── Dialog-based selection (legacy dialogs, kept for other screens) ──────────
+    // ── Dialog-based selection (legacy dialogs, kept for other screens) ──────────
 
-public String selectedClubFromDialog(Club selectedClub) {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    LOG.debug("param club = {}", selectedClub);
-    LOG.debug("original/old club value = {}", appContext.getClub());
-    
-    // ✅ Mise à jour du club via appContext
-    // setClub() va automatiquement charger les courses via loadCoursesForClub()
-    setClub(selectedClub);
-    
-    // ✅ Reset du course
-    appContext.setCourse(new Course());
-    
-    // ✅ Invalidation du cache (déjà fait dans setClub via loadCoursesForClub, mais on peut garder pour être sûr)
-    // was: lists.CourseListForClub.setListe(null);
-    invalidateClubCaches();
+    public String selectedClubFromDialog(Club selectedClub) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("selectedClub={}", selectedClub);
+        setClub(selectedClub);
+        appContext.setCourse(new Course());
+        invalidateClubCaches();
+        LOG.debug("club={}", appContext.getClub());
+        dialogController.closeDialog(null);
+        return null;
+    } // end method
 
-    LOG.debug("Exiting with club = {}", appContext.getClub());
-    
-    // ✅ Fermeture du dialogue
-    dialogController.closeDialog(null);
-    
-    return null;
-}
-    // ========== MÉTHODE MIGRÉE ==========
-/**
- * Sélection d'un course depuis un dialogue de sélection
- * Même pattern que selectedClubFromDialog
- */
-public String selectedCourseFromDialog(Course selectedCourse) {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    LOG.debug("param course = {}", selectedCourse);
-    LOG.debug("original course value = {}", appContext.getCourse());
-
-    // ✅ setCourse() charge automatiquement les tees via loadTeesForCourse()
-    setCourse(selectedCourse);
-
-    // ✅ Fermeture du dialogue
-    dialogController.closeDialog(null);
-
-    LOG.debug("Exiting with course = {}", appContext.getCourse());
+    public String selectedCourseFromDialog(Course selectedCourse) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+        LOG.debug("selectedCourse={}", selectedCourse);
+        setCourse(selectedCourse);
+        dialogController.closeDialog(null);
+        LOG.debug("course={}", appContext.getCourse());
     return null;
 }
 
 
-// ========== MÉTHODE MIGRÉE ==========
-/**
- * Liste tous les clubs pour le dialogue de sélection
- * @param type type de dialogue (non utilisé)
- * @return liste de tous les clubs
- */
-public List<Club> listClubsDialog(String type) {
+    public List<Club> listClubsDialog(String type) {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {} - type={}", methodName, type);
     try {
@@ -1017,57 +892,42 @@ public List<Club> listClubsDialog(String type) {
             String code = purpose.getCode();
             if ("CreateTarifGreenfee".equals(code) || "CreateTarifMember".equals(code)) {
                 List<Club> localAdminClubs = clubsListLocalAdmin.list(appContext.getPlayer());
-                LOG.debug("{} - returning {} local-admin clubs for purpose={}", methodName, localAdminClubs.size(), code);
+                LOG.debug("returning {} local-admin clubs for purpose={}", localAdminClubs.size(), code);
                 return localAdminClubs;
             }
         }
-        return clubManager.listClubs(); // ✅ via manager
+        return clubManager.listClubs();
     } catch (Exception ex) {
         handleGenericException(ex, methodName);
         return Collections.emptyList();
     }
 } // end method
-    // ========== MÉTHODE MIGRÉE 19-02-2026 ==========
-/**
- * Liste les flights disponibles pour le round et club courants
- * ✅ Délègue entièrement à clubManager
- * ✅ Validations en amont dans le controller
- */
-public List<Flight> listFlights() {
+
+    public List<Flight> listFlights() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
     cptFlight++;
     try {
-        // Guard clause — session-level cache
         if (cachedFlightsLoaded) {
-            LOG.debug("returning cached flightList size = {}", flightList.size());
+            LOG.debug("returning cached flightList size={}", flightList.size());
             return flightList;
         }
-        LOG.debug("starting with cptFlight=1");
-            
         Round round  = appContext.getRound();
-            LOG.debug("round from appContext = {}", round);
         Club club   = appContext.getClub();
-            LOG.debug("club from appContext = {}", club);
         Course course = appContext.getCourse();
-            LOG.debug("course from appContext = {}", course);
-        // Validation round
+        LOG.debug("round={} club={} course={}", round, club, course);
         if (round.getRoundDate() == null) {
-            String msg = methodName + " Fatal error ! ClubController - round date is null";
-            LOG.error(msg);
-            showMessageFatal(msg);
+            LOG.error("round date is null");
+            showMessageFatal("Fatal error — round date is null");
             return Collections.emptyList();
         }
 
-        // Validation coordonnées GPS
         if (club.getAddress().getLatLng().getLat() == 0) {
-            String msg = methodName + " - club latitude is unknown";
-            LOG.error(msg);
-            showMessageFatal(msg);
+            LOG.error("club latitude is unknown");
+            showMessageFatal("Club latitude is unknown");
             return Collections.emptyList();
         }
 
-        // ✅ Délégation totale à clubManager — controller ne connaît pas les services
         flightList = clubManager.computeAvailableFlights(round, club, course);
         cachedFlightsLoaded = true;
         return flightList;
@@ -1077,15 +937,7 @@ public List<Flight> listFlights() {
     }
 } // end method
 
-/*
- * Invalide tous les caches session liés aux clubs/courses.
- */
-/**
- * Invalide tous les caches liés aux clubs/courses/tees/holes.
- * Hiérarchie : Club > Course > Tee > Hole
- * Supprimer un niveau invalide aussi tous les niveaux enfants.
- */
-public void invalidateClubCaches() {
+    public void invalidateClubCaches() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
     // Session caches
@@ -1110,7 +962,7 @@ public String findClubWebsite() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
     try {
-        Club club = appContext.getClub();                               // ✅ appContext
+        Club club = appContext.getClub();
         LOG.debug("for club = {}", club);
 
         if (club.getClubWebsite() == null || club.getClubWebsite().trim().isEmpty()) {
@@ -1118,13 +970,12 @@ public String findClubWebsite() {
             return null;
         }
 
-        // ✅ Ajouter https:// si pas déjà présent
         String url = club.getClubWebsite().trim();
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
             url = "https://" + url;
         }
 
-        // ✅ Security: validate URL to prevent open redirect
+        // Security: validate URL to prevent open redirect
         java.net.URI uri = new java.net.URI(url);
         String scheme = uri.getScheme();
         if (scheme == null || (!scheme.equals("http") && !scheme.equals("https"))) {
@@ -1146,56 +997,26 @@ public String findClubWebsite() {
     }
 } // end method
 
-
-/*
-public String findClubWebsite(){ //used in player.xhtml
-       LOG.debug("entering findClubWebsite " );
- try{ 
-     
-     Club club = getClub();
-                LOG.debug("for club = {}", club);  // a été complété par clubWebsiteListener, 
-            if(club.getClubWebsite() == null){
-                club.setClubWebsite("Website must be completed !");
-                return null;
-            }
-            FacesContext.getCurrentInstance().getExternalContext().redirect("http://" + club.getClubWebsite());  // https ???
-            return null;
-  }catch (Exception e){
-            String msg = "Â£ Exception in CourseController - findClubWebsite = " + e.getMessage();
-            LOG.error(msg);
-            showMessageFatal(msg);
-            return null;
-        } finally {
-           // return null;
-        }
-} // end method
-*/
-        /**
-     * Met à jour les coordonnées du joueur
-     */
     public void updateCoordinates() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
             Club club = getClub();
-            LOG.debug("pour club = {}", club);
-          //  coordinatesService.updateCoordinates(appContext.getClub());
-             coordinatesService.updateCoordinates(club);
+            LOG.debug("club={}", club);
+            coordinatesService.updateCoordinates(club);
             showMessageInfo("Coordinates updated");
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
     } // end method
     
-    // Dans ClubController
-// Dans ClubController
-public void convertYtoM() {
+    public void convertYtoM() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
     LOG.debug("with hole = {}", hole);
     LOG.debug("with hole via délégation = {}", getHole());
     try {
-        Short yards = hole.getHoleDistance();               // ✅ Short comme dans l'entité
+        Short yards = hole.getHoleDistance();
         LOG.debug("yards = {}", yards);
 
         if (yards == null || yards == 0) {
@@ -1205,36 +1026,19 @@ public void convertYtoM() {
 
         // Conversion yards → mètres (1 yard = 0.9144 m)
         Short metres = (short) Math.round(yards * 0.9144);
-        hole.setHoleDistance(metres);                       // ✅ setHoleDistance(Short)
+        hole.setHoleDistance(metres);
 
         LOG.debug("converted {} yards → {} metres", yards, metres);
 
     } catch (Exception e) {
         handleGenericException(e, methodName);
     }
-}
-/*
+} // end method
 
----
-
-### Pourquoi ça fonctionne sans paramètre
-```
-1. Utilisateur saisit 350 dans holeDistance
-2. Clic sur commandButton (ajax="false")
-3. JSF soumet le formulaire → setHoleDistance(350) appelé automatiquement
-4. convertYtoM() lit hole.getHoleDistance() → 350 ✅
-5. setHoleDistance(320) → update="holeDistance" rafraîchit le champ
-    */
-    
-    
     // ========================================
     // Load from ECourseList (DataTable row)
-    // migrated from CourseController 2026-02-25
     // ========================================
 
-    /**
-     * Charge un club depuis une ligne du DataTable (modify_ClubCourseTee.xhtml)
-     */
     public String loadClub(ECourseList ecl) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1245,9 +1049,8 @@ public void convertYtoM() {
                 club.setCreateModify(false);
                 return "club.xhtml?faces-redirect=true&operation=modify";
             } else {
-                String msg = "error : club not retrieved !!";
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("club not retrieved for loadClub");
+                showMessageFatal("error : club not retrieved !!");
                 return null;
             }
         } catch (Exception ex) {
@@ -1256,9 +1059,6 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Prépare l'ajout d'un nouveau course pour un club (modify_ClubCourseTee.xhtml)
-     */
     public String addCourse(ECourseList ecl) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1276,9 +1076,6 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Charge un course depuis une ligne du DataTable (modify_ClubCourseTee.xhtml)
-     */
     public String loadCourse(ECourseList ecl) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1306,9 +1103,6 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Prépare l'ajout d'un nouveau tee pour un course (modify_ClubCourseTee.xhtml)
-     */
     public String addTee(ECourseList ecl) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1329,9 +1123,6 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Charge un tee depuis une ligne du DataTable (modify_ClubCourseTee.xhtml)
-     */
     public String loadTee(ECourseList ecl) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1360,9 +1151,6 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Charge les holes depuis une ligne du DataTable (modify_ClubCourseTee.xhtml)
-     */
     public String loadHoles(ECourseList ecl, String type) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1391,17 +1179,8 @@ public void convertYtoM() {
 
     // ========================================
     // Navigation — Club/Course selection
-    // migrated from CourseController 2026-02-25
     // ========================================
 
-    /*
-     * Action du bouton "Choix Club et Parcours" (selectClubCourse.xhtml)
-     * Navigue vers la page finale selon le SelectionPurpose.
-     */
-    /**
-     * Central action for selectClubCourse.xhtml — routes based on SelectionPurpose.
-     * Phase 2: all routing via purpose enum, no more inputSelectCourse string matching.
-     */
     public String clubAndCourseAction() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1443,10 +1222,7 @@ public void convertYtoM() {
         };
     } // end method
 
-    /**
-     * Action du bouton de sélection club (selectClubDelete.xhtml / selectClubDialog.xhtml)
-     * Navigue selon le contexte inputSelectClub dans la session.
-     */
+    // Called from selectClubDelete/selectClubDialog — routes via SelectionPurpose (PAYMENT_COTISATION → cotisation flow).
     public String selectorClubNextView() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1518,8 +1294,6 @@ public void convertYtoM() {
     // Getters / Setters
     // ========================================
 
-    // ========== GETTERS / SETTERS ==========
-    
     public Tee getTee() { if (tee == null) tee = new Tee(); return tee; }
     public void setTee(Tee tee) {
         this.tee = tee;
@@ -1572,14 +1346,6 @@ public void convertYtoM() {
         appContext.setUnavailable(unavailable);
     }
 
-    // ========================================
-    // MÉTHODES MIGRÉES depuis CourseController — 2026-02-25
-    // ========================================
-
-    /**
-     * Ouvre la page modify_holes_global pour éditer les holes du tee sélectionné.
-     * Migré depuis CourseController — 2026-02-25
-     */
     public String viewHolesGlobal() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1587,10 +1353,6 @@ public void convertYtoM() {
         return "modify_hole.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectCourse();
     } // end method
 
-    /**
-     * Charge un hole à partir d'une sélection ECourseList.
-     * Migré depuis CourseController — 2026-02-25
-     */
     public String loadHole(ECourseList ecl) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1623,13 +1385,9 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Met à jour la structure unavailable d'un club (modify ou delete).
-     * Migré depuis CourseController — 2026-02-25
-     */
     public String modifyGroundCondition(String type) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} for type = {}", type);
+        LOG.debug("entering {} type={}", methodName, type);
         try {
             EUnavailable unavailable = appContext.getUnavailable();
             Club club = appContext.getClub();
@@ -1646,9 +1404,6 @@ public void convertYtoM() {
         }
     } // end method
 
-     /* Sélection d'un course pour afficher le trajet (maps).
-     * Migré depuis CourseController — 2026-02-25
-     */
     public String selectTravel(ECourseList ecl) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1659,11 +1414,10 @@ public void convertYtoM() {
                 appContext.setCourse(ecl.course());
             }
 
-            String msg = "Select Travel Successful = "
+            LOG.debug("select travel ok club={} course={}", appContext.getClub().getClubName(), appContext.getCourse().getCourseName());
+            showMessageInfo("Select Travel Successful"
                     + " <br/> Club name = " + appContext.getClub().getClubName()
-                    + " <br/> Course name = " + appContext.getCourse().getCourseName();
-            LOG.debug(msg);
-            showMessageInfo(msg);
+                    + " <br/> Course name = " + appContext.getCourse().getCourseName());
             LOG.debug("inputSelectCourse = {}", appContext.getInputSelectCourse());
             return "maps_home_club.xhtml?faces-redirect=true";
         } catch (Exception e) {
@@ -1672,11 +1426,6 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Sélection d'un course pour afficher le chart statistique.
-     * Migré depuis CourseController — 2026-02-25
-     * Note: utilise encore new ChartController() legacy — migration ChartController hors scope
-     */
     public String selectChart(ECourseList ecl) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1686,15 +1435,13 @@ public void convertYtoM() {
                 appContext.setClub(ecl.club());
                 appContext.setCourse(ecl.course());
             }
-            String msg = "Select Course Successful = "
+            LOG.debug("select chart ok club={} course={}", appContext.getClub().getClubName(), appContext.getCourse().getCourseName());
+            showMessageInfo("Select Course Successful"
                     + " <br/> Club name = " + appContext.getClub().getClubName()
-                    + " <br/> Course name = " + appContext.getCourse().getCourseName()
-                    + " / " + appContext.getCourse().getIdcourse();
-            LOG.debug(msg);
-            showMessageInfo(msg);
+                    + " <br/> Course name = " + appContext.getCourse().getCourseName());
             LOG.debug("inputSelectCourse = {}", appContext.getInputSelectCourse());
             // new Controllers.ChartController().lineModelCourse(conn, ...)
-            String v = chartController.lineModelCourse(appContext.getPlayer(), appContext.getCourse()); // migrated 2026-02-26
+            String v = chartController.lineModelCourse(appContext.getPlayer(), appContext.getCourse());
             setLineModelCourse(v);
             LOG.debug("Chart returned = {}", getLineModelCourse());
             return "statChartCourse.xhtml?faces-redirect=true";
@@ -1707,37 +1454,25 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Navigation vers course.xhtml pour créer/modifier un course.
-     * Migré depuis CourseController — 2026-02-25
-     */
     public String to_course_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", s);
+        LOG.debug("entering {} string={}", methodName, s);
         navigationController.reset(s);
         appContext.getCourse().setCreateModify(true);
         return "course.xhtml?faces-redirect=true&operation=" + s;
     } // end method
 
-    /**
-     * Navigation vers tee.xhtml pour créer/modifier un tee.
-     * Migré depuis CourseController — 2026-02-25
-     */
     public String to_tee_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}", s);
+        LOG.debug("entering {} string={}", methodName, s);
         navigationController.reset(s);
         tee.setCreateModify(true);
         return "tee.xhtml?faces-redirect=true&operation=" + s;
     } // end method
 
-    /**
-     * Liste les courses pour un club donné (par ID string).
-     * Migré depuis CourseController — 2026-02-25
-     */
     public List<Course> listCoursesForClub(String clubid) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with param clubid = {}", clubid);
+        LOG.debug("entering {} clubid={}", methodName, clubid);
         if (cachedCoursesForClub != null) {
             LOG.debug("returning cached list size = {}", cachedCoursesForClub.size());
             return cachedCoursesForClub;
@@ -1751,7 +1486,7 @@ public void convertYtoM() {
                 club.setIdclub(Integer.parseInt(clubid));
             }
             LOG.debug("Club = {}", club);
-            cachedCoursesForClub = courseListForClubService.list(club); // migrated 2026-02-24
+            cachedCoursesForClub = courseListForClubService.list(club);
             return cachedCoursesForClub;
         } catch (SQLException e) {
             handleSQLException(e, methodName);
@@ -1762,10 +1497,7 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Pre-render handler pour club.xhtml — reset le club si pas un postback.
-     * Migré depuis CourseController — 2026-02-25
-     */
+    // Resets club to blank on initial page load (non-postback) so the form starts empty.
     public void preRenderClub() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1780,29 +1512,15 @@ public void convertYtoM() {
         }
     } // end method
 
-    // ========================================
-    // Getters/Setters — migrated from CourseController 2026-02-25
-    // ========================================
-
     public String getLineModelCourse() { return lineModelCourse; }
     public void setLineModelCourse(String lineModelCourse) { this.lineModelCourse = lineModelCourse; }
 
     public TarifMember getTarifMember() { return tarifMember; }
     public void setTarifMember(TarifMember tarifMember) { this.tarifMember = tarifMember; }
 
-    // ========================================
-    // Migrated from CourseController — 2026-02-25 (Étape 3)
-    // ========================================
-
-    // convertYtoM() — already exists at line ~1017 in this class
-
-    /**
-     * Navigation vers modify_ClubCourseTee.xhtml ou selectClubModify.xhtml.
-     * Migré depuis CourseController — 2026-02-25
-     */
     public String to_clubModify_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering with string = {}", s);
+        LOG.debug("entering {} string={}", methodName, s);
         navigationController.reset("clubRestart " + s);
         tee.setModifyClubCourseTee(true);
         appContext.setInputSelectClub(s);
@@ -1814,10 +1532,7 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Setter inputClub — réinitialise club/course/tee/hole si "ini".
-     * Migré depuis CourseController — 2026-02-25
-     */
+    // "ini" resets all context — called when user starts a new club creation flow.
     public void setInputClub(String inputClub) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering (new club !) = {}", inputClub);
@@ -1829,17 +1544,7 @@ public void convertYtoM() {
         }
     } // end method
 
-    // ========================================
-    // Groupe A — Navigation to_select* methods
-    // migrated from CourseController 2026-02-25 (Phase 2)
-    // ========================================
-
-    // to_selectPurpose_xhtml moved to NavigationController 2026-03-23
-
-    /**
-     * Initialise le menu unavailable : set menuLaunched=true, charge la structure si elle existe.
-     * Appelé depuis unavailable_menu.xhtml après sélection club/course.
-     */
+    // Called from unavailable_menu.xhtml — sets menuLaunched=true and loads existing structure from DB.
     public String initUnavailableMenu() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1870,17 +1575,17 @@ public void convertYtoM() {
 
     public String to_selectCourseLA_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering with string = {}", s);
+        LOG.debug("entering {} string={}", methodName, s);
         navigationController.reset("Reset to_selectClub2 " + s);
         appContext.setInputSelectCourse(s);
         appContext.setAdminType("admin");
         LOG.debug("club selected for :  = {}", appContext.getInputSelectCourse());
-        return "selectClubCourse.xhtml?faces-redirect=true"; // consolidated 2026-03-23
+        return "selectClubCourse.xhtml?faces-redirect=true";
     } // end method
 
     public String to_update_help(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering with string = {}", s);
+        LOG.debug("entering {} string={}", methodName, s);
         navigationController.reset("Reset to_update_help " + s);
         appContext.setInputSelectCourse(s);
         return "editor_help.xhtml?faces-redirect=true";
@@ -1888,7 +1593,7 @@ public void convertYtoM() {
 
     public String to_selectClub_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering with string = {}", s);
+        LOG.debug("entering {} string={}", methodName, s);
         navigationController.reset("Reset to_selectClub" + s);
         appContext.setInputSelectCourse(s);
         appContext.setInputSelectClub(s);
@@ -1897,39 +1602,30 @@ public void convertYtoM() {
 
     public String to_selectClubDialog_xhtml(String s) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering with string = {}", s);
+        LOG.debug("entering {} string={}", methodName, s);
         navigationController.reset("Reset to_selectClubDialog" + s);
         appContext.setInputSelectClub(s);
         return "selectClubDialog.xhtml?faces-redirect=true&cmd=" + appContext.getInputSelectClub();
     } // end method
 
-    // ========================================
-    // Groupe E — Extra navigation methods
-    // migrated from CourseController 2026-02-25 (Phase 2)
-    // ========================================
-
     public void to_reset_menu(String ini) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         navigationController.reset(ini);
-        // sessionMap.put("playerid/playerlastname/playerage") — removed 2026-02-28, dead code
-        String msg = "Reset PLAYER done = " + ini;
-        LOG.debug(msg);
-        showMessageInfo(msg);
+        LOG.debug("reset player done ini={}", ini);
+        showMessageInfo("Reset PLAYER done = " + ini);
     } // end method
 
     // ========================================
-    // Groupe B — List methods
-    // migrated from CourseController 2026-02-25 (Phase 2)
+    // List methods
     // ========================================
 
     public void findCourseListForClub() throws SQLException, Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        courseListForClub = courseListForClubService.list(appContext.getClub()); // migrated 2026-02-25
+        courseListForClub = courseListForClubService.list(appContext.getClub());
     } // end method
 
-    /** Migrated 2026-02-28 from NavigationController */
     public List<ECourseList> listProfessionalForClub() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1941,11 +1637,6 @@ public void convertYtoM() {
         }
     } // end method
 
-    /**
-     * Créer un professional pour un club.
-     * Migré depuis CourseController — 2026-02-28
-     * @return 
-     */
     public String createProfessional() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1958,13 +1649,11 @@ public void convertYtoM() {
             appContext.getProfessional().setProPlayerId(appContext.getPlayerTemp().getIdplayer());
 
             if (createProfessionalService.create(appContext.getProfessional())) {
-                String msg = "professional created";
-                LOG.info(msg);
-                showMessageInfo(msg);
+                LOG.info("professional created");
+                showMessageInfo("professional created");
             } else {
-                String msg = "FATAL error : professional NOT created - " + appContext.getProfessional();
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("professional NOT created professional={}", appContext.getProfessional());
+                showMessageFatal("FATAL error : professional NOT created - " + appContext.getProfessional());
             }
             return null;
         } catch (Exception ex) {
@@ -1990,9 +1679,8 @@ public void convertYtoM() {
         try {
             if (updateProfessionalService.updateFull(selectedProfessional)) {
                 cacheInvalidator.invalidateProfessionalCaches();
-                String msg = "Professional updated: " + selectedProfessional.getProId();
-                LOG.info(msg);
-                showMessageInfo(msg);
+                LOG.info("professional updated id={}", selectedProfessional.getProId());
+                showMessageInfo("Professional updated: " + selectedProfessional.getProId());
             } else {
                 showMessageFatal("Error updating Professional ProId=" + selectedProfessional.getProId());
             }
@@ -2007,9 +1695,8 @@ public void convertYtoM() {
         try {
             if (updateProfessionalService.updateAmount(selectedProfessional)) {
                 cacheInvalidator.invalidateProfessionalCaches();
-                String msg = "ProAmount updated: " + selectedProfessional.getProAmount();
-                LOG.info(msg);
-                showMessageInfo(msg);
+                LOG.info("proAmount updated amount={}", selectedProfessional.getProAmount());
+                showMessageInfo("ProAmount updated: " + selectedProfessional.getProAmount());
             } else {
                 showMessageFatal("Error updating ProAmount for ProId=" + selectedProfessional.getProId());
             }
@@ -2032,7 +1719,7 @@ public void convertYtoM() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            SelectionPurpose purpose = clubSelectionContext.getPurpose(); // Phase 2 — 2026-03-23
+            SelectionPurpose purpose = clubSelectionContext.getPurpose();
             LOG.debug("with purpose = {}", purpose);
             if (purpose == SelectionPurpose.CHART_COURSE
                     || purpose == SelectionPurpose.CREATE_ROUND
@@ -2054,8 +1741,8 @@ public void convertYtoM() {
         try {
             Club c = new Club();
             c.setIdclub(Integer.valueOf(id));
-            cacheInvalidator.invalidateClubCaches(); // centralized 2026-03-22
-            return clubDetailList.list(c);    // migrated 2026-02-25
+            cacheInvalidator.invalidateClubCaches();
+            return clubDetailList.list(c);
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
             return Collections.emptyList();
@@ -2063,8 +1750,7 @@ public void convertYtoM() {
     } // end method
 
     // ========================================
-    // Groupe C — Selection methods
-    // migrated from CourseController 2026-02-25 (Phase 2)
+    // Selection methods
     // ========================================
 
     public String selectedClub(Club c) {
@@ -2113,7 +1799,7 @@ public void convertYtoM() {
                 }
                 case PAYMENT_COTISATION -> {
                     appContext.getRound().setRoundDate(LocalDateTime.now());
-                    tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound()); // migrated 2026-02-26 navigationController.getRound() → appContext
+                    tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound());
                     LOG.debug("TarifMember loaded for club = {}", appContext.getClub());
                     dialogController.closeDialog(null);
                     yield null;
@@ -2155,9 +1841,8 @@ public void convertYtoM() {
             LOG.debug("with purpose = {}", purpose);
             appContext.setCourse(c);
             LOG.debug("course is now = {}", appContext.getCourse());
-            String msg = "Select Course Successfull = <br/> CourseName = " + appContext.getCourse().getCourseName();
-            LOG.debug(msg);
-            showMessageInfo(msg);
+            LOG.debug("course selected name={}", appContext.getCourse().getCourseName());
+            showMessageInfo("Select Course Successfull = <br/> CourseName = " + appContext.getCourse().getCourseName());
             LOG.debug(": inputSelectClub = {}", appContext.getInputSelectClub());
 
             dialogController.closeDialog(null);
@@ -2215,10 +1900,7 @@ public void convertYtoM() {
                 appContext.setClub(c);
             }
 
-            String msg = "Select Club Successfull = "
-                    + " <br/> Club name = " + appContext.getClub().getClubName()
-                    + " <br/> inputSelectCourse = " + select;
-            LOG.debug(msg);
+            LOG.debug("club selected name={} select={}", appContext.getClub().getClubName(), select);
 
             SelectionPurpose purpose = Optional.ofNullable(clubSelectionContext.getPurpose()).orElse(SelectionPurpose.CREATE_PLAYER);
             LOG.debug("with purpose = {}", purpose);
@@ -2228,14 +1910,11 @@ public void convertYtoM() {
                    
               }
             if (appContext.getInputSelectCourse() == null) {
-                msg = "No InputSelectCourse !";
-                LOG.error(msg);
-                showMessageFatal(msg);
+                LOG.error("no InputSelectCourse set");
+                showMessageFatal("No InputSelectCourse !");
                 return null;
             }
             if (select.equals("CreatePro")) {
-                
-                // ici intervenir pour soution avec purpose
                 return "professional.xhtml?faces-redirect=true";
             }
 
@@ -2281,7 +1960,7 @@ public void convertYtoM() {
                 LOG.debug("club = {}", appContext.getClub());
                 LOG.debug("round = {}", appContext.getRound());
                 
-                tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound()); // migrated 2026-02-26 navigationController.getRound() → appContext
+                tarifMember = findTarifMembersData.find(appContext.getClub(), appContext.getRound());
                 if (tarifMember == null) {
                     String msgerr = LCUtil.prepareMessageBean("tarif.member.notfound");
                     LOG.error(msgerr);
@@ -2299,15 +1978,9 @@ public void convertYtoM() {
         return null;
     } // end method
 
-    // selectCourseLA removed 2026-03-23 — dead code, routing via clubAndCourseAction + SelectionPurpose
-    private void selectCourseLA_placeholder() {
-    } // end method
-
-    // selectClubCourse() and selectedCourse() removed 2026-03-23 — dead code, replaced by clubAndCourseAction
 
     // ========================================
-    // Groupe D — Unavailable methods
-    // migrated from CourseController 2026-02-25 (Phase 2)
+    // Unavailable methods
     // ========================================
 
     public String createUnavailablePeriod() {
@@ -2435,11 +2108,9 @@ public void convertYtoM() {
         try {
             EUnavailable unavailable = appContext.getUnavailable();
             LOG.debug("for unavailable = {}", unavailable);
-            String msg = LCUtil.prepareMessageBean("unavailable.structure.show")
-                    + "<br/> Unavailable Structure = "
-                    + unavailable.structure().getStructureList().toString();
-            LOG.info(msg);
-            showMessageInfo(msg);
+            LOG.info("unavailable structure={}", unavailable.structure().getStructureList());
+            showMessageInfo(LCUtil.prepareMessageBean("unavailable.structure.show")
+                    + "<br/> Unavailable Structure = " + unavailable.structure().getStructureList().toString());
             return null;
         } catch (Exception ex) {
             handleGenericException(ex, methodName);
@@ -2462,9 +2133,8 @@ public void convertYtoM() {
                 appContext.setUnavailable(null);
             } else {
                 appContext.setUnavailable(lun);
-                String msg = "showUnavailablePeriods - first element of list is = " + lun.toString();
-                LOG.debug(msg);
-                showMessageInfo(msg);
+                LOG.debug("unavailable period found={}", lun);
+                showMessageInfo("Unavailable period: " + lun.toString());
                 return "ground_condition_show.xhtml?faces-redirect=true";
             }
             return null;
