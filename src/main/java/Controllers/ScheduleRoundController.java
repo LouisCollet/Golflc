@@ -43,11 +43,6 @@ import static interfaces.Log.LOG;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
-/**
- * Calendrier des créneaux de départ (flights) par semaine.
- * LazyScheduleModel — PrimeFaces appelle loadEvents(start, end) automatiquement
- * à chaque navigation prev/next/today et changement de vue.
- */
 @Named("schedRoundC")
 @ViewScoped
 public class ScheduleRoundController implements Serializable {
@@ -117,9 +112,6 @@ public class ScheduleRoundController implements Serializable {
     // ACTIONS CALENDRIER
     // ========================================
 
-    /**
-     * Clic sur un créneau — stocke l'heure et ouvre le dialog via oncomplete JS.
-     */
     public void onEventSelect(SelectEvent<ScheduleEvent<Object>> event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -237,17 +229,6 @@ public class ScheduleRoundController implements Serializable {
         return p != null && "ADMIN".equals(p.getPlayerRole());
     } // end method
 
-    /**
-     * Bouton "Confirmer" du dialog.
-     * Flux :
-     *   1. Paiement (non-membre) — membre skip
-     *   2. Find-or-create round au créneau sélectionné (après paiement pour non-membre)
-     *   3. L'inscription (choix du tee, mail) est reportée au menu Register Score
-     *
-     * Pour un non-membre la création du round a lieu dans
-     * PaymentController.onPaymentCompleted() après succès du paiement.
-     * L'inscription proprement dite se fait ensuite via le menu Register Score.
-     */
     public String confirmRound() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -353,13 +334,11 @@ public class ScheduleRoundController implements Serializable {
         }
     } // end method
 
-    /**
-     * Inscription automatique au round (avec 1er tee valide pour le genre du joueur).
-     * Idempotent — skip si le joueur est déjà inscrit pour ce round.
-     */
     public enum InscribeResult { CREATED, ALREADY_INSCRIBED, FAILED }
 
     private void reportInscribeResult(InscribeResult r) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         switch (r) {
             case CREATED -> {
                 Player player = appContext.getPlayer();
@@ -404,11 +383,6 @@ public class ScheduleRoundController implements Serializable {
         return InscribeResult.CREATED;
     } // end method
 
-    /**
-     * Cherche un round existant au slot (course + RoundDate exacte) ; le crée si absent.
-     * Vérifie aussi la contrainte {@value #MAX_PLAYERS_PER_SLOT}.
-     * @return le round avec idround renseigné, ou null en cas d'échec.
-     */
     private Round findOrCreateRound(Round candidate, Course course, Club club) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -440,10 +414,6 @@ public class ScheduleRoundController implements Serializable {
     // MÉTHODES PRIVÉES
     // ========================================
 
-    /**
-     * Appelé par LazyScheduleModel.loadEvents() — génère les slots pour la plage visible.
-     * Utilise sunrise/sunset du lundi de la plage comme référence pour toute la semaine.
-     */
     private static final DateTimeFormatter ID_FMT = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
 
 
@@ -561,15 +531,6 @@ public class ScheduleRoundController implements Serializable {
         }
     } // end method
 
-    /**
-     * Flux « 1-clic » depuis le calendrier — pré-remplit le tableau Choosen
-     * approprié avec quantité=1 pour que calcGreenfeePrice() retourne le prix
-     * du slot (sinon il retourne 0 → "amount ZERO no payment needed").
-     *
-     * BA → quantity=1 sur le premier basicList
-     * HO → ajoute le TeeTimes qui contient slotStart dans teeTimeChoosen
-     * DA → crée un DaysWeek avec le prix du jour-de-semaine dans dayChoosen
-     */
     private void pickChoosenFromSlot(TarifGreenfee tarif, LocalDateTime slotStart) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -640,6 +601,8 @@ public class ScheduleRoundController implements Serializable {
     } // end method
 
     private String extractPrice(TarifGreenfee tarif, LocalDateTime slotStart) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         if (tarif == null) return "unknown";
         LocalTime t   = slotStart.toLocalTime();
         DayOfWeek dow = slotStart.getDayOfWeek();
@@ -689,6 +652,8 @@ public class ScheduleRoundController implements Serializable {
     } // end method
 
     private Round buildRound(LocalDateTime start, Integer holes, Integer roundStartHole, String game, Course course) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         Round round = new Round();
         round.setRoundDate(start);
         round.setRoundHoles((short)(holes != null ? holes : 18));
@@ -708,17 +673,10 @@ public class ScheduleRoundController implements Serializable {
         };
     } // end method
 
-    /**
-     * Calcule les heures (LocalTime) des slots de la journée à partir du sunrise/sunset
-     * du LUNDI de la semaine. Ces heures sont utilisées telles quelles pour chaque jour
-     * de la plage visible, garantissant que 9h24 signifie 9h24 tous les jours.
-     *
-     * Règles conservées du comportement d'origine :
-     *   - premier slot = sunrise + 32 min (20 min de warmup + 1er incrément de 12 min)
-     *   - incrément entre slots = 12 min
-     *   - dernier slot accepté tant que (slot − 12 min) < sunset − 2h30
-     */
+    // premier slot = sunrise + 32 min (20 min warmup + 1er incrément 12 min), incrément 12 min, dernier slot < sunset − 2h30
     private java.util.List<LocalTime> computeSlotTimes(LocalTime sunrise, LocalTime sunset) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         java.util.List<LocalTime> out = new java.util.ArrayList<>();
         LocalTime cursor    = sunrise.plusMinutes(20);
         LocalTime threshold = sunset.minusHours(2).minusMinutes(30);
@@ -729,7 +687,7 @@ public class ScheduleRoundController implements Serializable {
         return out;
     } // end method
 
-    /** Détermine la période de la journée selon l'heure. A=matin, B=midi, C=après-midi. */
+    // A=matin (avant 12h), B=midi, C=après-midi (après 14h)
     private String computePeriod(LocalTime t) {
         if (t.isBefore(LocalTime.of(12, 0))) return "A";
         if (t.isAfter(LocalTime.of(14, 0)))  return "C";
