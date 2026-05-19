@@ -6,16 +6,12 @@ import entite.Round;
 import entite.Structure;
 import static interfaces.Log.LOG;
 import java.io.Serializable;
-import jakarta.inject.Named;
-import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import javax.sql.DataSource;
 import static exceptions.LCException.handleGenericException;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
-@Named("unavailableC")
 @ApplicationScoped
 public class UnavailableController implements Serializable {
 
