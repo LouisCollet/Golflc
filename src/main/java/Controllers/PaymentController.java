@@ -13,23 +13,11 @@ import static interfaces.Log.LOG;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.enterprise.event.Observes;
-import jakarta.faces.application.ViewHandler;
-import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ValueChangeEvent;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-// servlet imports removed 2026-03-21 - no longer needed after JAX-RS extraction
-// JAX-RS server annotations removed 2026-03-21 - moved to rest.PaymentRestResource
-// JAX-RS client imports kept for testWebService()
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.Invocation;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.Cookie;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,16 +28,9 @@ import static enumeration.eTypePayment.GREENFEE;
 import static enumeration.eTypePayment.LESSON;
 import static enumeration.eTypePayment.SUBSCRIPTION;
 import java.util.Objects;
-// PaymentOrchestrator/PaymentTarget imports removed 2026-03-21 - moved to PaymentRestResource
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
-/**
- * Controller JSF pour la gestion des paiements et cartes de credit.
- * Migre depuis CourseController le 2026-02-25.
- *
- * @author GolfLC
- */
 @Named("payC")
 @SessionScoped
 public class PaymentController implements Serializable {
@@ -69,7 +50,7 @@ public class PaymentController implements Serializable {
 
     @Inject private ApplicationContext                          appContext;
     @Inject private cache.CacheInvalidator                       cacheInvalidator;
-    @Inject private read.ReadCreditcard                          readCreditcard;       // migrated 2026-02-26 - was CreditcardController
+    @Inject private read.ReadCreditcard                          readCreditcard;
     @Inject private payment.PaymentSubscriptionController       paymentSubscriptionController;
     @Inject private payment.PaymentCotisationController         paymentCotisationController;
     @Inject private payment.PaymentGreenfeeController           paymentGreenfeeController;
@@ -77,8 +58,7 @@ public class PaymentController implements Serializable {
     @Inject private Controllers.TarifMemberController           tarifMemberController;
     @Inject private Controllers.TarifGreenfeeController         tarifGreenfeeController;
     @Inject private Controllers.MemberController                memberController;
-    @Inject private Controllers.CartController                  cartController;       // cart state extracted 2026-05-14
-    // SchedulerProController removed - @ViewScoped can't be injected in @SessionScoped. Data via appContext. // 2026-03-22
+    @Inject private Controllers.CartController                  cartController;
     @Inject private create.CreateLesson                         createLesson;
     @Inject private find.FindRoundBySlot                        findRoundBySlot;
     @Inject private find.FindInscriptionRound                   findInscriptionRound;
@@ -87,15 +67,13 @@ public class PaymentController implements Serializable {
     @Inject private manager.PlayerManager                       playerManager;
     @Inject private read.ReadClub                               readClubService;
     @Inject private Controllers.HttpController                  httpController;
-    // @Inject @SessionMap sessionMap - removed 2026-02-28, migrated to appContext
-    @Inject private mail.CreditcardMail                         creditcardMail;  // migrated 2026-02-26
     @Inject private mail.LessonMail                             lessonMail;
     @Inject private mail.PaymentConfirmationMail                paymentConfirmationMail;
     @Inject private entite.Settings                             settings;        // security audit 2026-03-18
     @Inject private payment.PaymentStateStore                   paymentStateStore; // architecture REST/JSF separation 2026-03-21
-    @Inject private find.FindCart                               findCartService;        // cart persistence 2026-05-07
-    @Inject private delete.DeleteCart                           deleteCartService;      // cart persistence 2026-05-07
-    @Inject private update.UpdateCartStatus                     updateCartStatusService; // cart status 2026-05-18
+    @Inject private find.FindCart                               findCartService;
+    @Inject private delete.DeleteCart                           deleteCartService;
+    @Inject private update.UpdateCartStatus                     updateCartStatusService;
     @Inject private find.FindGreenfeePaid                       findGreenfeePaid;
 
     // ========================================
@@ -183,7 +161,7 @@ public class PaymentController implements Serializable {
             LOG.debug("cotisation type : spontaneous ou round ? {}", cotisation.getType());
             LOG.debug("amount non ZERO payment COTISATION needed !");
             appContext.setCotisation(cotisation);
-            creditcard = completeWithCotisation(cotisation, appContext.getPlayer()); // migrated 2026-02-26 - was creditcardController
+            creditcard = completeWithCotisation(cotisation, appContext.getPlayer());
             if (creditcard != null) {
                 String msg = "creditcard completed with Cotisation ! ";
                 LOG.info(msg);
@@ -250,7 +228,7 @@ public class PaymentController implements Serializable {
                 cartController.clearLessonsFromCart();
                 return null;
             } // end if
-            creditcard = completeWithLesson(professional, cartController.getListLessons(), appContext.getPlayer()); // migrated 2026-02-26 - was creditcardController
+            creditcard = completeWithLesson(professional, cartController.getListLessons(), appContext.getPlayer());
             if (creditcard != null) {
                 LOG.info("creditcard with lesson = {}", creditcard);
                 return "cart.xhtml?faces-redirect=true";
@@ -386,7 +364,7 @@ public class PaymentController implements Serializable {
                     LOG.debug("getSubCode()is MONTHLY or YEARLY");
                     subscription = paymentSubscriptionController.complete(subscription); // migrated 2026-02-25
                     appContext.setSubscription(subscription);
-                    creditcard = completeWithSubscription(subscription, appContext.getPlayer()); // migrated 2026-02-26 - was creditcardController
+                    creditcard = completeWithSubscription(subscription, appContext.getPlayer());
                     LOG.debug("creditcard completed with subscription = {}", creditcard);
                     cartController.upsertSubscription();
                     return "cart.xhtml?faces-redirect=true"; // goes to cart for MIXED support
@@ -402,39 +380,12 @@ public class PaymentController implements Serializable {
         }
     } // end method manageSubscription
 
-    public String creditCardMail() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with creditcard typePayment = {}", creditcard.getTypePayment());
-        try {
-            if (GREENFEE().equals(creditcard.getTypePayment())) {
-                if (!creditcardMail.sendMailGreenfee(appContext.getPlayer(), creditcard, memberController.getTarifGreenfee(), appContext.getRound(), appContext.getInscription())) {
-                    LOG.warn("sendMailGreenfee returned false");
-                }
-            } // end if
-            if (SUBSCRIPTION().equals(creditcard.getTypePayment())) {
-                if (!creditcardMail.sendMailSubscription(appContext.getPlayer(), creditcard, appContext.getSubscription())) {
-                    LOG.warn("sendMailSubscription returned false");
-                }
-            } // end if
-            if (COTISATION().equals(creditcard.getTypePayment())) {
-                if (!creditcardMail.sendMailCotisation(appContext.getPlayer(), creditcard, appContext.getCotisation(), appContext.getClub(), memberController.getTarifMember())) {
-                    LOG.warn("sendMailCotisation returned false");
-                }
-            } // end if
-            return "creditcard_payment_executed.xhtml?faces-redirect=true";
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-            return null;
-        }
-    } // end method
-
-    //  !! ne pas toucher ..String typePayment.
     public void onCompletePayment() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         LOG.debug("coming from creditcard_accepted.xhtml");
-        progress1 = 0;  // �?� reset pour la prochaine visite
-        running = false; // new 09-03-2026
+        progress1 = 0;
+        running = false;
         try {
             creditcard.setTypePayment(appContext.getCreditcardType());
             savedType = creditcard.getTypePayment();
@@ -515,23 +466,11 @@ public class PaymentController implements Serializable {
         }
     } // end method onCompletePayment
 
-    // handlePayments - moved to rest.PaymentRestResource 2026-03-21
-
-    //  utilisé dans creditcard_accepted.xhtml
     public void onStart() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         running = true;
         progress1 = 0;
-        LOG.debug("entering {}, progress1 = {}", progress1);
-    //    showMessageInfo("entering onStart, progress1 = " + progress1);
-    } // end method
-
-    public void onProgress() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        String msg = "Progress Updated " + progress1;
-        showMessageInfo(msg);
     } // end method
 
     public void cancelProgress() {
@@ -539,7 +478,7 @@ public class PaymentController implements Serializable {
         LOG.debug("entering {}", methodName);
         LOG.debug("Payment canceled by User");
         progress1 = 0;  // était null
-        running = false; // new 09-03-2026
+        running = false;
         creditcard.setPaymentOK(false);
         String msg = "Creditcard payment canceled by user";
         LOG.error(msg);
@@ -617,15 +556,6 @@ public class PaymentController implements Serializable {
         cartController.updatePendingLesson(before, after);
     } // end method
 
-    public String to_creditcard_test_xhtml(String s) {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with string = {}",methodName, s);
-        creditcard.setTotalPrice(155.6);
-        creditcard.setCommunication(" prepared creditcard communication");
-        creditcard.setCreditcardType(enumeration.CreditcardBrand.VISA);
-        return "creditcard_test.xhtml?faces-redirect=true";
-    } // end method
-
     public void creditCardNumberListener(ValueChangeEvent e) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -641,110 +571,12 @@ public class PaymentController implements Serializable {
         LOG.debug("creditcardType NewValue = {}", e.getNewValue());
         creditcard.setCreditcardType((enumeration.CreditcardBrand) e.getNewValue());
         if (!Objects.equals(creditcard.getCreditcardIssuer(), creditcard.getCreditcardType())) {
-            String msg = "WARNING !!! "
-                    + " <br/> Issuer detected = " + creditcard.getCreditcardIssuer()
-                    + " <br/> Card Type data in = " + creditcard.getCreditcardType();
-            LOG.debug(msg);
-            showMessageInfo(msg);
+            LOG.warn("issuer/card type mismatch issuer={} cardType={}", creditcard.getCreditcardIssuer(), creditcard.getCreditcardType());
+            showMessageInfo("WARNING !!! <br/> Issuer detected = " + creditcard.getCreditcardIssuer()
+                    + " <br/> Card Type data in = " + creditcard.getCreditcardType());
         } // end if
     } // end method
 
-    // ========================================
-    // TEST METHODS - migrées depuis CourseController 2026-02-25
-    // ========================================
-
-    public String testWebServiceHttp() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} for creditcard, server = python");
-        try {
-            creditcard.setCreditCardHolder("LOUIS COLLET 11");
-            creditcard.setCreditCardIdPlayer(324713);
-            creditcard.setCommunication("creditcard using Java11HttpClientExample");
-            creditcard.setCreditcardNumber("1111222233334444");
-            creditcard.setTotalPrice(35.0);
-            creditcard.setTypePayment("LESSON");
-            creditcard.setCreditcardType(enumeration.CreditcardBrand.VISA);
-            creditcard.setCreditcardVerificationCode((short) 567);
-            creditcard.setPaymentOK(false);
-            creditcard.setCreditcardCurrency("EUR");
-            LOG.debug("just before send payment to python server, creditcard = {}", creditcard);
-            String s = httpController.sendPaymentServer(creditcard);
-            if (creditcard.getCreditCardIdPlayer() != null) { // fake test !!
-                String msg = "Payment validé par Amazone Payments Inc !";
-                LOG.info(msg);
-                showMessageInfo(msg);
-                return "creditcard_accepted.xhtml?faces-redirect=true";
-            } else {
-                String msg = "payment rejected by Amazone Payments Inc ! !";
-                LOG.error(msg);
-                showMessageFatal(msg);
-                return "welcome.xhtml?faces-redirect=true";
-            } // end if
-        } catch (Exception ex) {
-            handleGenericException(ex, methodName);
-            return null;
-        }
-    } // end method testWebServiceHttp
-
-    public void testWebService() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        String ws = null;
-        Response response = null;
-        try {
-            Creditcard c = new Creditcard();
-            c.setCreditCardHolder("LOUIS COLLET");
-            c.setCreditCardIdPlayer(324713);
-            c.setCommunication("creditcard communication");
-            c.setCreditcardNumber("1111222233334444");
-            c.setTotalPrice(35.0);
-            c.setTypePayment("LESSON");
-            c.setCreditcardType(enumeration.CreditcardBrand.VISA);
-            c.setCreditcardVerificationCode((short) 567);
-            String strJson = OBJECT_MAPPER.writeValueAsString(c);
-            LOG.debug("creditcard data in json format:\n{}", strJson);
-
-            jakarta.ws.rs.client.Client client = ClientBuilder.newClient();
-            ws = settings.getProperty("CREDITCARD_SERVICE_URL") + "/creditcard/" + URLEncoder.encode(strJson, "utf-8");
-            LOG.debug("going to Webservice creditcard escaped:\n{}", ws);
-            WebTarget webTarget = client.target(ws);
-            Invocation.Builder invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
-
-            response = invocationBuilder.get();
-            response.bufferEntity();
-            String s = response.readEntity(String.class);
-            LOG.debug("readEntity s = {}", s);
-            final Cookie sessionId = response.getCookies().get("JSESSIONID");
-            LOG.debug("sessionId = {}", sessionId);
-
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                String msg = response.readEntity(String.class);
-                LOG.debug(msg);
-                showMessageInfo(msg);
-            } else {
-                String msg = "response - it is !NOT OK!  = " + response.getStatus() + "<br/>\n" + ws;
-                LOG.error(msg);
-                showMessageFatal(msg);
-            } // end if
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            ViewHandler viewHandler = facesContext.getApplication().getViewHandler();
-            LOG.debug("viewhandler = {}", viewHandler);
-            UIViewRoot viewRoot = viewHandler.createView(facesContext, facesContext.getViewRoot().getViewId());
-            LOG.debug("viewRoot = {}", viewRoot);
-            LOG.debug("viewId = {}", viewRoot.getViewId());
-            String actionUrl = viewHandler.getActionURL(facesContext, viewRoot.getViewId());
-            LOG.debug("actionUrl = {}", actionUrl);
-
-            creditcard = c; //test only
-            facesContext.getExternalContext().redirect("creditcard_payment_executed.xhtml?faces-redirect=true");
-
-        } catch (Exception e) {
-            handleGenericException(e, methodName);
-        } finally {
-            if (response != null) { response.close(); }
-            LOG.debug("response closed");
-        }
-    } // end method
 
     // ========================================
     // PROGRESS BAR - migrée depuis CourseController 2026-02-25
@@ -793,7 +625,7 @@ public class PaymentController implements Serializable {
 
     private Creditcard completeWithGreenfee(Greenfee greenfee, Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} with Greenfee {}", greenfee);
+        LOG.debug("entering {} greenfee={}", methodName, greenfee);
         try {
             if (greenfee.getPrice() == 0) {
                 LOG.debug("amount ZERO no payment needed !");
@@ -841,7 +673,7 @@ public class PaymentController implements Serializable {
                 s.append(lessons.get(i).getEventStartDate().format(fmtDate))
                  .append(" ")
                  .append(lessons.get(i).getEventStartDate().format(fmtTime))
-                 .append("�?'")
+                 .append(" -> ")
                  .append(lessons.get(i).getEventEndDate().format(fmtTime));
             } // end for
             s.append(" #").append(professional.getProPlayerId());
@@ -917,25 +749,11 @@ public class PaymentController implements Serializable {
         }
     } // end method completeWithSubscription
 
-    // needsUpdate - moved to PaymentManager.needsUpdate 2026-03-21
-    // handlePaymentSubscription - moved to PaymentOrchestrator/SubscriptionRegistrar 2026-03-21
-
-    // ========================================
-    // JAX-RS ENDPOINTS - moved to rest.PaymentRestResource 2026-03-21
-    // Architecture separation: REST callbacks are now @RequestScoped
-    // and use PaymentStateStore instead of @SessionScoped state.
-    // ========================================
-
     // ========================================
     // PAYMENT COMPLETION - sync REST result back to JSF session
     // Called via f:viewParam/preRenderView on creditcard_payment_executed.xhtml
     // ========================================
 
-    /**
-     * Called by preRenderView on creditcard_payment_executed.xhtml and
-     * creditcard_payment_canceled.xhtml. Retrieves the completed PaymentTransaction
-     * from PaymentStateStore and syncs creditcard data back to the JSF session.
-     */
     public void onPaymentCompleted() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
@@ -1042,7 +860,7 @@ public class PaymentController implements Serializable {
                             cot.setStatus(m.get("status") instanceof String s ? s : "Y");
                             tx.setCotisation(cot);
                             sharedOrchestrator.handle(new payment.CotisationPayment(cot));
-                            updateCartStatusService.setCompleted(cart.getIdCart());
+                            deleteCartService.deleteById(cart.getIdCart());
                             String cotStart = cot.getCotisationStartDate() != null ? cot.getCotisationStartDate().format(DTF_DAY_SLASH) : "?";
                             String cotEnd   = cot.getCotisationEndDate()   != null ? cot.getCotisationEndDate().format(DTF_DAY_SLASH)   : "?";
                             showMessageInfo(utils.LCUtil.prepareMessageBean("cotisation.confirmed") + " "
@@ -1063,7 +881,7 @@ public class PaymentController implements Serializable {
                             entite.Subscription subComplete = paymentSubscriptionController.complete(sub);
                             if (subComplete != null) sub = subComplete;
                             sharedOrchestrator.handle(new payment.SubscriptionPayment(sub));
-                            updateCartStatusService.setCompleted(cart.getIdCart());
+                            deleteCartService.deleteById(cart.getIdCart());
                             showMessageInfo(utils.LCUtil.prepareMessageBean("subscription.success") + sub);
                             processedSub = sub;
                             LOG.debug("SUBSCRIPTION payment done idCart={}", cart.getIdCart());
@@ -1080,7 +898,7 @@ public class PaymentController implements Serializable {
                                 LOG.warn("GREENFEE idempotency - already in DB player={} club={} date={}",
                                         gf.getIdplayer(), gf.getIdclub(), gf.getRoundDate());
                                 processedGreenfees.add(gf);
-                                updateCartStatusService.setCompleted(cart.getIdCart());
+                                deleteCartService.deleteById(cart.getIdCart());
                             } else {
                                 entite.Round rc = new entite.Round();
                                 rc.setRoundDate(gf.getRoundDate());
@@ -1096,7 +914,7 @@ public class PaymentController implements Serializable {
                                 gfOrchestrator.handle(new payment.GreenfeePayment(gf));
                                 processOneGreenfeePostPayment(rc, gfCourse, tx.getClub());
                                 processedGreenfees.add(gf);
-                                updateCartStatusService.setCompleted(cart.getIdCart());
+                                deleteCartService.deleteById(cart.getIdCart());
                                 showMessageInfo(utils.LCUtil.prepareMessageBean("greenfee.success") + gf);
                                 LOG.debug("GREENFEE payment done idCart={}", cart.getIdCart());
                             }
@@ -1115,7 +933,6 @@ public class PaymentController implements Serializable {
                 if (!pendingLessons.isEmpty()) {
                     try {
                         sharedOrchestrator.handle(new payment.LessonPayment(pendingLessons, tx.getProfessional()));
-                        for (int lcId : lessonCartIds) updateCartStatusService.setCompleted(lcId);
                         showMessageInfo(utils.LCUtil.prepareMessageBean("lesson.success"));
                         entite.Lesson first = pendingLessons.get(0);
                         String count = pendingLessons.size() > 1 ? " (" + pendingLessons.size() + "x)" : "";
@@ -1123,13 +940,19 @@ public class PaymentController implements Serializable {
                                 + txPlayer.getPlayerFirstName() + " " + txPlayer.getPlayerLastName()
                                 + " — " + (first.getProName()       != null ? first.getProName()       : "")
                                 + " — " + (first.getEventClubName() != null ? first.getEventClubName() : "") + count);
-                        processedLessons = pendingLessons;
-                        tx.setListLessons(pendingLessons);
                         LOG.debug("LESSON batch payment done count={}", pendingLessons.size());
                     } catch (Exception lessonEx) {
                         String errMsg = "[LESSON] " + (lessonEx.getMessage() != null ? lessonEx.getMessage() : lessonEx.getClass().getSimpleName());
                         LOG.error("LESSON batch processing failed", lessonEx);
                         showMessageFatal(errMsg);
+                    } finally {
+                        // Payment already charged by gateway — always mark COMPLETED and always send mail
+                        for (int lcId : lessonCartIds) {
+                            try { deleteCartService.deleteById(lcId); }
+                            catch (Exception e) { LOG.warn("deleteById lesson idCart={} failed", lcId, e); }
+                        }
+                        processedLessons = pendingLessons;
+                        tx.setListLessons(pendingLessons);
                     }
                 }
             } else {
@@ -1201,10 +1024,6 @@ public class PaymentController implements Serializable {
         }
     } // end method
 
-    /**
-     * Envoie un mail unifié de confirmation basé sur ce qui a été effectivement traité dans la boucle cart.
-     * Aucune dépendance sur savedType — seules les listes passées en paramètre sont envoyées.
-     */
     private void dispatchMails(entite.Player player, Club club,
             java.util.List<entite.Greenfee> greenfees, java.util.List<entite.Lesson> lessons,
             entite.Cotisation cotisation, entite.Subscription subscription,
@@ -1219,7 +1038,7 @@ public class PaymentController implements Serializable {
                 subscription);
             LOG.info("payment confirmation mail enqueued");
             if (!lessons.isEmpty() && professional != null) {
-                lessonMail.sendProNotification(player, professional, lessons, this.creditcard);
+                lessonMail.sendProNotification(player, professional, lessons, this.creditcard, club);
                 LOG.info("pro notification mail enqueued count={}", lessons.size());
             } else if (!lessons.isEmpty()) {
                 LOG.warn("pro notification skipped — professional is null, lessons count={}", lessons.size());

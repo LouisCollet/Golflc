@@ -84,7 +84,7 @@ public class LessonMail implements Serializable {
     } // end method
 
     public Boolean sendProNotification(Player student, Professional professional,
-            List<Lesson> lessons, Creditcard creditcard) {
+            List<Lesson> lessons, Creditcard creditcard, entite.Club club) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
@@ -94,7 +94,6 @@ public class LessonMail implements Serializable {
                 return false;
             }
 
-            String clubName = !lessons.isEmpty() ? lessons.get(0).getEventClubName() : "";
             double lessonTotal = lessons.stream()
                 .mapToDouble(l -> l.getLessonAmount() != null ? l.getLessonAmount().doubleValue() : 0.0)
                 .sum();
@@ -110,7 +109,7 @@ public class LessonMail implements Serializable {
             String mail = "<html><body style='font-family:Arial,sans-serif;max-width:600px'>"
                 + "<h2>📬 Nouvelle réservation de leçon — GolfLC</h2>"
                 + "<p>" + LocalDateTime.now().format(ZDF_TIME) + "</p>"
-                + "<p>Club : <b>" + clubName + "</b></p>"
+                + "<p>" + clubBlock(club) + "</p>"
                 + "<hr/>"
                 + "<p><b>Étudiant :</b> " + student.getPlayerFirstName() + " " + student.getPlayerLastName()
                 + (student.getPlayerEmail() != null ? " — <a href='mailto:" + student.getPlayerEmail() + "'>" + student.getPlayerEmail() + "</a>" : "") + "</p>"
@@ -132,6 +131,26 @@ public class LessonMail implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
+    } // end method
+
+    private String clubBlock(entite.Club club) {
+        if (club == null) return "";
+        StringBuilder sb = new StringBuilder();
+        if (club.getClubName() != null) sb.append("<b>").append(club.getClubName()).append("</b><br/>");
+        entite.Address addr = club.getAddress();
+        if (addr != null) {
+            if (addr.getStreet() != null && !addr.getStreet().isBlank())
+                sb.append(addr.getStreet()).append("<br/>");
+            String cityLine = (addr.getZipCode() != null ? addr.getZipCode() + " " : "")
+                            + (addr.getCity() != null ? addr.getCity() : "");
+            if (!cityLine.isBlank()) sb.append(cityLine).append("<br/>");
+            if (addr.getCountry() != null && addr.getCountry().getName() != null)
+                sb.append(addr.getCountry().getName()).append("<br/>");
+        }
+        if (club.getClubWebsite() != null && !club.getClubWebsite().isBlank())
+            sb.append("<a href='").append(club.getClubWebsite()).append("' style='color:#0066cc'>")
+              .append(club.getClubWebsite()).append("</a>");
+        return sb.toString();
     } // end method
 
     private String currSymbol(Creditcard creditcard) {
