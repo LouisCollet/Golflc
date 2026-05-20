@@ -43,18 +43,22 @@ public TarifGreenfee inputTarifGreenfeePeriods(TarifGreenfee tarifGreenfee){// t
 try{
         LOG.debug("with inputTarifGreenfeePeriods with tarifGreenfee = {}", tarifGreenfee);
         if (tarifGreenfee.getStartDate() == null) {
-            showMessageFatal(LCUtil.prepareMessageBean("tarif.period.startdate.notnull"));
+            String msg = LCUtil.prepareMessageBean("tarif.period.startdate.notnull");
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return tarifGreenfee;
         }
         if (tarifGreenfee.getEndDate() == null) {
-            showMessageFatal(LCUtil.prepareMessageBean("tarif.period.enddate.notnull"));
+            String msg = LCUtil.prepareMessageBean("tarif.period.enddate.notnull");
+            LOG.warn(msg);
+            showMessageFatal(msg);
             return tarifGreenfee;
         }
         if (!tarifGreenfee.getStartDate().isBefore(tarifGreenfee.getEndDate())) {
             String msg = "Start date must be before end date : "
                     + ZDF_DAY.format(tarifGreenfee.getStartDate())
                     + " / " + ZDF_DAY.format(tarifGreenfee.getEndDate());
-            LOG.error("- {}", msg);
+            LOG.error(msg);
             showMessageFatal(msg);
             return tarifGreenfee;
         }
@@ -65,24 +69,19 @@ try{
         }
         LOG.debug("no overlap detected - we update !"); 
    // magic happens here         was non static
- /*  TarifGreenfee.DatesSeasons datesSeasons = tarifGreenfee.new DatesSeasons( // mod 23-06-2021 inner class DatesSeasons within TarifGreenfee !
-//     DatesSeasons datesSeasons = new DatesSeasons(
-             tarifGreenfee.getStartDate(),
-             tarifGreenfee.getEndDate(),
-             tarifGreenfee.getSeason());
-   */
- 
-   //   see pavel polivka using inner classes for jackson serialization
+   // using inner class for jackson serialization (see TarifGreenfee.DatesSeasons)
      TarifGreenfee.DatesSeasons datesSeasons = new TarifGreenfee.DatesSeasons();
             datesSeasons.setStartDate(tarifGreenfee.getStartDate());
             datesSeasons.setEndDate(tarifGreenfee.getEndDate());
             datesSeasons.setSeason(tarifGreenfee.getSeason()); 
    
      tarifGreenfee.getDatesSeasonsList().add(datesSeasons);
-     LOG.info("Period introduced = {}", datesSeasons);
-     showMessageInfo("Period introduced = " + datesSeasons);
-     LOG.info("SeasonsList after add = {}", tarifGreenfee.getDatesSeasonsList());
-     showMessageInfo("SeasonsList after add = " + tarifGreenfee.getDatesSeasonsList());
+     String msgPeriod = "Period introduced = " + datesSeasons;
+     LOG.info(msgPeriod);
+     showMessageInfo(msgPeriod);
+     String msgSeasons = "SeasonsList after add = " + tarifGreenfee.getDatesSeasonsList();
+     LOG.info(msgSeasons);
+     showMessageInfo(msgSeasons);
  // house keeping
     tarifGreenfee.setStartDate(null); // init pour affichage
     tarifGreenfee.setEndDate(null);
@@ -113,7 +112,7 @@ try{
         // 30/04/2022 validation
     if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
       String msg = "Fatal error : season Basic does not exist !";
-      LOG.debug(msg);
+      LOG.error(msg);
       showMessageFatal(msg);
       return tarifGreenfee;
   }
@@ -160,7 +159,7 @@ try{
  // 30/04/2022 validation
     if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
       String msg = "Fatal error : Season equipments does not exist !";
-      LOG.debug(msg);
+      LOG.error(msg);
       showMessageFatal(msg);
       return tarifGreenfee;
   }
@@ -174,17 +173,21 @@ try{
   // HO : slot obligatoire
     if ("HO".equals(tarifGreenfee.getGreenfeeType()) && tarifGreenfee.getWorkLinkedSlotKey() == null) {
         String msg = LCUtil.prepareMessageBean("tarif.equipment.slot.required");
-        LOG.warn("HO equipment without slot key");
+        LOG.warn(msg);
         showMessageFatal(msg);
         return tarifGreenfee;
     }
   // item + price obligatoires
     if (tarifGreenfee.getWorkItem() == null || tarifGreenfee.getWorkItem().isBlank()) {
-        showMessageFatal(LCUtil.prepareMessageBean("tarif.equipment.item.required"));
+        String msg = LCUtil.prepareMessageBean("tarif.equipment.item.required");
+        LOG.warn(msg);
+        showMessageFatal(msg);
         return tarifGreenfee;
     }
     if (tarifGreenfee.getWorkPrice() == null) {
-        showMessageFatal(LCUtil.prepareMessageBean("tarif.equipment.price.required"));
+        String msg = LCUtil.prepareMessageBean("tarif.equipment.price.required");
+        LOG.warn(msg);
+        showMessageFatal(msg);
         return tarifGreenfee;
     }
   // duplicate check — inclut linkedSlotKey pour autoriser même item/saison/prix sur slots différents
@@ -195,7 +198,7 @@ try{
          && java.util.Objects.equals(e.getLinkedSlotKey(), tarifGreenfee.getWorkLinkedSlotKey()));
     if (isDuplicate) {
         String msg = LCUtil.prepareMessageBean("tarif.equipment.duplicate");
-        LOG.warn("duplicate equipment detected");
+        LOG.warn(msg);
         showMessageFatal(msg);
         return tarifGreenfee;
     }
@@ -245,10 +248,10 @@ try{
 // 30/04/2022 validation
     if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
       msg = "Fatal error : season hours does not exist !";
-      LOG.debug(msg);
+      LOG.error(msg);
       showMessageFatal(msg);
       return tarifGreenfee;
-  }   
+  }
     
 // magic happens here 
     TarifGreenfee.DaysGreenfee daysGreenfee = new TarifGreenfee.DaysGreenfee();
@@ -276,10 +279,8 @@ try{
     Arrays.fill(numbers, 0.0);
     tarifGreenfee.setWorkDaysPrice(numbers); // gestion de l'écran ?
     tarifGreenfee.setWorkDaysAvailable(new boolean[]{true, true, true, true, true}); // reset availability
-//    LOG.debug("line 00");
     tarifGreenfee.setUpdateReady(true); // gestion du menu
- //   LOG.debug("line 01a - twilight = {}", daysGreenfee.getTwilight());
-  if(tarifGreenfee.getWorkTwilight().equals("Y")){ // mod 11-04-2025 was "N"
+  if ("Y".equals(tarifGreenfee.getWorkTwilight())) { // mod 11-04-2025 was "N"
         tarifGreenfee.setTwilightReady(true); // gestion du menu
    }
    LOG.debug("line 01 - twilight = N");
@@ -288,7 +289,7 @@ try{
   return tarifGreenfee;
 } catch (Exception e) {
     handleGenericException(e, methodName);
-    return null;
+    return tarifGreenfee;
 }
 } // end method
 
@@ -296,12 +297,12 @@ try{
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
 try{
-    LOG.debug("with inputTarifHours with tarif = !{}", tarifGreenfee);
-            LOG.debug("teeTimes List = "  + tarifGreenfee.getTeeTimesList());
+    LOG.debug("with inputTarifHours with tarif = {}", tarifGreenfee);
+    LOG.debug("teeTimes List = {}", tarifGreenfee.getTeeTimesList());
        // 30/04/2022 validation
     if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
       String msg = "Fatal error : season Hours does not exist !";
-      LOG.debug(msg);
+      LOG.error(msg);
       showMessageFatal(msg);
       resetWorkFields(tarifGreenfee);
       return tarifGreenfee;
@@ -317,50 +318,42 @@ try{
   } 
       // new 08/06/2022 permettre previous see example la cala
       // la validations d'écran sont transférées ici
-    if(tarifGreenfee.getWorkTwilight().equals("N")){ // normal = non twilight
+    if ("N".equals(tarifGreenfee.getWorkTwilight())) { // normal = non twilight
           if(tarifGreenfee.getStartHour() == null){
-              String msg = "Tarif Hours StartHour must be completed"; // + tarifGreenfee.getTeeTimesList();
-              LOG.info(msg);
+              String msg = "Tarif Hours StartHour must be completed";
+              LOG.warn(msg);
               showMessageFatal(msg);
               resetWorkFields(tarifGreenfee);
               return tarifGreenfee;
           }
           if(tarifGreenfee.getEndHour() == null){
-              String msg = "Tarif Hours EndHour must be completed"; // + tarifGreenfee.getTeeTimesList();
-              LOG.info(msg);
+              String msg = "Tarif Hours EndHour must be completed";
+              LOG.warn(msg);
               showMessageFatal(msg);
               resetWorkFields(tarifGreenfee);
               return tarifGreenfee;
           }
     }
-    if(tarifGreenfee.getWorkTwilight().equals("P")){   // previous  endHour sera complété par programme
+    if ("P".equals(tarifGreenfee.getWorkTwilight())) {  // previous  endHour sera complété par programme
           if(tarifGreenfee.getStartHour() == null){
-              String msg = "Tarif Hours StartHour must be completed"; // + tarifGreenfee.getTeeTimesList();
-              LOG.info(msg);
+              String msg = "Tarif Hours StartHour must be completed";
+              LOG.warn(msg);
               showMessageFatal(msg);
               resetWorkFields(tarifGreenfee);
               return tarifGreenfee;
           }
     }
     
-    if(tarifGreenfee.getWorkTwilight().equals("P") || tarifGreenfee.getWorkTwilight().equals("Y")){   
+    if ("P".equals(tarifGreenfee.getWorkTwilight()) || "Y".equals(tarifGreenfee.getWorkTwilight())) {
         String msg = "Tarif Twilight must be completed !! "; // + tarifGreenfee.getTeeTimesList();
         LOG.info(msg);
         showMessageInfo(msg);
     }
     
     // si WorkTwilight = Y les dates start et end seront complétées par programme
-    
-     //     if(tarifGreenfee.getEndHour() == null){
-     //         String msg = "Tarif Hours EndHour must be completed"; // + tarifGreenfee.getTeeTimesList();
-     //         LOG.info(msg);
-     //         showMessageFatal(msg);
-     //         return tarifGreenfee;
-    //      }
- 
     if (tarifGreenfee.getWorkPrice() == null || tarifGreenfee.getWorkPrice() <= 0) {
         String msg = "Tarif Hours Price must be completed";
-        LOG.info(msg);
+        LOG.warn(msg);
         showMessageFatal(msg);
         resetWorkFields(tarifGreenfee);
         return tarifGreenfee;
@@ -377,14 +370,12 @@ try{
         teeTimes.setTwilight(tarifGreenfee.getWorkTwilight());   // yes or no
         teeTimes.setSlotKey(UUID.randomUUID().toString().substring(0, 8)); // short unique key for equipment linking
         tarifGreenfee.getTeeTimesList().add(teeTimes);
-  //        LOG.debug("TeeTimesList after add = {}", tarifGreenfee.getTeeTimesList());
         String msg = "Tarif Hours = " + tarifGreenfee.getTeeTimesList();
         LOG.info(msg);
         showMessageInfo(msg);
   // house keeping
        tarifGreenfee.setGreenfeeType("HO");  // for Hours
-  //  if(tarifGreenfee.getWorkTwilight().equals("N")){ //enlevé 24-06-2022
-     if(tarifGreenfee.getWorkTwilight().equals("Y")){ //modifié 11-04-2025 
+     if ("Y".equals(tarifGreenfee.getWorkTwilight())) { //modifié 11-04-2025
           tarifGreenfee.setTwilightReady(true); // gestion du menu : écran
     }
        resetWorkFields(tarifGreenfee);
@@ -435,17 +426,6 @@ try{
              return tarifGreenfee;
          }
      }
- //    tarifGreenfee.getMultiTwilight().forEach(item -> LOG.debug("Twilight list {}", item));
-
-/* 30/04/2022 validation
-          si season est null alors on accepte les months
-    if(! validPeriod(tarifGreenfee.getDatesSeasonsList(),tarifGreenfee.getWorkSeason())){
-      msg = "Fatal error : season hours does not exist !";
-      LOG.debug(msg);
-      showMessageFatal(msg);
-      return tarifGreenfee;
-  }
- */
 // magic happens here 
    TarifGreenfee.Twilight twilight = new TarifGreenfee.Twilight();
    twilight.setStartTime(tarifGreenfee.getStartHour());
@@ -464,10 +444,10 @@ try{
   return tarifGreenfee;
 } catch (Exception e) {
     handleGenericException(e, methodName);
-    return null;
+    return tarifGreenfee;
 }
 } // end method
-  
+
  public boolean overlapCheckHours(TarifGreenfee tarif){
     final String methodName = utils.LCUtil.getCurrentMethodName();
     LOG.debug("entering {}", methodName);
@@ -512,9 +492,9 @@ try{
 }
 }  // end method
  
- public Greenfee completeGreenfee(TarifGreenfee tarif, Club club, Round round, Player player) throws Exception{
+ public Greenfee completeGreenfee(TarifGreenfee tarif, Club club, Round round, Player player) {
       final String methodName = utils.LCUtil.getCurrentMethodName();
-      LOG.debug("entering completeGreenfee");
+      LOG.debug("entering {}", methodName);
       Greenfee greenfee = new Greenfee();
 try{
         LOG.debug("with tarif = {}", tarif);
@@ -595,11 +575,11 @@ try{
  
  public double calcGreenfeePrice(TarifGreenfee tarif){
      final String methodName = utils.LCUtil.getCurrentMethodName();
-     LOG.debug(" -- Start of calc.CalcGreenfeePrice with tarif= {}", tarif);
-     // calcul le prix total à payer par creditcard
+     LOG.debug("entering {}", methodName);
+     LOG.debug("tarif = {}", tarif);
  try {
     double total = 0;
-     LOG.debug( " ,getPriceGreenfee: "   + tarif.getPriceGreenfee());
+     LOG.debug("getPriceGreenfee = {}", tarif.getPriceGreenfee());
      LOG.debug("GreenfeeType = {}", tarif.getGreenfeeType());
      LOG.debug(" ,equipmentChoosen : {}", tarif.getEquipmentChoosen());
      LOG.debug("calculating equipments-----------------");
@@ -611,7 +591,7 @@ try{
 LOG.debug("calculating greenfee -----------------");
 
  if (tarif.getGreenfeeType() == null) {
-     String msg = methodName + " - greenfeeType is null for tarif courseId=" + tarif.getTarifCourseId()
+     String msg = "greenfeeType is null for tarif courseId=" + tarif.getTarifCourseId()
              + " — pricing type must be selected (BA/HO/DA)";
      LOG.error(msg);
      LCUtil.showMessageFatal(msg);
@@ -619,9 +599,8 @@ LOG.debug("calculating greenfee -----------------");
  }
 
  if("DA".equals(tarif.getGreenfeeType())){
-       LOG.debug("Calculating greenfee for inputtype = DA");  // DAYS 
-   //  new 02-05-2021
-          LOG.debug("getDayChoosen  = {}", tarif.getDayChoosen());
+       LOG.debug("Calculating greenfee for inputtype = DA");
+          LOG.debug("getDayChoosen = {}", tarif.getDayChoosen());
        for (TarifGreenfee.DaysWeek day : tarif.getDayChoosen()) {
             total = total + (day.getPrice() * day.getQuantity());
        }
@@ -631,10 +610,8 @@ LOG.debug("calculating greenfee -----------------");
  
   if("HO".equals(tarif.getGreenfeeType())){
           LOG.debug("handling inputType HO"); // hours
- //         LOG.debug(" teeTimesList: "   + tarif.getTeeTimesList());
-          LOG.debug(" teeTimeChoosen: "   + tarif.getTeeTimeChoosen());
-        for (TarifGreenfee.TeeTimes hours : tarif.getTeeTimeChoosen()) {  // mod 23-06-2021 inner class Teetimes within TarifGreenfee !
-     //  for (TeeTimes hours : tarif.getTeeTimeChoosen()) {
+          LOG.debug("teeTimeChoosen = {}", tarif.getTeeTimeChoosen());
+        for (TarifGreenfee.TeeTimes hours : tarif.getTeeTimeChoosen()) {
             total = total + (hours.getPrice() * hours.getQuantity());
        }
         LOG.debug("total greenfee HO = {}", total);

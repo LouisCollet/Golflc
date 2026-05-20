@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 public class psCreateRound implements Serializable{
 
-    /**
+    /*
      * @param ldt RoundDate convertie en UTC par l'appelant avant insertion
      */
     public static PreparedStatement psMapCreate(
@@ -44,12 +44,5 @@ public class psCreateRound implements Serializable{
             return null;
         }
     } // end method
-
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-    } // end main
-    */
 
 } // end class

@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import static interfaces.GolfInterface.ZDF_TIME_HHmm;
 import static interfaces.Log.LOG;
 import manager.PlayerManager;
 import static exceptions.LCException.handleGenericException;
@@ -33,44 +32,37 @@ import static utils.LCUtil.showMessageInfo;
 @Named("schedulerC")
 @ViewScoped
 public class SchedulerProController implements Serializable {
-// ✅ Injection du contexte de session
-    @Inject
-    private ApplicationContext appContext;
+
     private static final long serialVersionUID = 1L;
-    @Inject
-    private PlayerManager playerManager;
-    @Inject private read.ReadLesson readLessons;           // migrated 2026-02-23
-    @Inject private cache.CacheInvalidator cacheInvalidator; // 2026-03-29
+
+    @Inject private ApplicationContext appContext;
+    @Inject private PlayerManager playerManager;
+    @Inject private read.ReadLesson readLessons;
+    @Inject private cache.CacheInvalidator cacheInvalidator;
     @Inject private DialogController dialogC;
-    @Inject private Controllers.PaymentController payC; // panier leçons — 2026-03-29
+    @Inject private Controllers.PaymentController payC;
     @Inject private update.UpdateLesson updateLessonService;
     @Inject private calc.CalcLessonPrice calcLessonPrice;
-  
-    // @Inject  enlevé 14-02-2026
+
     private Club club;
-
-  //  @Inject
-  //  private PlayerController playerC; // Utilisation du controller pour accéder à player
-
     private entite.Professional professional;
     private List<Lesson> listLessons = new ArrayList<>();
     private ScheduleModel scheduleModel = new org.primefaces.model.DefaultScheduleModel();
-
- //   private ScheduleEvent<Object> scheduleEvent = new DefaultScheduleEvent<>();
-    //private ScheduleEvent<Object> scheduleEvent;
-    private ScheduleEvent<Object> selectedEvent = new DefaultScheduleEvent<>();;
+    private ScheduleEvent<Object> selectedEvent = new DefaultScheduleEvent<>();
     private String selectedClubName    = "";
     private String selectedProName     = "";
     private String selectedStudentName = "";
     private Double selectedLessonAmount = null;
     private int idCurrentPlayer;
-    private boolean scheduleLoaded = false; // guard preRenderView — 2026-03-29
+    // guard preRenderView — avoids reload on AJAX postback
+    private boolean scheduleLoaded = false;
 
     public SchedulerProController() { }
 
     @PostConstruct
     public void init() {
-        LOG.debug("SchedulerProController init");
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
     } // end method
 
     /**
@@ -101,33 +93,28 @@ public class SchedulerProController implements Serializable {
         }
     } // end method
 
-    // Méthode principale pour lire les leçons depuis ECourseList
     public String readLessons(ECourseList ecp, int idplayer) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-
             appContext.getPlayer().setIdplayer(idplayer);
             playerManager.readPlayer(appContext.getPlayer().getIdplayer());
-            
             LOG.debug("Player read: {}", appContext.getPlayer());
-
             idCurrentPlayer = idplayer;
-
             // Pro, club et professional — store in appContext (survives @ViewScoped redirect)
             appContext.setPlayerPro(ecp.player());
             appContext.setClub(ecp.club());
             appContext.setProfessional(ecp.professional());
             club = ecp.club();
             professional = ecp.professional();
-
-            cacheInvalidator.invalidateProfessionalCaches(); // données fraîches pour le pro sélectionné — 2026-03-29
+            // données fraîches pour le pro sélectionné
+            cacheInvalidator.invalidateProfessionalCaches();
             return "schedule_pro.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
             return null;
         }
-    }
+    } // end method
 
     public void dateSelect(SelectEvent<LocalDateTime> event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -142,34 +129,30 @@ public class SchedulerProController implements Serializable {
                 .textColor("white")
                 .dynamicProperty("lesson-object", null) // pending event — no DB lesson yet
                 .build();
-        // Populate display fields for the dialog
             selectedClubName    = club != null && club.getClubName() != null ? club.getClubName() : "";
             selectedProName     = buildPlayerName(appContext.getPlayerPro());
             selectedStudentName = buildPlayerName(appContext.getPlayer());
-         //   selectedLessonAmount = null; // prix inconnu avant réservation
-            selectedLessonAmount = calcLessonPrice.calc(professional, event.getObject(), club); // mod LC 11-05-2026 plus fort que IA !
+            selectedLessonAmount = calcLessonPrice.calc(professional, event.getObject(), club);
             LOG.debug("dateSelect: club={} pro={} student={} amount={}", selectedClubName, selectedProName, selectedStudentName, selectedLessonAmount);
- 
             dialogC.showLessonDialog();
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
-    }
+    } // end method
 
     public void viewChange(SelectEvent<LocalDateTime> event) {
-        LOG.debug("Entering viewChange: {}", event);
-    }
-@SuppressWarnings("unchecked")
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+    } // end method
+
+    @SuppressWarnings("unchecked")
     public String moveLesson(ScheduleEntryMoveEvent ev) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-         //   scheduleEvent = ev.getScheduleEvent();
             selectedEvent = (ScheduleEvent<Object>) ev.getScheduleEvent();
             final long minutes = ev.getDeltaAsDuration().toMinutes();
-
-            if (!EventUserMgt(idCurrentPlayer)) return null;
-
+            if (!eventUserMgt(idCurrentPlayer)) return null;
             LocalDateTime ldt = selectedEvent.getStartDate().minusMinutes(minutes);
             if (modifyEvent(ldt)) {
                 LOG.debug("Event modified");
@@ -181,7 +164,7 @@ public class SchedulerProController implements Serializable {
             handleGenericException(e, methodName);
             return null;
         }
-    }
+    } // end method
 
     public void onEventSelect(SelectEvent<ScheduleEvent<Object>> event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -202,10 +185,11 @@ public class SchedulerProController implements Serializable {
         boolean isPro     = currentPlayerId != null && currentPlayerId.equals(proPlayerId);
         if (!isStudent && !isPro) {
             LOG.debug("player {} is neither student {} nor pro {} — blocking dialog", currentPlayerId, studentId, proPlayerId);
-            utils.LCUtil.showMessageFatal(utils.LCUtil.prepareMessageBean("lesson.booked.by.other"));
+            String msg = utils.LCUtil.prepareMessageBean("lesson.booked.by.other");
+            LOG.warn(msg);
+            utils.LCUtil.showMessageFatal(msg);
             return;
         }
-
         selectedClubName    = lesson.getEventClubName() != null ? lesson.getEventClubName() : "";
         selectedProName     = lesson.getProName()       != null ? lesson.getProName()        : "";
         selectedStudentName = lesson.getStudentName()   != null ? lesson.getStudentName()    : "";
@@ -214,23 +198,28 @@ public class SchedulerProController implements Serializable {
                 : calcLessonPrice.calc(professional, lesson.getEventStartDate(), club);
         LOG.debug("club={} pro={} student={} amount={} paid={}", selectedClubName, selectedProName, selectedStudentName, selectedLessonAmount, lesson.isLessonPaid());
         dialogC.showLessonDialog();
-    }
+    } // end method
 
     public void onViewChange(SelectEvent<String> selectEvent) {
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         String view = selectEvent.getObject();
-        showMessageInfo("View Changed", "View:" + view);
-      //  FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, ;
-     //   addMessage(message);
-    }
+        String msg = "View: " + view;
+        LOG.info(msg);
+        showMessageInfo("View Changed", msg);
+    } // end method
 
     public void onDateSelect(SelectEvent<LocalDateTime> selectEvent) {
-        
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
         var event = DefaultScheduleEvent.builder()
                 .startDate(selectEvent.getObject())
                 .endDate(selectEvent.getObject().plusHours(1))
                 .build();
-         showMessageInfo("Date Selected", "View:" + event.toString());
-    }
+        String msg = event.toString();
+        LOG.info(msg);
+        showMessageInfo("Date Selected", msg);
+    } // end method
 
     public boolean modifyEvent(LocalDateTime ldt) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -239,17 +228,14 @@ public class SchedulerProController implements Serializable {
             if (professional == null) {
                 professional = appContext.getProfessional();
             }
-            if (!EventValidations()) return false;
-
+            if (!eventValidations()) return false;
             Lesson evBefore = new Lesson();
             evBefore.setEventStartDate(ldt);
             evBefore.setEventProId(professional.getProId());
-
             Lesson evAfter = new Lesson();
             evAfter.setEventStartDate(selectedEvent.getStartDate());
             evAfter.setEventEndDate(selectedEvent.getStartDate().plusMinutes(30));
             evAfter.setEventTitle(selectedEvent.getTitle());
-
             updateLessonService.update(evBefore, evAfter);
             payC.updatePendingLesson(evBefore, evAfter);
             scheduleModel.updateEvent(selectedEvent);
@@ -258,9 +244,9 @@ public class SchedulerProController implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
-    }
+    } // end method
 
-    public boolean EventValidations() {
+    public boolean eventValidations() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
@@ -279,9 +265,9 @@ public class SchedulerProController implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
-    }
+    } // end method
 
-    public boolean EventUserMgt(int idplayer) {
+    public boolean eventUserMgt(int idplayer) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
@@ -291,7 +277,6 @@ public class SchedulerProController implements Serializable {
                 return true;
             }
             int idStudent = lesson.getEventPlayerId();
-
             if (idplayer == idStudent || idplayer == professional.getProPlayerId()) {
                 showDialogInfo("Modification authorized", "Student/Pro verified");
                 return true;
@@ -303,7 +288,7 @@ public class SchedulerProController implements Serializable {
             handleGenericException(e, methodName);
             return false;
         }
-    }
+    } // end method
 
     /**
      * Create a lesson from the schedule event selected by the user.
@@ -312,12 +297,11 @@ public class SchedulerProController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            if (!EventValidations()) return null;
+            if (!eventValidations()) return null;
             // Restore from appContext if lost after @ViewScoped redirect
             if (professional == null) {
                 professional = appContext.getProfessional();
             }
-
             // A pro cannot book a lesson with themselves
             if (professional.getProPlayerId() != null
                     && professional.getProPlayerId().equals(appContext.getPlayer().getIdplayer())) {
@@ -325,7 +309,6 @@ public class SchedulerProController implements Serializable {
                         "Player #" + appContext.getPlayer().getIdplayer());
                 return null;
             }
-
             Lesson lesson = new Lesson();
             lesson.setEventStartDate(selectedEvent.getStartDate());
             lesson.setEventEndDate(selectedEvent.getEndDate());
@@ -335,7 +318,6 @@ public class SchedulerProController implements Serializable {
             lesson.setProName(buildPlayerName(appContext.getPlayerPro()));
             lesson.setStudentName(buildPlayerName(appContext.getPlayer()));
             lesson.setEventClubName(club != null ? club.getClubName() : "");
-
             payC.addLesson(lesson);
             selectedEvent = org.primefaces.model.DefaultScheduleEvent.<Object>builder()
                     .title(lesson.getEventTitle())
@@ -356,11 +338,12 @@ public class SchedulerProController implements Serializable {
             String date = lesson.getEventStartDate() != null
                     ? lesson.getEventStartDate().format(ZDF_TIME_HHmm)
                     : "?";
-            showMessageInfo("✅ Lesson booked"
-                    + "\n" + lesson.getStudentName()
+            String msg = "Lesson booked: " + lesson.getStudentName()
                     + " | Pro: " + lesson.getProName()
                     + " | " + date
-                    + " | " + lesson.getEventClubName());
+                    + " | " + lesson.getEventClubName();
+            LOG.info(msg);
+            showMessageInfo(msg);
             dialogC.hideLessonDialog();
             return null;
         } catch (Exception e) {
@@ -374,18 +357,17 @@ public class SchedulerProController implements Serializable {
      */
     public String deleteLesson(int idplayer) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering for player={}", idplayer);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("player={}", idplayer);
         try {
             // Restore from appContext if lost after @ViewScoped redirect
             if (professional == null) {
                 professional = appContext.getProfessional();
             }
-            if (!EventUserMgt(idplayer)) return null;
-
+            if (!eventUserMgt(idplayer)) return null;
             Lesson lesson = new Lesson();
             lesson.setEventStartDate(selectedEvent.getStartDate());
             lesson.setEventProId(professional.getProId());
-
             payC.removeLesson(lesson);
             scheduleModel.deleteEvent(selectedEvent);
             String msg = "Lesson removed from cart: " + selectedEvent.getTitle();
@@ -399,7 +381,7 @@ public class SchedulerProController implements Serializable {
         }
     } // end method
 
-    // --- Getters & Setters refactorés pour accéder via PlayerController ---
+    // --- Getters & Setters ---
     public Player getPlayer() { return appContext.getPlayer(); }
     public void setPlayer(Player p) { appContext.setPlayer(p); }
 
@@ -409,22 +391,12 @@ public class SchedulerProController implements Serializable {
     public entite.Professional getProfessional() { return professional; }
     public void setProfessional(entite.Professional p) { professional = p; }
 
- //   public ScheduleEvent<Object> getScheduleEvent() { return scheduleEvent; }
- //   public void setScheduleEvent(ScheduleEvent<Object> e) { scheduleEvent = e; }
-
-    public ScheduleEvent<Object> getSelectedEvent() {
-        return selectedEvent;
-    }
-
-    public void setSelectedEvent(ScheduleEvent<Object> selectedEvent) {
-        this.selectedEvent = selectedEvent;
-    }
+    public ScheduleEvent<Object> getSelectedEvent() { return selectedEvent; }
+    public void setSelectedEvent(ScheduleEvent<Object> selectedEvent) { this.selectedEvent = selectedEvent; }
 
     public Double getSelectedLessonAmount() { return selectedLessonAmount; }
-    public void   setSelectedLessonAmount(Double v) {
-        selectedLessonAmount = v; }
+    public void   setSelectedLessonAmount(Double v) { selectedLessonAmount = v; }
 
-    
     public ScheduleModel getScheduleModel() { return scheduleModel; }
     public void setScheduleModel(ScheduleModel m) { scheduleModel = m; }
 
@@ -461,9 +433,8 @@ public class SchedulerProController implements Serializable {
         }
         StringBuilder sb = new StringBuilder("[");
         for (WorkingDay wd : WorkingDay.values()) {
-            LOG.debug(enumeration.WorkingDay.printWorkingDays(wd.mask())); // added 08-04-2026 by LC
+            LOG.debug(enumeration.WorkingDay.printWorkingDays(wd.mask()));
             LOG.debug(enumeration.WorkingDay.printWorkingDaysLine(wd.mask()));
-            
             if (!professional.isWorkingOn(wd.dayOfWeek())) {
                 sb.append(wd.fullCalendarIndex()).append(",");
             }

@@ -144,7 +144,9 @@ public class GroundConditionController implements Serializable {
                          || pickList.getTarget().stream().anyMatch(s -> s.equalsIgnoreCase(trimmed))
                          || customItemsBuffer.stream().anyMatch(c -> c.equalsIgnoreCase(trimmed));
         if (duplicate) {
-            LCUtil.showMessageWarn("Item déjà existant", trimmed);
+            String msg = trimmed;
+            LOG.warn(msg);
+            LCUtil.showMessageWarn("Item déjà existant", msg);
             newCustomItemInput = "";
             return;
         }
@@ -253,7 +255,9 @@ public class GroundConditionController implements Serializable {
             reconstructFromItemsToPersist();
             persist();
             refresh();
-            LCUtil.showMessageInfo("État du terrain enregistré");
+            String msg = "État du terrain enregistré";
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -268,7 +272,9 @@ public class GroundConditionController implements Serializable {
             reconstructFromItemStatus();
             persist();
             refresh();
-            LCUtil.showMessageInfo("État du terrain mis à jour");
+            String msg = "État du terrain mis à jour";
+            LOG.info(msg);
+            LCUtil.showMessageInfo(msg);
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -364,7 +370,7 @@ public class GroundConditionController implements Serializable {
         return s;
     } // end method
 
-    private static entite.Club clubById(Integer clubId) {
+    private entite.Club clubById(Integer clubId) {
         entite.Club club = new entite.Club();
         club.setIdclub(clubId);
         return club;
@@ -404,7 +410,7 @@ public class GroundConditionController implements Serializable {
         List<String> all = new ArrayList<>(MASTER_ITEMS);
         all.addAll(customItemsBuffer);
         return all;
-    }
+    } // end method
 
     public List<String> getItemsToPersist() {
         if (itemsToPersist == null) {
@@ -412,7 +418,7 @@ public class GroundConditionController implements Serializable {
             itemsToPersist.addAll(customItemsBuffer);
         }
         return itemsToPersist;
-    }
+    } // end method
 
     public String getNewCustomItemInput()                       { return newCustomItemInput; }
     public void setNewCustomItemInput(String v)                 { this.newCustomItemInput = v; }

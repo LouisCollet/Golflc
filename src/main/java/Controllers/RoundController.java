@@ -1,8 +1,6 @@
 package Controllers;
 
 import context.ApplicationContext;
-import Controllers.DialogController;
-import Controllers.StablefordController;
 import entite.*;
 import entite.composite.ECompetition;
 import entite.composite.ECourseList;
@@ -133,6 +131,9 @@ public class RoundController implements Serializable {
     // ✅ Injection PlayerController — session cache invalidation 2026-03-19
     @Inject private Controllers.PlayerController             playerController;
 
+    // ✅ Injection WeatherCache — not yet in production (cached alternative to findOpenWeather)
+    @Inject private cache.WeatherCacheService weatherCache;
+
     // ✅ Injections Phase 3A — Competition management — migrated 2026-02-25
     @Inject private create.CreateCompetitionDescription createCompetitionDescriptionService; // Phase 3A
     @Inject private lists.CompetitionDescriptionList    competitionDescriptionList;            // Phase 3A
@@ -185,6 +186,8 @@ public class RoundController implements Serializable {
     private Player               savedConnectedPlayer     = null;
     private final Map<Integer, String> inscriptionPaymentStatus = new ConcurrentHashMap<>();
 
+    private dto.WeatherDTO weather2; // not yet in production — cached alternative
+
     // ✅ Session-level cache — avoid repeated DB queries on JSF re-render
     private List<ECourseList> cachedRecentRounds = null;
     private List<HandicapIndex> cachedScoreCardList1WHS = null;
@@ -227,7 +230,7 @@ public class RoundController implements Serializable {
 
     public void onReset(@Observes events.ResetEvent event) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} — source: {}", event.getSource());
+        LOG.debug("entering {} — source: {}", methodName, event.getSource());
         listStableford      = Collections.emptyList();
         nextInscription     = false;
         nextScorecard       = false;
@@ -279,12 +282,16 @@ public class RoundController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (appContext.getClub() == null || appContext.getClub().getIdclub() == null || appContext.getClub().getIdclub() == 0) {
-                showMessageFatal("Club must be selected");
+                String msg = "Club must be selected";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 setNextInscription(false);
                 return;
             }
             if (appContext.getCourse() == null || appContext.getCourse().getIdcourse() == null || appContext.getCourse().getIdcourse() == 0) {
-                showMessageFatal("Course must be selected");
+                String msg = "Course must be selected";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 setNextInscription(false);
                 return;
             }
@@ -365,7 +372,9 @@ public class RoundController implements Serializable {
                     yield "inscription.xhtml?faces-redirect=true";
                 }
                 case "02" -> {
-                    showMessageFatal(LCUtil.prepareMessageBean("cotisation.notfound"));
+                    String msg02 = LCUtil.prepareMessageBean("cotisation.notfound");
+                    LOG.warn(msg02);
+                    showMessageFatal(msg02);
                     inscription.setInscriptionOK(false);
                     yield "greenfee_cotisation_round.xhtml?faces-redirect=true";
                 }
@@ -426,7 +435,9 @@ public class RoundController implements Serializable {
                     if ("02".equals(result.getErrorStatus())) {
                         // Cotisation not found, greenfee not found — treat as individual player
                         // Switch to target player's language, save connected player's context
-                        showMessageFatal(LCUtil.prepareMessageBean("cotisation.notfound"));
+                        String msgCot = LCUtil.prepareMessageBean("cotisation.notfound");
+                        LOG.warn(msgCot);
+                        showMessageFatal(msgCot);
                         savedConnectedPlayer = invitedBy;
                         connectedPlayerLocale = activeLocale.getCurrentLocale().getLanguage();
                         if (p.getPlayerLanguage() != null) {
@@ -589,7 +600,9 @@ public class RoundController implements Serializable {
 
             Round partial = appContext.getRound();
             if (partial.getIdround() == null || partial.getIdround() == 0) {
-                showMessageFatal("Veuillez sélectionner un round");
+                String msg = "Veuillez sélectionner un round";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             // Charge round + course + club depuis la DB (fonctionne même sans inscription)
@@ -1186,15 +1199,15 @@ public class RoundController implements Serializable {
             LOG.debug("player dropped = {}", playerDropped);
 
             if (appContext.getPlayer().getDroppedPlayers().contains(playerDropped)) {
-                String err = LCUtil.prepareMessageBean("déjà dans DroppedPlayers");
-                LOG.error(err);
+                String err = "Player already in dropped players list";
+                LOG.warn(err);
                 showMessageFatal(err);
                 return null;
             }
 
             if (appContext.getPlayer().getDroppedPlayers().size() > 4) {
                 String msg = "There are more than 4 dropped players";
-                LOG.debug(msg);
+                LOG.warn(msg);
                 showMessageFatal(msg);
                 return null;
             }
@@ -1281,34 +1294,26 @@ public class RoundController implements Serializable {
      * Cherche la météo pour le club du round courant.
      * Migré depuis CourseController — 2026-02-25
      */
-    
-    @Inject cache.WeatherCacheService weatherCache;
-
-    private dto.WeatherDTO weather2;
-    
-    
-    
- public String findWeather() {
+    public String findWeather() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-    try {
+        try {
             Club club = appContext.getClub();
             Inscription inscription = appContext.getInscription();
             LOG.debug("club = {}", club);
             LOG.debug("player = {}", appContext.getPlayer());
             LOG.debug("round = {}", appContext.getRound());
-// cette solution n'est pas en production - son intérêt = le cache
-          weather2 = weatherCache.getWeather(club, languageController.getLanguage());
-            LOG.debug("weather = {}", weather2.toString());
-            LOG.debug("humidity = {}", weather2.humidity().toString());
-            LOG.debug("windspeed = {}", weather2.windSpeed().toString());
-            LOG.debug("windsdirection = {}", weather2.windDirection());
-            LOG.debug("windsdirection = {}", weather2.windDirection());
-            LOG.debug("temperature = {}", weather2.temperature().toString());
-            LOG.debug("feelsLike = {}", weather2.feelsLike().toString());
-   // solution en production  
+            // not yet in production — cached alternative (WeatherCacheService)
+            weather2 = weatherCache.getWeather(club, languageController.getLanguage());
+            if (weather2 != null) {
+                LOG.debug("weather2 = {}", weather2);
+                LOG.debug("humidity = {}", weather2.humidity());
+                LOG.debug("windspeed = {}", weather2.windSpeed());
+                LOG.debug("winddirection = {}", weather2.windDirection());
+                LOG.debug("temperature = {}", weather2.temperature());
+                LOG.debug("feelsLike = {}", weather2.feelsLike());
+            }
             String weather = findOpenWeather.find(club, languageController.getLanguage()); // fix multi-user 2026-03-07
-            
             if (weather == null) {
                 LOG.debug("weather is null");
                 inscription.setWeather("Weather returned from findWeather is null");
@@ -1416,10 +1421,6 @@ public class RoundController implements Serializable {
         }
     } // end method
 
-    /*
-     * Calcule le score Stableford (WHS uniquement).
-     * Migré depuis CourseController — 2026-02-25
-     */
     /**
      * Appelé par le p:selectOneMenu du tee dans score_stableford.xhtml via p:ajax valueChange.
      * Parse l'idtee depuis la string "COLOR / GENDER / HH-HH / idtee", recharge le Tee,
@@ -1441,18 +1442,24 @@ public class RoundController implements Serializable {
             lookup.setIdtee(idtee);
             entite.Tee fresh = readTeeService.read(lookup);
             if (fresh == null || fresh.isNotFound()) {
-                showMessageFatal("Tee introuvable (idtee=" + idtee + ")");
+                String msg = "Tee introuvable (idtee=" + idtee + ")";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return;
             }
             this.tee = fresh;
             appContext.getInscription().setInscriptionIdTee(idtee);
             boolean ok = updateInscriptionTeeService.update(appContext.getRound(), appContext.getPlayer(), teeStart, idtee);
             if (!ok) {
-                showMessageFatal("Mise à jour du tee en DB échouée");
+                String msg = "Mise à jour du tee en DB échouée";
+                LOG.error(msg);
+                showMessageFatal(msg);
                 return;
             }
             invalidateRoundCaches();
-            showMessageInfo("Tee mis à jour : " + teeStart + ". Clique sur « Calculate » pour recalculer les scores.");
+            String msgOk = "Tee mis à jour : " + teeStart + ". Clique sur « Calculate » pour recalculer les scores.";
+            LOG.info(msgOk);
+            showMessageInfo(msgOk);
         } catch (NumberFormatException nfe) {
             LOG.error("cannot parse idtee from teeStart: {}", nfe.getMessage());
             showMessageFatal("Format de tee invalide.");
@@ -1477,11 +1484,15 @@ public class RoundController implements Serializable {
             LOG.debug("new game = {} for idround={}", round.getRoundGame(), round.getIdround());
             boolean ok = updateRoundGameQualifyingService.update(round);
             if (!ok) {
-                showMessageFatal("Mise à jour du genre de jeu en DB échouée");
+                String msg = "Mise à jour du genre de jeu en DB échouée";
+                LOG.error(msg);
+                showMessageFatal(msg);
                 return;
             }
             invalidateRoundCaches();
-            showMessageInfo("Genre de jeu mis à jour : " + round.getRoundGame());
+            String msgOk = "Genre de jeu mis à jour : " + round.getRoundGame();
+            LOG.info(msgOk);
+            showMessageInfo(msgOk);
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -1585,7 +1596,7 @@ public class RoundController implements Serializable {
 
             if (createStatisticsStableford.create(appContext.getPlayer(), round, score)) {
                 String msg = "statistics created !!";
-                LOG.debug(msg);
+                LOG.info(msg);
                 showMessageInfo(msg);
                 setNextScorecard(true);
             } else {
@@ -2078,9 +2089,9 @@ public class RoundController implements Serializable {
     public String createInscriptionCompetition(ECompetition ec) throws SQLException, IOException, InstantiationException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug("entering CreateInscriptionCompetition with Competition param = {}", ec);
-        LOG.debug("entering CreateInscriptionCompetition with Competition Data= {}", ec.competitionData());
-        LOG.debug("for player = {}", appContext.getPlayer());
+        LOG.debug("ec = {}", ec);
+        LOG.debug("competitionData = {}", ec.competitionData());
+        LOG.debug("player = {}", appContext.getPlayer());
         ec.competitionData().setCmpDataCompetitionId(ec.competitionDescription().getCompetitionId());
         ec.competitionData().setCmpDataPlayerId(appContext.getPlayer().getIdplayer());
         ec.competitionData().setCmpDataPlayerGender(appContext.getPlayer().getPlayerGender());
@@ -2102,9 +2113,10 @@ public class RoundController implements Serializable {
      * Crée les rounds et inscriptions d'une compétition.
      * Appelé depuis competition_admin_menu.xhtml
      */
-    public String createRoundsCompetition(CompetitionDescription cd) throws SQLException, IOException, Exception {
+    public String createRoundsCompetition(CompetitionDescription cd) throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering with CompetitionDescription = {}", cd);
+        LOG.debug("entering {}", methodName);
+        LOG.debug("CompetitionDescription = {}", cd);
         if (!createCompetitionRounds.create(cd)) {
             String msg = "Create Rounds competition NOT OK for competition = " + cd.getCompetitionId();
             LOG.error(msg);
@@ -2441,7 +2453,7 @@ public class RoundController implements Serializable {
     } // end method
 
     // --- Method 9: listStartCompetition ---
-    public List<ECompetition> listStartCompetition() throws SQLException, java.io.IOException, Exception {
+    public List<ECompetition> listStartCompetition() throws Exception {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         ECompetition competition = appContext.getCompetition();
@@ -2454,14 +2466,14 @@ public class RoundController implements Serializable {
             LOG.debug(msg);
             // 1. d'abord
             List<ECompetition> li = competitionInscriptionsList.list(competition.competitionDescription());
-            LOG.debug("line 01 after call competitionInscriptionsList li size = {}", li.size());
             if (li == null) {
                 msg = "there are no inscriptions : we do nothing for competition Id  = "
                         + competition.competitionDescription().getCompetitionId();
                 LOG.debug(msg);
                 LCUtil.showMessageFatal(msg);
-                return li;
+                return null;
             }
+            LOG.debug("inscriptions size = {}", li.size());
             // 2. ensuite
             LOG.debug("we go to CompetitionStartlist with Execution = {}", execution);
             li.get(0).competitionDescription().setCompetitionExecution(execution);
