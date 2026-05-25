@@ -42,7 +42,7 @@ public class CreatePaymentCotisation implements Serializable {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 PreparedStatement mapped = sql.preparedstatement.psCreatePaymentCotisation.psMapCreate(ps, cotisation);
                 if (mapped == null) {
-                    LOG.error("psMapCreate returned null — cotisation has null fields: idclub={} idplayer={} startDate={} endDate={} paymentRef={} status={}",
+                    LOG.error("psMapCreate null — cotisation: idclub={} idplayer={} startDate={} endDate={} paymentRef={} status={}",
                         cotisation.getIdclub(), cotisation.getIdplayer(),
                         cotisation.getCotisationStartDate(), cotisation.getCotisationEndDate(),
                         cotisation.getPaymentReference(), cotisation.getStatus());

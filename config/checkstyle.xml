@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  GolfJakarta — Checkstyle configuration
+  Stack: Java 26, Jakarta EE 11, JSF 4, WildFly 40
+
+  Intentionally excluded:
+    LeftCurly / NeedBraces  — codebase mixes K&R and Allman styles (migration in progress)
+    FileTabCharacter        — some legacy packages use tabs (numbertext, batch, utils)
+    MagicNumber             — JDBC column indices rs.getInt(1), rs.getString(2)
+    JavadocMethod/Type      — not systematic in the codebase
+    MethodLength            — SQL methods can legitimately be long
+    CyclomaticComplexity    — business logic with many conditional branches
+    HideUtilityClassConstructor — CDI requires a public no-arg constructor
+    VisibilityModifier      — @Inject on private fields is the CDI standard
+
+  MethodName allows underscores to support JSF navigation methods (to_xxx_xhtml style).
+
+  Existing violations in legacy packages are suppressed via config/checkstyle-suppressions.xml.
+  Remove a suppression entry when a package has been cleaned up.
+-->
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- ── File-level ─────────────────────────────────────────────── -->
+
+    <module name="LineLength">
+        <property name="max" value="150"/>
+        <!-- Exempt: package/import declarations and SQL keywords -->
+        <property name="ignorePattern"
+                  value="^(import|package)\s|^\s*(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|GROUP|ORDER|HAVING|ON|AND|OR|SET|VALUES|CREATE|ALTER|DROP|LIMIT|OFFSET|UNION|DISTINCT)\b"/>
+    </module>
+
+    <!-- ── TreeWalker (AST-level checks) ──────────────────────────── -->
+    <module name="TreeWalker">
+
+        <!-- Naming conventions ──────────────────────────────────── -->
+        <!-- Classes, interfaces, enums: PascalCase -->
+        <module name="TypeName"/>
+        <!-- Methods: camelCase, underscores allowed (JSF navigation: to_xxx_xhtml) -->
+        <module name="MethodName">
+            <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
+        </module>
+        <!-- Instance fields: camelCase -->
+        <module name="MemberName"/>
+        <!-- Local variables: camelCase -->
+        <module name="LocalVariableName"/>
+        <!-- Method parameters: camelCase -->
+        <module name="ParameterName"/>
+        <!-- static final constants: UPPER_SNAKE -->
+        <module name="ConstantName"/>
+        <!-- Long literals must use L (not l) -->
+        <module name="UpperEll"/>
+
+        <!-- Imports ──────────────────────────────────────────────── -->
+        <!-- No unused imports -->
+        <module name="UnusedImports"/>
+        <!-- No import foo.* or import static foo.Bar.* -->
+        <module name="AvoidStarImport"/>
+
+        <!-- Modifiers ────────────────────────────────────────────── -->
+        <!-- public/protected/private static abstract final transient volatile ... -->
+        <module name="ModifierOrder"/>
+
+    </module>
+
+</module>

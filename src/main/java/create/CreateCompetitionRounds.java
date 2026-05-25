@@ -47,7 +47,9 @@ public class CreateCompetitionRounds implements Serializable {
             List<ECompetition> li = competitionRoundsList.list(cd);
             LOG.debug("there are rounds = {}", li.size());
             for (int i = 0; i < li.size(); i++) {
-                LOG.debug("flightnumber = {} StartTime = {}", li.get(i).competitionData().getCmpDataFlightNumber(), li.get(i).competitionData().getCmpDataFlightStart());
+                LOG.debug("flightnumber = {} StartTime = {}",
+                    li.get(i).competitionData().getCmpDataFlightNumber(),
+                    li.get(i).competitionData().getCmpDataFlightStart());
             }
 
             int save = 0;

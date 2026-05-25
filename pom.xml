@@ -56,6 +56,8 @@
       <!--   <wildfly.version>35</wildfly.version> new 03/11/2024 not used in  -->
         <maven-enforcer-plugin.version>3.6.2</maven-enforcer-plugin.version> <!-- mod 25-10-2025 was 3.6.1 -->
         <maven-exec-plugin.version>3.6.3</maven-exec-plugin.version><!-- mod 04-01-2026 was 3.6.2 -->
+        <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+        <checkstyle.version>10.21.4</checkstyle.version>
 
   <!--   <exec.file>mongo.MongoHelpLoad</exec.file> utils.Java11HttpClientExample-->
         <exec.mainClass.pom>read.ReadClub</exec.mainClass.pom> <!-- dao.TestClubDAOMainical.icalservice_manual_test utils.CdiAuditScannern dao.TestClubDAOImpl utils.IcalServicetest.prepareStatement.ClubService>lists.CourseListupdate.UpdateClubsql.SqlFactoryutils.DBMetajollyday.JollyDayControllers.HttpController selenium.SeleniumTest  ScreenShotCaptureSelenium execute le main de la classe (qu'il ne faut pas mentionner) -->
@@ -83,7 +85,7 @@
         <maven.archiver.plugin.version>3.6.2 </maven.archiver.plugin.version><!--mod 17-07-2024 was 3.6.0 -->
         <maven.build.helper.plugin.version>3.6.1</maven.build.helper.plugin.version> <!--mod 13-06-2025 was 3.6.0 -->
     <!--    <netbeans.compile.on.save>all</netbeans.compile.on.save>  new 27/11/2013 enlevé 08-08-2024-->
-        <netbeans.version>29</netbeans.version> <!-- only used via MANIFEST.MF see manifestEntries further-->
+        <netbeans.version>30</netbeans.version> <!-- only used via MANIFEST.MF see manifestEntries further-->
         <primeflex.version>4.0.0</primeflex.version> <!-- modify also masterTemplate - mod 16-03-2025 was 3.3.1 used also in technical info MANIFEST.MF see manifestEntries further-->
         <log4j2.version>2.26.0</log4j2.version> <!-- mod 17-05-2026  was 2.25.4 -->
         <slf4j.version>2.1.0-alpha1</slf4j.version><!-- mod 12-03-2025 was 2.0.163 -->
@@ -1130,8 +1132,38 @@ Les tests d’intégration seront exécutés lors de mvn verify ou mvn integrati
           </configuration>
 </plugin>        
 
+
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-checkstyle-plugin</artifactId>
+    <version>${maven-checkstyle-plugin.version}</version>
+    <dependencies>
+        <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>${checkstyle.version}</version>
+        </dependency>
+    </dependencies>
+    <configuration>
+        <configLocation>config/checkstyle.xml</configLocation>
+        <encoding>UTF-8</encoding>
+        <consoleOutput>true</consoleOutput>
+        <failOnViolation>true</failOnViolation>
+        <violationSeverity>error</violationSeverity>
+        <includeTestSourceDirectory>false</includeTestSourceDirectory>
+        <suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
+    </configuration>
+    <executions>
+        <execution>
+            <id>checkstyle-validate</id>
+            <phase>validate</phase>
+            <goals><goal>check</goal></goals>
+        </execution>
+    </executions>
+</plugin>
+
   </plugins>
- 
+
 <!--  12-04-2020 15:21 https://blog.frankel.ch/whats-the-version-of-my-deployed-application/   -->
 <resources>
    <resource>

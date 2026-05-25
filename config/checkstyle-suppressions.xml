@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<!--
+  GolfJakarta — Checkstyle suppressions baseline (2026-05-25)
+  ============================================================
+  These suppressions grandfather existing violations so they don't block the build.
+  Remove an entry once the corresponding package has been cleaned up.
+
+  Packages with ZERO violations (no entry needed — already compliant):
+    dao/, events/, mongo/, ajax/, numbertext/, schedule/, startup/,
+    Conversations/, session/, dialog/, cache/
+-->
+<suppressions>
+
+    <!-- ── Legacy / third-party packages ─────────────────────────── -->
+
+    <!-- SQL factory classes use non-PascalCase type names by design -->
+    <suppress checks="TypeName|UnusedImports|LineLength" files="sql[/\\].*"/>
+
+    <!-- Google Maps API wrapper uses snake_case naming from the upstream API -->
+    <suppress checks="ParameterName|MemberName|UnusedImports" files="googlemaps[/\\].*"/>
+
+    <!-- Legacy connection package (being phased out during CDI migration) -->
+    <suppress checks="LineLength|AvoidStarImport|LocalVariableName|UnusedImports|TypeName|ModifierOrder" files="connection_package[/\\].*"/>
+
+    <!-- ── Domain objects (entite/) ──────────────────────────────── -->
+    <!-- POJOs use French field names, short param names, and various conventions -->
+    <suppress checks="UnusedImports|MemberName|ParameterName|ModifierOrder|LineLength|AvoidStarImport|TypeName|MethodName" files="entite[/\\].*"/>
+
+    <!-- ── Controllers (JSF backing beans) ───────────────────────── -->
+    <!-- Large legacy JSF controllers with mixed naming and long lines -->
+    <suppress checks="UnusedImports|LocalVariableName|AvoidStarImport|LineLength|MethodName|ParameterName|MemberName|ConstantName" files="Controllers[/\\].*"/>
+
+    <!-- ── Utilities ──────────────────────────────────────────────── -->
+    <!-- utils/ contains old helper classes with varied conventions -->
+    <suppress checks="MethodName|UnusedImports|AvoidStarImport|ParameterName|LineLength|ConstantName|ModifierOrder|TypeName|MemberName" files="utils[/\\].*"/>
+
+    <!-- ── Payment ────────────────────────────────────────────────── -->
+    <suppress checks="UnusedImports|AvoidStarImport|LineLength|MethodName" files="payment[/\\].*"/>
+    <suppress checks="LineLength|UnusedImports" files="payments[/\\].*"/>
+
+    <!-- ── Batch / Mail / Session / Listeners ─────────────────────── -->
+    <suppress checks="LineLength|LocalVariableName|UnusedImports|AvoidStarImport" files="batch[/\\].*"/>
+    <suppress checks="ModifierOrder|UnusedImports|AvoidStarImport|LocalVariableName|LineLength" files="mail[/\\].*"/>
+    <suppress checks="UnusedImports|LineLength|MethodName|ConstantName|AvoidStarImport" files="listeners[/\\].*"/>
+
+    <!-- ── CDI services — suppress only UnusedImports (transient during migration) -->
+    <suppress checks="UnusedImports|LocalVariableName|AvoidStarImport" files="read[/\\].*"/>
+    <suppress checks="UnusedImports|MemberName" files="create[/\\].*"/>
+    <suppress checks="UnusedImports|LocalVariableName" files="delete[/\\].*"/>
+    <suppress checks="UnusedImports|LineLength" files="update[/\\].*"/>
+    <suppress checks="UnusedImports|LocalVariableName|LineLength" files="lists[/\\].*"/>
+    <suppress checks="UnusedImports|LocalVariableName|LineLength|ModifierOrder" files="find[/\\].*"/>
+    <suppress checks="AvoidStarImport|UnusedImports" files="manager[/\\].*"/>
+    <suppress checks="UnusedImports" files="rowmappers[/\\].*"/>
+
+    <!-- ── Context / Cache ────────────────────────────────────────── -->
+    <suppress checks="UnusedImports|AvoidStarImport" files="context[/\\].*"/>
+    <suppress checks="ConstantName|UnusedImports" files="cachelist[/\\].*"/>
+
+    <!-- ── Miscellaneous ──────────────────────────────────────────── -->
+    <suppress checks="LineLength|UnusedImports|MethodName|ModifierOrder" files="calc[/\\].*"/>
+    <suppress checks="LineLength|MethodName|UnusedImports|TypeName" files="enumeration[/\\].*"/>
+    <suppress checks="LineLength|AvoidStarImport" files="filters[/\\].*"/>
+    <suppress checks="UnusedImports|AvoidStarImport|TypeName" files="ical[/\\].*"/>
+    <suppress checks="AvoidStarImport|UnusedImports" files="info_test[/\\].*"/>
+    <suppress checks="LineLength|ConstantName|UnusedImports|AvoidStarImport" files="interfaces[/\\].*"/>
+    <suppress checks="UnusedImports|AvoidStarImport|LineLength|LocalVariableName" files="jollyday[/\\].*"/>
+    <suppress checks="MethodName|UnusedImports" files="lc[/\\].*"/>
+    <suppress checks="LineLength" files="converter[/\\].*"/>
+    <suppress checks="LineLength|AvoidStarImport" files="rest[/\\].*"/>
+    <suppress checks="ConstantName" files="security[/\\].*"/>
+    <suppress checks="UnusedImports" files="service[/\\].*"/>
+    <suppress checks="LineLength|UnusedImports" files="showcase[/\\].*"/>
+    <suppress checks="AvoidStarImport|UnusedImports" files="smartCard[/\\].*"/>
+    <suppress checks="LineLength|UnusedImports" files="translation[/\\].*"/>
+    <suppress checks="AvoidStarImport|UnusedImports|LineLength|TypeName" files="validator[/\\].*"/>
+
+</suppressions>
