@@ -52,12 +52,14 @@
                     <p:column id="colProAmount"
                               toggleable="false"
                               headerText="#{msg['professional.amount']}"
-                              width="8%">
+                              width="8%"
+                              rendered="#{selectionContextBean.purpose.code eq 'TarifPro'}">
                         <h:outputText value="#{c.professional.proAmount}"/>
                     </p:column>
 
                     <p:column headerText=""
-                              width="5%">
+                              width="5%"
+                              rendered="#{selectionContextBean.purpose.code eq 'TarifPro'}">
                         <p:commandButton icon="pi pi-pencil"
                                          styleClass="p-button-text p-button-sm"
                                          title="#{msg['button.edit']}"
@@ -70,7 +72,8 @@
                     </p:column>
 
                     <p:column headerText="#{msg['professional.select']}"
-                              width="15%">
+                              width="15%"
+                              rendered="#{selectionContextBean.purpose.code eq 'ProInscription'}">
                         <p:commandButton id="selectButtonProCreate"
                                          action="#{schedulerC.readLessons(c, idplayer)}"
                                          value="#{msg['button.select']}"
@@ -79,7 +82,8 @@
                     </p:column>
 
                     <p:column headerText="#{msg['menu.tarif.pro']}"
-                              width="12%">
+                              width="12%"
+                              rendered="#{selectionContextBean.purpose.code eq 'TarifPro'}">
                         <p:commandButton value="#{msg['menu.tarif.pro']}"
                                          icon="pi pi-dollar"
                                          styleClass="p-button-warning p-button-outlined p-button-sm"
