@@ -120,8 +120,9 @@ public class HttpController implements Serializable {
             init();
         }
         if (httpClient == null) {
-            LOG.error("httpClient could not be initialized");
-            showMessageFatal("Payment client not available");
+            String msgInit = "Payment client not available";
+            LOG.error(msgInit);
+            showMessageFatal(msgInit);
             return "ClientNotInitialized";
         }
         HttpResponse<String> response = null;
@@ -229,8 +230,8 @@ public class HttpController implements Serializable {
                         + (details != null ? " : " + details : "");
                 } else {
                     msg = "Error from payment server (HTTP " + response.statusCode() + "): " + body;
-                    LOG.error(msg);
                 }
+                LOG.error(msg);
                 showMessageFatal(msg);
                 return Integer.toString(response.statusCode());
             }
@@ -274,8 +275,9 @@ public class HttpController implements Serializable {
                 showMessageFatal(msg);
                 return e.getMessage();
             }
-            LOG.error("Exception: {} response={}", e.getMessage(), response);
-            showMessageFatal("Exception: " + e.getMessage());
+            String msg = "Exception: " + e.getMessage();
+            LOG.error("{} response={}", msg, response);
+            showMessageFatal(msg);
             return e.getMessage();
         }
     } // end method
@@ -321,7 +323,7 @@ public class HttpController implements Serializable {
         }
     } // end method
 
-    private static void printResponse(HttpResponse<?> response) {
+    private void printResponse(HttpResponse<?> response) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         LOG.debug(" - URI     : {}", response.uri());

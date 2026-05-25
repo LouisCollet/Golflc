@@ -74,9 +74,10 @@ try{
 }
 } // end constructor
 
-public void login(){ // throws IOException, SQLException { // executed via actionView in login.xhtml
-        LOG.debug("entering login() coming from login.xhtml");
-}
+public void login(){ // executed via actionView in login.xhtml
+        final String methodName = utils.LCUtil.getCurrentMethodName();
+        LOG.debug("entering {}", methodName);
+} // end method
 
 
 // externalContext injection removed — fix multi-user 2026-03-07 (request-scoped, must not be cached in @ApplicationScoped)
@@ -93,31 +94,28 @@ public String deployVersion() throws IOException{
       LOG.debug("deployVersion - WAR not found (build in progress): {}", path);
       return "build...";
   }
-}
+} // end method
 
 public String getClientIpAddress() throws UnknownHostException, ServletException{
 return InetAddress.getLocalHost().toString();
-}
+} // end method
 
 public String getClientIPv6Address() throws UnknownHostException{
     return Inet6Address.getLocalHost().getHostAddress();
-}
+} // end method
 
 public String getClientMacAddress() throws UnknownHostException{
 try{
 return "fake mac";
 }catch (Exception e){
 	LOG.debug("UnknowHostException = {}", e);
-////}catch (Exception e){
-//	LOG.debug("SocketException = {}", e);
-//}
 return "yes, Louis : Mac adress";
-} //end method
 }
+} // end method
 
 public String getGlobalAddress() throws UnknownHostException{
     return Arrays.deepToString(InetAddress.getAllByName("localhost"));
-}
+} // end method
 @Resource(lookup = "java:jboss/datasources/golflc")
 private DataSource dataSource;
 
@@ -138,7 +136,7 @@ public String getMySql() throws SQLException {
         handleGenericException(e, methodName);
         return "";                                                  // ✅ jamais null
     }
-}
+} // end method
 
 
 
@@ -150,51 +148,49 @@ public String getMongoDB() throws SQLException, Exception{
                document = mongoClient.getDatabase("golflc").runCommand(new Document("buildInfo",1));
         }
     return "Driver version = " + MongoDriverVersion.VERSION + " - DB version = " + document.getString("version");
- }
+ } // end method
     public String getJQueryVersion() {
         return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("JQueryVersion");
-    }
+    } // end method
 
 public String getPrimefacesVersion(){
-   // return PrimeFaces.class.getPackage().getImplementationVersion(); // mod 04-12-2025
     return PrimeEnvironment.class.getPackage().getImplementationVersion();
-  //  return Primefaces.version();
-}
+} // end method
 
 public String getPrimefacesExtensionVersion(){
     return manifestAttributes.getValue("PFextension");
-}
+} // end method
 
 public String getLog4j2Version(){
     return manifestAttributes.getValue("logging");
-}
+} // end method
 
 public String getWeldVersion(){
     return utils.WildFlyEnvironmentInfo.getWeldVersion();
-}
+} // end method
 
 public String getServerVersion(){
     return utils.WildFlyEnvironmentInfo.getWildFlyVersion();
-}
+} // end method
 
 public String getApplicationVersion(){
     return manifestAttributes.getValue("golflc");
-}
+} // end method
 public String getNetbeansVersion() {
     return manifestAttributes.getValue("netbeans");
-}
+} // end method
 
 public String getPrimeflexVersion(){ //throws IOException{
     return manifestAttributes.getValue("primeflex");
-}
+} // end method
 
 public String getJakartaEEVersion(){// throws IOException{
     return manifestAttributes.getValue("javaEE");
-}
+} // end method
 
 public String getBuildVersion() {
      return manifestAttributes.getValue("buildTime");
-}
+} // end method
 
 public String getMojarraVersion(){
     Package jsfPackage = FacesContext.class.getPackage();
@@ -204,39 +200,30 @@ public String getMojarraVersion(){
         jsfPackage.getImplementationVendor() + " " +
         jsfPackage.getSpecificationTitle() + " " +
         jsfPackage.getSpecificationVersion();
- //   String specVendor = jsfPackage.getSpecificationVendor();
-  //  return implTitle + "/ " + implVersion + "/ " + implVendor + " / " + specTitle + "/ " + specVersion; // + "/" + specVendor;
-
-}
+} // end method
 public String getMavenVersion(){
      return manifestAttributes.getValue("Build-Tool");
-}
+} // end method
 
 public String getOmnifacesVersion(){
      return manifestAttributes.getValue("omnifaces");
-}
-//public String getJavaVersion(){
+} // end method
 public String javaVersion(){
     return System.getProperty("java.runtime.version") + " from " + System.getProperty("java.vendor");
-}
+} // end method
 
 public String getJqueryVersion(){
-  //  return 
-//  String s = PrimeFaces.current().executeScript("jQuery().jquery");
   return "unknown";
-}
+} // end method
 
 public String getIpadress6(){
     return System.getProperty("java.runtime.version") + " from " + System.getProperty("java.vendor");
-}
+} // end method
 
 public String getOsVersion(){
     return System.getProperty("os.name") + " " + System.getProperty("os.version")
             + " " + System.getProperty("os.arch");
-}
-// ========================================
-// Methods merged from InfoController2 — 2026-03-07
-// ========================================
+} // end method
 
 public String getMySQLInfo() {
     final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -335,4 +322,4 @@ public String getPrimeflexVersion2() {
     return manifestAttributes.getValue("primeflex");
 } // end method
 
-}// end class
+} // end class

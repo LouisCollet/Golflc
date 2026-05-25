@@ -30,9 +30,6 @@
     <!-- POJOs use French field names, short param names, and various conventions -->
     <suppress checks="UnusedImports|MemberName|ParameterName|ModifierOrder|LineLength|AvoidStarImport|TypeName|MethodName" files="entite[/\\].*"/>
 
-    <!-- ── Controllers (JSF backing beans) ───────────────────────── -->
-    <!-- Large legacy JSF controllers with mixed naming and long lines -->
-    <suppress checks="UnusedImports|LocalVariableName|AvoidStarImport|LineLength|MethodName|ParameterName|MemberName|ConstantName" files="Controllers[/\\].*"/>
 
     <!-- ── Utilities ──────────────────────────────────────────────── -->
     <!-- utils/ contains old helper classes with varied conventions -->

@@ -78,7 +78,7 @@ try{
     tarifMember.setWorkPrice(null);
     tarifMember.setWorkRangeAge(null);
     LOG.debug("inputTarifMembers updated = {}", tarifMember.getBasicList());
-        showMessageInfo("inputTarifMembers updated = " + tarifMember.getBasicList());
+    showMessageInfo("inputTarifMembers updated = " + tarifMember.getBasicList());
    return tarifMember;
 } catch (Exception e) {
     handleGenericException(e, methodName);
@@ -117,9 +117,9 @@ try{
 
 public Cotisation completeCotisation(TarifMember tarif, Player player, LocalDate referenceDate) throws Exception{
    final String methodName = utils.LCUtil.getCurrentMethodName();
+   LOG.debug("entering {}", methodName);
      Cotisation cotisation = new Cotisation();
     try{
-        LOG.debug("entering {}", methodName);
         LOG.debug("with TarifMember = {}", tarif);
         LOG.debug("for Player = {}", player.getIdplayer());
         LOG.debug("for referenceDate = {}", referenceDate);
@@ -230,7 +230,7 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
              if(startRange < 18){
                  String msg = "Accepted : you are older, but we consider you are paying for your kids";
                  LOG.debug(msg);
-                 LCUtil.showMessageInfo(msg);
+                 showMessageInfo(msg);
                  continue;}
              int endRange = Integer.parseInt(range.substring(range.length()-2));
                 LOG.debug("end for this item = {}", endRange);
@@ -277,11 +277,11 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
 
      double discount = 0.0;
         LOG.debug("tarif.getDiscount = {}", tarif.getDiscount());
-     if(tarif.getDiscount().equals("Year") || tarif.getDiscount() == null){
+     if(tarif.getDiscount() == null || "Year".equals(tarif.getDiscount())){
 //          LOG.debug("number of days = {}", Year.of(year).length());
              LOG.debug("discount = Year - no discount !");
      }
-     if(tarif.getDiscount().equals("Months")){
+     if("Months".equals(tarif.getDiscount())){
              LOG.debug("entering discount = Months !");
              BigDecimal months = BigDecimal.valueOf(
                   ChronoUnit.MONTHS.between(cotisation.getCotisationStartDate(), cotisation.getCotisationEndDate()));
@@ -292,7 +292,7 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
              cotisation.setCommunication(cotisation.getCommunication() + " - Discount " + months + " Months = " + discount);
          }
    // à vérifier
-         if(tarif.getDiscount().equals("Days")){
+         if("Days".equals(tarif.getDiscount())){
                 LOG.debug("entering discount = Days  !");
              int year = cotisation.getCotisationEndDate().getYear();
                 LOG.debug("year = {}", year);
@@ -346,4 +346,4 @@ public Cotisation calcCotisationPrice (TarifMember tarif, Player player, Cotisat
             return null;
         }
     } // end method
-} //end Class
+} // end class

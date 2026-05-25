@@ -34,7 +34,7 @@ public class LoginController implements Serializable {
     @Inject private Controllers.ActiveLocale                      activeLocale;
     @Inject private find.FindLastAudit                            findLastAudit;
     @Inject private update.UpdateAudit                            updateAudit;
-    @Inject private Controllers.CartController              cartC;
+  //  @Inject private Controllers.CartController              cartC;
     @Inject private read.ReadClub                           readClubService;
 
     private boolean showForceLogoutButton   = false;
@@ -50,10 +50,7 @@ public class LoginController implements Serializable {
         LOG.debug("LoginController reset done");
     } // end method
 
-    // ========================================
     // PREPARE LOGIN — called from login.xhtml <f:viewAction>
-    // Migrated from connection_package.LoginBean 2026-04-04
-    // ========================================
 
     public void prepareLogin() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
@@ -80,9 +77,8 @@ public class LoginController implements Serializable {
             appContext.setPlayer(epp.getPlayer());
 
             if (appContext.getPlayer().getIdplayer() == null) {
-                String err = "player is null = " + appContext.getPlayer();
-                LOG.debug("{}", err);
-                showMessageFatal(err);
+                LOG.error("player is null = {}", appContext.getPlayer());
+                showMessageFatal("player is null = " + appContext.getPlayer());
                 return null;
             } else {
                 LOG.debug("current Player = {}", appContext.getPlayer());
@@ -135,7 +131,6 @@ public class LoginController implements Serializable {
                     sessionAuditId, sessionPlayerId, newPlayerId, samePlayerReconnecting, anotherPlayerInSameBrowser);
 
             if (anotherPlayerInSameBrowser) {
-                LOG.warn("player {} already in session, blocking player {}", sessionPlayerId, newPlayerId);
                 String connectedName;
                 try {
                     entite.Player connectedPlayer = playerManager.readPlayer(sessionPlayerId);
@@ -143,14 +138,17 @@ public class LoginController implements Serializable {
                 } catch (Exception ex) {
                     connectedName = " (id=" + sessionPlayerId + ")";
                 }
-                showMessageFatal(utils.LCUtil.prepareMessageBean("player.already.connected.browser", connectedName));
+                String msg = utils.LCUtil.prepareMessageBean("player.already.connected.browser", connectedName);
+                LOG.warn("player {} already in session, blocking player {} — {}", sessionPlayerId, newPlayerId, msg);
+                showMessageFatal(msg);
                 showForceLogoutButton = true;
                 return null;
             }
 
             if (!forceLoginAllowed && !samePlayerReconnecting && auditConnectionList.isPlayerOnline(newPlayerId)) {
-                LOG.warn("player {} already connected from another session — login blocked", newPlayerId);
-                showMessageFatal(utils.LCUtil.prepareMessageBean("player.already.connected"));
+                String msg = utils.LCUtil.prepareMessageBean("player.already.connected");
+                LOG.warn("player {} already connected from another session — {}", newPlayerId, msg);
+                showMessageFatal(msg);
                 showForceReconnectButton = true;
                 pendingEpp = epp;
                 return null;
@@ -189,7 +187,9 @@ public class LoginController implements Serializable {
             Integer id = appContext.getPlayerTemp().getIdplayer();
             LOG.debug("looking up player id = {}", id);
             if (id == null || id == 0) {
-                showMessageFatal("Please enter a valid player ID");
+                String msg = "Please enter a valid player ID";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             EPlayerPassword epp = playerManager.listPlayers().stream()
@@ -197,6 +197,7 @@ public class LoginController implements Serializable {
                     .findFirst()
                     .orElse(null);
             if (epp == null) {
+                LOG.warn("Player ID {} not found", id);
                 showMessageFatal("Player ID " + id + " not found");
                 return null;
             }
@@ -297,7 +298,9 @@ public class LoginController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             if (pendingEpp == null) {
-                showMessageFatal("No pending login — please select your player again");
+                String msg = "No pending login — please select your player again";
+                LOG.warn(msg);
+                showMessageFatal(msg);
                 return null;
             }
             Integer playerId = pendingEpp.getPlayer().getIdplayer();
@@ -320,15 +323,7 @@ public class LoginController implements Serializable {
         }
     } // end method
 
-    public boolean isShowForceLogoutButton()    { return showForceLogoutButton; }
-    public boolean isShowForceReconnectButton() { return showForceReconnectButton; }
-
-    /*
-    void main() {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        // tests locaux
-    } // end main
-    */
+    public boolean isShowForceLogoutButton()    { return showForceLogoutButton; } // end method
+    public boolean isShowForceReconnectButton() { return showForceReconnectButton; } // end method
 
 } // end class
