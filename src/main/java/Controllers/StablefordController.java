@@ -149,7 +149,8 @@ public class StablefordController implements Serializable {
             int uncomplete = score.getPlayingHandicap() % holes;
             LOG.debug("-- loop Uncomplete = {}", uncomplete);
             LoggingUserController.write(" - loop Uncomplete = " + uncomplete);
-            LOG.debug("-- ArrayIndex input = {} control sum={} must be {}", Arrays.toString(score.getIndexArray()), IntStream.of(score.getIndexArray()).sum(), IntStream.rangeClosed(1, 18).sum());
+            LOG.debug("-- ArrayIndex input = {} control sum={} must be {}", Arrays.toString(score.getIndexArray()),
+                    IntStream.of(score.getIndexArray()).sum(), IntStream.rangeClosed(1, 18).sum());
 
             // 0. Slicing the arrays
             int[] sliced = null;

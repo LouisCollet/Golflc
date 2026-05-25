@@ -1,7 +1,7 @@
 package Controllers;
 
 import static interfaces.GolfInterface.ZDF_TIME_HHmm;
-import static interfaces.ScheduleColors.*;
+
 import context.ApplicationContext;
 import entite.Club;
 import entite.Player;
@@ -25,6 +25,10 @@ import java.util.List;
 import static interfaces.Log.LOG;
 import manager.PlayerManager;
 import static exceptions.LCException.handleGenericException;
+import static interfaces.ScheduleColors.GREEN_BG;
+import static interfaces.ScheduleColors.GREEN_BORDER;
+import static interfaces.ScheduleColors.RED_BG;
+import static interfaces.ScheduleColors.RED_BORDER;
 import static utils.LCUtil.showDialogFatal;
 import static utils.LCUtil.showDialogInfo;
 import static utils.LCUtil.showMessageInfo;
@@ -133,7 +137,8 @@ public class SchedulerProController implements Serializable {
             selectedProName     = buildPlayerName(appContext.getPlayerPro());
             selectedStudentName = buildPlayerName(appContext.getPlayer());
             selectedLessonAmount = calcLessonPrice.calc(professional, event.getObject(), club);
-            LOG.debug("dateSelect: club={} pro={} student={} amount={}", selectedClubName, selectedProName, selectedStudentName, selectedLessonAmount);
+            LOG.debug("dateSelect: club={} pro={} student={} amount={}", selectedClubName, selectedProName,
+                    selectedStudentName, selectedLessonAmount);
             dialogC.showLessonDialog();
         } catch (Exception e) {
             handleGenericException(e, methodName);
@@ -196,7 +201,8 @@ public class SchedulerProController implements Serializable {
         selectedLessonAmount = lesson.getLessonAmount() != null
                 ? lesson.getLessonAmount()
                 : calcLessonPrice.calc(professional, lesson.getEventStartDate(), club);
-        LOG.debug("club={} pro={} student={} amount={} paid={}", selectedClubName, selectedProName, selectedStudentName, selectedLessonAmount, lesson.isLessonPaid());
+        LOG.debug("club={} pro={} student={} amount={} paid={}", selectedClubName, selectedProName, selectedStudentName,
+                selectedLessonAmount, lesson.isLessonPaid());
         dialogC.showLessonDialog();
     } // end method
 

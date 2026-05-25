@@ -9,7 +9,6 @@ import entite.TarifGreenfee;
 import static exceptions.LCException.handleGenericException;
 import static interfaces.GolfInterface.ZDF_DAY;
 import static interfaces.Log.LOG;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;

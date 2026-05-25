@@ -196,7 +196,7 @@ public class MongoHelpController implements Serializable {
     // JSF ACTIONS
     // ========================================
 
-    public String SaveHelpFile() {  // called in editor_help_mongo.xhtml
+    public String saveHelpFile() {  // called in editor_help_mongo.xhtml
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering for = {}", helpView);
         try {
@@ -218,7 +218,7 @@ public class MongoHelpController implements Serializable {
         }
     } // end method
 
-    public String BackCurrentHelpFile() {
+    public String backCurrentHelpFile() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering — back to helpView {}", helpView);
         try {
@@ -266,7 +266,7 @@ public class MongoHelpController implements Serializable {
         }
     } // end method
 
-    public String ReadHelpFile() {
+    public String readHelpFile() {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {

@@ -6,7 +6,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import utils.LCUtil;
 import static utils.LCUtil.showMessageInfo;
 
 /**
@@ -22,7 +21,7 @@ public class LoggingUserController implements Serializable {
     @Inject private Controllers.MongoCalculationsController mongoCalculationsController;
 
     // fix multi-user 2026-03-07 — ThreadLocal instead of shared static String
-    private static final ThreadLocal<StringBuilder> textBuffer =
+    private static final ThreadLocal<StringBuilder> TEXT_BUFFER =
             ThreadLocal.withInitial(() -> new StringBuilder("start text"));
 
     public LoggingUserController() { }
@@ -51,7 +50,7 @@ public class LoggingUserController implements Serializable {
     } // end method
 
     public static void writeText(String newText) {
-        textBuffer.get().append(newText);
+        TEXT_BUFFER.get().append(newText);
     } // end method
 
     public boolean createUpdateLoggingUser(LoggingUser logging) {
@@ -67,12 +66,12 @@ public class LoggingUserController implements Serializable {
     } // end method
 
     public static String getText() {
-        return textBuffer.get().toString();
+        return TEXT_BUFFER.get().toString();
     } // end method
 
     public static void setText(String text) {
-        textBuffer.get().setLength(0);
-        textBuffer.get().append(text);
+        TEXT_BUFFER.get().setLength(0);
+        TEXT_BUFFER.get().append(text);
     } // end method
 
     /** Instance wrapper — CDI-compliant call from injected beans */
@@ -84,7 +83,7 @@ public class LoggingUserController implements Serializable {
      * Call at the end of each request to prevent ThreadLocal memory leak
      */
     public static void clearText() {
-        textBuffer.remove();
+        TEXT_BUFFER.remove();
     } // end method
 
     /*

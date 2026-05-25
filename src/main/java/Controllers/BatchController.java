@@ -85,13 +85,14 @@ public class BatchController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            String JOB_NAME = "GolfPlayers";
+          //  String jobName = "GolfPlayers";
+            String jobName = "golfPlayers"; // mod LC 25-05-2026
             Properties props = new Properties();
             String fileName = settings.getProperty("BATCH") + "importPlayers.csv";
             LOG.debug("using file = {}", fileName);
             props.setProperty("input_file", fileName);
-            executionId = jobOperator.start(JOB_NAME, props);
-            LOG.debug("job started = {}", JOB_NAME);
+            executionId = jobOperator.start(jobName, props);
+            LOG.debug("job started = {}", jobName);
         } catch (Exception e) {
             handleGenericException(e, methodName);
         }
@@ -101,10 +102,10 @@ public class BatchController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            String JOB_NAME = "GolfRounds";
+            String jobName = "GolfRounds";
             Properties props = new Properties();
             props.setProperty("input_file", settings.getProperty("BATCH") + "importPlayers.csv");
-            executionId = jobOperator.start(JOB_NAME, props);
+            executionId = jobOperator.start(jobName, props);
             Batch b = new Batch();
             b.setExecID(executionId);
             listeBatch.add(b);
@@ -121,10 +122,10 @@ public class BatchController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            String JOB_NAME = "GolfInscriptions";
+            String jobName = "GolfInscriptions";
             Properties props = new Properties();
             props.setProperty("input_file", settings.getProperty("BATCH") + "importPlayers.txt");
-            executionId = jobOperator.start(JOB_NAME, props);
+            executionId = jobOperator.start(jobName, props);
             Batch b = new Batch();
             b.setExecID(executionId);
             listeBatch.add(b);

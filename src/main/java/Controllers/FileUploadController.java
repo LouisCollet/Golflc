@@ -3,7 +3,6 @@ package Controllers;
 import context.ApplicationContext;
 import entite.Player;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.faces.annotation.SessionMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.apache.tika.detect.DefaultDetector;
@@ -25,8 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Map;
-
 import static exceptions.LCException.handleGenericException;
 import static interfaces.Log.LOG;
 import static utils.LCUtil.showMessageFatal;

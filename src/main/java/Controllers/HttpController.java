@@ -12,7 +12,6 @@ import io.mikael.urlbuilder.UrlBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -23,7 +22,6 @@ import java.net.CookieStore;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
@@ -157,7 +155,8 @@ public class HttpController implements Serializable {
             String timestamp = String.valueOf(Instant.now().getEpochSecond());
             String method    = "POST";
             String path      = "/creditcard";
-            String query     = uri.getRawQuery() != null ? uri.getRawQuery() : ""; // URL-encoded — matches Python request.query_string.decode('utf-8')
+            String query     = uri.getRawQuery() != null ? uri.getRawQuery() : ""; 
+                // URL-encoded — matches Python request.query_string.decode('utf-8')
             // migrated 2026-03-28 — SHA-256(body) replaces raw body: PCI-friendly + fixed-length component
             String bodyHash  = HexFormat.of().formatHex(
                 java.security.MessageDigest.getInstance("SHA-256")

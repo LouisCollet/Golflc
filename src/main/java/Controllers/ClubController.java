@@ -2,7 +2,15 @@ package Controllers;
 
 import Controllers.DialogController;
 import context.ApplicationContext;
-import entite.*;
+import entite.Club;
+import entite.Country;
+import entite.Course;
+import entite.Flight;
+import entite.Hole;
+import entite.HolesGlobal;
+import entite.Round;
+import entite.TarifMember;
+import entite.Tee;
 import entite.composite.ECourseList;
 import entite.composite.EUnavailable;
 import enumeration.SelectionPurpose;
@@ -79,7 +87,7 @@ public class ClubController implements Serializable {
     private List<Hole> holeListForTee;
     private List<Club> filteredClubs;
 
-    private boolean STROKEINDEX = true;
+    private boolean strokeIndex = true;
     private List<ECourseList> filteredCourses = null;
     private String lineModelCourse;
     private TarifMember tarifMember;
@@ -117,7 +125,7 @@ public class ClubController implements Serializable {
         teeListForCourse  = Collections.emptyList();
         holeListForTee    = Collections.emptyList();
         filteredClubs     = Collections.emptyList();
-        STROKEINDEX       = true;
+        strokeIndex       = true;
         filteredCourses   = null;
         lineModelCourse   = null;
         tarifMember       = new TarifMember();
@@ -275,9 +283,9 @@ public class ClubController implements Serializable {
             }
             int clubId = club.getIdclub();
             ClubManager.SaveResult result = clubManager.deleteClub(clubId);
-            boolean OK = result.isSuccess();
-            LOG.debug("result of deleteClub = {}", OK);
-            if (OK) {
+            boolean ok = result.isSuccess();
+            LOG.debug("result of deleteClub = {}", ok);
+            if (ok) {
                 invalidateClubCaches();
                 showMessageInfo(result.getMessage());
             } else {
@@ -401,9 +409,9 @@ public class ClubController implements Serializable {
             }
             int courseId = course.getIdcourse();
             ClubManager.SaveResult result = clubManager.deleteCourse(courseId);
-            boolean OK = result.isSuccess();
-            LOG.debug("result of deleteCourse = {}", OK);
-            if (OK) {
+            boolean ok = result.isSuccess();
+            LOG.debug("result of deleteCourse = {}", ok);
+            if (ok) {
                 invalidateClubCaches();
                 showMessageInfo(result.getMessage());
             } else {
@@ -555,9 +563,9 @@ public class ClubController implements Serializable {
         }
         int teeId = tee.getIdtee();
         ClubManager.SaveResult result = clubManager.deleteTee(teeId);
-        boolean OK = result.isSuccess();
-        LOG.debug("result of deleteTee = {}", OK);
-        if (OK) {
+        boolean ok = result.isSuccess();
+        LOG.debug("result of deleteTee = {}", ok);
+        if (ok) {
             invalidateClubCaches();
             showMessageInfo(result.getMessage());
         } else {
@@ -962,8 +970,8 @@ public class ClubController implements Serializable {
             LOG.debug("returning cached flightList size={}", flightList.size());
             return flightList;
         }
-        Round round  = appContext.getRound();
-        Club club   = appContext.getClub();
+        Round round   = appContext.getRound();
+        Club club     = appContext.getClub();
         Course course = appContext.getCourse();
         LOG.debug("round={} club={} course={}", round, club, course);
         if (round.getRoundDate() == null) {
@@ -1390,8 +1398,8 @@ public String findClubWebsite() {
     public List<Club> getFilteredClubs() { return filteredClubs; }
     public void setFilteredClubs(List<Club> l) { this.filteredClubs = l; }
 
-    public boolean isSTROKEINDEX() { return STROKEINDEX; }
-    public void setSTROKEINDEX(boolean STROKEINDEX) { this.STROKEINDEX = STROKEINDEX; }
+    public boolean isStrokeIndex() { return strokeIndex; }
+    public void setStrokeIndex(boolean strokeIndex) { this.strokeIndex = strokeIndex; }
 
     public List<ECourseList> getFilteredCourses() { return filteredCourses; }
     public void setFilteredCourses(List<ECourseList> filteredCourses) { this.filteredCourses = filteredCourses; }

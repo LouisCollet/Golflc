@@ -5,7 +5,7 @@ import com.lowagie.text.PageSize;
 import entite.PlayingHandicap;
 import entite.Round;
 import static interfaces.GolfInterface.ZDF_TIME;
-import java.io.*;
+import static interfaces.Log.LOG;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +25,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.model.SelectItem;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.io.IOException;
+import java.io.Serializable;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -42,7 +44,7 @@ import org.primefaces.model.map.Overlay;
 
 @Named("utilsC")
 @RequestScoped
-public class UtilsController implements Serializable, interfaces.GolfInterface, interfaces.Log {
+public class UtilsController implements Serializable {
 
     @Inject private entite.Settings settings;
 
@@ -165,16 +167,16 @@ public class UtilsController implements Serializable, interfaces.GolfInterface, 
     } // end method
 
     public int getElem(PlayingHandicap playingHcp) {
-        int counter_players = 0;
+        int counterPlayers = 0;
         Double[] hcp = playingHcp.getHcpScr();
         for (Double hcp1 : hcp) {
             if (hcp1 != 0.0) {
-                counter_players++;
+                counterPlayers++;
                 LOG.debug("Scramble Hcp = {}", hcp1);
             }
         }
-        LOG.debug("Scramble Hcp number of players = {}", counter_players);
-        return counter_players;
+        LOG.debug("Scramble Hcp number of players = {}", counterPlayers);
+        return counterPlayers;
     } // end method
 
     public void printResultSet(ResultSet rs) throws SQLException {
@@ -222,7 +224,7 @@ public class UtilsController implements Serializable, interfaces.GolfInterface, 
     public Overlay<Object> getOverlay() { return overlay; }
     public void setOverlay(Overlay<Object> overlay) { this.overlay = overlay; }
 
-    public String ViewModificationDate() {
+    public String viewModificationDate() {
         try {
             String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
             Path path = Paths.get(settings.getProperty("WEBAPP") + viewId);
@@ -236,7 +238,7 @@ public class UtilsController implements Serializable, interfaces.GolfInterface, 
         }
     } // end method
 
-    public List<SelectItem> ListGameType() {
+    public List<SelectItem> listGameType() {
         var data = Round.GameType.values();
         int le = data.length;
         var items = new SelectItem[le + 1];

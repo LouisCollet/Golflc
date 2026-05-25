@@ -1,7 +1,24 @@
 package Controllers;
 
 import context.ApplicationContext;
-import entite.*;
+import entite.Club;
+import entite.CompetitionDescription;
+import entite.Course;
+import entite.Flight;
+import entite.Handicap;
+import entite.HandicapIndex;
+import entite.Inscription;
+import entite.LoggingUser;
+import entite.Matchplay;
+import entite.Player;
+import entite.PlayingHandicap;
+import entite.Round;
+import entite.ScoreMatchplay;
+import entite.ScoreScramble;
+import entite.ScoreStableford;
+import entite.TarifGreenfee;
+import entite.Tee;
+import entite.UnavailablePeriod;
 import entite.composite.ECompetition;
 import entite.composite.ECourseList;
 import entite.composite.EMatchplayResult;
@@ -983,22 +1000,22 @@ public class RoundController implements Serializable {
 
             var v = participantsRoundList.list(round);
             if (v.size() == 4) {
-                String A1 = v.get(0).getInscription().getInscriptionMatchplayTeam()
+                String teamA1 = v.get(0).getInscription().getInscriptionMatchplayTeam()
                         + " - " + v.get(0).getPlayer().getPlayerLastName();
-                String A2 = ", " + v.get(1).getPlayer().getPlayerLastName();
-                scoreMatchplay.setPlayersA(A1 + A2);
-                String B1 = v.get(2).getInscription().getInscriptionMatchplayTeam()
+                String teamA2 = ", " + v.get(1).getPlayer().getPlayerLastName();
+                scoreMatchplay.setPlayersA(teamA1 + teamA2);
+                String teamB1 = v.get(2).getInscription().getInscriptionMatchplayTeam()
                         + " - " + v.get(2).getPlayer().getPlayerLastName();
-                String B2 = ", " + v.get(3).getPlayer().getPlayerLastName();
-                scoreMatchplay.setPlayersB(B1 + B2);
+                String teamB2 = ", " + v.get(3).getPlayer().getPlayerLastName();
+                scoreMatchplay.setPlayersB(teamB1 + teamB2);
             }
             if (v.size() == 2) {
-                String A1 = v.get(0).getInscription().getInscriptionMatchplayTeam()
+                String teamA1 = v.get(0).getInscription().getInscriptionMatchplayTeam()
                         + " - " + v.get(0).getPlayer().getPlayerLastName();
-                scoreMatchplay.setPlayersA(A1);
-                String B1 = v.get(1).getInscription().getInscriptionMatchplayTeam()
+                scoreMatchplay.setPlayersA(teamA1);
+                String teamB1 = v.get(1).getInscription().getInscriptionMatchplayTeam()
                         + " - " + v.get(1).getPlayer().getPlayerLastName();
-                scoreMatchplay.setPlayersB(B1);
+                scoreMatchplay.setPlayersB(teamB1);
             }
             return "score_matchplay.xhtml?faces-redirect=true";
 
@@ -1874,7 +1891,7 @@ public class RoundController implements Serializable {
      * ScoreCardList1 WHS — retourne le HandicapIndex à la date du round.
      * Migré depuis CourseController — 2026-02-25
      */
-    public List<HandicapIndex> ScoreCardList1WHS() throws SQLException {
+    public List<HandicapIndex> scoreCardList1WHS() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (cachedScoreCardList1WHS != null) {
@@ -1899,7 +1916,7 @@ public class RoundController implements Serializable {
      * ScoreCardList2 — slope rating et données du cours.
      * Migré depuis CourseController — 2026-02-25
      */
-    public List<ECourseList> ScoreCardList2() throws SQLException {
+    public List<ECourseList> scoreCardList2() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (cachedScoreCardList2 != null) {
@@ -1919,7 +1936,7 @@ public class RoundController implements Serializable {
      * ScoreCardList3 — données de score détaillées (putts, bunker, penalty).
      * Migré depuis CourseController — 2026-02-25
      */
-    public List<ECourseList> ScoreCardList3() throws SQLException {
+    public List<ECourseList> scoreCardList3() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
@@ -1934,7 +1951,7 @@ public class RoundController implements Serializable {
      * ScoreCardList4 — liste détaillée des scores par trou.
      * Migré depuis CourseController — 2026-02-25
      */
-    public List<ScoreStableford.Score> ScoreCardList4() throws SQLException {
+    public List<ScoreStableford.Score> scoreCardList4() throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         if (cachedScoreCardList4 != null) {
@@ -1958,7 +1975,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().mapToInt(o -> o.getPar() == null ? 0 : o.getPar()).sum();
+            return scoreCardList4().stream().mapToInt(o -> o.getPar() == null ? 0 : o.getPar()).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -1972,7 +1989,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().mapToInt(o -> o.getExtra() == null ? 0 : o.getExtra()).sum();
+            return scoreCardList4().stream().mapToInt(o -> o.getExtra() == null ? 0 : o.getExtra()).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -1986,7 +2003,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().mapToInt(ScoreStableford.Score::getStrokes).sum();
+            return scoreCardList4().stream().mapToInt(ScoreStableford.Score::getStrokes).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -2000,7 +2017,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().mapToInt(ScoreStableford.Score::getNetStrokes).sum();
+            return scoreCardList4().stream().mapToInt(ScoreStableford.Score::getNetStrokes).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -2014,7 +2031,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().mapToInt(ScoreStableford.Score::getPoints).sum();
+            return scoreCardList4().stream().mapToInt(ScoreStableford.Score::getPoints).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -2028,7 +2045,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().limit(9).mapToInt(ScoreStableford.Score::getPoints).sum();
+            return scoreCardList4().stream().limit(9).mapToInt(ScoreStableford.Score::getPoints).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -2048,7 +2065,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().mapToInt(ScoreStableford.Score::getDistances).sum();
+            return scoreCardList4().stream().mapToInt(ScoreStableford.Score::getDistances).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -2062,7 +2079,7 @@ public class RoundController implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return ScoreCardList4().stream().limit(9).mapToInt(ScoreStableford.Score::getDistances).sum();
+            return scoreCardList4().stream().limit(9).mapToInt(ScoreStableford.Score::getDistances).sum();
         } catch (SQLException e) {
             handleSQLException(e, methodName);
             return 0;
@@ -2095,7 +2112,8 @@ public class RoundController implements Serializable {
         ec.competitionData().setCmpDataCompetitionId(ec.competitionDescription().getCompetitionId());
         ec.competitionData().setCmpDataPlayerId(appContext.getPlayer().getIdplayer());
         ec.competitionData().setCmpDataPlayerGender(appContext.getPlayer().getPlayerGender());
-        ec.competitionData().setCmpDataPlayerFirstLastName(appContext.getPlayer().getPlayerLastName() + ", " + appContext.getPlayer().getPlayerFirstName());
+        ec.competitionData().setCmpDataPlayerFirstLastName(
+                appContext.getPlayer().getPlayerLastName() + ", " + appContext.getPlayer().getPlayerFirstName());
         LOG.debug("with competitionData = {}", ec.competitionData());
         if (createCompetitionData.create(ec.competitionData())) {
             String msg = "Inscription data competition OK for " + String.valueOf(ec.competitionData().getCmpDataCompetitionId());
@@ -2311,8 +2329,8 @@ public class RoundController implements Serializable {
 
         if (!pass.equals(confirm)) {
             LOG.debug("pass not equal confirm");
-            String field1Id_copy = toValidate.getClientId(context);
-            showMessageFatal(field1Id_copy);
+            String field1IdCopy = toValidate.getClientId(context);
+            showMessageFatal(field1IdCopy);
         }
     } // end method
 
@@ -2437,16 +2455,16 @@ public class RoundController implements Serializable {
     } // end method
 
     // --- Method 8: beforeListStartCompetition ---
-    public String beforeListStartCompetition(CompetitionDescription cd, String type_exec) throws SQLException, java.io.IOException {
+    public String beforeListStartCompetition(CompetitionDescription cd, String typeExec) throws SQLException, java.io.IOException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         LOG.debug("with competition description = {}", cd);
-        LOG.debug("with type = {}", type_exec);
-        if (type_exec.equals(entite.CompetitionDescription.StatusExecution.PROVISIONAL.toString())
-                || type_exec.equals(entite.CompetitionDescription.StatusExecution.FINAL.toString())) {
+        LOG.debug("with type = {}", typeExec);
+        if (typeExec.equals(entite.CompetitionDescription.StatusExecution.PROVISIONAL.toString())
+                || typeExec.equals(entite.CompetitionDescription.StatusExecution.FINAL.toString())) {
             LOG.debug("good execution type - PROVISIONAL or FINAL");
         }
-        cd.setCompetitionExecution(type_exec);
+        cd.setCompetitionExecution(typeExec);
         appContext.setCompetition(appContext.getCompetition().withCompetitionDescription(cd));
         LOG.debug("competition modified = {}", appContext.getCompetition());
         return "competition_list_start.xhtml?faces-redirect=true&operation=add";

@@ -87,16 +87,16 @@ public class CountryController implements Serializable{
     }
 
 
-public String getExtendedCountry(String S2) // migrated from static 2026-03-22
+public String getExtendedCountry(String s2) // migrated from static 2026-03-22
 {  // from "HU" finding "Hungary"
   try{
-//      LOG.debug("getExtendedCountry - searching for = {}", S2);
-  // tester si null 
+//      LOG.debug("getExtendedCountry - searching for = {}", s2);
+  // tester si null
       String ret = null;
          for (Map.Entry<String,String> entry : countriesMap.entrySet()){
    //         LOG.debug("entry.getKey = {}", entry.getKey());
    //         LOG.debug("entry.getValue = {}", entry.getValue());
-            if (entry.getValue().equals(S2)){
+            if (entry.getValue().equals(s2)){
                 ret = entry.getKey();
       //          LOG.debug("value founded = {}", entry.getValue());
       //          LOG.debug("key founded = {}", entry.getKey());

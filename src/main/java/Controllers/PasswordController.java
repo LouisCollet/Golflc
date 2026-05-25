@@ -1,7 +1,6 @@
 
 package Controllers;
 
-import delete.DeleteActivation;
 import entite.Activation;
 import entite.Blocking;
 import entite.composite.EPlayerPassword;
@@ -12,11 +11,11 @@ import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
-import java.io.*;
 import java.time.LocalDateTime;
 import jakarta.inject.Inject;
 import manager.PlayerManager;
 import static exceptions.LCException.handleGenericException;
+import java.io.Serializable;
 import static utils.LCUtil.prepareMessageBean;
 import static utils.LCUtil.showMessageFatal;
 
@@ -71,7 +70,7 @@ public boolean isBlocking(Player player){
     LOG.debug("entering {}", methodName);
     try{
         if(passwordBlocking(player)){
-             String err = prepareMessageBean("password.blocked"); // + blocking.getBlockingRetryTime().format(ZDF_TIME); // ,player.getPlayerPassword()); 
+             String err = prepareMessageBean("password.blocked");
              LOG.error(err);
              showMessageFatal(err);
              return true; //"selectPlayer.xhtml?faces-redirect=true";
@@ -106,7 +105,8 @@ try{ // coming from selectPlayer 5926
             showMessageFatal(msg);
             return true;
         }else{
-             LOG.debug("temps de blocage dépassé - delete record now = {} Retrytime = {}", LocalDateTime.now().format(ZDF_TIME), blocking.getBlockingRetryTime().format(ZDF_TIME));
+             LOG.debug("temps de blocage dépassé - delete record now = {} Retrytime = {}", LocalDateTime.now().format(ZDF_TIME),
+                     blocking.getBlockingRetryTime().format(ZDF_TIME));
              boolean b = deleteBlocking.delete(player);
        // new 29-06-2020  // a faire : tester sur le résultat
              Short s = 0;

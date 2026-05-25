@@ -769,16 +769,16 @@ public class PlayerController implements Serializable {
         }
     } // end method
 
-    public String passwordVerification(String OK_KO) {
+    public String passwordVerification(String okKo) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} ok_ko={}", methodName, OK_KO);
+        LOG.debug("entering {} ok_ko={}", methodName, okKo);
         try {
             LOG.debug("for player={}", appContext.getPlayer());
-            if ("OK".equals(OK_KO)) {
+            if ("OK".equals(okKo)) {
                 LOG.debug("password correct");
                 return null;
             }
-            if ("KO".equals(OK_KO)) {
+            if ("KO".equals(okKo)) {
                 String msg = LCUtil.prepareMessageBean("connection.failed");
                 LOG.info(msg);
                 showMessageInfo(msg);
@@ -901,11 +901,11 @@ public class PlayerController implements Serializable {
         }
     } // end method
 
-    public void completeActivation(String UUID) {
+    public void completeActivation(String uuid) {
         final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {} UUID={}", methodName, UUID);
+        LOG.debug("entering {} UUID={}", methodName, uuid);
         try {
-            activation.setActivationKey(UUID);
+            activation.setActivationKey(uuid);
             activation = readActivation.read(activation);
             if (activation == null) {
                 LOG.debug("activation not found");

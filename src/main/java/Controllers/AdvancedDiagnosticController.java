@@ -12,14 +12,20 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.primefaces.config.PrimeEnvironment; // new 04-12-2025
 import org.primefaces.context.PrimeApplicationContext;
 import org.primefaces.config.PrimeConfiguration;
 import org.primefaces.PrimeFaces;
-import static org.omnifaces.util.Faces.getResourceAsStream;
 /**
  * Bean admin avancé : diagnostic, monitoring JVM, test ajax, vérif ressource, sessions, export.
  * Note: uses FacesContext — must only be called from JSF request context (XHTML pages).
@@ -34,13 +40,13 @@ public class AdvancedDiagnosticController implements Serializable {
     private final Map<String, Boolean> resourceExistsCache = new ConcurrentHashMap<>();
 
     // fix multi-user 2026-03-07 — per-user ajax test result via ThreadLocal (was shared across all users)
-    private static final ThreadLocal<Map<String, String>> lastAjaxTest =
+    private static final ThreadLocal<Map<String, String>> LAST_AJAX_TEST =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
     @PostConstruct
     public void init() {
-        lastAjaxTest.get().put("status", "no-test-yet");
-        lastAjaxTest.get().put("timestamp", Instant.now().toString());
+        LAST_AJAX_TEST.get().put("status", "no-test-yet");
+        LAST_AJAX_TEST.get().put("timestamp", Instant.now().toString());
     }
 
     // ---------------- PRIMEFACES INFO ----------------
@@ -168,7 +174,7 @@ public class AdvancedDiagnosticController implements Serializable {
 
     /**
      * Action appelée depuis la page pour simuler un test AJAX.
-     * Met à jour lastAjaxTest et renvoie vrai. Côté client on peut afficher un growl.
+     * Met à jour LAST_AJAX_TEST et renvoie vrai. Côté client on peut afficher un growl.
      */
  //  ne fonctionne pas bug jakarta ee 11
      public void runAjaxTest() {
@@ -178,7 +184,7 @@ public class AdvancedDiagnosticController implements Serializable {
         result.put("thread", Thread.currentThread().getName());
         // sample small check: memory used
         result.put("heapUsed", String.valueOf(getJvmMemoryMetrics().get("heap.used")));
-        lastAjaxTest.set(result);
+        LAST_AJAX_TEST.set(result);
 
         // if page triggers PrimeFaces.ajax, we can update UI from server
         PrimeFaces.current().ajax().update("adminForm:ajaxTestPanel");
@@ -186,7 +192,7 @@ public class AdvancedDiagnosticController implements Serializable {
     }
 
     public Map<String, String> getLastAjaxTest() {
-        return lastAjaxTest.get();
+        return LAST_AJAX_TEST.get();
     }
 
     // ---------------- SESSIONS ----------------

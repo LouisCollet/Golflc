@@ -1,6 +1,6 @@
 package Controllers;
 
-import static interfaces.Log.LOG;
+//import static interfaces.Log.LOG;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;

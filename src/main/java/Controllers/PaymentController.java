@@ -1,7 +1,7 @@
 package Controllers;
 
 import context.ApplicationContext;
-import entite.*;
+
 import enumeration.eTypePayment;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
@@ -23,6 +23,18 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import entite.Club;
+import entite.Cotisation;
+import entite.Course;
+import entite.Creditcard;
+import entite.Greenfee;
+import entite.Inscription;
+import entite.Lesson;
+import entite.Player;
+import entite.Professional;
+import entite.Round;
+import entite.Subscription;
+import entite.UnavailablePeriod;
 import static enumeration.eTypePayment.COTISATION;
 import static enumeration.eTypePayment.GREENFEE;
 import static enumeration.eTypePayment.LESSON;
@@ -49,8 +61,8 @@ public class PaymentController implements Serializable {
     // ========================================
 
     @Inject private ApplicationContext                          appContext;
-    @Inject private cache.CacheInvalidator                       cacheInvalidator;
-    @Inject private read.ReadCreditcard                          readCreditcard;
+    @Inject private cache.CacheInvalidator                      cacheInvalidator;
+    @Inject private read.ReadCreditcard                         readCreditcard;
     @Inject private payment.PaymentSubscriptionController       paymentSubscriptionController;
     @Inject private payment.PaymentCotisationController         paymentCotisationController;
     @Inject private payment.PaymentGreenfeeController           paymentGreenfeeController;
@@ -126,7 +138,8 @@ public class PaymentController implements Serializable {
             LOG.debug("round = {}", appContext.getRound());
             appContext.setCreditcardType(COTISATION());
             LOG.debug("creditcardType = {}", appContext.getCreditcardType());
-            Cotisation cotisation = tarifMemberController.completeCotisation(memberController.getTarifMember(), appContext.getPlayer(), java.time.LocalDate.now());
+            Cotisation cotisation = tarifMemberController.completeCotisation(memberController.getTarifMember(),
+                    appContext.getPlayer(), java.time.LocalDate.now());
             if (cotisation == null) {
                 String msg = "cotisation not found !! is null";
                 LOG.error(msg);
@@ -258,7 +271,8 @@ public class PaymentController implements Serializable {
             LOG.debug("creditcardType = {}", appContext.getCreditcardType());
 
             // 1. complete greenfee with price - use memC.tarifGreenfee (loaded by findTarifGreenfee)
-            Greenfee gf = tarifGreenfeeController.completeGreenfee(memberController.getTarifGreenfee(), appContext.getClub(), appContext.getRound(), appContext.getPlayer());
+            Greenfee gf = tarifGreenfeeController.completeGreenfee(memberController.getTarifGreenfee(), appContext.getClub(),
+                    appContext.getRound(), appContext.getPlayer());
             LOG.debug("Greenfee completed with tarif data = {}", gf);
             if (gf.getPrice() == 0) {
                 String msg = "amount ZERO,  no payment needed !!";
@@ -297,7 +311,8 @@ public class PaymentController implements Serializable {
         LOG.debug("entering {}", methodName);
         try {
             appContext.setCreditcardType(GREENFEE());
-            Greenfee gf = tarifGreenfeeController.completeGreenfee(memberController.getTarifGreenfee(), appContext.getClub(), appContext.getRound(), appContext.getPlayer());
+            Greenfee gf = tarifGreenfeeController.completeGreenfee(memberController.getTarifGreenfee(), appContext.getClub(),
+                    appContext.getRound(), appContext.getPlayer());
             LOG.debug("Greenfee completed = {}", gf);
             if (gf.getPrice() == 0) {
                 showMessageInfo("amount ZERO, no payment needed");

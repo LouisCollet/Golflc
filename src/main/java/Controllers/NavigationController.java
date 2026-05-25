@@ -2,7 +2,6 @@ package Controllers;
 
 import entite.Audit;
 import static exceptions.LCException.handleGenericException;
-import static interfaces.GolfInterface.ZDF_TIME;
 import static interfaces.Log.LOG;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -10,14 +9,11 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import context.ApplicationContext;
 import jakarta.enterprise.context.SessionScoped;
 import utils.LCUtil;
-
-import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
 /**

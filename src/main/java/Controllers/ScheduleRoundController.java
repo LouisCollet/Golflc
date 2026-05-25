@@ -3,7 +3,6 @@ package Controllers;
 
 import static interfaces.GolfInterface.ZDF_HOURS;
 import static interfaces.GolfInterface.ZDF_TIME_HHmm;
-import static interfaces.ScheduleColors.*;
 import context.ApplicationContext;
 import entite.Club;
 import entite.Cotisation;
@@ -25,7 +24,6 @@ import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
-
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
@@ -40,6 +38,9 @@ import java.util.ArrayList;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
 import static interfaces.Log.LOG;
+import static interfaces.ScheduleColors.BLUE_BG;
+import static interfaces.ScheduleColors.GREEN_BG;
+import static interfaces.ScheduleColors.ORANGE_BG;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 

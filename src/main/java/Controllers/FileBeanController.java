@@ -6,14 +6,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.text.ParseException;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
-import utils.LCUtil;
+
 @Named("fileBeanC") // this qualifier  makes a bean EL-injectable (Expression Language)
 @SessionScoped
 public class FileBeanController implements Serializable{
@@ -24,7 +23,7 @@ public class FileBeanController implements Serializable{
 //https://stackoverflow.com/questions/16093527/primefaces-file-download-not-working
  //@PostConstruct  
 // public void FileDownload() {
- public StreamedContent FileDownload() {
+ public StreamedContent fileDownload() {
      try{
         LOG.debug("entering FileDownLoad of FileBean");
         LOG.debug("line 00");
@@ -61,7 +60,7 @@ public class FileBeanController implements Serializable{
     }
     public StreamedContent getFile() {
         LOG.debug("entering getFile");
-        return FileDownload();
+        return fileDownload();
  //       LOG.debug("file transfered to user = {}", this.file);
  //       return this.file;
     }

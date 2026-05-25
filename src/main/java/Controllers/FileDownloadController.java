@@ -2,9 +2,10 @@
 package Controllers;
 
 import static interfaces.Log.LOG;
-import java.io.*;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
+import java.io.IOException;
+import java.io.InputStream;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 

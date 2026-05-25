@@ -2,19 +2,18 @@
 package Controllers;
 
 import context.ApplicationContext;
-import delete.DeleteActivation;
 import entite.Activation;
 import entite.Player;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import static exceptions.LCException.handleGenericException;
-import java.io.*;
-import utils.LCUtil;
+import static interfaces.Log.LOG;
+import java.io.Serializable;
 
 @Named("activationC")
 @RequestScoped //@SessionScoped mod 26-08-2023
-public class ActivationController implements Serializable, interfaces.Log{
+public class ActivationController implements Serializable{
     // ✅ Injection du contexte de session
     @Inject
     private ApplicationContext appContext;

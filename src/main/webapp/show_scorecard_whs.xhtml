@@ -21,7 +21,7 @@
                deferred="true">
  <p:dataTable id="scorecard1"
              filteredValue="#{roundC.filteredCars}"
-             value="#{roundC.ScoreCardList1WHS()}"
+             value="#{roundC.scoreCardList1WHS()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c"
              styleClass="compact-table" >
@@ -75,7 +75,7 @@
 <p:spacer height="30" />
 
 <p:dataTable id="scorecard2a"
-             value="#{roundC.ScoreCardList2()}"
+             value="#{roundC.scoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c"
              styleClass="compact-table" >
@@ -111,7 +111,7 @@
 <p:spacer height="30" />
 
 <p:dataTable id="scorecard2b"
-             value="#{roundC.ScoreCardList2()}"
+             value="#{roundC.scoreCardList2()}"
              emptyMessage="#{msg['message.table.empty']}"
              var="c"
              styleClass="compact-table" >
@@ -168,7 +168,7 @@
 
 <p:dataTable id="table4"
              var="c"
-             value="#{roundC.ScoreCardList4()}"
+             value="#{roundC.scoreCardList4()}"
              emptyMessage="#{msg['message.table.empty']}"
              rowIndexVar="row"
              rowStyleClass="#{(row+1 == 9 or row+1 == 18) ? 'highlight' : null}"

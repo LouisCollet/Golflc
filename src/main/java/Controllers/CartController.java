@@ -1,7 +1,6 @@
 package Controllers;
 
 import context.ApplicationContext;
-import entite.*;
 import static enumeration.eTypePayment.GREENFEE;
 import static enumeration.eTypePayment.LESSON;
 import static enumeration.eTypePayment.SUBSCRIPTION;
@@ -18,10 +17,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import entite.Cotisation;
+import entite.Greenfee;
+import entite.Lesson;
+import entite.Professional;
+import entite.TarifMember;
 import static utils.LCUtil.showMessageFatal;
 import static utils.LCUtil.showMessageInfo;
 
@@ -67,9 +70,9 @@ public class CartController implements Serializable {
     private boolean      proFree = false;
 
     // Request-scope read cache — transient: never serialized, one DB hit per render cycle
-    private transient List<entite.Cart> _pendingRows;
-    private transient List<Greenfee>    _cachedGf;
-    private transient List<Lesson>      _cachedLs;
+    private transient List<entite.Cart> pendingRows;
+    private transient List<Greenfee>    cachedGf;
+    private transient List<Lesson>      cachedLs;
 
     public CartController() { }
 
@@ -135,29 +138,29 @@ public class CartController implements Serializable {
     // ========================================
 
     public List<Greenfee> getListGreenfees() {
-        if (_cachedGf == null) {
-            _cachedGf = new ArrayList<>();
+        if (cachedGf == null) {
+            cachedGf = new ArrayList<>();
             for (entite.Cart row : getPendingRows()) {
                 if (row.getCartType() == enumeration.eTypePayment.GREENFEE) {
                     Greenfee gf = parseGreenfee(row.getCartItemsJson());
-                    if (gf != null) _cachedGf.add(gf);
+                    if (gf != null) cachedGf.add(gf);
                 }
             }
         }
-        return _cachedGf;
+        return cachedGf;
     } // end method
 
     public List<Lesson> getListLessons() {
-        if (_cachedLs == null) {
-            _cachedLs = new ArrayList<>();
+        if (cachedLs == null) {
+            cachedLs = new ArrayList<>();
             for (entite.Cart row : getPendingRows()) {
                 if (row.getCartType() == enumeration.eTypePayment.LESSON) {
                     Lesson ls = parseLesson(row.getCartItemsJson());
-                    if (ls != null) _cachedLs.add(ls);
+                    if (ls != null) cachedLs.add(ls);
                 }
             }
         }
-        return _cachedLs;
+        return cachedLs;
     } // end method
 
     // ========================================
@@ -646,7 +649,8 @@ public class CartController implements Serializable {
                         Greenfee gf = OBJECT_MAPPER.readValue(json, Greenfee.class);
                         if (gf.getRoundDate() != null && gf.getIdclub() != null && gf.getIdplayer() != null) {
                             if (findGreenfeePaid.findByCartKeys(gf.getIdplayer(), gf.getRoundDate(), gf.getIdclub())) {
-                                LOG.warn("duplicate greenfee player={} club={} date={}", gf.getIdplayer(), gf.getIdclub(), gf.getRoundDate().toLocalDate());
+                                LOG.warn("duplicate greenfee player={} club={} date={}", gf.getIdplayer(), gf.getIdclub(),
+                                        gf.getRoundDate().toLocalDate());
                                 showMessageFatal("[GREENFEE] " + utils.LCUtil.prepareMessageBean("create.greenfee.duplicate")
                                         + " " + gf.getRoundDate().toLocalDate() + " club=" + gf.getIdclub());
                                 showMessageInfo(utils.LCUtil.prepareMessageBean("cart.duplicate.suggestion"));
@@ -682,24 +686,24 @@ public class CartController implements Serializable {
     } // end method
 
     private List<entite.Cart> getPendingRows() {
-        if (_pendingRows == null) {
+        if (pendingRows == null) {
             try {
                 int pid = playerId();
-                _pendingRows = pid > 0
+                pendingRows = pid > 0
                     ? findCartService.findAllPendingByPlayer(pid)
                     : Collections.emptyList();
             } catch (Exception e) {
                 LOG.warn("getPendingRows failed (non-fatal)", e);
-                _pendingRows = Collections.emptyList();
+                pendingRows = Collections.emptyList();
             }
         }
-        return _pendingRows;
+        return pendingRows;
     } // end method
 
     private void invalidateCache() {
-        _pendingRows = null;
-        _cachedGf    = null;
-        _cachedLs    = null;
+        pendingRows = null;
+        cachedGf    = null;
+        cachedLs    = null;
     } // end method
 
     private Greenfee parseGreenfee(String json) {

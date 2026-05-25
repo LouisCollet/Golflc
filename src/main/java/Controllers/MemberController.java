@@ -1,14 +1,20 @@
 package Controllers;
 
 import context.ApplicationContext;
-import entite.*;
+import entite.Club;
+import entite.Cotisation;
+import entite.Course;
+import entite.Greenfee;
+import entite.Round;
+import entite.Subscription;
+import entite.TarifGreenfee;
+import entite.TarifMember;
 import entite.composite.ECourseList;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -76,10 +82,11 @@ public class MemberController implements Serializable {
     private List<ECourseList> subscriptionRenewal;
     private List<?> filteredCars;
     private entite.TarifSubscription tarifSubscription;
-    private entite.TarifGreenfee.DatesSeasons editingPeriod    = null; // non-null = mode édition d'une période existante
+    private entite.TarifGreenfee.DatesSeasons  editingPeriod    = null; // non-null = mode édition d'une période existante
     private entite.EquipmentsAndBasic          editingEquipment = null; // non-null = mode édition d'un équipement existant
     private String                             wizardCourseDisplay = ""; // pre-computed display for courseDisplay ajax
-    private java.util.Map<Integer, String>     courseNameCache = new java.util.HashMap<>(); // id→name, populated when courses are loaded
+    private java.util.Map<Integer, String>     courseNameCache = new java.util.HashMap<>();
+                                                // id→name, populated when courses are loaded
 
     public MemberController() { }
 
@@ -130,7 +137,10 @@ public class MemberController implements Serializable {
                 return null;
             }
             LOG.debug("tarifGreenfee found = {}", tarifGreenfee);
-            tarifGreenfee = calcTarifGreenfee.calc(tarifGreenfee, appContext.getRound(), appContext.getClub(), appContext.getPlayer()); // migrated 2026-02-28
+            tarifGreenfee = calcTarifGreenfee.calc(tarifGreenfee,
+                    appContext.getRound(),
+                    appContext.getClub(),
+                    appContext.getPlayer());
             return "price_round_greenfee.xhtml?faces-redirect=true";
         } catch (Exception e) {
             handleGenericException(e, methodName);
