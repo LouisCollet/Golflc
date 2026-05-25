@@ -3,15 +3,12 @@ package find;
 import entite.Player;
 import entite.Subscription;
 import static interfaces.Log.LOG;
-import static exceptions.LCException.handleGenericException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import utils.LCUtil;
 
@@ -24,10 +21,10 @@ public class FindSubscriptionStatus implements Serializable {
 
     public FindSubscriptionStatus() { }
 
-    public Boolean find(Subscription subscription, Player player) throws SQLException {
+    public Subscription find(Subscription subscription, Player player) throws SQLException {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
-        LOG.debug(methodName + " - with subscription idplayer = " + subscription.getIdplayer());
+        LOG.debug("{} - with subscription idplayer = {}", methodName, subscription.getIdplayer());
 
         try {
             List<Subscription> subscriptionList = findCurrentSubscription.payments(player, "now");
@@ -35,45 +32,42 @@ public class FindSubscriptionStatus implements Serializable {
                 String msg = LCUtil.prepareMessageBean("subscription.notfound");
                 LOG.debug(msg);
                 LCUtil.showMessageInfo(msg);
-                return false;
+                return null;
             }
 
-            LOG.debug("subscription detail found = " + Arrays.deepToString(subscriptionList.toArray()));
+            Subscription found = subscriptionList.get(0);
+            LOG.debug("subscription found = {}", found);
 
-            subscription = subscriptionList.get(0);
-            LOG.debug("current subscription = " + subscription);
-
-            if (subscription.getTrialCount() > 5 && LocalDateTime.now().isAfter(subscription.getEndDate())) {
+            if (found.getTrialCount() > 5 && LocalDateTime.now().isAfter(found.getEndDate())) {
                 String msg = LCUtil.prepareMessageBean("subscription.create.toomuchtrials")
                         + " player = " + player.getIdplayer()
-                        + " , trial  = <h1>" + subscription.getTrialCount() + "</h1>";
+                        + " , trial  = <h1>" + found.getTrialCount() + "</h1>";
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
-                LOG.debug("returned to subscription.xhtml");
-                return false;
+                return null;
             }
 
-            if (LocalDateTime.now().isBefore(subscription.getStartDate())) {
-                String msg = "now is before subscription Start - subscription NOT valid !!! " + subscription.getStartDate().format(DateTimeFormatter.ISO_DATE);
+            if (LocalDateTime.now().isBefore(found.getStartDate())) {
+                String msg = "now is before subscription Start - subscription NOT valid !!! " + found.getStartDate().format(DateTimeFormatter.ISO_DATE);
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
-                return false;
+                return null;
             }
 
-            if (LocalDateTime.now().isAfter(subscription.getEndDate())) {
-                String msg = "now is after subscription endDate - subscription NOT valid !!! " + subscription.getEndDate().format(DateTimeFormatter.ISO_DATE);
+            if (LocalDateTime.now().isAfter(found.getEndDate())) {
+                String msg = "now is after subscription endDate - subscription NOT valid !!! " + found.getEndDate().format(DateTimeFormatter.ISO_DATE);
                 LOG.error(msg);
                 LCUtil.showMessageFatal(msg);
-                return false;
+                return null;
             }
 
-            return true;
+            return found;
 
         } catch (Exception e) {
             String msg = "Exception in " + methodName + " " + e.getMessage();
             LOG.error(msg);
             LCUtil.showMessageFatal(msg);
-            return false;
+            return null;
         }
     } // end method
 

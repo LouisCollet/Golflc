@@ -204,11 +204,10 @@ public class PaymentSubscriptionController implements Serializable {
         subscription.setIdplayer(player.getIdplayer());
 
         try {
-            boolean found = findSubscriptionStatus.find(subscription, player);
-            if (found) {
-                List<Subscription> list = findCurrentSubscription.payments(player, "now");
-                subscription = list.isEmpty() ? subscription : list.get(0);
-                subscription.setErrorStatus(false);
+            Subscription found = findSubscriptionStatus.find(subscription, player);
+            if (found != null) {
+                found.setErrorStatus(false);
+                return found;
             } else {
                 subscription.setErrorStatus(true);
                 LOG.error(prepareMessageBean("subscription.invalid"));

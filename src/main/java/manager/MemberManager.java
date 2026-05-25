@@ -352,7 +352,7 @@ public class MemberManager implements Serializable {
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            return findSubscriptionStatusService.find(subscription, player);
+            return findSubscriptionStatusService.find(subscription, player) != null;
         } catch (SQLException e) {
             LOG.error("SQLException in " + methodName, e);
             return false;

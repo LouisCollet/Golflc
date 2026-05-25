@@ -1,6 +1,7 @@
 package dao;
 import static exceptions.LCException.handleGenericException;
 import static exceptions.LCException.handleSQLException;
+import sql.LogPs;
 import static interfaces.Log.LOG;
 import jakarta.annotation.Resource;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -38,6 +39,7 @@ public class GenericDAO implements Serializable {
         try (Connection conn = dataSource.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
             bindParams(ps, params);
+            LogPs.log(ps);
             try (ResultSet rs = ps.executeQuery()) {
                 List<T> result = new ArrayList<>();
                 while (rs.next()) {
@@ -68,6 +70,7 @@ public class GenericDAO implements Serializable {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             bindParams(ps, params);
+            LogPs.log(ps);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapper.map(rs);
@@ -96,6 +99,7 @@ public class GenericDAO implements Serializable {
              PreparedStatement ps = conn.prepareStatement(sql)) {
           //    LOG.info("DAO connection = {}", conn);
             bindParams(ps, params);
+            LogPs.log(ps);
             return ps.executeUpdate();
         } catch (SQLException e) {
             handleSQLException(e, "GenericDAO.execute");
