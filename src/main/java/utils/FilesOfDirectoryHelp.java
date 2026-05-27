@@ -18,9 +18,6 @@ public class FilesOfDirectoryHelp {
 @Inject private entite.Settings settings;        // ✅ injection CDI
  // public static List<Path> files() throws IOException{
      public List<Path> files() throws IOException{  
-//   String dir = Settings.getProperty("HELP");
- //    String dir = "C:/Users/Collet/Documents/NetBeansProjects/GolfWfly/src/main/webapp/help";
- //   LOG.debug("directory HELP = " + dir);
    
  List<Path> fileNames = Files.list(Paths.get(settings.getProperty("HELP")))
                              .filter(Files::isRegularFile)

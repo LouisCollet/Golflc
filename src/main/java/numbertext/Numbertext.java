@@ -31,7 +31,6 @@ import static numbertext.MenuState.PREFIX;
  * ✅ @ApplicationScoped — singleton CDI, cache modules partagé
  * ✅ Settings injecté
  * ✅ modules — champ d'instance (plus static)
- * ✅ System.exit() supprimé — dangereux dans WildFly
  */
 @Named
 @ApplicationScoped
@@ -215,7 +214,6 @@ public class Numbertext implements Serializable {
                     }
                     case LANGUAGE -> {
                         lang = args[i];
-                        // ✅ System.exit() supprimé — dangereux dans WildFly
                         if (numbertext("1", lang) == null) {
                             LOG.error(methodName + " - language module not found for lang = " + lang);
                             return null;

@@ -17,7 +17,6 @@ public class ThumbnailsController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // ✅ Injection CDI — plus de Settings.getProperty() statique
     @Inject private entite.Settings settings;
 
     public ThumbnailsController() { }

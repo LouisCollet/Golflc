@@ -64,7 +64,6 @@ public class ItemReaderRound extends AbstractItemReader implements interfaces.Go
         final String methodName = utils.LCUtil.getCurrentMethodName();
         LOG.debug("entering {}", methodName);
         try {
-            // ✅ Settings injecté — plus de Settings.getProperty() statique
             String fileName = settings.getProperty("BATCH") + "ryder cup rounds.txt";
             LOG.debug(methodName + " - fileName = " + fileName);
 
