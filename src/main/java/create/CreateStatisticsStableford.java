@@ -82,23 +82,4 @@ public class CreateStatisticsStableford implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new CreateStatisticsStableford().create(..., conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #create(Player, Round, ScoreStableford)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        Round round = new Round();
-        round.setIdround(630);
-        ScoreStableford score = new ScoreStableford();
-        // boolean b = create(player, round, score);
-        LOG.debug("from main, CreateStatisticsStableford = ");
-    } // end main
-    */
-
 } // end class

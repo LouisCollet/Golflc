@@ -102,24 +102,4 @@ public class DeleteInscription implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new DeleteInscription().delete(player, round, club, course, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #delete(Player, Round, Club, Course)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324715);
-        Round round = new Round();
-        round.setIdround(757);
-        Club club = new Club();
-        Course course = new Course();
-        boolean b = delete(player, round, club, course);
-        LOG.debug("delete result = {}", b);
-    } // end main
-    */
-
 } // end class

@@ -249,13 +249,4 @@ public class CalcStablefordScoreDifferential implements Serializable {
   }
  } // end method
 
-    // @Deprecated bridge removed 2026-02-28 — no callers with Connection conn
-
-/*
-void main() {
-    final String methodName = utils.LCUtil.getCurrentMethodName();
-    LOG.debug("entering {}", methodName);
-    // tests locaux
-} // end main
-*/
 } // end class

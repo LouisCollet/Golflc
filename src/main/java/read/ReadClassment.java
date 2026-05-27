@@ -73,24 +73,4 @@ public class ReadClassment implements Serializable {
         return result;
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new ReadClassment().read(player, round, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #read(Player, Round)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        Round round = new Round();
-        round.setIdround(750);
-        round.setRoundHoles(18);
-        round.setRoundStart(0);
-        Classment cl = read(player, round);
-        LOG.debug("Classment = {}", cl);
-    } // end main
-    */
-
 } // end class

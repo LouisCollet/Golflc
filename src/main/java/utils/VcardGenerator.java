@@ -25,7 +25,6 @@ import net.fortuna.ical4j.vcard.Group;
 @RequestScoped
 public class VcardGenerator {
   //   invalidated on 12-11-2024 nouvelle version 2.0.0
-//     @SuppressWarnings("deprecation") à remplacer par @Deprecated ??
  @Inject
     private PlayerManager playerManager;
 // public static Path create(Player player){

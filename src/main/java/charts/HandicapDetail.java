@@ -44,6 +44,4 @@ public class HandicapDetail implements Serializable {
         }
     } // end method
 
-    // @Deprecated bridge removed 2026-02-28 — no callers with Connection conn
-
 } // end class

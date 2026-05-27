@@ -54,23 +54,4 @@ public class CreateOrUpdateScoreStableford implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new CreateOrUpdateScoreStableford().status(..., conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #status(ScoreStableford, Round, Player)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        Round round = new Round();
-        round.setIdround(300);
-        ScoreStableford score = new ScoreStableford();
-        // boolean b = status(score, round, player);
-        LOG.debug("from main, CreateOrUpdateScoreStableford = ");
-    } // end main
-    */
-
 } // end class

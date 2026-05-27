@@ -79,21 +79,4 @@ public class ScoreDifferentialList implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new ScoreDifferentialList().list(player, type, conn))
-    // A supprimer quand tous les appelants seront migres en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #list(Player, String)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        // List<HandicapIndex> li = list(player, ">20");
-        // LOG.debug("nombre items = " + li.size());
-        LOG.debug("from main, ScoreDifferentialList = ");
-    } // end main
-    */
-
 } // end class

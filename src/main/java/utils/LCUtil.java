@@ -1984,19 +1984,6 @@ public static void printWarnings(SQLWarning warning) throws SQLException {
         );
     }
  
-     /**
-     * Version avec classe fournie (pour compatibilité)
-     * @deprecated Utilisez getCurrentMethodName() sans paramètre
-     */
-    @Deprecated
-    public static String getCurrentMethodName(String classe) {
-        return STACK_WALKER.walk(frames -> 
-            frames.skip(1)
-                  .findFirst()
-                  .map(frame -> classe + "." + frame.getMethodName())
-                  .orElse(classe + ".unknown")
-        );
-    }
  /**
      * Récupère nom complet avec infos de ligne (debug)
      */

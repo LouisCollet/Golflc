@@ -84,22 +84,4 @@ public class UpdateInscriptionFinalResult implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new UpdateInscriptionFinalResult().update(player, round, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #update(Player, Round)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        Round round = new Round();
-        round.setIdround(487);
-        boolean b = update(player, round);
-        LOG.debug("update result = {}", b);
-    } // end main
-    */
-
 } // end class

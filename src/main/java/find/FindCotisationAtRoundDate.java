@@ -140,24 +140,4 @@ public class FindCotisationAtRoundDate implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new FindCotisationAtRoundDate().find(..., conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #find(Player, Club, Round)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324715);
-        Round round = new Round();
-        round.setIdround(699);
-        Club club = new Club();
-        club.setIdclub(1006);
-        Cotisation cotisation = find(player, club, round);
-        LOG.debug("cotisation found = " + cotisation);
-    } // end main
-    */
-
 } // end class

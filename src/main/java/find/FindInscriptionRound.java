@@ -60,22 +60,4 @@ public class FindInscriptionRound implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new FindInscriptionRound().find(round, player, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #find(Round, Player)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Round round = new Round();
-        round.setIdround(633);
-        Player player = new Player();
-        player.setIdplayer(324715);
-        boolean b = find(round, player);
-        LOG.debug("inscription found = " + b);
-    } // end main
-    */
-
 } // end class

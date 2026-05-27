@@ -68,20 +68,4 @@ public class RoundPlayersList implements Serializable {
         LOG.debug(methodName + " - cache invalidated");
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new RoundPlayersList().list(round, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #list(Round)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Round round = new Round();
-        round.setIdround(628);
-        List<Player> p1 = list(round);
-        LOG.debug("inscription list = " + p1.toString());
-    } // end main
-    */
-
 } // end class

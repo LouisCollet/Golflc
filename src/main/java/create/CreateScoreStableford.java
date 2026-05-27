@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import utils.LCUtil;
 
 @ApplicationScoped
@@ -35,13 +36,13 @@ public class CreateScoreStableford implements Serializable {
         try (Connection conn = dao.getConnection()) {
 
             final String query = LCUtil.generateInsertQuery(conn, "score");
-            try (PreparedStatement ps = conn.prepareStatement(query)) {
+            try (PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
                 for (ScoreStableford.Score sco : score.getScoreList()) {
                     sql.preparedstatement.psCreateUpdateScoreStableford.psMapCreate(ps, sco, player, round);
                     int row = ps.executeUpdate();
                     if (row != 0) {
-                        score.setIdscore(LCUtil.generatedKey(conn));
+                        score.setIdscore(dao.getGeneratedKey(ps));
                         LOG.debug("inserted score hole={}", sco.getHole());
                     } else {
                         LOG.error("insert score failed for hole={}", sco.getHole());
@@ -56,7 +57,7 @@ public class CreateScoreStableford implements Serializable {
                 }
 
                 LOG.debug("scores created round={} player={} lastScore={}",
-                        round.getIdround(), player.getIdplayer(), LCUtil.generatedKey(conn));
+                        round.getIdround(), player.getIdplayer(), dao.getGeneratedKey(ps));
                 LCUtil.showMessageInfo(LCUtil.prepareMessageBean("score.created")
                         + " — " + player.getPlayerLastName() + " / " + round.getRoundName());
                 return true;
@@ -70,21 +71,5 @@ public class CreateScoreStableford implements Serializable {
             return false;
         }
     } // end method
-
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new CreateScoreStableford().create(..., conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #create(ScoreStableford, Round, Player)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(324713);
-        // boolean b = create(score, round, player);
-        LOG.debug("from main, CreateScoreStableford = ");
-    } // end main
-    */
 
 } // end class

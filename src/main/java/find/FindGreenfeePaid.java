@@ -153,22 +153,4 @@ public class FindGreenfeePaid implements Serializable {
         }
     } // end method
 
-    // ===========================================================================================
-    // BRIDGE — @Deprecated — pour les appelants legacy (new FindGreenfeePaid().find(player, round, conn))
-    // À supprimer quand tous les appelants seront migrés en CDI
-    // ===========================================================================================
-    /** @deprecated Utiliser {@link #find(Player, Round)} via injection CDI */
-    /*
-    void main() throws SQLException {
-        final String methodName = utils.LCUtil.getCurrentMethodName();
-        LOG.debug("entering {}", methodName);
-        Player player = new Player();
-        player.setIdplayer(456781);
-        Round round = new Round();
-        round.setIdround(633);
-        boolean b = find(player, round);
-        LOG.debug("result findGreenfeePaid = " + b);
-    } // end main
-    */
-
 } // end class
