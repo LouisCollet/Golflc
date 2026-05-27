@@ -40,7 +40,6 @@ import net.fortuna.ical4j.model.property.immutable.ImmutableCalScale;
 import net.fortuna.ical4j.model.property.immutable.ImmutableVersion;
 import net.fortuna.ical4j.util.CompatibilityHints;
 import net.fortuna.ical4j.util.RandomUidGenerator;
-// ✅ SUPPRIMÉ : import connection_package.DBConnection;
 // ✅ SUPPRIMÉ : import java.sql.Connection;
 // ✅ SUPPRIMÉ : import java.sql.SQLException;
 import utils.LCUtil;

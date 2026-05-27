@@ -1,6 +1,5 @@
 package utils;
 
-// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import Controllers.LanguageController;
 import entite.Player;
 import static interfaces.Log.LOG;

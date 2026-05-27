@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
-// ✅ SUPPRIMÉ : import connection_package.DBConnection;
 // ✅ SUPPRIMÉ : import java.sql.Connection;
 
 @ApplicationScoped

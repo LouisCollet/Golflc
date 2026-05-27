@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import net.fortuna.ical4j.util.MapTimeZoneCache;
-// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import jakarta.inject.Inject;
 import static utils.LCUtil.showMessageFatal;
 

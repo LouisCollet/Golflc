@@ -15,7 +15,6 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import utils.LCUtil;
 
 @jakarta.enterprise.context.ApplicationScoped

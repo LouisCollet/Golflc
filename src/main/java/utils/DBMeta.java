@@ -1,6 +1,5 @@
 package utils;
 
-// import connection_package.DBConnection; // removed 2026-02-26 — CDI migration
 import static interfaces.Log.LOG;
 import static interfaces.Log.NEW_LINE;
 import java.net.InetAddress;
