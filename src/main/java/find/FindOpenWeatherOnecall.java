@@ -73,7 +73,7 @@ private final HttpClient httpClient = HttpClient.newBuilder()
        HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(string_url))
-                .setHeader("User-Agent", "Java 11 HttpClient Bot")
+                .setHeader("User-Agent", interfaces.GolfInterface.HTTP_USER_AGENT)
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
       

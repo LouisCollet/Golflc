@@ -12,6 +12,7 @@ import java.util.Locale;
 
 public interface GolfInterface{ 
  //  lso, the variables declared in an interface are public, static & final by default 
+String HTTP_USER_AGENT = "GolfLC/" + System.getProperty("java.version") + " HttpClient";
 String EMPTY_STRING = "";
  String NULL_STRING = "null";
  String ARRAY_START = "{";

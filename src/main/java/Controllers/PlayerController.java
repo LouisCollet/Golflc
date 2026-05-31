@@ -965,6 +965,10 @@ public class PlayerController implements Serializable {
             if (homeClubId == null || homeClubId <= 0) {
                 return "";
             }
+            entite.Club sessionClub = appContext.getClub();
+            if (homeClubId.equals(sessionClub.getIdclub()) && sessionClub.getClubName() != null) {
+                return sessionClub.getClubName();
+            }
             entite.Club club = new entite.Club();
             club.setIdclub(homeClubId);
             club = readClubService.read(club);

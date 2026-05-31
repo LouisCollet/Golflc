@@ -176,7 +176,7 @@ public class HttpController implements Serializable {
             HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(strJson))
                 .uri(uri) // migrated 2026-03-28 — URI now carries return_url query param
-                .setHeader("User-Agent", "Java 11 HttpClient Bot")
+                .setHeader("User-Agent", interfaces.GolfInterface.HTTP_USER_AGENT)
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .version(HttpClient.Version.HTTP_1_1)
